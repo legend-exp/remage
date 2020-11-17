@@ -55,20 +55,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # all the code is located under src/
 add_subdirectory(src)
 # add_subdirectory(data)
+add_subdirectory(doc)
 
-option(BUILD_DOCS "Build ${CMAKE_PROJECT_NAME} documents" OFF)
-if(BUILD_DOCS)
-    add_subdirectory(doc)
-else()
-    message(STATUS "Building of documents disabled")
-endif()
-
-option(BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} test suite" OFF)
-if(BUILD_TESTS)
-    message(STATUS "Building of test suite enabled")
-    enable_testing()
-    add_subdirectory(test)
-endif()
+# option(BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} test suite" OFF)
+# if(BUILD_TESTS)
+#     message(STATUS "Building of test suite enabled")
+#     enable_testing()
+#     add_subdirectory(test)
+# endif()
 
 # get project version infos
 include(GetVersionInfo)

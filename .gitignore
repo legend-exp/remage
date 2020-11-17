@@ -1,4 +1,6 @@
 /src/io/include/ProjectInfo.hh
+/doc/html
+/doc/latex
 
 # junk
 *.DS_Store
