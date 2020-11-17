@@ -1,0 +1,6 @@
+/src/io/include/ProjectInfo.hh
+
+# junk
+*.DS_Store
+*.swp
+*.swo
