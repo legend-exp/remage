@@ -12,65 +12,65 @@
 #endif
 #define MGLog(sev) MGLogger::msg( MGLogger::sev, __FILE__ "(" ERRLINE_HACK_2(__LINE__) ")")
 
+/** Logging utilities.  The `MGLog(severity)` function returns an output stream
+ * to which log messages should be sent. The message must be terminated with
+ * `endlog`.
+ * ```
+ * MGLog(routine) << "This is a routine message." << endlog;
+ * ```
+ */
 class MGLogger {
 
   public:
 
-  // a severity enum is defined; use only these values
-  enum Severity {debugging=-1, trace=0, routine, warning, error, fatal};
-  //  fatal: The message is related to a condition preventing
-  //    further execution of the program. ErrLogger will
-  //    terminate the program.Programmers should not call
-  //    abort or exit themselves.
-  //
-  //  error: A condition exists such that requested result
-  //    or action can not be produced. This is a serious
-  //
-  //  warning: The result is produced, but may not be
-  //    what's desired due to an unexpected condition
-  //
-  //  routine: Nothing known to be wrong with the result;
-  //    messages that are always produced in normal
-  //    operation
-  //
-  //  trace: Messages about the flow of program control
-  //    and which optional operations took place.
-  //    (This is the default if nothing is defined)
-  //
-  //  debugging: Information in addition to the above
+    /** Type of log message.
+     * To be specified for every message printed on screen.
+     */
+    enum Severity {
+      debugging = -1, /**< Maximum information about the program flow, technical information about low-level operations */
+      trace = 0,      /**< Detailed information about the program flow and which operations took place */
+      routine,        /**< Summary information about the program flow, execution of main routines */
+      warning,        /**< The result is produced, but may not be what's desired due to an unexpected condition */
+      error,          /**< Something went wrong. The issue is serious but the execution might proceed on a different path */
+      fatal           /**< The message is related to a condition preventing further execution of the program. `abort()` is automatically called */
+    };
 
-  static Severity GetSeverity() { return min_severity_; }
-  static std::ostream& msg(MGLogger::Severity severity,
-                           std::string facility);
+    /** Set minimum severity of messages to be actually printed on screen */
+    static void SetSeverity(Severity sever) { min_severity_ = sever; }
+    /** Get current minimum logging severity */
+    static Severity GetSeverity() { return min_severity_; }
 
-  static void SetSeverity(Severity sever) { min_severity_ = sever; }
-  static void endlog(std::ostream& s);
+    /** Get current version of the software suite */
+    static const std::string GetProjectVersion();
+    /** Switch to colorized log messages (default = true) */
+    static void SetColorOutput(bool val) { color_output_ = val; }
 
-  static const std::string GetProjectVersion();
-
-  static void SetColorOutput(bool val) { color_output_ = val; }
+    static std::ostream& msg(MGLogger::Severity severity, std::string facility);
+    static void endlog(std::ostream& s);
 
   protected:
 
-  MGLogger();
-  MGLogger(const MGLogger &);
-  ~MGLogger();
+    MGLogger();
+    MGLogger(const MGLogger &);
+    ~MGLogger();
 
   private:
 
-  static std::string to_string(Severity);
+    static std::string to_string(Severity);
 
-  static std::ostream* outstream_;
-  static std::ostream* errstream_;
-  static std::ostream* nullstream_;
+    static std::ostream* outstream_;
+    static std::ostream* errstream_;
+    static std::ostream* nullstream_;
 
-  static Severity min_severity_;
+    static Severity min_severity_;
 
-  static bool color_output_;
-  static bool do_print_;
-  static bool is_fatal_;
+    static bool color_output_;
+    static bool do_print_;
+    static bool is_fatal_;
 };
 
 std::ostream& endlog(std::ostream& s);
 
 #endif
+
+// vim: tabstop=2 shiftwidth=2 expandtab

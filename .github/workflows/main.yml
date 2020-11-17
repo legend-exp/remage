@@ -47,9 +47,9 @@ jobs:
     needs: test_in_legend_container
 
     steps:
-      - name: Start Doxygen build
-        run: make docs
-
-    container: docker://legendexp/legend-base:latest
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen
+      - name: Build docs with Doxygen
+        run: make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2
