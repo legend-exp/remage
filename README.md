@@ -1,5 +1,7 @@
 # remage - simulation framework for HPGe-based experiments
 
+![CI](https://github.com/gipert/remage/workflows/CI/badge.svg)
+
 Wrok in progress...
 
 ### Prerequisites

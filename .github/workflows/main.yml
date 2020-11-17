@@ -37,7 +37,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Get dependencies
-      run: brew install root geant4
+      run: brew install --force-bottle root geant4
     - name: Build project
       run: .github/workflows/build.sh
 
