@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+
+  in_legend_container:
+    name: Test in LEGEND container
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        container_version:
+        - latest
+        # - ...
+
+    container: docker://legendexp/legend-base:${{ matrix.container_version }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build project
+      run: |
+        cd ..; mkdir build; cd build
+        cmake ../remage
+        make
+        make install
+
+  on_macos:
+    name: Test on macOS
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get dependencies
+      run: |
+        brew install root geant4
+    - name: Build project
+      run: |
+        cd ..; mkdir build; cd build
+        cmake ../remage
+        make
+        make install
+
+# vim: expandtab tabstop=2 shiftwidth=2
