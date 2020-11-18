@@ -1,16 +1,13 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
-    # processes/MGProcessesList.cc
-    # processes/MGProcessesMaxTimeCuts.cc
-    # processes/MGProcessesMessenger.cc
-    # processes/MGProcessesMinEkineCuts.cc
-    # processes/MGProcessesSpecialCuts.cc
-    # processes/MGUIcmdStepLimit.cc
+    processes/MGProcessesList.cc
+    processes/MGProcessesMessenger.cc
+    processes/MGUIcmdStepLimit.cc
     io/MGLogger.cc)
 
 # TODO: list here manually all project sub-directories
 set(COMPONENTS
-    # processes
+    processes
     io)
 
 if(${PROJECT_VERSION} NOT EQUAL "unknown")

@@ -41,15 +41,15 @@ jobs:
     - name: Build project
       run: .github/workflows/build.sh
 
-  build_docs:
-    name: Build and deploy documentation
-    runs-on: ubuntu-latest
-    needs: test_in_legend_container
+  # build_docs:
+  #   name: Build and deploy documentation
+  #   runs-on: ubuntu-latest
+  #   needs: test_in_legend_container
 
-    steps:
-      - name: Install Doxygen
-        run: sudo apt-get install -y doxygen
-      - name: Build docs with Doxygen
-        run: make doc
+  #   steps:
+  #     - name: Install Doxygen
+  #       run: sudo apt-get install -y doxygen
+  #     - name: Build docs with Doxygen
+  #       run: make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2
