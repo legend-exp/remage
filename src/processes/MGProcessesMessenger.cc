@@ -1,7 +1,6 @@
 #include "MGProcessesMessenger.hh"
 #include "MGProcessesList.hh"
 #include "MGUIcmdStepLimit.hh"
-#include "MGLogger.hh"
 // #include "MGManager.hh"
 // #include "MGManagerDetectorConstruction.hh"
 

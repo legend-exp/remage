@@ -3,11 +3,14 @@ add_library(${PROJECT_TARNAME} SHARED
     processes/MGProcessesList.cc
     processes/MGProcessesMessenger.cc
     processes/MGUIcmdStepLimit.cc
-    io/MGLogger.cc)
+    generators/MGGeneratorUtil.cc
+    # generators/MGGeneratorPrimary.cc
+    io/MGLog.cc)
 
 # TODO: list here manually all project sub-directories
 set(COMPONENTS
     processes
+    generators
     io)
 
 if(${PROJECT_VERSION} NOT EQUAL "unknown")

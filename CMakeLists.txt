@@ -35,6 +35,12 @@ endif()
 # Define useful ROOT functions and macros
 include(${ROOT_USE_FILE})
 
+# # find BxDecay0
+# find_package(BxDecay0 1.0 REQUIRED)
+# if(BxDecay0_FOUND)
+#     message(STATUS "Found BxDecay0 - v" ${BxDecay0_VERSION})
+# endif()
+
 # Find Geant4
 option(WITH_GEANT4_UIVIS "Build ${CMAKE_PROJECT_NAME} with Geant4 UI and Vis drivers" ON)
 if(WITH_GEANT4_UIVIS)
@@ -55,7 +61,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # all the code is located under src/
 add_subdirectory(src)
 # add_subdirectory(data)
-add_subdirectory(doc)
+# add_subdirectory(doc)
 
 # option(BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} test suite" OFF)
 # if(BUILD_TESTS)
