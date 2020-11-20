@@ -9,6 +9,7 @@ Simulation framework for germanium detector experiments
 🚧 Work in progress...
 
 <p></p>
+
 ### Prerequisites
 * [CMake]() (≥ v3.0) — Build time dependency
 * [ROOT](https://root.cern.ch) (≥ v6.06) — Built with CMake and `xml=ON`
