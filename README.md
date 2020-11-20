@@ -1,9 +1,14 @@
-# remage - simulation framework for HPGe-based experiments
+<img src=".github/remage-logo.png" alt="remage logo" align="left" height="200">
+
+# remage
+
+Simulation framework for germanium detector experiments
 
 ![CI](https://github.com/gipert/remage/workflows/CI/badge.svg)
 
-Wrok in progress...
+🚧 Work in progress...
 
+<p></p>
 ### Prerequisites
 * [CMake]() (≥ v3.0) — Build time dependency
 * [ROOT](https://root.cern.ch) (≥ v6.06) — Built with CMake and `xml=ON`
