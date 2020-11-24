@@ -2,8 +2,6 @@
 
 #include "Randomize.hh"
 
-#include "CLHEP/Units/SystemOfUnits.h"
-
 G4ThreeVector MGGeneratorUtil::pick_isotropic() {
 
   G4double phi       = M_PI * G4UniformRand();

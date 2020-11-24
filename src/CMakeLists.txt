@@ -1,17 +1,29 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
+    generators/MGGeneratorUtil.cc
+    # generators/MGGeneratorPrimary.cc
+    io/MGLog.cc
+    io/MGVOutputManager.cc
+    management/MGManagementEventAction.cc
+    management/MGManagementEventActionMessenger.cc
+    management/MGManagementRunAction.cc
+    management/MGManagementStackingAction.cc
+    management/MGManagementSteppingAction.cc
+    management/MGManagementTrackingAction.cc
+    management/MGManager.cc
+    management/MGManagerMessenger.cc
     processes/MGProcessesList.cc
     processes/MGProcessesMessenger.cc
     processes/MGUIcmdStepLimit.cc
-    generators/MGGeneratorUtil.cc
-    # generators/MGGeneratorPrimary.cc
-    io/MGLog.cc)
+)
 
 # TODO: list here manually all project sub-directories
 set(COMPONENTS
-    processes
     generators
-    io)
+    io
+    management
+    processes
+)
 
 if(${PROJECT_VERSION} NOT EQUAL "unknown")
 set_target_properties(${PROJECT_TARNAME} PROPERTIES
