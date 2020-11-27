@@ -122,9 +122,9 @@ void MGProcessesList::ConstructProcess() {
   }
 
   if (fUseOpticalPhysOnly) {
-    MGLog::OutDetail("Constucting optical processes");
+    MGLog::Out(MGLog::detail, "Constucting optical processes");
     ConstructOp();
-    MGLog::OutDetail("Constucting Cerenkov processes");
+    MGLog::Out(MGLog::detail, "Constucting Cerenkov processes");
     ConstructCerenkov();
     return;
   }
@@ -136,36 +136,36 @@ void MGProcessesList::ConstructProcess() {
       // from https://geant4.web.cern.ch/node/1731
       case 1:
         em_constructor = new G4EmStandardPhysics_option1(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using EmPhysics Option 1");
+        MGLog::Out(MGLog::detail, "Using EmPhysics Option 1");
         break;
       case 2:
         em_constructor = new G4EmStandardPhysics_option2(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using EmPhysics Option 2");
+        MGLog::Out(MGLog::detail, "Using EmPhysics Option 2");
         break;
       case 3:
         em_constructor = new G4EmStandardPhysics_option3(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using EmPhysics Option 3");
+        MGLog::Out(MGLog::detail, "Using EmPhysics Option 3");
         break;
       case 4:
         em_constructor = new G4EmStandardPhysics_option4(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using EmPhysics Option 4");
+        MGLog::Out(MGLog::detail, "Using EmPhysics Option 4");
         break;
       case 5:
         em_constructor = new G4EmPenelopePhysics(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using Penelope Physics");
+        MGLog::Out(MGLog::detail, "Using Penelope Physics");
         break;
       case 6:
         em_constructor = new G4EmLivermorePolarizedPhysics(G4VModularPhysicsList::verboseLevel);
-        MGLog::OutDetail("Using Livermore-Polarized Physics");
+        MGLog::Out(MGLog::detail, "Using Livermore-Polarized Physics");
         break;
       default:
-        MGLog::OutDetail("Using Livermore/LowEnergy electromagnetic physics");
+        MGLog::Out(MGLog::detail, "Using Livermore/LowEnergy electromagnetic physics");
         em_constructor = new G4EmLivermorePhysics(G4VModularPhysicsList::verboseLevel);
         break;
     }
   }
   else {
-    MGLog::OutDetail("Using Standard electromagnetic physics");
+    MGLog::Out(MGLog::detail, "Using Standard electromagnetic physics");
     em_constructor = new G4EmStandardPhysics(G4VModularPhysicsList::verboseLevel);
   }
 
@@ -181,24 +181,24 @@ void MGProcessesList::ConstructProcess() {
   em_extra_physics->ConstructProcess();
 
   if (fConstructOptical) {
-    MGLog::OutDetail("Constucting optical processes");
+    MGLog::Out(MGLog::detail, "Constucting optical processes");
     this->ConstructOp();
-    MGLog::OutDetail("Constucting cerenkov processes");
+    MGLog::Out(MGLog::detail, "Constucting cerenkov processes");
     this->ConstructCerenkov();
   }
   else {
-    MGLog::OutSummary("Processes for Optical Photons are inactivated");
+    MGLog::Out(MGLog::summary, "Processes for Optical Photons are inactivated");
   }
-  MGLog::OutDetail("Finished optical contstruction physics");
+  MGLog::Out(MGLog::detail, "Finished optical contstruction physics");
 
   // Add decays
   auto decay_physics = new G4DecayPhysics(G4VModularPhysicsList::verboseLevel);
   decay_physics->ConstructProcess();
   auto rad_decay_physics = new G4RadioactiveDecayPhysics(G4VModularPhysicsList::verboseLevel);
   rad_decay_physics->ConstructProcess();
-  MGLog::OutDetail("finished decays processes construction");
+  MGLog::Out(MGLog::detail, "finished decays processes construction");
   const G4IonTable* the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
-  MGLog::OutDetail("entries in ion table "+ G4String(the_ion_table->Entries()));
+  MGLog::Out(MGLog::detail, "entries in ion table "+ G4String(the_ion_table->Entries()));
 
   // Assign manually triton decay
   for (G4int i = 0; i < the_ion_table->Entries(); i++) {
@@ -207,7 +207,7 @@ void MGProcessesList::ConstructProcess() {
     // follow http://hypernews.slac.stanford.edu/HyperNews/geant4/get/hadronprocess/1538/1.html
 
     if (particle == G4Triton::Definition()) {
-      MGLog::OutDetail(" found trition particle ");
+      MGLog::Out(MGLog::detail, " found trition particle ");
       particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*second);
       particle->SetPDGStable(false);
       auto proc_manager = particle->GetProcessManager();
@@ -223,7 +223,7 @@ void MGProcessesList::ConstructProcess() {
       proc_manager->AddProcess(new G4RadioactiveDecay(), 1000, -1, 1000);
     }
   }
-  MGLog::OutDetail("finsihed triton decay processes construction");
+  MGLog::Out(MGLog::detail, "finsihed triton decay processes construction");
 
   this->DumpPhysicsList();
 
@@ -249,7 +249,7 @@ void MGProcessesList::AddTransportation() {
     // step limits
     if(fLimitSteps[particle_name]) {
       proc_manager->AddProcess(new G4StepLimiter, -1, -1, 3);
-      MGLog::OutDetail("Steps will be limited for " + particle_name);
+      MGLog::Out(MGLog::detail, "Steps will be limited for " + particle_name);
     }
   }
 }
@@ -374,7 +374,7 @@ void MGProcessesList::SetCuts() {
       // Set different cuts for the sensitive region
       auto region = G4RegionStore::GetInstance()->GetRegion("SensitiveRegion", false);
       if (region) {
-        MGLog::OutDetail("Register cuts for SensitiveRegion ");
+        MGLog::Out(MGLog::detail, "Register cuts for SensitiveRegion ");
         auto cuts = region->GetProductionCuts();
         if (!cuts) cuts = new G4ProductionCuts; // zero pointer --> cuts not defined yet
         cuts->SetProductionCut(fCutForGammaSensitive, "gamma");
@@ -387,12 +387,12 @@ void MGProcessesList::SetCuts() {
       }
     }
   }
-  MGLog::OutDetail("Production cuts set");
+  MGLog::Out(MGLog::detail, "Production cuts set");
 }
 
 void MGProcessesList::SetRealm(G4String realm) {
   if (realm == "BBdecay") {
-    MGLog::OutSummary("Realm set to BBdecay");
+    MGLog::Out(MGLog::summary, "Realm set to BBdecay");
     fCutForGamma             = 0.1*mm;
     fCutForElectron          = 0.1*mm;
     fCutForPositron          = 0.1*mm;
@@ -405,7 +405,7 @@ void MGProcessesList::SetRealm(G4String realm) {
     this->SetCuts();
   }
   else if (realm == "DarkMatter") {
-    MGLog::OutSummary("Realm set to DarkMatter");
+    MGLog::Out(MGLog::summary, "Realm set to DarkMatter");
     // These values are tuned to ~1 keV for gamma, e+, e- in
     // natural germanium.
     fCutForGamma             = 0.005*mm;
@@ -420,7 +420,7 @@ void MGProcessesList::SetRealm(G4String realm) {
     this->SetCuts();
   }
   else if (realm == "CosmicRays") {
-    MGLog::OutSummary("Realm set to CosmicRays (cut-per-region)");
+    MGLog::Out(MGLog::summary, "Realm set to CosmicRays (cut-per-region)");
     fCutForGamma             = 5*cm;
     fCutForElectron          = 1*cm;
     fCutForPositron          = 1*cm;
@@ -433,7 +433,7 @@ void MGProcessesList::SetRealm(G4String realm) {
     this->SetCuts();
   }
   else {
-    MGLog::OutError("Error: invalid energy cut realm \"" + realm + "\"." +
+    MGLog::Out(MGLog::error, "Error: invalid energy cut realm \"" + realm + "\"." +
                     "Must use either \"BBdecay\" or \"DarkMatter\".");
   }
 }
@@ -454,37 +454,37 @@ void MGProcessesList::ConstructCerenkov() {
 }
 
 // void MGProcessesList::DumpPhysicsList() {
-//   MGLog::OutDetail("====================================================================");
-//   MGLog::OutDetail("                      MaGe physics list                             ");
-//   MGLog::OutDetail("====================================================================");
-//   if (useLowE)  MGLog::OutDetail("Electromagnetic physics: Livermore/LowEnergy ");
-//   else MGLog::OutDetail("Electromagnetic physics: Standard ");
-//   MGLog::OutDetail("====================================================================");
+//   MGLog::Out(MGLog::detail, "====================================================================");
+//   MGLog::Out(MGLog::detail, "                      MaGe physics list                             ");
+//   MGLog::Out(MGLog::detail, "====================================================================");
+//   if (useLowE)  MGLog::Out(MGLog::detail, "Electromagnetic physics: Livermore/LowEnergy ");
+//   else MGLog::Out(MGLog::detail, "Electromagnetic physics: Standard ");
+//   MGLog::Out(MGLog::detail, "====================================================================");
 
-//   if (constructOptical) MGLog::OutDetail("Physics for optical photons registered");
-//   else MGLog::OutDetail("No processes activated for optical photons");
-//   MGLog::OutDetail("====================================================================");
+//   if (constructOptical) MGLog::Out(MGLog::detail, "Physics for optical photons registered");
+//   else MGLog::Out(MGLog::detail, "No processes activated for optical photons");
+//   MGLog::Out(MGLog::detail, "====================================================================");
 
 //   if (fUseNoHadPhysFlag) {
-//     MGLog::OutDetail("No processes activated for hadrons");
-//     MGLog::OutDetail("====================================================================");
+//     MGLog::Out(MGLog::detail, "No processes activated for hadrons");
+//     MGLog::Out(MGLog::detail, "====================================================================");
 //     return;
 //   }
-//   MGLog::OutDetail(physics_list_hadrons_);
-//   MGLog::OutDetail("====================================================================");
+//   MGLog::Out(MGLog::detail, physics_list_hadrons_);
+//   MGLog::Out(MGLog::detail, "====================================================================");
 //   return;
 // }
 
 void MGProcessesList::GetStepLimits() {
   this->DumpPhysicsList();
-  MGLog::OutDetail("========================Show limits ================================");
-  MGLog::OutDetail(" gamma " + G4String(G4VModularPhysicsList::GetCutValue("gamma")) + "keV");
-  MGLog::OutDetail(" e-    " + G4String(GetCutValue("e-")) + "keV");
-  MGLog::OutDetail(" e+    " + G4String(GetCutValue("e+")) + "keV");
-  MGLog::OutDetail(" p     " + G4String(GetCutValue("proton")) + "keV");
-  MGLog::OutDetail(" alpha " + G4String(GetCutValue("alpha")) +"keV");
-  MGLog::OutDetail(" Ion   " + G4String(GetCutValue("GenericIon")) + "keV");
-  MGLog::OutDetail("====================================================================");
+  MGLog::Out(MGLog::detail, "========================Show limits ================================");
+  MGLog::Out(MGLog::detail, " gamma " + G4String(G4VModularPhysicsList::GetCutValue("gamma")) + "keV");
+  MGLog::Out(MGLog::detail, " e-    " + G4String(GetCutValue("e-")) + "keV");
+  MGLog::Out(MGLog::detail, " e+    " + G4String(GetCutValue("e+")) + "keV");
+  MGLog::Out(MGLog::detail, " p     " + G4String(GetCutValue("proton")) + "keV");
+  MGLog::Out(MGLog::detail, " alpha " + G4String(GetCutValue("alpha")) +"keV");
+  MGLog::Out(MGLog::detail, " Ion   " + G4String(GetCutValue("GenericIon")) + "keV");
+  MGLog::Out(MGLog::detail, "====================================================================");
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

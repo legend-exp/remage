@@ -66,19 +66,19 @@ void MGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
     else if (new_values == "warning") MGLog::SetLogLevelScreen(MGLog::warning);
     else if (new_values == "error"  ) MGLog::SetLogLevelScreen(MGLog::error);
     else if (new_values == "fatal"  ) MGLog::SetLogLevelScreen(MGLog::fatal);
-    else MGLog::OutError("Unknown option.");
+    else MGLog::Out(MGLog::error, "Unknown option.");
   }
   else if (cmd == fHEPRandomSeedCmd) {
 
     G4long seed = std::stol(new_values);
 
     if (seed >= std::numeric_limits<long>::max()) {
-      MGLog::OutError("Seed " + new_values + " is too large. Largest possible seed is " +
-                      std::to_string(std::numeric_limits<long>::max()) + ". Setting seed to 0.");
+      MGLog::Out(MGLog::error, "Seed ", new_values, " is too large. Largest possible seed is ",
+          std::numeric_limits<long>::max(), ". Setting seed to 0.");
       CLHEP::HepRandom::setTheSeed(0);
     }
     else CLHEP::HepRandom::setTheSeed(seed);
-    MGLog::OutSummary("CLHEP::HepRandom seed set to: " + G4String(seed));
+    MGLog::Out(MGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
     MGManager::GetMGManager()->GetMGRunAction()->SetControlledRandomization();
   }
   else if (cmd == fUseInternalSeedCmd) {
@@ -91,18 +91,18 @@ void MGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
 
     int array_index = index % 2;
     CLHEP::HepRandom::setTheSeed(seeds[array_index]);
-    MGLog::OutSummary("CLHEP::HepRandom seed set to: " + std::to_string(seeds[array_index]));
+    MGLog::Out(MGLog::summary, "CLHEP::HepRandom seed set to: ", seeds[array_index]);
     MGManager::GetMGManager()->GetMGRunAction()->SetControlledRandomization();
   }
   else if (cmd == fSeedWithDevRandomCmd) {
 
     std::ifstream devrandom("/dev/random");
     if (devrandom.bad()) {
-      MGLog::OutWarning("Couldn't open /dev/random. Setting seed to 0.");
+      MGLog::Out(MGLog::warning, "Couldn't open /dev/random. Setting seed to 0.");
       CLHEP::HepRandom::setTheSeed(0);
     }
     else {
-      MGLog::OutDebug("Reading a seed from /dev/random...");
+      MGLog::Out(MGLog::debug, "Reading a seed from /dev/random...");
       long seed;
       devrandom.read((char*)(&seed), sizeof(long));
 
@@ -113,7 +113,7 @@ void MGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
       if (seed < 0) seed = -seed;
 
       CLHEP::HepRandom::setTheSeed(seed);
-      MGLog::OutSummary("CLHEP::HepRandom seed set to: " + G4String(seed));
+      MGLog::Out(MGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
       MGManager::GetMGManager()->GetMGRunAction()->SetControlledRandomization();
     }
     devrandom.close();
@@ -122,20 +122,20 @@ void MGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
 
     if (new_values == "JamesRandom") {
       CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
-      MGLog::OutSummary("Using James engine.");
+      MGLog::Out(MGLog::summary, "Using James engine.");
     }
     else if (new_values == "RanLux") {
       CLHEP::HepRandom::setTheEngine(new CLHEP::RanluxEngine);
-      MGLog::OutSummary("Using RanLux engine.");
+      MGLog::Out(MGLog::summary, "Using RanLux engine.");
     }
     else if (new_values == "MTwist") {
       CLHEP::HepRandom::setTheEngine(new CLHEP::MTwistEngine);
-      MGLog::OutSummary("Using MTwist engine.");
+      MGLog::Out(MGLog::summary, "Using MTwist engine.");
     }
     else {
       CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
-      MGLog::OutError(new_values + " engine unknown, setting default engine.");
-      MGLog::OutSummary("Using James engine.");
+      MGLog::Out(MGLog::error, new_values, " engine unknown, setting default engine.");
+      MGLog::Out(MGLog::summary, "Using James engine.");
     }
   }
 }

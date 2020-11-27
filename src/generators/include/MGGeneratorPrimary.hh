@@ -3,17 +3,13 @@
 
 #include <vector>
 
-#include "Rtypes.h"
 #include "globals.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ThreeVector.hh"
 
-class TChain;
 class MGVGenerator;
 class MGGeneratorPrimaryMessenger;
 class MGGeneratorPositionSampling;
-class MGGeneratorPositionSamplingGeometrical;
-class MGGeneratorPositionSamplingDetectorShell;
 class MGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
   public:
@@ -22,45 +18,42 @@ class MGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
       noconfined,
       volume,
       volumelist,
-      volumearray,
-      surface,
-      surfacelist,
-      geometricalvolume,
-      geometricalsurface,
-      detectorshell
+      volumearray
     };
 
     MGGeneratorPrimary();
     ~MGGeneratorPrimary();
 
-    void GeneratePrimaries(G4Event *event);
+    MGGeneratorPrimary           (MGGeneratorPrimary const&) = delete;
+    MGGeneratorPrimary& operator=(MGGeneratorPrimary const&) = delete;
+    MGGeneratorPrimary           (MGGeneratorPrimary&&)      = delete;
+    MGGeneratorPrimary& operator=(MGGeneratorPrimary&&)      = delete;
 
-    MGVGenerator*    GetMGGenerator()            { return fMGGenerator;            }
-    G4String         GetVolumeName()             { return fVolumeName;             }
-    EConfinementCode GetConfinementCode()        { return fConfinementCode;        }
-    G4String         GetVolumeListName()         { return fVolumeListName;         }
-    G4int            GetVolumeListFrom()         { return fVolumeListFrom;         }
-    G4int            GetVolumeListTo()           { return fVolumeListTo;           }
-    G4bool           GetVolumeListInitialized()  { return fVolumeListInitialized;  }
-    G4bool           GetVolumeArrayInitialized() { return fVolumeArrayInitialized; }
-    G4ThreeVector    GetParticlePosition()       { return fPosition;               }
+    void GeneratePrimaries(G4Event *event) override;
+
+    inline MGVGenerator*    GetMGGenerator()            { return fMGGenerator;            }
+    inline G4String         GetVolumeName()             { return fVolumeName;             }
+    inline EConfinementCode GetConfinementCode()        { return fConfinementCode;        }
+    inline G4String         GetVolumeListName()         { return fVolumeListName;         }
+    inline G4int            GetVolumeListFrom()         { return fVolumeListFrom;         }
+    inline G4int            GetVolumeListTo()           { return fVolumeListTo;           }
+    inline G4bool           GetVolumeListInitialized()  { return fVolumeListInitialized;  }
+    inline G4bool           GetVolumeArrayInitialized() { return fVolumeArrayInitialized; }
+    inline G4ThreeVector    GetParticlePosition()       { return fPosition;               }
 
     void SetConfinementCode(EConfinementCode code);
-    void SetMGGenerator(MGVGenerator* gene)         { fMGGenerator = gene;              }
-    void SetVolumeName(G4String name)               { fVolumeName = name;               }
-    void SetVolumeListName(G4String name)           { fVolumeListName = name;           }
-    void SetVolumeListFrom(G4int n)                 { fVolumeListFrom = n;              }
-    void SetVolumeListTo(G4int n)                   { fVolumeListTo = n;                }
-    void SetVolumeListInitialized(G4bool val)       { fVolumeListInitialized = val;     }
-    void SetVolumeArrayInitialized(G4bool val)      { fVolumeArrayInitialized = val;    }
-    void SetParticlePosition(G4ThreeVector vec)     { fPosition = vec;                  }
-    void SetGSSOffset(G4double GSSOffset)           { fGSSOffset = GSSOffset;           }
-    void SetGSSEventNumber(Long64_t GSSEventNumber) { fGSSEventNumber = GSSEventNumber; }
+    inline void SetMGGenerator(MGVGenerator* gene)         { fMGGenerator = gene;              }
+    inline void SetVolumeName(G4String name)               { fVolumeName = name;               }
+    inline void SetVolumeListName(G4String name)           { fVolumeListName = name;           }
+    inline void SetVolumeListFrom(G4int n)                 { fVolumeListFrom = n;              }
+    inline void SetVolumeListTo(G4int n)                   { fVolumeListTo = n;                }
+    inline void SetVolumeListInitialized(G4bool val)       { fVolumeListInitialized = val;     }
+    inline void SetVolumeArrayInitialized(G4bool val)      { fVolumeArrayInitialized = val;    }
+    inline void SetParticlePosition(G4ThreeVector& vec)    { fPosition = vec;                  }
 
     void AddVolumeNumberToList(G4int nnn);
     void AddVolumeNameToArray(G4String pname);
-    void AddGSSFile(const char* filename);
-    void ClearList();
+    inline void ClearList() { fIDVolumeList.clear(); }
 
   private:
 
@@ -74,8 +67,6 @@ class MGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
     MGGeneratorPrimaryMessenger*              fG4Messenger;
     G4ThreeVector                             fPosition;
     MGGeneratorPositionSampling*              fPositionSampler;
-    MGGeneratorPositionSamplingGeometrical*   fPositionSamplerGeometrical;
-    MGGeneratorPositionSamplingDetectorShell* fPositionSamplerDetectorShell;
     G4String                                  fVolumeName;
     G4String                                  fVolumeListName;
     G4int                                     fVolumeListFrom;
@@ -86,9 +77,6 @@ class MGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
     std::vector<G4int>                        fIDVolumeList;
     std::vector<G4double>                     fMassFractionForVolumeArray;
     std::vector<G4String>                     fIDVolumeArray;
-    G4double                                  fGSSOffset;
-    Long64_t                                  fGSSEventNumber;
-    TChain*                                   fGSSChain;
 };
 
 #endif

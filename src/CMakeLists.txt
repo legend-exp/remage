@@ -1,7 +1,8 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
     generators/MGGeneratorUtil.cc
-    # generators/MGGeneratorPrimary.cc
+    generators/MGGeneratorPrimary.cc
+    generators/MGGeneratorPrimaryMessenger.cc
     io/MGLog.cc
     io/MGVOutputManager.cc
     management/MGManagementEventAction.cc

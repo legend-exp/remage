@@ -22,29 +22,10 @@
 
 // ---------------------------------------------------------
 
-/**
- * Macros to output a message to the log including the class and method name.
- */
-#define MGLOG_INTERNAL_OUT(t, s) \
-    do {\
-    MGLog:: t \
-      (std::string(__PRETTY_FUNCTION__) + ": " + s); \
-    } while (false)
-
-#define MGLOG_DEBUG(s)   MGLOG_INTERNAL_OUT(OutDebug, s)
-
-#define MGLOG_DETAIL(s)  MGLOG_INTERNAL_OUT(OutDetail, s)
-
-#define MGLOG_ERROR(s)   MGLOG_INTERNAL_OUT(OutError, s)
-
-#define MGLOG_SUMMARY(s) MGLOG_INTERNAL_OUT(OutSummary, s)
-
-#define MGLOG_WARNING(s) MGLOG_INTERNAL_OUT(OutWarning, s)
-
-// ---------------------------------------------------------
-
 #include <fstream>
 #include <string>
+#include <cstdio>
+#include <cstdarg>
 
 // ---------------------------------------------------------
 
@@ -66,6 +47,17 @@ class MGLog {
       nothing  ///< Print nothing
     };
 
+    enum Ansi {
+      black   = 30,
+      red     = 31,
+      green   = 32,
+      yellow  = 33,
+      blue    = 34,
+      magenta = 35,
+      cyan    = 36,
+      gray    = 37
+    };
+
     /** \name Constructor and destructor */
     /** @{ */
 
@@ -80,35 +72,31 @@ class MGLog {
     /**
      * Returns the minimum log level for file output.
      * @return log level */
-    static inline MGLog::LogLevel GetLogLevelFile() { return fMinimumLogLevelFile; };
+    static inline MGLog::LogLevel GetLogLevelFile() { return fMinimumLogLevelFile; }
 
     /**
      * Returns the minimum log level for screen output.
      * @return log level */
-    static inline MGLog::LogLevel GetLogLevelScreen() { return fMinimumLogLevelScreen; };
+    static inline MGLog::LogLevel GetLogLevelScreen() { return fMinimumLogLevelScreen; }
 
     /**
      * Returns true if the loglevel is prefixed to every message.
      * Default: true */
-    static inline bool GetPrefix() { return fPrefix; }
+    static inline bool GetPrefix() { return fUsePrefix; }
 
     /** @} */
     /** \name Setters */
     /** @{ */
 
     /**
-     * Use ANSI escape sequences to color the output on the terminal (only). */
-    static inline bool SetColoredOutput(bool flag) { fColoredOutput = flag; }
-
-    /**
      * Sets the minimum log level for file output.
      * @param loglevel log level */
-    static inline void SetLogLevelFile(MGLog::LogLevel loglevel) { fMinimumLogLevelFile = loglevel; };
+    static inline void SetLogLevelFile(MGLog::LogLevel loglevel) { fMinimumLogLevelFile = loglevel; }
 
     /**
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
-    static inline void SetLogLevelScreen(MGLog::LogLevel loglevel) { fMinimumLogLevelScreen = loglevel; };
+    static inline void SetLogLevelScreen(MGLog::LogLevel loglevel) { fMinimumLogLevelScreen = loglevel; }
 
     /**
      * Sets the minimum log level for file and screen output.
@@ -116,16 +104,16 @@ class MGLog {
      * @param loglevelscreen log level for screen */
     static inline void SetLogLevel(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen) {
       fMinimumLogLevelFile = loglevelfile; fMinimumLogLevelScreen = loglevelscreen;
-    };
+    }
 
     /**
      * Sets the minimum log level for file and screen output.
      * @param loglevel log level */
-    static inline void SetLogLevel(MGLog::LogLevel loglevel) { SetLogLevel(loglevel, loglevel); };
+    static inline void SetLogLevel(MGLog::LogLevel loglevel) { SetLogLevel(loglevel, loglevel); }
 
     /**
      * Toggle if the loglevel is prefixed to every message. */
-    static inline void SetPrefix(bool flag) { fPrefix = flag; }
+    static inline void SetPrefix(bool flag) { fUsePrefix = flag; }
 
     /** @} */
     /** \name Miscellaneous */
@@ -140,34 +128,32 @@ class MGLog {
 
     /**
      * @returns true if log file is open or false if not. */
-    static inline bool IsOpen() { return fOutputStream.is_open(); }
+    static inline bool IsOpen() { return fOutputFileStream.is_open(); }
 
     /**
      * Closes the log file */
-    static inline void CloseLog() { fOutputStream.close(); }
+    static inline void CloseLog() { fOutputFileStream.close(); }
 
     /**
      * Writes string to the file and screen log if the log level is equal or greater than the minimum
      * @param loglevelfile loglevel for the current message
      * @param loglevelscreen loglevel for the current message
      * @param message string to write to the file and screen log */
-    static void Out(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen, const std::string& message);
+    template <typename T>
+    static void Out(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen, const T& msg);
 
-    static inline void Out(const std::string& message) { Out(MGLog::fMinimumLogLevelFile, MGLog::fMinimumLogLevelScreen, message); }
+    template <typename T, typename... Args>
+    static void Out(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen, T& msg_first, Args... msg_other);
 
-    static inline void Out(MGLog::LogLevel loglevel, const std::string& message) { Out(loglevel, loglevel, message); };
+    static void OutFormat(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen, const char *fmt, ...);
 
-    static inline void OutFatal(const std::string& message) { Out(fatal, message); };
+    static void OutFormat(MGLog::LogLevel loglevel, const char *fmt, ...);
 
-    static inline void OutError(const std::string& message) { Out(error, message); };
+    template <typename T>
+    static inline void Out(MGLog::LogLevel loglevel, const T& msg) { Out(loglevel, loglevel, msg); }
 
-    static inline void OutWarning(const std::string& message) { Out(warning, message); };
-
-    static inline void OutSummary(const std::string& message) { Out(summary, message); };
-
-    static inline void OutDetail(const std::string& message) { Out(detail, message); };
-
-    static inline void OutDebug(const std::string& message) { Out(debug, message); };
+    template <typename T, typename... Args>
+    static inline void Out(MGLog::LogLevel loglevel, T& msg_first, Args... msg_other) { Out(loglevel, loglevel, msg_first, msg_other...); }
 
     /**
      * Writes startup information onto screen and into a logfile */
@@ -175,15 +161,23 @@ class MGLog {
 
     /**
      * @return string containing the version number  */
-    static inline const std::string& GetVersion() { return fVersion; };
+    static inline const std::string& GetVersion() { return fVersion; }
+
+    static bool SupportsColors(const std::ostream& os);
+
+    /** @} */
+  private:
+
+    template <typename T>
+    static void Print(MGLog::LogLevel loglevelfile, MGLog::LogLevel loglevelscreen, T& t, bool prefixed=true, bool do_flush=true);
 
     /**
      * Converts a log level to a string
      * @param force_no_colors forcibly disable usage of ANSI escape sequences (e.g. if printing to file) */
-    static std::string ToString(MGLog::LogLevel, bool force_no_colors=false);
+    static std::string GetPrefix(MGLog::LogLevel, std::ostream& os);
 
-    /** @} */
-  private:
+    template <MGLog::Ansi color, typename T>
+    static std::string Colorize(const T& msg, std::ostream& os, bool bold=false);
 
     /**
      * BAT version number */
@@ -199,7 +193,7 @@ class MGLog {
 
     /**
      * The output stream for the file log */
-    static std::ofstream fOutputStream;
+    static std::ofstream fOutputFileStream;
 
     /**
      * Specifies whether there were output printouts already */
@@ -207,11 +201,7 @@ class MGLog {
 
     /**
      * Include a prefix before each message? */
-    static bool fPrefix;
-
-    /**
-     * Use colors on the terminal? */
-    static bool fColoredOutput;
+    static bool fUsePrefix;
 
 };
 

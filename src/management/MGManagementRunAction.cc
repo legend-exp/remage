@@ -19,16 +19,16 @@ MGManagementRunAction::MGManagementRunAction() : fControlledRandomization(false)
 void MGManagementRunAction::BeginOfRunAction(const G4Run *run) {
 
   auto manager = MGManager::GetMGManager();
-  MGLog::OutDetail("Performing MG beginning of run actions");
+  MGLog::Out(MGLog::detail, "Performing MG beginning of run actions");
   if (manager->GetMGGeneratorPrimary()) {
     manager->GetMGGeneratorPrimary()->GetMGGenerator()->BeginOfRunAction(run);
   }
-  else MGLog::OutFatal("No generator specified!");
+  else MGLog::Out(MGLog::fatal, "No generator specified!");
 
   if (manager->GetMGEventAction()->GetOutputManager()) {
     manager->GetMGEventAction()->GetOutputManager()->BeginOfRunAction(); 
   }
-  else MGLog::OutWarning("No Output specified!");
+  else MGLog::Out(MGLog::warning, "No Output specified!");
 
   struct timeval tt;
   pid_t pid = getpid();
@@ -39,7 +39,7 @@ void MGManagementRunAction::BeginOfRunAction(const G4Run *run) {
 
   if (!fControlledRandomization) {
     CLHEP::HepRandom::setTheSeed(time_seed);
-    MGLog::OutSummary("CLHEP::HepRandom seed  set to: " + std::to_string(time_seed));
+    MGLog::Out(MGLog::summary, "CLHEP::HepRandom seed  set to: ", time_seed);
   }
 
   fStartTime = tt.tv_sec;
@@ -51,7 +51,7 @@ void MGManagementRunAction::BeginOfRunAction(const G4Run *run) {
 void MGManagementRunAction::EndOfRunAction(const G4Run *run) {
 
   auto manager = MGManager::GetMGManager();
-  MGLog::OutDetail("Performing MG end of run actions.");
+  MGLog::Out(MGLog::detail, "Performing MG end of run actions.");
   manager->GetMGGeneratorPrimary()->GetMGGenerator()->EndOfRunAction(run);
   if (manager->GetMGEventAction()->GetOutputManager()) {
     manager->GetMGEventAction()->GetOutputManager()->EndOfRunAction();

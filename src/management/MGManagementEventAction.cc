@@ -35,11 +35,9 @@ void MGManagementEventAction::BeginOfEventAction(const G4Event *event) {
       G4double timeDifference = difftime(endTime, manager->GetMGRunAction()->GetStartTime());
       tm *z = localtime(&endTime);
 
-      std::stringstream ss;
-      ss << " Processing Event # " << event->GetEventID()
-        << " at " << timeDifference << " seconds (real time), at the moment it is: " << z->tm_mon+1 << "."
-        << z->tm_mday << "." << z->tm_year+1900 << ", " << z->tm_hour << ":" << z->tm_min << ":" << z->tm_sec;
-      MGLog::OutSummary(ss.str());
+      MGLog::Out(MGLog::summary, " Processing Event ", event->GetEventID(), " at ", timeDifference,
+          " seconds (real time), at the moment it is: ", z->tm_mon+1, ".", z->tm_mday, ".",
+          z->tm_year+1900, ", ", z->tm_hour, ":", z->tm_min, ":", z->tm_sec);
     }
 
   if (fOutputManager) fOutputManager->BeginOfEventAction(event);

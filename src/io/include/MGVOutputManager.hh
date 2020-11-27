@@ -2,19 +2,19 @@
 #define _MGVOUTPUTMANAGER_HH_
 
 #include "globals.hh"
+#include "G4ClassificationOfNewTrack.hh"
 
 class G4Event;
 class G4Track;
 class G4Step;
 class G4SteppingManager;
-class G4ClassificationOfNewTrack;
 class G4VProcess;
 class MGVOutputManager {
 
   public:
 
     MGVOutputManager();
-    virtual ~MGVOutputManager();
+    virtual ~MGVOutputManager() = default;
 
     MGVOutputManager           (MGVOutputManager const&) = delete;
     MGVOutputManager& operator=(MGVOutputManager const&) = delete;
@@ -58,54 +58,50 @@ class MGVOutputManager {
     virtual void PostUserTrackingAction(const G4Track*);
 
     //Define detector specific tree schema
-    //MUST defined in the derived class
-    virtual void DefineSchema() = delete;
-    virtual void OpenFile() = delete;
-    virtual void CloseFile() = delete;
+    //TODO: MUST defined in the derived class, make explicit
+    virtual void DefineSchema();
+    virtual void OpenFile();
+    virtual void CloseFile();
     // allow for one to write out files in the midst of a run
     // (to save data being trashed by aborts)
     // By default, does nothing.
     virtual void WriteFile();
 
-    //Setters and getters
-    G4String GetFileName() {return fFileName;}
-    G4bool SchemaDefined() {return fSchemaDefined;}
-    void SetFileName(G4String name){fFileName = name;}
-    void SetSchemaDefined(G4bool sta) {fSchemaDefined = sta;}
-    void SetWaveformsSaved(G4bool saved) {fWaveformsSaved = saved;}
-    G4bool WaveformsSaved() {return fWaveformsSaved;}
+    // getters
+    inline G4String GetFileName() { return fFileName; }
+    inline G4double GetTimeWindow() { return fTimeWindow; }
+    inline G4double GetOffsetTime() { return fOffsetTime; }
+    inline G4bool   GetUseTimeWindow() { return fUseTimeWindow; }
+    inline G4bool   GetWaveformsSaved() { return fWaveformsSaved; }
+    inline G4bool   GetSchemaDefined() { return fSchemaDefined; }
+    inline G4bool   GetUseImportanceSamplingWindow() { return fUseImportanceSamplingWindow; }
 
-    void SetUseTimeWindow(G4bool val) {fUseTimeWindow = val;}
-    G4bool GetUseTimeWindow() {return fUseTimeWindow;}
-    void SetTimeWindow(G4double val) {fTimeWindow = val;}
-    G4double GetTimeWindow() {return fTimeWindow;}
-    void SetOffsetTime(G4double val) {fOffsetTime = val;}
-    G4double GetOffsetTime() {return fOffsetTime;}
-
+    // setters
+    void SetFileName(G4String& name) { fFileName = name; }
+    void SetSchemaDefined(G4bool sta) { fSchemaDefined = sta; }
+    void SetWaveformsSaved(G4bool saved) { fWaveformsSaved = saved; }
+    void SetUseTimeWindow(G4bool val) { fUseTimeWindow = val; }
+    void SetTimeWindow(G4double val) { fTimeWindow = val; }
+    void SetOffsetTime(G4double val) { fOffsetTime = val; }
     void SetUseImportanceSamplingWindow(G4bool val) { fUseImportanceSamplingWindow = val; }
-    G4bool GetUseImportanceSamplingWindow() { return fUseImportanceSamplingWindow; }
 
   protected:
+
     static G4String fFileName;
+    G4bool      fUseTimeWindow;               // if true will enable time windowing
+    G4double    fTimeWindow;                  // Time Window used in Windowing.
+    G4double    fOffsetTime;                  // Holds the cumulative deleted time for a track
+    G4double    fTempOffsetTime;              // Holds the most recent deleted time for a track
+    G4bool      fHasRadDecay;                 // bool to see if RadioactiveDK is valid process
+    G4VProcess* fRadDecayProcPointer;         // pointer to Radioactive Decay Process
+    G4bool      fInNewStage;                  // whether this is a new stage
+    G4bool      fOnFirstTrack;                // whether this is the first track
+    G4bool      fUseImportanceSamplingWindow; // whether to use importance sampling windowing
 
   private:
-    G4bool      fSchemaDefined; //true if DefineSchema() has been run
 
-    G4bool      fWaveformsSaved; //is waveform simulation data being saved?
-
-  protected:
-    // Time Windowing data members
-    G4bool      fUseTimeWindow; //if true will enable time windowing
-    G4double    fTimeWindow;    //Time Window used in Windowing.
-    G4double    fOffsetTime; //Holds the cumulative deleted time for a track
-    G4double    fTempOffsetTime; //Holds the most recent deleted time for a track
-    G4bool      fHasRadDecay;   //bool to see if RadioactiveDK is valid process
-    G4VProcess* fRadDecayProcPointer; //pointer to Radioactive Decay Process
-
-    // Importance sampling windowing data members
-    G4bool      fInNewStage;      // whether this is a new stage
-    G4bool      fOnFirstTrack;    // whether this is the first track
-    G4bool      fUseImportanceSamplingWindow; // whether to use importance sampling windowing
+    G4bool fSchemaDefined;  // true if DefineSchema() has been run
+    G4bool fWaveformsSaved; // is waveform simulation data being saved?
 };
 
 #endif

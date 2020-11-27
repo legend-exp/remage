@@ -4,6 +4,10 @@ project(remage
     LANGUAGES CXX)
 set(PROJECT_TARNAME remage)
 
+if(WIN32)
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} is not supported on Windows")
+endif()
+
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(STATUS "${CMAKE_PROJECT_NAME} requires an out-of-source build.")
     message(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")

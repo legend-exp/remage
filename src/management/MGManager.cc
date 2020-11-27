@@ -9,7 +9,7 @@
 MGManager* MGManager::fMGManager = 0;
 
 MGManager::MGManager() {
-  if (fMGManager) MGLog::OutFatal("MGManager must be singleton!");
+  if (fMGManager) MGLog::Out(MGLog::fatal, "MGManager must be singleton!");
   fMGManager = this;
   fG4Messenger = new MGManagerMessenger(this);
 }
