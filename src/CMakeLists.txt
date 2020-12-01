@@ -1,21 +1,21 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
-    generators/MGGeneratorUtil.cc
-    generators/MGGeneratorPrimary.cc
-    generators/MGGeneratorPrimaryMessenger.cc
-    io/MGLog.cc
-    io/MGVOutputManager.cc
-    management/MGManagementEventAction.cc
-    management/MGManagementEventActionMessenger.cc
-    management/MGManagementRunAction.cc
-    management/MGManagementStackingAction.cc
-    management/MGManagementSteppingAction.cc
-    management/MGManagementTrackingAction.cc
-    management/MGManager.cc
-    management/MGManagerMessenger.cc
-    processes/MGProcessesList.cc
-    processes/MGProcessesMessenger.cc
-    processes/MGUIcmdStepLimit.cc
+    generators/RMGGeneratorUtil.cc
+    # generators/RMGGeneratorPrimary.cc
+    # generators/RMGGeneratorPrimaryMessenger.cc
+    io/RMGLog.cc
+    io/RMGVOutputManager.cc
+    management/RMGManagementEventAction.cc
+    management/RMGManagementEventActionMessenger.cc
+    management/RMGManagementRunAction.cc
+    management/RMGManagementStackingAction.cc
+    management/RMGManagementSteppingAction.cc
+    management/RMGManagementTrackingAction.cc
+    management/RMGManager.cc
+    management/RMGManagerMessenger.cc
+    processes/RMGProcessesList.cc
+    processes/RMGProcessesMessenger.cc
+    processes/RMGUIcmdStepLimit.cc
 )
 
 # TODO: list here manually all project sub-directories
