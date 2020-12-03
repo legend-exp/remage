@@ -13,6 +13,8 @@ add_library(${PROJECT_TARNAME} SHARED
     management/RMGManagementTrackingAction.cc
     management/RMGManager.cc
     management/RMGManagerMessenger.cc
+    materials/RMGMaterialTable.cc
+    materials/RMGMaterialTableMessenger.cc
     processes/RMGProcessesList.cc
     processes/RMGProcessesMessenger.cc
     processes/RMGUIcmdStepLimit.cc
