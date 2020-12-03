@@ -13,7 +13,7 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorG4Gun() { fParticleGun = new G4ParticleGun(); }
+    inline RMGGeneratorG4Gun() : RMGVGenerator("G4Gun") { fParticleGun = new G4ParticleGun(); }
     inline ~RMGGeneratorG4Gun() { delete fParticleGun; }
 
     RMGGeneratorG4Gun           (RMGGeneratorG4Gun const&) = delete;

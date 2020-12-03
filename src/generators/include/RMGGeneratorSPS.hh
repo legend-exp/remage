@@ -10,7 +10,7 @@ class RMGGeneratorSPS : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorSPS() { fParticleSource = new G4GeneralParticleSource(); }
+    inline RMGGeneratorSPS() : RMGVGenerator("SPS") { fParticleSource = new G4GeneralParticleSource(); }
     inline ~RMGGeneratorSPS() { delete fParticleSource; }
 
     inline void GeneratePrimaryVertex(G4Event *event) override {

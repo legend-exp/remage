@@ -11,40 +11,33 @@ class G4UIcmdWithoutParameter;
 class G4UIcmdWithAnInteger; 
 class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithADoubleAndUnit;
-class RMGGeneratorPositionSampling;
-class RMGGeneratorPositionSamplingMessenger : public G4UImessenger {
+class RMGGeneratorVolumeConfinement;
+class RMGGeneratorVolumeConfinementMessenger : public G4UImessenger {
 
  public:
 
-   RMGGeneratorPositionSamplingMessenger(RMGGeneratorPositionSampling* generator);
-   ~RMGGeneratorPositionSamplingMessenger();
+   RMGGeneratorVolumeConfinementMessenger(RMGGeneratorVolumeConfinement* generator);
+   ~RMGGeneratorVolumeConfinementMessenger();
 
-   RMGGeneratorPositionSamplingMessenger           (RMGGeneratorPositionSamplingMessenger const&) = delete;
-   RMGGeneratorPositionSamplingMessenger& operator=(RMGGeneratorPositionSamplingMessenger const&) = delete;
-   RMGGeneratorPositionSamplingMessenger           (RMGGeneratorPositionSamplingMessenger&&)      = delete;
-   RMGGeneratorPositionSamplingMessenger& operator=(RMGGeneratorPositionSamplingMessenger&&)      = delete;
+   RMGGeneratorVolumeConfinementMessenger           (RMGGeneratorVolumeConfinementMessenger const&) = delete;
+   RMGGeneratorVolumeConfinementMessenger& operator=(RMGGeneratorVolumeConfinementMessenger const&) = delete;
+   RMGGeneratorVolumeConfinementMessenger           (RMGGeneratorVolumeConfinementMessenger&&)      = delete;
+   RMGGeneratorVolumeConfinementMessenger& operator=(RMGGeneratorVolumeConfinementMessenger&&)      = delete;
 
    void SetNewValue(G4UIcommand *command, G4String new_values) override;
 
  private:
 
-   RMGGeneratorPositionSampling* fSampler;
+   RMGGeneratorVolumeConfinement* fSampler;
 
    G4UIdirectory*             fSamplerDirectory;
-   G4UIdirectory*             fSurfaceDirectory;
    G4UIdirectory*             fVolumeDirectory;
    G4UIcmdWithAString*        fVolumeNameCmd;
-   G4UIcmdWithAString*        fSurfaceNameCmd;
    G4UIcmdWithADoubleAndUnit* fInnerSphereRadiusVolCmd;
    G4UIcmdWithADoubleAndUnit* fOuterSphereRadiusVolCmd;
-   G4UIcmdWithADoubleAndUnit* fSphereRadiusSurfCmd;
    G4UIcmdWithADoubleAndUnit* fInnerDiskRadiusCmd;
    G4UIcmdWithADoubleAndUnit* fOuterDiskRadiusCmd;
-   G4UIcmdWithADoubleAndUnit* fInnerCylinderRadiusSurfCmd;
-   G4UIcmdWithADoubleAndUnit* fOuterCylinderRadiusSurfCmd;
    G4UIcmdWithADoubleAndUnit* fCylinderHeightSurfCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderStartingAngleSurfCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderSpanningAngleSurfCmd;
    G4UIcmdWithADoubleAndUnit* fInnerCylinderRadiusVolCmd;
    G4UIcmdWithADoubleAndUnit* fOuterCylinderRadiusVolCmd;
    G4UIcmdWithADoubleAndUnit* fCylinderHeightVolCmd;
@@ -53,12 +46,7 @@ class RMGGeneratorPositionSamplingMessenger : public G4UImessenger {
    G4UIcmdWithADoubleAndUnit* fBoxXLengthVolCmd;
    G4UIcmdWithADoubleAndUnit* fBoxYLengthVolCmd;
    G4UIcmdWithADoubleAndUnit* fBoxZLengthVolCmd;
-   G4UIcmdWithADoubleAndUnit* fVolCenterXCmd;
-   G4UIcmdWithADoubleAndUnit* fVolCenterYCmd;
-   G4UIcmdWithADoubleAndUnit* fVolCenterZCmd;
-   G4UIcmdWithADoubleAndUnit* fSurfCenterXCmd;
-   G4UIcmdWithADoubleAndUnit* fSurfCenterYCmd;
-   G4UIcmdWithADoubleAndUnit* fSurfCenterZCmd;
+   G4UIcmdWith3VectorAndUnit* fVolCenterCmd;
    G4UIcmdWithAnInteger*      fNPositionsamplingMaxCmd;
 };
 

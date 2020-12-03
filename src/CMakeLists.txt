@@ -1,8 +1,10 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
     generators/RMGGeneratorUtil.cc
-    # generators/RMGGeneratorPrimary.cc
-    # generators/RMGGeneratorPrimaryMessenger.cc
+    generators/RMGGeneratorPrimary.cc
+    generators/RMGGeneratorPrimaryMessenger.cc
+    generators/RMGGeneratorVolumeConfinement.cc
+    generators/RMGGeneratorVolumeConfinementMessenger.cc
     io/RMGLog.cc
     io/RMGVOutputManager.cc
     management/RMGManagementEventAction.cc
@@ -25,6 +27,7 @@ set(COMPONENTS
     generators
     io
     management
+    materials
     processes
 )
 

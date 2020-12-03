@@ -1,22 +1,22 @@
-#ifndef _RMGVGENERATOR_HH
-#define _RMGVGENERATOR_HH
+#ifndef _RMGVGENERATOR_HH_
+#define _RMGVGENERATOR_HH_
 
 #include "globals.hh"
 #include "G4ThreeVector.hh"
+#include "G4UImessenger.hh"
 
 class G4Event;
-class G4UImessenger;
 class G4Run;
 class RMGVGenerator {
 
   public:
 
-    inline RMGVGenerator() :
-      fGeneratorName(""),
-      fG4Messenger(0),
+    inline RMGVGenerator(G4String name) :
+      fGeneratorName(name),
       fReportingFrequency(1000) {};
 
-    virtual ~RMGVGenerator() = default;
+    virtual inline ~RMGVGenerator() { if (fG4Messenger) delete fG4Messenger; }
+
     RMGVGenerator           (RMGVGenerator const&) = delete;
     RMGVGenerator& operator=(RMGVGenerator const&) = delete;
     RMGVGenerator           (RMGVGenerator&&)      = delete;
@@ -24,16 +24,16 @@ class RMGVGenerator {
 
     virtual void BeginOfRunAction(const G4Run*);
     virtual void EndOfRunAction(const G4Run*);
-    virtual void GeneratePrimaryVertex(G4Event *event);
+    virtual void GeneratePrimaryVertex(G4Event*);
     virtual void SetParticlePosition(G4ThreeVector vec);
-    inline G4String GetGeneratorName() { return fGeneratorName; }
     inline void SetReportingFrequency(G4int freq) { fReportingFrequency = freq; }
+    inline G4String GetGeneratorName() { return fGeneratorName; }
 
   protected:
 
-    G4String      fGeneratorName;      ///< Name of Generator
-    G4UImessenger *fG4Messenger;       ///< G4Messenger for setting up generator
-    G4int         fReportingFrequency; ///< Report generation rate
+    G4String       fGeneratorName;      ///< Name of Generator
+    G4UImessenger* fG4Messenger;        ///< G4Messenger for setting up generator
+    G4int          fReportingFrequency; ///< Report generation rate
 };
 
 #endif

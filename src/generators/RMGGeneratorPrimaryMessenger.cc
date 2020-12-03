@@ -93,115 +93,16 @@ void RMGGeneratorPrimaryMessenger::SetNewValue(G4UIcommand* command, G4String ne
 
   if (command == fSelectCmd) {
     if (new_values == "G4gun") {
-      fGeneratorPrimary->SetRMGGenerator(new RMGGeneratorG4Gun);
+      fGeneratorPrimary->SetGenerator(new RMGGeneratorG4Gun);
     }
     else if (new_values == "SPS") {
-      fGeneratorPrimary->SetRMGGenerator(new RMGGeneratorSPS);
+      fGeneratorPrimary->SetGenerator(new RMGGeneratorSPS);
     }
     else RMGLog::Out(RMGLog::fatal, "Unknown generator '", new_values, "'");
   }
 
-  if (command == fConfineCmd) {
-    if (new_values == "noconfined") {
-      fGeneratorPrimary->SetConfinementCode(RMGGeneratorPrimary::noconfined);
-      RMGLog::Out(RMGLog::detail, "Source not confined");
-    }
-    else if (new_values == "volume") {
-      fGeneratorPrimary->SetConfinementCode(RMGGeneratorPrimary::volume);
-      RMGLog::Out(RMGLog::detail, "Source confined in volume");
-    }
-    else if (new_values == "volumelist") {
-      fGeneratorPrimary->SetConfinementCode(RMGGeneratorPrimary::volumelist);
-      RMGLog::Out(RMGLog::detail, "Source confined in volume list");
-    }
-    else if (new_values == "volumearray") {
-      fGeneratorPrimary->SetConfinementCode(RMGGeneratorPrimary::volumearray);
-      RMGLog::Out(RMGLog::detail, "Source confined in volume array");
-    }
-  }
+  // else if...
 
-  if (command == fVolumeCmd) {
-
-    fGeneratorPrimary->SetVolumeName(new_values);
-
-    G4bool ifound = false;
-    auto vol_store = G4PhysicalVolumeStore::GetInstance();
-    auto n_volumes = vol_store->size();
-    G4String candidate_list;
-    for (size_t i = 0; i < n_volumes; i++) {
-      candidate_list += vol_store->at(i)->GetName();
-      candidate_list += ", ";
-      if (vol_store->at(i)->GetName() == new_values) ifound = true;
-    }
-
-    if (ifound) {
-      if (fGeneratorPrimary->GetConfinementCode() != RMGGeneratorPrimary::noconfined) {
-        fGeneratorPrimary->SetVolumeName(new_values);
-        RMGLog::Out(RMGLog::detail, "Source confined in ", new_values);
-      }
-      else RMGLog::Out(RMGLog::warning, "Source not confined: nothing happens ");
-    }
-    else {
-      RMGLog::Out(RMGLog::warning, "Volume not found ");
-      RMGLog::Out(RMGLog::warning, "The list of volumes is: ", candidate_list);
-    }
-  }
-
-  if (command == fVolumeListFromCmd) {
-    fGeneratorPrimary -> SetVolumeListFrom(fVolumeListFromCmd->GetNewIntValue(new_values));
-    fGeneratorPrimary->SetVolumeListInitialized(false);
-  }
-
-  if (command == fVolumeListToCmd) {
-    fGeneratorPrimary -> SetVolumeListTo(fVolumeListToCmd->GetNewIntValue(new_values));
-    fGeneratorPrimary->SetVolumeListInitialized(false);
-  }
-  if (command == fVolumeListAddCmd){
-    fGeneratorPrimary->AddVolumeNumberToList(fVolumeListAddCmd->GetNewIntValue(new_values));
-    fGeneratorPrimary->SetVolumeListInitialized(false);
-  }
-  if (command == fVolumeListClearCmd){
-    fGeneratorPrimary->ClearList();
-    fGeneratorPrimary->SetVolumeListInitialized(false);
-  }
-  if (command == fVolumeListCmd) {
-    G4bool ifound = false;
-    G4bool jfound = false;
-    auto vol_store = G4PhysicalVolumeStore::GetInstance();
-    auto n_volumes = vol_store->size();
-    G4String start_volume = new_values + "_" + std::to_string(fGeneratorPrimary->GetVolumeListFrom());
-    G4String end_volume = new_values + "_" + std::to_string(fGeneratorPrimary->GetVolumeListTo());
-
-    G4String candidate_list;
-    for (size_t i = 0; i < n_volumes; i++) {
-      candidate_list += vol_store->at(i)->GetName();
-      candidate_list += ", ";
-      if (vol_store->at(i)->GetName() == start_volume) ifound = true;
-      if (vol_store->at(i)->GetName() == end_volume) jfound = true;
-    }
-
-    if (ifound and jfound) {
-      if (fGeneratorPrimary->GetConfinementCode() != RMGGeneratorPrimary::noconfined) {
-        fGeneratorPrimary->SetVolumeListName(new_values);
-        RMGLog::Out(RMGLog::detail, "Source confined in ", start_volume, " to ", end_volume);
-      }
-      else RMGLog::Out(RMGLog::warning, "Source not confined: nothing happens");
-    }
-    else {
-      if (ifound == false) RMGLog::Out(RMGLog::warning, "Volume ", start_volume, " not found ");
-      if (jfound == false) RMGLog::Out(RMGLog::warning, "Volume ", end_volume, " not found ");
-      RMGLog::Out(RMGLog::warning, "The list of volumes is: ", candidate_list);
-    }
-    fGeneratorPrimary->SetVolumeListInitialized(false);
-  }
-  if (command == fVolumeArrayAddCmd) {
-    fGeneratorPrimary->AddVolumeNameToArray(new_values);
-  }
-  if (command == fPositionCmd) {
-    fGeneratorPrimary->GetRMGGenerator()->SetParticlePosition(fPositionCmd->GetNew3VectorValue(new_values));
-    RMGLog::Out(RMGLog::detail, "Default starting position set to ",
-        fPositionCmd->GetNew3VectorValue(new_values)/CLHEP::cm, "cm");
-  }
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

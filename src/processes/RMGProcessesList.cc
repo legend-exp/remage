@@ -249,7 +249,7 @@ void RMGProcessesList::AddTransportation() {
     // step limits
     if(fLimitSteps[particle_name]) {
       proc_manager->AddProcess(new G4StepLimiter, -1, -1, 3);
-      RMGLog::Out(RMGLog::detail, "Steps will be limited for " + particle_name);
+      RMGLog::Out(RMGLog::detail, "Steps will be limited for ", particle_name);
     }
   }
 }
