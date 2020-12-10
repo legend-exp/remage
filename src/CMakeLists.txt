@@ -1,5 +1,6 @@
 # TODO: list here manually all source files
 add_library(${PROJECT_TARNAME} SHARED
+    geometry/RMGNavigationTools.cc
     generators/RMGGeneratorUtil.cc
     generators/RMGGeneratorPrimary.cc
     generators/RMGGeneratorPrimaryMessenger.cc
@@ -20,15 +21,18 @@ add_library(${PROJECT_TARNAME} SHARED
     processes/RMGProcessesList.cc
     processes/RMGProcessesMessenger.cc
     processes/RMGUIcmdStepLimit.cc
+    tools/RMGMessengerTools.cc
 )
 
 # TODO: list here manually all project sub-directories
 set(COMPONENTS
+    geometry
     generators
     io
     management
     materials
     processes
+    tools
 )
 
 if(${PROJECT_VERSION} NOT EQUAL "unknown")

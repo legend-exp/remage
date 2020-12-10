@@ -1,6 +1,9 @@
 #ifndef _RMGGENERATORPOSITIONSAMPLINGMESSENGER_HH_
 #define _RMGGENERATORPOSITIONSAMPLINGMESSENGER_HH_
 
+#include <vector>
+#include <memory>
+
 #include "globals.hh"
 #include "G4UImessenger.hh"
 
@@ -17,7 +20,7 @@ class RMGGeneratorVolumeConfinementMessenger : public G4UImessenger {
  public:
 
    RMGGeneratorVolumeConfinementMessenger(RMGGeneratorVolumeConfinement* generator);
-   ~RMGGeneratorVolumeConfinementMessenger();
+   ~RMGGeneratorVolumeConfinementMessenger() = default;
 
    RMGGeneratorVolumeConfinementMessenger           (RMGGeneratorVolumeConfinementMessenger const&) = delete;
    RMGGeneratorVolumeConfinementMessenger& operator=(RMGGeneratorVolumeConfinementMessenger const&) = delete;
@@ -30,24 +33,29 @@ class RMGGeneratorVolumeConfinementMessenger : public G4UImessenger {
 
    RMGGeneratorVolumeConfinement* fSampler;
 
-   G4UIdirectory*             fSamplerDirectory;
-   G4UIdirectory*             fVolumeDirectory;
-   G4UIcmdWithAString*        fVolumeNameCmd;
-   G4UIcmdWithADoubleAndUnit* fInnerSphereRadiusVolCmd;
-   G4UIcmdWithADoubleAndUnit* fOuterSphereRadiusVolCmd;
-   G4UIcmdWithADoubleAndUnit* fInnerDiskRadiusCmd;
-   G4UIcmdWithADoubleAndUnit* fOuterDiskRadiusCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderHeightSurfCmd;
-   G4UIcmdWithADoubleAndUnit* fInnerCylinderRadiusVolCmd;
-   G4UIcmdWithADoubleAndUnit* fOuterCylinderRadiusVolCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderHeightVolCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderStartingAngleVolCmd;
-   G4UIcmdWithADoubleAndUnit* fCylinderSpanningAngleVolCmd;
-   G4UIcmdWithADoubleAndUnit* fBoxXLengthVolCmd;
-   G4UIcmdWithADoubleAndUnit* fBoxYLengthVolCmd;
-   G4UIcmdWithADoubleAndUnit* fBoxZLengthVolCmd;
-   G4UIcmdWith3VectorAndUnit* fVolCenterCmd;
-   G4UIcmdWithAnInteger*      fNPositionsamplingMaxCmd;
+   std::vector<std::unique_ptr<G4UIdirectory>> fDirectories;
+
+   std::unique_ptr<G4UIcmdWithAString>        fSamplingModeCmd;
+   std::unique_ptr<G4UIcmdWithAString>        fBoundingSolidTypeCmd;
+
+   std::unique_ptr<G4UIcmdWithAString>        fAddPhysVolCmd;
+   std::unique_ptr<G4UIcmdWithAString>        fAddGeomVolCmd;
+
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fSphereInnerRadiusVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fSphereOuterRadiusVolCmd;
+
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fCylinderInnerRadiusVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fCylinderOuterRadiusVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fCylinderHeightVolCmd;
+
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fCylinderStartingAngleVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fCylinderSpanningAngleVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fBoxXLengthVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fBoxYLengthVolCmd;
+   std::unique_ptr<G4UIcmdWithADoubleAndUnit> fBoxZLengthVolCmd;
+
+   std::unique_ptr<G4UIcmdWith3VectorAndUnit> fGeomVolCenterCmd;
+   std::unique_ptr<G4UIcmdWithAnInteger>      fNPositionsamplingMaxCmd;
 };
 
 #endif

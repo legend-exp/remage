@@ -10,134 +10,153 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 
 #include "RMGGeneratorVolumeConfinement.hh"
+#include "RMGTools.hh"
 #include "RMGLog.hh"
 
 RMGGeneratorVolumeConfinementMessenger::RMGGeneratorVolumeConfinementMessenger(RMGGeneratorVolumeConfinement* generator):
   fSampler(generator) {
 
-  fSamplerDirectory = new G4UIdirectory("/RMG/generator/Sampling/");
-  fSamplerDirectory->SetGuidance("Control commands for the geometry sampler");
+  G4String directory = "/RMG/Generators/Sampling";
 
-  fVolumeDirectory =  new G4UIdirectory("/RMG/generator/Sampling/volume/");
-  fVolumeDirectory->SetGuidance("Control commands for the volume geometry sampler");
+  // mkdir directories
+  fDirectories.emplace_back(new G4UIdirectory(directory));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Physical").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/Sphere").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/Cylinder").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/CylindricalShell").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/Box").c_str()));
 
-  fVolumeNameCmd = new G4UIcmdWithAString("/RMG/generator/Sampling/volume/name", this);
-  fVolumeNameCmd->SetGuidance("Selects the name of the geometrical volume for sampling");
-  fVolumeNameCmd->SetGuidance("Options are: ");
-  fVolumeNameCmd->SetGuidance("Sphere: sample from the volume of a spherical shell");
-  fVolumeNameCmd->SetGuidance("Cylinder: sample from the volume of a cylindrical shell");
-  fVolumeNameCmd->SetGuidance("Box: sample from the volume of a box");
-  fVolumeNameCmd->SetCandidates("Sphere Cylinder Box");
+  fSamplingModeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/SetSamplingMode", this,
+      {G4State_Init, G4State_PreInit}, "Union IntersectPhysicalWithGeometrical");
 
-  fInnerSphereRadiusVolCmd = new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/innerSphereRadius",this);
-  fInnerSphereRadiusVolCmd->SetGuidance("Set the inner radius for sphere (default: 0 cm)");
-  fInnerSphereRadiusVolCmd->SetDefaultUnit("cm");
-  fInnerSphereRadiusVolCmd->SetUnitCategory("Length");
-  fInnerSphereRadiusVolCmd->SetUnitCandidates("microm mm cm m km");
+  fBoundingSolidTypeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/SetFallbackBoundingVolumeType", this,
+      {G4State_Init, G4State_PreInit}, "Sphere Box");
 
-  fOuterSphereRadiusVolCmd = new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/outerSphereRadius",this);
-  fOuterSphereRadiusVolCmd->SetGuidance("Set the outer radius for sphere ");
-  fOuterSphereRadiusVolCmd->SetDefaultUnit("cm");
-  fOuterSphereRadiusVolCmd->SetUnitCategory("Length");
-  fOuterSphereRadiusVolCmd->SetUnitCandidates("microm mm cm m km");
+  fAddPhysVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Physical/AddVolume", this,
+      {G4State_Init, G4State_PreInit}, "");
 
-  fInnerCylinderRadiusVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/innerCylinderRadius",this);
-  fInnerCylinderRadiusVolCmd->SetGuidance("Set the inner radius for cylinder volume sampling (default: 0 cm)");
-  fInnerCylinderRadiusVolCmd->SetDefaultUnit("cm");
-  fInnerCylinderRadiusVolCmd->SetUnitCategory("Length");
-  fInnerCylinderRadiusVolCmd->SetUnitCandidates("microm mm cm m km");
+  fAddGeomVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Geometrical/AddSolid", this,
+      {G4State_Init, G4State_PreInit}, "Sphere Cylinder CylindricalShell Box");
 
-  fOuterCylinderRadiusVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/outerCylinderRadius",this);
-  fOuterCylinderRadiusVolCmd->SetGuidance("Set the outer radius for cylinder volume sampling");
-  fOuterCylinderRadiusVolCmd->SetDefaultUnit("cm");
-  fOuterCylinderRadiusVolCmd->SetUnitCategory("Length");
-  fOuterCylinderRadiusVolCmd->SetUnitCandidates("microm mm cm m km");
+  // Sphere
+  fSphereInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Sphere/InnerRadius", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fCylinderHeightVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/cylinderHeight",this);
-  fCylinderHeightVolCmd->SetGuidance("Set the height for cylinder volume sampling");
-  fCylinderHeightVolCmd->SetDefaultUnit("cm");
-  fCylinderHeightVolCmd->SetUnitCategory("Length");
-  fCylinderHeightVolCmd->SetUnitCandidates("microm mm cm m km");
+  fSphereOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Sphere/OuterRadius", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fCylinderStartingAngleVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/cylinderStartingAngle",this);
-  fCylinderStartingAngleVolCmd->SetGuidance("Set the starting angle for cylinder volume sampling (default: 0 deg)");
-  fCylinderStartingAngleVolCmd->SetDefaultUnit("deg");
-  fCylinderStartingAngleVolCmd->SetUnitCategory("Angle");
-  fCylinderStartingAngleVolCmd->SetUnitCandidates("deg");
+  // Cylinder
+  fCylinderInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Cylinder/InnerRadius", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fCylinderSpanningAngleVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/cylinderSpanningAngle",this);
-  fCylinderSpanningAngleVolCmd->SetGuidance("Set the spanning angle for cylinder volume sampling (default: 360 deg )");
-  fCylinderSpanningAngleVolCmd->SetDefaultUnit("deg");
-  fCylinderSpanningAngleVolCmd->SetUnitCategory("Angle");
-  fCylinderSpanningAngleVolCmd->SetUnitCandidates("deg");
+  fCylinderOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Cylinder/OuterRadius", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fBoxXLengthVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/boxXLength",this);
-  fBoxXLengthVolCmd->SetGuidance("Set the X-dimension for box volume sampling");
-  fBoxXLengthVolCmd->SetDefaultUnit("cm");
-  fBoxXLengthVolCmd->SetUnitCategory("Length");
-  fBoxXLengthVolCmd->SetUnitCandidates("microm mm cm m km");
+  fCylinderHeightVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Cylinder/Height", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fBoxYLengthVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/boxYLength",this);
-  fBoxYLengthVolCmd->SetGuidance("Set the Y-dimension for box volume sampling");
-  fBoxYLengthVolCmd->SetDefaultUnit("cm");
-  fBoxYLengthVolCmd->SetUnitCategory("Length");
-  fBoxYLengthVolCmd->SetUnitCandidates("microm mm cm m km");
+  fCylinderStartingAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Cylinder/StartingAngle", this,
+      {G4State_Init, G4State_PreInit}, "Angle");
 
-  fBoxZLengthVolCmd =  new G4UIcmdWithADoubleAndUnit("/RMG/generator/Sampling/volume/boxZLength",this);
-  fBoxZLengthVolCmd->SetGuidance("Set the X-dimension for box volume sampling");
-  fBoxZLengthVolCmd->SetDefaultUnit("cm");
-  fBoxZLengthVolCmd->SetUnitCategory("Length");
-  fBoxZLengthVolCmd->SetUnitCandidates("microm mm cm m km");
+  fCylinderSpanningAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Cylinder/SpanningAngle", this,
+      {G4State_Init, G4State_PreInit}, "Angle");
 
-  fVolCenterCmd =  new G4UIcmdWith3VectorAndUnit("/RMG/generator/Sampling/volume/offsetCenterPos",this);
-  fVolCenterCmd->SetGuidance("Set the position of the volume center");
-  fVolCenterCmd->SetDefaultUnit("cm");
-  fVolCenterCmd->SetUnitCategory("Length");
-  fVolCenterCmd->SetUnitCandidates("microm mm cm m km");
+  // Box
+  fBoxXLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Box/XLength", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
 
-  fNPositionsamplingMaxCmd =  new G4UIcmdWithAnInteger("/RMG/generator/Sampling/NPositionsamplingMax",this);
-  fNPositionsamplingMaxCmd->SetGuidance("Set the maximum number of tries used to find a vertex inside a volume/ on a surface.");
+  fBoxYLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Box/YLength", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+
+  fBoxZLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+      directory + "/Geometrical/Box/ZLength", this,
+      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+
+  fGeomVolCenterCmd = RMGTools::MakeG4UIcmd<G4UIcmdWith3VectorAndUnit>(
+      directory + "/Geometrical/CenterPosition", this,
+      {G4State_Init, G4State_PreInit}, "Length");
+
+  fNPositionsamplingMaxCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(
+      directory + "/MaxSamplingTrials", this,
+      {G4State_Init, G4State_PreInit}, "N", "N > 0");
 }
 
-RMGGeneratorVolumeConfinementMessenger::~RMGGeneratorVolumeConfinementMessenger() {
-  delete fSamplerDirectory;
-  delete fVolumeDirectory;
-  delete fVolumeNameCmd;
-  delete fInnerSphereRadiusVolCmd;
-  delete fOuterSphereRadiusVolCmd;
-  delete fInnerDiskRadiusCmd;
-  delete fOuterDiskRadiusCmd;
-  delete fCylinderHeightSurfCmd;
-  delete fInnerCylinderRadiusVolCmd;
-  delete fOuterCylinderRadiusVolCmd;
-  delete fCylinderHeightVolCmd;
-  delete fCylinderStartingAngleVolCmd;
-  delete fCylinderSpanningAngleVolCmd;
-  delete fBoxXLengthVolCmd;
-  delete fBoxYLengthVolCmd;
-  delete fBoxZLengthVolCmd;
-  delete fVolCenterCmd;
-  delete fNPositionsamplingMaxCmd;
-}
+void RMGGeneratorVolumeConfinementMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
 
-void RMGGeneratorVolumeConfinementMessenger::SetNewValue(G4UIcommand *command, G4String new_values) {
-  // if (command == fVolumeNameCmd) fSampler->SetGeometricalVolumeName(new_values);
-  // else if (command == fInnerSphereRadiusVolCmd) fSampler->SetInnerSphereRadius(fInnerSphereRadiusVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fOuterSphereRadiusVolCmd) fSampler->SetOuterSphereRadius(fOuterSphereRadiusVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fInnerDiskRadiusCmd) fSampler->SetInnerDiskRadius(fInnerDiskRadiusCmd->GetNewDoubleValue(new_values));
-  // else if (command == fOuterDiskRadiusCmd) fSampler->SetOuterDiskRadius(fOuterDiskRadiusCmd->GetNewDoubleValue(new_values));
-  // else if (command == fCylinderHeightSurfCmd) fSampler->SetCylinderHeight(fCylinderHeightSurfCmd->GetNewDoubleValue(new_values));
-  // else if (command == fInnerCylinderRadiusVolCmd) fSampler->SetInnerCylinderRadius(fInnerCylinderRadiusVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fOuterCylinderRadiusVolCmd) fSampler->SetOuterCylinderRadius(fOuterCylinderRadiusVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fCylinderHeightVolCmd) fSampler->SetCylinderHeight(fCylinderHeightVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fCylinderStartingAngleVolCmd) fSampler->SetCylinderStartingAngle(fCylinderStartingAngleVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fCylinderSpanningAngleVolCmd) fSampler->SetCylinderSpanningAngle(fCylinderSpanningAngleVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fBoxXLengthVolCmd) fSampler->SetXLengthBox(fBoxXLengthVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fBoxYLengthVolCmd) fSampler->SetYLengthBox(fBoxYLengthVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fBoxZLengthVolCmd) fSampler->SetZLengthBox(fBoxZLengthVolCmd->GetNewDoubleValue(new_values));
-  // else if (command == fVolCenterCmd) fSampler->SetGeometricalVolumeCenter(fVolCenterCmd->GetNew3VectorValue(new_values));
-  // else if (command == fNPositionsamplingMaxCmd) fSampler->SetNPositionsamplingMax( fNPositionsamplingMaxCmd->GetNewIntValue(new_values));
-  // else RMGLog::Out(RMGLog::error, "Command ", command->GetTitle(), "not known");
+  // little helper
+  auto get_last_geom_solid = [&]() -> RMGGeneratorVolumeConfinement::GenericGeometricalSolidData& {
+    if (fSampler->GetGeometricalSolidDataList().empty()) {
+      RMGLog::Out(RMGLog::fatal, "Must call '", fAddGeomVolCmd->GetTitle(),
+          "' before setting any geometrical parameter value");
+    }
+    return fSampler->GetGeometricalSolidDataList().back();
+  };
+
+  if (cmd == fBoundingSolidTypeCmd.get()) {
+    fSampler->SetBoundingSolidType(new_values);
+  }
+  if (cmd == fSamplingModeCmd.get()) {
+    if (new_values == "UnionAll") fSampler->SetSamplingMode(RMGGeneratorVolumeConfinement::SamplingMode::kUnionAll);
+    else if (new_values == "IntersectionWithGeometrical") fSampler->SetSamplingMode(RMGGeneratorVolumeConfinement::SamplingMode::kIntersectPhysicalWithGeometrical);
+  }
+  if (cmd == fAddPhysVolCmd.get()) {
+    if (new_values.find(' ') == std::string::npos) fSampler->AddPhysicalVolumeNameRegex(new_values);
+    else {
+      auto name = new_values.substr(0, new_values.find_first_of(' '));
+      auto copy_nr = new_values.substr(new_values.find_first_of(' ')+1, std::string::npos);
+      fSampler->AddPhysicalVolumeNameRegex(name, copy_nr);
+    }
+  }
+  if (cmd == fAddGeomVolCmd.get()) {
+    fSampler->GetGeometricalSolidDataList().emplace_back();
+  }
+  if (cmd == fSphereInnerRadiusVolCmd.get()) {
+    get_last_geom_solid().sphere_inner_radius = fSphereInnerRadiusVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fSphereOuterRadiusVolCmd.get()) {
+    get_last_geom_solid().sphere_inner_radius = fSphereOuterRadiusVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fCylinderInnerRadiusVolCmd.get()) {
+    get_last_geom_solid().cylinder_inner_radius = fCylinderInnerRadiusVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fCylinderOuterRadiusVolCmd.get()) {
+    get_last_geom_solid().cylinder_outer_radius = fCylinderOuterRadiusVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fCylinderHeightVolCmd.get()) {
+    get_last_geom_solid().cylinder_height = fCylinderHeightVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fCylinderStartingAngleVolCmd.get()) {
+    get_last_geom_solid().cylinder_starting_angle = fCylinderStartingAngleVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fCylinderSpanningAngleVolCmd.get()) {
+    get_last_geom_solid().cylinder_spanning_angle = fCylinderSpanningAngleVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fBoxXLengthVolCmd.get()) {
+    get_last_geom_solid().box_x_length = fBoxXLengthVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fBoxYLengthVolCmd.get()) {
+    get_last_geom_solid().box_y_length = fBoxYLengthVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fBoxZLengthVolCmd.get()) {
+    get_last_geom_solid().box_z_length = fBoxZLengthVolCmd->GetNewDoubleValue(new_values);
+  }
+  if (cmd == fGeomVolCenterCmd.get()) {
+    get_last_geom_solid().volume_center = fGeomVolCenterCmd->GetNew3VectorValue(new_values);
+  }
+  if (cmd == fNPositionsamplingMaxCmd.get()) {
+    fSampler->SetMaxAttempts(fNPositionsamplingMaxCmd->GetNewIntValue(new_values));
+  }
+  else RMGLog::Out(RMGLog::error, "Command ", cmd->GetTitle(), "not known");
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
