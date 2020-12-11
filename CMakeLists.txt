@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(remage
-    DESCRIPTION "Simulation framework for HPGe-based experiments" 
+    # DESCRIPTION "Simulation framework for HPGe-based experiments" 
     LANGUAGES CXX)
 set(PROJECT_TARNAME remage)
 
@@ -59,8 +59,11 @@ endif()
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# TODO: fixing the standard creates problems if dependencies need higher
+# standards, e.g. ROOT when root is compiled with C++14. What's the best
+# way to deal with this?
+# set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # all the code is located under src/
 add_subdirectory(src)
