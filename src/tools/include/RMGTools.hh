@@ -11,21 +11,21 @@
 namespace RMGTools {
 
   template <typename T> // G4UIcmdWithA[...]AndUnit
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String unit_cat, G4String unit_cand="",
-      G4String par_name="", G4String range="");
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String unit_cat,
+      G4String unit_cand="", G4String par_name="", G4String range="",
+      std::vector<G4ApplicationState> avail_for={G4State_Init, G4State_PreInit});
 
   template <typename T> // G4UIcmdWithA[...]
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String par_name="", G4String range="");
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String par_name="",
+      G4String range="", std::vector<G4ApplicationState> avail_for={G4State_Init, G4State_PreInit});
 
   template <typename T> // G4cmdWithAString
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String candidates);
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String candidates,
+      std::vector<G4ApplicationState> avail_for={G4State_Init, G4State_PreInit});
 
   template <typename T> // G4cmdWithABool
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4bool default_val, G4bool omittable=false);
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4bool default_val,
+      G4bool omittable=false, std::vector<G4ApplicationState> avail_for={G4State_Init, G4State_PreInit});
 
   std::tm ToUTCTime(std::chrono::time_point<std::chrono::system_clock> t);
 }

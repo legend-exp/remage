@@ -3,7 +3,6 @@
 #include "RMGGeneratorPrimaryMessenger.hh"
 #include "RMGVGeneratorPrimaryPosition.hh"
 #include "RMGGeneratorVolumeConfinement.hh"
-// #include "RMGGeneratorGeometricalVolumeConfinement.hh"
 #include "RMGVGenerator.hh"
 #include "RMGLog.hh"
 
@@ -37,13 +36,7 @@ void RMGGeneratorPrimary::SetConfinementCode(RMGGeneratorPrimary::ConfinementCod
       fPrimaryPositionGenerator = new RMGVGeneratorPrimaryPosition("DummyGenerator");
       break;
     case ConfinementCode::kVolume :
-    case ConfinementCode::kVolumeList :
-    case ConfinementCode::kSurface :
-    case ConfinementCode::kSurfaceList :
       fPrimaryPositionGenerator = new RMGGeneratorVolumeConfinement();
-      break;
-    case ConfinementCode::kGeometricalVolume :
-      // fPrimaryPositionGenerator = new RMGGeneratorGeometricalVolumeConfinement();
       break;
     default : RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
                                          fConfinementCode, "' specified (implement me)");

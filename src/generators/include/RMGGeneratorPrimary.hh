@@ -13,11 +13,7 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
     enum ConfinementCode {
       kUnConfined,
-      kVolume,
-      kVolumeList,
-      kSurface,
-      kSurfaceList,
-      kGeometricalVolume
+      kVolume
     };
 
     RMGGeneratorPrimary();

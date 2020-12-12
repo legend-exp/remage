@@ -16,7 +16,7 @@
 RMGGeneratorVolumeConfinementMessenger::RMGGeneratorVolumeConfinementMessenger(RMGGeneratorVolumeConfinement* generator):
   fSampler(generator) {
 
-  G4String directory = "/RMG/Generators/Sampling";
+  G4String directory = "/RMG/Generators/Confinement";
 
   // mkdir directories
   fDirectories.emplace_back(new G4UIdirectory(directory));
@@ -27,68 +27,56 @@ RMGGeneratorVolumeConfinementMessenger::RMGGeneratorVolumeConfinementMessenger(R
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/CylindricalShell").c_str()));
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/Box").c_str()));
 
-  fSamplingModeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/SetSamplingMode", this,
-      {G4State_Init, G4State_PreInit}, "Union IntersectPhysicalWithGeometrical");
+  fSamplingModeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+      directory + "/SetSamplingMode", this, "Union IntersectPhysicalWithGeometrical");
 
-  fBoundingSolidTypeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/SetFallbackBoundingVolumeType", this,
-      {G4State_Init, G4State_PreInit}, "Sphere Box");
+  fBoundingSolidTypeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+      directory + "/SetFallbackBoundingVolumeType", this, "Sphere Box");
 
-  fAddPhysVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Physical/AddVolume", this,
-      {G4State_Init, G4State_PreInit}, "");
+  fAddPhysVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+      directory + "/Physical/AddVolume", this, "");
 
-  fAddGeomVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Geometrical/AddSolid", this,
-      {G4State_Init, G4State_PreInit}, "Sphere Cylinder CylindricalShell Box");
+  fAddGeomVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+      directory + "/Geometrical/AddSolid", this, "Sphere Cylinder CylindricalShell Box");
 
   // Sphere
   fSphereInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Sphere/InnerRadius", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Sphere/InnerRadius", this, "Length", "L", "L >= 0");
 
   fSphereOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Sphere/OuterRadius", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Sphere/OuterRadius", this, "Length", "L", "L >= 0");
 
   // Cylinder
   fCylinderInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Cylinder/InnerRadius", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Cylinder/InnerRadius", this, "Length", "L", "L >= 0");
 
   fCylinderOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Cylinder/OuterRadius", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Cylinder/OuterRadius", this, "Length", "L", "L >= 0");
 
   fCylinderHeightVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Cylinder/Height", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Cylinder/Height", this, "Length", "L", "L >= 0");
 
   fCylinderStartingAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Cylinder/StartingAngle", this,
-      {G4State_Init, G4State_PreInit}, "Angle");
+      directory + "/Geometrical/Cylinder/StartingAngle", this, "Angle");
 
   fCylinderSpanningAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Cylinder/SpanningAngle", this,
-      {G4State_Init, G4State_PreInit}, "Angle");
+      directory + "/Geometrical/Cylinder/SpanningAngle", this, "Angle");
 
   // Box
   fBoxXLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Box/XLength", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Box/XLength", this, "Length", "L", "L >= 0");
 
   fBoxYLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Box/YLength", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Box/YLength", this, "Length", "L", "L >= 0");
 
   fBoxZLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
-      directory + "/Geometrical/Box/ZLength", this,
-      {G4State_Init, G4State_PreInit}, "Length", "L", "L >= 0");
+      directory + "/Geometrical/Box/ZLength", this, "Length", "L", "L >= 0");
 
   fGeomVolCenterCmd = RMGTools::MakeG4UIcmd<G4UIcmdWith3VectorAndUnit>(
-      directory + "/Geometrical/CenterPosition", this,
-      {G4State_Init, G4State_PreInit}, "Length");
+      directory + "/Geometrical/CenterPosition", this, "Length");
 
   fNPositionsamplingMaxCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(
-      directory + "/MaxSamplingTrials", this,
-      {G4State_Init, G4State_PreInit}, "N", "N > 0");
+      directory + "/MaxSamplingTrials", this, "N", "N > 0");
 }
 
 void RMGGeneratorVolumeConfinementMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {

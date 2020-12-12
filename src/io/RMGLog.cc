@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <sstream>
 #include <memory>
+#include <unistd.h> // for isatty()
 
 std::ofstream RMGLog::fOutputFileStream;
 

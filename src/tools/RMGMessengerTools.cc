@@ -11,8 +11,9 @@
 namespace RMGTools {
 
   template <typename T>
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String unit_cat, G4String unit_cand, G4String par_name, G4String range) {
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
+      unit_cat, G4String unit_cand, G4String par_name, G4String range,
+      std::vector<G4ApplicationState> avail_for) {
 
     std::unique_ptr<T> cmd(new T(name.c_str(), msg));
     for (auto& s : avail_for) cmd->AvailableForStates(s);
@@ -25,8 +26,8 @@ namespace RMGTools {
   }
 
   template <typename T>
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String par_name, G4String range) {
+  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
+      par_name, G4String range, std::vector<G4ApplicationState> avail_for) {
 
     std::unique_ptr<T> cmd(new T(name.c_str(), msg));
     for (auto& s : avail_for) cmd->AvailableForStates(s);
@@ -37,8 +38,9 @@ namespace RMGTools {
   }
 
   template <>
-  std::unique_ptr<G4UIcmdWithAString> MakeG4UIcmd<G4UIcmdWithAString>(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4String candidates) {
+  std::unique_ptr<G4UIcmdWithAString> MakeG4UIcmd<G4UIcmdWithAString>(G4String
+      name, G4UImessenger* msg, G4String candidates,
+      std::vector<G4ApplicationState> avail_for) {
 
     std::unique_ptr<G4UIcmdWithAString> cmd(new G4UIcmdWithAString(name.c_str(), msg));
     for (auto& s : avail_for) cmd->AvailableForStates(s);
@@ -48,8 +50,9 @@ namespace RMGTools {
   }
 
   template <>
-  std::unique_ptr<G4UIcmdWithABool> MakeG4UIcmd<G4UIcmdWithABool>(G4String name, G4UImessenger* msg,
-      std::vector<G4ApplicationState> avail_for, G4bool default_val, G4bool omittable) {
+  std::unique_ptr<G4UIcmdWithABool> MakeG4UIcmd<G4UIcmdWithABool>(G4String
+      name, G4UImessenger* msg, G4bool default_val, G4bool omittable,
+      std::vector<G4ApplicationState> avail_for) {
 
     std::unique_ptr<G4UIcmdWithABool> cmd(new G4UIcmdWithABool(name.c_str(), msg));
     for (auto& s : avail_for) cmd->AvailableForStates(s);

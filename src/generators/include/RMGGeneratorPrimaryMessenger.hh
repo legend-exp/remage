@@ -1,5 +1,7 @@
-#ifndef _RMGGENERATORPRIMARYMESSENGER_HH_
-#define _RMGGENERATORPRIMARYMESSENGER_HH_
+#ifndef _RMG_GENERATOR_PRIMARY_MESSENGER_HH_
+#define _RMG_GENERATOR_PRIMARY_MESSENGER_HH_
+
+#include <memory>
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
@@ -7,12 +9,7 @@
 class G4UIdirectory;
 class G4UIcommand;
 class G4UIcmdWithAString;
-class G4UIcmdWithoutParameter;
-class G4UIcmdWithAnInteger;
-class G4UIcmdWith3VectorAndUnit;
-class G4UIcmdWithADoubleAndUnit;
 class RMGGeneratorPrimary;
-
 class RMGGeneratorPrimaryMessenger : public G4UImessenger {
 
   public:
@@ -31,18 +28,10 @@ class RMGGeneratorPrimaryMessenger : public G4UImessenger {
 
     RMGGeneratorPrimary* fGeneratorPrimary;
 
-    G4UIdirectory*             fGeneratorDirectory;
-    G4UIcmdWithoutParameter*   fNameCmd;
-    G4UIcmdWithAString*        fSelectCmd;
-    G4UIcmdWithAString*        fConfineCmd;
-    G4UIcmdWithAString*        fVolumeCmd;
-    G4UIcmdWithAString*        fVolumeListCmd;
-    G4UIcmdWithAnInteger*      fVolumeListFromCmd;
-    G4UIcmdWithoutParameter*   fVolumeListClearCmd;
-    G4UIcmdWithAnInteger*      fVolumeListAddCmd;
-    G4UIcmdWithAnInteger*      fVolumeListToCmd;
-    G4UIcmdWithAString*        fVolumeArrayAddCmd;
-    G4UIcmdWith3VectorAndUnit* fPositionCmd;
+    std::unique_ptr<G4UIdirectory>           fGeneratorDirectory;
+
+    std::unique_ptr<G4UIcmdWithAString>      fSelectCmd;
+    std::unique_ptr<G4UIcmdWithAString>      fConfineCmd;
 };
 
 #endif
