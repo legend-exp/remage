@@ -1,13 +1,18 @@
-# TODO: list here manually all source files
+# List here manually all source files. Using GLOB is bad, see:
+# https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 add_library(${PROJECT_TARNAME} SHARED
+
     geometry/RMGNavigationTools.cc
+
     generators/RMGGeneratorUtil.cc
     generators/RMGGeneratorPrimary.cc
     generators/RMGGeneratorPrimaryMessenger.cc
     generators/RMGGeneratorVolumeConfinement.cc
     generators/RMGGeneratorVolumeConfinementMessenger.cc
+
     io/RMGLog.cc
     io/RMGVOutputManager.cc
+
     management/RMGManagementEventAction.cc
     management/RMGManagementEventActionMessenger.cc
     management/RMGManagementRunAction.cc
@@ -16,15 +21,23 @@ add_library(${PROJECT_TARNAME} SHARED
     management/RMGManagementTrackingAction.cc
     management/RMGManager.cc
     management/RMGManagerMessenger.cc
+
     materials/RMGMaterialTable.cc
     materials/RMGMaterialTableMessenger.cc
+
     processes/RMGProcessesList.cc
     processes/RMGProcessesMessenger.cc
     processes/RMGUIcmdStepLimit.cc
+
     tools/RMGMessengerTools.cc
 )
 
-# TODO: list here manually all project sub-directories
+# link against dependent libraries
+target_link_libraries(${PROJECT_TARNAME}
+    PUBLIC
+        ${Geant4_LIBRARIES}
+        ROOT::Core)
+
 set(COMPONENTS
     geometry
     generators
@@ -34,6 +47,16 @@ set(COMPONENTS
     processes
     tools
 )
+
+foreach(_sub ${COMPONENTS})
+    list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include")
+endforeach()
+
+target_include_directories(${PROJECT_TARNAME}
+    PUBLIC
+        "$<BUILD_INTERFACE:${_full_include_paths}>"
+        $<INSTALL_INTERFACE:include/${PROJECT_TARNAME}>
+        PRIVATE ${COMPONENTS})
 
 if(${PROJECT_VERSION} NOT EQUAL "unknown")
 set_target_properties(${PROJECT_TARNAME} PROPERTIES
@@ -45,20 +68,9 @@ set_target_properties(${PROJECT_TARNAME} PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR})
 endif()
 
-foreach(_sub ${COMPONENTS})
-    list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include")
-endforeach()
-
-target_include_directories(${PROJECT_TARNAME}
-    PUBLIC
-        "$<BUILD_INTERFACE:${_full_include_paths}>"
-        $<INSTALL_INTERFACE:include/${PROJECT_TARNAME}>
-    PRIVATE processes)
-
 install(TARGETS ${PROJECT_TARNAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}) # This is for Windows
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}) # This is for Windows
 
 foreach(_sub ${COMPONENTS})
     list(APPEND _include_paths "${_sub}/include")

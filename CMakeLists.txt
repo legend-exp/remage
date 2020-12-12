@@ -31,13 +31,10 @@ include(BuildType)
 
 # Find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-find_package(ROOT 6.06 REQUIRED Core Hist Tree Gui Graf MathCore Rint)
+find_package(ROOT 6.06 REQUIRED Core Tree)
 if(ROOT_FOUND)
     message(STATUS "Found ROOT - v" ${ROOT_VERSION})
 endif()
-
-# Define useful ROOT functions and macros
-include(${ROOT_USE_FILE})
 
 # # find BxDecay0
 # find_package(BxDecay0 1.0 REQUIRED)
