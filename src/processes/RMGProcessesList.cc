@@ -214,7 +214,7 @@ void RMGProcessesList::ConstructProcess() {
       // Remove G4Decay process, which requires a registered decay table
       G4VProcess* decay_proc = nullptr;
       auto pvec = proc_manager->GetAtRestProcessVector();
-      for (G4int j = 0; j < pvec->size() && decay_proc == nullptr; j++) {
+      for (size_t j = 0; j < pvec->size() && decay_proc == nullptr; j++) {
         if ((*pvec)[j]->GetProcessName() == "Decay") decay_proc = (*pvec)[j];
       }
       if (decay_proc) proc_manager->RemoveProcess(decay_proc);

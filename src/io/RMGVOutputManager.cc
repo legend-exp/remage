@@ -35,7 +35,7 @@ G4bool RMGVOutputManager::IsTrackTimeWindowed(const G4Track* aTrack) {
   // search for radioactive decay in the process list
   if (!fRadDecayProcPointer) {
     auto proc_list = G4GenericIon::GenericIon()->GetProcessManager()->GetProcessList();
-    for (G4int k = 0; k < proc_list->size(); k++) {
+    for (size_t k = 0; k < proc_list->size(); k++) {
       auto proc = (*proc_list)[k];
       if (proc->GetProcessName() == "RadioactiveDecay") {
         fRadDecayProcPointer = proc;
@@ -94,7 +94,7 @@ G4bool RMGVOutputManager::IsTrackImportanceSamplingWindowed(const G4Track* aTrac
       // RMGLog(debugging) << "particle = " << particleName << endlog;
 
       // loop over processes for this particle
-      for (G4int iproc = 0; iproc < pvector->size(); iproc++) {
+      for (size_t iproc = 0; iproc < pvector->size(); iproc++) {
 
         // get process name
         auto process = (*pvector)[iproc];

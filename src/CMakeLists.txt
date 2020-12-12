@@ -38,6 +38,7 @@ target_link_libraries(${PROJECT_TARNAME}
         ${Geant4_LIBRARIES}
         ROOT::Core)
 
+# let the project know where to find its headers
 set(COMPONENTS
     geometry
     generators
@@ -56,8 +57,10 @@ target_include_directories(${PROJECT_TARNAME}
     PUBLIC
         "$<BUILD_INTERFACE:${_full_include_paths}>"
         $<INSTALL_INTERFACE:include/${PROJECT_TARNAME}>
-        PRIVATE ${COMPONENTS})
+    PRIVATE
+        ${COMPONENTS})
 
+# attach project version to shared library
 if(${PROJECT_VERSION} NOT EQUAL "unknown")
 set_target_properties(${PROJECT_TARNAME} PROPERTIES
     VERSION ${PROJECT_VERSION})
@@ -68,6 +71,7 @@ set_target_properties(${PROJECT_TARNAME} PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR})
 endif()
 
+# configure install
 install(TARGETS ${PROJECT_TARNAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}) # This is for Windows

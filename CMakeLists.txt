@@ -56,11 +56,12 @@ endif()
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
 
-# TODO: fixing the standard creates problems if dependencies need higher
-# standards, e.g. ROOT when root is compiled with C++14. What's the best
-# way to deal with this?
-# set(CMAKE_CXX_STANDARD 11)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set C++ standard
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # all the code is located under src/
 add_subdirectory(src)
