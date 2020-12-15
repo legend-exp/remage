@@ -51,9 +51,10 @@ jobs:
     container: docker://gipert/remage-base:latest
 
     steps:
-      - name: Build docs with Doxygen
-        run: |
-          cd .. && mkdir build && cd build && cmake ../remage
-          make doc
+    - uses: actions/checkout@v2
+    - name: Build docs with Doxygen
+      run: |
+        cd .. && mkdir build && cd build && cmake ../remage
+        make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2
