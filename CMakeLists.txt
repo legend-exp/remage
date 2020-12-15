@@ -94,7 +94,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # all the code is located under src/
 add_subdirectory(src)
 # add_subdirectory(data)
-# add_subdirectory(doc)
+add_subdirectory(doc)
 enable_testing()
 add_subdirectory(test)
 

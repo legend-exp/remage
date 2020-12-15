@@ -10,7 +10,7 @@ macro(get_version_info)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if(_git_revision STREQUAL "")
-        message(WARNING "Cannot determine ${CMAKE_PROJECT_NAME} revision, is the .git directory there?")
+        message(WARNING "Cannot determine ${CMAKE_PROJECT_NAME} revision, is the .git directory there? Did you fetch tags from remote?")
         set(PROJECT_VERSION "unknown")
         set(PROJECT_VERSION_MAJOR "unknown")
     else()
