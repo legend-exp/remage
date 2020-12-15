@@ -15,15 +15,8 @@ jobs:
   test_on_linux:
     name: Test on Linux (Ubuntu LTS)
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        container_version:
-        - latest
-        # - ...
-
-      container: docker://gipert/remage-base:${{ matrix.container_version }}
+    container:
+      image: docker://gipert/remage-base:latest
 
     steps:
     - uses: actions/checkout@v2
