@@ -12,8 +12,8 @@ on:
 
 jobs:
 
-  test_in_legend_container:
-    name: Test in LEGEND container (CentOS)
+  test_on_linux:
+    name: Test on Linux (Ubuntu LTS)
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,7 +23,17 @@ jobs:
         - latest
         # - ...
 
-    container: docker://legendexp/legend-base:${{ matrix.container_version }}
+      container: docker://gipert/remage-base:${{ matrix.container_version }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build project
+      run: .github/workflows/build.sh
+
+  test_in_legend_container:
+    name: Test in LEGEND container (CentOS Linux)
+    runs-on: ubuntu-latest
+    container: docker://legendexp/legend-base:latest
 
     steps:
     - uses: actions/checkout@v2
@@ -41,15 +51,14 @@ jobs:
     - name: Build project
       run: .github/workflows/build.sh
 
-  # build_docs:
-  #   name: Build and deploy documentation
-  #   runs-on: ubuntu-latest
-  #   needs: test_in_legend_container
+  build_docs:
+    name: Build and deploy documentation
+    runs-on: ubuntu-latest
+    needs: test_on_linux
+    container: docker://gipert/remage-base:latest
 
-  #   steps:
-  #     - name: Install Doxygen
-  #       run: sudo apt-get install -y doxygen
-  #     - name: Build docs with Doxygen
-  #       run: make doc
+    steps:
+      - name: Build docs with Doxygen
+        run: make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2
