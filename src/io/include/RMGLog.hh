@@ -124,7 +124,7 @@ class RMGLog {
      * @param filename log filename
      * @param loglevelfile minimum log level for file output
      * @param loglevelscreen minimum log level for screen output */
-    static void OpenLog(const std::string& filename = "log.txt", RMGLog::LogLevel loglevelfile = RMGLog::debug, RMGLog::LogLevel loglevelscreen = RMGLog::summary);
+    static void OpenLogFile(const std::string& filename);
 
     /**
      * @returns true if log file is open or false if not. */

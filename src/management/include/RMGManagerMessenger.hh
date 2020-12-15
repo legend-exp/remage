@@ -1,14 +1,17 @@
-#ifndef _RMGMANAGERMESSENGER_HH
-#define _RMGMANAGERMESSENGER_HH
+#ifndef _RMG_MANAGER_MESSENGER_HH_
+#define _RMG_MANAGER_MESSENGER_HH_
+
+#include <vector>
+#include <memory>
 
 #include "globals.hh"
-#include "G4UIcommand.hh"
 #include "G4UImessenger.hh"
-#include "RMGManager.hh"
 
+class RMGManager;
+class G4UIcommand;
 class G4UIcmdWithAString;
 class G4UIcmdWithAnInteger;
-class G4UIcmdWithoutParameter;
+class G4UIcmdWithABool;
 class G4UIdirectory;
 class RMGManagerMessenger: public G4UImessenger {
 
@@ -26,12 +29,15 @@ class RMGManagerMessenger: public G4UImessenger {
 
   private:
 
-    G4UIdirectory*           fDirectory;
-    G4UIcmdWithAString*      fRMGLogCmd;
-    G4UIcmdWithAString*      fUseRandomEngineCmd;
-    G4UIcmdWithAnInteger*    fHEPRandomSeedCmd;
-    G4UIcmdWithAnInteger*    fUseInternalSeedCmd;
-    G4UIcmdWithoutParameter* fSeedWithDevRandomCmd;
+    std::vector<std::unique_ptr<G4UIdirectory>> fDirectories;
+
+    std::unique_ptr<G4UIcmdWithAString>   fScreenLogCmd;
+    std::unique_ptr<G4UIcmdWithAString>   fFileNameLogCmd;
+    std::unique_ptr<G4UIcmdWithAString>   fFileLogCmd;
+    std::unique_ptr<G4UIcmdWithAString>   fUseRandomEngineCmd;
+    std::unique_ptr<G4UIcmdWithAnInteger> fHEPRandomSeedCmd;
+    std::unique_ptr<G4UIcmdWithAnInteger> fUseInternalSeedCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fSeedWithDevRandomCmd;
 };
 
 #endif

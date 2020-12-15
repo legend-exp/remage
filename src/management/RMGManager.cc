@@ -6,7 +6,7 @@
 #include "RMGLog.hh"
 #include "RMGManagerMessenger.hh"
 
-RMGManager* RMGManager::fRMGManager = 0;
+RMGManager* RMGManager::fRMGManager = nullptr;
 
 RMGManager::RMGManager() {
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
@@ -16,6 +16,7 @@ RMGManager::RMGManager() {
 
 RMGManager::~RMGManager() {
   delete fG4Messenger;
+  if (RMGLog::IsOpen()) RMGLog::CloseLog();
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

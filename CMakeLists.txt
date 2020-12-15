@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(remage
-    # DESCRIPTION "Simulation framework for HPGe-based experiments" 
-    LANGUAGES CXX)
+    DESCRIPTION "Simulation framework for HPGe-based experiments" 
+    LANGUAGES C CXX) # C is needed for GEANT4's HDF5 support
 set(PROJECT_TARNAME remage)
 
 if(WIN32)
@@ -20,6 +20,7 @@ endif()
 
 # include path for custom modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules/)
+include(Colors)
 
 # get install directories names
 include(GNUInstallDirs)
@@ -31,32 +32,59 @@ include(BuildType)
 
 # Find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-find_package(ROOT 6.06 REQUIRED Core Tree)
+find_package(ROOT 6.06 QUIET COMPONENTS Core Tree)
 if(ROOT_FOUND)
-    message(STATUS "Found ROOT - v" ${ROOT_VERSION})
+    message(STATUS "Found ROOT v" ${ROOT_VERSION} ", support enabled")
 endif()
 
-# # find BxDecay0
-# find_package(BxDecay0 1.0 REQUIRED)
-# if(BxDecay0_FOUND)
-#     message(STATUS "Found BxDecay0 - v" ${BxDecay0_VERSION})
-# endif()
+option(REMAGE_USE_DECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" ON)
+# find BxDecay0
+find_package(BxDecay0 QUIET 1.0)
+if(BxDecay0_FOUND)
+    message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
+else()
+    message(STATUS "BxDecay0 not found, support disabled")
+endif()
 
 # Find Geant4
-option(WITH_GEANT4_UIVIS "Build ${CMAKE_PROJECT_NAME} with Geant4 UI and Vis drivers" ON)
-if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 10.4.3 REQUIRED gdml ui_all vis_all)
-else()
-  find_package(Geant4 10.4.3 REQUIRED gdml)
-endif()
+find_package(Geant4 10.4.3 REQUIRED)
 if(Geant4_FOUND)
-    message(STATUS "Found Geant4 - v" ${Geant4_VERSION})
+    message(STATUS "Found GEANT4 v" ${Geant4_VERSION})
+endif()
+
+# check for optional components
+find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreading gdml)
+
+if(Geant4_hdf5_FOUND)
+    message(STATUS "GEANT4 compiled with HDF5 support - enabling feature")
+else()
+    message(STATUS "GEANT4 lacks HDF5 support - disabling feature")
+endif()
+
+if(Geant4_usolids_FOUND)
+    message(STATUS "GEANT4 compiled with VecGeom support - enabling feature")
+else()
+    message(STATUS "GEANT4 lacks VecGeom support - disabling feature")
+endif()
+
+if(Geant4_multithreading_FOUND)
+    message(STATUS "GEANT4 compiled with multithreading support - enabling feature")
+else()
+    message(STATUS "GEANT4 lacks multithreading support - disabling feature")
+endif()
+
+if(Geant4_gdml_FOUND)
+    message(STATUS "GEANT4 compiled with GDML support - enabling feature")
+    set(REMAGE_HAS_GDML 1)
+else()
+    message(STATUS "GEANT4 lacks GDML support - disabling feature")
+    set(REMAGE_HAS_GDML 0)
 endif()
 
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
 
-# set C++ standard
+# set minimum C++ standard
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
@@ -67,15 +95,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src)
 # add_subdirectory(data)
 # add_subdirectory(doc)
+enable_testing()
+add_subdirectory(test)
 
-# option(BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} test suite" OFF)
-# if(BUILD_TESTS)
-#     message(STATUS "Building of test suite enabled")
-#     enable_testing()
-#     add_subdirectory(test)
-# endif()
-
-# get project version infos
+# get project version info from Git
 include(GetVersionInfo)
 get_version_info()
 
@@ -83,9 +106,4 @@ get_version_info()
 include(Toolchain)
 create_mage_toolchain()
 
-include(Colors)
-message(STATUS "${CMAKE_PROJECT_NAME} will be installed under ${CMAKE_INSTALL_PREFIX}")
-
-if(BUILD_TESTS)
-    message(STATUS "Run the test suite with 'make test'")
-endif()
+message(STATUS "${CMAKE_PROJECT_NAME} install prefix set to ${CMAKE_INSTALL_PREFIX}")

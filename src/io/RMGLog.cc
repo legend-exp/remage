@@ -30,7 +30,7 @@ bool RMGLog::fFirstOutputDone = false;
 
 bool RMGLog::fUsePrefix = true;
 
-std::string RMGLog::fVersion = PROJECT_VERSION;
+std::string RMGLog::fVersion = RMG_PROJECT_VERSION;
 
 // initialize them at start of program - mandatory
 // so that even if user redirects, we've a copy
@@ -47,7 +47,7 @@ RMGLog::RMGLog() {
 
 // ---------------------------------------------------------
 
-void RMGLog::OpenLog(const std::string& filename, RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen) {
+void RMGLog::OpenLogFile(const std::string& filename) {
 
     // suppress the ROOT Info printouts
     gErrorIgnoreLevel = 2000;
@@ -62,10 +62,6 @@ void RMGLog::OpenLog(const std::string& filename, RMGLog::LogLevel loglevelfile,
         std::cerr << " Could not open log file " << filename << ". " << std::endl;
         return;
     }
-
-    // set log level
-    RMGLog::SetLogLevelFile(loglevelfile);
-    RMGLog::SetLogLevelScreen(loglevelscreen);
 
     RMGLog::Out(RMGLog::summary, RMGLog::summary, "Opening logfile " + filename);
 }

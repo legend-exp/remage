@@ -1,5 +1,5 @@
-#ifndef _RMGMANAGER_HH_
-#define _RMGMANAGER_HH_
+#ifndef _RMG_MANAGER_HH_
+#define _RMG_MANAGER_HH_
 
 class G4RunManager;
 class G4VisManager;
@@ -26,14 +26,14 @@ class RMGManager {
 
     // getters
     static inline RMGManager*              GetRMGManager() { return fRMGManager; }
-    inline G4RunManager*                  GetG4RunManager() { return fG4RunManager; }
-    inline G4VisManager*                  GetG4VisManager() { return fG4VisManager; }
+    inline G4RunManager*                   GetG4RunManager() { return fG4RunManager; }
+    inline G4VisManager*                   GetG4VisManager() { return fG4VisManager; }
     inline RMGGeneratorPrimary*            GetRMGGeneratorPrimary() { return fGeneratorPrimary; }
     inline RMGManagerDetectorConstruction* GetManagerDetectorConstruction() { return fManagerDetectorConstruction; }
     inline RMGManagementEventAction*       GetRMGEventAction() { return fManagementEventAction;}
     inline RMGManagementRunAction*         GetRMGRunAction() { return fManagementRunAction;}
     inline RMGManagementSteppingAction*    GetRMGSteppingAction() { return fManagementSteppingAction; }
-    inline G4VUserPhysicsList*            GetRMGProcessesList() { return fProcessesList; }
+    inline G4VUserPhysicsList*             GetRMGProcessesList() { return fProcessesList; }
     inline RMGManagementStackingAction*    GetRMGStackingAction() { return fManagementStackingAction; }
     inline RMGManagementTrackingAction*    GetRMGTrackingAction() { return fManagementTrackingAction; }
 
@@ -44,16 +44,16 @@ class RMGManager {
     inline void SetUserInitialization(RMGManagerDetectorConstruction* det) { fManagerDetectorConstruction = det; }
     inline void SetUserInitialization(RMGManagementEventAction* evt) { fManagementEventAction = evt; }
     inline void SetUserInitialization(RMGManagementRunAction* runa) { fManagementRunAction = runa; }
-    inline void SetUserInitialization(RMGManagementTrackingAction* tracka) {fManagementTrackingAction = tracka;}
-    inline void SetUserInitialization(RMGManagementStackingAction* stacka) {fManagementStackingAction = stacka;}
+    inline void SetUserInitialization(RMGManagementTrackingAction* tracka) { fManagementTrackingAction = tracka; }
+    inline void SetUserInitialization(RMGManagementStackingAction* stacka) { fManagementStackingAction = stacka; }
     inline void SetUserInitialization(RMGManagementSteppingAction* stepa) { fManagementSteppingAction = stepa; }
     inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
 
   private:
 
-    G4RunManager*                   fG4RunManager;
-    G4VisManager*                   fG4VisManager;
-    G4VUserPhysicsList*             fProcessesList;
+    G4RunManager*                    fG4RunManager;
+    G4VisManager*                    fG4VisManager;
+    G4VUserPhysicsList*              fProcessesList;
     RMGGeneratorPrimary*             fGeneratorPrimary;
     RMGManagerDetectorConstruction*  fManagerDetectorConstruction;
     RMGManagementEventAction*        fManagementEventAction;

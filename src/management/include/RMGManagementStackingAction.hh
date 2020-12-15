@@ -9,7 +9,7 @@ class RMGManagementStackingAction : public G4UserStackingAction {
 
   public:
 
-    RMGManagementStackingAction(RMGManagementEventAction *eventaction);
+    RMGManagementStackingAction(RMGManagementEventAction*);
     ~RMGManagementStackingAction() = default;
 
     RMGManagementStackingAction           (RMGManagementStackingAction const&) = delete;
