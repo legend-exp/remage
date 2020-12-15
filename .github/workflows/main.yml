@@ -52,6 +52,8 @@ jobs:
 
     steps:
       - name: Build docs with Doxygen
-        run: make doc
+        run: |
+          - cd .. && mkdir build && cd build && cmake ../remage
+          - make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2
