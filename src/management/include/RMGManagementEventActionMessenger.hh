@@ -1,20 +1,21 @@
-#ifndef _RMGMANAGEMENTEVENTACTIONMESSENGER_HH_
-#define _RMGMANAGEMENTEVENTACTIONMESSENGER_HH_
+#ifndef _RMG_MANAGEMENT_EVENT_ACTION_MESSENGER_HH_
+#define _RMG_MANAGEMENT_EVENT_ACTION_MESSENGER_HH_
+
+#include <memory>
 
 #include "G4UImessenger.hh"
 
 class RMGManagementEventAction;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithAString;
-class G4UIcmdWithoutParameter;
+class G4UIcmdWithABool;
 class G4UIcommand;
 class G4UIdirectory;
-class G4UIcmdWithABool;
 class RMGManagementEventActionMessenger: public G4UImessenger  {
 
   public:
 
-    RMGManagementEventActionMessenger(RMGManagementEventAction *eventaction);
+    RMGManagementEventActionMessenger(RMGManagementEventAction*);
     ~RMGManagementEventActionMessenger();
 
     RMGManagementEventActionMessenger           (RMGManagementEventActionMessenger const&) = delete;
@@ -22,19 +23,19 @@ class RMGManagementEventActionMessenger: public G4UImessenger  {
     RMGManagementEventActionMessenger           (RMGManagementEventActionMessenger&&)      = delete;
     RMGManagementEventActionMessenger& operator=(RMGManagementEventActionMessenger&&)      = delete;
 
-    void SetNewValue(G4UIcommand *command, G4String newValues) override;
+    void SetNewValue(G4UIcommand*, G4String) override;
 
   private:
 
     RMGManagementEventAction* fEventAction;
 
-    G4UIdirectory*           fEventDirectory;
-    G4UIcmdWithoutParameter* fGetOutputSchemaCmd;
-    G4UIcmdWithAString*      fSetFileNameCmd;
-    G4UIcmdWithAString*      fSetSchemaCmd;
-    G4UIcmdWithAnInteger*    fSetReportingFrequencyCmd;
-    G4UIcmdWithAnInteger*    fSetWriteOutFrequencyCmd;
-    G4UIcmdWithABool*        fSetWriteOutFileDuringRunCmd;
+    std::unique_ptr<G4UIdirectory> fEventDirectory;
+
+    std::unique_ptr<G4UIcmdWithAString>      fSetFileNameCmd;
+    std::unique_ptr<G4UIcmdWithAString>      fSetSchemaCmd;
+    std::unique_ptr<G4UIcmdWithAnInteger>    fSetReportingFrequencyCmd;
+    std::unique_ptr<G4UIcmdWithAnInteger>    fSetWriteOutFrequencyCmd;
+    std::unique_ptr<G4UIcmdWithABool>        fSetWriteOutFileDuringRunCmd;
 };
 
 #endif

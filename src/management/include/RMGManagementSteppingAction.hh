@@ -1,5 +1,5 @@
-#ifndef _RMGMANAGEMENTSTEPPINGACTION_HH_
-#define _RMGMANAGEMENTSTEPPINGACTION_HH_
+#ifndef _RMG_MANAGEMENT_STEPPING_ACTION_HH_
+#define _RMG_MANAGEMENT_STEPPING_ACTION_HH_
 
 #include "G4UserSteppingAction.hh"
 
@@ -9,7 +9,7 @@ class RMGManagementSteppingAction : public G4UserSteppingAction {
 
   public:
 
-    RMGManagementSteppingAction(RMGManagementEventAction* eventaction);
+    RMGManagementSteppingAction(RMGManagementEventAction*);
     ~RMGManagementSteppingAction() = default;
 
     RMGManagementSteppingAction           (RMGManagementSteppingAction const&) = delete;
@@ -17,7 +17,7 @@ class RMGManagementSteppingAction : public G4UserSteppingAction {
     RMGManagementSteppingAction           (RMGManagementSteppingAction&&)      = delete;
     RMGManagementSteppingAction& operator=(RMGManagementSteppingAction&&)      = delete;
 
-    void UserSteppingAction(const G4Step *step) override;
+    void UserSteppingAction(const G4Step*) override;
 
   private:
 

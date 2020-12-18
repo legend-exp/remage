@@ -1,6 +1,8 @@
 #ifndef _RMG_MATERIAL_TABLE_HH_
 #define _RMG_MATERIAL_TABLE_HH_
 
+#include <memory>
+
 #include "globals.hh"
 
 class RMGMaterialTableMessenger;
@@ -18,7 +20,10 @@ class RMGMaterialTable {
 
   private:
 
-    RMGMaterialTableMessenger* fG4Messenger;
+    std::unique_ptr<RMGMaterialTableMessenger> fG4Messenger;
+
+    void InitializeMaterials();
+    void InitializeOpticalProperties();
 };
 
 #endif

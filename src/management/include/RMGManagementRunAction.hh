@@ -1,5 +1,5 @@
-#ifndef _RMGMANAGEMENTRUNACTION_HH_
-#define _RMGMANAGEMENTRUNACTION_HH_
+#ifndef _RMG_MANAGEMENT_RUN_ACTION_HH_
+#define _RMG_MANAGEMENT_RUN_ACTION_HH_
 
 #include <memory>
 #include <chrono>
