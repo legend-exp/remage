@@ -24,7 +24,7 @@ jobs:
         - G4.10.6
         - G4.10.5
       
-    container: docker://gipert/remage-base:${{ container_version }}
+    container: docker://gipert/remage-base:${{ matrix.container_version }}
 
     steps:
     - uses: actions/checkout@v2
