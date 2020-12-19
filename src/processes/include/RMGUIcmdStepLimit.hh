@@ -1,5 +1,5 @@
-#ifndef _RMGUICMDSTEPLIMIT_HH
-#define _RMGUICMDSTEPLIMIT_HH
+#ifndef _RMG_UI_CMD_STEP_LIMIT_HH_
+#define _RMG_UI_CMD_STEP_LIMIT_HH_
 
 #include "G4UIcommand.hh"
 

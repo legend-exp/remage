@@ -20,6 +20,7 @@ add_library(${PROJECT_TARNAME} SHARED
     management/RMGManagementSteppingAction.cc
     management/RMGManagementTrackingAction.cc
     management/RMGManager.cc
+    management/RMGManagerDetectorConstruction.cc
     management/RMGManagerMessenger.cc
 
     materials/RMGMaterialTable.cc
@@ -30,6 +31,7 @@ add_library(${PROJECT_TARNAME} SHARED
     processes/RMGUIcmdStepLimit.cc
 
     tools/RMGMessengerTools.cc
+    tools/RMGManagementTools.cc
 )
 
 # link against dependent libraries

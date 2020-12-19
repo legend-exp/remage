@@ -1,7 +1,8 @@
-#ifndef _RMGPROCESSESLIST_HH
-#define _RMGPROCESSESLIST_HH
+#ifndef _RMG_PROCESSES_LIST_HH_
+#define _RMG_PROCESSES_LIST_HH_
 
 #include <map>
+#include <memory>
 
 #include "G4VModularPhysicsList.hh"
 #include "globals.hh"
@@ -12,7 +13,6 @@ class RMGProcessesList : public G4VModularPhysicsList {
   public:
 
     RMGProcessesList();
-    ~RMGProcessesList() override;
 
     RMGProcessesList           (RMGProcessesList const&) = delete;
     RMGProcessesList& operator=(RMGProcessesList const&) = delete;
@@ -34,7 +34,7 @@ class RMGProcessesList : public G4VModularPhysicsList {
     inline G4bool GetOpticalFlag() {return fConstructOptical;};
 
     void DumpPhysicsList();
-    inline void LimitStepForParticle(G4String particle_name) {fLimitSteps[particle_name] = true;}
+    inline void LimitStepForParticle(G4String particle_name) {fLimitSteps.at(particle_name) = true;}
 
   protected:
 
@@ -66,7 +66,7 @@ class RMGProcessesList : public G4VModularPhysicsList {
 
     G4String fPhysicsListHadrons;
     std::map<G4String, G4bool> fLimitSteps;
-    RMGProcessesMessenger* fProcessesMessenger;
+    std::unique_ptr<RMGProcessesMessenger> fProcessesMessenger;
 };
 
 #endif

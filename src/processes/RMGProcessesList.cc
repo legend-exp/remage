@@ -1,5 +1,4 @@
-#include <iomanip>
-#include <sstream>
+#include "RMGProcessesList.hh"
 
 #include "G4ProcessManager.hh"
 #include "G4RegionStore.hh"
@@ -35,26 +34,23 @@
 #include "G4OpWLS.hh"
 #include "G4Cerenkov.hh"
 
-#include "RMGProcessesList.hh"
 #include "RMGProcessesMessenger.hh"
 #include "RMGLog.hh"
-
-using namespace CLHEP;
 
 RMGProcessesList::RMGProcessesList() :
   G4VModularPhysicsList() {
 
-  fProcessesMessenger = new RMGProcessesMessenger(this);
+  fProcessesMessenger = std::unique_ptr<RMGProcessesMessenger>(new RMGProcessesMessenger(this));
 
   // The default values for the energy thresholds are tuned to 100 keV
   // in natural germanium (i.e., the BBdecay realm)
-  G4VUserPhysicsList::defaultCutValue = 0.1*mm;
-  fCutForGamma                        = 0.1*mm;
-  fCutForElectron                     = 0.1*mm;
-  fCutForPositron                     = 0.1*mm;
-  fCutForGammaSensitive               = 0.1*mm;
-  fCutForElectronSensitive            = 0.1*mm;
-  fCutForPositronSensitive            = 0.1*mm;
+  G4VUserPhysicsList::defaultCutValue = 0.1*CLHEP::mm;
+  fCutForGamma                        = 0.1*CLHEP::mm;
+  fCutForElectron                     = 0.1*CLHEP::mm;
+  fCutForPositron                     = 0.1*CLHEP::mm;
+  fCutForGammaSensitive               = 0.1*CLHEP::mm;
+  fCutForElectronSensitive            = 0.1*CLHEP::mm;
+  fCutForPositronSensitive            = 0.1*CLHEP::mm;
   fCutForProton                       = 0.;
   fCutForAlpha                        = 0.;
   fCutForGenericIon                   = 0.;
@@ -70,10 +66,6 @@ RMGProcessesList::RMGProcessesList() :
   fUseOpticalPhysOnly = false;
 
   fPhysicsListHadrons = " ";
-}
-
-RMGProcessesList::~RMGProcessesList() {
-  delete fProcessesMessenger;
 }
 
 void RMGProcessesList::SetUseAngCorr(G4int max_two_j) {
@@ -208,7 +200,7 @@ void RMGProcessesList::ConstructProcess() {
 
     if (particle == G4Triton::Definition()) {
       RMGLog::Out(RMGLog::detail, " found trition particle ");
-      particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*second);
+      particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*CLHEP::second);
       particle->SetPDGStable(false);
       auto proc_manager = particle->GetProcessManager();
       // Remove G4Decay process, which requires a registered decay table
@@ -360,7 +352,7 @@ void RMGProcessesList::SetCuts() {
 
   G4HadronicProcessStore::Instance()->SetVerbose(G4VModularPhysicsList::verboseLevel);
   // special for low energy physics
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250*eV, 100.*GeV);
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250*CLHEP::eV, 100.*CLHEP::GeV);
 
   this->SetCutValue(fCutForGamma, "gamma");
   this->SetCutValue(fCutForElectron, "e-");
@@ -393,9 +385,9 @@ void RMGProcessesList::SetCuts() {
 void RMGProcessesList::SetRealm(G4String realm) {
   if (realm == "BBdecay") {
     RMGLog::Out(RMGLog::summary, "Realm set to BBdecay");
-    fCutForGamma             = 0.1*mm;
-    fCutForElectron          = 0.1*mm;
-    fCutForPositron          = 0.1*mm;
+    fCutForGamma             = 0.1*CLHEP::mm;
+    fCutForElectron          = 0.1*CLHEP::mm;
+    fCutForPositron          = 0.1*CLHEP::mm;
     fCutForProton            = G4VUserPhysicsList::defaultCutValue;
     fCutForAlpha             = G4VUserPhysicsList::defaultCutValue;
     fCutForGenericIon        = G4VUserPhysicsList::defaultCutValue;
@@ -408,9 +400,9 @@ void RMGProcessesList::SetRealm(G4String realm) {
     RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
     // These values are tuned to ~1 keV for gamma, e+, e- in
     // natural germanium.
-    fCutForGamma             = 0.005*mm;
-    fCutForElectron          = 0.0005*mm;
-    fCutForPositron          = 0.0005*mm;
+    fCutForGamma             = 0.005*CLHEP::mm;
+    fCutForElectron          = 0.0005*CLHEP::mm;
+    fCutForPositron          = 0.0005*CLHEP::mm;
     fCutForProton            = G4VUserPhysicsList::defaultCutValue;
     fCutForAlpha             = G4VUserPhysicsList::defaultCutValue;
     fCutForGenericIon        = G4VUserPhysicsList::defaultCutValue;
@@ -421,15 +413,15 @@ void RMGProcessesList::SetRealm(G4String realm) {
   }
   else if (realm == "CosmicRays") {
     RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
-    fCutForGamma             = 5*cm;
-    fCutForElectron          = 1*cm;
-    fCutForPositron          = 1*cm;
-    fCutForProton            = 5*mm;
-    fCutForAlpha             = 5*mm;
-    fCutForGenericIon        = 5*mm;
-    fCutForGammaSensitive    = 30*mm;
-    fCutForElectronSensitive = 0.04*mm;
-    fCutForPositronSensitive = 0.04*mm;
+    fCutForGamma             = 5*CLHEP::cm;
+    fCutForElectron          = 1*CLHEP::cm;
+    fCutForPositron          = 1*CLHEP::cm;
+    fCutForProton            = 5*CLHEP::mm;
+    fCutForAlpha             = 5*CLHEP::mm;
+    fCutForGenericIon        = 5*CLHEP::mm;
+    fCutForGammaSensitive    = 30*CLHEP::mm;
+    fCutForElectronSensitive = 0.04*CLHEP::mm;
+    fCutForPositronSensitive = 0.04*CLHEP::mm;
     this->SetCuts();
   }
   else {

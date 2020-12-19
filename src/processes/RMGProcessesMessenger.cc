@@ -1,119 +1,97 @@
 #include "RMGProcessesMessenger.hh"
-#include "RMGProcessesList.hh"
-#include "RMGUIcmdStepLimit.hh"
-// #include "RMGManager.hh"
-// #include "RMGManagerDetectorConstruction.hh"
+
+#include <map>
+#include <exception>
 
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAnInteger.hh"
-#include "G4UIcmdWithoutParameter.hh"
 #include "globals.hh"
-// #include "G4ProcessManager.hh"
-// #include "G4StepLimiter.hh"
+#include "G4ProcessManager.hh"
+#include "G4StepLimiter.hh"
+
+#include "RMGProcessesList.hh"
+#include "RMGUIcmdStepLimit.hh"
+#include "RMGManager.hh"
+#include "RMGManagerDetectorConstruction.hh"
+#include "RMGTools.hh"
+#include "RMGLog.hh"
 
 RMGProcessesMessenger::RMGProcessesMessenger(RMGProcessesList *plist) :
   fProcessesList(plist) {
 
-  fRMGProcessesDir = new G4UIdirectory("/RMG/processes/");
-  fRMGProcessesDir->SetGuidance("UI commands to control the energy realm of the simulation");
+  G4String directory = "/RMG/Processes";
 
-  fRMGProcessesChoiceCmd = new G4UIcmdWithAString("/RMG/processes/realm", this);
-  fRMGProcessesChoiceCmd->SetGuidance("Select the simulation realm");
-  fRMGProcessesChoiceCmd->SetParameterName("simRealm", false);
-  fRMGProcessesChoiceCmd->SetCandidates("BBdecay DarkMatter CosmicRays OpticalPhoton");
-  fRMGProcessesChoiceCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fProcessesDir = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
 
-  fOpticalProcessesCmd = new G4UIcmdWithABool("/RMG/processes/optical", this);
-  fOpticalProcessesCmd->SetGuidance("Switch on/off optical processes");
-  fOpticalProcessesCmd->SetGuidance("(default: false)");
-  fOpticalProcessesCmd->AvailableForStates(G4State_PreInit);
+  fRealmCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Realm", this,
+      "BBdecay DarkMatter CosmicRays OpticalPhoton");
 
-  fOpticalOnlyCmd = new G4UIcmdWithABool("/RMG/processes/opticalOnly", this);
-  fOpticalOnlyCmd->SetGuidance("Only use optical processes");
-  fOpticalOnlyCmd->SetGuidance("(default: false)");
-  fOpticalOnlyCmd->AvailableForStates(G4State_PreInit);
+  fOpticalProcessesCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/OpticalPhysics", this);
 
-  fLowEnergyProcessesCmd = new G4UIcmdWithABool("/RMG/processes/lowenergy", this);
-  fLowEnergyProcessesCmd->SetGuidance("Set on/off the LowE EM processes");
-  fLowEnergyProcessesCmd->SetGuidance("(default: true)");
-  fLowEnergyProcessesCmd->AvailableForStates(G4State_PreInit);
+  fOpticalOnlyCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/OpticalPhysicsOnly", this);
 
-  fLowEnergyProcessesOptionCmd = new G4UIcmdWithAnInteger("/RMG/processes/lowenergyOption", this);
-  fLowEnergyProcessesOptionCmd->SetGuidance("Switch between physics list options when lowenergy flag enabled");
-  fLowEnergyProcessesOptionCmd->SetGuidance("see https://geant4.web.cern.ch/node/1731#Ex");
-  fLowEnergyProcessesOptionCmd->SetGuidance("0 (default) Livermore");
-  fLowEnergyProcessesOptionCmd->SetGuidance("1           EmOption1");
-  fLowEnergyProcessesOptionCmd->SetGuidance("2           EmOption2");
-  fLowEnergyProcessesOptionCmd->SetGuidance("3           EmOption3");
-  fLowEnergyProcessesOptionCmd->SetGuidance("4           EmOption4");
-  fLowEnergyProcessesOptionCmd->SetGuidance("5           Penelope");
-  fLowEnergyProcessesOptionCmd->SetGuidance("6           LivermorePolarized");
-  fLowEnergyProcessesOptionCmd->AvailableForStates(G4State_PreInit);
-  fLowEnergyProcessesOptionCmd->SetDefaultValue(0);
+  fLowEnergyProcessesCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/LowEnergyEMPhysics", this);
 
-  // FIXME: uncomment this
-  // fStepLimitCmd = new RMGUIcmdStepLimit("/RMG/processes/setStepLimit", this);
-  // fGetStepLimitCmd = new G4UIcmdWithoutParameter("/RMG/processes/GetStepLimit", this);
-  // fGetStepLimitCmd->SetGuidance("Prints step limits for all particles");
+  fLowEnergyProcessesOptionCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>("/LowEnergyEMPhysicsOption", this,
+      "Livermore EmOption1 EmOption2 EmOption3 EmOption4 Penelope LivermorePolarized");
 
-  fAngCorrCmd = new G4UIcmdWithAnInteger("/RMG/processes/useAngCorr", this);
-  fAngCorrCmd->SetGuidance("Turn on angular correlations and optionally set max two J to something other than 20");
-  fAngCorrCmd->SetGuidance("Must be called before /run/initialize");
-  fAngCorrCmd->SetParameterName("maxTwoJ", true);
-  fAngCorrCmd->SetDefaultValue(20);
-  fAngCorrCmd->AvailableForStates(G4State_PreInit);
+  fStepLimitCmd = std::unique_ptr<RMGUIcmdStepLimit>(new RMGUIcmdStepLimit(directory + "/SetStepLimit", this));
 
-  fStoreICLevelData = new G4UIcmdWithABool("/RMG/processes/storeICLevelData", this);
-  fStoreICLevelData->SetGuidance("Enable storage of internal conversion level data. This has to be enabled manually due to the order in which processes are initialized");
-  fStoreICLevelData->SetGuidance("(default: true)");
-  fStoreICLevelData->SetDefaultValue(true);
-  fStoreICLevelData->AvailableForStates(G4State_PreInit);
-}
+  fUseAngCorrCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/AngularCorrelation", this);
 
-RMGProcessesMessenger::~RMGProcessesMessenger() {
-  delete fRMGProcessesChoiceCmd;
-  delete fRMGProcessesDir;
-  delete fOpticalProcessesCmd;
-  delete fOpticalOnlyCmd;
-  delete fLowEnergyProcessesCmd;
-  delete fLowEnergyProcessesOptionCmd;
-  // delete fStepLimitCmd;
-  // delete fGetStepLimitCmd;
-  delete fAngCorrCmd;
-  delete fStoreICLevelData;
+  fSetAngCorrCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(directory + "/TwoJMAX", this,
+      "x", "x >= 0");
+
+  fStoreICLevelData = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/StoreICLevelData", this);
 }
 
 void RMGProcessesMessenger::SetNewValue(G4UIcommand *cmd, G4String new_val) {
 
-  if (cmd == fRMGProcessesChoiceCmd) fProcessesList->SetRealm(new_val);
-  else if (cmd == fOpticalProcessesCmd) {
+  if (cmd == fRealmCmd.get()) {
+    fProcessesList->SetRealm(new_val);
+  }
+  else if (cmd == fOpticalProcessesCmd.get()) {
     fProcessesList->SetOpticalFlag(fOpticalProcessesCmd->GetNewBoolValue(new_val));
   }
-  else if (cmd == fOpticalOnlyCmd) {
+  else if (cmd == fOpticalOnlyCmd.get()) {
     fProcessesList->SetOpticalPhysicsOnly(fOpticalOnlyCmd->GetNewBoolValue(new_val));
   }
-  else if (cmd == fLowEnergyProcessesCmd) {
+  else if (cmd == fLowEnergyProcessesCmd.get()) {
     fProcessesList->SetLowEnergyFlag(fLowEnergyProcessesCmd->GetNewBoolValue(new_val));
   }
-  else if (cmd == fLowEnergyProcessesOptionCmd) {
-    fProcessesList->SetLowEnergyOption(fLowEnergyProcessesOptionCmd->GetNewIntValue(new_val));
-  }
-  // else if (cmd == fStepLimitCmd) {
-  //   G4String particle_name = fStepLimitCmd->GetParticleName(new_val);
-  //   fProcessesList->LimitStepForParticle(particle_name);
-  //   RMGLog(trace) << "Limit step for " << particle_name << endlog;
+  else if (cmd == fLowEnergyProcessesOptionCmd.get()) {
+    std::map<G4String, G4int> options = {
+      { "Livermore",          0 },
+      { "EmOption1",          1 },
+      { "EmOption2",          2 },
+      { "EmOption3",          3 },
+      { "EmOption4",          4 },
+      { "Penelope",           5 },
+      { "LivermorePolarized", 6 }
+    };
 
-  //   G4String volume_name = fStepLimitCmd->GetVolumeName(new_val);
-  //   G4double max_step = fStepLimitCmd->GetStepSize(new_val);
-  //   RMGManager::GetRMGManager()->GetManagerDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
-  // }
-  // else if (cmd == fGetStepLimitCmd) fProcessesList->GetStepLimits();
-  else if (cmd == fAngCorrCmd) {
-    fProcessesList->SetUseAngCorr(fAngCorrCmd->GetNewIntValue(new_val));
+    try {
+      fProcessesList->SetLowEnergyOption(options.at(new_val));
+    }
+    catch (const std::exception& e) {
+      RMGLog::Out(RMGLog::debug, e);
+      RMGLog::Out(RMGLog::fatal, "'", new_val, "' low energy option not known");
+    }
   }
-  else if (cmd == fStoreICLevelData) {
+  else if (cmd == fStepLimitCmd.get()) {
+    G4String particle_name = fStepLimitCmd->GetParticleName(new_val);
+    fProcessesList->LimitStepForParticle(particle_name);
+
+    G4String volume_name = fStepLimitCmd->GetVolumeName(new_val);
+    G4double max_step = fStepLimitCmd->GetStepSize(new_val);
+    RMGManager::GetRMGManager()->GetManagerDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
+  }
+  else if (cmd == fUseAngCorrCmd.get()) {
+    fProcessesList->SetUseAngCorr(fUseAngCorrCmd->GetNewBoolValue(new_val));
+  }
+  else if (cmd == fStoreICLevelData.get()) {
     fProcessesList->SetStoreICLevelData(fStoreICLevelData->GetNewBoolValue(new_val));
   }
 }

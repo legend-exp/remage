@@ -1,18 +1,17 @@
-#ifndef _RMGPROCESSESMESSENGER_HH
-#define _RMGPROCESSESMESSENGER_HH
+#ifndef _RMG_PROCESSES_MESSENGER_HH_
+#define _RMG_PROCESSES_MESSENGER_HH_
+
+#include <memory>
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
 
 class RMGProcessesList;
-
 class G4UIdirectory;
 class G4UIcmdWithAString;
-class G4UIcmdWithoutParameter;
-class G4UIcmdWithABool;
-// class RMGUIcmdStepLimit;
-// class G4UIcmdWithoutParameter;
 class G4UIcmdWithAnInteger;
+class G4UIcmdWithABool;
+class RMGUIcmdStepLimit;
 class RMGProcessesMessenger : public G4UImessenger {
 
   public:
@@ -29,17 +28,19 @@ class RMGProcessesMessenger : public G4UImessenger {
 
   private:
 
-    RMGProcessesList*         fProcessesList;
-    G4UIdirectory*           fRMGProcessesDir;
-    G4UIcmdWithAString*      fRMGProcessesChoiceCmd;
-    G4UIcmdWithABool*        fOpticalProcessesCmd;
-    G4UIcmdWithABool*        fOpticalOnlyCmd;
-    G4UIcmdWithABool*        fLowEnergyProcessesCmd;
-    G4UIcmdWithAnInteger*    fLowEnergyProcessesOptionCmd;
-    // G4UIcmdWithoutParameter* fGetStepLimitCmd;
-    // RMGUIcmdStepLimit*        fStepLimitCmd;
-    G4UIcmdWithAnInteger*    fAngCorrCmd;
-    G4UIcmdWithABool*        fStoreICLevelData;
+    RMGProcessesList* fProcessesList;
+
+    std::unique_ptr<G4UIdirectory> fProcessesDir;
+
+    std::unique_ptr<G4UIcmdWithAString>   fRealmCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fOpticalProcessesCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fOpticalOnlyCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fLowEnergyProcessesCmd;
+    std::unique_ptr<G4UIcmdWithAString>   fLowEnergyProcessesOptionCmd;
+    std::unique_ptr<RMGUIcmdStepLimit>    fStepLimitCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fUseAngCorrCmd;
+    std::unique_ptr<G4UIcmdWithAnInteger> fSetAngCorrCmd;
+    std::unique_ptr<G4UIcmdWithABool>     fStoreICLevelData;
 };
 
 #endif
