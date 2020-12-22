@@ -30,22 +30,6 @@ set(CMAKE_INSTALL_LIBDIR lib)
 # Set default build type
 include(BuildType)
 
-# Find ROOT
-list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-find_package(ROOT 6.06 QUIET COMPONENTS Core Tree)
-if(ROOT_FOUND)
-    message(STATUS "Found ROOT v" ${ROOT_VERSION} ", support enabled")
-endif()
-
-option(REMAGE_USE_DECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" ON)
-# find BxDecay0
-find_package(BxDecay0 1.0 COMPONENTS BxDecay0_Geant4)
-if(BxDecay0_FOUND)
-    message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
-else()
-    message(STATUS "BxDecay0 not found, support disabled")
-endif()
-
 # Find Geant4
 find_package(Geant4 10.4.3 REQUIRED)
 if(Geant4_FOUND)
@@ -83,6 +67,27 @@ endif()
 
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
+
+# Find ROOT
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+find_package(ROOT 6.06 QUIET COMPONENTS Core Tree)
+if(ROOT_FOUND)
+    message(STATUS "Found ROOT v" ${ROOT_VERSION} ", support enabled")
+endif()
+
+option(REMAGE_USE_DECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" ON)
+# find BxDecay0
+find_package(BxDecay0 1.0 QUIET)
+if(BxDecay0_FOUND)
+    if(NOT TARGET BxDecay0::BxDecay0_Geant4)
+        message(WARNING "BxDecay0 v" ${BxDecay0_VERSION} " found but without Geant4 extension library, recompile with -DBXDECAY0_WITH_GEANT4_EXTENSION. Disabling support")
+        set(BxDecay0_FOUND FALSE)
+    else()
+        message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
+    endif()
+else()
+    message(STATUS "BxDecay0 not found, support disabled")
+endif()
 
 # set minimum C++ standard
 if(NOT CMAKE_CXX_STANDARD)

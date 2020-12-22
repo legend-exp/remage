@@ -173,13 +173,11 @@ void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscree
 // ---------------------------------------------------------
 
 void RMGLog::StartupInfo() {
-    const char* message = Form(
-                              " +------------------------------------------------------+\n"
-                              " |                                                      |\n"
-                              " | remage version %-12s                          |\n"
-                              " |                                                      |\n"
-                              " +------------------------------------------------------+\n",
-                              RMGLog::fVersion.data());
+
+    std::string message = "";
+    message += " >>>\n";
+    message += " >>> remage version: " + RMGLog::fVersion + "\n";
+    message += " >>>\n";
 
     // write message to screen
     if (RMGLog::fMinimumLogLevelScreen < RMGLog::nothing)
