@@ -51,7 +51,7 @@ target_link_libraries(${PROJECT_TARNAME}
 if(BxDecay0_FOUND)
 target_link_libraries(${PROJECT_TARNAME}
     PUBLIC
-        BxDecay0::BxDecay0)
+        BxDecay0::BxDecay0
         BxDecay0::BxDecay0_Geant4)
 endif()
 
