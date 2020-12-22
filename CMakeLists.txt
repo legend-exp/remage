@@ -95,6 +95,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
 # all the code is located under src/
 add_subdirectory(src)

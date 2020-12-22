@@ -21,6 +21,8 @@
 #include <sstream>
 #include <memory>
 #include <unistd.h> // for isatty()
+#include <cstring>
+#include <algorithm>
 
 std::ofstream RMGLog::fOutputFileStream;
 
