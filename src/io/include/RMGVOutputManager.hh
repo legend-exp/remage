@@ -58,10 +58,9 @@ class RMGVOutputManager {
     virtual void PostUserTrackingAction(const G4Track*);
 
     //Define detector specific tree schema
-    //TODO: MUST defined in the derived class, make explicit
-    virtual void DefineSchema();
-    virtual void OpenFile();
-    virtual void CloseFile();
+    virtual void DefineSchema() = 0;
+    virtual void OpenFile() = 0;
+    virtual void CloseFile() = 0;
     // allow for one to write out files in the midst of a run
     // (to save data being trashed by aborts)
     // By default, does nothing.

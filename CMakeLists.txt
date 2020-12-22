@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 project(remage
     DESCRIPTION "Simulation framework for HPGe-based experiments" 
     LANGUAGES C CXX) # C is needed for GEANT4's HDF5 support
@@ -39,7 +39,7 @@ endif()
 
 option(REMAGE_USE_DECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" ON)
 # find BxDecay0
-find_package(BxDecay0 QUIET 1.0)
+find_package(BxDecay0 1.0 COMPONENTS BxDecay0_Geant4)
 if(BxDecay0_FOUND)
     message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
 else()

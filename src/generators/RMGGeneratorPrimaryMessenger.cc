@@ -15,6 +15,10 @@
 #include "RMGGeneratorSPS.hh"
 #include "RMGTools.hh"
 #include "RMGLog.hh"
+#include "ProjectInfo.hh"
+#if RMG_HAS_BXDECAY0
+#include "RMGGeneratorDecay0.hh"
+#endif
 
 RMGGeneratorPrimaryMessenger::RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary* generator) :
   fGeneratorPrimary(generator) {
@@ -22,8 +26,13 @@ RMGGeneratorPrimaryMessenger::RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary* 
   G4String directory = "/RMG/Generator";
   fGeneratorDirectory = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
 
+  G4String generators = "SPS G4Gun";
+#if RMG_HAS_BXDECAY0
+  generators += " Decay0";
+#endif
+
   fSelectCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
-      directory + "/Select", this, "SPS G4Gun");
+      directory + "/Select", this, generators, {G4State_Init, G4State_PreInit});
 
   fConfineCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Confine", this,
     "UnConfined Volume");
@@ -38,7 +47,11 @@ void RMGGeneratorPrimaryMessenger::SetNewValue(G4UIcommand* cmd, G4String new_va
     else if (new_values == "SPS") {
       fGeneratorPrimary->SetGenerator(new RMGGeneratorSPS);
     }
-    // else if...
+#if RMG_HAS_BXDECAY0
+    else if (new_values == "Decay0") {
+      fGeneratorPrimary->SetGenerator(new RMGGeneratorDecay0);
+    }
+#endif
     else RMGLog::Out(RMGLog::fatal, "Unknown generator '", new_values, "'");
   }
   else if (cmd == fConfineCmd.get()) {

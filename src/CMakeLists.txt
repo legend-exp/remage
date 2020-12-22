@@ -1,7 +1,7 @@
 # List here manually all source files. Using GLOB is bad, see:
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
-add_library(${PROJECT_TARNAME} SHARED
 
+set(PROJECT_SOURCES
     geometry/RMGNavigationTools.cc
 
     generators/RMGGeneratorUtil.cc
@@ -34,11 +34,32 @@ add_library(${PROJECT_TARNAME} SHARED
     tools/RMGManagementTools.cc
 )
 
+if(BxDecay0_FOUND)
+    list(APPEND PROJECT_SOURCES
+        generators/RMGGeneratorDecay0.cc
+        generators/RMGGeneratorDecay0Messenger.cc
+    )
+endif()
+
+add_library(${PROJECT_TARNAME} SHARED ${PROJECT_SOURCES})
+
 # link against dependent libraries
 target_link_libraries(${PROJECT_TARNAME}
     PUBLIC
-        ${Geant4_LIBRARIES}
+        ${Geant4_LIBRARIES})
+
+if(BxDecay0_FOUND)
+target_link_libraries(${PROJECT_TARNAME}
+    PUBLIC
+        BxDecay0::BxDecay0)
+        BxDecay0::BxDecay0_Geant4)
+endif()
+
+if(ROOT_FOUND)
+target_link_libraries(${PROJECT_TARNAME}
+    PUBLIC
         ROOT::Core)
+endif()
 
 # let the project know where to find its headers
 set(COMPONENTS

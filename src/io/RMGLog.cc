@@ -11,8 +11,10 @@
 #include "RMGLog.hh"
 #include "ProjectInfo.hh"
 
+#if RMG_HAS_ROOT
 #include <TError.h>
 #include <TROOT.h>
+#endif
 
 #include <iostream>
 #include <iomanip>
@@ -41,16 +43,20 @@ std::streambuf const *clogbuf = std::clog.rdbuf();
 // ---------------------------------------------------------
 
 RMGLog::RMGLog() {
+#if RMG_HAS_ROOT
     // suppress the ROOT Info printouts
     gErrorIgnoreLevel = 2000;
+#endif
 }
 
 // ---------------------------------------------------------
 
 void RMGLog::OpenLogFile(const std::string& filename) {
 
+#if RMG_HAS_ROOT
     // suppress the ROOT Info printouts
     gErrorIgnoreLevel = 2000;
+#endif
 
     // first close and flush and existing log file
     CloseLog();

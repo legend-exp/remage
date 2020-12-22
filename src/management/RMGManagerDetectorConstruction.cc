@@ -7,7 +7,10 @@
 
 #include "RMGMaterialTable.hh"
 
+RMGMaterialTable::BathMaterial RMGManagerDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kUndefined;
+
 RMGManagerDetectorConstruction::RMGManagerDetectorConstruction() {
+
   fMaterialTable = std::unique_ptr<RMGMaterialTable>(new RMGMaterialTable());
 }
 

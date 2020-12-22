@@ -1,10 +1,15 @@
 #ifndef _RMG_MATERIAL_TABLE_MESSENGER_HH_
 #define _RMG_MATERIAL_TABLE_MESSENGER_HH_
 
+#include <vector>
+#include <memory>
+
 #include "globals.hh"
 #include "G4UImessenger.hh"
 
 class RMGMaterialTable;
+class G4UIdirectory;
+class G4UIcmdWithADoubleAndUnit;
 class RMGMaterialTableMessenger : public G4UImessenger {
 
   public:
@@ -21,9 +26,13 @@ class RMGMaterialTableMessenger : public G4UImessenger {
 
   private:
 
-    RMGMaterialTable* fMatTable;
+    RMGMaterialTable* fMaterialTable;
 
-    G4UIdirectory* fGeneralDir;
+    std::vector<std::unique_ptr<G4UIdirectory>> fDirectories;
+    std::unique_ptr<G4UIcmdWithADoubleAndUnit> fLArFlatTopPhotonYieldCmd;
+    std::unique_ptr<G4UIcmdWithADoubleAndUnit> fLArSingletLifetimeCmd;
+    std::unique_ptr<G4UIcmdWithADoubleAndUnit> fLArTripletLifetimeCmd;
+    std::unique_ptr<G4UIcmdWithADoubleAndUnit> fLArVUVAbsorptionLengthCmd;
 };
 
 #endif
