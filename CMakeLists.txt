@@ -112,4 +112,7 @@ get_version_info()
 include(Toolchain)
 create_mage_toolchain()
 
+include(DependencyGraph)
+gen_dep_graph(pdf)
+
 message(STATUS "${CMAKE_PROJECT_NAME} install prefix set to ${CMAKE_INSTALL_PREFIX}")
