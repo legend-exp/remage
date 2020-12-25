@@ -445,7 +445,7 @@ void RMGProcessesList::ConstructCerenkov() {
   }
 }
 
-// void RMGProcessesList::DumpPhysicsList() {
+void RMGProcessesList::DumpPhysicsList() {
 //   RMGLog::Out(RMGLog::detail, "====================================================================");
 //   RMGLog::Out(RMGLog::detail, "                      MaGe physics list                             ");
 //   RMGLog::Out(RMGLog::detail, "====================================================================");
@@ -464,8 +464,7 @@ void RMGProcessesList::ConstructCerenkov() {
 //   }
 //   RMGLog::Out(RMGLog::detail, physics_list_hadrons_);
 //   RMGLog::Out(RMGLog::detail, "====================================================================");
-//   return;
-// }
+}
 
 void RMGProcessesList::GetStepLimits() {
   this->DumpPhysicsList();

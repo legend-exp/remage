@@ -10,6 +10,9 @@
 #include "RMGLog.hh"
 #include "RMGManagerDetectorConstruction.hh"
 
+std::map<G4String, G4String> RMGMaterialTable::fMaterialAliases = {};
+std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperature> fPropertiesAtTemperatureTable = {};
+
 RMGMaterialTable::RMGMaterialTable() {
 
   fG4Messenger = std::unique_ptr<RMGMaterialTableMessenger>(new RMGMaterialTableMessenger(this));

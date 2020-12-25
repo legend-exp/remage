@@ -1,4 +1,3 @@
-#include "RMGTools.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
@@ -62,4 +61,5 @@ namespace RMGTools {
     return cmd;
   }
 }
-// vim: shiftwidth=2 tabstop=2 expandtab 
+
+// vim: shiftwidth=2 tabstop=2 expandtab

@@ -1,3 +1,6 @@
+#ifndef _RMG_TOOLS_HH_
+#define _RMG_TOOLS_HH_
+
 #include <memory>
 #include <vector>
 #include <utility>
@@ -29,5 +32,9 @@ namespace RMGTools {
 
   std::tm ToUTCTime(std::chrono::time_point<std::chrono::system_clock> t);
 }
+
+#include "RMGMessengerTools.icc"
+
+#endif
 
 // vim: shiftwidth=2 tabstop=2 expandtab

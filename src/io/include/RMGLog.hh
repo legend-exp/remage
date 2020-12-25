@@ -22,6 +22,8 @@
 
 // ---------------------------------------------------------
 
+#include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string>
 #include <cstdio>
@@ -143,17 +145,19 @@ class RMGLog {
     static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg);
 
     template <typename T, typename... Args>
-    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, T& msg_first, Args... msg_other);
+    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg_first, const Args&... msg_other);
 
     static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...);
 
     static void OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...);
 
     template <typename T>
-    static inline void Out(RMGLog::LogLevel loglevel, const T& msg) { Out(loglevel, loglevel, msg); }
+    static inline void Out(RMGLog::LogLevel loglevel, const T& msg) { RMGLog::Out(loglevel, loglevel, msg); }
 
     template <typename T, typename... Args>
-    static inline void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) { Out(loglevel, loglevel, msg_first, msg_other...); }
+    static inline void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
+        RMGLog::Out(loglevel, loglevel, msg_first, msg_other...);
+    }
 
     /**
      * Writes startup information onto screen and into a logfile */
@@ -169,7 +173,7 @@ class RMGLog {
   private:
 
     template <typename T>
-    static void Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, T& t, bool prefixed=true, bool do_flush=true);
+    static void Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed=true, bool do_flush=true);
 
     /**
      * Converts a log level to a string
@@ -205,7 +209,7 @@ class RMGLog {
 
 };
 
-// ---------------------------------------------------------
+#include "RMGLog.icc"
 
 #endif
 

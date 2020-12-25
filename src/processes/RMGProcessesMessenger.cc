@@ -76,7 +76,7 @@ void RMGProcessesMessenger::SetNewValue(G4UIcommand *cmd, G4String new_val) {
       fProcessesList->SetLowEnergyOption(options.at(new_val));
     }
     catch (const std::exception& e) {
-      RMGLog::Out(RMGLog::debug, e);
+      RMGLog::Out(RMGLog::debug, e.what());
       RMGLog::Out(RMGLog::fatal, "'", new_val, "' low energy option not known");
     }
   }
