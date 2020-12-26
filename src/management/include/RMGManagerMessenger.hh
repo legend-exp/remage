@@ -6,19 +6,19 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithAnInteger.hh"
+#include "G4UIcmdWithABool.hh"
 
 class RMGManager;
 class G4UIcommand;
-class G4UIcmdWithAString;
-class G4UIcmdWithAnInteger;
-class G4UIcmdWithABool;
-class G4UIdirectory;
 class RMGManagerMessenger: public G4UImessenger {
 
   public:
 
-    RMGManagerMessenger(RMGManager *manager);
-    ~RMGManagerMessenger();
+    RMGManagerMessenger(RMGManager* manager);
+    ~RMGManagerMessenger() = default;
 
     RMGManagerMessenger           (RMGManagerMessenger const&) = delete;
     RMGManagerMessenger& operator=(RMGManagerMessenger const&) = delete;

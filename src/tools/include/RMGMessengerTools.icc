@@ -10,7 +10,7 @@
 namespace RMGTools {
 
   template <typename T>
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
+  inline std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
       unit_cat, G4String unit_cand, G4String par_name, G4String range,
       std::vector<G4ApplicationState> avail_for) {
 
@@ -25,7 +25,7 @@ namespace RMGTools {
   }
 
   template <typename T>
-  std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
+  inline std::unique_ptr<T> MakeG4UIcmd(G4String name, G4UImessenger* msg, G4String
       par_name, G4String range, std::vector<G4ApplicationState> avail_for) {
 
     std::unique_ptr<T> cmd(new T(name.c_str(), msg));
@@ -37,7 +37,7 @@ namespace RMGTools {
   }
 
   template <>
-  std::unique_ptr<G4UIcmdWithAString> MakeG4UIcmd<G4UIcmdWithAString>(G4String
+  inline std::unique_ptr<G4UIcmdWithAString> MakeG4UIcmd<G4UIcmdWithAString>(G4String
       name, G4UImessenger* msg, G4String candidates,
       std::vector<G4ApplicationState> avail_for) {
 
@@ -49,7 +49,7 @@ namespace RMGTools {
   }
 
   template <>
-  std::unique_ptr<G4UIcmdWithABool> MakeG4UIcmd<G4UIcmdWithABool>(G4String
+  inline std::unique_ptr<G4UIcmdWithABool> MakeG4UIcmd<G4UIcmdWithABool>(G4String
       name, G4UImessenger* msg, G4bool default_val, G4bool omittable,
       std::vector<G4ApplicationState> avail_for) {
 

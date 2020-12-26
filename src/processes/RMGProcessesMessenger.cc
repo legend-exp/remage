@@ -3,16 +3,11 @@
 #include <map>
 #include <exception>
 
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWithAString.hh"
-#include "G4UIcmdWithABool.hh"
-#include "G4UIcmdWithAnInteger.hh"
 #include "globals.hh"
 #include "G4ProcessManager.hh"
 #include "G4StepLimiter.hh"
 
 #include "RMGProcessesList.hh"
-#include "RMGUIcmdStepLimit.hh"
 #include "RMGManager.hh"
 #include "RMGManagerDetectorConstruction.hh"
 #include "RMGTools.hh"

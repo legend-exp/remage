@@ -5,17 +5,17 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithAString.hh"
 
-class G4UIdirectory;
 class G4UIcommand;
-class G4UIcmdWithAString;
 class RMGGeneratorPrimary;
 class RMGGeneratorPrimaryMessenger : public G4UImessenger {
 
   public:
 
     RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary *generator);
-    ~RMGGeneratorPrimaryMessenger();
+    ~RMGGeneratorPrimaryMessenger() = default;
 
     RMGGeneratorPrimaryMessenger           (RMGGeneratorPrimaryMessenger const&) = delete;
     RMGGeneratorPrimaryMessenger& operator=(RMGGeneratorPrimaryMessenger const&) = delete;

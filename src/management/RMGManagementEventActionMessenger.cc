@@ -1,10 +1,6 @@
 #include "RMGManagementEventActionMessenger.hh"
 
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWithAnInteger.hh"
-#include "G4UIcmdWithAString.hh"
 #include "G4UIcommand.hh"
-#include "G4UIcmdWithABool.hh"
 #include "G4UImessenger.hh"
 
 #include "RMGManagementEventAction.hh"

@@ -6,14 +6,13 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithAnInteger.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
 
-class G4UIdirectory;
 class G4UIcommand;
-class G4UIcmdWithAString;
-class G4UIcmdWithoutParameter;
-class G4UIcmdWithAnInteger; 
-class G4UIcmdWith3VectorAndUnit;
-class G4UIcmdWithADoubleAndUnit;
 class RMGGeneratorVolumeConfinement;
 class RMGGeneratorVolumeConfinementMessenger : public G4UImessenger {
 

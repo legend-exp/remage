@@ -4,7 +4,7 @@
 #include "RMGVOutputManager.hh"
 #include "RMGLog.hh"
 
-G4String  RMGVOutputManager::fFileName = "";
+G4String RMGVOutputManager::fFileName = "";
 
 RMGVOutputManager::RMGVOutputManager():
   fUseTimeWindow(false),

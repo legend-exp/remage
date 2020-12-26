@@ -9,13 +9,12 @@
 #include "RMGMaterialTable.hh"
 
 class G4VPhysicalVolume;
-class RMGMaterialTable;
 class RMGManagerDetectorConstruction : public G4VUserDetectorConstruction {
 
   public:
 
     RMGManagerDetectorConstruction();
-    ~RMGManagerDetectorConstruction() override;
+    ~RMGManagerDetectorConstruction() = default;
 
     RMGManagerDetectorConstruction           (RMGManagerDetectorConstruction const&) = delete;
     RMGManagerDetectorConstruction& operator=(RMGManagerDetectorConstruction const&) = delete;

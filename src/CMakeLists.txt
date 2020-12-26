@@ -11,7 +11,7 @@ set(PROJECT_SOURCES
     generators/RMGGeneratorVolumeConfinementMessenger.cc
 
     io/RMGLog.cc
-    io/RMGVOutputManager.cc
+    # io/RMGVOutputManager.cc
 
     management/RMGManagementEventAction.cc
     management/RMGManagementEventActionMessenger.cc

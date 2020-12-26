@@ -1,13 +1,7 @@
 #include "RMGGeneratorVolumeConfinementMessenger.hh"
 
 #include "globals.hh"
-#include "G4UIcmdWithoutParameter.hh"
-#include "G4UIcmdWithAString.hh"
-#include "G4UIcmdWithAnInteger.hh"
-#include "G4UIdirectory.hh"
 #include "G4PhysicalVolumeStore.hh"
-#include "G4UIcmdWith3VectorAndUnit.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
 
 #include "RMGGeneratorVolumeConfinement.hh"
 #include "RMGTools.hh"

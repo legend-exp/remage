@@ -11,6 +11,8 @@ class RMGVGenerator {
 
   public:
 
+    RMGVGenerator() = delete;
+
     inline RMGVGenerator(G4String name) :
       fGeneratorName(name),
       fReportingFrequency(1000) {};

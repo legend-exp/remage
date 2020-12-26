@@ -11,7 +11,7 @@
 #include "RMGManagerDetectorConstruction.hh"
 
 std::map<G4String, G4String> RMGMaterialTable::fMaterialAliases = {};
-std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperature> fPropertiesAtTemperatureTable = {};
+std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperature> RMGMaterialTable::fPropertiesAtTemperatureTable = {};
 
 RMGMaterialTable::RMGMaterialTable() {
 
@@ -23,7 +23,7 @@ RMGMaterialTable::RMGMaterialTable() {
   fLArProperties.triplet_lifetime = 1 *CLHEP::us;
   fLArProperties.vuv_absorption_length = 30 *CLHEP::cm;
 
-  fPropertiesAtTemperatureTable.emplace(BathMaterial::kUndefined,
+  fPropertiesAtTemperatureTable.emplace(BathMaterial::kNone,
       PropertiesAtTemperature("",
         5.32 *CLHEP::g/CLHEP::cm3,
         5.54 *CLHEP::g/CLHEP::cm3));
@@ -49,7 +49,7 @@ G4Material* RMGMaterialTable::GetMaterial(G4String name) {
 }
 
 G4Material* RMGMaterialTable::GetMaterial(RMGMaterialTable::BathMaterial val) {
-  if (val == BathMaterial::kUndefined) return nullptr;
+  if (val == BathMaterial::kNone) return nullptr;
   else {
     return RMGMaterialTable::GetMaterial(fPropertiesAtTemperatureTable[val].g4_name);
   }

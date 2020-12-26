@@ -1,5 +1,5 @@
-#ifndef __RMGLOG_HH
-#define __RMGLOG_HH
+#ifndef _RMGLOG_HH_
+#define _RMGLOG_HH_
 
 /**
  * @class RMGLog
@@ -23,10 +23,8 @@
 // ---------------------------------------------------------
 
 #include <iostream>
-#include <sstream>
 #include <fstream>
 #include <string>
-#include <cstdio>
 #include <cstdarg>
 
 // ---------------------------------------------------------
@@ -57,7 +55,7 @@ class RMGLog {
       blue    = 34,
       magenta = 35,
       cyan    = 36,
-      gray    = 37
+      grey    = 37
     };
 
     /** \name Constructor and destructor */

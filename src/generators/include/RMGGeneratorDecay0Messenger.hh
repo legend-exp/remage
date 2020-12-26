@@ -5,8 +5,8 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
 
-class G4UIdirectory;
 class G4UIcommand;
 class RMGGeneratorDecay0;
 class RMGGeneratorDecay0Messenger : public G4UImessenger {
@@ -14,7 +14,7 @@ class RMGGeneratorDecay0Messenger : public G4UImessenger {
   public:
 
     RMGGeneratorDecay0Messenger(RMGGeneratorDecay0* gen);
-    ~RMGGeneratorDecay0Messenger();
+    ~RMGGeneratorDecay0Messenger() = default;
 
     RMGGeneratorDecay0Messenger           (RMGGeneratorDecay0Messenger const&) = delete;
     RMGGeneratorDecay0Messenger& operator=(RMGGeneratorDecay0Messenger const&) = delete;

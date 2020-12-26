@@ -1,12 +1,8 @@
-#include <iostream>
 #include <sstream>
 #include <fstream>
-#include <string>
-#include <cstdio>
-#include <cstdarg>
 
 template <typename T>
-void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
+inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
 
   // open log file if not opened
   if (RMGLog::IsOpen()) {
@@ -30,7 +26,7 @@ void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscree
 // ---------------------------------------------------------
 
 template <typename T>
-void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& message) {
+inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& message) {
   // if this is the first call to Out(), call StartupInfo() first
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
 
@@ -45,7 +41,7 @@ void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
 // ---------------------------------------------------------
 
 template <typename T, typename... Args>
-void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& t, const Args&... args) {
+inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& t, const Args&... args) {
 
   // if this is the first call to Out(), call StartupInfo() first
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
@@ -68,7 +64,7 @@ void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
 // ---------------------------------------------------------
 
 template <RMGLog::Ansi color, typename T>
-std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
+inline std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
 
   // check terminal capabilities before
   if (!RMGLog::SupportsColors(os)) return msg;
@@ -76,47 +72,6 @@ std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
   std::ostringstream ss;
   ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
   return ss.str();
-}
-
-// ---------------------------------------------------------
-
-// https://codereview.stackexchange.com/questions/187183/create-a-c-string-using-printf-style-formatting
-void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...) {
-
-  char buf[256];
-  va_list args;
-  va_start(args, fmt);
-  const auto r = std::vsnprintf(buf, sizeof buf, fmt, args);
-  va_end(args);
-
-  // conversion failed
-  if (r < 0) {
-    RMGLog::Out(RMGLog::error, "Formatting error");
-    return;
-  }
-
-  // we fit in the buffer
-  const size_t len = r;
-  if (len < sizeof buf) {
-    RMGLog::Out(loglevelfile, loglevelscreen, std::string{buf, len});
-    return;
-  }
-
-  // we need to allocate scratch memory
-  auto vbuf = std::unique_ptr<char[]>(new char[len+1]);
-  va_start(args, fmt);
-  std::vsnprintf(vbuf.get(), len+1, fmt, args);
-  va_end(args);
-  RMGLog::Out(loglevelfile, loglevelscreen, std::string{vbuf.get(), len});
-}
-
-// ---------------------------------------------------------
-
-void OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  RMGLog::OutFormat(loglevel, loglevel, fmt, args);
-  va_end(args);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

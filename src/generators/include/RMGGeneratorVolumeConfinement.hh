@@ -39,7 +39,6 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
     };
 
     RMGGeneratorVolumeConfinement();
-    ~RMGGeneratorVolumeConfinement();
 
     G4ThreeVector ShootPrimaryPosition() override;
 

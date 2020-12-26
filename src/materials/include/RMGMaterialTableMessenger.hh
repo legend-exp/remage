@@ -6,16 +6,16 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
 
 class RMGMaterialTable;
-class G4UIdirectory;
-class G4UIcmdWithADoubleAndUnit;
 class RMGMaterialTableMessenger : public G4UImessenger {
 
   public:
 
     RMGMaterialTableMessenger(RMGMaterialTable*);
-    ~RMGMaterialTableMessenger();
+    ~RMGMaterialTableMessenger() = default;
 
     RMGMaterialTableMessenger           (RMGMaterialTableMessenger const&) = delete;
     RMGMaterialTableMessenger& operator=(RMGMaterialTableMessenger const&) = delete;
