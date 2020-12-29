@@ -1,6 +1,5 @@
 #include "RMGGeneratorDecay0Messenger.hh"
 
-#include "G4UIdirectory.hh"
 #include "G4UIcommand.hh"
 
 #include "RMGGeneratorDecay0.hh"

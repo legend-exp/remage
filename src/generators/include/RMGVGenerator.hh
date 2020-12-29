@@ -11,6 +11,8 @@ class RMGVGenerator {
 
   public:
 
+    RMGVGenerator() = delete;
+
     inline RMGVGenerator(G4String name) :
       fGeneratorName(name),
       fReportingFrequency(1000) {};
@@ -22,8 +24,8 @@ class RMGVGenerator {
     RMGVGenerator           (RMGVGenerator&&)      = delete;
     RMGVGenerator& operator=(RMGVGenerator&&)      = delete;
 
-    virtual void BeginOfRunAction(const G4Run*);
-    virtual void EndOfRunAction(const G4Run*);
+    virtual inline void BeginOfRunAction(const G4Run*) {};
+    virtual inline void EndOfRunAction(const G4Run*) {};
     virtual void GeneratePrimaryVertex(G4Event*) = 0;
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
     inline void SetReportingFrequency(G4int freq) { fReportingFrequency = freq; }

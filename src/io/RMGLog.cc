@@ -16,12 +16,12 @@
 #include <TROOT.h>
 #endif
 
-#include <iostream>
 #include <iomanip>
-#include <sstream>
-#include <memory>
 #include <unistd.h> // for isatty()
 #include <cstring>
+#include <cstdio>
+#include <cstdarg>
+#include <memory>
 #include <algorithm>
 
 std::ofstream RMGLog::fOutputFileStream;
@@ -37,7 +37,7 @@ bool RMGLog::fUsePrefix = true;
 std::string RMGLog::fVersion = RMG_PROJECT_VERSION;
 
 // initialize them at start of program - mandatory
-// so that even if user redirects, we've a copy
+// so that even if user redirects, we've got a copy
 std::streambuf const *coutbuf = std::cout.rdbuf();
 std::streambuf const *cerrbuf = std::cerr.rdbuf();
 std::streambuf const *clogbuf = std::clog.rdbuf();
@@ -72,104 +72,6 @@ void RMGLog::OpenLogFile(const std::string& filename) {
     }
 
     RMGLog::Out(RMGLog::summary, RMGLog::summary, "Opening logfile " + filename);
-}
-
-// ---------------------------------------------------------
-
-template <typename T>
-void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& message) {
-  // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
-
-  RMGLog::Print(loglevelfile, loglevelscreen, message, true);
-
-  // thorw exception if error is fatal
-  if (loglevelfile == fatal or loglevelscreen == fatal) {
-    throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
-  }
-}
-
-// ---------------------------------------------------------
-
-template <typename T, typename... Args>
-void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, T& t, Args... args) {
-
-  // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
-
-  RMGLog::Print(loglevelfile, loglevelscreen, t,       true,  false);
-  RMGLog::Print(loglevelfile, loglevelscreen, args..., false, false);
-  RMGLog::Print(loglevelfile, loglevelscreen, "\n",    false);
-
-  // thorw exception if error is fatal
-  if (loglevelfile == fatal or loglevelscreen == fatal) {
-    throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
-  }
-}
-
-// ---------------------------------------------------------
-
-// https://codereview.stackexchange.com/questions/187183/create-a-c-string-using-printf-style-formatting
-void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...) {
-
-  char buf[256];
-  va_list args;
-  va_start(args, fmt);
-  const auto r = std::vsnprintf(buf, sizeof buf, fmt, args);
-  va_end(args);
-
-  // conversion failed
-  if (r < 0) {
-    RMGLog::Out(RMGLog::error, "Formatting error");
-    return;
-  }
-
-  // we fit in the buffer
-  const size_t len = r;
-  if (len < sizeof buf) {
-    RMGLog::Out(loglevelfile, loglevelscreen, std::string{buf, len});
-    return;
-  }
-
-  // we need to allocate scratch memory
-  auto vbuf = std::unique_ptr<char[]>(new char[len+1]);
-  va_start(args, fmt);
-  std::vsnprintf(vbuf.get(), len+1, fmt, args);
-  va_end(args);
-  RMGLog::Out(loglevelfile, loglevelscreen, std::string{vbuf.get(), len});
-}
-
-// ---------------------------------------------------------
-
-void OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  RMGLog::OutFormat(loglevel, loglevel, fmt, args);
-  va_end(args);
-}
-
-// ---------------------------------------------------------
-
-template <typename T>
-void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, T& msg, bool prefixed, bool do_flush) {
-
-  // open log file if not opened
-  if (RMGLog::IsOpen()) {
-    // write message in to log file
-    if (loglevelfile >= RMGLog::fMinimumLogLevelFile) {
-      if (prefixed) RMGLog::fOutputFileStream << RMGLog::GetPrefix(loglevelfile, RMGLog::fOutputFileStream);
-      RMGLog::fOutputFileStream << msg;
-      if (do_flush) RMGLog::fOutputFileStream << std::flush;
-    }
-  }
-
-  // write message to screen
-  if (loglevelscreen >= RMGLog::fMinimumLogLevelScreen) {
-    std::ostream& strm = loglevelscreen > RMGLog::LogLevel::warning ? std::cout : std::cerr;
-    if (prefixed) strm << RMGLog::GetPrefix(loglevelscreen, strm);
-    strm << msg;
-    if (do_flush) strm << std::flush;
-  }
 }
 
 // ---------------------------------------------------------
@@ -246,15 +148,45 @@ bool RMGLog::SupportsColors(const std::ostream& os) {
     [&](const char *term) { return ::strstr(env_p, term) != nullptr; });
 }
 
-template <RMGLog::Ansi color, typename T>
-static std::string Colorize(const T& msg, std::ostream& os, bool bold) {
+/// ---------------------------------------------------------
 
-  // check terminal capabilities before
-  if (!RMGLog::SupportsColors(os)) return msg;
+// https://codereview.stackexchange.com/questions/187183/create-a-c-string-using-printf-style-formatting
+void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...) {
 
-  std::ostringstream ss;
-  ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
-  return ss.str();
+  char buf[256];
+  va_list args;
+  va_start(args, fmt);
+  const auto r = std::vsnprintf(buf, sizeof buf, fmt, args);
+  va_end(args);
+
+  // conversion failed
+  if (r < 0) {
+    RMGLog::Out(RMGLog::error, "Formatting error");
+    return;
+  }
+
+  // we fit in the buffer
+  const size_t len = r;
+  if (len < sizeof buf) {
+    RMGLog::Out(loglevelfile, loglevelscreen, std::string{buf, len});
+    return;
+  }
+
+  // we need to allocate scratch memory
+  auto vbuf = std::unique_ptr<char[]>(new char[len+1]);
+  va_start(args, fmt);
+  std::vsnprintf(vbuf.get(), len+1, fmt, args);
+  va_end(args);
+  RMGLog::Out(loglevelfile, loglevelscreen, std::string{vbuf.get(), len});
+}
+
+// ---------------------------------------------------------
+
+void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  RMGLog::OutFormat(loglevel, loglevel, fmt, args);
+  va_end(args);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

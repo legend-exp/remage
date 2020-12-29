@@ -7,7 +7,7 @@
 
 #include "RMGMaterialTable.hh"
 
-RMGMaterialTable::BathMaterial RMGManagerDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kUndefined;
+RMGMaterialTable::BathMaterial RMGManagerDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kNone;
 
 RMGManagerDetectorConstruction::RMGManagerDetectorConstruction() {
 
@@ -29,6 +29,10 @@ G4VPhysicalVolume* RMGManagerDetectorConstruction::Construct() {
 
   // TODO
   return nullptr;
+}
+
+void RMGManagerDetectorConstruction::ConstructSDandField() {
+  // TODO
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

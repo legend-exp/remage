@@ -39,15 +39,6 @@ RMGGeneratorVolumeConfinement::SampleableObject::~SampleableObject() {
   }
 }
 
-RMGGeneratorVolumeConfinement::RMGGeneratorVolumeConfinement() :
-  RMGVGeneratorPrimaryPosition("VolumeConfinement"),
-  fSamplingMode(SamplingMode::kUnionAll),
-  fOnSurface(false),
-  fBoundingSolidType("Sphere") {
-
-  fG4Messenger = new RMGGeneratorVolumeConfinementMessenger(this) ;
-}
-
 const RMGGeneratorVolumeConfinement::SampleableObject& RMGGeneratorVolumeConfinement::SampleableObjectCollection::SurfaceWeightedRand() {
   auto choice = total_surface * G4UniformRand();
   G4double w = 0;
@@ -105,6 +96,15 @@ void RMGGeneratorVolumeConfinement::SampleableObjectCollection::emplace_back(G4V
 }
 
 /* ========================================================================================== */
+
+RMGGeneratorVolumeConfinement::RMGGeneratorVolumeConfinement() :
+  RMGVGeneratorPrimaryPosition("VolumeConfinement"),
+  fSamplingMode(SamplingMode::kUnionAll),
+  fOnSurface(false),
+  fBoundingSolidType("Sphere") {
+
+  fG4Messenger = new RMGGeneratorVolumeConfinementMessenger(this) ;
+}
 
 void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
 

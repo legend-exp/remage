@@ -5,9 +5,9 @@
 #include <map>
 
 #include "globals.hh"
+#include "RMGMaterialTableMessenger.hh"
 
 class G4Material;
-class RMGMaterialTableMessenger;
 class RMGMaterialTable {
 
   public:
@@ -17,11 +17,11 @@ class RMGMaterialTable {
       kLiquidNitrogen,
       kLiquidXenon,
       kVacuum,
-      kUndefined
+      kNone
     };
 
     RMGMaterialTable();
-    ~RMGMaterialTable();
+    ~RMGMaterialTable() = default;
 
     RMGMaterialTable           (RMGMaterialTable const&) = delete;
     RMGMaterialTable& operator=(RMGMaterialTable const&) = delete;
@@ -36,23 +36,12 @@ class RMGMaterialTable {
     inline void SetLArTripletLifetime(G4double t) { fLArProperties.triplet_lifetime = t; }
     inline void SetLArVUVAbsorptionLength(G4double l) { fLArProperties.vuv_absorption_length = l; }
 
-  private:
-
-    void InitializeMaterials();
-    void InitializeOpticalProperties();
-    void InitializeLArOpticalProperties();
-
-    static std::map<G4String, G4String> fMaterialAliases;
-    std::unique_ptr<RMGMaterialTableMessenger> fG4Messenger;
-
     struct LArProperties {
       G4double flat_top_photon_yield;
       G4double singlet_lifetime;
       G4double triplet_lifetime;
       G4double vuv_absorption_length;
     };
-
-    LArProperties fLArProperties;
 
     struct PropertiesAtTemperature {
       PropertiesAtTemperature() = default;
@@ -64,6 +53,16 @@ class RMGMaterialTable {
       G4double enriched_germanium_density;
     };
 
+  private:
+
+    void InitializeMaterials();
+    void InitializeOpticalProperties();
+    void InitializeLArOpticalProperties();
+
+    static std::map<G4String, G4String> fMaterialAliases;
+    std::unique_ptr<RMGMaterialTableMessenger> fG4Messenger;
+
+    LArProperties fLArProperties;
     static std::map<BathMaterial, PropertiesAtTemperature> fPropertiesAtTemperatureTable;
 };
 

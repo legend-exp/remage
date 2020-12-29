@@ -11,7 +11,7 @@ set(PROJECT_SOURCES
     generators/RMGGeneratorVolumeConfinementMessenger.cc
 
     io/RMGLog.cc
-    io/RMGVOutputManager.cc
+    # io/RMGVOutputManager.cc
 
     management/RMGManagementEventAction.cc
     management/RMGManagementEventActionMessenger.cc
@@ -30,11 +30,16 @@ set(PROJECT_SOURCES
     processes/RMGProcessesMessenger.cc
     processes/RMGUIcmdStepLimit.cc
 
-    tools/RMGMessengerTools.cc
     tools/RMGManagementTools.cc
+    tools/RMGMessengerTools.cc
 )
 
 if(BxDecay0_FOUND)
+    list(APPEND PROJECT_HEADERS
+        generators/include/RMGGeneratorDecay0.hh
+        generators/include/RMGGeneratorDecay0Messenger.hh
+    )
+
     list(APPEND PROJECT_SOURCES
         generators/RMGGeneratorDecay0.cc
         generators/RMGGeneratorDecay0Messenger.cc
@@ -60,6 +65,9 @@ target_link_libraries(${PROJECT_TARNAME}
     PUBLIC
         ROOT::Core)
 endif()
+
+# Ensure clients are aware of the minimum C++ standard we were compiled with
+target_compile_features(${PROJECT_TARNAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 # let the project know where to find its headers
 set(COMPONENTS

@@ -39,7 +39,6 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
     };
 
     RMGGeneratorVolumeConfinement();
-    ~RMGGeneratorVolumeConfinement();
 
     G4ThreeVector ShootPrimaryPosition() override;
 
@@ -55,11 +54,11 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
     inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
     inline void SetBoundingSolidType(G4String type) { fBoundingSolidType = type; }
 
-    std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList();
+    inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() { return fGeomVolumeData; }
 
     struct SampleableObject {
 
-      SampleableObject();
+      SampleableObject() = default;
       SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
       ~SampleableObject();
 

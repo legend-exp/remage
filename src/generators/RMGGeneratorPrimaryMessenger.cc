@@ -1,12 +1,6 @@
 #include "RMGGeneratorPrimaryMessenger.hh"
 
 #include "globals.hh"
-#include "G4UIcmdWithoutParameter.hh"
-#include "G4UIcmdWithAString.hh"
-#include "G4UIcmdWithAnInteger.hh"
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWith3VectorAndUnit.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4PhysicalVolumeStore.hh"
 
 #include "RMGVGenerator.hh"
@@ -31,10 +25,10 @@ RMGGeneratorPrimaryMessenger::RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary* 
   generators += " Decay0";
 #endif
 
-  fSelectCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+  fSelectCmd = RMGTools::MakeG4UIcmdWithAString(
       directory + "/Select", this, generators, {G4State_Init, G4State_PreInit});
 
-  fConfineCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Confine", this,
+  fConfineCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Confine", this,
     "UnConfined Volume");
 }
 

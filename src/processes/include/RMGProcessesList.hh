@@ -48,7 +48,8 @@ class RMGProcessesList : public G4VModularPhysicsList {
 
   private:
 
-    G4double fCutForOpticalPhoton;
+    // TODO: missing cut for optical photon
+    // G4double fCutForOpticalPhoton;
     G4double fCutForGamma;
     G4double fCutForElectron;
     G4double fCutForPositron;

@@ -1,5 +1,5 @@
-#ifndef _RMGVOUTPUTMANAGER_HH_
-#define _RMGVOUTPUTMANAGER_HH_
+#ifndef _RMG_V_OUTPUT_MANAGER_HH_
+#define _RMG_V_OUTPUT_MANAGER_HH_
 
 #include "globals.hh"
 #include "G4ClassificationOfNewTrack.hh"
@@ -86,7 +86,7 @@ class RMGVOutputManager {
 
   protected:
 
-    static G4String fFileName;
+    /*static*/ G4String fFileName;
     G4bool      fUseTimeWindow;               // if true will enable time windowing
     G4double    fTimeWindow;                  // Time Window used in Windowing.
     G4double    fOffsetTime;                  // Holds the cumulative deleted time for a track

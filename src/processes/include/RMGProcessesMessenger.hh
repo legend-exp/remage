@@ -5,19 +5,19 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithAnInteger.hh"
+#include "RMGUIcmdStepLimit.hh"
 
 class RMGProcessesList;
-class G4UIdirectory;
-class G4UIcmdWithAString;
-class G4UIcmdWithAnInteger;
-class G4UIcmdWithABool;
-class RMGUIcmdStepLimit;
 class RMGProcessesMessenger : public G4UImessenger {
 
   public:
 
     RMGProcessesMessenger(RMGProcessesList*);
-    ~RMGProcessesMessenger() override;
+    ~RMGProcessesMessenger() = default;
 
     RMGProcessesMessenger           (RMGProcessesMessenger const&) = delete;
     RMGProcessesMessenger& operator=(RMGProcessesMessenger const&) = delete;
