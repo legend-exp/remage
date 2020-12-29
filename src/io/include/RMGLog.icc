@@ -1,6 +1,6 @@
 #include <sstream>
 #include <fstream>
-#include <exception>
+#include <stdexcept>
 
 template <typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
