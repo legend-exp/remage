@@ -17,25 +17,25 @@ RMGManagerMessenger::RMGManagerMessenger(RMGManager*) {
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Logging").c_str()));
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Randomization").c_str()));
 
-  fScreenLogCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Logging/LogLevelScreen", this,
+  fScreenLogCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Logging/LogLevelScreen", this,
       "Debug Detail Summary Warning Error Fatal");
 
-  fFileNameLogCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Logging/LogToFile", this,
+  fFileNameLogCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Logging/LogToFile", this,
       "");
 
-  fFileLogCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Logging/LogLevelFile", this,
+  fFileLogCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Logging/LogLevelFile", this,
       "Debug Detail Summary Warning Error Fatal");
 
-  fHEPRandomSeedCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(directory + "/Randomization/Seed", this,
+  fHEPRandomSeedCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(directory + "/Randomization/Seed", this,
       "seed", "seed >= 0");
 
-  fUseInternalSeedCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(
+  fUseInternalSeedCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(
       directory + "/UseInternalSeed", this, "index", "index >= 0 && index < 430");
 
-  fSeedWithDevRandomCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(
-      directory + "/Randomization/UseSystemEntropySeed", this, true, true);
+  fSeedWithDevRandomCmd = RMGTools::MakeG4UIcmdWithABool(
+      directory + "/Randomization/UseSystemEntropySeed", this);
 
-  fUseRandomEngineCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/Randomization/RandomEngine",
+  fUseRandomEngineCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Randomization/RandomEngine",
       this, "JamesRandom RanLux MTwist");
 }
 

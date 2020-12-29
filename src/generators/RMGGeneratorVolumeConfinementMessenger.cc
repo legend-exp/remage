@@ -21,55 +21,55 @@ RMGGeneratorVolumeConfinementMessenger::RMGGeneratorVolumeConfinementMessenger(R
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/CylindricalShell").c_str()));
   fDirectories.emplace_back(new G4UIdirectory((directory + "/Geometrical/Box").c_str()));
 
-  fSamplingModeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+  fSamplingModeCmd = RMGTools::MakeG4UIcmdWithAString(
       directory + "/SetSamplingMode", this, "Union IntersectPhysicalWithGeometrical");
 
-  fBoundingSolidTypeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+  fBoundingSolidTypeCmd = RMGTools::MakeG4UIcmdWithAString(
       directory + "/SetFallbackBoundingVolumeType", this, "Sphere Box");
 
-  fAddPhysVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+  fAddPhysVolCmd = RMGTools::MakeG4UIcmdWithAString(
       directory + "/Physical/AddVolume", this, "");
 
-  fAddGeomVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(
+  fAddGeomVolCmd = RMGTools::MakeG4UIcmdWithAString(
       directory + "/Geometrical/AddSolid", this, "Sphere Cylinder CylindricalShell Box");
 
   // Sphere
-  fSphereInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fSphereInnerRadiusVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Sphere/InnerRadius", this, "Length", "L", "L >= 0");
 
-  fSphereOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fSphereOuterRadiusVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Sphere/OuterRadius", this, "Length", "L", "L >= 0");
 
   // Cylinder
-  fCylinderInnerRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fCylinderInnerRadiusVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Cylinder/InnerRadius", this, "Length", "L", "L >= 0");
 
-  fCylinderOuterRadiusVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fCylinderOuterRadiusVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Cylinder/OuterRadius", this, "Length", "L", "L >= 0");
 
-  fCylinderHeightVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fCylinderHeightVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Cylinder/Height", this, "Length", "L", "L >= 0");
 
-  fCylinderStartingAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fCylinderStartingAngleVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Cylinder/StartingAngle", this, "Angle");
 
-  fCylinderSpanningAngleVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fCylinderSpanningAngleVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Cylinder/SpanningAngle", this, "Angle");
 
   // Box
-  fBoxXLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fBoxXLengthVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Box/XLength", this, "Length", "L", "L >= 0");
 
-  fBoxYLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fBoxYLengthVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Box/YLength", this, "Length", "L", "L >= 0");
 
-  fBoxZLengthVolCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fBoxZLengthVolCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/Geometrical/Box/ZLength", this, "Length", "L", "L >= 0");
 
-  fGeomVolCenterCmd = RMGTools::MakeG4UIcmd<G4UIcmdWith3VectorAndUnit>(
+  fGeomVolCenterCmd = RMGTools::MakeG4UIcmdWith3VectorAndUnit(
       directory + "/Geometrical/CenterPosition", this, "Length");
 
-  fNPositionsamplingMaxCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(
+  fNPositionsamplingMaxCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(
       directory + "/MaxSamplingTrials", this, "N", "N > 0");
 }
 

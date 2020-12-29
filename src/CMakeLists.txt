@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
     processes/RMGUIcmdStepLimit.cc
 
     tools/RMGManagementTools.cc
+    tools/RMGMessengerTools.cc
 )
 
 if(BxDecay0_FOUND)

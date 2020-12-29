@@ -14,15 +14,15 @@ RMGManagementEventActionMessenger::RMGManagementEventActionMessenger(RMGManageme
   G4String directory = "/RMG/Output";
   fEventDirectory = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
 
-  fSetFileNameCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAString>(directory + "/FileName", this);
+  fSetFileNameCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/FileName", this);
 
-  fSetReportingFrequencyCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(directory + "/ReportingFrequency", this,
+  fSetReportingFrequencyCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(directory + "/ReportingFrequency", this,
       "x", "x > 0");
 
-  fSetWriteOutFrequencyCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithAnInteger>(directory + "/WriteOutFrequency", this,
+  fSetWriteOutFrequencyCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(directory + "/WriteOutFrequency", this,
       "x", "x > 0");
 
-  fSetWriteOutFileDuringRunCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithABool>(directory + "/WriteOutFileDuringRun", this);
+  fSetWriteOutFileDuringRunCmd = RMGTools::MakeG4UIcmdWithABool(directory + "/WriteOutFileDuringRun", this);
 }
 
 void RMGManagementEventActionMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {

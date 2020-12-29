@@ -20,16 +20,16 @@ RMGMaterialTableMessenger::RMGMaterialTableMessenger(RMGMaterialTable* table) :
   new G4UnitDefinition("1/keV", "1/keV", "ScintillationYield", 1./CLHEP::keV);
   new G4UnitDefinition("1/MeV", "1/MeV", "ScintillationYield", 1./CLHEP::MeV);
 
-  fLArFlatTopPhotonYieldCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fLArFlatTopPhotonYieldCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/LAr/FlatTopPhotonYield", this, "ScintillationYield", "Y", "Y > 0");
 
-  fLArSingletLifetimeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fLArSingletLifetimeCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/LAr/SingletLifetime", this, "Time", "T", "T > 0");
 
-  fLArTripletLifetimeCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fLArTripletLifetimeCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/LAr/TripletLifetime", this, "Time", "T", "T > 0");
 
-  fLArVUVAbsorptionLengthCmd = RMGTools::MakeG4UIcmd<G4UIcmdWithADoubleAndUnit>(
+  fLArVUVAbsorptionLengthCmd = RMGTools::MakeG4UIcmdWithANumberAndUnit<G4UIcmdWithADoubleAndUnit>(
       directory + "/LAr/VUVAbsorptionLength", this, "Length", "L", "L > 0");
 }
 
