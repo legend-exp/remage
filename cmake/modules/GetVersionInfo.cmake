@@ -29,9 +29,4 @@ macro(get_version_info)
     endif()
 
     message(STATUS "${CMAKE_PROJECT_NAME} version: " ${PROJECT_VERSION})
-
-    # write ProjectInfo.hh and install it (anyways)
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh @ONLY)
-    install(FILES ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_TARNAME})
 endmacro()

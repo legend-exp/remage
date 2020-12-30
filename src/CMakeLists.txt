@@ -1,6 +1,51 @@
 # List here manually all source files. Using GLOB is bad, see:
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
+set(PROJECT_PUBLIC_HEADERS
+    geometry/include/RMGGeometryDetector.hh
+    geometry/include/RMGGeometryInvCoaxDetector.hh
+    geometry/include/RMGGeometryFileGeometryObject.hh
+    geometry/include/RMGGeometryBEGeDetectorPolycone.hh
+    geometry/include/RMGGeometrySemiCoaxDetector.hh
+    geometry/include/RMGSolidDetectorPolycone.hh
+    geometry/include/RMGNavigationTools.hh
+
+    generators/include/RMGVGenerator.hh
+    generators/include/RMGGeneratorVolumeConfinement.hh
+    generators/include/RMGGeneratorDecay0Messenger.hh
+    generators/include/RMGGeneratorVolumeConfinementMessenger.hh
+    generators/include/RMGGeneratorSPS.hh
+    generators/include/RMGVGeneratorPrimaryPosition.hh
+    generators/include/RMGGeneratorPrimary.hh
+    generators/include/RMGGeneratorDecay0.hh
+    generators/include/RMGGeneratorUtil.hh
+    generators/include/RMGGeneratorPrimaryMessenger.hh
+    generators/include/RMGGeneratorG4Gun.hh
+
+    io/include/RMGVOutputManager.hh
+    io/include/RMGLog.hh
+    io/include/ProjectInfo.hh
+
+    management/include/RMGManagerMessenger.hh
+    management/include/RMGManagementStackingAction.hh
+    management/include/RMGManagerDetectorConstruction.hh
+    management/include/RMGManagementEventActionMessenger.hh
+    management/include/RMGManagementEventAction.hh
+    management/include/RMGManagementTrackingAction.hh
+    management/include/RMGManagementSteppingAction.hh
+    management/include/RMGManager.hh
+    management/include/RMGManagementRunAction.hh
+
+    materials/include/RMGMaterialTable.hh
+    materials/include/RMGMaterialTableMessenger.hh
+
+    processes/include/RMGUIcmdStepLimit.hh
+    processes/include/RMGProcessesList.hh
+    processes/include/RMGProcessesMessenger.hh
+
+    tools/include/RMGTools.hh
+)
+
 set(PROJECT_SOURCES
     geometry/RMGNavigationTools.cc
 
@@ -35,7 +80,7 @@ set(PROJECT_SOURCES
 )
 
 if(BxDecay0_FOUND)
-    list(APPEND PROJECT_HEADERS
+    list(APPEND PROJECT_PUBLIC_HEADERS
         generators/include/RMGGeneratorDecay0.hh
         generators/include/RMGGeneratorDecay0Messenger.hh
     )
@@ -46,7 +91,7 @@ if(BxDecay0_FOUND)
     )
 endif()
 
-add_library(${PROJECT_TARNAME} SHARED ${PROJECT_SOURCES})
+add_library(${PROJECT_TARNAME} SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
 # link against dependent libraries
 target_link_libraries(${PROJECT_TARNAME}
@@ -54,16 +99,16 @@ target_link_libraries(${PROJECT_TARNAME}
         ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
-target_link_libraries(${PROJECT_TARNAME}
-    PUBLIC
-        BxDecay0::BxDecay0
-        BxDecay0::BxDecay0_Geant4)
+    target_link_libraries(${PROJECT_TARNAME}
+        PUBLIC
+            BxDecay0::BxDecay0
+            BxDecay0::BxDecay0_Geant4)
 endif()
 
 if(ROOT_FOUND)
-target_link_libraries(${PROJECT_TARNAME}
-    PUBLIC
-        ROOT::Core)
+    target_link_libraries(${PROJECT_TARNAME}
+        PUBLIC
+            ROOT::Core)
 endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
@@ -81,15 +126,13 @@ set(COMPONENTS
 )
 
 foreach(_sub ${COMPONENTS})
-    list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include")
+    list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include/")
 endforeach()
 
 target_include_directories(${PROJECT_TARNAME}
     PUBLIC
         "$<BUILD_INTERFACE:${_full_include_paths}>"
-        $<INSTALL_INTERFACE:include/${PROJECT_TARNAME}>
-    PRIVATE
-        ${COMPONENTS})
+        $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
 if(${PROJECT_VERSION} NOT EQUAL "unknown")
@@ -102,15 +145,16 @@ set_target_properties(${PROJECT_TARNAME} PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR})
 endif()
 
+# write ProjectInfo.hh and install it
+configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh @ONLY)
+install(FILES ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
 # configure install
 install(TARGETS ${PROJECT_TARNAME}
+    EXPORT ${PROJECT_TARNAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}) # This is for Windows
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-foreach(_sub ${COMPONENTS})
-    list(APPEND _include_paths "${_sub}/include")
-endforeach()
-
-install(DIRECTORY "${_include_paths}"
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_TARNAME}
-    FILES_MATCHING PATTERN "*.hh")
+install(FILES ${PROJECT_PUBLIC_HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

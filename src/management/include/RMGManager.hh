@@ -1,8 +1,13 @@
 #ifndef _RMG_MANAGER_HH_
 #define _RMG_MANAGER_HH_
 
-class G4RunManager;
-class G4VisManager;
+#include <memory>
+
+#include "globals.hh"
+
+#include "G4RunManager.hh"
+#include "G4VisManager.hh"
+
 class G4VUserPhysicsList;
 class RMGGeneratorPrimary;
 class RMGManagerDetectorConstruction;
@@ -16,7 +21,8 @@ class RMGManager {
 
   public:
 
-    RMGManager();
+    RMGManager() = delete;
+    RMGManager(G4String app_name);
     ~RMGManager();
 
     RMGManager           (RMGManager const&) = delete;
@@ -26,8 +32,8 @@ class RMGManager {
 
     // getters
     static inline RMGManager*              GetRMGManager() { return fRMGManager; }
-    inline G4RunManager*                   GetG4RunManager() { return fG4RunManager; }
-    inline G4VisManager*                   GetG4VisManager() { return fG4VisManager; }
+    inline std::unique_ptr<G4RunManager>&  GetG4RunManager() { return fG4RunManager; }
+    inline std::unique_ptr<G4VisManager>&  GetG4VisManager() { return fG4VisManager; }
     inline RMGGeneratorPrimary*            GetRMGGeneratorPrimary() { return fGeneratorPrimary; }
     inline RMGManagerDetectorConstruction* GetManagerDetectorConstruction() { return fManagerDetectorConstruction; }
     inline RMGManagementEventAction*       GetRMGEventAction() { return fManagementEventAction;}
@@ -38,21 +44,30 @@ class RMGManager {
     inline RMGManagementTrackingAction*    GetRMGTrackingAction() { return fManagementTrackingAction; }
 
     // setters
-    inline void SetUserInitialization(G4RunManager* g4_manager) { fG4RunManager = g4_manager; }
-    inline void SetUserInitialization(G4VisManager* vis) { fG4VisManager = vis; }
-    inline void SetUserInitialization(RMGGeneratorPrimary* gene) { fGeneratorPrimary = gene; }
+    inline void SetUserInitialization(G4RunManager* g4_manager)            { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
+    inline void SetUserInitialization(G4VisManager* vis)                   { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
+    inline void SetUserInitialization(RMGGeneratorPrimary* gene)           { fGeneratorPrimary = gene; }
     inline void SetUserInitialization(RMGManagerDetectorConstruction* det) { fManagerDetectorConstruction = det; }
-    inline void SetUserInitialization(RMGManagementEventAction* evt) { fManagementEventAction = evt; }
-    inline void SetUserInitialization(RMGManagementRunAction* runa) { fManagementRunAction = runa; }
+    inline void SetUserInitialization(RMGManagementEventAction* evt)       { fManagementEventAction = evt; }
+    inline void SetUserInitialization(RMGManagementRunAction* runa)        { fManagementRunAction = runa; }
     inline void SetUserInitialization(RMGManagementTrackingAction* tracka) { fManagementTrackingAction = tracka; }
     inline void SetUserInitialization(RMGManagementStackingAction* stacka) { fManagementStackingAction = stacka; }
-    inline void SetUserInitialization(RMGManagementSteppingAction* stepa) { fManagementSteppingAction = stepa; }
-    inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
+    inline void SetUserInitialization(RMGManagementSteppingAction* stepa)  { fManagementSteppingAction = stepa; }
+    inline void SetUserInitialization(G4VUserPhysicsList* proc)            { fProcessesList = proc; }
+
+    G4bool ParseCommandLineArgs(int argc, char** argv);
+    void PrintUsage();
+    void Initialize();
+    void Run();
 
   private:
 
-    G4RunManager*                    fG4RunManager;
-    G4VisManager*                    fG4VisManager;
+    G4String fApplicationName;
+
+    static RMGManager* fRMGManager;
+    std::unique_ptr<G4RunManager> fG4RunManager;
+    std::unique_ptr<G4VisManager> fG4VisManager;
+
     G4VUserPhysicsList*              fProcessesList;
     RMGGeneratorPrimary*             fGeneratorPrimary;
     RMGManagerDetectorConstruction*  fManagerDetectorConstruction;
@@ -61,9 +76,10 @@ class RMGManager {
     RMGManagementSteppingAction*     fManagementSteppingAction;
     RMGManagementTrackingAction*     fManagementTrackingAction;
     RMGManagementStackingAction*     fManagementStackingAction;
-    RMGManagerMessenger*             fG4Messenger;
 
-    static RMGManager*               fRMGManager;
+    G4String fMacroFileName;
+
+    RMGManagerMessenger*             fG4Messenger;
 };
 
 #endif

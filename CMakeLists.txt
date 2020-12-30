@@ -108,6 +108,18 @@ add_subdirectory(test)
 include(GetVersionInfo)
 get_version_info()
 
+# add support for find_package()
+configure_file(${CMAKE_SOURCE_DIR}/cmake/remageConfigVersion.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake @ONLY)
+
+install(FILES
+    ${CMAKE_SOURCE_DIR}/cmake/remageConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(EXPORT ${PROJECT_TARNAME}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
 # write useful post-install setup scripts
 include(Toolchain)
 create_mage_toolchain()
