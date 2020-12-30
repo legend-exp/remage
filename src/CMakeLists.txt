@@ -2,12 +2,6 @@
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
 set(PROJECT_PUBLIC_HEADERS
-    geometry/include/RMGGeometryDetector.hh
-    geometry/include/RMGGeometryInvCoaxDetector.hh
-    geometry/include/RMGGeometryFileGeometryObject.hh
-    geometry/include/RMGGeometryBEGeDetectorPolycone.hh
-    geometry/include/RMGGeometrySemiCoaxDetector.hh
-    geometry/include/RMGSolidDetectorPolycone.hh
     geometry/include/RMGNavigationTools.hh
 
     generators/include/RMGVGenerator.hh
