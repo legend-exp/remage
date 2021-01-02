@@ -5,8 +5,14 @@
 #include <string>
 #include <vector>
 
+#include "G4Threading.hh"
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#endif
 #include "G4RunManager.hh"
+#if G4VERSION_NUMBER >= 1070
 #include "G4RunManagerFactory.hh"
+#endif
 #include "G4VisManager.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4UImanager.hh"
@@ -20,6 +26,7 @@
 #include "RMGProcessesList.hh"
 #include "RMGGeneratorPrimary.hh"
 #include "RMGManagerDetectorConstruction.hh"
+#include "RMGManagementUserActionInitialization.hh"
 #include "RMGManagementEventAction.hh"
 #include "RMGManagementRunAction.hh"
 #include "RMGManagementSteppingAction.hh"
@@ -45,16 +52,32 @@ RMGManager::~RMGManager() {
 }
 
 void RMGManager::Initialize() {
-  if (!fG4RunManager) fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+
+  if (!fG4RunManager) {
+#if G4VERSION_NUMBER >= 1070
+    fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+#elif G4MULTITHREADED
+    fG4RunManager = std::unique_ptr<G4MTRunManager>(new G4MTRunManager());
+#else
+    fG4RunManager = std::unique_ptr<G4RunManager>(new G4RunManager());
+#endif
+  }
+
   if (!fG4VisManager) fG4VisManager = std::unique_ptr<G4VisManager>(new G4VisExecutive());
   if (!fProcessesList) fProcessesList = new RMGProcessesList();
+
   if (!fGeneratorPrimary) fGeneratorPrimary = new RMGGeneratorPrimary();
-  if (!fManagementRunAction) fManagementRunAction = new RMGManagementRunAction();
-  if (!fManagementEventAction) fManagementEventAction = new RMGManagementEventAction();
-  if (!fManagementStackingAction) fManagementStackingAction = new RMGManagementStackingAction(fManagementEventAction);
-  if (!fManagementSteppingAction) fManagementSteppingAction = new RMGManagementSteppingAction(fManagementEventAction);
-  if (!fManagementTrackingAction) fManagementTrackingAction = new RMGManagementTrackingAction(fManagementEventAction);
+  if (!fManagementUserActionInitialization) fManagementUserActionInitialization = new RMGManagementUserActionInitialization();
+  // if (!fManagementRunAction) fManagementRunAction = new RMGManagementRunAction();
+  // if (!fManagementEventAction) fManagementEventAction = new RMGManagementEventAction();
+  // if (!fManagementStackingAction) fManagementStackingAction = new RMGManagementStackingAction(fManagementEventAction);
+  // if (!fManagementSteppingAction) fManagementSteppingAction = new RMGManagementSteppingAction(fManagementEventAction);
+  // if (!fManagementTrackingAction) fManagementTrackingAction = new RMGManagementTrackingAction(fManagementEventAction);
   // if (!fManagerDetectorConstruction) fManagerDetectorConstruction = new RMGManagerDetectorConstruction();
+
+  fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
+  fG4RunManager->SetUserInitialization(fProcessesList);
+  fG4RunManager->SetUserInitialization(fManagementUserActionInitialization);
 }
 
 void RMGManager::Run() {
