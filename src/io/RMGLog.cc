@@ -9,6 +9,7 @@
 // ---------------------------------------------------------
 
 #include "RMGLog.hh"
+
 #include "ProjectInfo.hh"
 
 #if RMG_HAS_ROOT
@@ -38,9 +39,8 @@ std::string RMGLog::fVersion = RMG_PROJECT_VERSION;
 
 // initialize them at start of program - mandatory
 // so that even if user redirects, we've got a copy
-std::streambuf const *coutbuf = std::cout.rdbuf();
-std::streambuf const *cerrbuf = std::cerr.rdbuf();
-std::streambuf const *clogbuf = std::clog.rdbuf();
+std::streambuf const *coutbuf = G4cout.rdbuf();
+std::streambuf const *cerrbuf = G4cerr.rdbuf();
 
 // ---------------------------------------------------------
 
@@ -67,7 +67,7 @@ void RMGLog::OpenLogFile(const std::string& filename) {
     RMGLog::fOutputFileStream.open(filename.data());
 
     if (!RMGLog::fOutputFileStream.is_open()) {
-        std::cerr << " Could not open log file " << filename << ". " << std::endl;
+        G4cerr << " Could not open log file " << filename << ". " << G4endl;
         return;
     }
 
@@ -85,7 +85,7 @@ void RMGLog::StartupInfo() {
 
     // write message to screen
     if (RMGLog::fMinimumLogLevelScreen < RMGLog::nothing)
-        std::cout << message << std::endl;
+        G4cout << message << G4endl;
 
     if (RMGLog::IsOpen() && RMGLog::fMinimumLogLevelFile < RMGLog::nothing)
         RMGLog::fOutputFileStream << message;
@@ -126,7 +126,7 @@ bool RMGLog::SupportsColors(const std::ostream& os) {
   if (osbuf == coutbuf) {
     the_stream = stdout;
   }
-  else if (osbuf == cerrbuf or osbuf == clogbuf) {
+  else if (osbuf == cerrbuf) {
     the_stream = stderr;
   }
   else return false;

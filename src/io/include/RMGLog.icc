@@ -2,6 +2,8 @@
 #include <fstream>
 #include <stdexcept>
 
+#include "globals.hh"
+
 template <typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
 
@@ -17,7 +19,7 @@ inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglev
 
   // write message to screen
   if (loglevelscreen >= RMGLog::fMinimumLogLevelScreen) {
-    std::ostream& strm = loglevelscreen > RMGLog::LogLevel::warning ? std::cout : std::cerr;
+    std::ostream& strm = loglevelscreen > RMGLog::LogLevel::warning ? G4cout : G4cerr;
     if (prefixed) strm << RMGLog::GetPrefix(loglevelscreen, strm);
     strm << msg;
     if (do_flush) strm << std::flush;

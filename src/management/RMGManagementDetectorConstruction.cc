@@ -1,4 +1,4 @@
-#include "RMGManagerDetectorConstruction.hh"
+#include "RMGManagementDetectorConstruction.hh"
 
 #include "G4VPhysicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
@@ -7,14 +7,14 @@
 
 #include "RMGMaterialTable.hh"
 
-RMGMaterialTable::BathMaterial RMGManagerDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kNone;
+RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kNone;
 
-RMGManagerDetectorConstruction::RMGManagerDetectorConstruction() {
+RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() {
 
   fMaterialTable = std::unique_ptr<RMGMaterialTable>(new RMGMaterialTable());
 }
 
-G4VPhysicalVolume* RMGManagerDetectorConstruction::Construct() {
+G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
 
   this->DefineGeometry();
 
@@ -31,7 +31,7 @@ G4VPhysicalVolume* RMGManagerDetectorConstruction::Construct() {
   return nullptr;
 }
 
-void RMGManagerDetectorConstruction::ConstructSDandField() {
+void RMGManagementDetectorConstruction::ConstructSDandField() {
   // TODO
 }
 

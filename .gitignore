@@ -2,6 +2,8 @@
 /doc/html
 /doc/latex
 
+compile_commands.json
+
 # junk
 *.DS_Store
 *.swp

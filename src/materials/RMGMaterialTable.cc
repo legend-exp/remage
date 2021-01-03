@@ -8,7 +8,7 @@
 
 #include "RMGMaterialTableMessenger.hh"
 #include "RMGLog.hh"
-#include "RMGManagerDetectorConstruction.hh"
+#include "RMGManagementDetectorConstruction.hh"
 
 std::map<G4String, G4String> RMGMaterialTable::fMaterialAliases = {};
 std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperature> RMGMaterialTable::fPropertiesAtTemperatureTable = {};
@@ -112,7 +112,7 @@ void RMGMaterialTable::InitializeMaterials() {
       temperature = CLHEP::STP_Temperature,
       pressure    = CLHEP::STP_Pressure);
 
-  auto bath_material = RMGManagerDetectorConstruction::GetBathMaterial();
+  auto bath_material = RMGManagementDetectorConstruction::GetBathMaterial();
 
   // new germanium with cryogenic properties
   man->BuildMaterialWithNewDensity("RMG_CryogenicGermanium",

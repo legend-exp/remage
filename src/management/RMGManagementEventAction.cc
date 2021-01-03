@@ -4,37 +4,34 @@
 #include <chrono>
 
 #include "G4RunManager.hh"
-#include "G4Run.hh"
+#include "RMGRun.hh"
 
 #include "RMGManagementEventActionMessenger.hh"
 #include "RMGVOutputManager.hh"
 #include "RMGManager.hh"
 #include "RMGManagementRunAction.hh"
+#include "RMGManagementUserAction.hh"
 #include "RMGLog.hh"
 
-RMGManagementEventAction::RMGManagementEventAction() :
-  fReportingFrequency(100000),
-  fWriteOutFrequency(0),
-  fWriteOutFileDuringRun(false) {
-
-  fG4Messenger = new RMGManagementEventActionMessenger(this);
+RMGManagementEventAction::RMGManagementEventAction() {
+  fG4Messenger = std::unique_ptr<RMGManagementEventActionMessenger>(new RMGManagementEventActionMessenger(this));
 }
 
-
 RMGManagementEventAction::~RMGManagementEventAction() {
-  if (fOutputManager) {
-    fOutputManager->CloseFile();
-    delete fOutputManager;
-  }
-  delete fG4Messenger;
+  // if (fOutputManager) {
+  //   fOutputManager->CloseFile();
+  //   delete fOutputManager;
+  // }
 }
 
 void RMGManagementEventAction::BeginOfEventAction(const G4Event* event) {
 
-  if ((event->GetEventID()+1) % fReportingFrequency == 0) {
+  auto print_modulo = G4RunManager::GetRunManager()->GetPrintProgress();
+  if ((event->GetEventID()+1) % print_modulo == 0) {
 
-    auto start_time = RMGManager::GetRMGManager()->GetRMGRunAction()->GetStartTime();
-    auto tot_events = RMGManager::GetRMGManager()->GetG4RunManager()->GetCurrentRun()->GetNumberOfEventToBeProcessed();
+    auto current_run = dynamic_cast<const RMGRun*>(G4RunManager::GetRunManager()->GetCurrentRun());
+    auto start_time = current_run->GetStartTime();
+    auto tot_events = current_run->GetNumberOfEventToBeProcessed();
 
     auto time_now = std::chrono::system_clock::now();
     auto t_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
@@ -49,16 +46,12 @@ void RMGManagementEventAction::BeginOfEventAction(const G4Event* event) {
         event->GetEventID(), (event->GetEventID()+1.)/tot_events, t_days, t_hours, t_minutes, t_sec);
   }
 
-  if (fOutputManager) fOutputManager->BeginOfEventAction(event);
+  // if (fOutputManager) fOutputManager->BeginOfEventAction(event);
 }
 
-void RMGManagementEventAction::EndOfEventAction(const G4Event *event) {
+void RMGManagementEventAction::EndOfEventAction(const G4Event*) {
 
-  if (fWriteOutFileDuringRun and fOutputManager) {
-    if (fWriteOutFrequency <= 0) fWriteOutFrequency = fReportingFrequency;
-    if (event->GetEventID() % fWriteOutFrequency == 0) fOutputManager->WriteFile();
-  }
-  if (fOutputManager) fOutputManager->EndOfEventAction(event);
+  // if (fOutputManager) fOutputManager->EndOfEventAction(event);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

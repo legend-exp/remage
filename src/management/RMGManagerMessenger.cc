@@ -73,7 +73,7 @@ void RMGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
     }
     else CLHEP::HepRandom::setTheSeed(seed);
     RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
-    RMGManager::GetRMGManager()->GetRMGRunAction()->SetControlledRandomization();
+    RMGManager::GetRMGManager()->SetControlledRandomization();
   }
   else if (cmd == fUseInternalSeedCmd.get()) {
 
@@ -86,7 +86,7 @@ void RMGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
     int array_index = index % 2;
     CLHEP::HepRandom::setTheSeed(seeds[array_index]);
     RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seeds[array_index]);
-    RMGManager::GetRMGManager()->GetRMGRunAction()->SetControlledRandomization();
+    RMGManager::GetRMGManager()->SetControlledRandomization();
   }
   else if (cmd == fSeedWithDevRandomCmd.get()) {
     std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
@@ -94,7 +94,7 @@ void RMGManagerMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
     auto rand_seed = dist(rd);
     CLHEP::HepRandom::setTheSeed(rand_seed);
     RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
-    RMGManager::GetRMGManager()->GetRMGRunAction()->SetControlledRandomization();
+    RMGManager::GetRMGManager()->SetControlledRandomization();
   }
   else if (cmd == fUseRandomEngineCmd.get()) {
 

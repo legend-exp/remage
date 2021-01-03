@@ -9,7 +9,7 @@ class RMGManagementTrackingAction : public G4UserTrackingAction {
   public:
 
     RMGManagementTrackingAction(RMGManagementEventAction*);
-    virtual ~RMGManagementTrackingAction() = default;
+    ~RMGManagementTrackingAction() = default;
 
     RMGManagementTrackingAction           (RMGManagementTrackingAction const&) = delete;
     RMGManagementTrackingAction& operator=(RMGManagementTrackingAction const&) = delete;

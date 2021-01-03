@@ -1,6 +1,8 @@
 #ifndef _RMG_MANAGEMENT_EVENT_ACTION_HH_
 #define _RMG_MANAGEMENT_EVENT_ACTION_HH_
 
+#include <memory>
+
 #include "globals.hh"
 #include "G4Event.hh"
 #include "G4UserEventAction.hh"
@@ -24,23 +26,15 @@ class RMGManagementEventAction : public G4UserEventAction {
 
     inline void SetOutputManager(RMGVOutputManager* outr) { fOutputManager = outr; }
     inline void SetOutputName(const G4String name) { fOutputName = name; }
-    inline void SetReportingFrequency(G4int freq) { fReportingFrequency = freq; }
-    inline void SetWriteOutFileDuringRun(G4bool val) { fWriteOutFileDuringRun = val; }
-    inline void SetWriteOutFrequency(G4int val) { fWriteOutFrequency = val; }
 
     inline RMGVOutputManager* GetOutputManager() { return fOutputManager; }
     inline G4String GetOutputName() { return fOutputName; }
-    inline G4int GetReportingFrequency() { return fReportingFrequency; }
-    inline G4int GetWriteOutFrequency() { return fWriteOutFrequency; }
 
   private:
 
-  RMGManagementEventActionMessenger* fG4Messenger; ///> Messenger class for user interface.
-  RMGVOutputManager* fOutputManager; ///> Pointer to the output class. Set via user interface
-  G4String fOutputName; ///> Name of output schema (as selected by user)
-  G4int fReportingFrequency;
-  G4int fWriteOutFrequency;
-  G4bool fWriteOutFileDuringRun;
+    std::unique_ptr<RMGManagementEventActionMessenger> fG4Messenger;
+    RMGVOutputManager* fOutputManager; ///> Pointer to the output class. Set via user interface
+    G4String fOutputName; ///> Name of output schema (as selected by user)
 };
 
 #endif

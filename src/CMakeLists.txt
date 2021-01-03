@@ -18,17 +18,20 @@ set(PROJECT_PUBLIC_HEADERS
 
     io/include/RMGVOutputManager.hh
     io/include/RMGLog.hh
+    io/include/RMGLog.icc
     io/include/ProjectInfo.hh
 
-    management/include/RMGManagerMessenger.hh
-    management/include/RMGManagementStackingAction.hh
-    management/include/RMGManagerDetectorConstruction.hh
-    management/include/RMGManagementEventActionMessenger.hh
-    management/include/RMGManagementEventAction.hh
-    management/include/RMGManagementTrackingAction.hh
-    management/include/RMGManagementSteppingAction.hh
-    management/include/RMGManager.hh
+    management/include/RMGManagementDetectorConstruction.hh
     management/include/RMGManagementRunAction.hh
+    management/include/RMGManagementEventAction.hh
+    management/include/RMGManagementEventActionMessenger.hh
+    management/include/RMGManagementStackingAction.hh
+    management/include/RMGManagementSteppingAction.hh
+    management/include/RMGManagementTrackingAction.hh
+    management/include/RMGManagementUserAction.hh
+    management/include/RMGManager.hh
+    management/include/RMGManagerMessenger.hh
+    management/include/RMGRun.hh
 
     materials/include/RMGMaterialTable.hh
     materials/include/RMGMaterialTableMessenger.hh
@@ -38,6 +41,7 @@ set(PROJECT_PUBLIC_HEADERS
     processes/include/RMGProcessesMessenger.hh
 
     tools/include/RMGTools.hh
+    tools/include/RMGMessengerTools.icc
 )
 
 set(PROJECT_SOURCES
@@ -52,14 +56,15 @@ set(PROJECT_SOURCES
     io/RMGLog.cc
     # io/RMGVOutputManager.cc
 
+    management/RMGManagementDetectorConstruction.cc
     management/RMGManagementEventAction.cc
     management/RMGManagementEventActionMessenger.cc
     management/RMGManagementRunAction.cc
     management/RMGManagementStackingAction.cc
     management/RMGManagementSteppingAction.cc
     management/RMGManagementTrackingAction.cc
+    management/RMGManagementUserAction.cc
     management/RMGManager.cc
-    management/RMGManagerDetectorConstruction.cc
     management/RMGManagerMessenger.cc
 
     materials/RMGMaterialTable.cc

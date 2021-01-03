@@ -26,8 +26,8 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
     void GeneratePrimaries(G4Event *event) override;
 
-    inline RMGVGenerator*  GetRMGGenerator() { return fRMGGenerator; }
-    inline ConfinementCode GetConfinementCode() { return fConfinementCode; }
+    inline RMGVGenerator*  GetRMGGenerator() const { return fRMGGenerator; }
+    inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }
 
     void SetConfinementCode(ConfinementCode code);
     inline void SetGenerator(RMGVGenerator* gen) { fRMGGenerator = gen; }

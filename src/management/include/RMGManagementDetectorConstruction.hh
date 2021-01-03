@@ -9,17 +9,17 @@
 #include "RMGMaterialTable.hh"
 
 class G4VPhysicalVolume;
-class RMGManagerDetectorConstruction : public G4VUserDetectorConstruction {
+class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
 
   public:
 
-    RMGManagerDetectorConstruction();
-    ~RMGManagerDetectorConstruction() = default;
+    RMGManagementDetectorConstruction();
+    ~RMGManagementDetectorConstruction() = default;
 
-    RMGManagerDetectorConstruction           (RMGManagerDetectorConstruction const&) = delete;
-    RMGManagerDetectorConstruction& operator=(RMGManagerDetectorConstruction const&) = delete;
-    RMGManagerDetectorConstruction           (RMGManagerDetectorConstruction&&)      = delete;
-    RMGManagerDetectorConstruction& operator=(RMGManagerDetectorConstruction&&)      = delete;
+    RMGManagementDetectorConstruction           (RMGManagementDetectorConstruction const&) = delete;
+    RMGManagementDetectorConstruction& operator=(RMGManagementDetectorConstruction const&) = delete;
+    RMGManagementDetectorConstruction           (RMGManagementDetectorConstruction&&)      = delete;
+    RMGManagementDetectorConstruction& operator=(RMGManagementDetectorConstruction&&)      = delete;
 
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;

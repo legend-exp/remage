@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <string>
 #include <vector>
+#include <random>
 
 #include "G4Threading.hh"
 #ifdef G4MULTITHREADED
@@ -22,16 +23,11 @@
 #include "G4UIExecutive.hh"
 #include "G4UItcsh.hh"
 #include "G4VisExecutive.hh"
+#include "Randomize.hh"
 
 #include "RMGProcessesList.hh"
-#include "RMGGeneratorPrimary.hh"
-#include "RMGManagerDetectorConstruction.hh"
-#include "RMGManagementUserActionInitialization.hh"
-#include "RMGManagementEventAction.hh"
-#include "RMGManagementRunAction.hh"
-#include "RMGManagementSteppingAction.hh"
-#include "RMGManagementTrackingAction.hh"
-#include "RMGManagementStackingAction.hh"
+#include "RMGManagementDetectorConstruction.hh"
+#include "RMGManagementUserAction.hh"
 #include "RMGLog.hh"
 #include "RMGManagerMessenger.hh"
 
@@ -39,15 +35,15 @@ RMGManager* RMGManager::fRMGManager = nullptr;
 
 RMGManager::RMGManager(G4String app_name) :
   fApplicationName(app_name),
-  fMacroFileName("") {
+  fMacroFileName(""),
+  fControlledRandomization(false) {
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
-  fG4Messenger = new RMGManagerMessenger(this);
+  fG4Messenger = std::unique_ptr<RMGManagerMessenger>(new RMGManagerMessenger(this));
 }
 
 RMGManager::~RMGManager() {
-  delete fG4Messenger;
   if (RMGLog::IsOpen()) RMGLog::CloseLog();
 }
 
@@ -56,7 +52,7 @@ void RMGManager::Initialize() {
   if (!fG4RunManager) {
 #if G4VERSION_NUMBER >= 1070
     fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
-#elif G4MULTITHREADED
+#elif defined(G4MULTITHREADED)
     fG4RunManager = std::unique_ptr<G4MTRunManager>(new G4MTRunManager());
 #else
     fG4RunManager = std::unique_ptr<G4RunManager>(new G4RunManager());
@@ -65,19 +61,21 @@ void RMGManager::Initialize() {
 
   if (!fG4VisManager) fG4VisManager = std::unique_ptr<G4VisManager>(new G4VisExecutive());
   if (!fProcessesList) fProcessesList = new RMGProcessesList();
-
-  if (!fGeneratorPrimary) fGeneratorPrimary = new RMGGeneratorPrimary();
-  if (!fManagementUserActionInitialization) fManagementUserActionInitialization = new RMGManagementUserActionInitialization();
-  // if (!fManagementRunAction) fManagementRunAction = new RMGManagementRunAction();
-  // if (!fManagementEventAction) fManagementEventAction = new RMGManagementEventAction();
-  // if (!fManagementStackingAction) fManagementStackingAction = new RMGManagementStackingAction(fManagementEventAction);
-  // if (!fManagementSteppingAction) fManagementSteppingAction = new RMGManagementSteppingAction(fManagementEventAction);
-  // if (!fManagementTrackingAction) fManagementTrackingAction = new RMGManagementTrackingAction(fManagementEventAction);
-  // if (!fManagerDetectorConstruction) fManagerDetectorConstruction = new RMGManagerDetectorConstruction();
+  if (!fManagementUserAction) fManagementUserAction = new RMGManagementUserAction();
 
   fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
   fG4RunManager->SetUserInitialization(fProcessesList);
-  fG4RunManager->SetUserInitialization(fManagementUserActionInitialization);
+  fG4RunManager->SetUserInitialization(fManagementUserAction);
+
+  if (!fControlledRandomization) {
+    std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
+    std::random_device rd; // uses RDRND or /dev/urandom
+    auto rand_seed = dist(rd);
+    G4Random::setTheSeed(rand_seed);
+    RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
+  }
+
+  fG4RunManager->Initialize();
 }
 
 void RMGManager::Run() {

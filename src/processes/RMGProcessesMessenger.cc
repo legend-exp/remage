@@ -9,7 +9,7 @@
 
 #include "RMGProcessesList.hh"
 #include "RMGManager.hh"
-#include "RMGManagerDetectorConstruction.hh"
+#include "RMGManagementDetectorConstruction.hh"
 #include "RMGTools.hh"
 #include "RMGLog.hh"
 
@@ -81,7 +81,7 @@ void RMGProcessesMessenger::SetNewValue(G4UIcommand *cmd, G4String new_val) {
 
     G4String volume_name = fStepLimitCmd->GetVolumeName(new_val);
     G4double max_step = fStepLimitCmd->GetStepSize(new_val);
-    RMGManager::GetRMGManager()->GetManagerDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
+    RMGManager::GetRMGManager()->GetManagementDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
   }
   else if (cmd == fUseAngCorrCmd.get()) {
     fProcessesList->SetUseAngCorr(fUseAngCorrCmd->GetNewBoolValue(new_val));

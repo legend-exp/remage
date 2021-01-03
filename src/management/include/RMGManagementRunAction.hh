@@ -1,14 +1,13 @@
 #ifndef _RMG_MANAGEMENT_RUN_ACTION_HH_
 #define _RMG_MANAGEMENT_RUN_ACTION_HH_
 
-#include <memory>
 #include <chrono>
 
 #include "globals.hh"
 #include "G4UserRunAction.hh"
 
 class G4Run;
-class RMGManager;
+class RMGRun;
 class RMGManagementRunAction : public G4UserRunAction {
 
   public:
@@ -21,17 +20,13 @@ class RMGManagementRunAction : public G4UserRunAction {
     RMGManagementRunAction           (RMGManagementRunAction&&)      = delete;
     RMGManagementRunAction& operator=(RMGManagementRunAction&&)      = delete;
 
-    void BeginOfRunAction(const G4Run* run) override;
-    void EndOfRunAction(const G4Run* run) override;
-
-    inline void SetControlledRandomization() { fControlledRandomization = true; }
-    inline G4bool GetControlledRandomization() { return fControlledRandomization; }
-    inline const std::chrono::time_point<std::chrono::system_clock>& GetStartTime() { return fStartTime; }
+    G4Run* GenerateRun() override;
+    void BeginOfRunAction(const G4Run*) override;
+    void EndOfRunAction(const G4Run*) override;
 
   private:
 
-    G4bool fControlledRandomization;
-    std::chrono::time_point<std::chrono::system_clock> fStartTime;
+    RMGRun* fRun;
 };
 
 #endif

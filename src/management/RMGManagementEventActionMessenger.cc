@@ -15,28 +15,11 @@ RMGManagementEventActionMessenger::RMGManagementEventActionMessenger(RMGManageme
   fEventDirectory = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
 
   fSetFileNameCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/FileName", this);
-
-  fSetReportingFrequencyCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(directory + "/ReportingFrequency", this,
-      "x", "x > 0");
-
-  fSetWriteOutFrequencyCmd = RMGTools::MakeG4UIcmdWithANumber<G4UIcmdWithAnInteger>(directory + "/WriteOutFrequency", this,
-      "x", "x > 0");
-
-  fSetWriteOutFileDuringRunCmd = RMGTools::MakeG4UIcmdWithABool(directory + "/WriteOutFileDuringRun", this);
 }
 
 void RMGManagementEventActionMessenger::SetNewValue(G4UIcommand* cmd, G4String new_values) {
 
-  if (cmd == fSetReportingFrequencyCmd.get()) {
-    fEventAction->SetReportingFrequency(fSetReportingFrequencyCmd->GetNewIntValue(new_values));
-  }
-  else if (cmd == fSetWriteOutFrequencyCmd.get()) {
-    fEventAction->SetWriteOutFrequency(fSetWriteOutFrequencyCmd->GetNewIntValue(new_values));
-  }
-  else if (cmd == fSetWriteOutFileDuringRunCmd.get()) {
-    fEventAction->SetWriteOutFileDuringRun(fSetWriteOutFileDuringRunCmd->GetNewBoolValue(new_values));
-  }
-  else if (cmd == fSetFileNameCmd.get()) {
+  if (cmd == fSetFileNameCmd.get()) {
      if (fEventAction->GetOutputManager()) {
         fEventAction->GetOutputManager()->SetFileName(new_values);
      }
