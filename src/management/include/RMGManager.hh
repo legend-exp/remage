@@ -27,8 +27,8 @@ class RMGManager {
 
     // getters
     static inline RMGManager*                 GetRMGManager() { return fRMGManager; }
-    inline std::unique_ptr<G4RunManager>&     GetG4RunManager() { return fG4RunManager; }
-    inline std::unique_ptr<G4VisManager>&     GetG4VisManager() { return fG4VisManager; }
+    inline G4RunManager*                      GetG4RunManager() { return fG4RunManager.get(); }
+    inline G4VisManager*                      GetG4VisManager() { return fG4VisManager.get(); }
     inline RMGManagementDetectorConstruction* GetManagementDetectorConstruction() { return fManagerDetectorConstruction; }
     inline G4VUserPhysicsList*                GetRMGProcessesList() { return fProcessesList; }
 

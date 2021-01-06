@@ -4,17 +4,21 @@
 #include <memory>
 
 #include "RMGVGenerator.hh"
+#include "ProjectInfo.hh"
 
 #include "G4ThreeVector.hh"
 
+#if RMG_HAS_BXDECAY0
+#include "bxdecay0_g4/primary_generator_action.hh"
+#endif
+
 class G4Event;
-class RMGGeneratorDecay0Messenger;
 class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
 
     RMGGeneratorDecay0();
-    ~RMGGeneratorDecay0();
+    inline ~RMGGeneratorDecay0() = default;
 
     RMGGeneratorDecay0           (RMGGeneratorDecay0 const&) = delete;
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0 const&) = delete;
@@ -22,11 +26,11 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0&&)      = delete;
 
     void GeneratePrimaryVertex(G4Event*) override;
-    void SetParticlePosition(G4ThreeVector) override;
+    inline void SetParticlePosition(G4ThreeVector) override {};
 
   private:
 
-    std::unique_ptr<RMGGeneratorDecay0Messenger> fG4Messenger;
+    std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
 };
 
 #endif

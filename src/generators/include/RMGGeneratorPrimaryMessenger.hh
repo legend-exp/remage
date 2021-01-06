@@ -14,8 +14,8 @@ class RMGGeneratorPrimaryMessenger : public G4UImessenger {
 
   public:
 
-    RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary *generator);
-    ~RMGGeneratorPrimaryMessenger() = default;
+    RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary*);
+    inline ~RMGGeneratorPrimaryMessenger() = default;
 
     RMGGeneratorPrimaryMessenger           (RMGGeneratorPrimaryMessenger const&) = delete;
     RMGGeneratorPrimaryMessenger& operator=(RMGGeneratorPrimaryMessenger const&) = delete;

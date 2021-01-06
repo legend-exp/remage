@@ -8,11 +8,13 @@
 
 class G4Run;
 class RMGRun;
+class RMGGeneratorPrimary;
 class RMGManagementRunAction : public G4UserRunAction {
 
   public:
 
-    RMGManagementRunAction();
+    RMGManagementRunAction() = default;
+    RMGManagementRunAction(RMGGeneratorPrimary*);
     ~RMGManagementRunAction() = default;
 
     RMGManagementRunAction           (RMGManagementRunAction const&) = delete;
@@ -26,7 +28,8 @@ class RMGManagementRunAction : public G4UserRunAction {
 
   private:
 
-    RMGRun* fRun;
+    RMGRun* fRMGRun;
+    RMGGeneratorPrimary* fRMGGeneratorPrimary;
 };
 
 #endif

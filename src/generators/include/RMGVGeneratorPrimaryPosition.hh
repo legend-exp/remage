@@ -1,6 +1,8 @@
 #ifndef _RMGGENERATORPRIMARYPOSITION_HH_
 #define _RMGGENERATORPRIMARYPOSITION_HH_
 
+#include <memory>
+
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
@@ -13,9 +15,7 @@ class RMGVGeneratorPrimaryPosition {
       fGeneratorName(name),
       fMaxAttempts(100000) {}
 
-    virtual inline ~RMGVGeneratorPrimaryPosition() {
-      if (fG4Messenger) delete fG4Messenger;
-    }
+    virtual inline ~RMGVGeneratorPrimaryPosition() = default;
 
     RMGVGeneratorPrimaryPosition           (RMGVGeneratorPrimaryPosition const&) = delete;
     RMGVGeneratorPrimaryPosition& operator=(RMGVGeneratorPrimaryPosition const&) = delete;
@@ -32,7 +32,7 @@ class RMGVGeneratorPrimaryPosition {
     G4int fMaxAttempts;
     const G4ThreeVector kDummyPrimaryPosition = G4ThreeVector(0, 0, 0);
 
-    G4UImessenger* fG4Messenger;
+    std::unique_ptr<G4UImessenger> fG4Messenger;
 };
 
 #endif
