@@ -10,10 +10,30 @@ Simulation framework for germanium detector experiments
 
 <p></p>
 
+The remage project provides a modern Geant4-based C++ library that can be used
+to efficiently simulate physics processes in typical germanium detector
+experiments. The library is setup-agnostic, therefore the user is mainly asked
+to provide a geometrical implementation of his/her experimental setup (C++
+code and GDML among the supported formats). The user can then benefit from a
+set of tools to perform common actions (frequently used materials, geometry
+helpers, standard output classes, LAr scintillation mechanism, and much more).
+
 ### Prerequisites
-* [CMake]() (≥ v3.0) — Build time dependency
-* [ROOT](https://root.cern.ch) (≥ v6.06) — Built with CMake and `xml=ON`
-* [Geant4](https://geant4.web.cern.ch) (≥ v10.4.3) — with `GEANT4_INSTALL_DATA=ON`, `GEANT4_USE_GDML=ON` and `GEANT4_BUILD_MULTITHREADED=OFF`
+* [CMake]() (≥ v3.8) — Build-only dependency
+* [Geant4](https://geant4.web.cern.ch) (≥ v10.5) — with:
+    * `GEANT4_INSTALL_DATA=ON`
+    * `GEANT4_USE_HDF5=ON` [optional]
+    * `GEANT4_USE_USOLIDS=ON` [optional], requires VecGeom library
+    * `GEANT4_USE_GDML=ON` [optional]
+    * `GEANT4_BUILD_MULTITHREADED=ON` [optional]
+
+### Optional dependencies
+* [bxdecay0](https://github.com/BxCppDev/bxdecay0) (≥ v1.0) with
+  `BXDECAY0_WITH_GEANT4_EXTENSION=ON`, to simulate double-beta decay (and
+  more...)
+* [ROOT](https://root.cern.ch), only for output formatting
+* [VecGeom](https://gitlab.cern.ch/VecGeom/VecGeom), for vectorized geometry
+  (Geant4 must be compiled with `GEANT4_USE_USOLIDS=ON` too)
 
 ### Installing the project
 To build and install the project, first clone the repository:
@@ -25,28 +45,15 @@ Create a build directory, and run CMake from there:
 $ mkdir -p build && cd build
 $ cmake <path-to-remage-source> -DCMAKE_INSTALL_PREFIX=<your-custom-install-location>
 ```
-If you also want to build the test suite just set the `BUILD_TESTS` variable to
-`ON` (see [`test/README.md`](test/README.md) for details). The default build
-type is set to `RelWithDebInfo`, if you need something different you can
-customize it by setting the
+The default build type is set to `RelWithDebInfo`, if you need something
+different you can customize it by setting the
 [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
 variable. Finally build and install the project (in `/usr/local` by default):
 ```console
-$ make install
+$ cmake --build . --target install
 ```
 and you're done!
 
-### Known issues
-CMake could have troubles in finding ROOT on some environments because of two
-possible reasons:
-* ROOT is compiled with the deprecated `./configure` method. Solution: just
-  recompile it with CMake.
-* the ROOT CMake files in your installation are somewhat misplaced. Solution:
-  just set the `CMAKE_PREFIX_PATH` variable to point to the `cmake` folder in
-  your `ROOTSYS` directory:
-  ```console
-  $ cmake <path-to-MaGe-source> -DCMAKE_INSTALL_PREFIX=<your-custom-install-location> -DCMAKE_PREFIX_PATH=$ROOTSYS/[etc]/cmake
-  ```
-* The documents build step could fail if the LaTeX executables are found but
-  the distribution does not actually contain the needed packages. Turn off
-  documents building by setting `BUILD_DOCS` to `OFF` in the CMake invocation.
+### A simple application
+
+Under construction... Browse the `examples` directory in the meanwhile.
