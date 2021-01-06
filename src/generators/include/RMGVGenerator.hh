@@ -1,6 +1,8 @@
 #ifndef _RMGVGENERATOR_HH_
 #define _RMGVGENERATOR_HH_
 
+#include <memory>
+
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
@@ -17,7 +19,7 @@ class RMGVGenerator {
       fGeneratorName(name),
       fReportingFrequency(1000) {};
 
-    virtual inline ~RMGVGenerator() { if (fG4Messenger) delete fG4Messenger; }
+    virtual inline ~RMGVGenerator() = default;
 
     RMGVGenerator           (RMGVGenerator const&) = delete;
     RMGVGenerator& operator=(RMGVGenerator const&) = delete;
@@ -33,9 +35,9 @@ class RMGVGenerator {
 
   protected:
 
-    G4String       fGeneratorName;      ///< Name of Generator
-    G4UImessenger* fG4Messenger;        ///< G4Messenger for setting up generator
-    G4int          fReportingFrequency; ///< Report generation rate
+    G4String fGeneratorName;
+    std::unique_ptr<G4UImessenger> fG4Messenger;
+    G4int fReportingFrequency;
 };
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef _RMGGENERATORSPS_HH_
 #define _RMGGENERATORSPS_HH_
 
+#include <memory>
+
 #include "G4ThreeVector.hh"
 #include "RMGVGenerator.hh"
 #include "G4GeneralParticleSource.hh"
@@ -10,8 +12,11 @@ class RMGGeneratorSPS : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorSPS() : RMGVGenerator("SPS") { fParticleSource = new G4GeneralParticleSource(); }
-    inline ~RMGGeneratorSPS() { delete fParticleSource; }
+    inline RMGGeneratorSPS() : RMGVGenerator("SPS") {
+      fParticleSource = std::unique_ptr<G4GeneralParticleSource>(new G4GeneralParticleSource());
+    }
+
+    inline ~RMGGeneratorSPS() = default;
 
     inline void GeneratePrimaryVertex(G4Event *event) override {
       fParticleSource->GeneratePrimaryVertex(event);
@@ -23,7 +28,7 @@ class RMGGeneratorSPS : public RMGVGenerator {
 
   private:
 
-    G4GeneralParticleSource* fParticleSource;
+    std::unique_ptr<G4GeneralParticleSource> fParticleSource;
 };
 
 #endif

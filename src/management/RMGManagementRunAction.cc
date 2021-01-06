@@ -16,22 +16,21 @@
 #include "RMGTools.hh"
 
 G4Run* RMGManagementRunAction::GenerateRun() {
-  fRun = new RMGRun();
-  return fRun;
+  fRMGRun = new RMGRun();
+  return fRMGRun;
 }
 
-RMGManagementRunAction::RMGManagementRunAction() {}
+RMGManagementRunAction::RMGManagementRunAction(RMGGeneratorPrimary* gene) {
+  fRMGGeneratorPrimary = gene;
+}
 
 void RMGManagementRunAction::BeginOfRunAction(const G4Run*) {
 
-  auto manager = G4RunManager::GetRunManager();
   RMGLog::Out(RMGLog::detail, "Performing RMG beginning of run actions");
 
-  auto primary_generator = manager->GetUserPrimaryGeneratorAction();
-  if (primary_generator) {
-    dynamic_cast<const RMGGeneratorPrimary*>(primary_generator)->GetRMGGenerator()->BeginOfRunAction(fRun);
+  if (fRMGGeneratorPrimary) {
+    fRMGGeneratorPrimary->GetRMGGenerator()->BeginOfRunAction(fRMGRun);
   }
-  else RMGLog::Out(RMGLog::fatal, "No generator specified!");
 
   // if (manager->GetRMGEventAction()->GetOutputManager()) {
   //   manager->GetRMGEventAction()->GetOutputManager()->BeginOfRunAction();
@@ -40,20 +39,21 @@ void RMGManagementRunAction::BeginOfRunAction(const G4Run*) {
 
   if (this->IsMaster()) {
     // save start time for future
-    fRun->SetStartTime(std::chrono::system_clock::now());
-    auto tt = RMGTools::ToUTCTime(fRun->GetStartTime());
+    fRMGRun->SetStartTime(std::chrono::system_clock::now());
+    auto tt = RMGTools::ToUTCTime(fRMGRun->GetStartTime());
 
     RMGLog::OutFormat(RMGLog::summary, "Starting run nr. %i. Current time is %i/%i/%i %i:%i:%i (UTC)",
-        fRun->GetRunID(), tt.tm_mday, tt.tm_mon+1, tt.tm_year+1900, tt.tm_hour, tt.tm_min, tt.tm_sec);
+        fRMGRun->GetRunID(), tt.tm_mday, tt.tm_mon+1, tt.tm_year+1900, tt.tm_hour, tt.tm_min, tt.tm_sec);
     RMGLog::OutFormat(RMGLog::summary, "Number of events to be processed: %i (%g)",
-        fRun->GetNumberOfEventToBeProcessed(), fRun->GetNumberOfEventToBeProcessed());
+        fRMGRun->GetNumberOfEventToBeProcessed(), fRMGRun->GetNumberOfEventToBeProcessed());
   }
 }
 
 void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
 
-  auto primary_generator = G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction();
-  dynamic_cast<const RMGGeneratorPrimary*>(primary_generator)->GetRMGGenerator()->BeginOfRunAction(fRun);
+  if (fRMGGeneratorPrimary) {
+    fRMGGeneratorPrimary->GetRMGGenerator()->EndOfRunAction(fRMGRun);
+  }
   // if (manager->GetRMGEventAction()->GetOutputManager()) {
   //   manager->GetRMGEventAction()->GetOutputManager()->EndOfRunAction();
   // }
@@ -62,10 +62,10 @@ void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
     auto time_now = std::chrono::system_clock::now();
     auto tt = RMGTools::ToUTCTime(time_now);
     RMGLog::OutFormat(RMGLog::summary, "Run nr. %i completed. %i (%g) events simulated. Current time is %i/%i/%i %i:%i:%i (UTC)",
-        fRun->GetRunID(), fRun->GetNumberOfEventToBeProcessed(), fRun->GetNumberOfEventToBeProcessed(),
+        fRMGRun->GetRunID(), fRMGRun->GetNumberOfEventToBeProcessed(), fRMGRun->GetNumberOfEventToBeProcessed(),
         tt.tm_mday, tt.tm_mon+1, tt.tm_year+1900, tt.tm_hour, tt.tm_min, tt.tm_sec);
 
-      auto total_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - fRun->GetStartTime()).count();
+      auto total_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - fRMGRun->GetStartTime()).count();
       auto t_sec = total_sec;
       auto t_days = (t_sec - (t_sec % 86400)) / 86400;
       t_sec -= 86400 * t_sec;
@@ -78,7 +78,7 @@ void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
           t_days, t_hours, t_minutes, t_sec);
 
       RMGLog::OutFormat(RMGLog::summary, "Stats: average event processing time was %g seconds/event",
-          total_sec*1./fRun->GetNumberOfEvent());
+          total_sec*1./fRMGRun->GetNumberOfEvent());
   }
 }
 

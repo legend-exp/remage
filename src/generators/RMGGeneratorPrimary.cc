@@ -9,13 +9,7 @@
 RMGGeneratorPrimary::RMGGeneratorPrimary():
   fConfinementCode(ConfinementCode::kUnConfined) {
 
-  fG4Messenger = new RMGGeneratorPrimaryMessenger(this);
-}
-
-RMGGeneratorPrimary::~RMGGeneratorPrimary() {
-  delete fPrimaryPositionGenerator;
-  delete fRMGGenerator;
-  delete fG4Messenger;
+  fG4Messenger = std::unique_ptr<RMGGeneratorPrimaryMessenger>(new RMGGeneratorPrimaryMessenger(this));
 }
 
 void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {
@@ -33,10 +27,10 @@ void RMGGeneratorPrimary::SetConfinementCode(RMGGeneratorPrimary::ConfinementCod
 
   switch (fConfinementCode) {
     case ConfinementCode::kUnConfined :
-      fPrimaryPositionGenerator = new RMGVGeneratorPrimaryPosition("DummyGenerator");
+      fPrimaryPositionGenerator = std::unique_ptr<RMGVGeneratorPrimaryPosition>(new RMGVGeneratorPrimaryPosition("DummyGenerator"));
       break;
     case ConfinementCode::kVolume :
-      fPrimaryPositionGenerator = new RMGGeneratorVolumeConfinement();
+      fPrimaryPositionGenerator = std::unique_ptr<RMGGeneratorVolumeConfinement>(new RMGGeneratorVolumeConfinement());
       break;
     default : RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
                                          fConfinementCode, "' specified (implement me)");

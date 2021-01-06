@@ -6,12 +6,10 @@ set(PROJECT_PUBLIC_HEADERS
 
     generators/include/RMGVGenerator.hh
     generators/include/RMGGeneratorVolumeConfinement.hh
-    generators/include/RMGGeneratorDecay0Messenger.hh
     generators/include/RMGGeneratorVolumeConfinementMessenger.hh
     generators/include/RMGGeneratorSPS.hh
     generators/include/RMGVGeneratorPrimaryPosition.hh
     generators/include/RMGGeneratorPrimary.hh
-    generators/include/RMGGeneratorDecay0.hh
     generators/include/RMGGeneratorUtil.hh
     generators/include/RMGGeneratorPrimaryMessenger.hh
     generators/include/RMGGeneratorG4Gun.hh
@@ -81,12 +79,10 @@ set(PROJECT_SOURCES
 if(BxDecay0_FOUND)
     list(APPEND PROJECT_PUBLIC_HEADERS
         generators/include/RMGGeneratorDecay0.hh
-        generators/include/RMGGeneratorDecay0Messenger.hh
     )
 
     list(APPEND PROJECT_SOURCES
         generators/RMGGeneratorDecay0.cc
-        generators/RMGGeneratorDecay0Messenger.cc
     )
 endif()
 

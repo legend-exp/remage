@@ -103,7 +103,7 @@ RMGGeneratorVolumeConfinement::RMGGeneratorVolumeConfinement() :
   fOnSurface(false),
   fBoundingSolidType("Sphere") {
 
-  fG4Messenger = new RMGGeneratorVolumeConfinementMessenger(this) ;
+  fG4Messenger = std::unique_ptr<RMGGeneratorVolumeConfinementMessenger>(new RMGGeneratorVolumeConfinementMessenger(this));
 }
 
 void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
