@@ -1,6 +1,7 @@
 /src/io/include/ProjectInfo.hh
 /doc/html
 /doc/latex
+/build
 
 compile_commands.json
 

@@ -11,7 +11,7 @@ RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial 
 
 RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() {
 
-  fMaterialTable = std::unique_ptr<RMGMaterialTable>(new RMGMaterialTable());
+  fMaterialTable = std::make_unique<RMGMaterialTable>();
 }
 
 G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {

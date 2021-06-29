@@ -14,7 +14,7 @@
 #include "RMGLog.hh"
 
 RMGManagementEventAction::RMGManagementEventAction() {
-  fG4Messenger = std::unique_ptr<RMGManagementEventActionMessenger>(new RMGManagementEventActionMessenger(this));
+  fG4Messenger = std::make_unique<RMGManagementEventActionMessenger>(this);
 }
 
 RMGManagementEventAction::~RMGManagementEventAction() {

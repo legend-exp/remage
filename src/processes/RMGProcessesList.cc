@@ -40,7 +40,7 @@
 RMGProcessesList::RMGProcessesList() :
   G4VModularPhysicsList() {
 
-  fProcessesMessenger = std::unique_ptr<RMGProcessesMessenger>(new RMGProcessesMessenger(this));
+  fProcessesMessenger = std::make_unique<RMGProcessesMessenger>(this);
 
   // The default values for the energy thresholds are tuned to 100 keV
   // in natural germanium (i.e., the BBdecay realm)

@@ -11,9 +11,7 @@
 #include "G4MTRunManager.hh"
 #endif
 #include "G4RunManager.hh"
-#if G4VERSION_NUMBER >= 1070
 #include "G4RunManagerFactory.hh"
-#endif
 #include "G4VisManager.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4UImanager.hh"
@@ -40,7 +38,7 @@ RMGManager::RMGManager(G4String app_name) :
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
-  fG4Messenger = std::unique_ptr<RMGManagerMessenger>(new RMGManagerMessenger(this));
+  fG4Messenger = std::make_unique<RMGManagerMessenger>(this);
 }
 
 RMGManager::~RMGManager() {
@@ -49,15 +47,7 @@ RMGManager::~RMGManager() {
 
 void RMGManager::Initialize() {
 
-  if (!fG4RunManager) {
-#if G4VERSION_NUMBER >= 1070
-    fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
-#elif defined(G4MULTITHREADED)
-    fG4RunManager = std::unique_ptr<G4MTRunManager>(new G4MTRunManager());
-#else
-    fG4RunManager = std::unique_ptr<G4RunManager>(new G4RunManager());
-#endif
-  }
+  if (!fG4RunManager) fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
 
   if (!fG4VisManager) fG4VisManager = std::unique_ptr<G4VisManager>(new G4VisExecutive());
   if (!fProcessesList) fProcessesList = new RMGProcessesList();

@@ -37,7 +37,7 @@ if(Geant4_FOUND)
 endif()
 
 # check for optional components
-find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreading gdml)
+find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml)
 
 if(Geant4_hdf5_FOUND)
     message(STATUS "GEANT4 compiled with HDF5 support - enabling feature")
@@ -51,7 +51,7 @@ else()
     message(STATUS "GEANT4 lacks VecGeom support - disabling feature")
 endif()
 
-if(Geant4_multithreading_FOUND)
+if(Geant4_multithreaded_FOUND)
     message(STATUS "GEANT4 compiled with multithreading support - enabling feature")
 else()
     message(STATUS "GEANT4 lacks multithreading support - disabling feature")
@@ -91,7 +91,7 @@ endif()
 
 # set minimum C++ standard
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

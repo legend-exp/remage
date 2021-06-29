@@ -18,7 +18,7 @@ RMGProcessesMessenger::RMGProcessesMessenger(RMGProcessesList* plist) :
 
   G4String directory = "/RMG/Processes";
 
-  fProcessesDir = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
+  fProcessesDir = std::make_unique<G4UIdirectory>(directory);
 
   fRealmCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Realm", this,
       "BBdecay DarkMatter CosmicRays OpticalPhoton");
@@ -32,7 +32,7 @@ RMGProcessesMessenger::RMGProcessesMessenger(RMGProcessesList* plist) :
   fLowEnergyProcessesOptionCmd = RMGTools::MakeG4UIcmdWithAString("/LowEnergyEMPhysicsOption", this,
       "Livermore EmOption1 EmOption2 EmOption3 EmOption4 Penelope LivermorePolarized");
 
-  fStepLimitCmd = std::unique_ptr<RMGUIcmdStepLimit>(new RMGUIcmdStepLimit(directory + "/SetStepLimit", this));
+  fStepLimitCmd = std::make_unique<RMGUIcmdStepLimit>(directory + "/SetStepLimit", this);
 
   fUseAngCorrCmd = RMGTools::MakeG4UIcmdWithABool(directory + "/UseAngularCorrelation", this);
 

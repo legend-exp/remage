@@ -15,7 +15,7 @@ std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperatu
 
 RMGMaterialTable::RMGMaterialTable() {
 
-  fG4Messenger = std::unique_ptr<RMGMaterialTableMessenger>(new RMGMaterialTableMessenger(this));
+  fG4Messenger = std::make_unique<RMGMaterialTableMessenger>(this);
 
   // default LAr optical properties
   fLArProperties.flat_top_photon_yield = 51 *1./CLHEP::keV;

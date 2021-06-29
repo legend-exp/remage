@@ -13,8 +13,8 @@ RMGMaterialTableMessenger::RMGMaterialTableMessenger(RMGMaterialTable* table) :
 
   G4String directory = "/RMG/Materials";
 
-  fDirectories.push_back(std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory)));
-  fDirectories.push_back(std::unique_ptr<G4UIdirectory>(new G4UIdirectory((directory + "/LAr").c_str())));
+  fDirectories.emplace_back(new G4UIdirectory(directory));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "/LAr").c_str()));
 
   new G4UnitDefinition("1/eV", "1/eV", "ScintillationYield", 1./CLHEP::eV);
   new G4UnitDefinition("1/keV", "1/keV", "ScintillationYield", 1./CLHEP::keV);

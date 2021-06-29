@@ -12,7 +12,7 @@ RMGManagementEventActionMessenger::RMGManagementEventActionMessenger(RMGManageme
   fEventAction(eventaction) {
 
   G4String directory = "/RMG/Output";
-  fEventDirectory = std::unique_ptr<G4UIdirectory>(new G4UIdirectory(directory));
+  fEventDirectory = std::make_unique<G4UIdirectory>(directory);
 
   fSetFileNameCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/FileName", this);
 }
