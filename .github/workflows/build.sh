@@ -1,8 +1,7 @@
 #!/bin/bash
 
-cd ..
 mkdir build
 cd build
-cmake ../remage
+cmake ..
 make
 make install
