@@ -30,26 +30,26 @@ jobs:
     - name: Build project
       run: .github/workflows/build.sh
 
-  test_in_legend_container:
-    name: Test in LEGEND container (CentOS Linux)
-    runs-on: ubuntu-latest
-    container: docker://legendexp/legend-base:latest
+  # test_in_legend_container:
+  #   name: Test in LEGEND container (CentOS Linux)
+  #   runs-on: ubuntu-latest
+  #   container: docker://legendexp/legend-base:latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build project
-      run: .github/workflows/build.sh
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Build project
+  #     run: scl enable devtoolset-8 -- .github/workflows/build.sh
 
-  test_on_macos:
-    name: Test on macOS
-    runs-on: macos-latest
+  # test_on_macos:
+  #   name: Test on macOS
+  #   runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Get dependencies
-      run: brew install --force-bottle root geant4
-    - name: Build project
-      run: .github/workflows/build.sh
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Get dependencies
+  #     run: brew install --force-bottle root geant4
+  #   - name: Build project
+  #     run: .github/workflows/build.sh
 
   build_docs:
     name: Build and deploy documentation
