@@ -1,0 +1,27 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")
+
+# custom code to check for remage components
+# the 'remage_components' list is configure in the main CMakeLists.txt
+set(_supported_components @remage_components@)
+
+foreach(_comp ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
+  if (NOT _comp IN_LIST _supported_components)
+    set(@CMAKE_PROJECT_NAME@_FOUND False)
+    set(@CMAKE_PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}. Recompile remage with the corresponding option.")
+  endif()
+endforeach()
+
+# now look for remage dependencies as well, with the correct compoents remage was compiled with
+include(CMakeFindDependencyMacro)
+
+find_dependency(Geant4 @RMG_G4_MINIMUM_VERSION@ REQUIRED COMPONENTS @g4_components@)
+
+if(@ROOT_FOUND@)
+    find_dependency(ROOT @RMG_ROOT_MINIMUM_VERSION@ REQUIRED COMPONENTS Core Tree)
+endif()
+
+if(@BxDecay0_FOUND0@)
+    find_dependency(BxDecay0 @RMG_BXDECAY0_MINIMUM_VERSION@ REQUIRED COMPONENTS Geant4)
+endif()

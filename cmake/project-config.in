@@ -6,7 +6,7 @@
 # clhep and xft projects.
 # ---------------------------------------------------------------------
 
-package="@PROJECT_TARNAME@"
+package="@PROJECT_NAME@"
 version="@PROJECT_VERSION@"
 
 # ---------------------------------------------------------------------

@@ -32,7 +32,6 @@ set(PROJECT_PUBLIC_HEADERS
     management/include/RMGRun.hh
 
     materials/include/RMGMaterialTable.hh
-    materials/include/RMGMaterialTableMessenger.hh
 
     processes/include/RMGUIcmdStepLimit.hh
     processes/include/RMGProcessesList.hh
@@ -66,7 +65,6 @@ set(PROJECT_SOURCES
     management/RMGManagerMessenger.cc
 
     materials/RMGMaterialTable.cc
-    materials/RMGMaterialTableMessenger.cc
 
     processes/RMGProcessesList.cc
     processes/RMGProcessesMessenger.cc
@@ -86,28 +84,28 @@ if(BxDecay0_FOUND)
     )
 endif()
 
-add_library(${PROJECT_TARNAME} SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
+add_library(${CMAKE_PROJECT_NAME} SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
 # link against dependent libraries
-target_link_libraries(${PROJECT_TARNAME}
+target_link_libraries(${CMAKE_PROJECT_NAME}
     PUBLIC
         ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
-    target_link_libraries(${PROJECT_TARNAME}
+    target_link_libraries(${CMAKE_PROJECT_NAME}
         PUBLIC
             BxDecay0::BxDecay0
             BxDecay0::BxDecay0_Geant4)
 endif()
 
 if(ROOT_FOUND)
-    target_link_libraries(${PROJECT_TARNAME}
+    target_link_libraries(${CMAKE_PROJECT_NAME}
         PUBLIC
             ROOT::Core)
 endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
-target_compile_features(${PROJECT_TARNAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 # let the project know where to find its headers
 set(COMPONENTS
@@ -124,32 +122,34 @@ foreach(_sub ${COMPONENTS})
     list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include/")
 endforeach()
 
-target_include_directories(${PROJECT_TARNAME}
+target_include_directories(${CMAKE_PROJECT_NAME}
     PUBLIC
         "$<BUILD_INTERFACE:${_full_include_paths}>"
         $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
-if(${PROJECT_VERSION} NOT EQUAL "unknown")
-set_target_properties(${PROJECT_TARNAME} PROPERTIES
-    VERSION ${PROJECT_VERSION})
-endif()
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    INTERFACE_${CMAKE_PROJECT_NAME}_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
 
-if(${PROJECT_VERSION_MAJOR} NOT EQUAL "unknown")
-set_target_properties(${PROJECT_TARNAME} PROPERTIES
-    SOVERSION ${PROJECT_VERSION_MAJOR})
-endif()
+set_property(TARGET ${CMAKE_PROJECT_NAME} APPEND PROPERTY
+  COMPATIBLE_INTERFACE_STRING ${CMAKE_PROJECT_NAME}_MAJOR_VERSION)
 
-# write ProjectInfo.hh and install it
-configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh @ONLY)
-install(FILES ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# write ProjectInfo.hh
+# no need to install, it is included in the header list above
+configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in
+    ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh @ONLY)
 
-# configure install
-install(TARGETS ${PROJECT_TARNAME}
-    EXPORT ${PROJECT_TARNAME}
+# install CMake targets
+install(TARGETS ${CMAKE_PROJECT_NAME}
+    EXPORT ${CMAKE_PROJECT_NAME}Targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
+# install headers
 install(FILES ${PROJECT_PUBLIC_HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

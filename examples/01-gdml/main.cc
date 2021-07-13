@@ -1,6 +1,9 @@
 #include "RMGManager.hh"
+#include "RMGLog.hh"
 
 int main(int argc, char** argv) {
+
+    RMGLog::SetLogLevel(RMGLog::debug);
 
     RMGManager manager("01-gdml");
 

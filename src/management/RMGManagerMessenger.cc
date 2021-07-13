@@ -12,10 +12,10 @@
 
 RMGManagerMessenger::RMGManagerMessenger(RMGManager*) {
 
-  G4String directory = "/RMG/Manager";
+  G4String directory = "/RMG/Manager/";
   fDirectories.emplace_back(new G4UIdirectory(directory));
-  fDirectories.emplace_back(new G4UIdirectory((directory + "/Logging").c_str()));
-  fDirectories.emplace_back(new G4UIdirectory((directory + "/Randomization").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "Logging/").c_str()));
+  fDirectories.emplace_back(new G4UIdirectory((directory + "Randomization/").c_str()));
 
   fScreenLogCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Logging/LogLevelScreen", this,
       "Debug Detail Summary Warning Error Fatal");

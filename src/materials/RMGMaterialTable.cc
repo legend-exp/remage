@@ -2,11 +2,11 @@
 
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
 #include "G4MaterialPropertiesTable.hh"
 
-#include "RMGMaterialTableMessenger.hh"
 #include "RMGLog.hh"
 #include "RMGManagementDetectorConstruction.hh"
 
@@ -15,7 +15,7 @@ std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperatu
 
 RMGMaterialTable::RMGMaterialTable() {
 
-  fG4Messenger = std::make_unique<RMGMaterialTableMessenger>(this);
+  this->DefineCommands();
 
   // default LAr optical properties
   fLArProperties.flat_top_photon_yield = 51 *1./CLHEP::keV;
@@ -335,6 +335,51 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    */
 
   RMGMaterialTable::GetMaterial("LiquidArgon")->GetIonisation()->SetBirksConstant(5.1748e-4*CLHEP::cm/CLHEP::MeV);
+}
+
+void RMGMaterialTable::DefineCommands() {
+
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials",
+      "Commands for controlling material definitions");
+
+  fLArMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials/LAr",
+      "Commands for controlling LAr specifications");
+
+  new G4UnitDefinition("1/eV", "1/eV", "ScintillationYield", 1./CLHEP::eV);
+  new G4UnitDefinition("1/keV", "1/keV", "ScintillationYield", 1./CLHEP::keV);
+  new G4UnitDefinition("1/MeV", "1/MeV", "ScintillationYield", 1./CLHEP::MeV);
+
+  fLArMessenger->DeclarePropertyWithUnit("FlatTopPhotonYield", "1/keV", fLArProperties.flat_top_photon_yield)
+    .SetGuidance("LAr photon yield for flat-top particles")
+    .SetUnitCategory("ScintillationYield")
+    .SetParameterName("Y", false)
+    .SetRange("Y > 0")
+    .SetToBeBroadcasted(false)
+    .SetStates(G4State_PreInit, G4State_Init);
+
+  fLArMessenger->DeclarePropertyWithUnit("SingletLifetime", "ns", fLArProperties.singlet_lifetime)
+    .SetGuidance("Lifetime of the LAr singlet state")
+    .SetUnitCategory("Time")
+    .SetParameterName("T", false)
+    .SetRange("T > 0")
+    .SetToBeBroadcasted(false)
+    .SetStates(G4State_PreInit, G4State_Init);
+
+  fLArMessenger->DeclarePropertyWithUnit("TripletLifetime", "ns", fLArProperties.triplet_lifetime)
+    .SetGuidance("Lifetime of the LAr triplet state")
+    .SetUnitCategory("Time")
+    .SetParameterName("T", false)
+    .SetRange("T > 0")
+    .SetToBeBroadcasted(false)
+    .SetStates(G4State_PreInit, G4State_Init);
+
+  fLArMessenger->DeclarePropertyWithUnit("VUVAbsorptionLength", "cm", fLArProperties.vuv_absorption_length)
+    .SetGuidance("LAr absorption length at 128 nm wavelength")
+    .SetUnitCategory("Length")
+    .SetParameterName("L", false)
+    .SetRange("L > 0")
+    .SetToBeBroadcasted(false)
+    .SetStates(G4State_PreInit, G4State_Init);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -2,11 +2,11 @@
 
 macro(create_mage_toolchain)
     # create and eventually install configuration scripts
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/project-config.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_TARNAME}-config @ONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/project-config.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
 
     # don't install project-config on windows
     if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_TARNAME}-config
+        install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config
             DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif()
 

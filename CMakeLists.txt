@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 project(remage
-    DESCRIPTION "Simulation framework for HPGe-based experiments" 
+    VERSION 0.1.0
+    DESCRIPTION "Simulation framework for HPGe-based experiments"
     LANGUAGES C CXX) # C is needed for GEANT4's HDF5 support
-set(PROJECT_TARNAME remage)
+
+message(STATUS "${CMAKE_PROJECT_NAME} version ${CMAKE_PROJECT_VERSION}")
 
 if(WIN32)
     message(FATAL_ERROR "${CMAKE_PROJECT_NAME} is not supported on Windows")
@@ -30,8 +32,13 @@ set(CMAKE_INSTALL_LIBDIR lib)
 # Set default build type
 include(BuildType)
 
+# Find dependencies
+set(RMG_G4_MINIMUM_VERSION 10.4.3)
+set(RMG_ROOT_MINIMUM_VERSION 6.06)
+set(RMG_BXDECAY0_MINIMUM_VERSION 1.0.10)
+
 # Find Geant4
-find_package(Geant4 10.4.3 REQUIRED)
+find_package(Geant4 ${RMG_G4_MINIMUM_VERSION} REQUIRED)
 if(Geant4_FOUND)
     message(STATUS "Found GEANT4 v" ${Geant4_VERSION})
 endif()
@@ -41,61 +48,70 @@ find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml)
 
 if(Geant4_hdf5_FOUND)
     message(STATUS "GEANT4 compiled with HDF5 support - enabling feature")
+    list(APPEND g4_components hdf5)
+    list(APPEND remage_components HDF5)
 else()
     message(STATUS "GEANT4 lacks HDF5 support - disabling feature")
 endif()
 
 if(Geant4_usolids_FOUND)
     message(STATUS "GEANT4 compiled with VecGeom support - enabling feature")
+    list(APPEND g4_components usolids)
+    list(APPEND remage_components VecGeom)
 else()
     message(STATUS "GEANT4 lacks VecGeom support - disabling feature")
 endif()
 
 if(Geant4_multithreaded_FOUND)
     message(STATUS "GEANT4 compiled with multithreading support - enabling feature")
+    list(APPEND g4_components multithreaded)
+    list(APPEND remage_components Multithreaded)
 else()
     message(STATUS "GEANT4 lacks multithreading support - disabling feature")
 endif()
 
 if(Geant4_gdml_FOUND)
     message(STATUS "GEANT4 compiled with GDML support - enabling feature")
-    set(REMAGE_HAS_GDML 1)
+    set(RMG_HAS_GDML 1)
+    list(APPEND g4_components gdml)
+    list(APPEND remage_components GDML)
 else()
     message(STATUS "GEANT4 lacks GDML support - disabling feature")
-    set(REMAGE_HAS_GDML 0)
+    set(RMG_HAS_GDML 0)
 endif()
 
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
 
-option(REMAGE_USE_ROOT "Build ${CMAKE_PROJECT_NAME} with ROOT support" ON)
-if(REMAGE_USE_ROOT)
-    # Find ROOT
-    list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-    find_package(ROOT 6.06 QUIET COMPONENTS Core Tree)
-    if(ROOT_FOUND)
-        message(STATUS "Found ROOT v" ${ROOT_VERSION} ", support enabled")
-    endif()
+option(RMG_USE_ROOT "Build ${CMAKE_PROJECT_NAME} with ROOT support" OFF)
+
+# Find ROOT
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+find_package(ROOT ${RMG_ROOT_MINIMUM_VERSION} QUIET COMPONENTS Core Tree)
+if(ROOT_FOUND)
+    message(STATUS "Found ROOT v" ${ROOT_VERSION} ", support enabled")
+    list(APPEND remage_components ROOT)
 else()
-    set(ROOT_FOUND FALSE)
+    if(RMG_USE_ROOT)
+        find_package(ROOT ${RMG_ROOT_MINIMUM_VERSION} REQUIRED COMPONENTS Core Tree)
+    else()
+        message(STATUS "ROOT not found, support disabled")
+    endif()
 endif()
 
-option(REMAGE_USE_DECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" ON)
-if(REMAGE_USE_DECAY0)
-    # find BxDecay0
-    find_package(BxDecay0 1.0 QUIET)
-    if(BxDecay0_FOUND)
-        if(NOT TARGET BxDecay0::BxDecay0_Geant4)
-            message(WARNING "BxDecay0 v" ${BxDecay0_VERSION} " found but without Geant4 extension library, recompile with -DBXDECAY0_WITH_GEANT4_EXTENSION. Disabling support")
-            set(BxDecay0_FOUND FALSE)
-        else()
-            message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
-        endif()
+option(RMG_USE_BXDECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" OFF)
+
+# find BxDecay0
+find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} QUIET COMPONENTS Geant4)
+if(BxDecay0_FOUND)
+    message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
+    list(APPEND remage_components BxDecay0)
+else()
+    if(RMG_USE_BXDECAY0)
+        find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} REQUIRED COMPONENTS Geant4)
     else()
         message(STATUS "BxDecay0 not found, support disabled")
     endif()
-else()
-    set(BxDecay0_FOUND FALSE)
 endif()
 
 # set minimum C++ standard
@@ -113,21 +129,28 @@ add_subdirectory(doc)
 enable_testing()
 add_subdirectory(test)
 
-# get project version info from Git
-include(GetVersionInfo)
-get_version_info()
+# export targets for dependent projects
+install(EXPORT ${CMAKE_PROJECT_NAME}Targets
+    NAMESPACE RMG::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
 
 # add support for find_package()
-configure_file(${CMAKE_SOURCE_DIR}/cmake/remageConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake @ONLY)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
 
+# create version file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+  VERSION "${PROJECT_VERSION}"
+  COMPATIBILITY AnyNewerVersion)
+
+# install
 install(FILES
-    ${CMAKE_SOURCE_DIR}/cmake/remageConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-install(EXPORT ${PROJECT_TARNAME}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
 
 # write useful post-install setup scripts
 include(Toolchain)

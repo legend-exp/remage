@@ -47,13 +47,29 @@ RMGManager::~RMGManager() {
 
 void RMGManager::Initialize() {
 
-  if (!fG4RunManager) fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+  RMGLog::Out(RMGLog::detail, "Initializing application");
+
+  // Suppress the Geant4 header:
+  // save underlying buffer and set null (only standard output)
+  std::streambuf* orig_buf = std::cout.rdbuf();
+  std::cout.rdbuf(nullptr);
+
+  if (!fG4RunManager) {
+    RMGLog::Out(RMGLog::debug, "Initializing default run manager");
+    fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+  }
+
+  // restore buffer
+  std::cout.rdbuf(orig_buf);
 
   if (!fG4VisManager) fG4VisManager = std::unique_ptr<G4VisManager>(new G4VisExecutive());
   if (!fProcessesList) fProcessesList = new RMGProcessesList();
   if (!fManagementUserAction) fManagementUserAction = new RMGManagementUserAction();
 
-  fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
+  fG4RunManager->SetVerboseLevel(0);
+  fG4VisManager->SetVerboseLevel(0);
+
+  if (!fManagerDetectorConstruction) fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
   fG4RunManager->SetUserInitialization(fProcessesList);
   fG4RunManager->SetUserInitialization(fManagementUserAction);
 

@@ -5,7 +5,7 @@
 #include <map>
 
 #include "globals.hh"
-#include "RMGMaterialTableMessenger.hh"
+#include "G4GenericMessenger.hh"
 
 class G4Material;
 class RMGMaterialTable {
@@ -31,11 +31,6 @@ class RMGMaterialTable {
     static G4Material* GetMaterial(G4String);
     static G4Material* GetMaterial(BathMaterial);
 
-    inline void SetLArFlatTopPhotonYield(G4double y) { fLArProperties.flat_top_photon_yield = y; }
-    inline void SetLArSingletLifetime(G4double t) { fLArProperties.singlet_lifetime = t; }
-    inline void SetLArTripletLifetime(G4double t) { fLArProperties.triplet_lifetime = t; }
-    inline void SetLArVUVAbsorptionLength(G4double l) { fLArProperties.vuv_absorption_length = l; }
-
     struct LArProperties {
       G4double flat_top_photon_yield;
       G4double singlet_lifetime;
@@ -59,9 +54,11 @@ class RMGMaterialTable {
     void InitializeOpticalProperties();
     void InitializeLArOpticalProperties();
 
-    static std::map<G4String, G4String> fMaterialAliases;
-    std::unique_ptr<RMGMaterialTableMessenger> fG4Messenger;
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::unique_ptr<G4GenericMessenger> fLArMessenger;
+    void DefineCommands();
 
+    static std::map<G4String, G4String> fMaterialAliases;
     LArProperties fLArProperties;
     static std::map<BathMaterial, PropertiesAtTemperature> fPropertiesAtTemperatureTable;
 };
