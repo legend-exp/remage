@@ -34,8 +34,9 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevel
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
 
   RMGLog::Print(loglevelfile, loglevelscreen, message, true);
+  RMGLog::Print(loglevelfile, loglevelscreen, "\n", false);
 
-  // thorw exception if error is fatal
+  // throw exception if error is fatal
   if (loglevelfile == fatal or loglevelscreen == fatal) {
     throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
   }
@@ -50,18 +51,25 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevel
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
 
   RMGLog::Print(loglevelfile, loglevelscreen, t, true, false);
-
-  // https://stackoverflow.com/questions/53281096/apply-function-to-all-elements-of-parameter-pack-from-a-variadic-function/53281524
-  // The following is a hacky way to have C++17-like behaviour with C++11
-  using dummy = int[];
-  (void)dummy { 0, (RMGLog::Print(loglevelfile, loglevelscreen, args, false, false), 0)... };
-
+  (RMGLog::Print(loglevelfile, loglevelscreen, args, false, false), ...);
   RMGLog::Print(loglevelfile, loglevelscreen, "\n", false);
 
-  // thorw exception if error is fatal
+  // throw exception if error is fatal
   if (loglevelfile == fatal or loglevelscreen == fatal) {
     throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
   }
+}
+
+// ---------------------------------------------------------
+
+template <typename... Args>
+inline void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const std::string& fmt, const Args&... args) {
+    try {
+        RMGLog::Out(loglevelfile, loglevelscreen, fmt::format(fmt, args...));
+    }
+    catch (fmt::v8::format_error& e) {
+        RMGLog::Out(RMGLog::error, "fmt library exception caugth: ", e.what());
+    }
 }
 
 // ---------------------------------------------------------
@@ -77,4 +85,4 @@ inline std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
   return ss.str();
 }
 
-// vim: tabstop=2 shiftwidth=2 expandtab
+// vim: tabstop=2 shiftwidth=2 expandtab ft=cpp

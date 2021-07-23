@@ -22,6 +22,6 @@ if(@ROOT_FOUND@)
     find_dependency(ROOT @RMG_ROOT_MINIMUM_VERSION@ REQUIRED COMPONENTS Core Tree)
 endif()
 
-if(@BxDecay0_FOUND0@)
+if(@BxDecay0_FOUND@)
     find_dependency(BxDecay0 @RMG_BXDECAY0_MINIMUM_VERSION@ REQUIRED COMPONENTS Geant4)
 endif()

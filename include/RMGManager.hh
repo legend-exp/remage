@@ -16,8 +16,13 @@ class RMGManager {
 
   public:
 
+    enum SessionType {
+      kTerminal,
+      kDefault
+    };
+
     RMGManager() = delete;
-    RMGManager(G4String app_name);
+    RMGManager(G4String app_name, int argc, char** argv);
     ~RMGManager();
 
     RMGManager           (RMGManager const&) = delete;
@@ -26,11 +31,11 @@ class RMGManager {
     RMGManager& operator=(RMGManager&&)      = delete;
 
     // getters
-    static inline RMGManager*                 GetRMGManager() { return fRMGManager; }
-    inline G4RunManager*                      GetG4RunManager() { return fG4RunManager.get(); }
-    inline G4VisManager*                      GetG4VisManager() { return fG4VisManager.get(); }
-    inline RMGManagementDetectorConstruction* GetManagementDetectorConstruction() { return fManagerDetectorConstruction; }
-    inline G4VUserPhysicsList*                GetRMGProcessesList() { return fProcessesList; }
+    static inline RMGManager*          GetRMGManager() { return fRMGManager; }
+    G4RunManager*                      GetG4RunManager();
+    G4VisManager*                      GetG4VisManager();
+    RMGManagementDetectorConstruction* GetManagementDetectorConstruction();
+    G4VUserPhysicsList*                GetRMGProcessesList();
 
     // setters
     inline void SetUserInitialization(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
@@ -38,7 +43,6 @@ class RMGManager {
     inline void SetUserInitialization(RMGManagementDetectorConstruction* det) { fManagerDetectorConstruction = det; }
     inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
 
-    G4bool ParseCommandLineArgs(int argc, char** argv);
     void PrintUsage();
     void Initialize();
     void Run();
@@ -48,9 +52,17 @@ class RMGManager {
 
   private:
 
+    void SetupDefaultG4RunManager();
+    void SetupDefaultG4VisManager();
+    void SetupDefaultManagementDetectorConstruction();
+    void SetupDefaultRMGProcessesList();
+
     G4String fApplicationName;
+    int fArgc;
+    char** fArgv;
     G4String fMacroFileName;
     G4bool   fControlledRandomization;
+    SessionType fSessionType;
 
     static RMGManager* fRMGManager;
     std::unique_ptr<G4RunManager> fG4RunManager;

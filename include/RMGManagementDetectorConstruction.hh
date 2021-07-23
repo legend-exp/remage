@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
@@ -26,13 +27,14 @@ class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;
 
+    inline void IncludeGDMLFile(G4String filename) { fGDMLFiles.emplace_back(filename); }
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
     inline void SetMaxStepLimit(G4String name, double max_step) { fPhysVolStepLimits.at(name) = max_step; }
     static inline RMGMaterialTable::BathMaterial GetBathMaterial() { return fBathMaterial; }
 
   private:
 
-    G4String fGDMLFile;
+    std::vector<G4String> fGDMLFiles;
     std::unique_ptr<RMGMaterialTable> fMaterialTable;
     std::map<G4String, G4double> fPhysVolStepLimits;
     static RMGMaterialTable::BathMaterial fBathMaterial;

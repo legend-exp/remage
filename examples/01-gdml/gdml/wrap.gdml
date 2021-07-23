@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+ <define>
+	  <constant name="TWOPI" value="2.*pi"/>
+
+	  <quantity name="wrap_z" type="length" value="93.5" unit="mm"/>
+	  <quantity name="wrap_radius" type="length" value="41.0" unit="mm"/>
+	  
+	  <quantity name="wrap_cavity_radius" type="length" value="40.4" unit="mm"/>
+	  <quantity name="wrap_top_thickness" type="length" value="1.0" unit="mm" />
+  
+ </define>
+
+
+
+ <materials>
+         <element Z="1" formula="H" name="Hydrogen" >
+                 <atom value="1" />
+         </element>
+         <element Z="6" formula="C" name="Carbon" >
+                 <atom value="12.01" />
+         </element>
+         <material name="HD1000" >
+                 <D value="0.93" unit="g/cm3" />
+                 <composite n="4" ref="Hydrogen" />
+                 <composite n="2" ref="Carbon" />
+         </material>
+ </materials>
+
+
+
+ <solids>
+	 
+	 <polycone name="wrap" startphi="0" deltaphi="TWOPI" aunit="rad">
+		 <zplane rmin="0" rmax="wrap_radius" z="0" />
+                 <zplane rmin="0" rmax="wrap_radius" z="wrap_top_thickness" />
+                 <zplane rmin="wrap_cavity_radius" rmax="wrap_radius" z="wrap_top_thickness" />
+                 <zplane rmin="wrap_cavity_radius" rmax="wrap_radius" z="wrap_z" />
+         </polycone>
+</solids>
+
+ <structure>
+	 <volume name="Wrap">
+		 <materialref ref="HD1000"/>
+		 <solidref ref="wrap"/>
+	 </volume>
+ </structure>
+
+
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="Wrap"/>
+ </setup>
+
+</gdml>
+

@@ -1,7 +1,6 @@
 #include "RMGManager.hh"
 
 #include <iostream>
-#include <getopt.h>
 #include <string>
 #include <vector>
 #include <random>
@@ -14,12 +13,9 @@
 #include "G4RunManagerFactory.hh"
 #include "G4VisManager.hh"
 #include "G4VUserPhysicsList.hh"
-#include "G4UImanager.hh"
-#include "G4UIsession.hh"
-#include "G4UIterminal.hh"
 #include "G4VisManager.hh"
 #include "G4UIExecutive.hh"
-#include "G4UItcsh.hh"
+#include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 #include "Randomize.hh"
 
@@ -31,13 +27,24 @@
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
-RMGManager::RMGManager(G4String app_name) :
+RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
   fApplicationName(app_name),
+  fArgc(argc),
+  fArgv(argv),
   fMacroFileName(""),
-  fControlledRandomization(false) {
+  fControlledRandomization(false),
+  fSessionType(RMGManager::kDefault),
+  fG4RunManager(nullptr),
+  fG4VisManager(nullptr),
+  fProcessesList(nullptr),
+  fManagerDetectorConstruction(nullptr),
+  fManagementUserAction(nullptr) {
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
+
+  // FIXME: I don't like this here
+  this->SetupDefaultG4RunManager();
   fG4Messenger = std::make_unique<RMGManagerMessenger>(this);
 }
 
@@ -49,27 +56,19 @@ void RMGManager::Initialize() {
 
   RMGLog::Out(RMGLog::detail, "Initializing application");
 
-  // Suppress the Geant4 header:
-  // save underlying buffer and set null (only standard output)
-  std::streambuf* orig_buf = std::cout.rdbuf();
-  std::cout.rdbuf(nullptr);
+  if (!fG4RunManager) this->SetupDefaultG4RunManager();
+  if (!fProcessesList) this->SetupDefaultRMGProcessesList();
+  if (!fG4VisManager) this->SetupDefaultG4VisManager();
+  fG4VisManager->Initialize();
 
-  if (!fG4RunManager) {
-    RMGLog::Out(RMGLog::debug, "Initializing default run manager");
-    fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+  if (!fManagementUserAction) {
+    RMGLog::Out(RMGLog::debug, "Initializing default user action class");
+    fManagementUserAction = new RMGManagementUserAction();
   }
 
-  // restore buffer
-  std::cout.rdbuf(orig_buf);
+  if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
 
-  if (!fG4VisManager) fG4VisManager = std::unique_ptr<G4VisManager>(new G4VisExecutive());
-  if (!fProcessesList) fProcessesList = new RMGProcessesList();
-  if (!fManagementUserAction) fManagementUserAction = new RMGManagementUserAction();
-
-  fG4RunManager->SetVerboseLevel(0);
-  fG4VisManager->SetVerboseLevel(0);
-
-  if (!fManagerDetectorConstruction) fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
+  fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
   fG4RunManager->SetUserInitialization(fProcessesList);
   fG4RunManager->SetUserInitialization(fManagementUserAction);
 
@@ -85,48 +84,67 @@ void RMGManager::Initialize() {
 }
 
 void RMGManager::Run() {
-    if (fMacroFileName.empty()) {
-    // MGLog(routine) << "Entering interactive mode." << endlog;
-    // G4UIExecutive *session = new G4UIExecutive(argc,argv);
-    // session->SessionStart();
-    // delete session;
+  if (fMacroFileName.empty()) {
+    RMGLog::Out(RMGLog::summary, "Entering interactive mode");
+    auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv);
+    session->SetPrompt("remage>");
+    session->SessionStart();
   }
   else {
-    // MGLog(routine) << "Entering batch mode..." << endlog;
-    // MGLog(routine) << "Executing script file from command line: " << *(args.end()-1) << endlog;
+    RMGLog::Out(RMGLog::summary, "Entering batch mode");
+    RMGLog::Out(RMGLog::summary, "Executing script file from command line: ", fMacroFileName);
     auto UI = G4UImanager::GetUIpointer();
     UI->ApplyCommand("/control/execute " + fMacroFileName);
   }
 }
 
-G4bool RMGManager::ParseCommandLineArgs(int argc, char** argv) {
+void RMGManager::SetupDefaultG4RunManager() {
+  // Suppress the Geant4 header:
+  // save underlying buffer and set null (only standard output)
+  std::streambuf* orig_buf = std::cout.rdbuf();
+  std::cout.rdbuf(nullptr);
 
-    const char* const short_opts = ":h";
-    const option long_opts[] = {
-        { "help",  no_argument, nullptr, 'h' },
-        { nullptr, no_argument, nullptr, 0   }
-    };
+  RMGLog::Out(RMGLog::debug, "Initializing default run manager");
+  fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager());
+  fG4RunManager->SetVerboseLevel(0);
 
-    int opt = 0;
-    while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) != -1) {
-        switch (opt) {
-            case 'h': // -h or --help
-            case '?': // Unrecognized option
-            default:
-                this->PrintUsage();
-                return false;
-        }
-    }
+  // restore buffer
+  std::cout.rdbuf(orig_buf);
+}
 
-    // extra arguments
-    std::vector<std::string> args;
-    for(; optind < argc; optind++) {
-        args.emplace_back(argv[optind]);
-    }
+void RMGManager::SetupDefaultRMGProcessesList() {
+  RMGLog::Out(RMGLog::debug, "Initializing default processes list");
+  fProcessesList = new RMGProcessesList();
+}
 
-    if (!args.empty()) fMacroFileName = args[0];
+void RMGManager::SetupDefaultG4VisManager() {
+  RMGLog::Out(RMGLog::debug, "Initializing default visualization manager");
+  fG4VisManager = std::make_unique<G4VisExecutive>("quiet");
+}
 
-    return true;
+void RMGManager::SetupDefaultManagementDetectorConstruction() {
+  RMGLog::Out(RMGLog::debug, "Initializing default (empty) detector");
+  fManagerDetectorConstruction = new RMGManagementDetectorConstruction();
+}
+
+G4RunManager* RMGManager::GetG4RunManager() {
+  if (!fG4RunManager) this->SetupDefaultG4RunManager();
+  return fG4RunManager.get();
+}
+
+G4VisManager* RMGManager::GetG4VisManager() {
+  if (!fG4VisManager) this->SetupDefaultG4VisManager();
+  return fG4VisManager.get();
+}
+
+RMGManagementDetectorConstruction* RMGManager::GetManagementDetectorConstruction() {
+  if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
+  return fManagerDetectorConstruction;
+}
+
+G4VUserPhysicsList* RMGManager::GetRMGProcessesList() {
+  if (!fProcessesList) this->SetupDefaultRMGProcessesList();
+  return fProcessesList;
 }
 
 void RMGManager::PrintUsage() {

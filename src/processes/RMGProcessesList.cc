@@ -379,7 +379,7 @@ void RMGProcessesList::SetCuts() {
       }
     }
   }
-  RMGLog::Out(RMGLog::detail, "Production cuts set");
+  RMGLog::Out(RMGLog::debug, "Production cuts set");
 }
 
 void RMGProcessesList::SetRealm(G4String realm) {

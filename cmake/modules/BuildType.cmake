@@ -1,4 +1,5 @@
 # Set a default build type if none was specified
+# CHANGEME when first stable version is out
 set(default_build_type "RelWithDebInfo")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)

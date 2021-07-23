@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+<!ENTITY define_lead_castle SYSTEM "define_lead_castle.xml">
+<!--<!ENTITY materials SYSTEM "materials.xml"> -->
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+       <!-- when positioning a volume associated to a Boolean solid, the relative center of coordinates considered for the positioning is the one related to the first of the two constituent solids -->
+
+
+ <define>
+
+	&define_lead_castle;		
+
+	  <quantity name="bottom_plate_x" type="length" value="bottom_plate_width" unit="mm"/>
+	  <quantity name="bottom_plate_y" type="length" value="bottom_plate_depth" unit="mm"/> 
+	  <quantity name="bottom_plate_z" type="length" value="bottom_plate_height" unit="mm"/>
+
+	  <quantity name="cavity_bottom_plate_x" type="length" value="cavity_bottom_plate_width" unit="mm"/>
+	  <quantity name="cavity_bottom_plate_y" type="length" value="cavity_bottom_plate_depth" unit="mm"/>
+	  <quantity name="cavity_bottom_plate_z" type="length" value="cavity_bottom_plate_height" unit="mm"/>
+
+	  <position name="pos_cavity_bottom_plate" y="(bottom_plate_y)/2"/> 
+
+   </define>
+
+
+   <materials/>
+  <!--        &materials;
+   </materials>  -->
+
+
+
+ <solids>
+         <box name="bottom_plate" x="bottom_plate_x" y="bottom_plate_y" z="bottom_plate_z"/>
+         <box name="cavity_bottom_plate" x="cavity_bottom_plate_x" y="cavity_bottom_plate_y" z="cavity_bottom_plate_z"/>
+	 
+         <subtraction name="final_bottom_plate" >
+                 <first ref="bottom_plate"/> <second ref="cavity_bottom_plate"/>
+                 <positionref ref="pos_cavity_bottom_plate" />
+         </subtraction>
+
+ </solids>
+
+
+<structure>
+	 <volume name="Bottom_plate">
+		 <materialref ref="G4_Al"/>
+		 <solidref ref="final_bottom_plate"/>
+	 </volume>
+ </structure>
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="Bottom_plate"/>
+ </setup>
+
+</gdml>
+

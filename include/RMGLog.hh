@@ -27,6 +27,11 @@
 #include <string>
 #include <cstdarg>
 
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif
+#include "fmt/core.h"
+
 // ---------------------------------------------------------
 
 class RMGLog {
@@ -145,9 +150,13 @@ class RMGLog {
     template <typename T, typename... Args>
     static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg_first, const Args&... msg_other);
 
-    static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...);
+    template <typename... Args>
+    static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const std::string& fmt, const Args&... args);
 
-    static void OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...);
+    template <typename... Args>
+    static inline void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
+      RMGLog::OutFormat(loglevel, loglevel, fmt, args...);
+    }
 
     template <typename T>
     static inline void Out(RMGLog::LogLevel loglevel, const T& msg) { RMGLog::Out(loglevel, loglevel, msg); }

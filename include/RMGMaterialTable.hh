@@ -17,7 +17,7 @@ class RMGMaterialTable {
       kLiquidNitrogen,
       kLiquidXenon,
       kVacuum,
-      kNone
+      kAir
     };
 
     RMGMaterialTable();

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+<!ENTITY define_cryostat SYSTEM "define_cryostat.xml">
+<!ENTITY define_source SYSTEM "define_source.xml">
+<!ENTITY define_positions SYSTEM "define_positions.xml">
+<!ENTITY define_plexiglass_source_holder SYSTEM "define_plexiglass_source_holder.xml">
+<!ENTITY define_lead_castle SYSTEM "define_lead_castle.xml">
+<!ENTITY materials SYSTEM "materials.xml">
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+ <define>
+	
+	 &define_cryostat;
+	 
+	 &define_source;
+
+	 &define_positions;
+
+	 &define_plexiglass_source_holder;
+		
+	 &define_lead_castle;
+ 
+          <constant name="TWOPI" value="2.*pi"/>
+	
+	  <position name="center" x="0" y="0" z="0" />
+
+          <position name="pos_source" x="" y="" z="-position_source_fromcryostat_z" unit="mm" />
+          <position name="pos_plexiglass_source_holder" z="-(position_source_fromcryostat_z+source_holder_top_plate_height/2)" unit="mm"/>
+	  <position name="pos_detector" z="(position_detector_fromcryostat_z-position_cryostat_cavity_fromTop)" unit="mm"/>
+	 <!-- <position name="pos_wrap" z="(position_holder_fromTop-position_cryostat_cavity_fromTop)" unit="mm"/>      
+	  <position name="pos_wrap" z="(position_holder_fromTop-position_cryostat_cavity_fromTop-(wrap_outer_height-cylinder_inner_height))" unit="mm"/> --> <!--wrap height > holder inner height-->
+          <position name="pos_wrap" z="(position_wrap_fromcryostat_z-position_cryostat_cavity_fromTop)" unit="mm"/>
+	  <position name="pos_holder" z="(position_holder_fromcryostat_z-position_cryostat_cavity_fromTop)"  unit="mm"/>
+
+
+	  <position name="pos_bottom_plate_table" z="position_cryostat_fromBottom+(bottom_plate_height)/2" unit="mm" />
+	  <position name="pos_lead_castle_table1" z="position_cryostat_fromBottom-(base_height_1)/2" />
+	  
+	  <quantity name="vacuum_cavity_z" type="length" value="(cryostat_height-position_cryostat_cavity_fromTop-position_cryostat_cavity_fromBottom)" unit="mm"/>
+	  <quantity name="vacuum_cavity_radius" type="length" value="(cryostat_width-2*cryostat_thickness)/2" unit="mm"/>
+	  <position name="pos_vacuum_cavity" z="position_cryostat_cavity_fromTop" unit="mm"/>
+
+
+ </define>
+
+
+
+
+ <materials/>
+<!--	&materials;
+ </materials>  -->
+
+
+
+ <solids>
+	 <box name="worldBox" lunit="m" x="10.0" y="10.0" z="10.0"/>
+
+         <polycone name="vacuum_cavity" startphi="0" deltaphi="TWOPI" aunit="rad">
+                 <zplane rmin="0" rmax="vacuum_cavity_radius" z="0" />
+                 <zplane rmin="0" rmax="vacuum_cavity_radius" z="vacuum_cavity_z" />
+         </polycone>
+
+ </solids>
+
+
+
+
+ <structure>
+
+	<volume name="Vacuum_cavity">
+                 <materialref ref="G4_Galactic"/> 
+                 <solidref ref="vacuum_cavity"/>
+		 <physvol>
+                         <file name="gdml/detector.gdml"/>
+                         <positionref ref="pos_detector"/>
+		 </physvol>
+                <physvol>
+                         <file name="gdml/wrap.gdml"/>
+                         <positionref ref="pos_wrap"/>
+                 </physvol> 
+		 <physvol>
+                         <file name="gdml/holder.gdml"/>
+                         <positionref ref="pos_holder"/>
+		 </physvol>
+	 </volume>
+
+
+
+	     <volume name="World">
+                 <materialref ref="G4_AIR"/> 
+                 <solidref ref="worldBox"/>
+		 <physvol>
+                         <file name="gdml/bottom_plate.gdml"/>
+			 <positionref ref="pos_bottom_plate_table"/>
+		 </physvol>
+		 <physvol>
+                         <file name="gdml/lead_castle_table1.gdml"/>
+			 <positionref ref="pos_lead_castle_table1"/>
+		 </physvol>
+		 <physvol>
+                         <file name="gdml/source_encapsulated_ba_HS4.gdml"/>  
+                         <positionref ref="pos_source"/>
+                 </physvol>  
+		 <physvol>
+                         <file name="gdml/plexiglass_source_holder.gdml"/>  
+                         <positionref ref="pos_plexiglass_source_holder"/>
+                 </physvol>  
+		  <physvol>
+			 <file name="gdml/cryostat.gdml"/>
+			 <positionref ref="center"/>
+		 </physvol>
+		 <physvol> 
+                         <volumeref ref="Vacuum_cavity"/>
+                         <positionref ref="pos_vacuum_cavity"/>
+		 </physvol>
+	 </volume>
+
+ </structure>
+
+
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="World"/>
+ </setup>
+</gdml>
+

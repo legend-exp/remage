@@ -2,43 +2,43 @@
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
 set(PROJECT_PUBLIC_HEADERS
-    geometry/include/RMGNavigationTools.hh
+    ../include/RMGNavigationTools.hh
 
-    generators/include/RMGVGenerator.hh
-    generators/include/RMGGeneratorVolumeConfinement.hh
-    generators/include/RMGGeneratorVolumeConfinementMessenger.hh
-    generators/include/RMGGeneratorSPS.hh
-    generators/include/RMGVGeneratorPrimaryPosition.hh
-    generators/include/RMGGeneratorPrimary.hh
-    generators/include/RMGGeneratorUtil.hh
-    generators/include/RMGGeneratorPrimaryMessenger.hh
-    generators/include/RMGGeneratorG4Gun.hh
+    ../include/RMGVGenerator.hh
+    ../include/RMGGeneratorVolumeConfinement.hh
+    ../include/RMGGeneratorVolumeConfinementMessenger.hh
+    ../include/RMGGeneratorSPS.hh
+    ../include/RMGVGeneratorPrimaryPosition.hh
+    ../include/RMGGeneratorPrimary.hh
+    ../include/RMGGeneratorUtil.hh
+    ../include/RMGGeneratorPrimaryMessenger.hh
+    ../include/RMGGeneratorG4Gun.hh
 
-    io/include/RMGVOutputManager.hh
-    io/include/RMGLog.hh
-    io/include/RMGLog.icc
-    io/include/ProjectInfo.hh
+    ../include/RMGVOutputManager.hh
+    ../include/RMGLog.hh
+    ../include/RMGLog.icc
+    ../include/ProjectInfo.hh
 
-    management/include/RMGManagementDetectorConstruction.hh
-    management/include/RMGManagementRunAction.hh
-    management/include/RMGManagementEventAction.hh
-    management/include/RMGManagementEventActionMessenger.hh
-    management/include/RMGManagementStackingAction.hh
-    management/include/RMGManagementSteppingAction.hh
-    management/include/RMGManagementTrackingAction.hh
-    management/include/RMGManagementUserAction.hh
-    management/include/RMGManager.hh
-    management/include/RMGManagerMessenger.hh
-    management/include/RMGRun.hh
+    ../include/RMGManagementDetectorConstruction.hh
+    ../include/RMGManagementRunAction.hh
+    ../include/RMGManagementEventAction.hh
+    ../include/RMGManagementEventActionMessenger.hh
+    ../include/RMGManagementStackingAction.hh
+    ../include/RMGManagementSteppingAction.hh
+    ../include/RMGManagementTrackingAction.hh
+    ../include/RMGManagementUserAction.hh
+    ../include/RMGManager.hh
+    ../include/RMGManagerMessenger.hh
+    ../include/RMGRun.hh
 
-    materials/include/RMGMaterialTable.hh
+    ../include/RMGMaterialTable.hh
 
-    processes/include/RMGUIcmdStepLimit.hh
-    processes/include/RMGProcessesList.hh
-    processes/include/RMGProcessesMessenger.hh
+    ../include/RMGUIcmdStepLimit.hh
+    ../include/RMGProcessesList.hh
+    ../include/RMGProcessesMessenger.hh
 
-    tools/include/RMGTools.hh
-    tools/include/RMGMessengerTools.icc
+    ../include/RMGTools.hh
+    ../include/RMGMessengerTools.icc
 )
 
 set(PROJECT_SOURCES
@@ -76,7 +76,7 @@ set(PROJECT_SOURCES
 
 if(BxDecay0_FOUND)
     list(APPEND PROJECT_PUBLIC_HEADERS
-        generators/include/RMGGeneratorDecay0.hh
+        ../include/RMGGeneratorDecay0.hh
     )
 
     list(APPEND PROJECT_SOURCES
@@ -107,24 +107,9 @@ endif()
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-# let the project know where to find its headers
-set(COMPONENTS
-    geometry
-    generators
-    io
-    management
-    materials
-    processes
-    tools
-)
-
-foreach(_sub ${COMPONENTS})
-    list(APPEND _full_include_paths "${CMAKE_CURRENT_SOURCE_DIR}/${_sub}/include/")
-endforeach()
-
 target_include_directories(${CMAKE_PROJECT_NAME}
     PUBLIC
-        "$<BUILD_INTERFACE:${_full_include_paths}>"
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>"
         $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
@@ -139,7 +124,7 @@ set_property(TARGET ${CMAKE_PROJECT_NAME} APPEND PROPERTY
 # write ProjectInfo.hh
 # no need to install, it is included in the header list above
 configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-    ${CMAKE_SOURCE_DIR}/src/io/include/ProjectInfo.hh @ONLY)
+    ${CMAKE_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
 
 # install CMake targets
 install(TARGETS ${CMAKE_PROJECT_NAME}
@@ -151,5 +136,5 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
 )
 
 # install headers
-install(FILES ${PROJECT_PUBLIC_HEADERS}
+install(DIRECTORY ../include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

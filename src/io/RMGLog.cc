@@ -25,6 +25,8 @@
 #include <memory>
 #include <algorithm>
 
+#include "fmt/core.h"
+
 std::ofstream RMGLog::fOutputFileStream;
 
 RMGLog::LogLevel RMGLog::fMinimumLogLevelFile = RMGLog::debug;
@@ -146,47 +148,6 @@ bool RMGLog::SupportsColors(const std::ostream& os) {
 
   return std::any_of(std::begin(terms), std::end(terms),
     [&](const char *term) { return ::strstr(env_p, term) != nullptr; });
-}
-
-/// ---------------------------------------------------------
-
-// https://codereview.stackexchange.com/questions/187183/create-a-c-string-using-printf-style-formatting
-void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const char *fmt, ...) {
-
-  char buf[256];
-  va_list args;
-  va_start(args, fmt);
-  const auto r = std::vsnprintf(buf, sizeof buf, fmt, args);
-  va_end(args);
-
-  // conversion failed
-  if (r < 0) {
-    RMGLog::Out(RMGLog::error, "Formatting error");
-    return;
-  }
-
-  // we fit in the buffer
-  const size_t len = r;
-  if (len < sizeof buf) {
-    RMGLog::Out(loglevelfile, loglevelscreen, std::string{buf, len});
-    return;
-  }
-
-  // we need to allocate scratch memory
-  auto vbuf = std::unique_ptr<char[]>(new char[len+1]);
-  va_start(args, fmt);
-  std::vsnprintf(vbuf.get(), len+1, fmt, args);
-  va_end(args);
-  RMGLog::Out(loglevelfile, loglevelscreen, std::string{vbuf.get(), len});
-}
-
-// ---------------------------------------------------------
-
-void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  RMGLog::OutFormat(loglevel, loglevel, fmt, args);
-  va_end(args);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -23,8 +23,8 @@ RMGMaterialTable::RMGMaterialTable() {
   fLArProperties.triplet_lifetime = 1 *CLHEP::us;
   fLArProperties.vuv_absorption_length = 30 *CLHEP::cm;
 
-  fPropertiesAtTemperatureTable.emplace(BathMaterial::kNone,
-      PropertiesAtTemperature("",
+  fPropertiesAtTemperatureTable.emplace(BathMaterial::kAir,
+      PropertiesAtTemperature("Air",
         5.32 *CLHEP::g/CLHEP::cm3,
         5.54 *CLHEP::g/CLHEP::cm3));
 
@@ -49,20 +49,19 @@ G4Material* RMGMaterialTable::GetMaterial(G4String name) {
 }
 
 G4Material* RMGMaterialTable::GetMaterial(RMGMaterialTable::BathMaterial val) {
-  if (val == BathMaterial::kNone) return nullptr;
-  else {
-    return RMGMaterialTable::GetMaterial(fPropertiesAtTemperatureTable[val].g4_name);
-  }
+  return RMGMaterialTable::GetMaterial(fPropertiesAtTemperatureTable[val].g4_name);
 }
 
 void RMGMaterialTable::InitializeMaterials() {
+
+  RMGLog::Out(RMGLog::detail, "Initializing materials");
 
   fMaterialAliases = {
     {"Air",            "G4_AIR"},
     {"Brass",          "G4_BRASS"},
     {"Bronze",         "G4_BRONZE"},
     {"Concrete",       "G4_CONCRETE"},
-    {"Germanium",      "G4_Ge"}, // with natural istopic composition
+    {"Germanium",      "G4_Ge"}, // with natural isotopic composition
     {"Kapton",         "G4_KAPTON"},
     {"LiquidArgon",    "G4_lAr"},
     {"LiquidNitrogen", "G4_lN2"},
@@ -75,19 +74,19 @@ void RMGMaterialTable::InitializeMaterials() {
   };
 
   auto man = G4NistManager::Instance();
-  if (RMGLog::GetLogLevelScreen() < RMGLog::detail) man->SetVerbose(1);
+  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) man->SetVerbose(2);
 
   G4String name, symbol;
   std::vector<G4String> elements;
-  std::vector<G4int> n_atoms;
   std::vector<G4double> mass_fraction;
-  G4double density; // g/cm3
-  G4bool isotopes;
+  G4double density;
   G4State state;
   G4double temperature;
   G4double pressure;
   G4double abundance;
   G4int n_isotopes;
+  G4int n_components;
+  G4int n_atoms;
 
   // define enriched germanium
   auto Ge70 = new G4Isotope(name="Ge70", 32, 70, 69.92 *CLHEP::g/CLHEP::mole);
@@ -96,21 +95,20 @@ void RMGMaterialTable::InitializeMaterials() {
   auto Ge74 = new G4Isotope(name="Ge74", 32, 74, 74.00 *CLHEP::g/CLHEP::mole);
   auto Ge76 = new G4Isotope(name="Ge76", 32, 76, 76.00 *CLHEP::g/CLHEP::mole);
 
-  auto elGeEnr = new G4Element(name="EnrichedGermanium", symbol="EnrGe", n_isotopes=5);
-  elGeEnr->AddIsotope(Ge70, abundance= 0.0 *CLHEP::perCent);
-  elGeEnr->AddIsotope(Ge72, abundance= 0.1 *CLHEP::perCent);
-  elGeEnr->AddIsotope(Ge73, abundance= 0.2 *CLHEP::perCent);
-  elGeEnr->AddIsotope(Ge74, abundance=13.1 *CLHEP::perCent);
-  elGeEnr->AddIsotope(Ge76, abundance=86.6 *CLHEP::perCent);
+  auto el_enr_ge = new G4Element(name="EnrichedGermanium", symbol="EnrGe", n_isotopes=5);
+  el_enr_ge->AddIsotope(Ge70, abundance= 0.0 *CLHEP::perCent);
+  el_enr_ge->AddIsotope(Ge72, abundance= 0.1 *CLHEP::perCent);
+  el_enr_ge->AddIsotope(Ge73, abundance= 0.2 *CLHEP::perCent);
+  el_enr_ge->AddIsotope(Ge74, abundance=13.1 *CLHEP::perCent);
+  el_enr_ge->AddIsotope(Ge76, abundance=86.6 *CLHEP::perCent);
 
-  man->ConstructNewMaterial("RMG_EnrichedGermanium",
-      elements    = {"EnrGe"},
-      n_atoms     = {1},
-      density     = 5.54,
-      isotopes    = true,
-      state       = G4State::kStateSolid,
-      temperature = CLHEP::STP_Temperature,
-      pressure    = CLHEP::STP_Pressure);
+  auto mat_enr_ge = new G4Material("RMG_EnrichedGermanium",
+      density      = 5.54,
+      n_components = 1,
+      state        = G4State::kStateSolid,
+      temperature  = CLHEP::STP_Temperature,
+      pressure     = CLHEP::STP_Pressure);
+  mat_enr_ge->AddElement(el_enr_ge, n_atoms=1);
 
   auto bath_material = RMGManagementDetectorConstruction::GetBathMaterial();
 
@@ -134,6 +132,8 @@ void RMGMaterialTable::InitializeOpticalProperties() {
 }
 
 void RMGMaterialTable::InitializeLArOpticalProperties() {
+
+  RMGLog::Out(RMGLog::detail, "Initializing liquid argon optical properties");
 
   // helpers
   auto to_energy     = [](G4double lambda) { return CLHEP::h_Planck * CLHEP::c_light / lambda; };
@@ -208,12 +208,20 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
     return std::exp(-0.5*((kk-128*CLHEP::nm)/(2.929*CLHEP::nm))*((kk-128*CLHEP::nm)/(2.929*CLHEP::nm)));
   };
 
+  lar_mpt->AddProperty("FASTCOMPONENT", {}, {});
+  lar_mpt->AddProperty("SLOWCOMPONENT", {}, {});
+
   // sample 100 points in 128nm +- 15nm
   auto E1 = to_energy(143*CLHEP::nm);
   auto E2 = to_energy(113*CLHEP::nm);
-  auto dE = (E2 - E1)/100;
+  auto dE = (E2 - E1)/100.;
 
-  for (int e = E1; e <= E2; e += dE) {
+  RMGLog::OutFormat(RMGLog::debug, "Sampling scintillation spectrum from {:.3f} nm ({:.3f} eV) to {:.3f} nm ({:.3f} eV) with a {:.3f} eV step",
+      to_wavelength(E1)/CLHEP::nm, E1/CLHEP::eV,
+      to_wavelength(E2)/CLHEP::nm, E2/CLHEP::eV,
+      dE/CLHEP::eV);
+
+  for (double e = E1; e <= E2; e += dE) {
     lar_mpt->AddEntry("FASTCOMPONENT", e, lar_scint_spectrum(to_wavelength(e)));
     lar_mpt->AddEntry("SLOWCOMPONENT", e, lar_scint_spectrum(to_wavelength(e)));
   }
@@ -281,7 +289,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    */
 
   RMGLog::Out(RMGLog::detail, "Using LAr singlet lifetime of ", fLArProperties.singlet_lifetime/CLHEP::ns," ns");
-  RMGLog::Out(RMGLog::detail, "Using LAr triples lifetime of ", fLArProperties.singlet_lifetime/CLHEP::us," us");
+  RMGLog::Out(RMGLog::detail, "Using LAr triplet lifetime of ", fLArProperties.singlet_lifetime/CLHEP::us," us");
 
   lar_mpt->AddConstProperty("FASTTIMECONSTANT", fLArProperties.singlet_lifetime);
   lar_mpt->AddConstProperty("SLOWTIMECONSTANT", fLArProperties.triplet_lifetime);
@@ -308,8 +316,19 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
 
   E1 = to_energy(650*CLHEP::nm);
   E2 = to_energy(113*CLHEP::nm);
-  dE = (E2 - E1)/100;
-  for (int e = E1; e <= E2; e += dE) {
+  dE = (E2 - E1)/100.;
+
+  RMGLog::OutFormat(RMGLog::debug,
+      "Sampling LAr attenuation length from {:.3f} nm ({:.3f} eV) to {:.3f} nm ({:.3f} eV) with a {:.3f} eV step",
+      to_wavelength(E1)/CLHEP::nm, E1/CLHEP::eV,
+      to_wavelength(E2)/CLHEP::nm, E2/CLHEP::eV,
+      dE/CLHEP::eV);
+
+  lar_mpt->AddProperty("RINDEX",    {}, {});
+  lar_mpt->AddProperty("RAYLEIGH",  {}, {});
+  lar_mpt->AddProperty("ABSLENGTH", {}, {});
+
+  for (double e = E1; e <= E2; e += dE) {
     lar_mpt->AddEntry("RINDEX",    e, std::sqrt(lar_dielectric_const(to_wavelength(e))));
     lar_mpt->AddEntry("RAYLEIGH",  e, lar_rayleigh_length(to_wavelength(e),
           RMGMaterialTable::GetMaterial("LiquidArgon")->GetTemperature()));
@@ -339,10 +358,10 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
 
 void RMGMaterialTable::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials",
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials/",
       "Commands for controlling material definitions");
 
-  fLArMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials/LAr",
+  fLArMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Materials/LAr/",
       "Commands for controlling LAr specifications");
 
   new G4UnitDefinition("1/eV", "1/eV", "ScintillationYield", 1./CLHEP::eV);
@@ -351,7 +370,6 @@ void RMGMaterialTable::DefineCommands() {
 
   fLArMessenger->DeclarePropertyWithUnit("FlatTopPhotonYield", "1/keV", fLArProperties.flat_top_photon_yield)
     .SetGuidance("LAr photon yield for flat-top particles")
-    .SetUnitCategory("ScintillationYield")
     .SetParameterName("Y", false)
     .SetRange("Y > 0")
     .SetToBeBroadcasted(false)
@@ -359,7 +377,6 @@ void RMGMaterialTable::DefineCommands() {
 
   fLArMessenger->DeclarePropertyWithUnit("SingletLifetime", "ns", fLArProperties.singlet_lifetime)
     .SetGuidance("Lifetime of the LAr singlet state")
-    .SetUnitCategory("Time")
     .SetParameterName("T", false)
     .SetRange("T > 0")
     .SetToBeBroadcasted(false)
@@ -367,7 +384,6 @@ void RMGMaterialTable::DefineCommands() {
 
   fLArMessenger->DeclarePropertyWithUnit("TripletLifetime", "ns", fLArProperties.triplet_lifetime)
     .SetGuidance("Lifetime of the LAr triplet state")
-    .SetUnitCategory("Time")
     .SetParameterName("T", false)
     .SetRange("T > 0")
     .SetToBeBroadcasted(false)
@@ -375,7 +391,6 @@ void RMGMaterialTable::DefineCommands() {
 
   fLArMessenger->DeclarePropertyWithUnit("VUVAbsorptionLength", "cm", fLArProperties.vuv_absorption_length)
     .SetGuidance("LAr absorption length at 128 nm wavelength")
-    .SetUnitCategory("Length")
     .SetParameterName("L", false)
     .SetRange("L > 0")
     .SetToBeBroadcasted(false)

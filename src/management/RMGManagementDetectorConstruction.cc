@@ -1,5 +1,8 @@
 #include "RMGManagementDetectorConstruction.hh"
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
 #include "G4VPhysicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -9,20 +12,25 @@
 #include "RMGMaterialTable.hh"
 #include "RMGLog.hh"
 
-RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kNone;
+RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
 
-RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() :
-  fGDMLFile("")
-{
+RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() {
   fMaterialTable = std::make_unique<RMGMaterialTable>();
 }
 
 G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
 
-  if (!fGDMLFile.empty()) {
+  RMGLog::Out(RMGLog::debug, "Constructing detector");
+
+  if (!fGDMLFiles.empty()) {
+    RMGLog::Out(RMGLog::debug, "Setting up G4GDMLParser");
     G4GDMLParser parser;
     parser.SetOverlapCheck(true);
-    parser.Read(fGDMLFile);
+    for (const auto& file : fGDMLFiles) {
+      RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
+      if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
+      parser.Read(file);
+    }
     fWorld = parser.GetWorldVolume();
   }
   else {
@@ -52,7 +60,7 @@ void RMGManagementDetectorConstruction::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry",
       "Commands for controlling geometry definitions");
 
-  fMessenger->DeclareProperty("GDMLFile", fGDMLFile)
+  fMessenger->DeclareMethod("GDMLFile", &RMGManagementDetectorConstruction::IncludeGDMLFile)
     .SetGuidance("Use GDML file for geometry definition")
     .SetParameterName("filename", false)
     .SetToBeBroadcasted(false)
