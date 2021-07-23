@@ -103,17 +103,17 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
 
     switch (loglevel) {
         case debug:
-            return Colorize<RMGLog::Ansi::magenta>("[Debug ___ ", os);
+            return Colorize<RMGLog::Ansi::magenta>("[Debug ---> ", os);
         case detail:
-            return Colorize<RMGLog::Ansi::blue>   ("[Detail __ ", os);
+            return Colorize<RMGLog::Ansi::blue>   ("[Detail --> ", os);
         case summary:
-            return Colorize<RMGLog::Ansi::green>  ("[Summary _ ", os);
+            return Colorize<RMGLog::Ansi::green>  ("[Summary -> ", os);
         case warning:
-            return Colorize<RMGLog::Ansi::yellow> ("[Warning _ ", os);
+            return Colorize<RMGLog::Ansi::yellow> ("[Warning -> ", os);
         case error:
-            return Colorize<RMGLog::Ansi::red>    ("[Error ___ ", os);
+            return Colorize<RMGLog::Ansi::red>    ("[Error ---> ", os);
         case fatal:
-            return Colorize<RMGLog::Ansi::red>    ("[Fatal ___ ", os, true);
+            return Colorize<RMGLog::Ansi::red>    ("[Fatal ---> ", os, true);
         default:
             return "";
     }

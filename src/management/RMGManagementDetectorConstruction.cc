@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 
 #include "RMGMaterialTable.hh"
 #include "RMGLog.hh"
+#include "RMGNavigationTools.hh"
 
 RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
 
@@ -41,11 +42,13 @@ G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
 
   // TODO: build and return world volume?
 
-  for (auto v : *G4PhysicalVolumeStore::GetInstance()) {
-    auto max_step = fPhysVolStepLimits.at(v->GetName());
-    if (max_step > 0) {
-      v->GetLogicalVolume()->SetUserLimits(new G4UserLimits(max_step));
+  for (const auto& el : fPhysVolStepLimits) {
+    RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first, el.second);
+    auto vol = RMGNavigationTools::FindVolumeByName(el.first);
+    if (!vol) {
+      RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
     }
+    else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
   }
 
   return fWorld;

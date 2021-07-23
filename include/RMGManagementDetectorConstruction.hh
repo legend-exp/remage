@@ -29,7 +29,9 @@ class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
 
     inline void IncludeGDMLFile(G4String filename) { fGDMLFiles.emplace_back(filename); }
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
-    inline void SetMaxStepLimit(G4String name, double max_step) { fPhysVolStepLimits.at(name) = max_step; }
+    inline void SetMaxStepLimit(G4String name, double max_step) {
+      fPhysVolStepLimits.insert_or_assign(name, max_step);
+    }
     static inline RMGMaterialTable::BathMaterial GetBathMaterial() { return fBathMaterial; }
 
   private:

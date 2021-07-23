@@ -8,6 +8,16 @@
 
 #include "RMGLog.hh"
 
+G4VPhysicalVolume* RMGNavigationTools::FindVolumeByName(G4String name) {
+    auto& store = *G4PhysicalVolumeStore::GetInstance();
+    auto result = std::find_if(store.begin(), store.end(), [&name](auto v) { return std::string(v->GetName()) == name; });
+    if (result == store.end()) {
+      RMGLog::Out(RMGLog::error, "Volume ", name, " not found in volume store. Returning nullptr");
+      return nullptr;
+    }
+    return *result;
+}
+
 G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volume) {
 
   std::set<G4VPhysicalVolume*> ancestors;
