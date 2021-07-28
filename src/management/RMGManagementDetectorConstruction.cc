@@ -60,14 +60,13 @@ void RMGManagementDetectorConstruction::ConstructSDandField() {
 
 void RMGManagementDetectorConstruction::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry",
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
       "Commands for controlling geometry definitions");
 
   fMessenger->DeclareMethod("GDMLFile", &RMGManagementDetectorConstruction::IncludeGDMLFile)
     .SetGuidance("Use GDML file for geometry definition")
     .SetParameterName("filename", false)
-    .SetToBeBroadcasted(false)
-    .SetStates(G4State_PreInit, G4State_Init);
+    .SetStates(G4State_PreInit);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

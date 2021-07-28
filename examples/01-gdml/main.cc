@@ -9,6 +9,9 @@ int main(int argc, char** argv) {
     RMGManager manager("01-gdml", argc, argv);
     manager.GetManagementDetectorConstruction()->IncludeGDMLFile("gdml/main.gdml");
 
+    std::string macro = argc > 1 ? argv[1] : "";
+    manager.IncludeMacroFile(macro);
+
     manager.Initialize();
     manager.Run();
 

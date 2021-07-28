@@ -28,7 +28,6 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGManagementTrackingAction.hh
     ../include/RMGManagementUserAction.hh
     ../include/RMGManager.hh
-    ../include/RMGManagerMessenger.hh
     ../include/RMGRun.hh
 
     ../include/RMGMaterialTable.hh
@@ -38,6 +37,7 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGProcessesMessenger.hh
 
     ../include/RMGTools.hh
+    ../include/RMGTools.icc
     ../include/RMGMessengerTools.icc
 )
 
@@ -62,7 +62,6 @@ set(PROJECT_SOURCES
     management/RMGManagementTrackingAction.cc
     management/RMGManagementUserAction.cc
     management/RMGManager.cc
-    management/RMGManagerMessenger.cc
 
     materials/RMGMaterialTable.cc
 

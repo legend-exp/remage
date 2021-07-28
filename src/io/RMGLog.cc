@@ -47,6 +47,7 @@ std::streambuf const *cerrbuf = G4cerr.rdbuf();
 // ---------------------------------------------------------
 
 RMGLog::RMGLog() {
+
 #if RMG_HAS_ROOT
     // suppress the ROOT Info printouts
     gErrorIgnoreLevel = 2000;
@@ -81,9 +82,11 @@ void RMGLog::OpenLogFile(const std::string& filename) {
 void RMGLog::StartupInfo() {
 
     std::string message = "";
-    message += " >>>\n";
-    message += " >>> remage version: " + RMGLog::fVersion + "\n";
-    message += " >>>\n";
+    message += "  _ __ ___ _ __ ___   __ _  __ _  ___ \n";
+    message += " | '__/ _ \\ '_ ` _ \\ / _` |/ _` |/ _ \\\n";
+    message += " | | |  __/ | | | | | (_| | (_| |  __/\n";
+    message += " |_|  \\___|_| |_| |_|\\__,_|\\__, |\\___| v" + RMGLog::fVersion + "\n";
+    message += "                           |___/      \n";
 
     // write message to screen
     if (RMGLog::fMinimumLogLevelScreen < RMGLog::nothing)

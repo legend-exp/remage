@@ -34,7 +34,6 @@ class RMGProcessesMessenger : public G4UImessenger {
 
     std::unique_ptr<G4UIcmdWithAString>   fRealmCmd;
     std::unique_ptr<G4UIcmdWithABool>     fOpticalProcessesCmd;
-    std::unique_ptr<G4UIcmdWithABool>     fOpticalOnlyCmd;
     std::unique_ptr<G4UIcmdWithABool>     fLowEnergyProcessesCmd;
     std::unique_ptr<G4UIcmdWithAString>   fLowEnergyProcessesOptionCmd;
     std::unique_ptr<RMGUIcmdStepLimit>    fStepLimitCmd;

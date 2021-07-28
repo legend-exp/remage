@@ -25,8 +25,8 @@ RMGGeneratorPrimaryMessenger::RMGGeneratorPrimaryMessenger(RMGGeneratorPrimary* 
   generators += " Decay0";
 #endif
 
-  fSelectCmd = RMGTools::MakeG4UIcmdWithAString(
-      directory + "/Select", this, generators, {G4State_Init, G4State_PreInit});
+  fSelectCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Select", this,
+      generators, {G4State_Init, G4State_PreInit});
 
   fConfineCmd = RMGTools::MakeG4UIcmdWithAString(directory + "/Confine", this,
     "UnConfined Volume");

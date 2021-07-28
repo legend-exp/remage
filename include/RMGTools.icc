@@ -1,0 +1,17 @@
+#include <stdexcept>
+
+#include "magic_enum/magic_enum.hpp"
+
+namespace RMGTools {
+
+    template <typename T>
+    T ToEnum(G4String name) {
+        auto result = magic_enum::enum_cast<T>(name);
+        if (!result.has_value()) {
+            throw std::bad_cast();
+        }
+        else return result.value();
+    }
+}
+
+// vim: shiftwidth=2 tabstop=2 expandtab ft=cpp

@@ -44,7 +44,7 @@ if(Geant4_FOUND)
 endif()
 
 # check for optional components
-find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml)
+find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml ui_all vis_all)
 
 if(Geant4_hdf5_FOUND)
     message(STATUS "GEANT4 compiled with HDF5 support - enabling feature")

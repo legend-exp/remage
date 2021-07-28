@@ -7,10 +7,11 @@
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "G4GenericMessenger.hh"
 
 #include "RMGMaterialTable.hh"
 
+class G4VPhysicalVolume;
+class G4GenericMessenger;
 class G4VPhysicalVolume;
 class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
 

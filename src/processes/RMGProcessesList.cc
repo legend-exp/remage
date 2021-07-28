@@ -25,7 +25,7 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
-#include "G4RadioactiveDecay.hh"
+#include "G4RadioactiveDecayBase.hh"
 #include "G4IonTable.hh"
 #include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"
@@ -37,51 +37,51 @@
 #include "RMGProcessesMessenger.hh"
 #include "RMGLog.hh"
 
+namespace u = CLHEP;
+
 RMGProcessesList::RMGProcessesList() :
   G4VModularPhysicsList() {
 
-  fProcessesMessenger = std::make_unique<RMGProcessesMessenger>(this);
-
-  // The default values for the energy thresholds are tuned to 100 keV
-  // in natural germanium (i.e., the BBdecay realm)
-  G4VUserPhysicsList::defaultCutValue = 0.1*CLHEP::mm;
-  fCutForGamma                        = 0.1*CLHEP::mm;
-  fCutForElectron                     = 0.1*CLHEP::mm;
-  fCutForPositron                     = 0.1*CLHEP::mm;
-  fCutForGammaSensitive               = 0.1*CLHEP::mm;
-  fCutForElectronSensitive            = 0.1*CLHEP::mm;
-  fCutForPositronSensitive            = 0.1*CLHEP::mm;
-  fCutForProton                       = 0.;
-  fCutForAlpha                        = 0.;
-  fCutForGenericIon                   = 0.;
-
-  this->SetCuts();
+  G4VUserPhysicsList::defaultCutValue = 0.1*u::mm;
+  this->SetPhysicsRealm(RMGProcessesList::kDoubleBetaDecay);
 
   G4VModularPhysicsList::verboseLevel = 0;
   this->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
-  fUseLowEnergy       = true;
-  fUseLowEnergyOption = 0;
+  fUseLowEnergyEM     = true;
+  fLowEnergyEMOption  = RMGProcessesList::LowEnergyEMOption::kLivermore;
   fConstructOptical   = false;
-  fUseOpticalPhysOnly = false;
 
-  fPhysicsListHadrons = " ";
+  this->DefineCommands();
 }
 
-void RMGProcessesList::SetUseAngCorr(G4int max_two_j) {
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGProcessesList::SetUseGammaAngCorr(G4bool b) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
-  pars->SetCorrelatedGamma(max_two_j);
-  // The above method takes a bool, so maxTwoJ=0 will disable
+  pars->SetCorrelatedGamma(b);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGProcessesList::SetGammaTwoJMAX(G4int max_two_j) {
+  auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
+  pars->SetCorrelatedGamma(true);
   pars->SetTwoJMAX(max_two_j);
 }
 
-// Set Store IC Level Data
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::SetStoreICLevelData(G4bool store) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetStoreICLevelData(store);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::ConstructParticle() {
+
+  RMGLog::Out(RMGLog::detail, "Constructing particles");
 
   G4BosonConstructor boson_const;
   boson_const.ConstructParticle();
@@ -104,53 +104,48 @@ void RMGProcessesList::ConstructParticle() {
   return;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::ConstructProcess() {
 
   this->AddTransportation();
 
   // parallel worlds must be added after G4Transportation
   if (G4RunManagerKernel::GetRunManagerKernel()->GetNumberOfParallelWorld() > 0) {
-    AddParallelWorldScoring();
-  }
-
-  if (fUseOpticalPhysOnly) {
-    RMGLog::Out(RMGLog::detail, "Constucting optical processes");
-    ConstructOp();
-    RMGLog::Out(RMGLog::detail, "Constucting Cerenkov processes");
-    ConstructCerenkov();
-    return;
+    this->AddParallelWorldScoring();
   }
 
   // EM Physics
   G4VPhysicsConstructor* em_constructor = nullptr;
-  if (fUseLowEnergy) {
-    switch (fUseLowEnergyOption){
+  RMGLog::Out(RMGLog::detail, "Adding electromagnetic physics");
+  if (fUseLowEnergyEM) {
+    switch (fLowEnergyEMOption) {
       // from https://geant4.web.cern.ch/node/1731
-      case 1:
+      case RMGProcessesList::LowEnergyEMOption::kOption1 :
         em_constructor = new G4EmStandardPhysics_option1(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 1");
         break;
-      case 2:
+      case RMGProcessesList::LowEnergyEMOption::kOption2 :
         em_constructor = new G4EmStandardPhysics_option2(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 2");
         break;
-      case 3:
+      case RMGProcessesList::LowEnergyEMOption::kOption3 :
         em_constructor = new G4EmStandardPhysics_option3(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 3");
         break;
-      case 4:
+      case RMGProcessesList::LowEnergyEMOption::kOption4:
         em_constructor = new G4EmStandardPhysics_option4(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 4");
         break;
-      case 5:
+      case RMGProcessesList::LowEnergyEMOption::kPenelope :
         em_constructor = new G4EmPenelopePhysics(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Penelope Physics");
         break;
-      case 6:
+      case RMGProcessesList::LowEnergyEMOption::kLivermorePolarized :
         em_constructor = new G4EmLivermorePolarizedPhysics(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Livermore-Polarized Physics");
         break;
-      default:
+      case RMGProcessesList::LowEnergyEMOption::kLivermore :
         RMGLog::Out(RMGLog::detail, "Using Livermore/LowEnergy electromagnetic physics");
         em_constructor = new G4EmLivermorePhysics(G4VModularPhysicsList::verboseLevel);
         break;
@@ -165,42 +160,40 @@ void RMGProcessesList::ConstructProcess() {
 
   // Includes synchrotron radiation, gamma-nuclear, muon-nuclear and
   // e+/e- nuclear interactions
+  RMGLog::Out(RMGLog::detail, "Adding extra electromagnetic physics");
   auto em_extra_physics = new G4EmExtraPhysics(G4VModularPhysicsList::verboseLevel);
-  G4String choice = "on";
-  em_extra_physics->Synch(choice);
-  em_extra_physics->GammaNuclear(choice);
-  em_extra_physics->MuonNuclear(choice);
+  em_extra_physics->Synch("on");
+  em_extra_physics->GammaNuclear("on");
+  em_extra_physics->MuonNuclear("on");
   em_extra_physics->ConstructProcess();
 
   if (fConstructOptical) {
-    RMGLog::Out(RMGLog::detail, "Constucting optical processes");
-    this->ConstructOp();
-    RMGLog::Out(RMGLog::detail, "Constucting cerenkov processes");
+    this->ConstructOptical();
     this->ConstructCerenkov();
   }
   else {
-    RMGLog::Out(RMGLog::summary, "Processes for Optical Photons are inactivated");
+    RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
   }
-  RMGLog::Out(RMGLog::detail, "Finished optical contstruction physics");
 
   // Add decays
+  RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
   auto decay_physics = new G4DecayPhysics(G4VModularPhysicsList::verboseLevel);
   decay_physics->ConstructProcess();
   auto rad_decay_physics = new G4RadioactiveDecayPhysics(G4VModularPhysicsList::verboseLevel);
   rad_decay_physics->ConstructProcess();
-  RMGLog::Out(RMGLog::detail, "finished decays processes construction");
-  const G4IonTable* the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
-  RMGLog::Out(RMGLog::detail, "entries in ion table "+ G4String(the_ion_table->Entries()));
+  const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
+  RMGLog::Out(RMGLog::detail, "Entries in ion table "+ G4String(the_ion_table->Entries()));
 
   // Assign manually triton decay
+  /*
   for (G4int i = 0; i < the_ion_table->Entries(); i++) {
     auto particle = the_ion_table->GetParticle(i);
     // assign Tritium (3H) life time given by NuDat 2.5 - A. Schubert 21 July 2010:
     // follow http://hypernews.slac.stanford.edu/HyperNews/geant4/get/hadronprocess/1538/1.html
 
     if (particle == G4Triton::Definition()) {
-      RMGLog::Out(RMGLog::detail, " found trition particle ");
-      particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*CLHEP::second);
+      RMGLog::Out(RMGLog::detail, "Adding triton decay manually");
+      particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*u::second);
       particle->SetPDGStable(false);
       auto proc_manager = particle->GetProcessManager();
       // Remove G4Decay process, which requires a registered decay table
@@ -212,24 +205,17 @@ void RMGProcessesList::ConstructProcess() {
       if (decay_proc) proc_manager->RemoveProcess(decay_proc);
       // Attach RDM, which is a rest-discrete process
       proc_manager->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
-      proc_manager->AddProcess(new G4RadioactiveDecay(), 1000, -1, 1000);
+      proc_manager->AddProcess(new G4RadioactiveDecayBase(), 1000, -1, 1000);
     }
   }
-  RMGLog::Out(RMGLog::detail, "finsihed triton decay processes construction");
-
-  this->DumpPhysicsList();
-
-  // FIXME: is this really needed?
-  // the following logic emulates the /process/setVerbose [VerboseLevel] all
-  // auto pProcNameVec = G4ProcessTable::GetProcessTable()->GetNameList();
-  // for (auto& i : *pProcNameVec) {
-  //   auto v = G4ProcessTable::GetProcessTable()->FindProcesses(i);
-  //   (*v)[0]->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
-  //   delete v;
-  // }
+  */
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::AddTransportation() {
+
+  RMGLog::Out(RMGLog::detail, "Adding transportation");
 
   G4VUserPhysicsList::AddTransportation();
 
@@ -239,14 +225,19 @@ void RMGProcessesList::AddTransportation() {
     auto proc_manager = particle->GetProcessManager();
     auto particle_name = particle->GetParticleName();
     // step limits
-    if(fLimitSteps[particle_name]) {
+    if (fLimitSteps[particle_name]) {
       proc_manager->AddProcess(new G4StepLimiter, -1, -1, 3);
       RMGLog::Out(RMGLog::detail, "Steps will be limited for ", particle_name);
     }
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::AddParallelWorldScoring() {
+
+  RMGLog::Out(RMGLog::detail, "Adding parallel world scoring");
+
   auto parallel_world_scoring_proc = new G4ParallelWorldScoringProcess("ParallelWorldScoringProc");
   parallel_world_scoring_proc->SetParallelWorld("ParallelSamplingWorld");
 
@@ -285,7 +276,9 @@ void RMGProcessesList::AddParallelWorldScoring() {
  * reference: WArP data
  */
 
-void RMGProcessesList::ConstructOp() {
+void RMGProcessesList::ConstructOptical() {
+
+  RMGLog::Out(RMGLog::detail, "Adding optical physics");
 
   // default scintillation process (electrons and gammas)
   auto scint_proc_default = new G4Scintillation("Scintillation");
@@ -346,20 +339,22 @@ void RMGProcessesList::ConstructOp() {
   }
 }
 
-// Hadronic processes
+////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGProcessesList::SetCuts() {
 
+  RMGLog::Out(RMGLog::debug, "Setting particle cut values");
+
   G4HadronicProcessStore::Instance()->SetVerbose(G4VModularPhysicsList::verboseLevel);
   // special for low energy physics
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250*CLHEP::eV, 100.*CLHEP::GeV);
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250*u::eV, 100.*u::GeV);
 
-  this->SetCutValue(fCutForGamma, "gamma");
-  this->SetCutValue(fCutForElectron, "e-");
-  this->SetCutValue(fCutForPositron, "e+");
-  this->SetCutValue(fCutForProton, "proton");
-  this->SetCutValue(fCutForAlpha, "alpha");
-  this->SetCutValue(fCutForGenericIon, "GenericIon");
+  this->SetCutValue(fStepCuts.gamma, "gamma");
+  this->SetCutValue(fStepCuts.electron, "e-");
+  this->SetCutValue(fStepCuts.positron, "e+");
+  this->SetCutValue(fStepCuts.proton, "proton");
+  this->SetCutValue(fStepCuts.alpha, "alpha");
+  this->SetCutValue(fStepCuts.generic_ion, "GenericIon");
 
   if (G4RegionStore::GetInstance()) {
     if (G4RegionStore::GetInstance()->size() > 1) {
@@ -368,69 +363,83 @@ void RMGProcessesList::SetCuts() {
       if (region) {
         RMGLog::Out(RMGLog::detail, "Register cuts for SensitiveRegion ");
         auto cuts = region->GetProductionCuts();
-        if (!cuts) cuts = new G4ProductionCuts; // zero pointer --> cuts not defined yet
-        cuts->SetProductionCut(fCutForGammaSensitive, "gamma");
-        cuts->SetProductionCut(fCutForElectronSensitive, "e-");
-        cuts->SetProductionCut(fCutForPositronSensitive, "e+");
-        cuts->SetProductionCut(G4VUserPhysicsList::defaultCutValue, "proton");
-        cuts->SetProductionCut(G4VUserPhysicsList::defaultCutValue, "alpha");
-        cuts->SetProductionCut(G4VUserPhysicsList::defaultCutValue, "GenericIon");
+        if (!cuts) cuts = new G4ProductionCuts;
+        cuts->SetProductionCut(fStepCutsSensitive.gamma, "gamma");
+        cuts->SetProductionCut(fStepCutsSensitive.electron, "e-");
+        cuts->SetProductionCut(fStepCutsSensitive.positron, "e+");
+        cuts->SetProductionCut(fStepCutsSensitive.proton, "proton");
+        cuts->SetProductionCut(fStepCutsSensitive.alpha, "alpha");
+        cuts->SetProductionCut(fStepCutsSensitive.generic_ion, "GenericIon");
         region->SetProductionCuts(cuts);
       }
     }
   }
-  RMGLog::Out(RMGLog::debug, "Production cuts set");
 }
 
-void RMGProcessesList::SetRealm(G4String realm) {
-  if (realm == "BBdecay") {
-    RMGLog::Out(RMGLog::summary, "Realm set to BBdecay");
-    fCutForGamma             = 0.1*CLHEP::mm;
-    fCutForElectron          = 0.1*CLHEP::mm;
-    fCutForPositron          = 0.1*CLHEP::mm;
-    fCutForProton            = G4VUserPhysicsList::defaultCutValue;
-    fCutForAlpha             = G4VUserPhysicsList::defaultCutValue;
-    fCutForGenericIon        = G4VUserPhysicsList::defaultCutValue;
-    fCutForGammaSensitive    = fCutForGamma;
-    fCutForElectronSensitive = fCutForElectron;
-    fCutForPositronSensitive = fCutForPositron;
-    this->SetCuts();
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGProcessesList::SetPhysicsRealm(PhysicsRealm realm) {
+  switch (realm) {
+    case RMGProcessesList::PhysicsRealm::kDoubleBetaDecay :
+      RMGLog::Out(RMGLog::summary, "Realm set to BBdecay");
+      // The default values for the energy thresholds are tuned to 100 keV
+      // in natural germanium (i.e., the BBdecay realm)
+      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCuts.gamma    = 0.1*u::mm;
+      fStepCuts.electron = 0.1*u::mm;
+      fStepCuts.positron = 0.1*u::mm;
+
+      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCutsSensitive.gamma    = 0.1*u::mm;
+      fStepCutsSensitive.electron = 0.1*u::mm;
+      fStepCutsSensitive.positron = 0.1*u::mm;
+      break;
+
+    case RMGProcessesList::PhysicsRealm::kDarkMatter :
+      RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
+      // These values are tuned to ~1 keV for gamma, e+, e- in
+      // natural germanium.
+      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCuts.gamma    = 5*u::um;
+      fStepCuts.electron = 0.5*u::um;
+      fStepCuts.positron = 0.5*u::um;
+
+      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCutsSensitive.gamma    = 5*u::um;
+      fStepCutsSensitive.electron = 0.5*u::um;
+      fStepCutsSensitive.positron = 0.5*u::um;
+      break;
+
+    case RMGProcessesList::PhysicsRealm::kCosmicRays :
+      RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
+      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCuts.gamma       = 5*u::cm;
+      fStepCuts.electron    = 1*u::cm;
+      fStepCuts.positron    = 1*u::cm;
+      fStepCuts.proton      = 5*u::mm;
+      fStepCuts.alpha       = 5*u::mm;
+      fStepCuts.generic_ion = 5*u::mm;
+
+      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCutsSensitive.gamma    = 30*u::mm;
+      fStepCutsSensitive.electron = 40*u::um;
+      fStepCutsSensitive.positron = 40*u::um;
+      break;
+
+    case RMGProcessesList::PhysicsRealm::kLArScintillation :
+      RMGLog::Out(RMGLog::warning, "LAr scintillation realm unimplemented");
   }
-  else if (realm == "DarkMatter") {
-    RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
-    // These values are tuned to ~1 keV for gamma, e+, e- in
-    // natural germanium.
-    fCutForGamma             = 0.005*CLHEP::mm;
-    fCutForElectron          = 0.0005*CLHEP::mm;
-    fCutForPositron          = 0.0005*CLHEP::mm;
-    fCutForProton            = G4VUserPhysicsList::defaultCutValue;
-    fCutForAlpha             = G4VUserPhysicsList::defaultCutValue;
-    fCutForGenericIon        = G4VUserPhysicsList::defaultCutValue;
-    fCutForGammaSensitive    = fCutForGamma;
-    fCutForElectronSensitive = fCutForElectron;
-    fCutForPositronSensitive = fCutForPositron;
-    this->SetCuts();
-  }
-  else if (realm == "CosmicRays") {
-    RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
-    fCutForGamma             = 5*CLHEP::cm;
-    fCutForElectron          = 1*CLHEP::cm;
-    fCutForPositron          = 1*CLHEP::cm;
-    fCutForProton            = 5*CLHEP::mm;
-    fCutForAlpha             = 5*CLHEP::mm;
-    fCutForGenericIon        = 5*CLHEP::mm;
-    fCutForGammaSensitive    = 30*CLHEP::mm;
-    fCutForElectronSensitive = 0.04*CLHEP::mm;
-    fCutForPositronSensitive = 0.04*CLHEP::mm;
-    this->SetCuts();
-  }
-  else {
-    RMGLog::Out(RMGLog::error, "Error: invalid energy cut realm \"" + realm + "\"." +
-                    "Must use either \"BBdecay\" or \"DarkMatter\".");
-  }
+
+  this->SetCuts();
+  fPhysicsRealm = realm;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGProcessesList::ConstructCerenkov() {
+
+  RMGLog::Out(RMGLog::detail, "Adding Cherenkov physics");
+
   auto cerenkov_process = new G4Cerenkov();
   G4ProcessManager* proc_manager = nullptr;
 
@@ -445,37 +454,69 @@ void RMGProcessesList::ConstructCerenkov() {
   }
 }
 
-void RMGProcessesList::DumpPhysicsList() {
-//   RMGLog::Out(RMGLog::detail, "====================================================================");
-//   RMGLog::Out(RMGLog::detail, "                      MaGe physics list                             ");
-//   RMGLog::Out(RMGLog::detail, "====================================================================");
-//   if (useLowE)  RMGLog::Out(RMGLog::detail, "Electromagnetic physics: Livermore/LowEnergy ");
-//   else RMGLog::Out(RMGLog::detail, "Electromagnetic physics: Standard ");
-//   RMGLog::Out(RMGLog::detail, "====================================================================");
+////////////////////////////////////////////////////////////////////////////////////////////
 
-//   if (constructOptical) RMGLog::Out(RMGLog::detail, "Physics for optical photons registered");
-//   else RMGLog::Out(RMGLog::detail, "No processes activated for optical photons");
-//   RMGLog::Out(RMGLog::detail, "====================================================================");
+void RMGProcessesList::DefineCommands() {
 
-//   if (fUseNoHadPhysFlag) {
-//     RMGLog::Out(RMGLog::detail, "No processes activated for hadrons");
-//     RMGLog::Out(RMGLog::detail, "====================================================================");
-//     return;
-//   }
-//   RMGLog::Out(RMGLog::detail, physics_list_hadrons_);
-//   RMGLog::Out(RMGLog::detail, "====================================================================");
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/",
+      "Commands for controlling physics processes");
+
+  auto cmd = fMessenger->DeclareMethod("Realm", &RMGProcessesList::SetPhysicsRealmString)
+    .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
+    .SetParameterName("realm", false)
+    .SetStates(G4State_PreInit, G4State_Idle);
+
+  G4String _str;
+  for (const auto& s : fPhysicsRealmString) _str += s.first + " ";
+  cmd.SetCandidates(_str);
+
+  fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
+    .SetGuidance("Add optical processes to the physics list")
+    .SetStates(G4State_PreInit, G4State_Idle);
+
+  cmd = fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGProcessesList::SetLowEnergyEMOptionString)
+    .SetGuidance("Add low energy electromagnetic processes to the physics list")
+    .SetStates(G4State_PreInit, G4State_Idle);
+
+  _str = "";
+  for (const auto& s : fLowEnergyEMOptionString) _str += s.first + " ";
+  cmd.SetCandidates(_str);
+
+  fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGProcessesList::SetUseGammaAngCorr)
+    .SetGuidance("")
+    .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareMethod("GammaTwoJMAX", &RMGProcessesList::SetGammaTwoJMAX)
+    .SetGuidance("")
+    .SetParameterName("x", false)
+    .SetRange("x > 0")
+    .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareMethod("StoreICLevelData", &RMGProcessesList::SetStoreICLevelData)
+    .SetGuidance("")
+    .SetStates(G4State_PreInit, G4State_Idle);
 }
 
-void RMGProcessesList::GetStepLimits() {
-  this->DumpPhysicsList();
-  RMGLog::Out(RMGLog::detail, "========================Show limits ================================");
-  RMGLog::Out(RMGLog::detail, " gamma " + G4String(G4VModularPhysicsList::GetCutValue("gamma")) + "keV");
-  RMGLog::Out(RMGLog::detail, " e-    " + G4String(GetCutValue("e-")) + "keV");
-  RMGLog::Out(RMGLog::detail, " e+    " + G4String(GetCutValue("e+")) + "keV");
-  RMGLog::Out(RMGLog::detail, " p     " + G4String(GetCutValue("proton")) + "keV");
-  RMGLog::Out(RMGLog::detail, " alpha " + G4String(GetCutValue("alpha")) +"keV");
-  RMGLog::Out(RMGLog::detail, " Ion   " + G4String(GetCutValue("GenericIon")) + "keV");
-  RMGLog::Out(RMGLog::detail, "====================================================================");
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGProcessesList::SetLowEnergyEMOptionString(G4String option) {
+  if (fLowEnergyEMOptionString.find(option) != fLowEnergyEMOptionString.end()) {
+    fLowEnergyEMOption = fLowEnergyEMOptionString[option];
+  }
+  else {
+    RMGLog::OutFormat(RMGLog::error, "'{}' option undefined", option);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGProcessesList::SetPhysicsRealmString(G4String realm) {
+  if (fPhysicsRealmString.find(realm) != fPhysicsRealmString.end()) {
+    this->SetPhysicsRealm(fPhysicsRealmString[realm]);
+  }
+  else {
+    RMGLog::OutFormat(RMGLog::error, "'{}' realm undefined", realm);
+  }
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

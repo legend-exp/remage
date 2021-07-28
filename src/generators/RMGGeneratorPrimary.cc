@@ -9,7 +9,7 @@
 RMGGeneratorPrimary::RMGGeneratorPrimary():
   fConfinementCode(ConfinementCode::kUnConfined) {
 
-  fG4Messenger = std::unique_ptr<RMGGeneratorPrimaryMessenger>(new RMGGeneratorPrimaryMessenger(this));
+  fG4Messenger = std::make_unique<RMGGeneratorPrimaryMessenger>(this);
 }
 
 void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {

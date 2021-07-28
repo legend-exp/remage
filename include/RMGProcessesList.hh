@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "G4VModularPhysicsList.hh"
+#include "G4GenericMessenger.hh"
 #include "globals.hh"
 
 class RMGProcessesMessenger;
@@ -19,21 +20,46 @@ class RMGProcessesList : public G4VModularPhysicsList {
     RMGProcessesList           (RMGProcessesList&&)      = delete;
     RMGProcessesList& operator=(RMGProcessesList&&)      = delete;
 
-    // setters
-    void         SetCuts() override;
-    void         SetRealm             (G4String realm_name);
-    void         SetUseAngCorr        (G4int max_two_j);
-    void         SetStoreICLevelData  (G4bool);
-    inline void  SetOpticalFlag       (G4bool val) {fConstructOptical = val;};
-    inline void  SetOpticalPhysicsOnly(G4bool val) {fUseOpticalPhysOnly = val;}
-    inline void  SetLowEnergyFlag     (G4bool val) {fUseLowEnergy = val;};
-    inline void  SetLowEnergyOption   (G4int  val) {fUseLowEnergyOption = val;};
+    enum PhysicsRealm {
+      kDoubleBetaDecay,
+      kDarkMatter,
+      kCosmicRays,
+      kLArScintillation
+    };
 
-    // getters
-    void GetStepLimits();
-    inline G4bool GetOpticalFlag() {return fConstructOptical;};
+    enum LowEnergyEMOption {
+      kOption1,
+      kOption2,
+      kOption3,
+      kOption4,
+      kPenelope,
+      kLivermore,
+      kLivermorePolarized
+    };
 
-    void DumpPhysicsList();
+    // TODO: cut for optical photon?
+    struct StepCutStore {
+      StepCutStore() = default;
+      inline StepCutStore(G4double def_cut) :
+        gamma(def_cut), electron(def_cut), positron(def_cut),
+        proton(def_cut), alpha(def_cut), generic_ion(def_cut) {}
+
+      G4double gamma;
+      G4double electron;
+      G4double positron;
+      G4double proton;
+      G4double alpha;
+      G4double generic_ion;
+    };
+
+    void SetCuts() override;
+    void SetPhysicsRealm(PhysicsRealm realm);
+    void SetPhysicsRealmString(G4String realm);
+    void SetLowEnergyEMOptionString(G4String option);
+    void SetUseGammaAngCorr(G4bool);
+    void SetGammaTwoJMAX(G4int two_j_max);
+    void SetStoreICLevelData(G4bool);
+
     inline void LimitStepForParticle(G4String particle_name) {fLimitSteps.at(particle_name) = true;}
 
   protected:
@@ -43,31 +69,38 @@ class RMGProcessesList : public G4VModularPhysicsList {
 
     void AddTransportation();
     void AddParallelWorldScoring();
-    void ConstructOp();
+    void ConstructOptical();
     void ConstructCerenkov();
 
   private:
 
-    // TODO: missing cut for optical photon
-    // G4double fCutForOpticalPhoton;
-    G4double fCutForGamma;
-    G4double fCutForElectron;
-    G4double fCutForPositron;
-    G4double fCutForProton;
-    G4double fCutForAlpha;
-    G4double fCutForGenericIon;
-    G4double fCutForGammaSensitive;
-    G4double fCutForElectronSensitive;
-    G4double fCutForPositronSensitive;
-
-    G4bool fUseLowEnergy;
-    G4int  fUseLowEnergyOption;
+    PhysicsRealm fPhysicsRealm;
+    StepCutStore fStepCuts;
+    StepCutStore fStepCutsSensitive;
     G4bool fConstructOptical;
-    G4bool fUseOpticalPhysOnly;
-
-    G4String fPhysicsListHadrons;
+    G4bool fUseLowEnergyEM;
+    LowEnergyEMOption fLowEnergyEMOption;
     std::map<G4String, G4bool> fLimitSteps;
-    std::unique_ptr<RMGProcessesMessenger> fProcessesMessenger;
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
+
+    std::map<G4String, PhysicsRealm> fPhysicsRealmString = {
+      {"DoubleBetaDecay",  PhysicsRealm::kDoubleBetaDecay},
+      {"DarkMatter",       PhysicsRealm::kDarkMatter},
+      {"CosmicRays",       PhysicsRealm::kCosmicRays},
+      {"LArScintillation", PhysicsRealm::kLArScintillation}
+    };
+
+    std::map<G4String, LowEnergyEMOption> fLowEnergyEMOptionString = {
+       { "Option1",            LowEnergyEMOption::kOption1 },
+       { "Option2",            LowEnergyEMOption::kOption2 },
+       { "Option3",            LowEnergyEMOption::kOption3 },
+       { "Option4",            LowEnergyEMOption::kOption4 },
+       { "Penelope",           LowEnergyEMOption::kPenelope },
+       { "Livermore",          LowEnergyEMOption::kLivermore },
+       { "LivermorePolarized", LowEnergyEMOption::kLivermorePolarized }
+    };
 };
 
 #endif

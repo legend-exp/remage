@@ -27,10 +27,13 @@
 #include <string>
 #include <cstdarg>
 
+#include "RMGTools.hh"
+
 #ifndef FMT_HEADER_ONLY
 #define FMT_HEADER_ONLY
 #endif
 #include "fmt/core.h"
+#include "magic_enum/magic_enum.hpp"
 
 // ---------------------------------------------------------
 
@@ -60,7 +63,8 @@ class RMGLog {
       blue    = 34,
       magenta = 35,
       cyan    = 36,
-      grey    = 37
+      grey    = 37,
+      unspecified
     };
 
     /** \name Constructor and destructor */
@@ -102,6 +106,8 @@ class RMGLog {
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
     static inline void SetLogLevelScreen(RMGLog::LogLevel loglevel) { fMinimumLogLevelScreen = loglevel; }
+
+    static inline void SetLogLevelScreenString(G4String loglevel) { fMinimumLogLevelScreen = RMGTools::ToEnum<LogLevel>(loglevel); }
 
     /**
      * Sets the minimum log level for file and screen output.
@@ -176,6 +182,9 @@ class RMGLog {
 
     static bool SupportsColors(const std::ostream& os);
 
+    template <RMGLog::Ansi color, typename T>
+    static std::string Colorize(const T& msg, std::ostream& os, bool bold=false);
+
     /** @} */
   private:
 
@@ -186,9 +195,6 @@ class RMGLog {
      * Converts a log level to a string
      * @param force_no_colors forcibly disable usage of ANSI escape sequences (e.g. if printing to file) */
     static std::string GetPrefix(RMGLog::LogLevel, std::ostream& os);
-
-    template <RMGLog::Ansi color, typename T>
-    static std::string Colorize(const T& msg, std::ostream& os, bool bold=false);
 
     /**
      * BAT version number */

@@ -81,7 +81,13 @@ inline std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
   if (!RMGLog::SupportsColors(os)) return msg;
 
   std::ostringstream ss;
-  ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
+  if (color == RMGLog::Ansi::unspecified) {
+      if (bold) ss << "\033[1m" << msg << "\033[0m";
+      else ss << msg;
+  }
+  else {
+      ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
+  }
   return ss.str();
 }
 

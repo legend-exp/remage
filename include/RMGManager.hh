@@ -2,24 +2,23 @@
 #define _RMG_MANAGER_HH_
 
 #include <memory>
+#include <vector>
 
 #include "globals.hh"
 
 #include "G4RunManager.hh"
 #include "G4VisManager.hh"
 
+#include "RMGLog.hh"
+
 class G4VUserPhysicsList;
 class RMGManagementDetectorConstruction;
 class RMGManagementUserAction;
 class RMGManagerMessenger;
+class G4GenericMessenger;
 class RMGManager {
 
   public:
-
-    enum SessionType {
-      kTerminal,
-      kDefault
-    };
 
     RMGManager() = delete;
     RMGManager(G4String app_name, int argc, char** argv);
@@ -42,13 +41,21 @@ class RMGManager {
     inline void SetUserInitialization(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
     inline void SetUserInitialization(RMGManagementDetectorConstruction* det) { fManagerDetectorConstruction = det; }
     inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
+    inline void SetBatchMode(G4bool flag=true) { fBatchMode = flag; }
 
-    void PrintUsage();
+    inline void IncludeMacroFile(G4String filename) { fMacroFileNames.emplace_back(filename); }
     void Initialize();
     void Run();
 
-    inline void SetControlledRandomization() { fControlledRandomization = true; }
-    inline G4bool GetControlledRandomization() { return fControlledRandomization; }
+    void SetRandEngine(G4String name);
+    void SetRandEngineSeed(G4long seed);
+    void SetRandEngineInternalSeed(G4int index);
+    void SetRandSystemEntropySeed();
+    inline G4bool GetRandIsControlled() { return fIsRandControlled; }
+
+    void SetLogLevelScreen(G4String level);
+    void SetLogLevelFile(G4String level);
+    inline void SetLogToFileName(G4String filename) { RMGLog::OpenLogFile(filename); }
 
   private:
 
@@ -58,11 +65,10 @@ class RMGManager {
     void SetupDefaultRMGProcessesList();
 
     G4String fApplicationName;
-    int fArgc;
-    char** fArgv;
-    G4String fMacroFileName;
-    G4bool   fControlledRandomization;
-    SessionType fSessionType;
+    int fArgc; char** fArgv;
+    std::vector<G4String> fMacroFileNames;
+    G4bool fIsRandControlled;
+    G4bool fBatchMode;
 
     static RMGManager* fRMGManager;
     std::unique_ptr<G4RunManager> fG4RunManager;
@@ -72,7 +78,10 @@ class RMGManager {
     RMGManagementDetectorConstruction*  fManagerDetectorConstruction;
     RMGManagementUserAction* fManagementUserAction;
 
-    std::unique_ptr<RMGManagerMessenger> fG4Messenger;
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::unique_ptr<G4GenericMessenger> fLogMessenger;
+    std::unique_ptr<G4GenericMessenger> fRandMessenger;
+    void DefineCommands();
 };
 
 #endif
