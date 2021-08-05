@@ -1,12 +1,17 @@
 #include "RMGNavigationTools.hh"
 
 #include <set>
-#include <vector>
+#include <map>
 
 #include "G4PhysicalVolumeStore.hh"
+#include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
+#include "G4UnitsTable.hh"
+#include "G4Material.hh"
 
 #include "RMGLog.hh"
+
+#include "fmt/core.h"
 
 G4VPhysicalVolume* RMGNavigationTools::FindVolumeByName(G4String name) {
     auto& store = *G4PhysicalVolumeStore::GetInstance();
@@ -54,18 +59,46 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
   return *ancestors.begin();
 }
 
+void RMGNavigationTools::PrintListOfLogicalVolumes() {
+
+  G4int max_length = 0;
+  // use std::set to have volumes automatically sorted by name
+  std::set<std::pair<G4String, G4String>> volumes;
+  for (const auto& v : *G4LogicalVolumeStore::GetInstance()) {
+
+    if (v->GetName().size() > std::size_t(max_length)) max_length = v->GetName().size();
+
+    volumes.insert({v->GetName(),
+        fmt::format("{} daugh. // {} // {} // {} // {} // {}",
+            v->GetNoDaughters(),
+            G4String(G4BestUnit(v->GetMaterial()->GetDensity(), "Volumic Mass")),
+            G4String(G4BestUnit(v->GetMass(), "Mass")),
+            G4String(G4BestUnit(v->GetMass() / v->GetMaterial()->GetDensity(), "Volume")),
+            G4String(G4BestUnit(v->GetMaterial()->GetPressure(), "Pressure")),
+            G4String(G4BestUnit(v->GetMaterial()->GetTemperature(), "Temperature")))
+        });
+  }
+
+  RMGLog::Out(RMGLog::summary, "Logical volumes registered in the volume store (alphabetic order):");
+  for (const auto& v : volumes) {
+    RMGLog::OutFormat(RMGLog::summary, " · {:<" + std::to_string(max_length) + "} // {}", v.first, v.second);
+  }
+  RMGLog::Out(RMGLog::summary, "");
+  RMGLog::Out(RMGLog::summary, "Total: ", volumes.size(), " volumes");
+}
+
 void RMGNavigationTools::PrintListOfPhysicalVolumes() {
 
   std::vector<G4String> volumes;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
-    volumes.push_back(v->GetName() + ", copy nr. " + G4String(v->GetCopyNo()));
+    volumes.push_back(" · " + v->GetName() + " (" + std::to_string(v->GetCopyNo()) +
+        + ") // from logical: " + v->GetLogicalVolume()->GetName());
   }
   std::sort(volumes.begin(), volumes.end());
 
-  RMGLog::Out(RMGLog::summary, "Physical volumes registered in the volume store:");
-  RMGLog::Out(RMGLog::summary, "------------------------------------------------");
+  RMGLog::Out(RMGLog::summary, "Physical volumes registered in the volume store in alphabetic order [name (copy nr.)]:");
   for (const auto& v : volumes) RMGLog::Out(RMGLog::summary, v);
-  RMGLog::Out(RMGLog::summary, "------------------------------------------------");
+  RMGLog::Out(RMGLog::summary, "");
   RMGLog::Out(RMGLog::summary, "Total: ", volumes.size(), " volumes");
 }
 

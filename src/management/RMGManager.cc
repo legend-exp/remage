@@ -90,6 +90,9 @@ void RMGManager::Initialize() {
 
 void RMGManager::Run() {
 
+  auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv);
+  session->SetPrompt(RMGLog::Colorize<RMGLog::Ansi::unspecified>("remage> ", G4cout, true));
+
   auto UI = G4UImanager::GetUIpointer();
   for (const auto& macro : fMacroFileNames) {
     RMGLog::Out(RMGLog::summary, "Loading macro file: ", macro);
@@ -98,8 +101,6 @@ void RMGManager::Run() {
 
   if (!fBatchMode) {
     RMGLog::Out(RMGLog::summary, "Entering interactive mode");
-    auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv);
-    session->SetPrompt(RMGLog::Colorize<RMGLog::Ansi::unspecified>("remage> ", G4cout, true));
     session->SessionStart();
   }
 }

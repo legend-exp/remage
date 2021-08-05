@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     manager.GetManagementDetectorConstruction()->IncludeGDMLFile("gdml/main.gdml");
 
     std::string macro = argc > 1 ? argv[1] : "";
-    manager.IncludeMacroFile(macro);
+    if (!macro.empty()) manager.IncludeMacroFile(macro);
 
     manager.Initialize();
     manager.Run();

@@ -17,6 +17,8 @@ RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial 
 
 RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() {
   fMaterialTable = std::make_unique<RMGMaterialTable>();
+
+  this->DefineCommands();
 }
 
 G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
@@ -63,10 +65,18 @@ void RMGManagementDetectorConstruction::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
       "Commands for controlling geometry definitions");
 
-  fMessenger->DeclareMethod("GDMLFile", &RMGManagementDetectorConstruction::IncludeGDMLFile)
+  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGManagementDetectorConstruction::IncludeGDMLFile)
     .SetGuidance("Use GDML file for geometry definition")
     .SetParameterName("filename", false)
     .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGManagementDetectorConstruction::PrintListOfLogicalVolumes)
+    .SetGuidance("Print list of defined physical volumes")
+    .SetStates(G4State_Idle);
+
+  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGManagementDetectorConstruction::PrintListOfPhysicalVolumes)
+    .SetGuidance("Print list of defined physical volumes")
+    .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

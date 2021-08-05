@@ -25,8 +25,6 @@
 #include <memory>
 #include <algorithm>
 
-#include "fmt/core.h"
-
 std::ofstream RMGLog::fOutputFileStream;
 
 RMGLog::LogLevel RMGLog::fMinimumLogLevelFile = RMGLog::debug;

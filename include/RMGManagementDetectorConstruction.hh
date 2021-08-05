@@ -9,6 +9,7 @@
 #include "G4VUserDetectorConstruction.hh"
 
 #include "RMGMaterialTable.hh"
+#include "RMGNavigationTools.hh"
 
 class G4VPhysicalVolume;
 class G4GenericMessenger;
@@ -34,6 +35,8 @@ class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
       fPhysVolStepLimits.insert_or_assign(name, max_step);
     }
     static inline RMGMaterialTable::BathMaterial GetBathMaterial() { return fBathMaterial; }
+    inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
+    inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
 
   private:
 
