@@ -98,12 +98,12 @@ void RMGGeneratorPrimary::DefineCommands() {
   fMessenger->DeclareMethod("Confine", &RMGGeneratorPrimary::SetConfinementCodeString)
     .SetGuidance("Select primary confinement strategy")
     .SetParameterName("strategy", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
+    .SetStates(G4State_Idle);
 
   fMessenger->DeclareMethod("Select", &RMGGeneratorPrimary::SetGeneratorString)
     .SetGuidance("Select event generator")
     .SetParameterName("generator", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
+    .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
