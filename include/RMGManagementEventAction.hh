@@ -7,7 +7,7 @@
 #include "G4Event.hh"
 #include "G4UserEventAction.hh"
 
-class RMGManagementEventActionMessenger;
+class G4GenericMessenger;
 class RMGVOutputManager;
 class RMGManagementEventAction : public G4UserEventAction {
 
@@ -32,9 +32,11 @@ class RMGManagementEventAction : public G4UserEventAction {
 
   private:
 
-    std::unique_ptr<RMGManagementEventActionMessenger> fG4Messenger;
     RMGVOutputManager* fOutputManager; ///> Pointer to the output class. Set via user interface
     G4String fOutputName; ///> Name of output schema (as selected by user)
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif

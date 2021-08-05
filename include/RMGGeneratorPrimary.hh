@@ -8,8 +8,8 @@
 
 #include "RMGVGeneratorPrimaryPosition.hh"
 #include "RMGVGenerator.hh"
-#include "RMGGeneratorPrimaryMessenger.hh"
 
+class G4GenericMessenger;
 class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
   public:
@@ -17,6 +17,14 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
     enum ConfinementCode {
       kUnConfined,
       kVolume
+    };
+
+    enum Generator {
+      kG4gun,
+      kSPS,
+      kBxDecay0,
+      kUserDefined,
+      kUndefined
     };
 
     RMGGeneratorPrimary();
@@ -29,18 +37,25 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
     void GeneratePrimaries(G4Event *event) override;
 
-    inline RMGVGenerator* GetRMGGenerator() { return fRMGGenerator.get(); }
+    inline RMGVGenerator* GetRMGGenerator() { return fGeneratorObj.get(); }
     inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }
 
     void SetConfinementCode(ConfinementCode code);
-    inline void SetGenerator(RMGVGenerator* gen) { fRMGGenerator = std::unique_ptr<RMGVGenerator>(gen); }
+    void SetConfinementCodeString(G4String code);
+    void SetUserGenerator(RMGVGenerator* gen);
+    void SetGenerator(Generator gen);
+    void SetGeneratorString(G4String gen);
 
   private:
 
     ConfinementCode fConfinementCode;
-    std::unique_ptr<RMGVGeneratorPrimaryPosition>  fPrimaryPositionGenerator;
-    std::unique_ptr<RMGVGenerator>                 fRMGGenerator;
-    std::unique_ptr<RMGGeneratorPrimaryMessenger>  fG4Messenger;
+    std::unique_ptr<RMGVGeneratorPrimaryPosition> fPrimaryPositionGenerator;
+
+    Generator fGenerator;
+    std::unique_ptr<RMGVGenerator> fGeneratorObj;
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif

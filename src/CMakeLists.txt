@@ -6,12 +6,10 @@ set(PROJECT_PUBLIC_HEADERS
 
     ../include/RMGVGenerator.hh
     ../include/RMGGeneratorVolumeConfinement.hh
-    ../include/RMGGeneratorVolumeConfinementMessenger.hh
     ../include/RMGGeneratorSPS.hh
     ../include/RMGVGeneratorPrimaryPosition.hh
     ../include/RMGGeneratorPrimary.hh
     ../include/RMGGeneratorUtil.hh
-    ../include/RMGGeneratorPrimaryMessenger.hh
     ../include/RMGGeneratorG4Gun.hh
 
     ../include/RMGVOutputManager.hh
@@ -22,7 +20,6 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGManagementDetectorConstruction.hh
     ../include/RMGManagementRunAction.hh
     ../include/RMGManagementEventAction.hh
-    ../include/RMGManagementEventActionMessenger.hh
     ../include/RMGManagementStackingAction.hh
     ../include/RMGManagementSteppingAction.hh
     ../include/RMGManagementTrackingAction.hh
@@ -38,39 +35,34 @@ set(PROJECT_PUBLIC_HEADERS
 
     ../include/RMGTools.hh
     ../include/RMGTools.icc
-    ../include/RMGMessengerTools.icc
 )
 
 set(PROJECT_SOURCES
-    geometry/RMGNavigationTools.cc
+    RMGNavigationTools.cc
 
-    generators/RMGGeneratorUtil.cc
-    generators/RMGGeneratorPrimary.cc
-    generators/RMGGeneratorPrimaryMessenger.cc
-    generators/RMGGeneratorVolumeConfinement.cc
-    generators/RMGGeneratorVolumeConfinementMessenger.cc
+    RMGGeneratorUtil.cc
+    RMGGeneratorPrimary.cc
+    RMGGeneratorVolumeConfinement.cc
 
-    io/RMGLog.cc
-    # io/RMGVOutputManager.cc
+    RMGLog.cc
+    # RMGVOutputManager.cc
 
-    management/RMGManagementDetectorConstruction.cc
-    management/RMGManagementEventAction.cc
-    management/RMGManagementEventActionMessenger.cc
-    management/RMGManagementRunAction.cc
-    management/RMGManagementStackingAction.cc
-    management/RMGManagementSteppingAction.cc
-    management/RMGManagementTrackingAction.cc
-    management/RMGManagementUserAction.cc
-    management/RMGManager.cc
+    RMGManagementDetectorConstruction.cc
+    RMGManagementEventAction.cc
+    RMGManagementRunAction.cc
+    RMGManagementStackingAction.cc
+    RMGManagementSteppingAction.cc
+    RMGManagementTrackingAction.cc
+    RMGManagementUserAction.cc
+    RMGManager.cc
 
-    materials/RMGMaterialTable.cc
+    RMGMaterialTable.cc
 
-    processes/RMGProcessesList.cc
-    processes/RMGProcessesMessenger.cc
-    processes/RMGUIcmdStepLimit.cc
+    RMGProcessesList.cc
+    RMGProcessesMessenger.cc
+    RMGUIcmdStepLimit.cc
 
-    tools/RMGManagementTools.cc
-    tools/RMGMessengerTools.cc
+    RMGManagementTools.cc
 )
 
 if(BxDecay0_FOUND)
@@ -79,7 +71,7 @@ if(BxDecay0_FOUND)
     )
 
     list(APPEND PROJECT_SOURCES
-        generators/RMGGeneratorDecay0.cc
+        RMGGeneratorDecay0.cc
     )
 endif()
 

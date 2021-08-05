@@ -13,7 +13,7 @@
 
 class G4VPhysicalVolume;
 class G4VSolid;
-class RMGGeneratorVolumeConfinementMessenger;
+class G4GenericMessenger;
 class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
 
   public:
@@ -47,6 +47,7 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
       fPhysicalVolumeNameRegexes.emplace_back(name);
       fPhysicalVolumeCopyNrRegexes.emplace_back(copy_nr);
     }
+    void AddPhysicalVolumeString(G4String expr);
 
     inline void AddGeometricalVolume(GenericGeometricalSolidData& data) { fGeomVolumeData.emplace_back(data); }
     void Reset();
@@ -107,6 +108,12 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
     SamplingMode fSamplingMode;
     G4bool       fOnSurface;
     G4String     fBoundingSolidType;
+
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
+    void SetSamplingModeString(G4String mode);
+    void AddGeometricalVolumeString(G4String solid);
+    GenericGeometricalSolidData& SafeBack();
+    void DefineCommands();
 };
 
 #endif
