@@ -84,23 +84,6 @@ class RMGProcessesList : public G4VModularPhysicsList {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
-
-    std::map<G4String, PhysicsRealm> fPhysicsRealmString = {
-      {"DoubleBetaDecay",  PhysicsRealm::kDoubleBetaDecay},
-      {"DarkMatter",       PhysicsRealm::kDarkMatter},
-      {"CosmicRays",       PhysicsRealm::kCosmicRays},
-      {"LArScintillation", PhysicsRealm::kLArScintillation}
-    };
-
-    std::map<G4String, LowEnergyEMOption> fLowEnergyEMOptionString = {
-       { "Option1",            LowEnergyEMOption::kOption1 },
-       { "Option2",            LowEnergyEMOption::kOption2 },
-       { "Option3",            LowEnergyEMOption::kOption3 },
-       { "Option4",            LowEnergyEMOption::kOption4 },
-       { "Penelope",           LowEnergyEMOption::kPenelope },
-       { "Livermore",          LowEnergyEMOption::kLivermore },
-       { "LivermorePolarized", LowEnergyEMOption::kLivermorePolarized }
-    };
 };
 
 #endif

@@ -42,8 +42,9 @@ void RMGManagementEventAction::BeginOfEventAction(const G4Event* event) {
     auto t_minutes = (t_sec - (t_sec % 60)) / 60;
     t_sec -= 60 * t_minutes;
 
-    RMGLog::OutFormat(RMGLog::summary, "Processing event nr. %i (%i%%), at %i days, %i hours, %i minutes and %i seconds",
-        event->GetEventID(), (event->GetEventID()+1.)/tot_events, t_days, t_hours, t_minutes, t_sec);
+    // FIXME: how to cast the percentage to int?
+    RMGLog::OutFormat(RMGLog::summary, "Processing event nr. {:d} ({}%), at {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
+        event->GetEventID(), (event->GetEventID()+1)*100./tot_events, t_days, t_hours, t_minutes, t_sec);
   }
 
   // if (fOutputManager) fOutputManager->BeginOfEventAction(event);

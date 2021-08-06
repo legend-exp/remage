@@ -37,7 +37,7 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
 
     void GeneratePrimaries(G4Event *event) override;
 
-    inline RMGVGenerator* GetRMGGenerator() { return fGeneratorObj.get(); }
+    inline RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
     inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }
 
     void SetConfinementCode(ConfinementCode code);

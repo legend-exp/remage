@@ -11,7 +11,7 @@
 #include "RMGLog.hh"
 #include "G4GenericMessenger.hh"
 
-#include "magic_enum/magic_enum.hpp"
+#include "RMGTools.hh"
 
 RMGGeneratorPrimary::RMGGeneratorPrimary():
   fConfinementCode(RMGGeneratorPrimary::ConfinementCode::kUnConfined),
@@ -22,8 +22,8 @@ RMGGeneratorPrimary::RMGGeneratorPrimary():
 
 void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {
 
-  if (!fPrimaryPositionGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator specified!");
-  if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No generator specified!");
+  if (!fPrimaryPositionGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
+  if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
   fGeneratorObj->SetParticlePosition(fPrimaryPositionGenerator->ShootPrimaryPosition());
   fGeneratorObj->GeneratePrimaryVertex(event);
@@ -43,12 +43,7 @@ void RMGGeneratorPrimary::SetConfinementCode(RMGGeneratorPrimary::ConfinementCod
     default : RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
                                          fConfinementCode, "' specified (implement me)");
   }
-}
-
-void RMGGeneratorPrimary::SetConfinementCodeString(G4String code) {
-  auto result = magic_enum::enum_cast<RMGGeneratorPrimary::ConfinementCode>(code);
-  if (result.has_value()) RMGGeneratorPrimary::SetConfinementCode(result.value());
-  else RMGLog::Out(RMGLog::error, "Illegal confinement code '", code, "'");
+  RMGLog::OutFormat(RMGLog::debug, "Primary vertex confinement strategy set to {}", magic_enum::enum_name<RMGGeneratorPrimary::ConfinementCode>(code));
 }
 
 void RMGGeneratorPrimary::SetGenerator(RMGGeneratorPrimary::Generator gen) {
@@ -66,7 +61,7 @@ void RMGGeneratorPrimary::SetGenerator(RMGGeneratorPrimary::Generator gen) {
 #if RMG_HAS_BXDECAY0
       fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>();
 #else
-      RMGLog::Out(RMGLog::fatal, "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
+      RMGLog::OutFormat(RMGLog::fatal, "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
 #endif
       break;
     case RMGGeneratorPrimary::Generator::kUndefined:
@@ -76,12 +71,17 @@ void RMGGeneratorPrimary::SetGenerator(RMGGeneratorPrimary::Generator gen) {
       RMGLog::Out(RMGLog::fatal, "No known implementation for generator '",
           fGenerator, "' (implement me)");
   }
+  RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}", magic_enum::enum_name<RMGGeneratorPrimary::Generator>(gen));
+}
+
+void RMGGeneratorPrimary::SetConfinementCodeString(G4String code) {
+  try { this->SetConfinementCode(RMGTools::ToEnum<RMGGeneratorPrimary::ConfinementCode>(code, "confinement code")); }
+  catch (const std::bad_cast&) { return; }
 }
 
 void RMGGeneratorPrimary::SetGeneratorString(G4String gen) {
-  auto result = magic_enum::enum_cast<RMGGeneratorPrimary::Generator>(gen);
-  if (result.has_value()) RMGGeneratorPrimary::SetGenerator(result.value());
-  else RMGLog::Out(RMGLog::error, "Illegal generator name '", gen, "'");
+  try { this->SetGenerator(RMGTools::ToEnum<RMGGeneratorPrimary::Generator>(gen, "generator name")); }
+  catch (const std::bad_cast&) { return; }
 }
 
 void RMGGeneratorPrimary::SetUserGenerator(RMGVGenerator* gen) {
@@ -98,12 +98,16 @@ void RMGGeneratorPrimary::DefineCommands() {
   fMessenger->DeclareMethod("Confine", &RMGGeneratorPrimary::SetConfinementCodeString)
     .SetGuidance("Select primary confinement strategy")
     .SetParameterName("strategy", false)
-    .SetStates(G4State_Idle);
+    .SetCandidates(RMGTools::GetCandidates<RMGGeneratorPrimary::ConfinementCode>())
+    .SetStates(G4State_Idle)
+    .SetToBeBroadcasted(true);
 
   fMessenger->DeclareMethod("Select", &RMGGeneratorPrimary::SetGeneratorString)
     .SetGuidance("Select event generator")
     .SetParameterName("generator", false)
-    .SetStates(G4State_Idle);
+    .SetCandidates(RMGTools::GetCandidates<RMGGeneratorPrimary::Generator>())
+    .SetStates(G4State_Idle)
+    .SetToBeBroadcasted(true);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

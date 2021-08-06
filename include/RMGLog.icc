@@ -4,6 +4,8 @@
 
 #include "globals.hh"
 
+#include "magic_enum/magic_enum.hpp"
+
 template <typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
 

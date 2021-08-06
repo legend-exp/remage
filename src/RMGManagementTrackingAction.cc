@@ -7,16 +7,16 @@
 RMGManagementTrackingAction::RMGManagementTrackingAction(RMGManagementEventAction* eventaction) :
   fEventAction(eventaction) {}
 
-void RMGManagementTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
-  if (fEventAction->GetOutputManager()) {
-    fEventAction->GetOutputManager()->PreUserTrackingAction(aTrack);
-  }
+void RMGManagementTrackingAction::PreUserTrackingAction(const G4Track* /*aTrack*/) {
+  // if (fEventAction->GetOutputManager()) {
+  //   fEventAction->GetOutputManager()->PreUserTrackingAction(aTrack);
+  // }
 }
 
-void RMGManagementTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
-  if (fEventAction->GetOutputManager()) {
-    fEventAction->GetOutputManager()->PostUserTrackingAction(aTrack);
-  }
+void RMGManagementTrackingAction::PostUserTrackingAction(const G4Track* /*aTrack*/) {
+  // if (fEventAction->GetOutputManager()) {
+  //   fEventAction->GetOutputManager()->PostUserTrackingAction(aTrack);
+  // }
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

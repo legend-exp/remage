@@ -27,13 +27,12 @@
 #include <string>
 #include <cstdarg>
 
-#include "RMGTools.hh"
+#include "globals.hh"
 
 #ifndef FMT_HEADER_ONLY
 #define FMT_HEADER_ONLY
 #endif
 #include "fmt/core.h"
-#include "magic_enum/magic_enum.hpp"
 
 #define OutDev(loglevel, args...) \
   RMGLog::Out(loglevel, "[ ", __PRETTY_FUNCTION__, " ] ", args)
@@ -112,8 +111,6 @@ class RMGLog {
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
     static inline void SetLogLevelScreen(RMGLog::LogLevel loglevel) { fMinimumLogLevelScreen = loglevel; }
-
-    static inline void SetLogLevelScreenString(G4String loglevel) { fMinimumLogLevelScreen = RMGTools::ToEnum<LogLevel>(loglevel); }
 
     /**
      * Sets the minimum log level for file and screen output.

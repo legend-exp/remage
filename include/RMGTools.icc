@@ -1,16 +1,32 @@
 #include <stdexcept>
 
+#include "globals.hh"
+#include "RMGLog.hh"
+
 #include "magic_enum/magic_enum.hpp"
 
 namespace RMGTools {
 
     template <typename T>
-    T ToEnum(G4String name) {
+    T ToEnum(const G4String name, G4String prop_name="property") {
         auto result = magic_enum::enum_cast<T>(name);
+        if (!result.has_value()) result = magic_enum::enum_cast<T>("k" + name);
         if (!result.has_value()) {
+            RMGLog::OutFormat(RMGLog::error, "Illegal '{}' {} specified", name, prop_name);
             throw std::bad_cast();
         }
         else return result.value();
+    }
+
+    template <typename T>
+    G4String GetCandidates() {
+        auto v = magic_enum::enum_names<T>();
+        G4String cand = "";
+        for (const auto& s : v) {
+            auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
+            cand += std::string(name) + " ";
+        }
+        return cand.substr(0, cand.size()-1);
     }
 }
 

@@ -61,8 +61,6 @@ set(PROJECT_SOURCES
     RMGProcessesList.cc
     RMGProcessesMessenger.cc
     RMGUIcmdStepLimit.cc
-
-    RMGManagementTools.cc
 )
 
 if(BxDecay0_FOUND)

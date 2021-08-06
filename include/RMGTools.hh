@@ -7,21 +7,14 @@
 #include <ctime>
 #include <chrono>
 
-#include "globals.hh"
-#include "G4UImessenger.hh"
-#include "G4ApplicationState.hh"
-#include "G4UIcmdWithAString.hh"
-#include "G4UIcmdWithABool.hh"
-#include "G4UIcmdWith3Vector.hh"
-#include "G4UIcmdWith3VectorAndUnit.hh"
-
+class G4String;
 namespace RMGTools {
-
-  std::tm ToUTCTime(std::chrono::time_point<std::chrono::system_clock> t);
 
   template <typename T>
   T ToEnum(G4String);
 
+  template <typename T>
+  G4String GetCandidates();
 }
 
 #include "RMGTools.icc"

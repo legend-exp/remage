@@ -36,6 +36,7 @@
 
 #include "RMGProcessesMessenger.hh"
 #include "RMGLog.hh"
+#include "RMGTools.hh"
 
 namespace u = CLHEP;
 
@@ -381,7 +382,7 @@ void RMGProcessesList::SetCuts() {
 void RMGProcessesList::SetPhysicsRealm(PhysicsRealm realm) {
   switch (realm) {
     case RMGProcessesList::PhysicsRealm::kDoubleBetaDecay :
-      RMGLog::Out(RMGLog::summary, "Realm set to BBdecay");
+      RMGLog::Out(RMGLog::summary, "Realm set to DoubleBetaDecay");
       // The default values for the energy thresholds are tuned to 100 keV
       // in natural germanium (i.e., the BBdecay realm)
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
@@ -456,31 +457,37 @@ void RMGProcessesList::ConstructCerenkov() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+void RMGProcessesList::SetLowEnergyEMOptionString(G4String option) {
+  try { fLowEnergyEMOption = RMGTools::ToEnum<RMGProcessesList::LowEnergyEMOption>(option, "low energy EM option"); }
+  catch (const std::bad_cast&) { return; }
+}
+
+void RMGProcessesList::SetPhysicsRealmString(G4String realm) {
+  try { this->SetPhysicsRealm(RMGTools::ToEnum<RMGProcessesList::PhysicsRealm>(realm, "physics realm")); }
+  catch (const std::bad_cast&) { return; }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGProcessesList::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/",
       "Commands for controlling physics processes");
 
-  auto cmd = fMessenger->DeclareMethod("Realm", &RMGProcessesList::SetPhysicsRealmString)
+  fMessenger->DeclareMethod("Realm", &RMGProcessesList::SetPhysicsRealmString)
     .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
     .SetParameterName("realm", false)
+    .SetCandidates(RMGTools::GetCandidates<RMGProcessesList::PhysicsRealm>())
     .SetStates(G4State_PreInit, G4State_Idle);
-
-  G4String _str;
-  for (const auto& s : fPhysicsRealmString) _str += s.first + " ";
-  cmd.SetCandidates(_str);
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
     .SetGuidance("Add optical processes to the physics list")
     .SetStates(G4State_PreInit, G4State_Idle);
 
-  cmd = fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGProcessesList::SetLowEnergyEMOptionString)
+  fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGProcessesList::SetLowEnergyEMOptionString)
     .SetGuidance("Add low energy electromagnetic processes to the physics list")
+    .SetCandidates(RMGTools::GetCandidates<RMGProcessesList::LowEnergyEMOption>())
     .SetStates(G4State_PreInit, G4State_Idle);
-
-  _str = "";
-  for (const auto& s : fLowEnergyEMOptionString) _str += s.first + " ";
-  cmd.SetCandidates(_str);
 
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGProcessesList::SetUseGammaAngCorr)
     .SetGuidance("")
@@ -495,28 +502,6 @@ void RMGProcessesList::DefineCommands() {
   fMessenger->DeclareMethod("StoreICLevelData", &RMGProcessesList::SetStoreICLevelData)
     .SetGuidance("")
     .SetStates(G4State_PreInit, G4State_Idle);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGProcessesList::SetLowEnergyEMOptionString(G4String option) {
-  if (fLowEnergyEMOptionString.find(option) != fLowEnergyEMOptionString.end()) {
-    fLowEnergyEMOption = fLowEnergyEMOptionString[option];
-  }
-  else {
-    RMGLog::OutFormat(RMGLog::error, "'{}' option undefined", option);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGProcessesList::SetPhysicsRealmString(G4String realm) {
-  if (fPhysicsRealmString.find(realm) != fPhysicsRealmString.end()) {
-    this->SetPhysicsRealm(fPhysicsRealmString[realm]);
-  }
-  else {
-    RMGLog::OutFormat(RMGLog::error, "'{}' realm undefined", realm);
-  }
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

@@ -19,11 +19,15 @@
 #include "G4GenericMessenger.hh"
 #include "Randomize.hh"
 
+#include "ProjectInfo.hh"
 #include "RMGProcessesList.hh"
 #include "RMGManagementDetectorConstruction.hh"
 #include "RMGManagementUserAction.hh"
+#include "RMGTools.hh"
 
-#include "magic_enum/magic_enum.hpp"
+#if RMG_HAS_ROOT
+#include "TEnv.h"
+#endif
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
@@ -41,6 +45,10 @@ RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
+
+#if RMG_HAS_ROOT
+  gEnv->SetValue("Root.Stacktrace", 0);
+#endif
 
   // FIXME: I don't like this here
   this->SetupDefaultG4RunManager();
@@ -157,15 +165,13 @@ G4VUserPhysicsList* RMGManager::GetRMGProcessesList() {
 }
 
 void RMGManager::SetLogLevelScreen(G4String level) {
-  auto result = magic_enum::enum_cast<RMGLog::LogLevel>(level);
-  if (result.has_value()) RMGLog::SetLogLevelScreen(result.value());
-  else RMGLog::Out(RMGLog::error, "Illegal logging level '", level, "'");
+  try { RMGLog::SetLogLevelScreen(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
+  catch (const std::bad_cast&) { return; }
 }
 
 void RMGManager::SetLogLevelFile(G4String level) {
-  auto result = magic_enum::enum_cast<RMGLog::LogLevel>(level);
-  if (result.has_value()) RMGLog::SetLogLevelFile(result.value());
-  else RMGLog::Out(RMGLog::error, "Illegal logging level '", level, "'");
+  try { RMGLog::SetLogLevelFile(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
+  catch (const std::bad_cast&) { return; }
 }
 
 void RMGManager::SetRandEngine(G4String name) {
@@ -236,11 +242,13 @@ void RMGManager::DefineCommands() {
   fLogMessenger->DeclareMethod("LogLevelScreen", &RMGManager::SetLogLevelScreen)
     .SetGuidance("Set verbosity level on screen")
     .SetParameterName("level", false)
+    .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
     .SetStates(G4State_PreInit, G4State_Idle);
 
   fLogMessenger->DeclareMethod("LogLevelFile", &RMGManager::SetLogLevelFile)
     .SetGuidance("Set verbosity level on file")
     .SetParameterName("level", false)
+    .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
     .SetStates(G4State_PreInit, G4State_Idle);
 
   fLogMessenger->DeclareMethod("LogToFile", &RMGManager::SetLogToFileName)

@@ -17,7 +17,7 @@
 #include "RMGNavigationTools.hh"
 #include "RMGManager.hh"
 
-#include "magic_enum/magic_enum.hpp"
+#include "RMGTools.hh"
 
 RMGGeneratorVolumeConfinement::SampleableObject::SampleableObject(
   G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s):
@@ -360,9 +360,8 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
 }
 
 void RMGGeneratorVolumeConfinement::SetSamplingModeString(G4String mode) {
-  auto result = magic_enum::enum_cast<RMGGeneratorVolumeConfinement::SamplingMode>(mode);
-  if (result.has_value()) this->SetSamplingMode(result.value());
-  else RMGLog::Out(RMGLog::error, "Illegal sampling mode '", mode, "'");
+  try { this->SetSamplingMode(RMGTools::ToEnum<RMGGeneratorVolumeConfinement::SamplingMode>(mode, "sampling mode")); }
+  catch (const std::bad_cast&) { return; }
 }
 
 void RMGGeneratorVolumeConfinement::AddPhysicalVolumeString(G4String expr) {
@@ -388,8 +387,6 @@ RMGGeneratorVolumeConfinement::GenericGeometricalSolidData& RMGGeneratorVolumeCo
   return fGeomVolumeData.back();
 };
 
-
-
 void RMGGeneratorVolumeConfinement::DefineCommands() {
 
   fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Generators/Confinement/",
@@ -398,6 +395,7 @@ void RMGGeneratorVolumeConfinement::DefineCommands() {
   fMessengers.back()->DeclareMethod("SamplingMode", &RMGGeneratorVolumeConfinement::SetSamplingModeString)
     .SetGuidance("Select sampling mode for volume confinement")
     .SetParameterName("mode", false)
+    .SetCandidates(RMGTools::GetCandidates<RMGGeneratorVolumeConfinement::SamplingMode>())
     .SetStates(G4State_Idle);
 
   fMessengers.back()->DeclareMethod("FallbackBoundingVolumeType", &RMGGeneratorVolumeConfinement::SetBoundingSolidType)
