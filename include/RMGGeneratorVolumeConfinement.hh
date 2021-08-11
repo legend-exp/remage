@@ -113,6 +113,17 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
     void SetSamplingModeString(G4String mode);
     void AddGeometricalVolumeString(G4String solid);
     GenericGeometricalSolidData& SafeBack();
+    inline void SetGeomVolumeCenter(G4ThreeVector& v) { this->SafeBack().volume_center = v; }
+    inline void SetGeomSphereInnerRadius(double r) { this->SafeBack().sphere_inner_radius = r; }
+    inline void SetGeomSphereOuterRadius(double r) { this->SafeBack().sphere_outer_radius = r; }
+    inline void SetGeomCylinderInnerRadius(double r) { this->SafeBack().cylinder_inner_radius = r; }
+    inline void SetGeomCylinderOuterRadius(double r) { this->SafeBack().cylinder_outer_radius = r; }
+    inline void SetGeomCylinderHeight(double h) { this->SafeBack().cylinder_height = h; }
+    inline void SetGeomCylinderStartingAngle(double a) { this->SafeBack().cylinder_starting_angle = a; }
+    inline void SetGeomCylinderSpanningAngle(double a) { this->SafeBack().cylinder_spanning_angle = a; }
+    inline void SetGeomBoxXLength(double x) { this->SafeBack().box_x_length = x; }
+    inline void SetGeomBoxYLength(double y) { this->SafeBack().box_y_length = y; }
+    inline void SetGeomBoxZLength(double z) { this->SafeBack().box_z_length = z; }
     void DefineCommands();
 };
 

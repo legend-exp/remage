@@ -1,0 +1,13 @@
+# /RMG/Geometry/IncludeGDMLFile gdml/main.gdml
+
+/run/initialize
+
+# /RMG/Geometry/PrintListOfLogicalVolumes
+# /RMG/Geometry/PrintListOfPhysicalVolumes
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Detector_PV
+
+/RMG/Generator/Select G4gun
+
+/run/beamOn 10

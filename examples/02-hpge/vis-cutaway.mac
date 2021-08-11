@@ -1,0 +1,14 @@
+/run/initialize
+
+/vis/open OGLIQt
+/vis/scene/create
+
+/vis/viewer/set/style surface
+/vis/viewer/set/background white
+
+/vis/viewer/addCutawayPlane 0 0 0 m 1 0 0
+
+/vis/drawVolume
+
+/vis/sceneHandler/attach
+/vis/viewer/flush

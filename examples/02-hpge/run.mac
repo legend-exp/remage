@@ -1,0 +1,11 @@
+/run/initialize
+
+# /RMG/Geometry/PrintListOfLogicalVolumes
+/RMG/Geometry/PrintListOfPhysicalVolumes
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume HPGe
+
+/RMG/Generator/Select G4gun
+
+/run/beamOn 10

@@ -25,7 +25,9 @@ void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {
   if (!fPrimaryPositionGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
-  fGeneratorObj->SetParticlePosition(fPrimaryPositionGenerator->ShootPrimaryPosition());
+  auto vertex = fPrimaryPositionGenerator->ShootPrimaryPosition();
+  RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex);
+  fGeneratorObj->SetParticlePosition(vertex);
   fGeneratorObj->GeneratePrimaryVertex(event);
 }
 
