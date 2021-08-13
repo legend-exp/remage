@@ -4,10 +4,11 @@
 #include <memory>
 
 #include "RMGVGenerator.hh"
-#include "ProjectInfo.hh"
+#include "RMGVGeneratorPrimaryPosition.hh"
 
 #include "G4ThreeVector.hh"
 
+#include "ProjectInfo.hh"
 #if RMG_HAS_BXDECAY0
 #include "bxdecay0_g4/primary_generator_action.hh"
 #endif
@@ -17,7 +18,8 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
 
-    RMGGeneratorDecay0();
+    RMGGeneratorDecay0(RMGVGeneratorPrimaryPosition* prim_gen);
+    RMGGeneratorDecay0() = delete;
     inline ~RMGGeneratorDecay0() = default;
 
     RMGGeneratorDecay0           (RMGGeneratorDecay0 const&) = delete;

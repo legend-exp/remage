@@ -152,6 +152,8 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
   // appropriate sampling strategy
   for (auto&& el : fPhysicalVolumes.data) {
 
+    RMGLog::OutFormatDev(RMGLog::debug, "Inspecting volume '{}'", el.physical_volume->GetName());
+
     // warning if world volume is selected
     if (el.physical_volume == world_volume) {
       RMGLog::Out(RMGLog::warning, "Do you really want to sample from the world volume?");
@@ -164,10 +166,17 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
     // if the solid is simple one can avoid using bounding volumes for sampling
     // both volume and native surface sampling are available
     if (RMGGeneratorUtil::IsSampleable(solid_type)) {
+      RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
       // if there are no daugthers one can avoid doing containment checks
-      if (log_vol->GetNoDaughters()) el.containment_check = false;
-      else el.containment_check = true;
+      if (log_vol->GetNoDaughters()) {
+        RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
+        el.containment_check = false;
+      }
+      else {
+        RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
+        el.containment_check = true;
+      }
     }
     // if it's not sampleable, cannot perform native surface sampling
     else if (fOnSurface) {
@@ -177,6 +186,7 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
     else if (solid_type == "G4SubtractionSolid") {
+      RMGLog::OutDev(RMGLog::debug, "Is a subtraction solid, sampling from constituent solid with containment check");
       if (RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
         el.sampling_solid = solid->GetConstituentSolid(0);
         el.containment_check = true;
@@ -184,6 +194,7 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
     }
     // use bounding solid for all other cases
     else {
+      RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding box with containment check");
       el.containment_check = true;
       auto solid_extent = solid->GetExtent(); // do not call multiple times, the function does not cache the result!
       if (fBoundingSolidType == "Sphere") {
@@ -213,14 +224,14 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
       if (!v) RMGLog::Out(RMGLog::fatal, "nullptr detected in loop condition, this is unexpected. ",
           "Blame RMGPhysVolNavigator::FindDirectMother?");
 
-      partial_rotations.emplace_back(*(v->GetObjectRotation()));
+      partial_rotations.push_back(v->GetObjectRotationValue());
       partial_translations.push_back(v->GetObjectTranslation());
 
       vol_global_rotation = partial_rotations.back() * vol_global_rotation;
     }
     // world volume not included in loop
-    partial_rotations.emplace_back();
-    partial_translations.emplace_back(0, 0, 0);
+    partial_translations.emplace_back(); // origin
+    partial_rotations.emplace_back(); // identity
 
     // partial_rotations[0] and partial_translations[0] refer to the target
     // volume partial_rotations[1] and partial_translations[1], to the direct
@@ -291,6 +302,8 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
   this->InitializePhysicalVolumes();
   this->InitializeGeometricalVolumes();
 
+  RMGLog::OutDev(RMGLog::debug, "Sampling mode: ", magic_enum::enum_name<RMGGeneratorVolumeConfinement::SamplingMode>(fSamplingMode));
+
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical : {
       // strategy: sample a point in the geometrical user volume or the
@@ -353,7 +366,8 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
       return RMGVGeneratorPrimaryPosition::kDummyPrimaryPosition;
       break;
     }
-    case SamplingMode::kUnionAll :
+
+    case SamplingMode::kUnionAll : {
 
       if (fGeomVolumeSolids.empty() and fPhysicalVolumes.empty()) {
         RMGLog::Out(RMGLog::fatal, "'UnionAll' mode is set but ",
@@ -364,13 +378,18 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
         fPhysicalVolumes.SurfaceWeightedRand() :
         fPhysicalVolumes.VolumeWeightedRand();
 
+      RMGLog::OutDev(RMGLog::debug, "Chosen random volume: ", choice.physical_volume->GetName());
+      RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", RMGVGeneratorPrimaryPosition::fMaxAttempts);
+
       G4ThreeVector vertex;
       G4int calls = 0;
       while (calls++ < RMGVGeneratorPrimaryPosition::fMaxAttempts) {
 
         if (choice.containment_check) {
+          vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVGeneratorPrimaryPosition::fMaxAttempts) {
             vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+            RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex/CLHEP::cm, " cm");
           }
           if (calls >= RMGVGeneratorPrimaryPosition::fMaxAttempts) {
             RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
@@ -381,8 +400,10 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
         }
         else {
           vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+          RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex/CLHEP::cm, " cm");
         }
 
+        RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex/CLHEP::cm, " cm", " after ", calls, " iterations, returning");
         return vertex;
       }
 
@@ -395,9 +416,13 @@ G4ThreeVector RMGGeneratorVolumeConfinement::ShootPrimaryPosition() {
       // everything has failed so return the dummy vertex
       return RMGVGeneratorPrimaryPosition::kDummyPrimaryPosition;
       break;
-  }
+    }
 
-  return G4ThreeVector();
+    default: {
+      RMGLog::Out(RMGLog::error, "Sampling mode not implemented, returning dummy vertex");
+      return RMGVGeneratorPrimaryPosition::kDummyPrimaryPosition;
+    }
+  }
 }
 
 void RMGGeneratorVolumeConfinement::SetSamplingModeString(G4String mode) {
@@ -426,7 +451,7 @@ RMGGeneratorVolumeConfinement::GenericGeometricalSolidData& RMGGeneratorVolumeCo
         "' before setting any geometrical parameter value");
   }
   return fGeomVolumeData.back();
-};
+}
 
 void RMGGeneratorVolumeConfinement::DefineCommands() {
 

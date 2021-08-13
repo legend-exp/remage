@@ -1,5 +1,10 @@
-#ifndef _RMGGENERATORPRIMARYPOSITION_HH_
-#define _RMGGENERATORPRIMARYPOSITION_HH_
+#ifndef _RMG_GENERATOR_PRIMARY_POSITION_HH_
+#define _RMG_GENERATOR_PRIMARY_POSITION_HH_
+
+#include "ProjectInfo.hh"
+#if RMG_HAS_BXDECAY0
+#include "bxdecay0_g4/vertex_generator_interface.hh"
+#endif
 
 #include <memory>
 
@@ -7,7 +12,11 @@
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
 
+#if RMG_HAS_BXDECAY0
+class RMGVGeneratorPrimaryPosition : public bxdecay0_g4::VertexGeneratorInterface {
+#else
 class RMGVGeneratorPrimaryPosition {
+#endif
 
   public:
 
@@ -25,6 +34,10 @@ class RMGVGeneratorPrimaryPosition {
     virtual inline G4ThreeVector ShootPrimaryPosition() { return kDummyPrimaryPosition; }
     inline void SetMaxAttempts(G4int val) { fMaxAttempts = val; }
     inline G4int GetMaxAttempts() { return fMaxAttempts; }
+
+#if RMG_HAS_BXDECAY0
+    inline void ShootVertex(G4ThreeVector& v) { v = ShootPrimaryPosition(); }
+#endif
 
   protected:
 

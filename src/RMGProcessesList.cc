@@ -26,6 +26,7 @@
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4RadioactiveDecayBase.hh"
+#include "G4HadronicParameters.hh"
 #include "G4IonTable.hh"
 #include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"

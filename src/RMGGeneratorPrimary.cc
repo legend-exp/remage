@@ -1,5 +1,6 @@
 #include "RMGGeneratorPrimary.hh"
 
+#include "ProjectInfo.hh"
 #include "RMGVGeneratorPrimaryPosition.hh"
 #include "RMGGeneratorVolumeConfinement.hh"
 #include "RMGVGenerator.hh"
@@ -26,7 +27,7 @@ void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
   auto vertex = fPrimaryPositionGenerator->ShootPrimaryPosition();
-  RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex);
+  RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
   fGeneratorObj->SetParticlePosition(vertex);
   fGeneratorObj->GeneratePrimaryVertex(event);
 }
@@ -53,21 +54,21 @@ void RMGGeneratorPrimary::SetGenerator(RMGGeneratorPrimary::Generator gen) {
   fGenerator = gen;
 
   switch (fGenerator) {
-    case RMGGeneratorPrimary::Generator::kG4gun:
+    case RMGGeneratorPrimary::Generator::kG4gun :
       fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>();
       break;
-    case RMGGeneratorPrimary::Generator::kSPS:
+    case RMGGeneratorPrimary::Generator::kSPS :
       fGeneratorObj = std::make_unique<RMGGeneratorSPS>();
       break;
-    case RMGGeneratorPrimary::Generator::kBxDecay0:
+    case RMGGeneratorPrimary::Generator::kBxDecay0 :
 #if RMG_HAS_BXDECAY0
-      fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>();
+      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fPrimaryPositionGenerator.get());
 #else
       RMGLog::OutFormat(RMGLog::fatal, "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
 #endif
       break;
-    case RMGGeneratorPrimary::Generator::kUndefined:
-    case RMGGeneratorPrimary::Generator::kUserDefined:
+    case RMGGeneratorPrimary::Generator::kUndefined :
+    case RMGGeneratorPrimary::Generator::kUserDefined :
       break;
     default:
       RMGLog::Out(RMGLog::fatal, "No known implementation for generator '",

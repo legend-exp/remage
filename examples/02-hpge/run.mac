@@ -6,6 +6,7 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
 
-/RMG/Generator/Select G4gun
+/RMG/Generator/Select BxDecay0
+/bxdecay0/generator/dbd Ge76 2345 1 0
 
 /run/beamOn 10
