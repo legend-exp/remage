@@ -1,3 +1,5 @@
+/RMG/Manager/Logging/LogLevelScreen summary
+
 /run/initialize
 
 # /RMG/Geometry/PrintListOfLogicalVolumes
@@ -6,7 +8,12 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
 
-/RMG/Generator/Select BxDecay0
-/bxdecay0/generator/dbd Ge76 2345 1 0
+# /RMG/Generator/Select BxDecay0
+# /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/run/beamOn 10
+/RMG/Generator/Select G4gun
+/gun/particle ion
+/gun/ion 27 60
+/gun/energy 0 eV
+
+/run/beamOn 24567

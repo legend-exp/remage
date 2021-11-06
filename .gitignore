@@ -2,6 +2,7 @@
 /doc/html
 /doc/latex
 build
+.local
 
 compile_commands.json
 

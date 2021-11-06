@@ -37,6 +37,7 @@ RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
   fArgv(argv),
   fIsRandControlled(false),
   fBatchMode(false),
+  fPrintModulo(-1),
   fG4RunManager(nullptr),
   fG4VisManager(nullptr),
   fProcessesList(nullptr),
@@ -236,6 +237,12 @@ void RMGManager::DefineCommands() {
     .SetParameterName("filename", false)
     .SetStates(G4State_PreInit, G4State_Idle);
 
+  fMessenger->DeclareMethod("PrintProgressModulo", &RMGManager::SetPrintModulo)
+    .SetGuidance("How many processed events before progress information is displayed")
+    .SetParameterName("n", false)
+    .SetRange("n > 0")
+    .SetStates(G4State_PreInit, G4State_Idle);
+
   fLogMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Logging/",
       "Commands for controlling application logging");
 
@@ -268,7 +275,7 @@ void RMGManager::DefineCommands() {
     .SetGuidance("Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)")
     .SetParameterName("n", false)
     .SetRange("n >= 0")
-    .SetDefaultValue("1.")
+    .SetDefaultValue("1")
     .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("InternalSeed", &RMGManager::SetRandEngineInternalSeed)

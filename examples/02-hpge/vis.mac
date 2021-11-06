@@ -1,17 +1,29 @@
-# /RMG/Geometry/IncludeGDMLFile gdml/main.gdml
+/RMG/Manager/Logging/LogLevelScreen debug
 
 /run/initialize
 
 /vis/open OGLIQt
 /vis/scene/create
-
-/vis/geometry/set/forceSolid Detector
-/vis/geometry/set/forceSolid Source_Encapsulated
+/vis/scene/endOfEventAction accumulate
+/vis/sceneHandler/attach
 
 /vis/viewer/set/defaultColour black
 /vis/viewer/set/background white
+/vis/viewer/set/autoRefresh true
+
+/vis/scene/add/trajectories smooth
+
+/vis/scene/add/hits
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume HPGe
+
+/RMG/Generator/Select G4gun
+/gun/particle ion
+/gun/ion 27 60
+/gun/energy 0 eV
 
 /vis/drawVolume
+/run/beamOn 10
 
-/vis/sceneHandler/attach
 /vis/viewer/flush

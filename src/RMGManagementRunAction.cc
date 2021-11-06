@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "G4Run.hh"
+#include "G4RunManager.hh"
 
 #include "RMGRun.hh"
 #include "RMGLog.hh"
@@ -43,13 +44,19 @@ void RMGManagementRunAction::BeginOfRunAction(const G4Run*) {
   if (this->IsMaster()) {
     // save start time for future
     fRMGRun->SetStartTime(std::chrono::system_clock::now());
-    auto tt = fmt::gmtime(fRMGRun->GetStartTime());
+    auto tt = fmt::localtime(fRMGRun->GetStartTime());
 
-    RMGLog::OutFormat(RMGLog::summary, "Starting run nr. {:d}. Current time is {:%d-%m-%Y %H:%M:%S} (UTC)",
+    RMGLog::OutFormat(RMGLog::summary, "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}",
         fRMGRun->GetRunID(), tt);
     RMGLog::OutFormat(RMGLog::summary, "Number of events to be processed: {:d}",
         fRMGRun->GetNumberOfEventToBeProcessed());
   }
+
+  auto manager = RMGManager::GetRMGManager();
+  auto g4manager = G4RunManager::GetRunManager();
+  auto tot_events = g4manager->GetNumberOfEventsToBeProcessed();
+  if (manager->GetPrintModulo() <= 0 and tot_events >= 100) manager->SetPrintModulo(tot_events/10);
+  else if (tot_events < 100) manager->SetPrintModulo(100);
 }
 
 void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
@@ -68,24 +75,26 @@ void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
 
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
-    auto tt = fmt::gmtime(time_now);
-    RMGLog::OutFormat(RMGLog::summary, "Run nr. {:d} completed. {:d} events simulated. Current time is {:%d-%m-%Y %H:%M:%S} (UTC)",
-        fRMGRun->GetRunID(), fRMGRun->GetNumberOfEventToBeProcessed(), tt);
 
-      auto total_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - fRMGRun->GetStartTime()).count();
-      auto t_sec = total_sec;
-      auto t_days = (t_sec - (t_sec % 86400)) / 86400;
-      t_sec -= 86400 * t_sec;
-      auto t_hours = (t_sec - (t_sec % 3600)) / 3600;
-      t_sec -= 3600 * t_hours;
-      auto t_minutes = (t_sec - (t_sec % 60)) / 60;
-      t_sec -= 60 * t_minutes;
+    RMGLog::OutFormat(RMGLog::summary, "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
+        fRMGRun->GetRunID(), fRMGRun->GetNumberOfEventToBeProcessed(), fmt::localtime(time_now));
 
-      RMGLog::OutFormat(RMGLog::summary, "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
-          t_days, t_hours, t_minutes, t_sec);
+    auto total_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - fRMGRun->GetStartTime()).count();
 
-      RMGLog::OutFormat(RMGLog::summary, "Stats: average event processing time was {} seconds/event",
-          total_sec*1./fRMGRun->GetNumberOfEvent());
+    auto start_time = fRMGRun->GetStartTime();
+    auto tot_elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
+    long partial = 0;
+    long elapsed_d = (tot_elapsed_s - partial) / 86400; partial += elapsed_d * 86400;
+    long elapsed_h = (tot_elapsed_s - partial) / 3600;  partial += elapsed_h * 3600;
+    long elapsed_m = (tot_elapsed_s - partial) / 60;    partial += elapsed_m * 60;
+    long elapsed_s = tot_elapsed_s - partial;
+
+    RMGLog::OutFormat(RMGLog::summary, "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
+        elapsed_d, elapsed_h, elapsed_m, elapsed_s);
+
+    RMGLog::OutFormat(RMGLog::summary, "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
+        total_sec*1./fRMGRun->GetNumberOfEvent(),
+        fRMGRun->GetNumberOfEvent()*1./total_sec);
   }
 }
 

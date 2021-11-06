@@ -26,9 +26,14 @@ void RMGGeneratorPrimary::GeneratePrimaries(G4Event* event) {
   if (!fPrimaryPositionGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
-  auto vertex = fPrimaryPositionGenerator->ShootPrimaryPosition();
-  RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
-  fGeneratorObj->SetParticlePosition(vertex);
+  // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
+  // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
+  // about the vertex position from outside, in particular in this function here).
+  if (fGenerator != RMGGeneratorPrimary::Generator::kBxDecay0) {
+    auto vertex = fPrimaryPositionGenerator->ShootPrimaryPosition();
+    RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
+    fGeneratorObj->SetParticlePosition(vertex);
+  }
   fGeneratorObj->GeneratePrimaryVertex(event);
 }
 

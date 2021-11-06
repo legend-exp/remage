@@ -169,13 +169,13 @@ void RMGGeneratorVolumeConfinement::InitializePhysicalVolumes() {
       RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
       // if there are no daugthers one can avoid doing containment checks
-      if (log_vol->GetNoDaughters()) {
-        RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
-        el.containment_check = false;
-      }
-      else {
+      if (log_vol->GetNoDaughters() > 0) {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
         el.containment_check = true;
+      }
+      else {
+        RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
+        el.containment_check = false;
       }
     }
     // if it's not sampleable, cannot perform native surface sampling

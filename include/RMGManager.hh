@@ -36,12 +36,15 @@ class RMGManager {
     RMGManagementDetectorConstruction* GetManagementDetectorConstruction();
     G4VUserPhysicsList*                GetRMGProcessesList();
 
+    inline G4int GetPrintModulo() { return fPrintModulo; }
+
     // setters
     inline void SetUserInitialization(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInitialization(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
     inline void SetUserInitialization(RMGManagementDetectorConstruction* det) { fManagerDetectorConstruction = det; }
     inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
     inline void SetBatchMode(G4bool flag=true) { fBatchMode = flag; }
+    inline void SetPrintModulo(G4int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
     inline void IncludeMacroFile(G4String filename) { fMacroFileNames.emplace_back(filename); }
     void Initialize();
@@ -69,6 +72,7 @@ class RMGManager {
     std::vector<G4String> fMacroFileNames;
     G4bool fIsRandControlled;
     G4bool fBatchMode;
+    G4int fPrintModulo;
 
     static RMGManager* fRMGManager;
     std::unique_ptr<G4RunManager> fG4RunManager;
