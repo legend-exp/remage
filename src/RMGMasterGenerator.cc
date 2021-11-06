@@ -10,7 +10,9 @@
 #include "RMGGeneratorDecay0.hh"
 #endif
 #include "RMGLog.hh"
+
 #include "G4GenericMessenger.hh"
+#include "G4ThreeVector.hh"
 
 #include "RMGTools.hh"
 
@@ -30,11 +32,12 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
   // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
   // about the vertex position from outside, in particular in this function here).
   if (fGenerator != RMGMasterGenerator::Generator::kBxDecay0) {
-    auto vertex = fPrimaryPositionGenerator->ShootPrimaryPosition();
+    auto vertex = G4ThreeVector();
+    fPrimaryPositionGenerator->GeneratePrimariesVertex(vertex);
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
     fGeneratorObj->SetParticlePosition(vertex);
   }
-  fGeneratorObj->GeneratePrimaryVertex(event);
+  fGeneratorObj->GeneratePrimariesKinematics(event);
 }
 
 void RMGMasterGenerator::SetConfinementCode(RMGMasterGenerator::ConfinementCode code) {

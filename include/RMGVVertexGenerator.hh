@@ -31,12 +31,12 @@ class RMGVVertexGenerator {
     RMGVVertexGenerator           (RMGVVertexGenerator&&)      = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator&&)      = delete;
 
-    virtual inline G4ThreeVector ShootPrimaryPosition() { return kDummyPrimaryPosition; }
+    virtual inline void GeneratePrimariesVertex(G4ThreeVector& v) { v = kDummyPrimaryPosition; }
     inline void SetMaxAttempts(G4int val) { fMaxAttempts = val; }
     inline G4int GetMaxAttempts() { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0
-    inline void ShootVertex(G4ThreeVector& v) { v = ShootPrimaryPosition(); }
+    inline void ShootVertex(G4ThreeVector& v) { GeneratePrimariesVertex(v); }
 #endif
 
   protected:

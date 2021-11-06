@@ -18,7 +18,7 @@ class RMGGeneratorSPS : public RMGVGenerator {
 
     inline ~RMGGeneratorSPS() = default;
 
-    inline void GeneratePrimaryVertex(G4Event *event) override {
+    inline void GeneratePrimariesKinematics(G4Event *event) override {
       fParticleSource->GeneratePrimaryVertex(event);
     }
 

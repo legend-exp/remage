@@ -40,7 +40,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     RMGVertexConfinement();
 
-    G4ThreeVector ShootPrimaryPosition() override;
+    void GeneratePrimariesVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
     inline void AddPhysicalVolumeNameRegex(G4String name, G4String copy_nr=".*") {

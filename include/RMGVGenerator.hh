@@ -28,8 +28,10 @@ class RMGVGenerator {
 
     virtual inline void BeginOfRunAction(const G4Run*) {};
     virtual inline void EndOfRunAction(const G4Run*) {};
-    virtual void GeneratePrimaryVertex(G4Event*) = 0;
+
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
+    virtual void GeneratePrimariesKinematics(G4Event*) = 0;
+
     inline void SetReportingFrequency(G4int freq) { fReportingFrequency = freq; }
     inline G4String GetGeneratorName() { return fGeneratorName; }
 

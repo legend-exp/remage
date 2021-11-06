@@ -10,7 +10,7 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) :
   fDecay0G4Generator->SetVertexGenerator(prim_gen);
 }
 
-void RMGGeneratorDecay0::GeneratePrimaryVertex(G4Event* event) {
+void RMGGeneratorDecay0::GeneratePrimariesKinematics(G4Event* event) {
   fDecay0G4Generator->GeneratePrimaries(event);
 }
 

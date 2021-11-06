@@ -297,7 +297,7 @@ void RMGVertexConfinement::Reset() {
   fBoundingSolidType = "Sphere";
 }
 
-G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
+void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
   this->InitializePhysicalVolumes();
   this->InitializeGeometricalVolumes();
@@ -332,7 +332,6 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
       }
 
       // shoot in the first region
-      G4ThreeVector vertex;
       G4int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
@@ -344,7 +343,8 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
             RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
                 RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently sampleable and ",
                 "try, eventually, to increase the threshold through the dedicated macro command. Returning dummy vertex");
-            return RMGVVertexGenerator::kDummyPrimaryPosition;
+            vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+            return;
           }
         }
         else {
@@ -352,8 +352,8 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
         }
 
         // is it also in the other volume class (geometrical/physical)?
-        if (physical_first) { if (fGeomVolumeSolids.IsInside(vertex)) return vertex; }
-        else { if (fPhysicalVolumes.IsInside(vertex)) return vertex; }
+        if (physical_first) { if (fGeomVolumeSolids.IsInside(vertex)) return; }
+        else { if (fPhysicalVolumes.IsInside(vertex)) return; }
       }
 
       if (calls >= RMGVVertexGenerator::fMaxAttempts) {
@@ -363,8 +363,8 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
       }
 
       // everything has failed so return the dummy vertex
-      return RMGVVertexGenerator::kDummyPrimaryPosition;
-      break;
+      vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+      return;
     }
 
     case SamplingMode::kUnionAll : {
@@ -381,7 +381,6 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
       RMGLog::OutDev(RMGLog::debug, "Chosen random volume: ", choice.physical_volume->GetName());
       RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
 
-      G4ThreeVector vertex;
       G4int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
@@ -395,7 +394,8 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
             RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
                 RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently sampleable and ",
                 "try, eventually, to increase the threshold through the dedicated macro command. Returning dummy vertex");
-            return RMGVVertexGenerator::kDummyPrimaryPosition;
+            vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+            return;
           }
         }
         else {
@@ -404,7 +404,7 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
         }
 
         RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex/CLHEP::cm, " cm", " after ", calls, " iterations, returning");
-        return vertex;
+        return;
       }
 
       if (calls >= RMGVVertexGenerator::fMaxAttempts) {
@@ -414,13 +414,14 @@ G4ThreeVector RMGVertexConfinement::ShootPrimaryPosition() {
       }
 
       // everything has failed so return the dummy vertex
-      return RMGVVertexGenerator::kDummyPrimaryPosition;
-      break;
+      vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+      return;
     }
 
     default: {
       RMGLog::Out(RMGLog::error, "Sampling mode not implemented, returning dummy vertex");
-      return RMGVVertexGenerator::kDummyPrimaryPosition;
+      vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+      return;
     }
   }
 }
