@@ -12,7 +12,6 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGGeneratorUtil.hh
     ../include/RMGGeneratorG4Gun.hh
 
-    ../include/RMGVOutputManager.hh
     ../include/RMGLog.hh
     ../include/RMGLog.icc
     ../include/ProjectInfo.hh
@@ -45,7 +44,6 @@ set(PROJECT_SOURCES
     RMGVertexConfinement.cc
 
     RMGLog.cc
-    # RMGVOutputManager.cc
 
     RMGDetectorConstruction.cc
     RMGEventAction.cc

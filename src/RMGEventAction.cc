@@ -7,7 +7,6 @@
 #include "RMGRun.hh"
 
 #include "G4GenericMessenger.hh"
-#include "RMGVOutputManager.hh"
 #include "RMGManager.hh"
 #include "RMGRunAction.hh"
 #include "RMGUserAction.hh"
@@ -20,10 +19,6 @@ RMGEventAction::RMGEventAction() {
 }
 
 RMGEventAction::~RMGEventAction() {
-  // if (fOutputManager) {
-  //   fOutputManager->CloseFile();
-  //   delete fOutputManager;
-  // }
 }
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
@@ -48,21 +43,15 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
         event->GetEventID()+1, (event->GetEventID()+1)*100./tot_events,
         elapsed_d, elapsed_h, elapsed_m, elapsed_s);
   }
-
-  // if (fOutputManager) fOutputManager->BeginOfEventAction(event);
 }
 
 void RMGEventAction::EndOfEventAction(const G4Event*) {
-
-  // if (fOutputManager) fOutputManager->EndOfEventAction(event);
 }
 
 void RMGEventAction::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
       "Commands for controlling the event actions");
-
-  // fMessenger->DeclareMethod("FileName"
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

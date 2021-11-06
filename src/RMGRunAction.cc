@@ -9,7 +9,6 @@
 
 #include "RMGRun.hh"
 #include "RMGLog.hh"
-#include "RMGVOutputManager.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
 #include "RMGVGenerator.hh"
@@ -35,11 +34,6 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
       fRMGMasterGenerator->GetGenerator()->BeginOfRunAction(fRMGRun);
     }
   }
-
-  // if (manager->GetRMGEventAction()->GetOutputManager()) {
-  //   manager->GetRMGEventAction()->GetOutputManager()->BeginOfRunAction();
-  // }
-  // else RMGLog::Out(RMGLog::warning, "No Output specified!");
 
   if (this->IsMaster()) {
     // save start time for future
@@ -69,17 +63,11 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     }
   }
 
-  // if (manager->GetRMGEventAction()->GetOutputManager()) {
-  //   manager->GetRMGEventAction()->GetOutputManager()->EndOfRunAction();
-  // }
-
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
 
     RMGLog::OutFormat(RMGLog::summary, "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
         fRMGRun->GetRunID(), fRMGRun->GetNumberOfEventToBeProcessed(), fmt::localtime(time_now));
-
-    auto total_sec = std::chrono::duration_cast<std::chrono::seconds>(time_now - fRMGRun->GetStartTime()).count();
 
     auto start_time = fRMGRun->GetStartTime();
     auto tot_elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
@@ -92,9 +80,13 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     RMGLog::OutFormat(RMGLog::summary, "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
         elapsed_d, elapsed_h, elapsed_m, elapsed_s);
 
+    auto total_sec_hres = std::chrono::duration<double>(time_now - fRMGRun->GetStartTime()).count();
+
+    G4double n_ev = fRMGRun->GetNumberOfEvent();
     RMGLog::OutFormat(RMGLog::summary, "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
-        total_sec*1./fRMGRun->GetNumberOfEvent(),
-        fRMGRun->GetNumberOfEvent()*1./total_sec);
+        total_sec_hres/n_ev, n_ev/total_sec_hres);
+
+    if (n_ev < 100) RMGLog::Out(RMGLog::warning, "Event processing time might be inaccurate");
   }
 }
 
