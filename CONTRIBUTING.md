@@ -15,3 +15,10 @@ submitting a pull request.
 
 - Class names are generally prefixed with `RMG`. Purely virtual class names
   with `RMGV`.
+
+# Ideas behind remage
+
+- `RMGGeneratorPrimary` is the remage mandatory concretization of G4's
+  `G4VUserPrimaryGenerator`. An instance of this class is passed to G4 as user
+  action. This master class manages remage generators
+

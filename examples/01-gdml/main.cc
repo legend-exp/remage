@@ -1,5 +1,5 @@
 #include "RMGManager.hh"
-#include "RMGManagementDetectorConstruction.hh"
+#include "RMGDetectorConstruction.hh"
 #include "RMGLog.hh"
 
 int main(int argc, char** argv) {

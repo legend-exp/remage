@@ -1,4 +1,4 @@
-#include "RMGManagementEventAction.hh"
+#include "RMGEventAction.hh"
 
 #include <sstream>
 #include <chrono>
@@ -9,24 +9,24 @@
 #include "G4GenericMessenger.hh"
 #include "RMGVOutputManager.hh"
 #include "RMGManager.hh"
-#include "RMGManagementRunAction.hh"
-#include "RMGManagementUserAction.hh"
+#include "RMGRunAction.hh"
+#include "RMGUserAction.hh"
 #include "RMGLog.hh"
 
 #include "fmt/chrono.h"
 
-RMGManagementEventAction::RMGManagementEventAction() {
+RMGEventAction::RMGEventAction() {
   this->DefineCommands();
 }
 
-RMGManagementEventAction::~RMGManagementEventAction() {
+RMGEventAction::~RMGEventAction() {
   // if (fOutputManager) {
   //   fOutputManager->CloseFile();
   //   delete fOutputManager;
   // }
 }
 
-void RMGManagementEventAction::BeginOfEventAction(const G4Event* event) {
+void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
   auto print_modulo = RMGManager::GetRMGManager()->GetPrintModulo();
   if ((event->GetEventID()+1) % print_modulo == 0) {
@@ -52,12 +52,12 @@ void RMGManagementEventAction::BeginOfEventAction(const G4Event* event) {
   // if (fOutputManager) fOutputManager->BeginOfEventAction(event);
 }
 
-void RMGManagementEventAction::EndOfEventAction(const G4Event*) {
+void RMGEventAction::EndOfEventAction(const G4Event*) {
 
   // if (fOutputManager) fOutputManager->EndOfEventAction(event);
 }
 
-void RMGManagementEventAction::DefineCommands() {
+void RMGEventAction::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
       "Commands for controlling the event actions");

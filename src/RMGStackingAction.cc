@@ -1,12 +1,12 @@
-#include "RMGManagementStackingAction.hh"
+#include "RMGStackingAction.hh"
 
-#include "RMGManagementEventAction.hh"
+#include "RMGEventAction.hh"
 #include "RMGVOutputManager.hh"
 
-RMGManagementStackingAction::RMGManagementStackingAction(RMGManagementEventAction* eventaction) :
+RMGStackingAction::RMGStackingAction(RMGEventAction* eventaction) :
   fEventAction(eventaction) {}
 
-G4ClassificationOfNewTrack RMGManagementStackingAction::ClassifyNewTrack(const G4Track* /*aTrack*/) {
+G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* /*aTrack*/) {
   // if (fEventAction->GetOutputManager()) {
   //   return fEventAction->GetOutputManager()->StackingAction(aTrack);
   // }
@@ -14,13 +14,13 @@ G4ClassificationOfNewTrack RMGManagementStackingAction::ClassifyNewTrack(const G
   return fUrgent;
 }
 
-void RMGManagementStackingAction::NewStage() {
+void RMGStackingAction::NewStage() {
   // if (fEventAction->GetOutputManager()) {
   //   fEventAction->GetOutputManager()->NewStage();
   // }
 }
 
-void RMGManagementStackingAction::PrepareNewEvent() {
+void RMGStackingAction::PrepareNewEvent() {
   // if (fEventAction->GetOutputManager()) {
   //   fEventAction->GetOutputManager()->PrepareNewEvent();
   // }

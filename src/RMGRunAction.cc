@@ -1,4 +1,4 @@
-#include "RMGManagementRunAction.hh"
+#include "RMGRunAction.hh"
 
 #include <limits>
 #include <ctime>
@@ -13,20 +13,20 @@
 #include "RMGManager.hh"
 #include "RMGGeneratorPrimary.hh"
 #include "RMGVGenerator.hh"
-#include "RMGManagementEventAction.hh"
+#include "RMGEventAction.hh"
 
 #include "fmt/chrono.h"
 
-G4Run* RMGManagementRunAction::GenerateRun() {
+G4Run* RMGRunAction::GenerateRun() {
   fRMGRun = new RMGRun();
   return fRMGRun;
 }
 
-RMGManagementRunAction::RMGManagementRunAction(RMGGeneratorPrimary* gene) {
+RMGRunAction::RMGRunAction(RMGGeneratorPrimary* gene) {
   fRMGGeneratorPrimary = gene;
 }
 
-void RMGManagementRunAction::BeginOfRunAction(const G4Run*) {
+void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "Start of run action");
 
@@ -59,7 +59,7 @@ void RMGManagementRunAction::BeginOfRunAction(const G4Run*) {
   else if (tot_events < 100) manager->SetPrintModulo(100);
 }
 
-void RMGManagementRunAction::EndOfRunAction(const G4Run*) {
+void RMGRunAction::EndOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "End of run action");
 

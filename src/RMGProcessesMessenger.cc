@@ -9,7 +9,7 @@
 
 #include "RMGProcessesList.hh"
 #include "RMGManager.hh"
-#include "RMGManagementDetectorConstruction.hh"
+#include "RMGDetectorConstruction.hh"
 #include "RMGTools.hh"
 #include "RMGLog.hh"
 

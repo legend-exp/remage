@@ -12,8 +12,8 @@
 #include "RMGLog.hh"
 
 class G4VUserPhysicsList;
-class RMGManagementDetectorConstruction;
-class RMGManagementUserAction;
+class RMGDetectorConstruction;
+class RMGUserAction;
 class RMGManagerMessenger;
 class G4GenericMessenger;
 class RMGManager {
@@ -33,7 +33,7 @@ class RMGManager {
     static inline RMGManager*          GetRMGManager() { return fRMGManager; }
     G4RunManager*                      GetG4RunManager();
     G4VisManager*                      GetG4VisManager();
-    RMGManagementDetectorConstruction* GetManagementDetectorConstruction();
+    RMGDetectorConstruction* GetManagementDetectorConstruction();
     G4VUserPhysicsList*                GetRMGProcessesList();
 
     inline G4int GetPrintModulo() { return fPrintModulo; }
@@ -41,7 +41,7 @@ class RMGManager {
     // setters
     inline void SetUserInitialization(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInitialization(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
-    inline void SetUserInitialization(RMGManagementDetectorConstruction* det) { fManagerDetectorConstruction = det; }
+    inline void SetUserInitialization(RMGDetectorConstruction* det) { fManagerDetectorConstruction = det; }
     inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
     inline void SetBatchMode(G4bool flag=true) { fBatchMode = flag; }
     inline void SetPrintModulo(G4int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
@@ -79,8 +79,8 @@ class RMGManager {
     std::unique_ptr<G4VisManager> fG4VisManager;
 
     G4VUserPhysicsList* fProcessesList;
-    RMGManagementDetectorConstruction*  fManagerDetectorConstruction;
-    RMGManagementUserAction* fManagementUserAction;
+    RMGDetectorConstruction*  fManagerDetectorConstruction;
+    RMGUserAction* fManagementUserAction;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<G4GenericMessenger> fLogMessenger;

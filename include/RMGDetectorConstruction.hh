@@ -14,17 +14,17 @@
 class G4VPhysicalVolume;
 class G4GenericMessenger;
 class G4VPhysicalVolume;
-class RMGManagementDetectorConstruction : public G4VUserDetectorConstruction {
+class RMGDetectorConstruction : public G4VUserDetectorConstruction {
 
   public:
 
-    RMGManagementDetectorConstruction();
-    ~RMGManagementDetectorConstruction() = default;
+    RMGDetectorConstruction();
+    ~RMGDetectorConstruction() = default;
 
-    RMGManagementDetectorConstruction           (RMGManagementDetectorConstruction const&) = delete;
-    RMGManagementDetectorConstruction& operator=(RMGManagementDetectorConstruction const&) = delete;
-    RMGManagementDetectorConstruction           (RMGManagementDetectorConstruction&&)      = delete;
-    RMGManagementDetectorConstruction& operator=(RMGManagementDetectorConstruction&&)      = delete;
+    RMGDetectorConstruction           (RMGDetectorConstruction const&) = delete;
+    RMGDetectorConstruction& operator=(RMGDetectorConstruction const&) = delete;
+    RMGDetectorConstruction           (RMGDetectorConstruction&&)      = delete;
+    RMGDetectorConstruction& operator=(RMGDetectorConstruction&&)      = delete;
 
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;

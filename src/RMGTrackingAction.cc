@@ -1,19 +1,19 @@
-#include "RMGManagementTrackingAction.hh"
+#include "RMGTrackingAction.hh"
 
-#include "RMGManagementEventAction.hh"
+#include "RMGEventAction.hh"
 #include "G4Track.hh"
 #include "RMGVOutputManager.hh"
 
-RMGManagementTrackingAction::RMGManagementTrackingAction(RMGManagementEventAction* eventaction) :
+RMGTrackingAction::RMGTrackingAction(RMGEventAction* eventaction) :
   fEventAction(eventaction) {}
 
-void RMGManagementTrackingAction::PreUserTrackingAction(const G4Track* /*aTrack*/) {
+void RMGTrackingAction::PreUserTrackingAction(const G4Track* /*aTrack*/) {
   // if (fEventAction->GetOutputManager()) {
   //   fEventAction->GetOutputManager()->PreUserTrackingAction(aTrack);
   // }
 }
 
-void RMGManagementTrackingAction::PostUserTrackingAction(const G4Track* /*aTrack*/) {
+void RMGTrackingAction::PostUserTrackingAction(const G4Track* /*aTrack*/) {
   // if (fEventAction->GetOutputManager()) {
   //   fEventAction->GetOutputManager()->PostUserTrackingAction(aTrack);
   // }

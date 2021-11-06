@@ -21,8 +21,8 @@
 
 #include "ProjectInfo.hh"
 #include "RMGProcessesList.hh"
-#include "RMGManagementDetectorConstruction.hh"
-#include "RMGManagementUserAction.hh"
+#include "RMGDetectorConstruction.hh"
+#include "RMGUserAction.hh"
 #include "RMGTools.hh"
 
 #if RMG_HAS_ROOT
@@ -79,7 +79,7 @@ void RMGManager::Initialize() {
 
   if (!fManagementUserAction) {
     RMGLog::Out(RMGLog::debug, "Initializing default user action class");
-    fManagementUserAction = new RMGManagementUserAction();
+    fManagementUserAction = new RMGUserAction();
   }
 
   if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
@@ -142,7 +142,7 @@ void RMGManager::SetupDefaultG4VisManager() {
 
 void RMGManager::SetupDefaultManagementDetectorConstruction() {
   RMGLog::Out(RMGLog::debug, "Initializing default (empty) detector");
-  fManagerDetectorConstruction = new RMGManagementDetectorConstruction();
+  fManagerDetectorConstruction = new RMGDetectorConstruction();
 }
 
 G4RunManager* RMGManager::GetG4RunManager() {
@@ -155,7 +155,7 @@ G4VisManager* RMGManager::GetG4VisManager() {
   return fG4VisManager.get();
 }
 
-RMGManagementDetectorConstruction* RMGManager::GetManagementDetectorConstruction() {
+RMGDetectorConstruction* RMGManager::GetManagementDetectorConstruction() {
   if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
   return fManagerDetectorConstruction;
 }

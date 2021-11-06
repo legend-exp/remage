@@ -1,14 +1,14 @@
-#include "RMGManagementSteppingAction.hh"
+#include "RMGSteppingAction.hh"
 
 #include "G4Step.hh"
 
-#include "RMGManagementEventAction.hh"
+#include "RMGEventAction.hh"
 #include "RMGVOutputManager.hh"
 
-RMGManagementSteppingAction::RMGManagementSteppingAction(RMGManagementEventAction* eventaction):
+RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction):
   fEventAction(eventaction) {}
 
-void RMGManagementSteppingAction::UserSteppingAction(const G4Step* /*step*/) {
+void RMGSteppingAction::UserSteppingAction(const G4Step* /*step*/) {
   // if (fEventAction->GetOutputManager()) {
   //   fEventAction->GetOutputManager()->SteppingAction(step, G4UserSteppingAction::fpSteppingManager);
   // }

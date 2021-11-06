@@ -1,4 +1,4 @@
-#include "RMGManagementDetectorConstruction.hh"
+#include "RMGDetectorConstruction.hh"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -13,15 +13,15 @@ namespace fs = std::filesystem;
 #include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 
-RMGMaterialTable::BathMaterial RMGManagementDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
+RMGMaterialTable::BathMaterial RMGDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
 
-RMGManagementDetectorConstruction::RMGManagementDetectorConstruction() {
+RMGDetectorConstruction::RMGDetectorConstruction() {
   fMaterialTable = std::make_unique<RMGMaterialTable>();
 
   this->DefineCommands();
 }
 
-G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
+G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
 
   RMGLog::Out(RMGLog::debug, "Constructing detector");
 
@@ -56,25 +56,25 @@ G4VPhysicalVolume* RMGManagementDetectorConstruction::Construct() {
   return fWorld;
 }
 
-void RMGManagementDetectorConstruction::ConstructSDandField() {
+void RMGDetectorConstruction::ConstructSDandField() {
   // TODO
 }
 
-void RMGManagementDetectorConstruction::DefineCommands() {
+void RMGDetectorConstruction::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
       "Commands for controlling geometry definitions");
 
-  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGManagementDetectorConstruction::IncludeGDMLFile)
+  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGDetectorConstruction::IncludeGDMLFile)
     .SetGuidance("Use GDML file for geometry definition")
     .SetParameterName("filename", false)
     .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGManagementDetectorConstruction::PrintListOfLogicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGDetectorConstruction::PrintListOfLogicalVolumes)
     .SetGuidance("Print list of defined physical volumes")
     .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGManagementDetectorConstruction::PrintListOfPhysicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGDetectorConstruction::PrintListOfPhysicalVolumes)
     .SetGuidance("Print list of defined physical volumes")
     .SetStates(G4State_Idle);
 }

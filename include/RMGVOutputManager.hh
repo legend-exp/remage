@@ -24,7 +24,7 @@ class RMGVOutputManager {
     /** Action to perform at beginning and end of events and runs
      * Detector specific.
      * Only include actions that directly affect the Root tree.
-     * Other actions should go into the RMGManagementEventAction class.
+     * Other actions should go into the RMGEventAction class.
      */
     virtual void BeginOfEventAction(const G4Event*);
     virtual void BeginOfRunAction();

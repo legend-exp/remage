@@ -17,13 +17,13 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGLog.icc
     ../include/ProjectInfo.hh
 
-    ../include/RMGManagementDetectorConstruction.hh
-    ../include/RMGManagementRunAction.hh
-    ../include/RMGManagementEventAction.hh
-    ../include/RMGManagementStackingAction.hh
-    ../include/RMGManagementSteppingAction.hh
-    ../include/RMGManagementTrackingAction.hh
-    ../include/RMGManagementUserAction.hh
+    ../include/RMGDetectorConstruction.hh
+    ../include/RMGRunAction.hh
+    ../include/RMGEventAction.hh
+    ../include/RMGStackingAction.hh
+    ../include/RMGSteppingAction.hh
+    ../include/RMGTrackingAction.hh
+    ../include/RMGUserAction.hh
     ../include/RMGManager.hh
     ../include/RMGRun.hh
 
@@ -47,13 +47,13 @@ set(PROJECT_SOURCES
     RMGLog.cc
     # RMGVOutputManager.cc
 
-    RMGManagementDetectorConstruction.cc
-    RMGManagementEventAction.cc
-    RMGManagementRunAction.cc
-    RMGManagementStackingAction.cc
-    RMGManagementSteppingAction.cc
-    RMGManagementTrackingAction.cc
-    RMGManagementUserAction.cc
+    RMGDetectorConstruction.cc
+    RMGEventAction.cc
+    RMGRunAction.cc
+    RMGStackingAction.cc
+    RMGSteppingAction.cc
+    RMGTrackingAction.cc
+    RMGUserAction.cc
     RMGManager.cc
 
     RMGMaterialTable.cc

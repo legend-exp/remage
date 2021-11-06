@@ -9,17 +9,17 @@
 
 class G4GenericMessenger;
 class RMGVOutputManager;
-class RMGManagementEventAction : public G4UserEventAction {
+class RMGEventAction : public G4UserEventAction {
 
   public:
 
-    RMGManagementEventAction();
-    ~RMGManagementEventAction();
+    RMGEventAction();
+    ~RMGEventAction();
 
-    RMGManagementEventAction           (RMGManagementEventAction const&) = delete;
-    RMGManagementEventAction& operator=(RMGManagementEventAction const&) = delete;
-    RMGManagementEventAction           (RMGManagementEventAction&&)      = delete;
-    RMGManagementEventAction& operator=(RMGManagementEventAction&&)      = delete;
+    RMGEventAction           (RMGEventAction const&) = delete;
+    RMGEventAction& operator=(RMGEventAction const&) = delete;
+    RMGEventAction           (RMGEventAction&&)      = delete;
+    RMGEventAction& operator=(RMGEventAction&&)      = delete;
 
     void BeginOfEventAction(const G4Event*) override;
     void EndOfEventAction(const G4Event*) override;
