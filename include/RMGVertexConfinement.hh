@@ -9,12 +9,12 @@
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
 
-#include "RMGVGeneratorPrimaryPosition.hh"
+#include "RMGVVertexGenerator.hh"
 
 class G4VPhysicalVolume;
 class G4VSolid;
 class G4GenericMessenger;
-class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
+class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
 
@@ -38,7 +38,7 @@ class RMGGeneratorVolumeConfinement : public RMGVGeneratorPrimaryPosition {
       kUnionAll
     };
 
-    RMGGeneratorVolumeConfinement();
+    RMGVertexConfinement();
 
     G4ThreeVector ShootPrimaryPosition() override;
 

@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "RMGVGenerator.hh"
-#include "RMGVGeneratorPrimaryPosition.hh"
+#include "RMGVVertexGenerator.hh"
 
 #include "G4ThreeVector.hh"
 
@@ -18,7 +18,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
 
-    RMGGeneratorDecay0(RMGVGeneratorPrimaryPosition* prim_gen);
+    RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
     RMGGeneratorDecay0() = delete;
     inline ~RMGGeneratorDecay0() = default;
 

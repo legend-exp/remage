@@ -11,7 +11,7 @@
 #include "RMGLog.hh"
 #include "RMGVOutputManager.hh"
 #include "RMGManager.hh"
-#include "RMGGeneratorPrimary.hh"
+#include "RMGMasterGenerator.hh"
 #include "RMGVGenerator.hh"
 #include "RMGEventAction.hh"
 
@@ -22,17 +22,17 @@ G4Run* RMGRunAction::GenerateRun() {
   return fRMGRun;
 }
 
-RMGRunAction::RMGRunAction(RMGGeneratorPrimary* gene) {
-  fRMGGeneratorPrimary = gene;
+RMGRunAction::RMGRunAction(RMGMasterGenerator* gene) {
+  fRMGMasterGenerator = gene;
 }
 
 void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "Start of run action");
 
-  if (fRMGGeneratorPrimary) {
-    if (fRMGGeneratorPrimary->GetGenerator()) {
-      fRMGGeneratorPrimary->GetGenerator()->BeginOfRunAction(fRMGRun);
+  if (fRMGMasterGenerator) {
+    if (fRMGMasterGenerator->GetGenerator()) {
+      fRMGMasterGenerator->GetGenerator()->BeginOfRunAction(fRMGRun);
     }
   }
 
@@ -63,9 +63,9 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "End of run action");
 
-  if (fRMGGeneratorPrimary) {
-    if (fRMGGeneratorPrimary->GetGenerator()) {
-      fRMGGeneratorPrimary->GetGenerator()->EndOfRunAction(fRMGRun);
+  if (fRMGMasterGenerator) {
+    if (fRMGMasterGenerator->GetGenerator()) {
+      fRMGMasterGenerator->GetGenerator()->EndOfRunAction(fRMGRun);
     }
   }
 

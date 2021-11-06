@@ -5,10 +5,10 @@ set(PROJECT_PUBLIC_HEADERS
     ../include/RMGNavigationTools.hh
 
     ../include/RMGVGenerator.hh
-    ../include/RMGGeneratorVolumeConfinement.hh
+    ../include/RMGVertexConfinement.hh
     ../include/RMGGeneratorSPS.hh
-    ../include/RMGVGeneratorPrimaryPosition.hh
-    ../include/RMGGeneratorPrimary.hh
+    ../include/RMGVVertexGenerator.hh
+    ../include/RMGMasterGenerator.hh
     ../include/RMGGeneratorUtil.hh
     ../include/RMGGeneratorG4Gun.hh
 
@@ -41,8 +41,8 @@ set(PROJECT_SOURCES
     RMGNavigationTools.cc
 
     RMGGeneratorUtil.cc
-    RMGGeneratorPrimary.cc
-    RMGGeneratorVolumeConfinement.cc
+    RMGMasterGenerator.cc
+    RMGVertexConfinement.cc
 
     RMGLog.cc
     # RMGVOutputManager.cc

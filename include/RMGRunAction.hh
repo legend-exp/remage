@@ -8,13 +8,13 @@
 
 class G4Run;
 class RMGRun;
-class RMGGeneratorPrimary;
+class RMGMasterGenerator;
 class RMGRunAction : public G4UserRunAction {
 
   public:
 
     RMGRunAction() = default;
-    RMGRunAction(RMGGeneratorPrimary*);
+    RMGRunAction(RMGMasterGenerator*);
     ~RMGRunAction() = default;
 
     RMGRunAction           (RMGRunAction const&) = delete;
@@ -29,7 +29,7 @@ class RMGRunAction : public G4UserRunAction {
   private:
 
     RMGRun* fRMGRun;
-    RMGGeneratorPrimary* fRMGGeneratorPrimary;
+    RMGMasterGenerator* fRMGMasterGenerator;
 };
 
 #endif

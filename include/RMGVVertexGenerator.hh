@@ -13,23 +13,23 @@
 #include "G4UImessenger.hh"
 
 #if RMG_HAS_BXDECAY0
-class RMGVGeneratorPrimaryPosition : public bxdecay0_g4::VertexGeneratorInterface {
+class RMGVVertexGenerator : public bxdecay0_g4::VertexGeneratorInterface {
 #else
-class RMGVGeneratorPrimaryPosition {
+class RMGVVertexGenerator {
 #endif
 
   public:
 
-    inline RMGVGeneratorPrimaryPosition(G4String name) :
+    inline RMGVVertexGenerator(G4String name) :
       fGeneratorName(name),
       fMaxAttempts(100000) {}
 
-    virtual inline ~RMGVGeneratorPrimaryPosition() = default;
+    virtual inline ~RMGVVertexGenerator() = default;
 
-    RMGVGeneratorPrimaryPosition           (RMGVGeneratorPrimaryPosition const&) = delete;
-    RMGVGeneratorPrimaryPosition& operator=(RMGVGeneratorPrimaryPosition const&) = delete;
-    RMGVGeneratorPrimaryPosition           (RMGVGeneratorPrimaryPosition&&)      = delete;
-    RMGVGeneratorPrimaryPosition& operator=(RMGVGeneratorPrimaryPosition&&)      = delete;
+    RMGVVertexGenerator           (RMGVVertexGenerator const&) = delete;
+    RMGVVertexGenerator& operator=(RMGVVertexGenerator const&) = delete;
+    RMGVVertexGenerator           (RMGVVertexGenerator&&)      = delete;
+    RMGVVertexGenerator& operator=(RMGVVertexGenerator&&)      = delete;
 
     virtual inline G4ThreeVector ShootPrimaryPosition() { return kDummyPrimaryPosition; }
     inline void SetMaxAttempts(G4int val) { fMaxAttempts = val; }

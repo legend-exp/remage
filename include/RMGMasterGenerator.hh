@@ -6,11 +6,11 @@
 #include "globals.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
-#include "RMGVGeneratorPrimaryPosition.hh"
+#include "RMGVVertexGenerator.hh"
 #include "RMGVGenerator.hh"
 
 class G4GenericMessenger;
-class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
+class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   public:
 
@@ -27,13 +27,13 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
       kUndefined
     };
 
-    RMGGeneratorPrimary();
-    ~RMGGeneratorPrimary() = default;
+    RMGMasterGenerator();
+    ~RMGMasterGenerator() = default;
 
-    RMGGeneratorPrimary           (RMGGeneratorPrimary const&) = delete;
-    RMGGeneratorPrimary& operator=(RMGGeneratorPrimary const&) = delete;
-    RMGGeneratorPrimary           (RMGGeneratorPrimary&&)      = delete;
-    RMGGeneratorPrimary& operator=(RMGGeneratorPrimary&&)      = delete;
+    RMGMasterGenerator           (RMGMasterGenerator const&) = delete;
+    RMGMasterGenerator& operator=(RMGMasterGenerator const&) = delete;
+    RMGMasterGenerator           (RMGMasterGenerator&&)      = delete;
+    RMGMasterGenerator& operator=(RMGMasterGenerator&&)      = delete;
 
     void GeneratePrimaries(G4Event *event) override;
 
@@ -49,7 +49,7 @@ class RMGGeneratorPrimary : public G4VUserPrimaryGeneratorAction {
   private:
 
     ConfinementCode fConfinementCode;
-    std::unique_ptr<RMGVGeneratorPrimaryPosition> fPrimaryPositionGenerator;
+    std::unique_ptr<RMGVVertexGenerator> fPrimaryPositionGenerator;
 
     Generator fGenerator;
     std::unique_ptr<RMGVGenerator> fGeneratorObj;

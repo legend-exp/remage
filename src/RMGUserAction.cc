@@ -1,6 +1,6 @@
 #include "RMGUserAction.hh"
 
-#include "RMGGeneratorPrimary.hh"
+#include "RMGMasterGenerator.hh"
 #include "RMGRunAction.hh"
 #include "RMGEventAction.hh"
 #include "RMGStackingAction.hh"
@@ -15,7 +15,7 @@ void RMGUserAction::BuildForMaster() const {
 
 void RMGUserAction::Build() const {
 
-  auto generator_primary = new RMGGeneratorPrimary();
+  auto generator_primary = new RMGMasterGenerator();
   this->SetUserAction(generator_primary);
   this->SetUserAction(new RMGRunAction(generator_primary));
   auto event_action = new RMGEventAction();
