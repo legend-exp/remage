@@ -1,29 +1,27 @@
-/RMG/Manager/Logging/LogLevelScreen debug
+/RMG/Manager/Logging/LogLevelScreen summary
 
 /run/initialize
 
 /vis/open OGLIQt
 /vis/scene/create
-/vis/scene/endOfEventAction accumulate
 /vis/sceneHandler/attach
+
+/vis/drawVolume
 
 /vis/viewer/set/defaultColour black
 /vis/viewer/set/background white
-/vis/viewer/set/autoRefresh true
+/vis/viewer/set/autoRefresh false
 
 /vis/scene/add/trajectories smooth
-
 /vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
 
-/RMG/Generator/Select G4gun
-/gun/particle ion
-/gun/ion 27 60
-/gun/energy 0 eV
+/RMG/Generator/Select BxDecay0
+/bxdecay0/generator/dbd Ge76 2345 1 0
 
-/vis/drawVolume
 /run/beamOn 10
 
 /vis/viewer/flush

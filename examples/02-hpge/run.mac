@@ -3,7 +3,7 @@
 /run/initialize
 
 # /RMG/Geometry/PrintListOfLogicalVolumes
-/RMG/Geometry/PrintListOfPhysicalVolumes
+# /RMG/Geometry/PrintListOfPhysicalVolumes
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
