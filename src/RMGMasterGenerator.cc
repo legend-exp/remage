@@ -5,7 +5,7 @@
 #include "RMGVertexConfinement.hh"
 #include "RMGVGenerator.hh"
 #include "RMGGeneratorG4Gun.hh"
-#include "RMGGeneratorSPS.hh"
+#include "RMGGeneratorGPS.hh"
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
 #endif
@@ -65,8 +65,8 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
     case RMGMasterGenerator::Generator::kG4gun :
       fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>();
       break;
-    case RMGMasterGenerator::Generator::kSPS :
-      fGeneratorObj = std::make_unique<RMGGeneratorSPS>();
+    case RMGMasterGenerator::Generator::kGPS :
+      fGeneratorObj = std::make_unique<RMGGeneratorGPS>();
       break;
     case RMGMasterGenerator::Generator::kBxDecay0 :
 #if RMG_HAS_BXDECAY0

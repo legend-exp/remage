@@ -21,7 +21,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
     enum Generator {
       kG4gun,
-      kSPS,
+      kGPS,
       kBxDecay0,
       kUserDefined,
       kUndefined

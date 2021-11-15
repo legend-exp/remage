@@ -6,7 +6,7 @@ set(PROJECT_PUBLIC_HEADERS
 
     ../include/RMGVGenerator.hh
     ../include/RMGVertexConfinement.hh
-    ../include/RMGGeneratorSPS.hh
+    ../include/RMGGeneratorGPS.hh
     ../include/RMGVVertexGenerator.hh
     ../include/RMGMasterGenerator.hh
     ../include/RMGGeneratorUtil.hh

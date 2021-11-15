@@ -8,15 +8,15 @@
 #include "G4GeneralParticleSource.hh"
 
 class G4Event;
-class RMGGeneratorSPS : public RMGVGenerator {
+class RMGGeneratorGPS : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorSPS() : RMGVGenerator("SPS") {
+    inline RMGGeneratorGPS() : RMGVGenerator("GPS") {
       fParticleSource = std::unique_ptr<G4GeneralParticleSource>(new G4GeneralParticleSource());
     }
 
-    inline ~RMGGeneratorSPS() = default;
+    inline ~RMGGeneratorGPS() = default;
 
     inline void GeneratePrimariesKinematics(G4Event *event) override {
       fParticleSource->GeneratePrimaryVertex(event);
