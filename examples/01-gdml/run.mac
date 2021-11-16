@@ -1,5 +1,3 @@
-# /RMG/Geometry/IncludeGDMLFile gdml/main.gdml
-
 /run/initialize
 
 # /RMG/Geometry/PrintListOfLogicalVolumes

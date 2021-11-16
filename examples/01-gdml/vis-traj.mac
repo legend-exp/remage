@@ -1,12 +1,16 @@
-/RMG/Manager/Logging/LogLevelScreen summary
-
 /run/initialize
+
+# /RMG/Geometry/PrintListOfLogicalVolumes
+# /RMG/Geometry/PrintListOfPhysicalVolumes
 
 /vis/open OGLIQt
 /vis/scene/create
 /vis/sceneHandler/attach
 
 /vis/drawVolume
+
+/vis/geometry/set/forceSolid Detector
+/vis/geometry/set/forceSolid Source_Encapsulated
 
 /vis/viewer/set/defaultColour black
 /vis/viewer/set/background white
@@ -16,10 +20,12 @@
 /vis/scene/endOfEventAction accumulate
 
 /RMG/Generator/Confine Volume
-/RMG/Generator/Confinement/Physical/AddVolume HPGe
+/RMG/Generator/Confinement/Physical/AddVolume Source_Encapsulated_PV
 
-/RMG/Generator/Select BxDecay0
-/bxdecay0/generator/dbd Ge76 2345 1 0
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/ion 27 60
+/gps/energy 0 eV
 
 /run/beamOn 10
 
