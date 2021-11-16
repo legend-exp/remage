@@ -40,27 +40,27 @@ class RMGProcessesList : public G4VModularPhysicsList {
     // TODO: cut for optical photon?
     struct StepCutStore {
       StepCutStore() = default;
-      inline StepCutStore(G4double def_cut) :
+      inline StepCutStore(double def_cut) :
         gamma(def_cut), electron(def_cut), positron(def_cut),
         proton(def_cut), alpha(def_cut), generic_ion(def_cut) {}
 
-      G4double gamma;
-      G4double electron;
-      G4double positron;
-      G4double proton;
-      G4double alpha;
-      G4double generic_ion;
+      double gamma;
+      double electron;
+      double positron;
+      double proton;
+      double alpha;
+      double generic_ion;
     };
 
     void SetCuts() override;
     void SetPhysicsRealm(PhysicsRealm realm);
-    void SetPhysicsRealmString(G4String realm);
-    void SetLowEnergyEMOptionString(G4String option);
-    void SetUseGammaAngCorr(G4bool);
-    void SetGammaTwoJMAX(G4int two_j_max);
-    void SetStoreICLevelData(G4bool);
+    void SetPhysicsRealmString(std::string realm);
+    void SetLowEnergyEMOptionString(std::string option);
+    void SetUseGammaAngCorr(bool);
+    void SetGammaTwoJMAX(int two_j_max);
+    void SetStoreICLevelData(bool);
 
-    inline void LimitStepForParticle(G4String particle_name) {fLimitSteps.at(particle_name) = true;}
+    inline void LimitStepForParticle(std::string particle_name) {fLimitSteps.at(particle_name) = true;}
 
   protected:
 
@@ -77,10 +77,10 @@ class RMGProcessesList : public G4VModularPhysicsList {
     PhysicsRealm fPhysicsRealm;
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
-    G4bool fConstructOptical;
-    G4bool fUseLowEnergyEM;
+    bool fConstructOptical;
+    bool fUseLowEnergyEM;
     LowEnergyEMOption fLowEnergyEMOption;
-    std::map<G4String, G4bool> fLimitSteps;
+    std::map<std::string, bool> fLimitSteps;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

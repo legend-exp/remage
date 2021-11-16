@@ -44,7 +44,7 @@ RMGVertexConfinement::SampleableObject::~SampleableObject() {
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() {
   auto choice = total_surface * G4UniformRand();
-  G4double w = 0;
+  double w = 0;
   for (const auto& o : data) {
     if (choice > w and choice <= w+o.surface) return o;
     w += o.surface;
@@ -59,7 +59,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand() {
   auto choice = total_volume * G4UniformRand();
-  G4double w = 0;
+  double w = 0;
   for (const auto& o : data) {
     if (choice > w and choice <= w+o.volume) return o;
     w += o.volume;
@@ -72,7 +72,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return data.back();
 }
 
-G4bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) {
+bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) {
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   for (const auto& o : data) {
     if (o.physical_volume) {
@@ -119,7 +119,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     RMGLog::OutFormat(RMGLog::detail, "Physical volumes matching pattern '{}'['{}']",
         fPhysicalVolumeNameRegexes.at(i).c_str(), fPhysicalVolumeCopyNrRegexes.at(i).c_str());
 
-    G4bool found = false;
+    bool found = false;
     // scan the volume store for matches
     for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
       if (std::regex_match((*it)->GetName(), std::regex(fPhysicalVolumeNameRegexes.at(i))) and
@@ -128,7 +128,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         fPhysicalVolumes.emplace_back(*it, G4RotationMatrix(), G4ThreeVector(), nullptr);
 
         RMGLog::OutFormat(RMGLog::detail, " · '{}[{}]', mass = {}", (*it)->GetName().c_str(),
-            (*it)->GetCopyNo(), G4String(G4BestUnit(fPhysicalVolumes.data.back().volume, "Mass")));
+            (*it)->GetCopyNo(), std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Mass")));
 
         found = true;
       }
@@ -317,7 +317,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
       // choose a volume component randomly
       SampleableObject choice;
-      G4bool physical_first;
+      bool physical_first;
       if (fOnSurface) {
         physical_first = fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface;
         choice = physical_first ?
@@ -332,7 +332,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       }
 
       // shoot in the first region
-      G4int calls = 0;
+      int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
         if (choice.containment_check) { // this can effectively happen only with physical volumes
@@ -381,7 +381,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       RMGLog::OutDev(RMGLog::debug, "Chosen random volume: ", choice.physical_volume->GetName());
       RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
 
-      G4int calls = 0;
+      int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
         if (choice.containment_check) {
@@ -426,12 +426,12 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
   }
 }
 
-void RMGVertexConfinement::SetSamplingModeString(G4String mode) {
+void RMGVertexConfinement::SetSamplingModeString(std::string mode) {
   try { this->SetSamplingMode(RMGTools::ToEnum<RMGVertexConfinement::SamplingMode>(mode, "sampling mode")); }
   catch (const std::bad_cast&) { return; }
 }
 
-void RMGVertexConfinement::AddPhysicalVolumeString(G4String expr) {
+void RMGVertexConfinement::AddPhysicalVolumeString(std::string expr) {
   if (expr.find(' ') == std::string::npos) this->AddPhysicalVolumeNameRegex(expr);
   else {
     auto name = expr.substr(0, expr.find_first_of(' '));
@@ -440,7 +440,7 @@ void RMGVertexConfinement::AddPhysicalVolumeString(G4String expr) {
   }
 }
 
-void RMGVertexConfinement::AddGeometricalVolumeString(G4String solid) {
+void RMGVertexConfinement::AddGeometricalVolumeString(std::string solid) {
   GenericGeometricalSolidData data;
   data.g4_name = solid;
   fGeomVolumeData.push_back(data);

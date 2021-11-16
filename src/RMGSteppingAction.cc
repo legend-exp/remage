@@ -7,7 +7,6 @@
 RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction):
   fEventAction(eventaction) {}
 
-void RMGSteppingAction::UserSteppingAction(const G4Step* /*step*/) {
-}
+void RMGSteppingAction::UserSteppingAction(const G4Step* /*step*/) {}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

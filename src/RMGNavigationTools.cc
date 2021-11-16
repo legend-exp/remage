@@ -13,7 +13,7 @@
 
 #include "fmt/core.h"
 
-G4VPhysicalVolume* RMGNavigationTools::FindVolumeByName(G4String name) {
+G4VPhysicalVolume* RMGNavigationTools::FindVolumeByName(std::string name) {
     auto& store = *G4PhysicalVolumeStore::GetInstance();
     auto result = std::find_if(store.begin(), store.end(), [&name](auto v) { return std::string(v->GetName()) == name; });
     if (result == store.end()) {
@@ -39,7 +39,7 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
   for (auto it = ancestors.begin(); it != ancestors.end(); ) {
     // determine if element should be erased or not because it is an ancestor
     // of someone else in the list
-    G4bool to_erase = false;
+    bool to_erase = false;
     for (auto itt = ancestors.begin(); itt != ancestors.end(); ) {
       if (*it != *itt and (*it)->GetLogicalVolume()->IsAncestor(*itt)) {
         to_erase = true;
@@ -61,9 +61,9 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
 
 void RMGNavigationTools::PrintListOfLogicalVolumes() {
 
-  G4int max_length = 0;
+  int max_length = 0;
   // use std::set to have volumes automatically sorted by name
-  std::set<std::pair<G4String, G4String>> volumes;
+  std::set<std::pair<std::string, std::string>> volumes;
   for (const auto& v : *G4LogicalVolumeStore::GetInstance()) {
 
     if (v->GetName().size() > std::size_t(max_length)) max_length = v->GetName().size();
@@ -71,11 +71,11 @@ void RMGNavigationTools::PrintListOfLogicalVolumes() {
     volumes.insert({v->GetName(),
         fmt::format("{} daugh. // {} // {} // {} // {} // {}",
             v->GetNoDaughters(),
-            G4String(G4BestUnit(v->GetMaterial()->GetDensity(), "Volumic Mass")),
-            G4String(G4BestUnit(v->GetMass(), "Mass")),
-            G4String(G4BestUnit(v->GetMass() / v->GetMaterial()->GetDensity(), "Volume")),
-            G4String(G4BestUnit(v->GetMaterial()->GetPressure(), "Pressure")),
-            G4String(G4BestUnit(v->GetMaterial()->GetTemperature(), "Temperature")))
+            std::string(G4BestUnit(v->GetMaterial()->GetDensity(), "Volumic Mass")),
+            std::string(G4BestUnit(v->GetMass(), "Mass")),
+            std::string(G4BestUnit(v->GetMass() / v->GetMaterial()->GetDensity(), "Volume")),
+            std::string(G4BestUnit(v->GetMaterial()->GetPressure(), "Pressure")),
+            std::string(G4BestUnit(v->GetMaterial()->GetTemperature(), "Temperature")))
         });
   }
 
@@ -89,7 +89,7 @@ void RMGNavigationTools::PrintListOfLogicalVolumes() {
 
 void RMGNavigationTools::PrintListOfPhysicalVolumes() {
 
-  std::vector<G4String> volumes;
+  std::vector<std::string> volumes;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
     volumes.push_back(" · " + v->GetName() + " (" + std::to_string(v->GetCopyNo()) +
         + ") // from logical: " + v->GetLogicalVolume()->GetName());

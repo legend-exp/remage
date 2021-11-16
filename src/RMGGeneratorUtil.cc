@@ -8,7 +8,7 @@
 #define _g4rand() ::G4UniformRand()
 #endif
 
-G4bool RMGGeneratorUtil::IsSampleable(G4String g4_solid_type) {
+bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
   if (g4_solid_type == "G4Box" or
       g4_solid_type == "G4Orb" or
       g4_solid_type == "G4Sphere" or
@@ -16,7 +16,7 @@ G4bool RMGGeneratorUtil::IsSampleable(G4String g4_solid_type) {
   else return false;
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, G4bool on_surface) {
+G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {
   auto entity = vol->GetEntityType();
   if (entity == "G4Sphere") return RMGGeneratorUtil::rand(dynamic_cast<const G4Sphere*>(vol), on_surface);
   if (entity == "G4Orb")    return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(vol), on_surface);
@@ -28,7 +28,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, G4bool on_surface) {
   }
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, G4bool on_surface) {
+G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
 
   auto dx = box->GetXHalfLength();
   auto dy = box->GetYHalfLength();
@@ -38,7 +38,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, G4bool on_surface) {
     auto A1 = 4*dx*dy, A2 = 4*dx*dz, A3 = 4*dy*dz;
     auto face = _g4rand()*(A1 + A2 + A3);
     auto face_sign = _g4rand() <= 0.5 ? -1 : 1;
-    G4double x, y, z;
+    double x, y, z;
 
     if (face <= A1) {
       x = dx*(2*_g4rand()-1); y = dy*(2*_g4rand()-1); z = dz*face_sign;
@@ -58,7 +58,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, G4bool on_surface) {
   }
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, G4bool on_surface) {
+G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
 
   auto r1 = sphere->GetInnerRadius();
   auto r2 = sphere->GetOuterRadius();
@@ -84,11 +84,11 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, G4bool on_surface) 
   }
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4Orb* orb, G4bool on_surface) {
+G4ThreeVector RMGGeneratorUtil::rand(const G4Orb* orb, bool on_surface) {
   return RMGGeneratorUtil::rand(new G4Sphere(orb->GetName(), 0, orb->GetRadius(), 0, CLHEP::twopi, 0, CLHEP::pi), on_surface);
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, G4bool on_surface) {
+G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
 
   auto r1 = tub->GetInnerRadius();
   auto r2 = tub->GetOuterRadius();

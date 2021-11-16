@@ -5,11 +5,10 @@
 
 namespace RMGNavigationTools {
 
-  G4VPhysicalVolume* FindVolumeByName(G4String name);
+  G4VPhysicalVolume* FindVolumeByName(std::string name);
   G4VPhysicalVolume* FindDirectMother(G4VPhysicalVolume* volume);
   void PrintListOfLogicalVolumes();
   void PrintListOfPhysicalVolumes();
-
 }
 
 #endif

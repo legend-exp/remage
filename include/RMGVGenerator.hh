@@ -15,7 +15,7 @@ class RMGVGenerator {
 
     RMGVGenerator() = delete;
 
-    inline RMGVGenerator(G4String name) :
+    inline RMGVGenerator(std::string name) :
       fGeneratorName(name),
       fReportingFrequency(1000) {};
 
@@ -32,14 +32,14 @@ class RMGVGenerator {
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
     virtual void GeneratePrimariesKinematics(G4Event*) = 0;
 
-    inline void SetReportingFrequency(G4int freq) { fReportingFrequency = freq; }
-    inline G4String GetGeneratorName() { return fGeneratorName; }
+    inline void SetReportingFrequency(int freq) { fReportingFrequency = freq; }
+    inline std::string GetGeneratorName() { return fGeneratorName; }
 
   protected:
 
-    G4String fGeneratorName;
+    std::string fGeneratorName;
     std::unique_ptr<G4UImessenger> fG4Messenger;
-    G4int fReportingFrequency;
+    int fReportingFrequency;
 };
 
 #endif

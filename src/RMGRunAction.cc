@@ -82,7 +82,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
     auto total_sec_hres = std::chrono::duration<double>(time_now - fRMGRun->GetStartTime()).count();
 
-    G4double n_ev = fRMGRun->GetNumberOfEvent();
+    double n_ev = fRMGRun->GetNumberOfEvent();
     RMGLog::OutFormat(RMGLog::summary, "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
         total_sec_hres/n_ev, n_ev/total_sec_hres);
 

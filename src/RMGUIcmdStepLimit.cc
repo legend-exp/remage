@@ -5,8 +5,8 @@
 
 #include "RMGUIcmdStepLimit.hh"
 
-RMGUIcmdStepLimit::RMGUIcmdStepLimit(G4String command_path, G4UImessenger* aMessenger):
-  G4UIcommand(command_path, aMessenger) {
+RMGUIcmdStepLimit::RMGUIcmdStepLimit(std::string command_path, G4UImessenger* aMessenger):
+  G4UIcommand(G4String(command_path), aMessenger) {
 
   auto particle_par = new G4UIparameter('s');
   this->SetParameter(particle_par);
@@ -29,21 +29,21 @@ RMGUIcmdStepLimit::RMGUIcmdStepLimit(G4String command_path, G4UImessenger* aMess
   this->SetGuidance("Set step limit for [particle] in [physical volume name].");
 }
 
-G4double RMGUIcmdStepLimit::GetStepSize(G4String par_string) {
+double RMGUIcmdStepLimit::GetStepSize(std::string par_string) {
 
-  G4String particle, volume, units;
-  G4double value;
+  std::string particle, volume, units;
+  double value;
 
   std::istringstream is(par_string);
   is >> particle >> volume >> value >> units;
 
-  return value*this->ValueOf(units);
+  return value*this->ValueOf(G4String(units));
 }
 
-G4String RMGUIcmdStepLimit::GetParticleName(G4String par_string) {
+std::string RMGUIcmdStepLimit::GetParticleName(std::string par_string) {
 
-  G4String particle, volume, units;
-  G4double value;
+  std::string particle, volume, units;
+  double value;
 
   std::istringstream is(par_string);
   is >> particle >> volume >> value >> units;
@@ -51,10 +51,10 @@ G4String RMGUIcmdStepLimit::GetParticleName(G4String par_string) {
   return particle;
 }
 
-G4String RMGUIcmdStepLimit::GetVolumeName(G4String par_string) {
+std::string RMGUIcmdStepLimit::GetVolumeName(std::string par_string) {
 
-  G4String particle, volume, units;
-  G4double value;
+  std::string particle, volume, units;
+  double value;
 
   std::istringstream is(par_string);
   is >> particle >> volume >> value >> units;

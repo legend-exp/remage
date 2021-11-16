@@ -7,10 +7,10 @@ class RMGUIcmdStepLimit : public G4UIcommand {
 
   public:
 
-    RMGUIcmdStepLimit(G4String command_path, G4UImessenger* messenger);
-    G4double GetStepSize(G4String par_string);
-    G4String GetParticleName(G4String par_string);
-    G4String GetVolumeName(G4String par_string);
+    RMGUIcmdStepLimit(std::string command_path, G4UImessenger* messenger);
+    double GetStepSize(std::string par_string);
+    std::string GetParticleName(std::string par_string);
+    std::string GetVolumeName(std::string par_string);
 };
 
 #endif

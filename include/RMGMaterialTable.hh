@@ -28,24 +28,24 @@ class RMGMaterialTable {
     RMGMaterialTable           (RMGMaterialTable&&)      = delete;
     RMGMaterialTable& operator=(RMGMaterialTable&&)      = delete;
 
-    static G4Material* GetMaterial(G4String);
+    static G4Material* GetMaterial(std::string);
     static G4Material* GetMaterial(BathMaterial);
 
     struct LArProperties {
-      G4double flat_top_photon_yield;
-      G4double singlet_lifetime;
-      G4double triplet_lifetime;
-      G4double vuv_absorption_length;
+      double flat_top_photon_yield;
+      double singlet_lifetime;
+      double triplet_lifetime;
+      double vuv_absorption_length;
     };
 
     struct PropertiesAtTemperature {
       PropertiesAtTemperature() = default;
-      inline PropertiesAtTemperature(G4String name, G4double ge_dens, G4double enr_ge_dens) :
+      inline PropertiesAtTemperature(std::string name, double ge_dens, double enr_ge_dens) :
         g4_name(name), germanium_density(ge_dens), enriched_germanium_density(enr_ge_dens) {}
 
-      G4String g4_name;
-      G4double germanium_density;
-      G4double enriched_germanium_density;
+      std::string g4_name;
+      double germanium_density;
+      double enriched_germanium_density;
     };
 
   private:
@@ -58,7 +58,7 @@ class RMGMaterialTable {
     std::unique_ptr<G4GenericMessenger> fLArMessenger;
     void DefineCommands();
 
-    static std::map<G4String, G4String> fMaterialAliases;
+    static std::map<std::string, std::string> fMaterialAliases;
     LArProperties fLArProperties;
     static std::map<BathMaterial, PropertiesAtTemperature> fPropertiesAtTemperatureTable;
 };

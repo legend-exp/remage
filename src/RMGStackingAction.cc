@@ -9,10 +9,8 @@ G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* /*
   return fUrgent;
 }
 
-void RMGStackingAction::NewStage() {
-}
+void RMGStackingAction::NewStage() {}
 
-void RMGStackingAction::PrepareNewEvent() {
-}
+void RMGStackingAction::PrepareNewEvent() {}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

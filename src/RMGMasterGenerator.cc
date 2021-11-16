@@ -85,12 +85,12 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
   RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}", magic_enum::enum_name<RMGMasterGenerator::Generator>(gen));
 }
 
-void RMGMasterGenerator::SetConfinementCodeString(G4String code) {
+void RMGMasterGenerator::SetConfinementCodeString(std::string code) {
   try { this->SetConfinementCode(RMGTools::ToEnum<RMGMasterGenerator::ConfinementCode>(code, "confinement code")); }
   catch (const std::bad_cast&) { return; }
 }
 
-void RMGMasterGenerator::SetGeneratorString(G4String gen) {
+void RMGMasterGenerator::SetGeneratorString(std::string gen) {
   try { this->SetGenerator(RMGTools::ToEnum<RMGMasterGenerator::Generator>(gen, "generator name")); }
   catch (const std::bad_cast&) { return; }
 }

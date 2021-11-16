@@ -59,14 +59,14 @@ RMGProcessesList::RMGProcessesList() :
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void RMGProcessesList::SetUseGammaAngCorr(G4bool b) {
+void RMGProcessesList::SetUseGammaAngCorr(bool b) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetCorrelatedGamma(b);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void RMGProcessesList::SetGammaTwoJMAX(G4int max_two_j) {
+void RMGProcessesList::SetGammaTwoJMAX(int max_two_j) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetCorrelatedGamma(true);
   pars->SetTwoJMAX(max_two_j);
@@ -74,7 +74,7 @@ void RMGProcessesList::SetGammaTwoJMAX(G4int max_two_j) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void RMGProcessesList::SetStoreICLevelData(G4bool store) {
+void RMGProcessesList::SetStoreICLevelData(bool store) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetStoreICLevelData(store);
 }
@@ -184,11 +184,11 @@ void RMGProcessesList::ConstructProcess() {
   auto rad_decay_physics = new G4RadioactiveDecayPhysics(G4VModularPhysicsList::verboseLevel);
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
-  RMGLog::Out(RMGLog::detail, "Entries in ion table "+ G4String(the_ion_table->Entries()));
+  RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
 
   // Assign manually triton decay
   /*
-  for (G4int i = 0; i < the_ion_table->Entries(); i++) {
+  for (int i = 0; i < the_ion_table->Entries(); i++) {
     auto particle = the_ion_table->GetParticle(i);
     // assign Tritium (3H) life time given by NuDat 2.5 - A. Schubert 21 July 2010:
     // follow http://hypernews.slac.stanford.edu/HyperNews/geant4/get/hadronprocess/1538/1.html
@@ -458,12 +458,12 @@ void RMGProcessesList::ConstructCerenkov() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void RMGProcessesList::SetLowEnergyEMOptionString(G4String option) {
+void RMGProcessesList::SetLowEnergyEMOptionString(std::string option) {
   try { fLowEnergyEMOption = RMGTools::ToEnum<RMGProcessesList::LowEnergyEMOption>(option, "low energy EM option"); }
   catch (const std::bad_cast&) { return; }
 }
 
-void RMGProcessesList::SetPhysicsRealmString(G4String realm) {
+void RMGProcessesList::SetPhysicsRealmString(std::string realm) {
   try { this->SetPhysicsRealm(RMGTools::ToEnum<RMGProcessesList::PhysicsRealm>(realm, "physics realm")); }
   catch (const std::bad_cast&) { return; }
 }

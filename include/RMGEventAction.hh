@@ -14,7 +14,7 @@ class RMGEventAction : public G4UserEventAction {
   public:
 
     RMGEventAction();
-    ~RMGEventAction();
+    inline ~RMGEventAction() = default;
 
     RMGEventAction           (RMGEventAction const&) = delete;
     RMGEventAction& operator=(RMGEventAction const&) = delete;
@@ -24,16 +24,7 @@ class RMGEventAction : public G4UserEventAction {
     void BeginOfEventAction(const G4Event*) override;
     void EndOfEventAction(const G4Event*) override;
 
-    // inline void SetOutputManager(RMGVOutputManager* outr) { fOutputManager = outr; }
-    // inline void SetOutputName(const G4String name) { fOutputName = name; }
-
-    // inline RMGVOutputManager* GetOutputManager() { return fOutputManager; }
-    // inline G4String GetOutputName() { return fOutputName; }
-
   private:
-
-    // RMGVOutputManager* fOutputManager; ///> Pointer to the output class. Set via user interface
-    // G4String fOutputName; ///> Name of output schema (as selected by user)
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

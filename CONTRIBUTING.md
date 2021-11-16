@@ -10,7 +10,7 @@ submitting a pull request.
   exception being names of private class data members. In our convention, those
   names are prefixed by an `f`, as in GEANT4.
   ```cpp
-  G4int fSomePrivateMember;
+  int fSomePrivateMember;
   ```
 
 - Class names are generally prefixed with `RMG`. Purely virtual class names

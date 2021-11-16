@@ -29,9 +29,9 @@ class RMGDetectorConstruction : public G4VUserDetectorConstruction {
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;
 
-    inline void IncludeGDMLFile(G4String filename) { fGDMLFiles.emplace_back(filename); }
+    inline void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
-    inline void SetMaxStepLimit(G4String name, double max_step) {
+    inline void SetMaxStepLimit(std::string name, double max_step) {
       fPhysVolStepLimits.insert_or_assign(name, max_step);
     }
     static inline RMGMaterialTable::BathMaterial GetBathMaterial() { return fBathMaterial; }
@@ -40,9 +40,9 @@ class RMGDetectorConstruction : public G4VUserDetectorConstruction {
 
   private:
 
-    std::vector<G4String> fGDMLFiles;
+    std::vector<std::string> fGDMLFiles;
     std::unique_ptr<RMGMaterialTable> fMaterialTable;
-    std::map<G4String, G4double> fPhysVolStepLimits;
+    std::map<std::string, double> fPhysVolStepLimits;
     static RMGMaterialTable::BathMaterial fBathMaterial;
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

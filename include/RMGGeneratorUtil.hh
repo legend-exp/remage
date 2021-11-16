@@ -12,17 +12,17 @@
 
 namespace RMGGeneratorUtil {
 
-  G4bool IsSampleable(G4String g4_solid_type);
+  bool IsSampleable(std::string g4_solid_type);
 
-  G4ThreeVector rand(const G4VSolid*, G4bool on_surface=false);
+  G4ThreeVector rand(const G4VSolid*, bool on_surface=false);
 
-  G4ThreeVector rand(const G4Box*, G4bool on_surface=false);
+  G4ThreeVector rand(const G4Box*, bool on_surface=false);
 
-  G4ThreeVector rand(const G4Sphere*, G4bool on_surface=false);
+  G4ThreeVector rand(const G4Sphere*, bool on_surface=false);
 
-  G4ThreeVector rand(const G4Orb*, G4bool on_surface=false);
+  G4ThreeVector rand(const G4Orb*, bool on_surface=false);
 
-  G4ThreeVector rand(const G4Tubs*, G4bool on_surface=false);
+  G4ThreeVector rand(const G4Tubs*, bool on_surface=false);
 }
 
 #endif

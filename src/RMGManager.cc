@@ -31,7 +31,7 @@
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
-RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
+RMGManager::RMGManager(std::string app_name, int argc, char** argv) :
   fApplicationName(app_name),
   fArgc(argc),
   fArgv(argv),
@@ -70,7 +70,7 @@ void RMGManager::Initialize() {
   if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
 
-  G4String _str = "";
+  std::string _str = "";
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
     _str += i->GetNickname() + " ";
   }
@@ -165,17 +165,17 @@ G4VUserPhysicsList* RMGManager::GetProcessesList() {
   return fProcessesList;
 }
 
-void RMGManager::SetLogLevelScreen(G4String level) {
+void RMGManager::SetLogLevelScreen(std::string level) {
   try { RMGLog::SetLogLevelScreen(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
   catch (const std::bad_cast&) { return; }
 }
 
-void RMGManager::SetLogLevelFile(G4String level) {
+void RMGManager::SetLogLevelFile(std::string level) {
   try { RMGLog::SetLogLevelFile(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
   catch (const std::bad_cast&) { return; }
 }
 
-void RMGManager::SetRandEngine(G4String name) {
+void RMGManager::SetRandEngine(std::string name) {
   if (name == "JamesRandom") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
     RMGLog::Out(RMGLog::summary, "Using James random engine");
@@ -193,7 +193,7 @@ void RMGManager::SetRandEngine(G4String name) {
   }
 }
 
-void RMGManager::SetRandEngineSeed(G4long seed) {
+void RMGManager::SetRandEngineSeed(long seed) {
   if (seed >= std::numeric_limits<long>::max()) {
     RMGLog::Out(RMGLog::error, "Seed ", seed, " is too large. Largest possible seed is ",
         std::numeric_limits<long>::max(), ". Setting seed to 0.");
@@ -205,7 +205,7 @@ void RMGManager::SetRandEngineSeed(G4long seed) {
   fIsRandControlled = true;
 }
 
-void RMGManager::SetRandEngineInternalSeed(G4int index) {
+void RMGManager::SetRandEngineInternalSeed(int index) {
   long seeds[2];
   int table_index = index/2;
   CLHEP::HepRandom::getTheTableSeeds(seeds, table_index);
@@ -287,7 +287,6 @@ void RMGManager::DefineCommands() {
   fRandMessenger->DeclareMethod("UseSystemEntropy", &RMGManager::SetRandSystemEntropySeed)
     .SetGuidance("Select a random initial seed from system entropy")
     .SetStates(G4State_PreInit, G4State_Idle);
-
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

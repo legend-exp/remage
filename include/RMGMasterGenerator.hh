@@ -41,10 +41,10 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }
 
     void SetConfinementCode(ConfinementCode code);
-    void SetConfinementCodeString(G4String code);
+    void SetConfinementCodeString(std::string code);
     void SetUserGenerator(RMGVGenerator* gen);
     void SetGenerator(Generator gen);
-    void SetGeneratorString(G4String gen);
+    void SetGeneratorString(std::string gen);
 
   private:
 

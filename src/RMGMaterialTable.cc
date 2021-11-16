@@ -11,7 +11,7 @@
 
 namespace u = CLHEP;
 
-std::map<G4String, G4String> RMGMaterialTable::fMaterialAliases = {};
+std::map<std::string, std::string> RMGMaterialTable::fMaterialAliases = {};
 std::map<RMGMaterialTable::BathMaterial, RMGMaterialTable::PropertiesAtTemperature> RMGMaterialTable::fPropertiesAtTemperatureTable = {};
 
 RMGMaterialTable::RMGMaterialTable() {
@@ -38,7 +38,7 @@ RMGMaterialTable::RMGMaterialTable() {
   this->DefineCommands();
 }
 
-G4Material* RMGMaterialTable::GetMaterial(G4String name) {
+G4Material* RMGMaterialTable::GetMaterial(std::string name) {
 
   auto man = G4NistManager::Instance();
   if (RMGLog::GetLogLevelScreen() < RMGLog::detail) man->SetVerbose(1);
@@ -77,17 +77,17 @@ void RMGMaterialTable::InitializeMaterials() {
   auto man = G4NistManager::Instance();
   if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) man->SetVerbose(2);
 
-  G4String name, symbol;
-  std::vector<G4String> elements;
-  std::vector<G4double> mass_fraction;
-  G4double density;
+  std::string name, symbol;
+  std::vector<std::string> elements;
+  std::vector<double> mass_fraction;
+  double density;
   G4State state;
-  G4double temperature;
-  G4double pressure;
-  G4double abundance;
-  G4int n_isotopes;
-  G4int n_components;
-  G4int n_atoms;
+  double temperature;
+  double pressure;
+  double abundance;
+  int n_isotopes;
+  int n_components;
+  int n_atoms;
 
   // define enriched germanium
   auto Ge70 = new G4Isotope(name="Ge70", 32, 70, 69.92 *u::g/u::mole);
@@ -137,7 +137,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
   RMGLog::Out(RMGLog::detail, "Initializing liquid argon optical properties");
 
   // helpers
-  auto to_energy     = [](G4double lambda) { return u::h_Planck *u::c_light / lambda; };
+  auto to_energy     = [](double lambda) { return u::h_Planck *u::c_light / lambda; };
   auto to_wavelength = to_energy;
 
   auto lar_mpt = new G4MaterialPropertiesTable();
@@ -149,17 +149,17 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    * Kr and Xe ...", J. Quant. Spectrosc. Radiat. Transfer, Vol. 25 (1981), 395
    */
 
-  auto lar_dielectric_const = [](G4double lambda) {
+  auto lar_dielectric_const = [](double lambda) {
     if (lambda < 110*u::nm) return 1.0e4; // lambda MUST be > 110.0 nm
 
-    G4double eps = lambda / u::um; // switch to micrometers
+    double eps = lambda / u::um; // switch to micrometers
     eps = 1.0 / (eps * eps);    // 1 / (lambda)^2
     eps = 1.2055e-2 * ( 0.2075 / (91.012 - eps) +
                         0.0415 / (87.892 - eps) +
                         4.3330 / (214.02 - eps) );
     eps *= (8./12); // Bideau-Sellmeier -> Clausius-Mossotti
-    G4double lar_rho = 1.396 * u::g/u::cm3;
-    G4double gar_rho = 1.66e-03 * u::g/u::cm3;
+    double lar_rho = 1.396 * u::g/u::cm3;
+    double gar_rho = 1.66e-03 * u::g/u::cm3;
     eps *= (lar_rho / gar_rho); // density correction (Ar gas -> LAr liquid)
 
     if (eps < 0.0 || eps > 0.999999) return 4.0e6;
@@ -177,11 +177,11 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    * 110cm at 135nm).
    */
 
-  auto lar_rayleigh_length = [&lar_dielectric_const](G4double lambda, G4double temp) {
-    G4double dyne = 1.0e-5 *u::newton;
-    const G4double lar_kt = 2.18e-10 *u::cm2/dyne;           // LAr isothermal compressibility
-    const G4double k = 1.380658e-23 *u::joule/u::kelvin; // the Boltzmann constant
-    G4double h;
+  auto lar_rayleigh_length = [&lar_dielectric_const](double lambda, double temp) {
+    double dyne = 1.0e-5 *u::newton;
+    const double lar_kt = 2.18e-10 *u::cm2/dyne;           // LAr isothermal compressibility
+    const double k = 1.380658e-23 *u::joule/u::kelvin; // the Boltzmann constant
+    double h;
     h = lar_dielectric_const(lambda);
     if (h < 1.00000001) h = 1.00000001;     // just a precaution
     h = (h - 1.0) * (h + 2.0);              // the "dielectric constant" dependance
@@ -205,7 +205,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    * shows the whole spectrum in fig. 1 & 2
    */
 
-  auto lar_scint_spectrum = [](G4double kk) {
+  auto lar_scint_spectrum = [](double kk) {
     return std::exp(-0.5*((kk-128*u::nm)/(2.929*u::nm))*((kk-128*u::nm)/(2.929*u::nm)));
   };
 

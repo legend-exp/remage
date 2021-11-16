@@ -18,9 +18,6 @@ RMGEventAction::RMGEventAction() {
   this->DefineCommands();
 }
 
-RMGEventAction::~RMGEventAction() {
-}
-
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
   auto print_modulo = RMGManager::GetRMGManager()->GetPrintModulo();
@@ -45,8 +42,7 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
   }
 }
 
-void RMGEventAction::EndOfEventAction(const G4Event*) {
-}
+void RMGEventAction::EndOfEventAction(const G4Event* /*event*/) {}
 
 void RMGEventAction::DefineCommands() {
 

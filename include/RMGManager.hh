@@ -21,7 +21,7 @@ class RMGManager {
   public:
 
     RMGManager() = delete;
-    RMGManager(G4String app_name, int argc, char** argv);
+    RMGManager(std::string app_name, int argc, char** argv);
     ~RMGManager();
 
     RMGManager           (RMGManager const&) = delete;
@@ -35,29 +35,29 @@ class RMGManager {
     G4VisManager* GetG4VisManager();
     RMGDetectorConstruction* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
-    inline G4int GetPrintModulo() { return fPrintModulo; }
+    inline int GetPrintModulo() { return fPrintModulo; }
 
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
     inline void SetUserInit(RMGDetectorConstruction* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fProcessesList = proc; }
-    inline void SetBatchMode(G4bool flag=true) { fBatchMode = flag; }
-    inline void SetPrintModulo(G4int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
+    inline void SetBatchMode(bool flag=true) { fBatchMode = flag; }
+    inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
-    inline void IncludeMacroFile(G4String filename) { fMacroFileNames.emplace_back(filename); }
+    inline void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
     void Initialize();
     void Run();
 
-    void SetRandEngine(G4String name);
-    void SetRandEngineSeed(G4long seed);
-    void SetRandEngineInternalSeed(G4int index);
+    void SetRandEngine(std::string name);
+    void SetRandEngineSeed(long seed);
+    void SetRandEngineInternalSeed(int index);
     void SetRandSystemEntropySeed();
-    inline G4bool GetRandIsControlled() { return fIsRandControlled; }
+    inline bool GetRandIsControlled() { return fIsRandControlled; }
 
-    void SetLogLevelScreen(G4String level);
-    void SetLogLevelFile(G4String level);
-    inline void SetLogToFileName(G4String filename) { RMGLog::OpenLogFile(filename); }
+    void SetLogLevelScreen(std::string level);
+    void SetLogLevelFile(std::string level);
+    inline void SetLogToFileName(std::string filename) { RMGLog::OpenLogFile(filename); }
 
   private:
 
@@ -66,21 +66,21 @@ class RMGManager {
     void SetUpDefaultDetectorConstruction();
     void SetUpDefaultProcessesList();
 
-    G4String fApplicationName;
+    std::string fApplicationName;
     int fArgc; char** fArgv;
-    std::vector<G4String> fMacroFileNames;
-    G4bool fIsRandControlled;
-    G4bool fBatchMode;
-    G4int fPrintModulo;
+    std::vector<std::string> fMacroFileNames;
+    bool fIsRandControlled;
+    bool fBatchMode;
+    int fPrintModulo;
 
     static RMGManager* fRMGManager;
 
     std::unique_ptr<G4RunManager> fG4RunManager;
     std::unique_ptr<G4VisManager> fG4VisManager;
 
-    G4VUserPhysicsList*      fProcessesList;
+    G4VUserPhysicsList* fProcessesList;
     RMGDetectorConstruction* fDetectorConstruction;
-    RMGUserAction*           fUserAction;
+    RMGUserAction* fUserAction;
 
     // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;

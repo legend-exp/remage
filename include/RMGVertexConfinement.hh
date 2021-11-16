@@ -19,18 +19,18 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
   public:
 
     struct GenericGeometricalSolidData {
-      G4String      g4_name = "";
+      std::string g4_name = "";
       G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
-      G4double      sphere_inner_radius = 0;
-      G4double      sphere_outer_radius = -1;
-      G4double      cylinder_inner_radius = 0;
-      G4double      cylinder_outer_radius = -1;
-      G4double      cylinder_height = -1;
-      G4double      cylinder_starting_angle = 0;
-      G4double      cylinder_spanning_angle = CLHEP::twopi;
-      G4double      box_x_length = -1;
-      G4double      box_y_length = -1;
-      G4double      box_z_length = -1;
+      double      sphere_inner_radius = 0;
+      double      sphere_outer_radius = -1;
+      double      cylinder_inner_radius = 0;
+      double      cylinder_outer_radius = -1;
+      double      cylinder_height = -1;
+      double      cylinder_starting_angle = 0;
+      double      cylinder_spanning_angle = CLHEP::twopi;
+      double      box_x_length = -1;
+      double      box_y_length = -1;
+      double      box_z_length = -1;
     };
 
     enum SamplingMode {
@@ -43,17 +43,17 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void GeneratePrimariesVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
-    inline void AddPhysicalVolumeNameRegex(G4String name, G4String copy_nr=".*") {
+    inline void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr=".*") {
       fPhysicalVolumeNameRegexes.emplace_back(name);
       fPhysicalVolumeCopyNrRegexes.emplace_back(copy_nr);
     }
-    void AddPhysicalVolumeString(G4String expr);
+    void AddPhysicalVolumeString(std::string expr);
 
     inline void AddGeometricalVolume(GenericGeometricalSolidData& data) { fGeomVolumeData.emplace_back(data); }
     void Reset();
 
     inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
-    inline void SetBoundingSolidType(G4String type) { fBoundingSolidType = type; }
+    inline void SetBoundingSolidType(std::string type) { fBoundingSolidType = type; }
 
     inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() { return fGeomVolumeData; }
 
@@ -67,9 +67,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       G4VSolid*          sampling_solid;
       G4RotationMatrix   rotation;
       G4ThreeVector      translation;
-      G4double           volume;
-      G4double           surface;
-      G4bool             containment_check;
+      double             volume;
+      double             surface;
+      bool               containment_check;
     };
 
     struct SampleableObjectCollection {
@@ -79,18 +79,18 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
       const SampleableObject& SurfaceWeightedRand();
       const SampleableObject& VolumeWeightedRand();
-      G4bool IsInside(const G4ThreeVector& point);
+      bool IsInside(const G4ThreeVector& point);
 
       // emulate std::vector
       void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix& r, G4ThreeVector& t, G4VSolid* s);
       void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
-      inline G4bool empty() { return data.empty(); }
+      inline bool empty() { return data.empty(); }
       inline SampleableObject& back() { return data.back(); }
       inline void clear() { data.clear(); }
 
       std::vector<SampleableObject> data;
-      G4double total_volume;
-      G4double total_surface;
+      double total_volume;
+      double total_surface;
     };
 
   private:
@@ -98,20 +98,20 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void InitializePhysicalVolumes();
     void InitializeGeometricalVolumes();
 
-    std::vector<G4String> fPhysicalVolumeNameRegexes;
-    std::vector<G4String> fPhysicalVolumeCopyNrRegexes;
+    std::vector<std::string> fPhysicalVolumeNameRegexes;
+    std::vector<std::string> fPhysicalVolumeCopyNrRegexes;
 
     std::vector<GenericGeometricalSolidData> fGeomVolumeData;
     SampleableObjectCollection fPhysicalVolumes;
     SampleableObjectCollection fGeomVolumeSolids;
 
     SamplingMode fSamplingMode;
-    G4bool       fOnSurface;
-    G4String     fBoundingSolidType;
+    bool         fOnSurface;
+    std::string  fBoundingSolidType;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
-    void SetSamplingModeString(G4String mode);
-    void AddGeometricalVolumeString(G4String solid);
+    void SetSamplingModeString(std::string mode);
+    void AddGeometricalVolumeString(std::string solid);
     GenericGeometricalSolidData& SafeBack();
     inline void SetGeomVolumeCenter(G4ThreeVector& v) { this->SafeBack().volume_center = v; }
     inline void SetGeomSphereInnerRadius(double r) { this->SafeBack().sphere_inner_radius = r; }

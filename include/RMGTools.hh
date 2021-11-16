@@ -7,14 +7,13 @@
 #include <ctime>
 #include <chrono>
 
-class G4String;
 namespace RMGTools {
 
   template <typename T>
-  T ToEnum(G4String);
+  T ToEnum(std::string);
 
   template <typename T>
-  G4String GetCandidates();
+  std::string GetCandidates();
 }
 
 #include "RMGTools.icc"

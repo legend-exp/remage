@@ -26,11 +26,11 @@ RMGProcessesMessenger::RMGProcessesMessenger(RMGProcessesList* plist) :
 void RMGProcessesMessenger::SetNewValue(G4UIcommand *cmd, G4String new_val) {
 
   if (cmd == fStepLimitCmd.get()) {
-    G4String particle_name = fStepLimitCmd->GetParticleName(new_val);
+    std::string particle_name = fStepLimitCmd->GetParticleName(new_val);
     fProcessesList->LimitStepForParticle(particle_name);
 
-    G4String volume_name = fStepLimitCmd->GetVolumeName(new_val);
-    G4double max_step = fStepLimitCmd->GetStepSize(new_val);
+    std::string volume_name = fStepLimitCmd->GetVolumeName(new_val);
+    double max_step = fStepLimitCmd->GetStepSize(new_val);
     RMGManager::GetRMGManager()->GetDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
   }
 }
