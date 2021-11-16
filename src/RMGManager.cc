@@ -41,8 +41,8 @@ RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
   fG4RunManager(nullptr),
   fG4VisManager(nullptr),
   fProcessesList(nullptr),
-  fManagerDetectorConstruction(nullptr),
-  fManagementUserAction(nullptr) {
+  fDetectorConstruction(nullptr),
+  fUserAction(nullptr) {
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
@@ -52,7 +52,7 @@ RMGManager::RMGManager(G4String app_name, int argc, char** argv) :
 #endif
 
   // FIXME: I don't like this here
-  this->SetupDefaultG4RunManager();
+  this->SetUpDefaultG4RunManager();
 
   this->DefineCommands();
 }
@@ -65,9 +65,9 @@ void RMGManager::Initialize() {
 
   RMGLog::Out(RMGLog::detail, "Initializing application");
 
-  if (!fG4RunManager) this->SetupDefaultG4RunManager();
-  if (!fProcessesList) this->SetupDefaultRMGProcessesList();
-  if (!fG4VisManager) this->SetupDefaultG4VisManager();
+  if (!fG4RunManager) this->SetUpDefaultG4RunManager();
+  if (!fProcessesList) this->SetUpDefaultProcessesList();
+  if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
 
   G4String _str = "";
@@ -77,16 +77,16 @@ void RMGManager::Initialize() {
   RMGLog::Out(RMGLog::detail, "Available graphic systems: ", _str);
 
 
-  if (!fManagementUserAction) {
+  if (!fUserAction) {
     RMGLog::Out(RMGLog::debug, "Initializing default user action class");
-    fManagementUserAction = new RMGUserAction();
+    fUserAction = new RMGUserAction();
   }
 
-  if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
+  if (!fDetectorConstruction) this->SetUpDefaultDetectorConstruction();
 
-  fG4RunManager->SetUserInitialization(fManagerDetectorConstruction);
+  fG4RunManager->SetUserInitialization(fDetectorConstruction);
   fG4RunManager->SetUserInitialization(fProcessesList);
-  fG4RunManager->SetUserInitialization(fManagementUserAction);
+  fG4RunManager->SetUserInitialization(fUserAction);
 
   if (!fIsRandControlled) {
     std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
@@ -114,7 +114,7 @@ void RMGManager::Run() {
   }
 }
 
-void RMGManager::SetupDefaultG4RunManager() {
+void RMGManager::SetUpDefaultG4RunManager() {
   RMGLog::Out(RMGLog::debug, "Initializing default run manager");
 
   // Suppress the Geant4 header:
@@ -130,38 +130,38 @@ void RMGManager::SetupDefaultG4RunManager() {
   std::cout.rdbuf(orig_buf);
 }
 
-void RMGManager::SetupDefaultRMGProcessesList() {
+void RMGManager::SetUpDefaultProcessesList() {
   RMGLog::Out(RMGLog::debug, "Initializing default processes list");
   fProcessesList = new RMGProcessesList();
 }
 
-void RMGManager::SetupDefaultG4VisManager() {
+void RMGManager::SetUpDefaultG4VisManager() {
   RMGLog::Out(RMGLog::debug, "Initializing default visualization manager");
   fG4VisManager = std::make_unique<G4VisExecutive>("quiet");
 }
 
-void RMGManager::SetupDefaultManagementDetectorConstruction() {
+void RMGManager::SetUpDefaultDetectorConstruction() {
   RMGLog::Out(RMGLog::debug, "Initializing default (empty) detector");
-  fManagerDetectorConstruction = new RMGDetectorConstruction();
+  fDetectorConstruction = new RMGDetectorConstruction();
 }
 
 G4RunManager* RMGManager::GetG4RunManager() {
-  if (!fG4RunManager) this->SetupDefaultG4RunManager();
+  if (!fG4RunManager) this->SetUpDefaultG4RunManager();
   return fG4RunManager.get();
 }
 
 G4VisManager* RMGManager::GetG4VisManager() {
-  if (!fG4VisManager) this->SetupDefaultG4VisManager();
+  if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   return fG4VisManager.get();
 }
 
-RMGDetectorConstruction* RMGManager::GetManagementDetectorConstruction() {
-  if (!fManagerDetectorConstruction) this->SetupDefaultManagementDetectorConstruction();
-  return fManagerDetectorConstruction;
+RMGDetectorConstruction* RMGManager::GetDetectorConstruction() {
+  if (!fDetectorConstruction) this->SetUpDefaultDetectorConstruction();
+  return fDetectorConstruction;
 }
 
-G4VUserPhysicsList* RMGManager::GetRMGProcessesList() {
-  if (!fProcessesList) this->SetupDefaultRMGProcessesList();
+G4VUserPhysicsList* RMGManager::GetProcessesList() {
+  if (!fProcessesList) this->SetUpDefaultProcessesList();
   return fProcessesList;
 }
 

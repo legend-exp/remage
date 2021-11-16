@@ -30,19 +30,18 @@ class RMGManager {
     RMGManager& operator=(RMGManager&&)      = delete;
 
     // getters
-    static inline RMGManager*          GetRMGManager() { return fRMGManager; }
-    G4RunManager*                      GetG4RunManager();
-    G4VisManager*                      GetG4VisManager();
-    RMGDetectorConstruction* GetManagementDetectorConstruction();
-    G4VUserPhysicsList*                GetRMGProcessesList();
-
+    static inline RMGManager* GetRMGManager() { return fRMGManager; }
+    G4RunManager* GetG4RunManager();
+    G4VisManager* GetG4VisManager();
+    RMGDetectorConstruction* GetDetectorConstruction();
+    G4VUserPhysicsList* GetProcessesList();
     inline G4int GetPrintModulo() { return fPrintModulo; }
 
     // setters
-    inline void SetUserInitialization(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
-    inline void SetUserInitialization(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
-    inline void SetUserInitialization(RMGDetectorConstruction* det) { fManagerDetectorConstruction = det; }
-    inline void SetUserInitialization(G4VUserPhysicsList* proc) { fProcessesList = proc; }
+    inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
+    inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
+    inline void SetUserInit(RMGDetectorConstruction* det) { fDetectorConstruction = det; }
+    inline void SetUserInit(G4VUserPhysicsList* proc) { fProcessesList = proc; }
     inline void SetBatchMode(G4bool flag=true) { fBatchMode = flag; }
     inline void SetPrintModulo(G4int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
@@ -62,10 +61,10 @@ class RMGManager {
 
   private:
 
-    void SetupDefaultG4RunManager();
-    void SetupDefaultG4VisManager();
-    void SetupDefaultManagementDetectorConstruction();
-    void SetupDefaultRMGProcessesList();
+    void SetUpDefaultG4RunManager();
+    void SetUpDefaultG4VisManager();
+    void SetUpDefaultDetectorConstruction();
+    void SetUpDefaultProcessesList();
 
     G4String fApplicationName;
     int fArgc; char** fArgv;
@@ -75,13 +74,15 @@ class RMGManager {
     G4int fPrintModulo;
 
     static RMGManager* fRMGManager;
+
     std::unique_ptr<G4RunManager> fG4RunManager;
     std::unique_ptr<G4VisManager> fG4VisManager;
 
-    G4VUserPhysicsList* fProcessesList;
-    RMGDetectorConstruction*  fManagerDetectorConstruction;
-    RMGUserAction* fManagementUserAction;
+    G4VUserPhysicsList*      fProcessesList;
+    RMGDetectorConstruction* fDetectorConstruction;
+    RMGUserAction*           fUserAction;
 
+    // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<G4GenericMessenger> fLogMessenger;
     std::unique_ptr<G4GenericMessenger> fRandMessenger;

@@ -31,7 +31,7 @@ void RMGProcessesMessenger::SetNewValue(G4UIcommand *cmd, G4String new_val) {
 
     G4String volume_name = fStepLimitCmd->GetVolumeName(new_val);
     G4double max_step = fStepLimitCmd->GetStepSize(new_val);
-    RMGManager::GetRMGManager()->GetManagementDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
+    RMGManager::GetRMGManager()->GetDetectorConstruction()->SetMaxStepLimit(volume_name, max_step);
   }
 }
 
