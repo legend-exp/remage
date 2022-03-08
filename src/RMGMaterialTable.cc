@@ -41,6 +41,7 @@ RMGMaterialTable::RMGMaterialTable() {
 G4Material* RMGMaterialTable::GetMaterial(std::string name) {
 
   auto man = G4NistManager::Instance();
+  if (RMGLog::GetLogLevelScreen() < RMGLog::detail) man->SetVerbose(1);
   if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) man->SetVerbose(2);
 
   if (fMaterialAliases.find(name) != fMaterialAliases.end()) {
