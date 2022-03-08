@@ -18,14 +18,16 @@
 
 RMGMasterGenerator::RMGMasterGenerator():
   fConfinementCode(RMGMasterGenerator::ConfinementCode::kUnConfined),
-  fGenerator(RMGMasterGenerator::Generator::kUndefined) {
+  fVertexGenerator(nullptr),
+  fGenerator(RMGMasterGenerator::Generator::kUndefined),
+  fGeneratorObj(nullptr) {
 
   this->DefineCommands();
 }
 
 void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
 
-  if (!fPrimaryPositionGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
+  if (!fVertexGenerator) RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
   // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
@@ -33,7 +35,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
   // about the vertex position from outside, in particular in this function here).
   if (fGenerator != RMGMasterGenerator::Generator::kBxDecay0) {
     auto vertex = G4ThreeVector();
-    fPrimaryPositionGenerator->GeneratePrimariesVertex(vertex);
+    fVertexGenerator->GeneratePrimariesVertex(vertex);
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
     fGeneratorObj->SetParticlePosition(vertex);
   }
@@ -46,10 +48,10 @@ void RMGMasterGenerator::SetConfinementCode(RMGMasterGenerator::ConfinementCode 
 
   switch (fConfinementCode) {
     case ConfinementCode::kUnConfined :
-      fPrimaryPositionGenerator = std::unique_ptr<RMGVVertexGenerator>(new RMGVVertexGenerator("DummyGenerator"));
+      fVertexGenerator = std::unique_ptr<RMGVVertexGenerator>(new RMGVVertexGenerator("DummyGenerator"));
       break;
     case ConfinementCode::kVolume :
-      fPrimaryPositionGenerator = std::unique_ptr<RMGVertexConfinement>(new RMGVertexConfinement());
+      fVertexGenerator = std::unique_ptr<RMGVertexConfinement>(new RMGVertexConfinement());
       break;
     default : RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
                                          fConfinementCode, "' specified (implement me)");
@@ -70,7 +72,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       break;
     case RMGMasterGenerator::Generator::kBxDecay0 :
 #if RMG_HAS_BXDECAY0
-      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fPrimaryPositionGenerator.get());
+      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGenerator.get());
 #else
       RMGLog::OutFormat(RMGLog::fatal, "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
 #endif

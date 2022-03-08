@@ -49,7 +49,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
   private:
 
     ConfinementCode fConfinementCode;
-    std::unique_ptr<RMGVVertexGenerator> fPrimaryPositionGenerator;
+    std::unique_ptr<RMGVVertexGenerator> fVertexGenerator;
 
     Generator fGenerator;
     std::unique_ptr<RMGVGenerator> fGeneratorObj;

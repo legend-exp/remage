@@ -11,7 +11,6 @@
 #include "RMGMaterialTable.hh"
 #include "RMGNavigationTools.hh"
 
-class G4VPhysicalVolume;
 class G4GenericMessenger;
 class G4VPhysicalVolume;
 class RMGDetectorConstruction : public G4VUserDetectorConstruction {
