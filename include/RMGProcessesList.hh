@@ -60,8 +60,6 @@ class RMGProcessesList : public G4VModularPhysicsList {
     void SetGammaTwoJMAX(int two_j_max);
     void SetStoreICLevelData(bool);
 
-    inline void LimitStepForParticle(std::string particle_name) {fLimitSteps.at(particle_name) = true;}
-
   protected:
 
     void ConstructParticle() override;
@@ -80,7 +78,6 @@ class RMGProcessesList : public G4VModularPhysicsList {
     bool fConstructOptical;
     bool fUseLowEnergyEM;
     LowEnergyEMOption fLowEnergyEMOption;
-    std::map<std::string, bool> fLimitSteps;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

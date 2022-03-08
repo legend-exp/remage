@@ -35,7 +35,6 @@
 #include "G4OpWLS.hh"
 #include "G4Cerenkov.hh"
 
-#include "RMGProcessesMessenger.hh"
 #include "RMGLog.hh"
 #include "RMGTools.hh"
 
@@ -220,18 +219,6 @@ void RMGProcessesList::AddTransportation() {
   RMGLog::Out(RMGLog::detail, "Adding transportation");
 
   G4VUserPhysicsList::AddTransportation();
-
-  GetParticleIterator()->reset();
-  while ((*GetParticleIterator())()) {
-    auto particle = GetParticleIterator()->value();
-    auto proc_manager = particle->GetProcessManager();
-    auto particle_name = particle->GetParticleName();
-    // step limits
-    if (fLimitSteps[particle_name]) {
-      proc_manager->AddProcess(new G4StepLimiter, -1, -1, 3);
-      RMGLog::Out(RMGLog::detail, "Steps will be limited for ", particle_name);
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

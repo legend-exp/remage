@@ -28,9 +28,7 @@ set(PROJECT_PUBLIC_HEADERS
 
     ../include/RMGMaterialTable.hh
 
-    ../include/RMGUIcmdStepLimit.hh
     ../include/RMGProcessesList.hh
-    ../include/RMGProcessesMessenger.hh
 
     ../include/RMGTools.hh
     ../include/RMGTools.icc
@@ -57,8 +55,6 @@ set(PROJECT_SOURCES
     RMGMaterialTable.cc
 
     RMGProcessesList.cc
-    RMGProcessesMessenger.cc
-    RMGUIcmdStepLimit.cc
 )
 
 if(BxDecay0_FOUND)
