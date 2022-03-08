@@ -51,13 +51,13 @@ class RMGLog {
     /**
      * Enumerator for the amount of details to put into the log file */
     enum LogLevel {
-      debug,   ///< Print everything, including debug info
-      detail,  ///< Print all details of operation
-      summary, ///< Print only results summary, warnings, and errors
-      warning, ///< Print only warnings and errors
-      error,   ///< Print only errors
-      fatal,   ///< Print only errors, stop execution
-      nothing  ///< Print nothing
+      debug   = 0, ///< Print everything, including debug info
+      detail  = 1, ///< Print all details of operation
+      summary = 2, ///< Print only results summary, warnings, and errors
+      warning = 3, ///< Print only warnings and errors
+      error   = 4, ///< Print only errors
+      fatal   = 5, ///< Print only errors, stop execution
+      nothing = 6  ///< Print nothing
     };
 
     enum Ansi {
