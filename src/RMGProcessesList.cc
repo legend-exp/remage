@@ -25,9 +25,9 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
-#include "G4RadioactiveDecayBase.hh"
 #include "G4HadronicParameters.hh"
 #include "G4IonTable.hh"
+#include "G4OpticalParameters.hh"
 #include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpBoundaryProcess.hh"
@@ -282,24 +282,14 @@ void RMGProcessesList::ConstructOptical() {
 
   RMGLog::Out(RMGLog::detail, "Adding optical physics");
 
-  // default scintillation process (electrons and gammas)
-  auto scint_proc_default = new G4Scintillation("Scintillation");
-  scint_proc_default->SetTrackSecondariesFirst(true);
-  scint_proc_default->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  G4OpticalParameters* op_par = G4OpticalParameters::Instance();
+  op_par->SetScintTrackSecondariesFirst(true);
+  op_par->SetScintByParticleType(true);
 
-  // scintillation process for alphas:
-  auto scint_proc_alpha = new G4Scintillation("Scintillation");
-  scint_proc_alpha->SetTrackSecondariesFirst(true);
-  scint_proc_alpha->SetScintillationYieldFactor(0.875);
-  scint_proc_alpha->SetScintillationExcitationRatio(1.0); // this is a guess
-  scint_proc_alpha->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
-
-  // scintillation process for heavy nuclei
-  auto scint_proc_nuclei = new G4Scintillation("Scintillation");
-  scint_proc_nuclei->SetTrackSecondariesFirst(true);
-  scint_proc_nuclei->SetScintillationYieldFactor(0.375);
-  scint_proc_nuclei->SetScintillationExcitationRatio(0.75);
-  scint_proc_nuclei->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  // scintillation process
+  auto scint_proc = new G4Scintillation("Scintillation");
+  scint_proc->SetTrackSecondariesFirst(true);
+  scint_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   // optical processes
   auto absorption_proc     = new G4OpAbsorption();
@@ -316,20 +306,10 @@ void RMGProcessesList::ConstructOptical() {
     auto particle = GetParticleIterator()->value();
     auto proc_manager = particle->GetProcessManager();
     auto particle_name = particle->GetParticleName();
-     if (scint_proc_default->IsApplicable(*particle)) {
-      if (particle->GetParticleName() == "GenericIon") {
-        proc_manager->AddProcess(scint_proc_nuclei);
-        proc_manager->SetProcessOrderingToLast(scint_proc_nuclei, G4ProcessVectorDoItIndex::idxAtRest);
-        proc_manager->SetProcessOrderingToLast(scint_proc_nuclei, G4ProcessVectorDoItIndex::idxPostStep);
-      } else if (particle->GetParticleName() == "alpha") {
-        proc_manager->AddProcess(scint_proc_alpha);
-        proc_manager->SetProcessOrderingToLast(scint_proc_alpha, G4ProcessVectorDoItIndex::idxAtRest);
-        proc_manager->SetProcessOrderingToLast(scint_proc_alpha, G4ProcessVectorDoItIndex::idxPostStep);
-      } else {
-        proc_manager->AddProcess(scint_proc_default);
-        proc_manager->SetProcessOrderingToLast(scint_proc_default, G4ProcessVectorDoItIndex::idxAtRest);
-        proc_manager->SetProcessOrderingToLast(scint_proc_default, G4ProcessVectorDoItIndex::idxPostStep);
-      }
+    if (scint_proc->IsApplicable(*particle)) {
+      proc_manager->AddProcess(scint_proc);
+      proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxAtRest);
+      proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxPostStep);
     }
 
     if (particle_name == "opticalphoton") {

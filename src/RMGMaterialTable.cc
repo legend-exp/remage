@@ -41,7 +41,7 @@ RMGMaterialTable::RMGMaterialTable() {
 G4Material* RMGMaterialTable::GetMaterial(std::string name) {
 
   auto man = G4NistManager::Instance();
-  if (RMGLog::GetLogLevelScreen() < RMGLog::detail) man->SetVerbose(1);
+  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) man->SetVerbose(2);
 
   if (fMaterialAliases.find(name) != fMaterialAliases.end()) {
     return man->FindOrBuildMaterial(fMaterialAliases[name]);
@@ -209,8 +209,8 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
     return std::exp(-0.5*((kk-128*u::nm)/(2.929*u::nm))*((kk-128*u::nm)/(2.929*u::nm)));
   };
 
-  lar_mpt->AddProperty("FASTCOMPONENT", {}, {});
-  lar_mpt->AddProperty("SLOWCOMPONENT", {}, {});
+  lar_mpt->AddProperty("SCINTILLATIONCOMPONENT1", {}, {});
+  lar_mpt->AddProperty("SCINTILLATIONCOMPONENT2", {}, {});
 
   // sample 100 points in 128nm +- 15nm
   auto E1 = to_energy(143 *u::nm);
@@ -223,12 +223,14 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
       dE/u::eV);
 
   for (double e = E1; e <= E2; e += dE) {
-    lar_mpt->AddEntry("FASTCOMPONENT", e, lar_scint_spectrum(to_wavelength(e)));
-    lar_mpt->AddEntry("SLOWCOMPONENT", e, lar_scint_spectrum(to_wavelength(e)));
+    lar_mpt->AddEntry("SCINTILLATIONCOMPONENT1", e, lar_scint_spectrum(to_wavelength(e)));
+    lar_mpt->AddEntry("SCINTILLATIONCOMPONENT2", e, lar_scint_spectrum(to_wavelength(e)));
   }
   // make sure it is zero at the edges
-  lar_mpt->AddEntry("FASTCOMPONENT", E1-dE, 0);
-  lar_mpt->AddEntry("FASTCOMPONENT", E2+dE, 0);
+  lar_mpt->AddEntry("SCINTILLATIONCOMPONENT1", E1-dE, 0);
+  lar_mpt->AddEntry("SCINTILLATIONCOMPONENT1", E2+dE, 0);
+  lar_mpt->AddEntry("SCINTILLATIONCOMPONENT2", E1-dE, 0);
+  lar_mpt->AddEntry("SCINTILLATIONCOMPONENT2", E2+dE, 0);
 
   /* Scintillation yield (mean energy to produce a UV photon)
    *
@@ -256,26 +258,33 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    *  Y_recoils = 0.2-0.4
    *
    * References
-   * ---------
+   * ----------
    *
    * [1] http://iopscience.iop.org/article/10.1143/JJAP.41.1538/pdf
    * [2] https://www.mpi-hd.mpg.de/gerda/public/2016/phd2016_bjoernLehnert.pdf
    * [3] "Attenuation of the scintillation light in liquid argon in the GERDA Experiment"
    */
 
+  const auto& Y = fLArProperties.flat_top_photon_yield;
+
   RMGLog::Out(RMGLog::detail, "Using LAr flat-top photon yield of ",
       fLArProperties.flat_top_photon_yield/u::keV, " / keV");
 
-  lar_mpt->AddConstProperty("SCINTILLATIONYIELD", fLArProperties.flat_top_photon_yield);
+  lar_mpt->AddProperty("SCINTILLATIONYIELD", {0, 1*u::MeV}, {0, Y*1*u::MeV});
+  lar_mpt->AddConstProperty("SCINTILLATIONYIELD1", 1.0); // ????
+  lar_mpt->AddConstProperty("SCINTILLATIONYIELD2", 1.0);
 
-  /* Yield ratio
-   *
-   * This is the value for electrons and gammas
-   * For example, for nuclear recoils it should be 0.75
-   * nominal value for electrons and gammas: 0.23 (WArP data)
-   */
+  lar_mpt->AddProperty("ELECTRONSCINTILLATIONYIELD", {0, 1*u::MeV}, {0, 0.8*Y*1*u::MeV});
+  lar_mpt->AddConstProperty("ELECTRONSCINTILLATIONYIELD1", 1.0); // ????
+  lar_mpt->AddConstProperty("ELECTRONSCINTILLATIONYIELD2", 1.0);
 
-  lar_mpt->AddConstProperty("YIELDRATIO", 0.23);
+  lar_mpt->AddProperty("ALPHASCINTILLATIONYIELD", {0, 1*u::MeV}, {0, 0.7*Y*1*u::MeV});
+  lar_mpt->AddConstProperty("ALPHASCINTILLATIONYIELD1", 1.0); // ????
+  lar_mpt->AddConstProperty("ALPHASCINTILLATIONYIELD2", 1.0);
+
+  lar_mpt->AddProperty("IONSCINTILLATIONYIELD", {0, 1*u::MeV}, {0, 0.3*Y*1*u::MeV});
+  lar_mpt->AddConstProperty("IONSCINTILLATIONYIELD1", 1.0); // ????
+  lar_mpt->AddConstProperty("IONSCINTILLATIONYIELD2", 1.0);
 
   /* Singlet and triplet lifetimes
    *
@@ -283,17 +292,13 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
    *   /RMG/Materials/LAr/SingletLifetime <value> <unit>
    *   /RMG/Materials/LAr/TripletLifetime <value> <unit>
    * default values of 5.95ns and 1um can be found in the messenger class
-   *
-   * The triplet lifetime is the one measured during GERDA PhaseII
-   * Seems to be quite constant over time for the whole length of PhaseII
-   * https://www.mpi-hd.mpg.de/gerda/internal/Catania18/slides/20181112_DataSelectionLArBI.pdf
    */
 
-  RMGLog::Out(RMGLog::detail, "Using LAr singlet lifetime of ", fLArProperties.singlet_lifetime/u::ns," ns");
-  RMGLog::Out(RMGLog::detail, "Using LAr triplet lifetime of ", fLArProperties.triplet_lifetime/u::us," us");
+  RMGLog::Out(RMGLog::detail, "Using LAr singlet lifetime of ", fLArProperties.singlet_lifetime/u::ns, " ns");
+  RMGLog::Out(RMGLog::detail, "Using LAr triplet lifetime of ", fLArProperties.triplet_lifetime/u::us, " us");
 
-  lar_mpt->AddConstProperty("FASTTIMECONSTANT", fLArProperties.singlet_lifetime);
-  lar_mpt->AddConstProperty("SLOWTIMECONSTANT", fLArProperties.triplet_lifetime);
+  lar_mpt->AddConstProperty("SCINTILLATIONTIMECONSTANT1", fLArProperties.singlet_lifetime);
+  lar_mpt->AddConstProperty("SCINTILLATIONTIMECONSTANT2", fLArProperties.triplet_lifetime);
 
   /* Attenuation length
    *

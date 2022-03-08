@@ -29,17 +29,8 @@ class RMGProcessesMessenger : public G4UImessenger {
   private:
 
     RMGProcessesList* fProcessesList;
-
     std::unique_ptr<G4UIdirectory> fProcessesDir;
-
-    std::unique_ptr<G4UIcmdWithAString>   fRealmCmd;
-    std::unique_ptr<G4UIcmdWithABool>     fOpticalProcessesCmd;
-    std::unique_ptr<G4UIcmdWithABool>     fLowEnergyProcessesCmd;
-    std::unique_ptr<G4UIcmdWithAString>   fLowEnergyProcessesOptionCmd;
-    std::unique_ptr<RMGUIcmdStepLimit>    fStepLimitCmd;
-    std::unique_ptr<G4UIcmdWithABool>     fUseAngCorrCmd;
-    std::unique_ptr<G4UIcmdWithAnInteger> fSetAngCorrCmd;
-    std::unique_ptr<G4UIcmdWithABool>     fStoreICLevelData;
+    std::unique_ptr<RMGUIcmdStepLimit> fStepLimitCmd;
 };
 
 #endif
