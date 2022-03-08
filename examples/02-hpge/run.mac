@@ -1,4 +1,4 @@
-/RMG/Manager/Logging/LogLevelScreen summary
+# /RMG/Manager/Logging/LogLevelScreen debug
 
 /run/initialize
 
@@ -8,10 +8,10 @@
 # /RMG/Generator/Select BxDecay0
 # /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/RMG/Generator/Select G4gun
-/gun/particle ion
-/gun/ion 27 60
-/gun/energy 0 eV
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/ion 27 60
+/gps/energy 0 eV
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
