@@ -13,11 +13,21 @@
 
 #include "fmt/core.h"
 
-G4VPhysicalVolume* RMGNavigationTools::FindVolumeByName(std::string name) {
-    auto& store = *G4PhysicalVolumeStore::GetInstance();
+G4VPhysicalVolume* RMGNavigationTools::FindPhysicalVolume(std::string name) {
+    auto const& store = *G4PhysicalVolumeStore::GetInstance();
     auto result = std::find_if(store.begin(), store.end(), [&name](auto v) { return std::string(v->GetName()) == name; });
     if (result == store.end()) {
-      RMGLog::Out(RMGLog::error, "Volume ", name, " not found in volume store. Returning nullptr");
+      RMGLog::Out(RMGLog::error, "Physical volume ", name, " not found in store. Returning nullptr");
+      return nullptr;
+    }
+    return *result;
+}
+
+G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
+    auto const& store = *G4LogicalVolumeStore::GetInstance();
+    auto result = std::find_if(store.begin(), store.end(), [&name](auto v) { return std::string(v->GetName()) == name; });
+    if (result == store.end()) {
+      RMGLog::Out(RMGLog::error, "Logical volume ", name, " not found in store. Returning nullptr");
       return nullptr;
     }
     return *result;

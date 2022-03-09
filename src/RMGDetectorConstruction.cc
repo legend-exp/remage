@@ -46,7 +46,7 @@ G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
 
   for (const auto& el : fPhysVolStepLimits) {
     RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first, el.second);
-    auto vol = RMGNavigationTools::FindVolumeByName(el.first);
+    auto vol = RMGNavigationTools::FindPhysicalVolume(el.first);
     if (!vol) {
       RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
     }
