@@ -37,9 +37,8 @@ class RMGManager {
     G4VUserPhysicsList* GetProcessesList();
     inline int GetPrintModulo() { return fPrintModulo; }
 
-    inline static bool IsExecSequential() {
-      return RMGManager::GetRMGManager()->GetG4RunManager()->GetRunManagerType()
-        == G4RunManager::RMType::sequentialRM;
+    inline bool IsExecSequential() {
+      return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
 
     // setters

@@ -97,6 +97,10 @@ void RMGManager::Initialize() {
 
 void RMGManager::Run() {
 
+  if (fBatchMode and fMacroFileNames.empty()) {
+    RMGLog::Out(RMGLog::fatal, "Batch mode has been requested but no macro file has been set");
+  }
+
   auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv);
   session->SetPrompt(RMGLog::Colorize<RMGLog::Ansi::unspecified>("remage> ", G4cout, true));
 
