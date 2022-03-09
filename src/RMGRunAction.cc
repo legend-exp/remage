@@ -35,9 +35,10 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     }
   }
 
+  // save start time for future
+  fRMGRun->SetStartTime(std::chrono::system_clock::now());
+
   if (this->IsMaster()) {
-    // save start time for future
-    fRMGRun->SetStartTime(std::chrono::system_clock::now());
     auto tt = fmt::localtime(fRMGRun->GetStartTime());
 
     RMGLog::OutFormat(RMGLog::summary, "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}",

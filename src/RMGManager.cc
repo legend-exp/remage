@@ -67,7 +67,9 @@ void RMGManager::Initialize() {
     if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
     else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
     fG4RunManager->SetNumberOfThreads(fNThreads);
+    RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
   }
+  else RMGLog::Out(RMGLog::detail, "Execution is sequential (one-threaded)");
 
   std::string _str = "";
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
@@ -233,6 +235,7 @@ void RMGManager::SetRandSystemEntropySeed() {
   CLHEP::HepRandom::setTheSeed(rand_seed);
   RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
 
+  // TODO: does this make sense?
   fIsRandControlled = true;
 }
 
