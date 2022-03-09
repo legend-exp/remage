@@ -28,7 +28,7 @@ set(PROJECT_PUBLIC_HEADERS
 
     ../include/RMGMaterialTable.hh
 
-    ../include/RMGProcessesList.hh
+    ../include/RMGPhysics.hh
 
     ../include/RMGTools.hh
     ../include/RMGTools.icc
@@ -54,7 +54,7 @@ set(PROJECT_SOURCES
 
     RMGMaterialTable.cc
 
-    RMGProcessesList.cc
+    RMGPhysics.cc
 )
 
 if(BxDecay0_FOUND)

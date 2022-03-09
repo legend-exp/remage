@@ -21,7 +21,7 @@
 #include "Randomize.hh"
 
 #include "ProjectInfo.hh"
-#include "RMGProcessesList.hh"
+#include "RMGPhysics.hh"
 #include "RMGDetectorConstruction.hh"
 #include "RMGUserAction.hh"
 #include "RMGTools.hh"
@@ -59,7 +59,7 @@ void RMGManager::Initialize() {
   RMGLog::Out(RMGLog::detail, "Initializing application");
 
   if (!fG4RunManager) this->SetUpDefaultG4RunManager();
-  if (!fProcessesList) this->SetUpDefaultProcessesList();
+  if (!fPhysicsList) this->SetUpDefaultProcessesList();
   if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
 
@@ -86,7 +86,7 @@ void RMGManager::Initialize() {
   if (!fDetectorConstruction) this->SetUpDefaultDetectorConstruction();
 
   fG4RunManager->SetUserInitialization(fDetectorConstruction);
-  fG4RunManager->SetUserInitialization(fProcessesList);
+  fG4RunManager->SetUserInitialization(fPhysicsList);
   fG4RunManager->SetUserInitialization(fUserAction);
 
   if (!fIsRandControlled) {
@@ -143,7 +143,7 @@ void RMGManager::SetUpDefaultG4RunManager() {
 
 void RMGManager::SetUpDefaultProcessesList() {
   RMGLog::Out(RMGLog::debug, "Initializing default processes list");
-  fProcessesList = new RMGProcessesList();
+  fPhysicsList = new RMGPhysics();
 }
 
 void RMGManager::SetUpDefaultG4VisManager() {
@@ -172,8 +172,8 @@ RMGDetectorConstruction* RMGManager::GetDetectorConstruction() {
 }
 
 G4VUserPhysicsList* RMGManager::GetProcessesList() {
-  if (!fProcessesList) this->SetUpDefaultProcessesList();
-  return fProcessesList;
+  if (!fPhysicsList) this->SetUpDefaultProcessesList();
+  return fPhysicsList;
 }
 
 void RMGManager::SetLogLevelScreen(std::string level) {

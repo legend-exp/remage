@@ -9,16 +9,16 @@
 #include "globals.hh"
 
 class RMGProcessesMessenger;
-class RMGProcessesList : public G4VModularPhysicsList {
+class RMGPhysics : public G4VModularPhysicsList {
 
   public:
 
-    RMGProcessesList();
+    RMGPhysics();
 
-    RMGProcessesList           (RMGProcessesList const&) = delete;
-    RMGProcessesList& operator=(RMGProcessesList const&) = delete;
-    RMGProcessesList           (RMGProcessesList&&)      = delete;
-    RMGProcessesList& operator=(RMGProcessesList&&)      = delete;
+    RMGPhysics           (RMGPhysics const&) = delete;
+    RMGPhysics& operator=(RMGPhysics const&) = delete;
+    RMGPhysics           (RMGPhysics&&)      = delete;
+    RMGPhysics& operator=(RMGPhysics&&)      = delete;
 
     enum PhysicsRealm {
       kDoubleBetaDecay,

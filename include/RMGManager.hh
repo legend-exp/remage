@@ -45,7 +45,7 @@ class RMGManager {
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
     inline void SetUserInit(RMGDetectorConstruction* det) { fDetectorConstruction = det; }
-    inline void SetUserInit(G4VUserPhysicsList* proc) { fProcessesList = proc; }
+    inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
     inline void SetBatchMode(bool flag=true) { fBatchMode = flag; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
@@ -83,7 +83,7 @@ class RMGManager {
     std::unique_ptr<G4RunManager> fG4RunManager = nullptr;
     std::unique_ptr<G4VisManager> fG4VisManager = nullptr;
 
-    G4VUserPhysicsList* fProcessesList = nullptr;
+    G4VUserPhysicsList* fPhysicsList = nullptr;
     RMGDetectorConstruction* fDetectorConstruction = nullptr;
     RMGUserAction* fUserAction = nullptr;
 
