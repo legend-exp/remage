@@ -89,6 +89,11 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
     if (n_ev < 100) RMGLog::Out(RMGLog::warning, "Event processing time might be inaccurate");
   }
+
+  // reset print modulo
+  // TODO: if it's user specified, it shouldn't be reset
+  RMGManager::GetRMGManager()->SetPrintModulo(-1);
+
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
