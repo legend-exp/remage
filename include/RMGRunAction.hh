@@ -13,8 +13,8 @@ class RMGRunAction : public G4UserRunAction {
 
   public:
 
-    RMGRunAction() = default;
-    RMGRunAction(RMGMasterGenerator*);
+    RMGRunAction(bool persistency=false);
+    RMGRunAction(RMGMasterGenerator*, bool persistency=false);
     ~RMGRunAction() = default;
 
     RMGRunAction           (RMGRunAction const&) = delete;
@@ -29,6 +29,7 @@ class RMGRunAction : public G4UserRunAction {
   private:
 
     RMGRun* fRMGRun = nullptr;
+    bool fIsPersistencyEnabled = false;
     RMGMasterGenerator* fRMGMasterGenerator = nullptr;
 };
 

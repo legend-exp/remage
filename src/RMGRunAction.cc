@@ -21,8 +21,12 @@ G4Run* RMGRunAction::GenerateRun() {
   return fRMGRun;
 }
 
-RMGRunAction::RMGRunAction(RMGMasterGenerator* gene) {
-  fRMGMasterGenerator = gene;
+RMGRunAction::RMGRunAction(bool persistency) :
+  fIsPersistencyEnabled(persistency) {}
+
+RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency) :
+  fIsPersistencyEnabled(persistency),
+  fRMGMasterGenerator(gene) {
 }
 
 void RMGRunAction::BeginOfRunAction(const G4Run*) {

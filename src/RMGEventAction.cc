@@ -14,7 +14,8 @@
 
 #include "fmt/chrono.h"
 
-RMGEventAction::RMGEventAction() {
+RMGEventAction::RMGEventAction(RMGRunAction* run_action) :
+  fRunAction(run_action) {
   this->DefineCommands();
 }
 

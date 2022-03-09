@@ -1,5 +1,6 @@
 #include "RMGUserAction.hh"
 
+#include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
 #include "RMGRunAction.hh"
 #include "RMGEventAction.hh"
@@ -9,17 +10,19 @@
 
 void RMGUserAction::BuildForMaster() const {
 
-  // the master thread does not simulate anything, no primary generator is needed
-  this->SetUserAction(new RMGRunAction());
+  // the master thread does not simulate anything
+  this->SetUserAction(new RMGRunAction(RMGManager::GetRMGManager()->IsPersistencyEnabled()));
 }
 
 void RMGUserAction::Build() const {
 
   auto generator_primary = new RMGMasterGenerator();
+  auto run_action = new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled());
+  auto event_action = new RMGEventAction(run_action);
+
   this->SetUserAction(generator_primary);
-  this->SetUserAction(new RMGRunAction(generator_primary));
-  auto event_action = new RMGEventAction();
   this->SetUserAction(event_action);
+  this->SetUserAction(run_action);
   this->SetUserAction(new RMGStackingAction(event_action));
   this->SetUserAction(new RMGSteppingAction(event_action));
   this->SetUserAction(new RMGTrackingAction(event_action));

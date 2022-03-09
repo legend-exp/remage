@@ -3,17 +3,17 @@
 
 #include <memory>
 
-#include "globals.hh"
 #include "G4Event.hh"
 #include "G4UserEventAction.hh"
 
+class RMGRunAction;
 class G4GenericMessenger;
 class RMGVOutputManager;
 class RMGEventAction : public G4UserEventAction {
 
   public:
 
-    RMGEventAction();
+    RMGEventAction(RMGRunAction*);
     inline ~RMGEventAction() = default;
 
     RMGEventAction           (RMGEventAction const&) = delete;
@@ -28,6 +28,8 @@ class RMGEventAction : public G4UserEventAction {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
+    RMGRunAction* fRunAction = nullptr;
+
 };
 
 #endif

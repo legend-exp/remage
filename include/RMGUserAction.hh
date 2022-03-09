@@ -1,8 +1,6 @@
 #ifndef _RMG_MANAGEMENT_USER_ACTION_HH_
 #define _RMG_MANAGEMENT_USER_ACTION_HH_
 
-#include "globals.hh"
-
 #include "G4VUserActionInitialization.hh"
 
 class RMGUserAction : public G4VUserActionInitialization {

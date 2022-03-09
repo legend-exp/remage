@@ -40,6 +40,7 @@ class RMGManager {
     inline bool IsExecSequential() {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
+    inline bool IsPersistencyEnabled() { return fIsPersistencyEnabled; }
 
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
@@ -49,6 +50,7 @@ class RMGManager {
     inline void SetBatchMode(bool flag=true) { fBatchMode = flag; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
+    inline void EnablePersistency(bool flag=true) { fIsPersistencyEnabled = flag; }
     inline void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
     void Initialize();
     void Run();
@@ -75,6 +77,7 @@ class RMGManager {
     std::vector<std::string> fMacroFileNames;
     bool fIsRandControlled = false;
     bool fBatchMode = false;
+    bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
     int fNThreads = 0;
 
