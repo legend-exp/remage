@@ -1,60 +1,51 @@
 # List here manually all source files. Using GLOB is bad, see:
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
+set(_root ${CMAKE_SOURCE_DIR})
+
 set(PROJECT_PUBLIC_HEADERS
-    ../include/RMGNavigationTools.hh
-
-    ../include/RMGVGenerator.hh
-    ../include/RMGVertexConfinement.hh
-    ../include/RMGGeneratorGPS.hh
-    ../include/RMGVVertexGenerator.hh
-    ../include/RMGMasterGenerator.hh
-    ../include/RMGGeneratorUtil.hh
-    ../include/RMGGeneratorG4Gun.hh
-
-    ../include/RMGLog.hh
-    ../include/RMGLog.icc
-    ../include/ProjectInfo.hh
-
-    ../include/RMGDetectorConstruction.hh
-    ../include/RMGRunAction.hh
-    ../include/RMGEventAction.hh
-    ../include/RMGStackingAction.hh
-    ../include/RMGSteppingAction.hh
-    ../include/RMGTrackingAction.hh
-    ../include/RMGUserAction.hh
-    ../include/RMGManager.hh
-    ../include/RMGRun.hh
-
-    ../include/RMGMaterialTable.hh
-
-    ../include/RMGPhysics.hh
-
-    ../include/RMGTools.hh
-    ../include/RMGTools.icc
+    ${_root}/include/RMGNavigationTools.hh
+    ${_root}/include/RMGVGenerator.hh
+    ${_root}/include/RMGVertexConfinement.hh
+    ${_root}/include/RMGGeneratorGPS.hh
+    ${_root}/include/RMGVVertexGenerator.hh
+    ${_root}/include/RMGMasterGenerator.hh
+    ${_root}/include/RMGGeneratorUtil.hh
+    ${_root}/include/RMGGeneratorG4Gun.hh
+    ${_root}/include/RMGLog.hh
+    ${_root}/include/RMGLog.icc
+    ${_root}/include/ProjectInfo.hh
+    ${_root}/include/RMGDetectorConstruction.hh
+    ${_root}/include/RMGRunAction.hh
+    ${_root}/include/RMGEventAction.hh
+    ${_root}/include/RMGStackingAction.hh
+    ${_root}/include/RMGSteppingAction.hh
+    ${_root}/include/RMGTrackingAction.hh
+    ${_root}/include/RMGUserAction.hh
+    ${_root}/include/RMGManager.hh
+    ${_root}/include/RMGRun.hh
+    ${_root}/include/RMGMaterialTable.hh
+    ${_root}/include/RMGPhysics.hh
+    ${_root}/include/RMGTools.hh
+    ${_root}/include/RMGTools.icc
 )
 
 set(PROJECT_SOURCES
-    RMGNavigationTools.cc
-
-    RMGGeneratorUtil.cc
-    RMGMasterGenerator.cc
-    RMGVertexConfinement.cc
-
-    RMGLog.cc
-
-    RMGDetectorConstruction.cc
-    RMGEventAction.cc
-    RMGRunAction.cc
-    RMGStackingAction.cc
-    RMGSteppingAction.cc
-    RMGTrackingAction.cc
-    RMGUserAction.cc
-    RMGManager.cc
-
-    RMGMaterialTable.cc
-
-    RMGPhysics.cc
+    ${_root}/src/RMGNavigationTools.cc
+    ${_root}/src/RMGGeneratorUtil.cc
+    ${_root}/src/RMGMasterGenerator.cc
+    ${_root}/src/RMGVertexConfinement.cc
+    ${_root}/src/RMGLog.cc
+    ${_root}/src/RMGDetectorConstruction.cc
+    ${_root}/src/RMGEventAction.cc
+    ${_root}/src/RMGRunAction.cc
+    ${_root}/src/RMGStackingAction.cc
+    ${_root}/src/RMGSteppingAction.cc
+    ${_root}/src/RMGTrackingAction.cc
+    ${_root}/src/RMGUserAction.cc
+    ${_root}/src/RMGManager.cc
+    ${_root}/src/RMGMaterialTable.cc
+    ${_root}/src/RMGPhysics.cc
 )
 
 if(BxDecay0_FOUND)
@@ -71,8 +62,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOU
 
 # link against dependent libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
-    PUBLIC
-        ${Geant4_LIBRARIES})
+    PUBLIC ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
     target_link_libraries(${CMAKE_PROJECT_NAME}
@@ -84,7 +74,7 @@ endif()
 if(ROOT_FOUND)
     target_link_libraries(${CMAKE_PROJECT_NAME}
         PUBLIC
-            ROOT::Core)
+            ROOT::Core ROOT::Tree ROOT::Hist)
 endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
