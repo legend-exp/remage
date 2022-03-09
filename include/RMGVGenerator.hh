@@ -16,8 +16,7 @@ class RMGVGenerator {
     RMGVGenerator() = delete;
 
     inline RMGVGenerator(std::string name) :
-      fGeneratorName(name),
-      fReportingFrequency(1000) {};
+      fGeneratorName(name) {};
 
     virtual inline ~RMGVGenerator() = default;
 
@@ -39,7 +38,7 @@ class RMGVGenerator {
 
     std::string fGeneratorName;
     std::unique_ptr<G4UImessenger> fG4Messenger;
-    int fReportingFrequency;
+    int fReportingFrequency = 1000;
 };
 
 #endif

@@ -40,13 +40,13 @@ class RMGDetectorConstruction : public G4VUserDetectorConstruction {
   private:
 
     std::vector<std::string> fGDMLFiles;
-    std::unique_ptr<RMGMaterialTable> fMaterialTable;
+    std::unique_ptr<RMGMaterialTable> fMaterialTable = nullptr;
     std::map<std::string, double> fPhysVolStepLimits;
     static RMGMaterialTable::BathMaterial fBathMaterial;
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
 
-    G4VPhysicalVolume* fWorld;
+    G4VPhysicalVolume* fWorld = nullptr;
 };
 
 #endif

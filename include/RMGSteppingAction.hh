@@ -21,7 +21,7 @@ class RMGSteppingAction : public G4UserSteppingAction {
 
   private:
 
-    RMGEventAction* fEventAction;
+    RMGEventAction* fEventAction = nullptr;
 };
 
 #endif

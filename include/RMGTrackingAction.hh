@@ -22,7 +22,7 @@ class RMGTrackingAction : public G4UserTrackingAction {
 
   private:
 
-    RMGEventAction* fEventAction;
+    RMGEventAction* fEventAction = nullptr;
 };
 
 #endif

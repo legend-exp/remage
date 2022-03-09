@@ -69,18 +69,18 @@ class RMGManager {
     std::string fApplicationName;
     int fArgc; char** fArgv;
     std::vector<std::string> fMacroFileNames;
-    bool fIsRandControlled;
-    bool fBatchMode;
-    int fPrintModulo;
+    bool fIsRandControlled = false;
+    bool fBatchMode = false;
+    int fPrintModulo = -1;
 
     static RMGManager* fRMGManager;
 
-    std::unique_ptr<G4RunManager> fG4RunManager;
-    std::unique_ptr<G4VisManager> fG4VisManager;
+    std::unique_ptr<G4RunManager> fG4RunManager = nullptr;
+    std::unique_ptr<G4VisManager> fG4VisManager = nullptr;
 
-    G4VUserPhysicsList* fProcessesList;
-    RMGDetectorConstruction* fDetectorConstruction;
-    RMGUserAction* fUserAction;
+    G4VUserPhysicsList* fProcessesList = nullptr;
+    RMGDetectorConstruction* fDetectorConstruction = nullptr;
+    RMGUserAction* fUserAction = nullptr;
 
     // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;

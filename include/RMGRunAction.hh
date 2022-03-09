@@ -28,8 +28,8 @@ class RMGRunAction : public G4UserRunAction {
 
   private:
 
-    RMGRun* fRMGRun;
-    RMGMasterGenerator* fRMGMasterGenerator;
+    RMGRun* fRMGRun = nullptr;
+    RMGMasterGenerator* fRMGMasterGenerator = nullptr;
 };
 
 #endif

@@ -21,8 +21,7 @@ class RMGVVertexGenerator {
   public:
 
     inline RMGVVertexGenerator(std::string name) :
-      fGeneratorName(name),
-      fMaxAttempts(100000) {}
+      fGeneratorName(name) {}
 
     virtual inline ~RMGVVertexGenerator() = default;
 
@@ -42,7 +41,7 @@ class RMGVVertexGenerator {
   protected:
 
     std::string fGeneratorName;
-    int fMaxAttempts;
+    int fMaxAttempts = 100000;
     const G4ThreeVector kDummyPrimaryPosition = G4ThreeVector(0, 0, 0);
 
     std::unique_ptr<G4UImessenger> fG4Messenger;

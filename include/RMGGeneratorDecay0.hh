@@ -32,7 +32,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
   private:
 
-    std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
+    std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator = nullptr;
 };
 
 #endif

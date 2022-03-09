@@ -23,7 +23,7 @@ class RMGStackingAction : public G4UserStackingAction {
 
   private:
 
-    RMGEventAction* fEventAction;
+    RMGEventAction* fEventAction = nullptr;
 };
 
 #endif

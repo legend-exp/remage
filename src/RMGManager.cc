@@ -34,15 +34,7 @@ RMGManager* RMGManager::fRMGManager = nullptr;
 RMGManager::RMGManager(std::string app_name, int argc, char** argv) :
   fApplicationName(app_name),
   fArgc(argc),
-  fArgv(argv),
-  fIsRandControlled(false),
-  fBatchMode(false),
-  fPrintModulo(-1),
-  fG4RunManager(nullptr),
-  fG4VisManager(nullptr),
-  fProcessesList(nullptr),
-  fDetectorConstruction(nullptr),
-  fUserAction(nullptr) {
+  fArgv(argv) {
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;

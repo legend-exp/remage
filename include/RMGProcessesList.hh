@@ -75,9 +75,9 @@ class RMGProcessesList : public G4VModularPhysicsList {
     PhysicsRealm fPhysicsRealm;
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
-    bool fConstructOptical;
-    bool fUseLowEnergyEM;
-    LowEnergyEMOption fLowEnergyEMOption;
+    bool fConstructOptical = false;
+    bool fUseLowEnergyEM = true;
+    LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

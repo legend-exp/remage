@@ -34,7 +34,7 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
 
   private:
 
-    std::unique_ptr<G4ParticleGun> fParticleGun;
+    std::unique_ptr<G4ParticleGun> fParticleGun = nullptr;
 };
 
 #endif

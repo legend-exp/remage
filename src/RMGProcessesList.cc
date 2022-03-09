@@ -49,10 +49,6 @@ RMGProcessesList::RMGProcessesList() :
   G4VModularPhysicsList::verboseLevel = 0;
   this->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
-  fUseLowEnergyEM     = true;
-  fLowEnergyEMOption  = RMGProcessesList::LowEnergyEMOption::kLivermore;
-  fConstructOptical   = false;
-
   this->DefineCommands();
 }
 

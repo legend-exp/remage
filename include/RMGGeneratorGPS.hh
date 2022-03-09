@@ -28,7 +28,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
   private:
 
-    std::unique_ptr<G4GeneralParticleSource> fParticleSource;
+    std::unique_ptr<G4GeneralParticleSource> fParticleSource = nullptr;
 };
 
 #endif
