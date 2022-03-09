@@ -62,6 +62,12 @@ void RMGManager::Initialize() {
   if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
 
+  if (!this->IsExecSequential()) {
+    if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
+    else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
+    fG4RunManager->SetNumberOfThreads(fNThreads);
+  }
+
   std::string _str = "";
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
     _str += i->GetNickname() + " ";

@@ -37,6 +37,11 @@ class RMGManager {
     G4VUserPhysicsList* GetProcessesList();
     inline int GetPrintModulo() { return fPrintModulo; }
 
+    inline static bool IsExecSequential() {
+      return RMGManager::GetRMGManager()->GetG4RunManager()->GetRunManagerType()
+        == G4RunManager::RMType::sequentialRM;
+    }
+
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
@@ -72,6 +77,7 @@ class RMGManager {
     bool fIsRandControlled = false;
     bool fBatchMode = false;
     int fPrintModulo = -1;
+    int fNThreads = 0;
 
     static RMGManager* fRMGManager;
 
