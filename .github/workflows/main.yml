@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         container_version:
-        - G4.10.7
+        - G4.11.0
         - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
