@@ -9,6 +9,7 @@
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
 #endif
+#include "RMGGeneratorCosmicMuons.hh"
 #include "RMGLog.hh"
 
 #include "G4GenericMessenger.hh"
@@ -77,6 +78,9 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       RMGLog::OutFormat(RMGLog::fatal, "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
 #endif
       break;
+    case RMGMasterGenerator::Generator::kCosmicMuons :
+      // fGeneratorObj = std::make_unique<RMGGeneratorCosmicMuons>();
+      // break;
     case RMGMasterGenerator::Generator::kUndefined :
     case RMGMasterGenerator::Generator::kUserDefined :
       break;

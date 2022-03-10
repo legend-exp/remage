@@ -10,6 +10,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGeneratorGPS.hh
     ${_root}/include/RMGVVertexGenerator.hh
     ${_root}/include/RMGMasterGenerator.hh
+    ${_root}/include/RMGGeneratorCosmicMuons.hh
     ${_root}/include/RMGGeneratorUtil.hh
     ${_root}/include/RMGGeneratorG4Gun.hh
     ${_root}/include/RMGLog.hh
@@ -34,6 +35,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGNavigationTools.cc
     ${_root}/src/RMGGeneratorUtil.cc
     ${_root}/src/RMGMasterGenerator.cc
+    ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGDetectorConstruction.cc
