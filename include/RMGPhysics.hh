@@ -64,11 +64,7 @@ class RMGPhysics : public G4VModularPhysicsList {
 
     void ConstructParticle() override;
     void ConstructProcess() override;
-
-    void AddTransportation();
-    void AddParallelWorldScoring();
     void ConstructOptical();
-    void ConstructCerenkov();
 
   private:
 

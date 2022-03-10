@@ -4,7 +4,6 @@
 #include "G4RegionStore.hh"
 #include "G4HadronicProcessStore.hh"
 #include "G4StepLimiter.hh"
-#include "G4ParallelWorldScoringProcess.hh"
 #include "G4NuclearLevelData.hh"
 #include "G4DeexPrecoParameters.hh"
 #include "G4BosonConstructor.hh"
@@ -80,21 +79,17 @@ void RMGPhysics::ConstructParticle() {
   RMGLog::Out(RMGLog::detail, "Constructing particles");
 
   G4BosonConstructor boson_const;
-  boson_const.ConstructParticle();
-
   G4LeptonConstructor lepton_const;
-  lepton_const.ConstructParticle();
-
   G4MesonConstructor meson_const;
-  meson_const.ConstructParticle();
-
   G4BaryonConstructor baryon_const;
-  baryon_const.ConstructParticle();
-
   G4IonConstructor ion_const;
-  ion_const.ConstructParticle();
-
   G4ShortLivedConstructor short_lived_const;
+
+  boson_const.ConstructParticle();
+  lepton_const.ConstructParticle();
+  meson_const.ConstructParticle();
+  baryon_const.ConstructParticle();
+  ion_const.ConstructParticle();
   short_lived_const.ConstructParticle();
 
   return;
@@ -104,12 +99,7 @@ void RMGPhysics::ConstructParticle() {
 
 void RMGPhysics::ConstructProcess() {
 
-  this->AddTransportation();
-
-  // parallel worlds must be added after G4Transportation
-  if (G4RunManagerKernel::GetRunManagerKernel()->GetNumberOfParallelWorld() > 0) {
-    this->AddParallelWorldScoring();
-  }
+  G4VUserPhysicsList::AddTransportation();
 
   // EM Physics
   G4VPhysicsConstructor* em_constructor = nullptr;
@@ -163,13 +153,8 @@ void RMGPhysics::ConstructProcess() {
   em_extra_physics->MuonNuclear("on");
   em_extra_physics->ConstructProcess();
 
-  if (fConstructOptical) {
-    this->ConstructOptical();
-    this->ConstructCerenkov();
-  }
-  else {
-    RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
-  }
+  if (fConstructOptical) this->ConstructOptical();
+  else RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
 
   // Add decays
   RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
@@ -179,86 +164,9 @@ void RMGPhysics::ConstructProcess() {
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
-
-  // Assign manually triton decay
-  /*
-  for (int i = 0; i < the_ion_table->Entries(); i++) {
-    auto particle = the_ion_table->GetParticle(i);
-    // assign Tritium (3H) life time given by NuDat 2.5 - A. Schubert 21 July 2010:
-    // follow http://hypernews.slac.stanford.edu/HyperNews/geant4/get/hadronprocess/1538/1.html
-
-    if (particle == G4Triton::Definition()) {
-      RMGLog::Out(RMGLog::detail, "Adding triton decay manually");
-      particle->SetPDGLifeTime(12.32*log(2.0)*365*24*3600*u::second);
-      particle->SetPDGStable(false);
-      auto proc_manager = particle->GetProcessManager();
-      // Remove G4Decay process, which requires a registered decay table
-      G4VProcess* decay_proc = nullptr;
-      auto pvec = proc_manager->GetAtRestProcessVector();
-      for (size_t j = 0; j < pvec->size() && decay_proc == nullptr; j++) {
-        if ((*pvec)[j]->GetProcessName() == "Decay") decay_proc = (*pvec)[j];
-      }
-      if (decay_proc) proc_manager->RemoveProcess(decay_proc);
-      // Attach RDM, which is a rest-discrete process
-      proc_manager->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
-      proc_manager->AddProcess(new G4RadioactiveDecayBase(), 1000, -1, 1000);
-    }
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGPhysics::AddTransportation() {
-
-  RMGLog::Out(RMGLog::detail, "Adding transportation");
-
-  G4VUserPhysicsList::AddTransportation();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGPhysics::AddParallelWorldScoring() {
-
-  RMGLog::Out(RMGLog::detail, "Adding parallel world scoring");
-
-  auto parallel_world_scoring_proc = new G4ParallelWorldScoringProcess("ParallelWorldScoringProc");
-  parallel_world_scoring_proc->SetParallelWorld("ParallelSamplingWorld");
-
-  GetParticleIterator()->reset();
-  while((*GetParticleIterator())()) {
-    auto particle = GetParticleIterator()->value();
-    if (!particle->IsShortLived()) {
-      auto proc_manager = particle->GetProcessManager();
-      proc_manager->AddProcess(parallel_world_scoring_proc);
-      proc_manager->SetProcessOrderingToLast(parallel_world_scoring_proc, G4ProcessVectorDoItIndex::idxAtRest);
-      proc_manager->SetProcessOrdering(parallel_world_scoring_proc, G4ProcessVectorDoItIndex::idxAlongStep, 1);
-      proc_manager->SetProcessOrderingToLast(parallel_world_scoring_proc, G4ProcessVectorDoItIndex::idxPostStep);
-    }
-  }
-}
-
-/** Optical Processes
- *
- * The default scintillation process (see LAr properties in RMGGerdaLocalMaterialTable.cc)
- * is the one for electrons and gammas, for alphas and nuclar recoils we define two
- * additional processes, to be able to set different scintillation yields and yield ratios.
- *
- * Recap:
- * Relative scintillation yields:
- * - flat-top particles: 1
- * - electrons and gammas: 0.8
- * - alphas: 0.7
- * - nuclear recoils: 0.2-0.4
- *
- * reference: http://iopscience.iop.org/article/10.1143/JJAP.41.1538/pdf
- *
- * yield ratio:
- * - electrons and gammas: 0.23
- * - nuclear recoils: 0.75
- *
- * reference: WArP data
- */
 
 void RMGPhysics::ConstructOptical() {
 
@@ -278,20 +186,27 @@ void RMGPhysics::ConstructOptical() {
   auto boundary_proc       = new G4OpBoundaryProcess();
   auto rayleigh_scatt_proc = new G4OpRayleigh();
   auto wls_proc            = new G4OpWLS();
+  auto cerenkov_proc       = new G4Cerenkov();
 
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   wls_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   GetParticleIterator()->reset();
-  while((*GetParticleIterator())()) {
+  while ((*GetParticleIterator())()) {
     auto particle = GetParticleIterator()->value();
     auto proc_manager = particle->GetProcessManager();
     auto particle_name = particle->GetParticleName();
+
     if (scint_proc->IsApplicable(*particle)) {
       proc_manager->AddProcess(scint_proc);
       proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxAtRest);
       proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxPostStep);
+    }
+
+    if (cerenkov_proc->IsApplicable(*particle)) {
+      proc_manager->AddProcess(cerenkov_proc);
+      proc_manager->SetProcessOrdering(cerenkov_proc, G4ProcessVectorDoItIndex::idxPostStep);
     }
 
     if (particle_name == "opticalphoton") {
@@ -396,26 +311,6 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 
   this->SetCuts();
   fPhysicsRealm = realm;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGPhysics::ConstructCerenkov() {
-
-  RMGLog::Out(RMGLog::detail, "Adding Cherenkov physics");
-
-  auto cerenkov_process = new G4Cerenkov();
-  G4ProcessManager* proc_manager = nullptr;
-
-  GetParticleIterator()->reset();
-  while ((*GetParticleIterator())()) {
-    auto particle = GetParticleIterator()->value();
-    proc_manager = particle->GetProcessManager();
-    if (cerenkov_process->IsApplicable(*particle)) {
-      proc_manager->AddProcess(cerenkov_process);
-      proc_manager->SetProcessOrdering(cerenkov_process, G4ProcessVectorDoItIndex::idxPostStep);
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
