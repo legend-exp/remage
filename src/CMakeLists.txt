@@ -4,59 +4,59 @@
 set(_root ${CMAKE_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
-    ${_root}/include/RMGNavigationTools.hh
-    ${_root}/include/RMGVGenerator.hh
-    ${_root}/include/RMGVertexConfinement.hh
-    ${_root}/include/RMGGeneratorGPS.hh
-    ${_root}/include/RMGVVertexGenerator.hh
-    ${_root}/include/RMGMasterGenerator.hh
-    ${_root}/include/RMGGeneratorCosmicMuons.hh
-    ${_root}/include/RMGGeneratorUtil.hh
-    ${_root}/include/RMGGeneratorG4Gun.hh
-    ${_root}/include/RMGLog.hh
-    ${_root}/include/RMGLog.icc
-    ${_root}/include/ProjectInfo.hh
-    ${_root}/include/RMGDetectorConstruction.hh
-    ${_root}/include/RMGRunAction.hh
     ${_root}/include/RMGEventAction.hh
+    ${_root}/include/RMGGeneratorCosmicMuons.hh
+    ${_root}/include/RMGGeneratorG4Gun.hh
+    ${_root}/include/RMGGeneratorGPS.hh
+    ${_root}/include/RMGGeneratorUtil.hh
+    ${_root}/include/RMGLog.hh
+    ${_root}/include/RMGManager.hh
+    ${_root}/include/RMGMasterGenerator.hh
+    ${_root}/include/RMGMaterialTable.hh
+    ${_root}/include/RMGNavigationTools.hh
+    ${_root}/include/RMGOpticalDetector.hh
+    ${_root}/include/RMGOpticalDetectorHit.hh
+    ${_root}/include/RMGPhysics.hh
+    ${_root}/include/RMGRunAction.hh
+    ${_root}/include/RMGRun.hh
     ${_root}/include/RMGStackingAction.hh
     ${_root}/include/RMGSteppingAction.hh
+    ${_root}/include/RMGTools.hh
     ${_root}/include/RMGTrackingAction.hh
     ${_root}/include/RMGUserAction.hh
-    ${_root}/include/RMGManager.hh
-    ${_root}/include/RMGRun.hh
-    ${_root}/include/RMGMaterialTable.hh
-    ${_root}/include/RMGPhysics.hh
-    ${_root}/include/RMGTools.hh
-    ${_root}/include/RMGTools.icc
+    ${_root}/include/RMGVertexConfinement.hh
+    ${_root}/include/RMGVGenerator.hh
+    ${_root}/include/RMGVVertexGenerator.hh
 )
 
 set(PROJECT_SOURCES
-    ${_root}/src/RMGNavigationTools.cc
-    ${_root}/src/RMGGeneratorUtil.cc
-    ${_root}/src/RMGMasterGenerator.cc
-    ${_root}/src/RMGGeneratorCosmicMuons.cc
-    ${_root}/src/RMGVertexConfinement.cc
-    ${_root}/src/RMGLog.cc
     ${_root}/src/RMGDetectorConstruction.cc
     ${_root}/src/RMGEventAction.cc
+    ${_root}/src/RMGGeneratorCosmicMuons.cc
+    ${_root}/src/RMGGeneratorUtil.cc
+    ${_root}/src/RMGLog.cc
+    ${_root}/src/RMGManager.cc
+    ${_root}/src/RMGMasterGenerator.cc
+    ${_root}/src/RMGMaterialTable.cc
+    ${_root}/src/RMGNavigationTools.cc
+    ${_root}/src/RMGOpticalDetector.cc
+    ${_root}/src/RMGOpticalDetectorHit.cc
+    ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGStackingAction.cc
     ${_root}/src/RMGSteppingAction.cc
     ${_root}/src/RMGTrackingAction.cc
     ${_root}/src/RMGUserAction.cc
-    ${_root}/src/RMGManager.cc
-    ${_root}/src/RMGMaterialTable.cc
-    ${_root}/src/RMGPhysics.cc
+    ${_root}/src/RMGVertexConfinement.cc
 )
 
 if(BxDecay0_FOUND)
     list(APPEND PROJECT_PUBLIC_HEADERS
-        ../include/RMGGeneratorDecay0.hh
+        ${_root}/include/RMGGeneratorDecay0.hh
     )
 
     list(APPEND PROJECT_SOURCES
-        RMGGeneratorDecay0.cc
+        ${_root}/src/RMGGeneratorDecay0.cc
     )
 endif()
 
