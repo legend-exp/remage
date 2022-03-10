@@ -33,7 +33,7 @@ RMGMaterialTable::RMGMaterialTable() {
         5.56 *u::g/u::cm3));
 
   this->InitializeMaterials();
-  this->InitializeOpticalProperties();
+  // this->InitializeOpticalProperties();
 
   this->DefineCommands();
 }

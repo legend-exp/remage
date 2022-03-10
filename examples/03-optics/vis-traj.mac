@@ -1,0 +1,29 @@
+/run/initialize
+
+/vis/open OGLIQt
+
+/vis/drawVolume world
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+/vis/viewer/set/viewpointVector -3 -2 1
+/vis/viewer/set/upVector 0 0 1
+
+/vis/scene/add/trajectories
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume LAr
+
+/RMG/Generator/Select GPS
+/gps/particle                                     opticalphoton
+/gps/ene/type                                     Gauss
+/gps/ene/mono                                     9.68 eV # 128nm (VUV) LAr scintillation
+/gps/ene/sigma                                    0.22 eV # gaussian width
+/gps/ang/type                                     iso
+/gps/polarization                                 1 1 1
+
+/run/beamOn 10
+
+/vis/viewer/flush

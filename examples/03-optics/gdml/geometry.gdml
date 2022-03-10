@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="WorldAir" x="5" y="5" z="5" lunit="m"/>
+		<box name="LAr" x="4" y="4" z="4" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="LAr">
+			<materialref ref="G4_lAr"/>
+			<solidref ref="LAr"/>
+		</volume>
+		<volume name="WorldAir">
+			<materialref ref="G4_AIR"/>
+			<solidref ref="WorldAir"/>
+			<physvol name="LAr">
+				<volumeref ref="LAr"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="WorldAir"/>
+	</setup>
+</gdml>
