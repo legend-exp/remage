@@ -15,7 +15,6 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGMaterialTable.hh
     ${_root}/include/RMGNavigationTools.hh
     ${_root}/include/RMGOpticalDetector.hh
-    ${_root}/include/RMGOpticalDetectorHit.hh
     ${_root}/include/RMGPhysics.hh
     ${_root}/include/RMGRunAction.hh
     ${_root}/include/RMGRun.hh
@@ -40,7 +39,6 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGMaterialTable.cc
     ${_root}/src/RMGNavigationTools.cc
     ${_root}/src/RMGOpticalDetector.cc
-    ${_root}/src/RMGOpticalDetectorHit.cc
     ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGStackingAction.cc

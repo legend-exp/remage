@@ -9,8 +9,17 @@
 #include "G4ThreeVector.hh"
 #include "G4GenericMessenger.hh"
 
-#include "RMGOpticalDetectorHit.hh"
 #include "RMGLog.hh"
+
+G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator = nullptr;
+
+G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) const {
+  return ( this == &right ) ? true : false;
+}
+
+void RMGOpticalDetectorHit::Print() {
+  RMGLog::Out(RMGLog::debug, "Detector ID: ", fDetectorID);
+}
 
 RMGOpticalDetector::RMGOpticalDetector(const std::string& name, const std::string& hits_coll_name) :
   G4VSensitiveDetector(name) {
