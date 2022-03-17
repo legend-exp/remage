@@ -34,7 +34,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
   // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
   // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
   // about the vertex position from outside, in particular in this function here).
-  if (fGenerator != RMGMasterGenerator::Generator::kBxDecay0) {
+  if (fGenerator != Generator::kBxDecay0 and fConfinementCode != ConfinementCode::kUnConfined) {
     auto vertex = G4ThreeVector();
     fVertexGenerator->GeneratePrimariesVertex(vertex);
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex/CLHEP::cm, " cm");
