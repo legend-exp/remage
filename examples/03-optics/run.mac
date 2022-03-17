@@ -4,11 +4,11 @@
 /RMG/Generator/Confinement/Physical/AddVolume LAr
 
 /RMG/Generator/Select GPS
-/gps/particle                                     opticalphoton
-/gps/ene/type                                     Gauss
-/gps/ene/mono                                     9.68 eV # 128nm (VUV) LAr scintillation
-/gps/ene/sigma                                    0.22 eV # gaussian width
-/gps/ang/type                                     iso
-/gps/polarization                                 1 1 1
+/gps/particle     opticalphoton
+/gps/ene/type     Gauss
+/gps/ene/mono     9.68 eV # 128nm (VUV) LAr scintillation
+/gps/ene/sigma    0.22 eV # gaussian width
+/gps/ang/type     iso
+/gps/polarization 1 1 1
 
 /run/beamOn 100

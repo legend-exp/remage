@@ -3,6 +3,7 @@
 /doc/latex
 build
 .local
+*.root
 
 compile_commands.json
 

@@ -8,6 +8,7 @@ int main(int argc, char** argv) {
 
     RMGManager manager("03-optics", argc, argv);
     manager.GetDetectorConstruction()->IncludeGDMLFile("gdml/geometry.gdml");
+    manager.GetDetectorConstruction()->RegisterDetector(RMGDetectorConstruction::kOptical, "Detector", 0);
 
     std::string macro = argc > 1 ? argv[1] : "";
     if (!macro.empty()) manager.IncludeMacroFile(macro);
