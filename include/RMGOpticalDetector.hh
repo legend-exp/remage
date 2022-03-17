@@ -27,17 +27,21 @@ class RMGOpticalDetectorHit : public G4VHit {
     inline void  operator delete(void*);
 
     // getters
-    inline int GetDetectorID() { return fDetectorID; }
+    inline int GetDetectorUID() { return fDetectorUID; }
+    inline int GetPhotoelectrons() { return fPhotoElectrons; }
 
     // setters
-    inline void SetDetectorID(int id) { fDetectorID = id; }
+    inline void SetDetectorUID(int id) { fDetectorUID = id; }
+    inline void AddPhotoElectron() { fPhotoElectrons++; }
 
-    // TODO: override Draw
     void Print() override;
+    // TODO
+    // void Draw() override;
 
   private:
 
-    int fDetectorID = -1;
+    int fDetectorUID = -1;
+    int fPhotoElectrons = 0;
 };
 
 typedef G4THitsCollection<RMGOpticalDetectorHit> RMGOpticalDetectorHitsCollection;
@@ -50,7 +54,7 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
 
   public:
 
-    RMGOpticalDetector(const std::string& name, const std::string& hits_coll_name);
+    RMGOpticalDetector();
     ~RMGOpticalDetector() = default;
 
     RMGOpticalDetector           (RMGOpticalDetector const&) = delete;

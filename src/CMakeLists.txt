@@ -15,6 +15,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGMaterialTable.hh
     ${_root}/include/RMGNavigationTools.hh
     ${_root}/include/RMGOpticalDetector.hh
+    ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGPhysics.hh
     ${_root}/include/RMGRunAction.hh
     ${_root}/include/RMGRun.hh
@@ -25,6 +26,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGUserAction.hh
     ${_root}/include/RMGVertexConfinement.hh
     ${_root}/include/RMGVGenerator.hh
+    ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
 )
 
@@ -39,6 +41,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGMaterialTable.cc
     ${_root}/src/RMGNavigationTools.cc
     ${_root}/src/RMGOpticalDetector.cc
+    ${_root}/src/RMGOpticalOutputScheme.cc
     ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGStackingAction.cc

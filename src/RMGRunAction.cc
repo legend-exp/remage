@@ -6,6 +6,7 @@
 
 #include "G4Run.hh"
 #include "G4RunManager.hh"
+#include "G4AnalysisManager.hh"
 
 #include "RMGRun.hh"
 #include "RMGLog.hh"
@@ -13,6 +14,7 @@
 #include "RMGMasterGenerator.hh"
 #include "RMGVGenerator.hh"
 #include "RMGEventAction.hh"
+#include "RMGOpticalOutputScheme.hh"
 
 #include "fmt/chrono.h"
 
@@ -22,16 +24,71 @@ G4Run* RMGRunAction::GenerateRun() {
 }
 
 RMGRunAction::RMGRunAction(bool persistency) :
-  fIsPersistencyEnabled(persistency) {}
+  fIsPersistencyEnabled(persistency) {
+
+  if (fIsPersistencyEnabled) { this->SetupAnalysisManager(); }
+}
 
 RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency) :
   fIsPersistencyEnabled(persistency),
   fRMGMasterGenerator(gene) {
+
+  if (fIsPersistencyEnabled) { this->SetupAnalysisManager(); }
+}
+
+void RMGRunAction::SetupAnalysisManager() {
+
+  RMGLog::Out(RMGLog::debug, "Setting up analysis manager");
+
+  auto ana_man = G4AnalysisManager::Instance();
+
+  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
+  else ana_man->SetVerboseLevel(0);
+
+  if (!RMGManager::GetRMGManager()->IsExecSequential()) ana_man->SetNtupleMerging(true);
+
+  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+
+  // create ntuples
+  ana_man->CreateNtuple("events", "Event data");
+
+  // do it only for activated detectors (have to ask to the manager)
+  for (const auto& d_type : det_cons->GetActiveDetectorList() ) {
+
+    RMGLog::OutFormatDev(RMGLog::debug, "Initializing output scheme for sensitive detector type '{}'",
+        magic_enum::enum_name(d_type));
+
+    // instatiate concrete output scheme class
+    // TODO: allow for library user to register own output scheme
+    switch (d_type) {
+      case RMGDetectorConstruction::kOptical :
+        fOutputDataFields.emplace(d_type, std::make_unique<RMGOpticalOutputScheme>(ana_man));
+        fOutputDataFields[d_type]->AssignOutputNames(ana_man);
+        break;
+      default : RMGLog::Out(RMGLog::fatal, "No output scheme sensitive detector type '",
+                    magic_enum::enum_name(d_type), "' implemented (implement me)");
+    }
+  }
+
+  ana_man->FinishNtuple();
 }
 
 void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "Start of run action");
+
+  auto manager = RMGManager::GetRMGManager();
+
+  if (fIsPersistencyEnabled) {
+    auto ana_man = G4AnalysisManager::Instance();
+    // TODO: realpath
+    if (this->IsMaster()) RMGLog::Out(RMGLog::summary, "Opening output file: ",
+        manager->GetOutputFileName());
+    ana_man->OpenFile(manager->GetOutputFileName());
+  }
+  else {
+    if (this->IsMaster()) RMGLog::Out(RMGLog::warning, "Object persistency disabled");
+  }
 
   if (fRMGMasterGenerator) {
     if (fRMGMasterGenerator->GetGenerator()) {
@@ -51,7 +108,6 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
         fRMGRun->GetNumberOfEventToBeProcessed());
   }
 
-  auto manager = RMGManager::GetRMGManager();
   auto g4manager = G4RunManager::GetRunManager();
   auto tot_events = g4manager->GetNumberOfEventsToBeProcessed();
   if (manager->GetPrintModulo() <= 0 and tot_events >= 100) manager->SetPrintModulo(tot_events/10);
@@ -66,6 +122,12 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     if (fRMGMasterGenerator->GetGenerator()) {
       fRMGMasterGenerator->GetGenerator()->EndOfRunAction(fRMGRun);
     }
+  }
+
+  if (fIsPersistencyEnabled) {
+    auto ana_man = G4AnalysisManager::Instance();
+    ana_man->Write();
+    ana_man->CloseFile();
   }
 
   if (this->IsMaster()) {
@@ -97,7 +159,6 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   // reset print modulo
   // TODO: if it's user specified, it shouldn't be reset
   RMGManager::GetRMGManager()->SetPrintModulo(-1);
-
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

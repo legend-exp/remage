@@ -13,7 +13,7 @@
 namespace RMGNavigationTools {
 
   G4LogicalVolume* FindLogicalVolume(std::string name);
-  G4VPhysicalVolume* FindPhysicalVolume(std::string name);
+  G4VPhysicalVolume* FindPhysicalVolume(std::string name, int copy_nr=0);
   G4VPhysicalVolume* FindDirectMother(G4VPhysicalVolume* volume);
 
   void PrintListOfLogicalVolumes();

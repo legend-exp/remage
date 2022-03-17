@@ -13,9 +13,10 @@
 
 #include "fmt/core.h"
 
-G4VPhysicalVolume* RMGNavigationTools::FindPhysicalVolume(std::string name) {
+G4VPhysicalVolume* RMGNavigationTools::FindPhysicalVolume(std::string name, int copy_nr) {
     auto const& store = *G4PhysicalVolumeStore::GetInstance();
-    auto result = std::find_if(store.begin(), store.end(), [&name](auto v) { return std::string(v->GetName()) == name; });
+    auto result = std::find_if(store.begin(), store.end(),
+        [&name, &copy_nr](auto v) { return (std::string(v->GetName()) == name && v->GetCopyNo() == copy_nr); });
     if (result == store.end()) {
       RMGLog::Out(RMGLog::error, "Physical volume ", name, " not found in store. Returning nullptr");
       return nullptr;

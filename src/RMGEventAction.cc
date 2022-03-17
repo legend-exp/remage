@@ -4,15 +4,18 @@
 #include <chrono>
 
 #include "G4RunManager.hh"
-#include "RMGRun.hh"
-
+#include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
+
+#include "RMGRun.hh"
 #include "RMGManager.hh"
+#include "RMGDetectorConstruction.hh"
 #include "RMGRunAction.hh"
 #include "RMGUserAction.hh"
 #include "RMGLog.hh"
 
 #include "fmt/chrono.h"
+#include "magic_enum/magic_enum.hpp"
 
 RMGEventAction::RMGEventAction(RMGRunAction* run_action) :
   fRunAction(run_action) {
@@ -42,9 +45,25 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
         event->GetEventID()+1, (event->GetEventID()+1)*100./tot_events,
         elapsed_d, elapsed_h, elapsed_m, elapsed_s);
   }
+
+  if (RMGManager::GetRMGManager()->IsPersistencyEnabled()) {
+    fRunAction->ClearOutputDataFields();
+  }
 }
 
-void RMGEventAction::EndOfEventAction(const G4Event* /*event*/) {}
+void RMGEventAction::EndOfEventAction(const G4Event* event) {
+
+  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+  auto active_dets = det_cons->GetActiveDetectorList();
+
+  for (const auto& d_type : active_dets) {
+    fRunAction->GetOutputDataFields(d_type)->EndOfEventAction(event);
+  }
+
+  if (RMGManager::GetRMGManager()->IsPersistencyEnabled()) {
+    G4AnalysisManager::Instance()->AddNtupleRow();
+  }
+}
 
 void RMGEventAction::DefineCommands() {
 

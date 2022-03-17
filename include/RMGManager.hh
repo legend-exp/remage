@@ -41,6 +41,7 @@ class RMGManager {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
     inline bool IsPersistencyEnabled() { return fIsPersistencyEnabled; }
+    inline const std::string& GetOutputFileName() { return fOutputFile; }
 
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
@@ -80,6 +81,7 @@ class RMGManager {
     bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
     int fNThreads = 0;
+    std::string fOutputFile = "detector-hits.root";
 
     static RMGManager* fRMGManager;
 
@@ -94,6 +96,7 @@ class RMGManager {
     std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<G4GenericMessenger> fLogMessenger;
     std::unique_ptr<G4GenericMessenger> fRandMessenger;
+    std::unique_ptr<G4GenericMessenger> fOutputMessenger;
     void DefineCommands();
 };
 

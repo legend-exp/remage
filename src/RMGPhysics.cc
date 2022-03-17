@@ -220,6 +220,7 @@ void RMGPhysics::ConstructOptical() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO: define multiple sensitive regions? look in detector construction too
 void RMGPhysics::SetCuts() {
 
   RMGLog::Out(RMGLog::debug, "Setting particle cut values");

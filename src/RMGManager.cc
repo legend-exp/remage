@@ -299,6 +299,15 @@ void RMGManager::DefineCommands() {
   fRandMessenger->DeclareMethod("UseSystemEntropy", &RMGManager::SetRandSystemEntropySeed)
     .SetGuidance("Select a random initial seed from system entropy")
     .SetStates(G4State_PreInit, G4State_Idle);
+
+  fOutputMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
+      "Commands for controlling the simulation output");
+
+  fOutputMessenger->DeclareProperty("FileName", fOutputFile)
+    .SetGuidance("Set output file name for object persistency")
+    .SetParameterName("filename", false)
+    .SetStates(G4State_PreInit, G4State_Idle);
+
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

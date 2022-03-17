@@ -8,10 +8,14 @@ namespace fs = std::filesystem;
 #include "G4LogicalVolume.hh"
 #include "G4UserLimits.hh"
 #include "G4GDMLParser.hh"
+#include "G4SDManager.hh"
 
 #include "RMGMaterialTable.hh"
 #include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
+#include "RMGOpticalDetector.hh"
+
+#include "magic_enum/magic_enum.hpp"
 
 RMGMaterialTable::BathMaterial RMGDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
 
@@ -32,7 +36,8 @@ G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
     for (const auto& file : fGDMLFiles) {
       RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
-      parser.Read(file);
+      // TODO: decide here
+      parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
   }
@@ -53,11 +58,77 @@ G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
     else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
   }
 
+  // TODO: create sensitive region for special production cuts
+  // auto det_lv = RMGNavigationTools::FindLogicalVolume("Detector");
+  // det_lv->SetRegion(fSensitiveRegion);
+  // fSensitiveRegion->AddRootLogicalVolume(det_lv);
+
   return fWorld;
 }
 
 void RMGDetectorConstruction::ConstructSDandField() {
-  // TODO
+
+  // set up G4SDManager
+  auto sd_man = G4SDManager::GetSDMpointer();
+  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) sd_man->SetVerboseLevel(1);
+  else sd_man->SetVerboseLevel(0);
+
+  // map holding a list of sensitive detectors to activate
+  std::map<DetectorType, G4VSensitiveDetector*> active_dets;
+
+  for (const auto& [k, v] : fDetectorMetadata) {
+
+    // initialize a concrete detector, if not done yet
+    // TODO: allow user to register custom detectors
+    if (active_dets.find(v.type) == active_dets.end()) {
+      RMGLog::Out(RMGLog::debug, "Registering new sensitive detector of type ", magic_enum::enum_name(v.type));
+
+      G4VSensitiveDetector* obj = nullptr;
+      switch (v.type) {
+        case DetectorType::kOptical :
+          obj = new RMGOpticalDetector();
+          break;
+        case DetectorType::kGermanium :
+        case DetectorType::kLAr :
+        default : RMGLog::Out(RMGLog::fatal, "No behaviour for sensitive detector type '",
+                      magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
+      }
+      sd_man->AddNewDetector(obj);
+      active_dets.emplace(v.type, obj);
+    }
+
+    // now assign logical volumes to the sensitive detector
+    // TODO: what does it happen if one adds the same logical volume multiple times?
+    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
+    if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
+    this->SetSensitiveDetector(pv->GetLogicalVolume(), active_dets[v.type]);
+  }
+
+  std::string vec_repr = "";
+  for (const auto& d : fActiveDetectors) vec_repr += std::string(magic_enum::enum_name(d)) + ", ";
+  if (vec_repr.size() > 2) vec_repr.erase(vec_repr.size() - 2);
+  RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
+}
+
+void RMGDetectorConstruction::RegisterDetector(DetectorType type, const std::string& pv_name,
+    int uid, int copy_nr) {
+
+  for (const auto& [k, v] : fDetectorMetadata) {
+    if (v.uid == uid) RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
+    return;
+  }
+
+  // this must be done here to inform the run action in time
+  fActiveDetectors.insert(type);
+
+  // FIXME: can this be done with emplace?
+  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid}});
+  if (!r_value.second) RMGLog::OutFormat(RMGLog::warning,
+      "Physical volume '{}' (copy number {}) has already been registered as detector",
+      pv_name, copy_nr);
+
+  RMGLog::OutFormat(RMGLog::detail, "Registered physical volume '{}' (copy nr. {}) as {} detector type",
+      pv_name, copy_nr, magic_enum::enum_name(type));
 }
 
 void RMGDetectorConstruction::DefineCommands() {

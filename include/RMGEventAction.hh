@@ -29,7 +29,6 @@ class RMGEventAction : public G4UserEventAction {
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
     RMGRunAction* fRunAction = nullptr;
-
 };
 
 #endif
