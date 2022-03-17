@@ -1,4 +1,4 @@
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -17,15 +17,15 @@ namespace fs = std::filesystem;
 
 #include "magic_enum/magic_enum.hpp"
 
-RMGMaterialTable::BathMaterial RMGDetectorConstruction::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
+RMGMaterialTable::BathMaterial RMGHardware::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
 
-RMGDetectorConstruction::RMGDetectorConstruction() {
+RMGHardware::RMGHardware() {
   fMaterialTable = std::make_unique<RMGMaterialTable>();
 
   this->DefineCommands();
 }
 
-G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
+G4VPhysicalVolume* RMGHardware::Construct() {
 
   RMGLog::Out(RMGLog::debug, "Constructing detector");
 
@@ -66,7 +66,7 @@ G4VPhysicalVolume* RMGDetectorConstruction::Construct() {
   return fWorld;
 }
 
-void RMGDetectorConstruction::ConstructSDandField() {
+void RMGHardware::ConstructSDandField() {
 
   // set up G4SDManager
   auto sd_man = G4SDManager::GetSDMpointer();
@@ -110,7 +110,7 @@ void RMGDetectorConstruction::ConstructSDandField() {
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
 }
 
-void RMGDetectorConstruction::RegisterDetector(DetectorType type, const std::string& pv_name,
+void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name,
     int uid, int copy_nr) {
 
   for (const auto& [k, v] : fDetectorMetadata) {
@@ -131,21 +131,21 @@ void RMGDetectorConstruction::RegisterDetector(DetectorType type, const std::str
       pv_name, copy_nr, magic_enum::enum_name(type));
 }
 
-void RMGDetectorConstruction::DefineCommands() {
+void RMGHardware::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
       "Commands for controlling geometry definitions");
 
-  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGDetectorConstruction::IncludeGDMLFile)
+  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
     .SetGuidance("Use GDML file for geometry definition")
     .SetParameterName("filename", false)
     .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGDetectorConstruction::PrintListOfLogicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
     .SetGuidance("Print list of defined physical volumes")
     .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGDetectorConstruction::PrintListOfPhysicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
     .SetGuidance("Print list of defined physical volumes")
     .SetStates(G4State_Idle);
 }

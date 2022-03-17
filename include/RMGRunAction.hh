@@ -9,7 +9,7 @@
 #include "G4UserRunAction.hh"
 #include "G4AnalysisManager.hh"
 
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 #include "RMGVOutputScheme.hh"
 
 class G4Run;
@@ -33,7 +33,7 @@ class RMGRunAction : public G4UserRunAction {
     void BeginOfRunAction(const G4Run*) override;
     void EndOfRunAction(const G4Run*) override;
 
-    inline auto& GetOutputDataFields(RMGDetectorConstruction::DetectorType d_type) {
+    inline auto& GetOutputDataFields(RMGHardware::DetectorType d_type) {
       return fOutputDataFields.at(d_type);
     }
     inline void ClearOutputDataFields() {
@@ -46,7 +46,7 @@ class RMGRunAction : public G4UserRunAction {
     bool fIsPersistencyEnabled = false;
     RMGMasterGenerator* fRMGMasterGenerator = nullptr;
 
-    std::map<RMGDetectorConstruction::DetectorType, std::unique_ptr<RMGVOutputScheme>> fOutputDataFields;
+    std::map<RMGHardware::DetectorType, std::unique_ptr<RMGVOutputScheme>> fOutputDataFields;
 };
 
 #endif

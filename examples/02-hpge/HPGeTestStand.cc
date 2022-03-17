@@ -1,4 +1,4 @@
-#include "DetectorConstruction.hh"
+#include "HPGeTestStand.hh"
 
 #include "RMGMaterialTable.hh"
 
@@ -6,7 +6,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
-G4VPhysicalVolume* DetectorConstruction::DefineGeometry() {
+G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
     auto world_s = new G4Box("WorldLAr",
             0.5*CLHEP::m, 0.5*CLHEP::m, 0.5*CLHEP::m);

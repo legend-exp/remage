@@ -9,7 +9,7 @@
 
 #include "RMGRun.hh"
 #include "RMGManager.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 #include "RMGRunAction.hh"
 #include "RMGUserAction.hh"
 #include "RMGLog.hh"

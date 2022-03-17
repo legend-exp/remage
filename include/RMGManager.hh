@@ -12,7 +12,7 @@
 #include "RMGLog.hh"
 
 class G4VUserPhysicsList;
-class RMGDetectorConstruction;
+class RMGHardware;
 class RMGUserAction;
 class RMGManagerMessenger;
 class G4GenericMessenger;
@@ -33,7 +33,7 @@ class RMGManager {
     static inline RMGManager* GetRMGManager() { return fRMGManager; }
     G4RunManager* GetG4RunManager();
     G4VisManager* GetG4VisManager();
-    RMGDetectorConstruction* GetDetectorConstruction();
+    RMGHardware* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
     inline int GetPrintModulo() { return fPrintModulo; }
 
@@ -46,7 +46,7 @@ class RMGManager {
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
     inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
-    inline void SetUserInit(RMGDetectorConstruction* det) { fDetectorConstruction = det; }
+    inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
     inline void SetBatchMode(bool flag=true) { fBatchMode = flag; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
@@ -89,7 +89,7 @@ class RMGManager {
     std::unique_ptr<G4VisManager> fG4VisManager = nullptr;
 
     G4VUserPhysicsList* fPhysicsList = nullptr;
-    RMGDetectorConstruction* fDetectorConstruction = nullptr;
+    RMGHardware* fDetectorConstruction = nullptr;
     RMGUserAction* fUserAction = nullptr;
 
     // messenger stuff

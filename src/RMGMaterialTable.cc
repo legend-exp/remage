@@ -7,7 +7,7 @@
 #include "G4MaterialPropertiesTable.hh"
 
 #include "RMGLog.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 
 namespace u = CLHEP;
 
@@ -112,7 +112,7 @@ void RMGMaterialTable::InitializeMaterials() {
       pressure     = u::STP_Pressure);
   mat_enr_ge->AddElement(el_enr_ge, n_atoms=1);
 
-  auto bath_material = RMGDetectorConstruction::GetBathMaterial();
+  auto bath_material = RMGHardware::GetBathMaterial();
 
   // new germanium with cryogenic properties
   man->BuildMaterialWithNewDensity("RMG_CryogenicGermanium",

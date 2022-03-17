@@ -8,7 +8,7 @@
 #include "RMGManager.hh"
 #include "RMGLog.hh"
 #include "RMGOpticalDetector.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 
 void RMGOpticalOutputScheme::clear() {
   detector_uid.clear();

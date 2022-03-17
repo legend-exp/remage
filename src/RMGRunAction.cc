@@ -61,7 +61,7 @@ void RMGRunAction::SetupAnalysisManager() {
     // instatiate concrete output scheme class
     // TODO: allow for library user to register own output scheme
     switch (d_type) {
-      case RMGDetectorConstruction::kOptical :
+      case RMGHardware::kOptical :
         fOutputDataFields.emplace(d_type, std::make_unique<RMGOpticalOutputScheme>(ana_man));
         fOutputDataFields[d_type]->AssignOutputNames(ana_man);
         break;

@@ -12,7 +12,7 @@
 #include "ProjectInfo.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 #include "RMGTools.hh"
 
 #include "magic_enum/magic_enum.hpp"

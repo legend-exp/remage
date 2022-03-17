@@ -5,5 +5,5 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_package(remage)
 
-add_executable(02-hpge main.cc DetectorConstruction.hh DetectorConstruction.cc)
+add_executable(02-hpge main.cc HPGeTestStand.hh HPGeTestStand.cc)
 target_link_libraries(02-hpge PUBLIC RMG::remage)

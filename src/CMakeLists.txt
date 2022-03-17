@@ -31,7 +31,7 @@ set(PROJECT_PUBLIC_HEADERS
 )
 
 set(PROJECT_SOURCES
-    ${_root}/src/RMGDetectorConstruction.cc
+    ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGEventAction.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc

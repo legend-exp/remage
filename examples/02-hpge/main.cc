@@ -1,14 +1,14 @@
 #include "RMGManager.hh"
 #include "RMGLog.hh"
 
-#include "DetectorConstruction.hh"
+#include "HPGeTestStand.hh"
 
 int main(int argc, char** argv) {
 
     // RMGLog::SetLogLevel(RMGLog::debug);
 
     RMGManager manager("02-hpge", argc, argv);
-    manager.SetUserInit(new DetectorConstruction());
+    manager.SetUserInit(new HPGeTestStand());
 
     std::string macro = argc > 1 ? argv[1] : "";
     if (!macro.empty()) manager.IncludeMacroFile(macro);

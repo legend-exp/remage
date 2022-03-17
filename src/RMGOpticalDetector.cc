@@ -13,7 +13,7 @@
 
 #include "RMGLog.hh"
 #include "RMGManager.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 
 G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator = nullptr;
 
@@ -73,7 +73,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGDetectorConstruction::kOptical) {
+    if (d_type != RMGHardware::kOptical) {
       RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {} not registered as optical detector",
           pv_name, pv_copynr);
       return false;

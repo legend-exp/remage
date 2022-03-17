@@ -22,7 +22,7 @@
 
 #include "ProjectInfo.hh"
 #include "RMGPhysics.hh"
-#include "RMGDetectorConstruction.hh"
+#include "RMGHardware.hh"
 #include "RMGUserAction.hh"
 #include "RMGTools.hh"
 
@@ -153,7 +153,7 @@ void RMGManager::SetUpDefaultG4VisManager() {
 
 void RMGManager::SetUpDefaultDetectorConstruction() {
   RMGLog::Out(RMGLog::debug, "Initializing default (empty) detector");
-  fDetectorConstruction = new RMGDetectorConstruction();
+  fDetectorConstruction = new RMGHardware();
 }
 
 G4RunManager* RMGManager::GetG4RunManager() {
@@ -166,7 +166,7 @@ G4VisManager* RMGManager::GetG4VisManager() {
   return fG4VisManager.get();
 }
 
-RMGDetectorConstruction* RMGManager::GetDetectorConstruction() {
+RMGHardware* RMGManager::GetDetectorConstruction() {
   if (!fDetectorConstruction) this->SetUpDefaultDetectorConstruction();
   return fDetectorConstruction;
 }
