@@ -1,4 +1,8 @@
+/RMG/Processes/OpticalPhysics true
+
 /run/initialize
+
+/process/optical/boundary/setInvokeSD true
 
 /vis/open OGLIQt
 
