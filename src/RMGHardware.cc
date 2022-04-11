@@ -106,11 +106,9 @@ void RMGHardware::ConstructSDandField() {
       this->SetSensitiveDetector(lv, active_dets[v.type]);
     }
 
-    RMGLog::OutFormat(RMGLog::debug, "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
-      magic_enum::enum_name(v.type),
-      pv->GetName().c_str(),
-      v.uid,
-      lv->GetName().c_str() );
+    RMGLog::OutFormat(RMGLog::debug,
+        "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
+        magic_enum::enum_name(v.type), pv->GetName().c_str(), v.uid, lv->GetName().c_str());
   }
 
   std::string vec_repr = "";
@@ -124,8 +122,8 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
 
   for (const auto& [k, v] : fDetectorMetadata) {
     if (v.uid == uid) {
-        RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
-        return;
+      RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
+      return;
     }
   }
 
