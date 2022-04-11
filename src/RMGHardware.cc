@@ -98,10 +98,19 @@ void RMGHardware::ConstructSDandField() {
     }
 
     // now assign logical volumes to the sensitive detector
-    // TODO: what does it happen if one adds the same logical volume multiple times?
     const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
     if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
-    this->SetSensitiveDetector(pv->GetLogicalVolume(), active_dets[v.type]);
+    const auto lv = pv->GetLogicalVolume();
+    // only add the SD to the LV if not already present.
+    if (lv->GetSensitiveDetector() != active_dets[v.type]) {
+      this->SetSensitiveDetector(lv, active_dets[v.type]);
+    }
+
+    RMGLog::OutFormat(RMGLog::debug, "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
+      magic_enum::enum_name(v.type),
+      pv->GetName().c_str(),
+      v.uid,
+      lv->GetName().c_str() );
   }
 
   std::string vec_repr = "";
@@ -114,8 +123,10 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
     int copy_nr) {
 
   for (const auto& [k, v] : fDetectorMetadata) {
-    if (v.uid == uid) RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
-    return;
+    if (v.uid == uid) {
+        RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
+        return;
+    }
   }
 
   // this must be done here to inform the run action in time
