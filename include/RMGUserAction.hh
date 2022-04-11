@@ -10,10 +10,10 @@ class RMGUserAction : public G4VUserActionInitialization {
     inline RMGUserAction() = default;
     ~RMGUserAction() override = default;
 
-    RMGUserAction           (RMGUserAction const&) = delete;
+    RMGUserAction(RMGUserAction const&) = delete;
     RMGUserAction& operator=(RMGUserAction const&) = delete;
-    RMGUserAction           (RMGUserAction&&)      = delete;
-    RMGUserAction& operator=(RMGUserAction&&)      = delete;
+    RMGUserAction(RMGUserAction&&) = delete;
+    RMGUserAction& operator=(RMGUserAction&&) = delete;
 
     void Build() const override;
     void BuildForMaster() const override;

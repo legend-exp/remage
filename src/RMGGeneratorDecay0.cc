@@ -1,8 +1,7 @@
 #include "RMGGeneratorDecay0.hh"
 #include "RMGLog.hh"
 
-RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) :
-  RMGVGenerator("Decay0") {
+RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGenerator("Decay0") {
 
   if (!prim_gen) RMGLog::OutDev(RMGLog::fatal, "Primary position generator is nullptr");
 

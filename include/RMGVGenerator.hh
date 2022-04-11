@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
+#include "globals.hh"
 
 class G4Event;
 class G4Run;
@@ -15,18 +15,17 @@ class RMGVGenerator {
 
     RMGVGenerator() = delete;
 
-    inline RMGVGenerator(std::string name) :
-      fGeneratorName(name) {};
+    inline RMGVGenerator(std::string name) : fGeneratorName(name){};
 
     virtual inline ~RMGVGenerator() = default;
 
-    RMGVGenerator           (RMGVGenerator const&) = delete;
+    RMGVGenerator(RMGVGenerator const&) = delete;
     RMGVGenerator& operator=(RMGVGenerator const&) = delete;
-    RMGVGenerator           (RMGVGenerator&&)      = delete;
-    RMGVGenerator& operator=(RMGVGenerator&&)      = delete;
+    RMGVGenerator(RMGVGenerator&&) = delete;
+    RMGVGenerator& operator=(RMGVGenerator&&) = delete;
 
-    virtual inline void BeginOfRunAction(const G4Run*) {};
-    virtual inline void EndOfRunAction(const G4Run*) {};
+    virtual inline void BeginOfRunAction(const G4Run*){};
+    virtual inline void EndOfRunAction(const G4Run*){};
 
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
     virtual void GeneratePrimariesKinematics(G4Event*) = 0;

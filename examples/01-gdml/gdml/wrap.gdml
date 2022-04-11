@@ -9,10 +9,10 @@
 
 	  <quantity name="wrap_z" type="length" value="93.5" unit="mm"/>
 	  <quantity name="wrap_radius" type="length" value="41.0" unit="mm"/>
-	  
+
 	  <quantity name="wrap_cavity_radius" type="length" value="40.4" unit="mm"/>
 	  <quantity name="wrap_top_thickness" type="length" value="1.0" unit="mm" />
-  
+
  </define>
 
 
@@ -34,7 +34,7 @@
 
 
  <solids>
-	 
+
 	 <polycone name="wrap" startphi="0" deltaphi="TWOPI" aunit="rad">
 		 <zplane rmin="0" rmax="wrap_radius" z="0" />
                  <zplane rmin="0" rmax="wrap_radius" z="wrap_top_thickness" />
@@ -58,4 +58,3 @@
  </setup>
 
 </gdml>
-

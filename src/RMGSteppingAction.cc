@@ -4,8 +4,7 @@
 
 #include "RMGEventAction.hh"
 
-RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction):
-  fEventAction(eventaction) {}
+RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* /*step*/) {}
 

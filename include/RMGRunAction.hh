@@ -1,13 +1,13 @@
 #ifndef _RMG_MANAGEMENT_RUN_ACTION_HH_
 #define _RMG_MANAGEMENT_RUN_ACTION_HH_
 
-#include <memory>
 #include <chrono>
-#include <vector>
 #include <map>
+#include <memory>
+#include <vector>
 
-#include "G4UserRunAction.hh"
 #include "G4AnalysisManager.hh"
+#include "G4UserRunAction.hh"
 
 #include "RMGHardware.hh"
 #include "RMGVOutputScheme.hh"
@@ -19,14 +19,14 @@ class RMGRunAction : public G4UserRunAction {
 
   public:
 
-    RMGRunAction(bool persistency=false);
-    RMGRunAction(RMGMasterGenerator*, bool persistency=false);
+    RMGRunAction(bool persistency = false);
+    RMGRunAction(RMGMasterGenerator*, bool persistency = false);
     ~RMGRunAction() = default;
 
-    RMGRunAction           (RMGRunAction const&) = delete;
+    RMGRunAction(RMGRunAction const&) = delete;
     RMGRunAction& operator=(RMGRunAction const&) = delete;
-    RMGRunAction           (RMGRunAction&&)      = delete;
-    RMGRunAction& operator=(RMGRunAction&&)      = delete;
+    RMGRunAction(RMGRunAction&&) = delete;
+    RMGRunAction& operator=(RMGRunAction&&) = delete;
 
     void SetupAnalysisManager();
     G4Run* GenerateRun() override;

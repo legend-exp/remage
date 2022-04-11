@@ -9,6 +9,5 @@
   <constant name="position_cryostat_cavity_fromBottom" value="0.8" />
 
 
- <!-- POSITIONS  --> 
+ <!-- POSITIONS  -->
   <constant name="position_cryostat_fromBottom" value="250.0" />
-

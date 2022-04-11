@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
+#include "globals.hh"
 
 #if RMG_HAS_BXDECAY0
 class RMGVVertexGenerator : public bxdecay0_g4::VertexGeneratorInterface {
@@ -20,15 +20,14 @@ class RMGVVertexGenerator {
 
   public:
 
-    inline RMGVVertexGenerator(std::string name) :
-      fGeneratorName(name) {}
+    inline RMGVVertexGenerator(std::string name) : fGeneratorName(name) {}
 
     virtual inline ~RMGVVertexGenerator() = default;
 
-    RMGVVertexGenerator           (RMGVVertexGenerator const&) = delete;
+    RMGVVertexGenerator(RMGVVertexGenerator const&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator const&) = delete;
-    RMGVVertexGenerator           (RMGVVertexGenerator&&)      = delete;
-    RMGVVertexGenerator& operator=(RMGVVertexGenerator&&)      = delete;
+    RMGVVertexGenerator(RMGVVertexGenerator&&) = delete;
+    RMGVVertexGenerator& operator=(RMGVVertexGenerator&&) = delete;
 
     virtual inline void GeneratePrimariesVertex(G4ThreeVector& v) { v = kDummyPrimaryPosition; }
     inline void SetMaxAttempts(int val) { fMaxAttempts = val; }

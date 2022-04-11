@@ -21,4 +21,3 @@ submitting a pull request.
 - `RMGMasterGenerator` is the remage mandatory concretization of G4's
   `G4VUserPrimaryGenerator`. An instance of this class is passed to G4 as user
   action. This master class manages remage generators
-

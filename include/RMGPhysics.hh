@@ -4,8 +4,8 @@
 #include <map>
 #include <memory>
 
-#include "G4VModularPhysicsList.hh"
 #include "G4GenericMessenger.hh"
+#include "G4VModularPhysicsList.hh"
 #include "globals.hh"
 
 class RMGProcessesMessenger;
@@ -15,10 +15,10 @@ class RMGPhysics : public G4VModularPhysicsList {
 
     RMGPhysics();
 
-    RMGPhysics           (RMGPhysics const&) = delete;
+    RMGPhysics(RMGPhysics const&) = delete;
     RMGPhysics& operator=(RMGPhysics const&) = delete;
-    RMGPhysics           (RMGPhysics&&)      = delete;
-    RMGPhysics& operator=(RMGPhysics&&)      = delete;
+    RMGPhysics(RMGPhysics&&) = delete;
+    RMGPhysics& operator=(RMGPhysics&&) = delete;
 
     enum PhysicsRealm {
       kDoubleBetaDecay,
@@ -39,17 +39,17 @@ class RMGPhysics : public G4VModularPhysicsList {
 
     // TODO: cut for optical photon?
     struct StepCutStore {
-      StepCutStore() = default;
-      inline StepCutStore(double def_cut) :
-        gamma(def_cut), electron(def_cut), positron(def_cut),
-        proton(def_cut), alpha(def_cut), generic_ion(def_cut) {}
+        StepCutStore() = default;
+        inline StepCutStore(double def_cut)
+            : gamma(def_cut), electron(def_cut), positron(def_cut), proton(def_cut), alpha(def_cut),
+              generic_ion(def_cut) {}
 
-      double gamma;
-      double electron;
-      double positron;
-      double proton;
-      double alpha;
-      double generic_ion;
+        double gamma;
+        double electron;
+        double positron;
+        double proton;
+        double alpha;
+        double generic_ion;
     };
 
     void SetCuts() override;

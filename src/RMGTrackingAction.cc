@@ -1,10 +1,9 @@
 #include "RMGTrackingAction.hh"
 
-#include "RMGEventAction.hh"
 #include "G4Track.hh"
+#include "RMGEventAction.hh"
 
-RMGTrackingAction::RMGTrackingAction(RMGEventAction* eventaction) :
-  fEventAction(eventaction) {}
+RMGTrackingAction::RMGTrackingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
 
 void RMGTrackingAction::PreUserTrackingAction(const G4Track* /*aTrack*/) {}
 

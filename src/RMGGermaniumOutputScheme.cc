@@ -1,14 +1,14 @@
 #include "RMGGermaniumOutputScheme.hh"
 
-#include "G4Event.hh"
 #include "G4AnalysisManager.hh"
-#include "G4SDManager.hh"
+#include "G4Event.hh"
 #include "G4HCtable.hh"
+#include "G4SDManager.hh"
 
-#include "RMGManager.hh"
-#include "RMGLog.hh"
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
+#include "RMGLog.hh"
+#include "RMGManager.hh"
 
 void RMGGermaniumOutputScheme::clear() {
   detector_uid.clear();
@@ -43,8 +43,7 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
   if (hit_coll->entries() <= 0) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
     return;
-  }
-  else {
+  } else {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 

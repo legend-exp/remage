@@ -1,30 +1,30 @@
 #include "RMGManager.hh"
 
+#include <cstdlib>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
-#include <cstdlib>
 
 #include "G4Threading.hh"
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #endif
+#include "G4GenericMessenger.hh"
 #include "G4RunManager.hh"
 #include "G4RunManagerFactory.hh"
-#include "G4VUserPhysicsList.hh"
-#include "G4VisManager.hh"
-#include "G4UImanager.hh"
-#include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
-#include "G4GenericMessenger.hh"
+#include "G4UImanager.hh"
+#include "G4VUserPhysicsList.hh"
+#include "G4VisExecutive.hh"
+#include "G4VisManager.hh"
 #include "Randomize.hh"
 
 #include "ProjectInfo.hh"
-#include "RMGPhysics.hh"
 #include "RMGHardware.hh"
-#include "RMGUserAction.hh"
+#include "RMGPhysics.hh"
 #include "RMGTools.hh"
+#include "RMGUserAction.hh"
 
 #if RMG_HAS_ROOT
 #include "TEnv.h"
@@ -32,10 +32,8 @@
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
-RMGManager::RMGManager(std::string app_name, int argc, char** argv) :
-  fApplicationName(app_name),
-  fArgc(argc),
-  fArgv(argv) {
+RMGManager::RMGManager(std::string app_name, int argc, char** argv)
+    : fApplicationName(app_name), fArgc(argc), fArgv(argv) {
 
   if (fRMGManager) RMGLog::Out(RMGLog::fatal, "RMGManager must be singleton!");
   fRMGManager = this;
@@ -68,8 +66,7 @@ void RMGManager::Initialize() {
     else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
     fG4RunManager->SetNumberOfThreads(fNThreads);
     RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
-  }
-  else RMGLog::Out(RMGLog::detail, "Execution is sequential (one-threaded)");
+  } else RMGLog::Out(RMGLog::detail, "Execution is sequential (one-threaded)");
 
   std::string _str = "";
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
@@ -177,29 +174,28 @@ G4VUserPhysicsList* RMGManager::GetProcessesList() {
 }
 
 void RMGManager::SetLogLevelScreen(std::string level) {
-  try { RMGLog::SetLogLevelScreen(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
-  catch (const std::bad_cast&) { return; }
+  try {
+    RMGLog::SetLogLevelScreen(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
+  } catch (const std::bad_cast&) { return; }
 }
 
 void RMGManager::SetLogLevelFile(std::string level) {
-  try { RMGLog::SetLogLevelFile(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level")); }
-  catch (const std::bad_cast&) { return; }
+  try {
+    RMGLog::SetLogLevelFile(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
+  } catch (const std::bad_cast&) { return; }
 }
 
 void RMGManager::SetRandEngine(std::string name) {
   if (name == "JamesRandom") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
     RMGLog::Out(RMGLog::summary, "Using James random engine");
-  }
-  else if (name == "RanLux") {
+  } else if (name == "RanLux") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::RanluxEngine);
     RMGLog::Out(RMGLog::summary, "Using RanLux random engine");
-  }
-  else if (name == "MTwist") {
+  } else if (name == "MTwist") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::MTwistEngine);
     RMGLog::Out(RMGLog::summary, "Using MTwist random engine");
-  }
-  else {
+  } else {
     RMGLog::Out(RMGLog::error, "'", name, "' random engine unknown");
   }
 }
@@ -209,8 +205,7 @@ void RMGManager::SetRandEngineSeed(long seed) {
     RMGLog::Out(RMGLog::error, "Seed ", seed, " is too large. Largest possible seed is ",
         std::numeric_limits<long>::max(), ". Setting seed to 0.");
     CLHEP::HepRandom::setTheSeed(0);
-  }
-  else CLHEP::HepRandom::setTheSeed(seed);
+  } else CLHEP::HepRandom::setTheSeed(seed);
   RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
 
   fIsRandControlled = true;
@@ -218,7 +213,7 @@ void RMGManager::SetRandEngineSeed(long seed) {
 
 void RMGManager::SetRandEngineInternalSeed(int index) {
   long seeds[2];
-  int table_index = index/2;
+  int table_index = index / 2;
   CLHEP::HepRandom::getTheTableSeeds(seeds, table_index);
 
   int array_index = index % 2;
@@ -245,69 +240,68 @@ void RMGManager::DefineCommands() {
       "General commands for controlling the application");
 
   fMessenger->DeclareMethod("Include", &RMGManager::IncludeMacroFile)
-    .SetGuidance("Include macro file")
-    .SetParameterName("filename", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Include macro file")
+      .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("PrintProgressModulo", &RMGManager::SetPrintModulo)
-    .SetGuidance("How many processed events before progress information is displayed")
-    .SetParameterName("n", false)
-    .SetRange("n > 0")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("How many processed events before progress information is displayed")
+      .SetParameterName("n", false)
+      .SetRange("n > 0")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fLogMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Logging/",
       "Commands for controlling application logging");
 
   fLogMessenger->DeclareMethod("LogLevelScreen", &RMGManager::SetLogLevelScreen)
-    .SetGuidance("Set verbosity level on screen")
-    .SetParameterName("level", false)
-    .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Set verbosity level on screen")
+      .SetParameterName("level", false)
+      .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fLogMessenger->DeclareMethod("LogLevelFile", &RMGManager::SetLogLevelFile)
-    .SetGuidance("Set verbosity level on file")
-    .SetParameterName("level", false)
-    .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Set verbosity level on file")
+      .SetParameterName("level", false)
+      .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fLogMessenger->DeclareMethod("LogToFile", &RMGManager::SetLogToFileName)
-    .SetGuidance("Set filename for dumping application output")
-    .SetParameterName("filename", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Set filename for dumping application output")
+      .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Randomization/",
       "Commands for controlling randomization settings");
 
   fRandMessenger->DeclareMethod("RandomEngine", &RMGManager::SetRandEngine)
-    .SetGuidance("Select the random engine (CLHEP)")
-    .SetParameterName("name", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Select the random engine (CLHEP)")
+      .SetParameterName("name", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("Seed", &RMGManager::SetRandEngineSeed)
-    .SetGuidance("Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)")
-    .SetParameterName("n", false)
-    .SetRange("n >= 0")
-    .SetDefaultValue("1")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)")
+      .SetParameterName("n", false)
+      .SetRange("n >= 0")
+      .SetDefaultValue("1")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("InternalSeed", &RMGManager::SetRandEngineInternalSeed)
-    .SetGuidance("Select the initial seed for randomization by using the internal CLHEP table")
-    .SetParameterName("index", false)
-    .SetRange("index >= 0 && index < 430")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Select the initial seed for randomization by using the internal CLHEP table")
+      .SetParameterName("index", false)
+      .SetRange("index >= 0 && index < 430")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("UseSystemEntropy", &RMGManager::SetRandSystemEntropySeed)
-    .SetGuidance("Select a random initial seed from system entropy")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Select a random initial seed from system entropy")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fOutputMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
       "Commands for controlling the simulation output");
 
   fOutputMessenger->DeclareProperty("FileName", fOutputFile)
-    .SetGuidance("Set output file name for object persistency")
-    .SetParameterName("filename", false)
-    .SetStates(G4State_PreInit, G4State_Idle);
-
+      .SetGuidance("Set output file name for object persistency")
+      .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

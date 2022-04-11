@@ -1,48 +1,47 @@
 #include "RMGPhysics.hh"
 
-#include "G4ProcessManager.hh"
-#include "G4RegionStore.hh"
-#include "G4HadronicProcessStore.hh"
-#include "G4StepLimiter.hh"
-#include "G4NuclearLevelData.hh"
-#include "G4DeexPrecoParameters.hh"
-#include "G4BosonConstructor.hh"
-#include "G4LeptonConstructor.hh"
-#include "G4MesonConstructor.hh"
 #include "G4BaryonConstructor.hh"
-#include "G4IonConstructor.hh"
-#include "G4ShortLivedConstructor.hh"
-#include "G4RunManagerKernel.hh"
+#include "G4BosonConstructor.hh"
+#include "G4Cerenkov.hh"
+#include "G4DecayPhysics.hh"
+#include "G4DeexPrecoParameters.hh"
+#include "G4EmExtraPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
+#include "G4EmPenelopePhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
-#include "G4EmPenelopePhysics.hh"
-#include "G4EmLivermorePolarizedPhysics.hh"
-#include "G4EmExtraPhysics.hh"
-#include "G4DecayPhysics.hh"
-#include "G4RadioactiveDecayPhysics.hh"
 #include "G4HadronicParameters.hh"
+#include "G4HadronicProcessStore.hh"
+#include "G4IonConstructor.hh"
 #include "G4IonTable.hh"
-#include "G4OpticalParameters.hh"
-#include "G4Scintillation.hh"
+#include "G4LeptonConstructor.hh"
+#include "G4MesonConstructor.hh"
+#include "G4NuclearLevelData.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpBoundaryProcess.hh"
 #include "G4OpRayleigh.hh"
 #include "G4OpWLS.hh"
-#include "G4Cerenkov.hh"
+#include "G4OpticalParameters.hh"
+#include "G4ProcessManager.hh"
+#include "G4RadioactiveDecayPhysics.hh"
+#include "G4RegionStore.hh"
+#include "G4RunManagerKernel.hh"
+#include "G4Scintillation.hh"
+#include "G4ShortLivedConstructor.hh"
+#include "G4StepLimiter.hh"
 
 #include "RMGLog.hh"
 #include "RMGTools.hh"
 
 namespace u = CLHEP;
 
-RMGPhysics::RMGPhysics() :
-  G4VModularPhysicsList() {
+RMGPhysics::RMGPhysics() : G4VModularPhysicsList() {
 
-  G4VUserPhysicsList::defaultCutValue = 0.1*u::mm;
+  G4VUserPhysicsList::defaultCutValue = 0.1 * u::mm;
   this->SetPhysicsRealm(RMGPhysics::kDoubleBetaDecay);
 
   G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevelScreen() <= RMGLog::debug ? 1 : 0;
@@ -107,15 +106,15 @@ void RMGPhysics::ConstructProcess() {
   if (fUseLowEnergyEM) {
     switch (fLowEnergyEMOption) {
       // from https://geant4.web.cern.ch/node/1731
-      case RMGPhysics::LowEnergyEMOption::kOption1 :
+      case RMGPhysics::LowEnergyEMOption::kOption1:
         em_constructor = new G4EmStandardPhysics_option1(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 1");
         break;
-      case RMGPhysics::LowEnergyEMOption::kOption2 :
+      case RMGPhysics::LowEnergyEMOption::kOption2:
         em_constructor = new G4EmStandardPhysics_option2(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 2");
         break;
-      case RMGPhysics::LowEnergyEMOption::kOption3 :
+      case RMGPhysics::LowEnergyEMOption::kOption3:
         em_constructor = new G4EmStandardPhysics_option3(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 3");
         break;
@@ -123,21 +122,20 @@ void RMGPhysics::ConstructProcess() {
         em_constructor = new G4EmStandardPhysics_option4(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 4");
         break;
-      case RMGPhysics::LowEnergyEMOption::kPenelope :
+      case RMGPhysics::LowEnergyEMOption::kPenelope:
         em_constructor = new G4EmPenelopePhysics(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Penelope Physics");
         break;
-      case RMGPhysics::LowEnergyEMOption::kLivermorePolarized :
+      case RMGPhysics::LowEnergyEMOption::kLivermorePolarized:
         em_constructor = new G4EmLivermorePolarizedPhysics(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Livermore-Polarized Physics");
         break;
-      case RMGPhysics::LowEnergyEMOption::kLivermore :
+      case RMGPhysics::LowEnergyEMOption::kLivermore:
         RMGLog::Out(RMGLog::detail, "Using Livermore/LowEnergy electromagnetic physics");
         em_constructor = new G4EmLivermorePhysics(G4VModularPhysicsList::verboseLevel);
         break;
     }
-  }
-  else {
+  } else {
     RMGLog::Out(RMGLog::detail, "Using Standard electromagnetic physics");
     em_constructor = new G4EmStandardPhysics(G4VModularPhysicsList::verboseLevel);
   }
@@ -182,11 +180,11 @@ void RMGPhysics::ConstructOptical() {
   scint_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   // optical processes
-  auto absorption_proc     = new G4OpAbsorption();
-  auto boundary_proc       = new G4OpBoundaryProcess();
+  auto absorption_proc = new G4OpAbsorption();
+  auto boundary_proc = new G4OpBoundaryProcess();
   auto rayleigh_scatt_proc = new G4OpRayleigh();
-  auto wls_proc            = new G4OpWLS();
-  auto cerenkov_proc       = new G4Cerenkov();
+  auto wls_proc = new G4OpWLS();
+  auto cerenkov_proc = new G4Cerenkov();
 
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
@@ -227,7 +225,7 @@ void RMGPhysics::SetCuts() {
 
   G4HadronicProcessStore::Instance()->SetVerbose(G4VModularPhysicsList::verboseLevel);
   // special for low energy physics
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250*u::eV, 100.*u::GeV);
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250 * u::eV, 100. * u::GeV);
 
   this->SetCutValue(fStepCuts.gamma, "gamma");
   this->SetCutValue(fStepCuts.electron, "e-");
@@ -260,53 +258,53 @@ void RMGPhysics::SetCuts() {
 
 void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
   switch (realm) {
-    case RMGPhysics::PhysicsRealm::kDoubleBetaDecay :
+    case RMGPhysics::PhysicsRealm::kDoubleBetaDecay:
       RMGLog::Out(RMGLog::summary, "Realm set to DoubleBetaDecay");
       // The default values for the energy thresholds are tuned to 100 keV
       // in natural germanium (i.e., the BBdecay realm)
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma    = 0.1*u::mm;
-      fStepCuts.electron = 0.1*u::mm;
-      fStepCuts.positron = 0.1*u::mm;
+      fStepCuts.gamma = 0.1 * u::mm;
+      fStepCuts.electron = 0.1 * u::mm;
+      fStepCuts.positron = 0.1 * u::mm;
 
       fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma    = 0.1*u::mm;
-      fStepCutsSensitive.electron = 0.1*u::mm;
-      fStepCutsSensitive.positron = 0.1*u::mm;
+      fStepCutsSensitive.gamma = 0.1 * u::mm;
+      fStepCutsSensitive.electron = 0.1 * u::mm;
+      fStepCutsSensitive.positron = 0.1 * u::mm;
       break;
 
-    case RMGPhysics::PhysicsRealm::kDarkMatter :
+    case RMGPhysics::PhysicsRealm::kDarkMatter:
       RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
       // These values are tuned to ~1 keV for gamma, e+, e- in
       // natural germanium.
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma    = 5*u::um;
-      fStepCuts.electron = 0.5*u::um;
-      fStepCuts.positron = 0.5*u::um;
+      fStepCuts.gamma = 5 * u::um;
+      fStepCuts.electron = 0.5 * u::um;
+      fStepCuts.positron = 0.5 * u::um;
 
       fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma    = 5*u::um;
-      fStepCutsSensitive.electron = 0.5*u::um;
-      fStepCutsSensitive.positron = 0.5*u::um;
+      fStepCutsSensitive.gamma = 5 * u::um;
+      fStepCutsSensitive.electron = 0.5 * u::um;
+      fStepCutsSensitive.positron = 0.5 * u::um;
       break;
 
-    case RMGPhysics::PhysicsRealm::kCosmicRays :
+    case RMGPhysics::PhysicsRealm::kCosmicRays:
       RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma       = 5*u::cm;
-      fStepCuts.electron    = 1*u::cm;
-      fStepCuts.positron    = 1*u::cm;
-      fStepCuts.proton      = 5*u::mm;
-      fStepCuts.alpha       = 5*u::mm;
-      fStepCuts.generic_ion = 5*u::mm;
+      fStepCuts.gamma = 5 * u::cm;
+      fStepCuts.electron = 1 * u::cm;
+      fStepCuts.positron = 1 * u::cm;
+      fStepCuts.proton = 5 * u::mm;
+      fStepCuts.alpha = 5 * u::mm;
+      fStepCuts.generic_ion = 5 * u::mm;
 
       fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma    = 30*u::mm;
-      fStepCutsSensitive.electron = 40*u::um;
-      fStepCutsSensitive.positron = 40*u::um;
+      fStepCutsSensitive.gamma = 30 * u::mm;
+      fStepCutsSensitive.electron = 40 * u::um;
+      fStepCutsSensitive.positron = 40 * u::um;
       break;
 
-    case RMGPhysics::PhysicsRealm::kLArScintillation :
+    case RMGPhysics::PhysicsRealm::kLArScintillation:
       RMGLog::Out(RMGLog::warning, "LAr scintillation realm unimplemented");
   }
 
@@ -317,13 +315,16 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
-  try { fLowEnergyEMOption = RMGTools::ToEnum<RMGPhysics::LowEnergyEMOption>(option, "low energy EM option"); }
-  catch (const std::bad_cast&) { return; }
+  try {
+    fLowEnergyEMOption =
+        RMGTools::ToEnum<RMGPhysics::LowEnergyEMOption>(option, "low energy EM option");
+  } catch (const std::bad_cast&) { return; }
 }
 
 void RMGPhysics::SetPhysicsRealmString(std::string realm) {
-  try { this->SetPhysicsRealm(RMGTools::ToEnum<RMGPhysics::PhysicsRealm>(realm, "physics realm")); }
-  catch (const std::bad_cast&) { return; }
+  try {
+    this->SetPhysicsRealm(RMGTools::ToEnum<RMGPhysics::PhysicsRealm>(realm, "physics realm"));
+  } catch (const std::bad_cast&) { return; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,33 +335,33 @@ void RMGPhysics::DefineCommands() {
       "Commands for controlling physics processes");
 
   fMessenger->DeclareMethod("Realm", &RMGPhysics::SetPhysicsRealmString)
-    .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
-    .SetParameterName("realm", false)
-    .SetCandidates(RMGTools::GetCandidates<RMGPhysics::PhysicsRealm>())
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
+      .SetParameterName("realm", false)
+      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::PhysicsRealm>())
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
-    .SetGuidance("Add optical processes to the physics list")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Add optical processes to the physics list")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
-    .SetGuidance("Add low energy electromagnetic processes to the physics list")
-    .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Add low energy electromagnetic processes to the physics list")
+      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)
-    .SetGuidance("")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("GammaTwoJMAX", &RMGPhysics::SetGammaTwoJMAX)
-    .SetGuidance("")
-    .SetParameterName("x", false)
-    .SetRange("x > 0")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("")
+      .SetParameterName("x", false)
+      .SetRange("x > 0")
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("StoreICLevelData", &RMGPhysics::SetStoreICLevelData)
-    .SetGuidance("")
-    .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("")
+      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

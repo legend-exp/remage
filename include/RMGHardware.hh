@@ -1,14 +1,14 @@
 #ifndef _RMG_MANAGEMENT_DETECTOR_CONSTRUCTION_HH_
 #define _RMG_MANAGEMENT_DETECTOR_CONSTRUCTION_HH_
 
-#include <string>
-#include <set>
 #include <map>
 #include <memory>
+#include <set>
+#include <string>
 #include <vector>
 
-#include "G4VUserDetectorConstruction.hh"
 #include "G4Region.hh"
+#include "G4VUserDetectorConstruction.hh"
 
 #include "RMGMaterialTable.hh"
 #include "RMGNavigationTools.hh"
@@ -22,10 +22,10 @@ class RMGHardware : public G4VUserDetectorConstruction {
     RMGHardware();
     ~RMGHardware() = default;
 
-    RMGHardware           (RMGHardware const&) = delete;
+    RMGHardware(RMGHardware const&) = delete;
     RMGHardware& operator=(RMGHardware const&) = delete;
-    RMGHardware           (RMGHardware&&)      = delete;
-    RMGHardware& operator=(RMGHardware&&)      = delete;
+    RMGHardware(RMGHardware&&) = delete;
+    RMGHardware& operator=(RMGHardware&&) = delete;
 
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;
@@ -37,11 +37,11 @@ class RMGHardware : public G4VUserDetectorConstruction {
     };
 
     struct DetectorMetadata {
-      DetectorType type;
-      int uid;
+        DetectorType type;
+        int uid;
     };
 
-    void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr=0);
+    void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr = 0);
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
     inline const auto& GetDetectorMetadata(std::pair<std::string, int> det) {
       return fDetectorMetadata.at(det);

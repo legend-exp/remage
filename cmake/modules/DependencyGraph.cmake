@@ -22,15 +22,11 @@ else()
 endif()
 
 if(NOT DOT_EXE)
-  option(
-    BUILD_DEP_GRAPH
-    "Builds a visual representation of the dependencies of that included targets"
-    OFF)
+  option(BUILD_DEP_GRAPH
+         "Builds a visual representation of the dependencies of that included targets" OFF)
 else()
-  option(
-    BUILD_DEP_GRAPH
-    "Builds a visual representation of the dependencies of that included targets"
-    ON)
+  option(BUILD_DEP_GRAPH
+         "Builds a visual representation of the dependencies of that included targets" ON)
 endif()
 
 # Builds a dependency graph of the active code targets using the `dot`
@@ -83,10 +79,8 @@ function(gen_dep_graph OUTPUT_TYPE)
       ${TARGET_NAME}
       COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
               --graphviz=${CMAKE_CURRENT_BINARY_DIR}/graphviz/${TARGET_NAME}.dot
-      COMMAND
-        ${DOT_EXE} -T${OUTPUT_TYPE}
-        ${CMAKE_CURRENT_BINARY_DIR}/graphviz/${TARGET_NAME}.dot -o
-        ${OUT_DIR}/${TARGET_NAME}.${OUTPUT_TYPE})
+      COMMAND ${DOT_EXE} -T${OUTPUT_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/graphviz/${TARGET_NAME}.dot
+              -o ${OUT_DIR}/${TARGET_NAME}.${OUTPUT_TYPE})
 
     add_custom_command(
       TARGET ${TARGET_NAME}

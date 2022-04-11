@@ -24,10 +24,10 @@ class RMGManager {
     RMGManager(std::string app_name, int argc, char** argv);
     ~RMGManager();
 
-    RMGManager           (RMGManager const&) = delete;
+    RMGManager(RMGManager const&) = delete;
     RMGManager& operator=(RMGManager const&) = delete;
-    RMGManager           (RMGManager&&)      = delete;
-    RMGManager& operator=(RMGManager&&)      = delete;
+    RMGManager(RMGManager&&) = delete;
+    RMGManager& operator=(RMGManager&&) = delete;
 
     // getters
     static inline RMGManager* GetRMGManager() { return fRMGManager; }
@@ -44,14 +44,18 @@ class RMGManager {
     inline const std::string& GetOutputFileName() { return fOutputFile; }
 
     // setters
-    inline void SetUserInit(G4RunManager* g4_manager) { fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager); }
-    inline void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
+    inline void SetUserInit(G4RunManager* g4_manager) {
+      fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager);
+    }
+    inline void SetUserInit(G4VisManager* vis) {
+      fG4VisManager = std::unique_ptr<G4VisManager>(vis);
+    }
     inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
-    inline void SetBatchMode(bool flag=true) { fBatchMode = flag; }
+    inline void SetBatchMode(bool flag = true) { fBatchMode = flag; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
-    inline void EnablePersistency(bool flag=true) { fIsPersistencyEnabled = flag; }
+    inline void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
     inline void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
     void Initialize();
     void Run();
@@ -74,7 +78,8 @@ class RMGManager {
     void SetUpDefaultProcessesList();
 
     std::string fApplicationName;
-    int fArgc; char** fArgv;
+    int fArgc;
+    char** fArgv;
     std::vector<std::string> fMacroFileNames;
     bool fIsRandControlled = false;
     bool fBatchMode = false;

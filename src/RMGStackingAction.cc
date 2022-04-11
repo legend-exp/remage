@@ -2,8 +2,7 @@
 
 #include "RMGEventAction.hh"
 
-RMGStackingAction::RMGStackingAction(RMGEventAction* eventaction) :
-  fEventAction(eventaction) {}
+RMGStackingAction::RMGStackingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
 
 G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* /*aTrack*/) {
   return fUrgent;

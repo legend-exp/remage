@@ -2,10 +2,10 @@
 <!DOCTYPE gdml [
 ]>
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
-	
+
 
  <define>
-  
+
   <constant name="TWOPI" value="2.*pi"/>
 
   <quantity name="max_radius" type="lenght"  value="44.5" unit="mm"/>
@@ -77,4 +77,3 @@
  </setup>
 
 </gdml>
-

@@ -5,8 +5,8 @@
 
 #include "RMGVGenerator.hh"
 
-#include "G4ThreeVector.hh"
 #include "G4ParticleGun.hh"
+#include "G4ThreeVector.hh"
 
 class G4Event;
 class G4ParticleGun;
@@ -20,10 +20,10 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
     }
     inline ~RMGGeneratorG4Gun() = default;
 
-    RMGGeneratorG4Gun           (RMGGeneratorG4Gun const&) = delete;
+    RMGGeneratorG4Gun(RMGGeneratorG4Gun const&) = delete;
     RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun const&) = delete;
-    RMGGeneratorG4Gun           (RMGGeneratorG4Gun&&)      = delete;
-    RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun&&)      = delete;
+    RMGGeneratorG4Gun(RMGGeneratorG4Gun&&) = delete;
+    RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun&&) = delete;
 
     inline void GeneratePrimariesKinematics(G4Event* event) override {
       fParticleGun->GeneratePrimaryVertex(event);

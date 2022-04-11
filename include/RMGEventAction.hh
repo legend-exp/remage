@@ -16,10 +16,10 @@ class RMGEventAction : public G4UserEventAction {
     RMGEventAction(RMGRunAction*);
     inline ~RMGEventAction() = default;
 
-    RMGEventAction           (RMGEventAction const&) = delete;
+    RMGEventAction(RMGEventAction const&) = delete;
     RMGEventAction& operator=(RMGEventAction const&) = delete;
-    RMGEventAction           (RMGEventAction&&)      = delete;
-    RMGEventAction& operator=(RMGEventAction&&)      = delete;
+    RMGEventAction(RMGEventAction&&) = delete;
+    RMGEventAction& operator=(RMGEventAction&&) = delete;
 
     void BeginOfEventAction(const G4Event*) override;
     void EndOfEventAction(const G4Event*) override;

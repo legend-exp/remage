@@ -10,8 +10,7 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    inline RMGOpticalOutputScheme(G4AnalysisManager* ana_man) :
-      RMGVOutputScheme(ana_man) {}
+    inline RMGOpticalOutputScheme(G4AnalysisManager* ana_man) : RMGVOutputScheme(ana_man) {}
 
     void clear() override;
     void AssignOutputNames(G4AnalysisManager* ana_man) override;

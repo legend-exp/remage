@@ -3,11 +3,11 @@
 
 #include <memory>
 
-#include "globals.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
+#include "globals.hh"
 
-#include "RMGVVertexGenerator.hh"
 #include "RMGVGenerator.hh"
+#include "RMGVVertexGenerator.hh"
 
 class G4GenericMessenger;
 class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
@@ -31,12 +31,12 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     RMGMasterGenerator();
     ~RMGMasterGenerator() = default;
 
-    RMGMasterGenerator           (RMGMasterGenerator const&) = delete;
+    RMGMasterGenerator(RMGMasterGenerator const&) = delete;
     RMGMasterGenerator& operator=(RMGMasterGenerator const&) = delete;
-    RMGMasterGenerator           (RMGMasterGenerator&&)      = delete;
-    RMGMasterGenerator& operator=(RMGMasterGenerator&&)      = delete;
+    RMGMasterGenerator(RMGMasterGenerator&&) = delete;
+    RMGMasterGenerator& operator=(RMGMasterGenerator&&) = delete;
 
-    void GeneratePrimaries(G4Event *event) override;
+    void GeneratePrimaries(G4Event* event) override;
 
     inline RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
     inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }

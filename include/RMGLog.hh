@@ -22,10 +22,10 @@
 
 // ---------------------------------------------------------
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <cstdarg>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 #include "globals.hh"
 
@@ -34,10 +34,9 @@
 #endif
 #include "fmt/core.h"
 
-#define OutDev(loglevel, args...) \
-  RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", args)
+#define OutDev(loglevel, args...) RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", args)
 
-#define OutFormatDev(loglevel, fmt, args...) \
+#define OutFormatDev(loglevel, fmt, args...)                                                       \
   RMGLog::OutFormat(loglevel, "[" + std::string(__PRETTY_FUNCTION__) + "] " + fmt, args)
 
 // ---------------------------------------------------------
@@ -51,24 +50,24 @@ class RMGLog {
     /**
      * Enumerator for the amount of details to put into the log file */
     enum LogLevel {
-      debug   = 0, ///< Print everything, including debug info
-      detail  = 1, ///< Print all details of operation
+      debug = 0,   ///< Print everything, including debug info
+      detail = 1,  ///< Print all details of operation
       summary = 2, ///< Print only results summary, warnings, and errors
       warning = 3, ///< Print only warnings and errors
-      error   = 4, ///< Print only errors
-      fatal   = 5, ///< Print only errors, stop execution
+      error = 4,   ///< Print only errors
+      fatal = 5,   ///< Print only errors, stop execution
       nothing = 6  ///< Print nothing
     };
 
     enum Ansi {
-      black   = 30,
-      red     = 31,
-      green   = 32,
-      yellow  = 33,
-      blue    = 34,
+      black = 30,
+      red = 31,
+      green = 32,
+      yellow = 33,
+      blue = 34,
       magenta = 35,
-      cyan    = 36,
-      grey    = 37,
+      cyan = 36,
+      grey = 37,
       unspecified
     };
 
@@ -105,19 +104,24 @@ class RMGLog {
     /**
      * Sets the minimum log level for file output.
      * @param loglevel log level */
-    static inline void SetLogLevelFile(RMGLog::LogLevel loglevel) { fMinimumLogLevelFile = loglevel; }
+    static inline void SetLogLevelFile(RMGLog::LogLevel loglevel) {
+      fMinimumLogLevelFile = loglevel;
+    }
 
     /**
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
-    static inline void SetLogLevelScreen(RMGLog::LogLevel loglevel) { fMinimumLogLevelScreen = loglevel; }
+    static inline void SetLogLevelScreen(RMGLog::LogLevel loglevel) {
+      fMinimumLogLevelScreen = loglevel;
+    }
 
     /**
      * Sets the minimum log level for file and screen output.
      * @param loglevelfile log level for file
      * @param loglevelscreen log level for screen */
     static inline void SetLogLevel(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen) {
-      fMinimumLogLevelFile = loglevelfile; fMinimumLogLevelScreen = loglevelscreen;
+      fMinimumLogLevelFile = loglevelfile;
+      fMinimumLogLevelScreen = loglevelscreen;
     }
 
     /**
@@ -153,26 +157,30 @@ class RMGLog {
      * @param loglevelfile loglevel for the current message
      * @param loglevelscreen loglevel for the current message
      * @param message string to write to the file and screen log */
-    template <typename T>
+    template<typename T>
     static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg);
 
-    template <typename T, typename... Args>
-    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg_first, const Args&... msg_other);
+    template<typename T, typename... Args>
+    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
+        const T& msg_first, const Args&... msg_other);
 
-    template <typename... Args>
-    static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const std::string& fmt, const Args&... args);
+    template<typename... Args>
+    static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
+        const std::string& fmt, const Args&... args);
 
-    template <typename... Args>
-    static inline void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
+    template<typename... Args>
+    static inline void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt,
+        const Args&... args) {
       RMGLog::OutFormat(loglevel, loglevel, fmt, args...);
     }
 
-    template <typename T>
-    static inline void Out(RMGLog::LogLevel loglevel, const T& msg) { RMGLog::Out(loglevel, loglevel, msg); }
+    template<typename T> static inline void Out(RMGLog::LogLevel loglevel, const T& msg) {
+      RMGLog::Out(loglevel, loglevel, msg);
+    }
 
-    template <typename T, typename... Args>
+    template<typename T, typename... Args>
     static inline void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
-        RMGLog::Out(loglevel, loglevel, msg_first, msg_other...);
+      RMGLog::Out(loglevel, loglevel, msg_first, msg_other...);
     }
 
     /**
@@ -185,14 +193,16 @@ class RMGLog {
 
     static bool SupportsColors(const std::ostream& os);
 
-    template <RMGLog::Ansi color, typename T>
-    static std::string Colorize(const T& msg, std::ostream& os, bool bold=false);
+    template<RMGLog::Ansi color, typename T>
+    static std::string Colorize(const T& msg, std::ostream& os, bool bold = false);
 
     /** @} */
+
   private:
 
-    template <typename T>
-    static void Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed=true, bool do_flush=true);
+    template<typename T>
+    static void Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg,
+        bool prefixed = true, bool do_flush = true);
 
     /**
      * Converts a log level to a string
@@ -222,7 +232,6 @@ class RMGLog {
     /**
      * Include a prefix before each message? */
     static bool fUsePrefix;
-
 };
 
 #include "RMGLog.icc"

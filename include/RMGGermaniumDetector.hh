@@ -4,9 +4,9 @@
 #include <memory>
 #include <string>
 
-#include "G4VHit.hh"
-#include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#include "G4THitsCollection.hh"
+#include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
 class RMGGermaniumDetectorHit : public G4VHit {
@@ -16,15 +16,15 @@ class RMGGermaniumDetectorHit : public G4VHit {
     RMGGermaniumDetectorHit() = default;
     ~RMGGermaniumDetectorHit() = default;
 
-    RMGGermaniumDetectorHit           (RMGGermaniumDetectorHit const&) = delete;
+    RMGGermaniumDetectorHit(RMGGermaniumDetectorHit const&) = delete;
     RMGGermaniumDetectorHit& operator=(RMGGermaniumDetectorHit const&) = delete;
-    RMGGermaniumDetectorHit           (RMGGermaniumDetectorHit&&)      = delete;
-    RMGGermaniumDetectorHit& operator=(RMGGermaniumDetectorHit&&)      = delete;
+    RMGGermaniumDetectorHit(RMGGermaniumDetectorHit&&) = delete;
+    RMGGermaniumDetectorHit& operator=(RMGGermaniumDetectorHit&&) = delete;
 
     bool operator==(const RMGGermaniumDetectorHit&) const;
 
     inline void* operator new(size_t);
-    inline void  operator delete(void*);
+    inline void operator delete(void*);
 
     // getters
     inline int GetDetectorUID() { return fDetectorUID; }
@@ -57,10 +57,10 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
     RMGGermaniumDetector();
     ~RMGGermaniumDetector() = default;
 
-    RMGGermaniumDetector           (RMGGermaniumDetector const&) = delete;
+    RMGGermaniumDetector(RMGGermaniumDetector const&) = delete;
     RMGGermaniumDetector& operator=(RMGGermaniumDetector const&) = delete;
-    RMGGermaniumDetector           (RMGGermaniumDetector&&)      = delete;
-    RMGGermaniumDetector& operator=(RMGGermaniumDetector&&)      = delete;
+    RMGGermaniumDetector(RMGGermaniumDetector&&) = delete;
+    RMGGermaniumDetector& operator=(RMGGermaniumDetector&&) = delete;
 
     void Initialize(G4HCofThisEvent* hit_coll) override;
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
@@ -77,13 +77,13 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
 extern G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator;
 
 inline void* RMGGermaniumDetectorHit::operator new(size_t) {
-  if(!RMGGermaniumDetectorHitAllocator)
-      RMGGermaniumDetectorHitAllocator = new G4Allocator<RMGGermaniumDetectorHit>;
-  return (void *) RMGGermaniumDetectorHitAllocator->MallocSingle();
+  if (!RMGGermaniumDetectorHitAllocator)
+    RMGGermaniumDetectorHitAllocator = new G4Allocator<RMGGermaniumDetectorHit>;
+  return (void*)RMGGermaniumDetectorHitAllocator->MallocSingle();
 }
 
-inline void RMGGermaniumDetectorHit::operator delete(void *hit) {
-  RMGGermaniumDetectorHitAllocator->FreeSingle((RMGGermaniumDetectorHit*) hit);
+inline void RMGGermaniumDetectorHit::operator delete(void* hit) {
+  RMGGermaniumDetectorHitAllocator->FreeSingle((RMGGermaniumDetectorHit*)hit);
 }
 
 #endif

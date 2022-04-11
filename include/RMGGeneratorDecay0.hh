@@ -22,13 +22,13 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     RMGGeneratorDecay0() = delete;
     inline ~RMGGeneratorDecay0() = default;
 
-    RMGGeneratorDecay0           (RMGGeneratorDecay0 const&) = delete;
+    RMGGeneratorDecay0(RMGGeneratorDecay0 const&) = delete;
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0 const&) = delete;
-    RMGGeneratorDecay0           (RMGGeneratorDecay0&&)      = delete;
-    RMGGeneratorDecay0& operator=(RMGGeneratorDecay0&&)      = delete;
+    RMGGeneratorDecay0(RMGGeneratorDecay0&&) = delete;
+    RMGGeneratorDecay0& operator=(RMGGeneratorDecay0&&) = delete;
 
     void GeneratePrimariesKinematics(G4Event*) override;
-    inline void SetParticlePosition(G4ThreeVector) override {};
+    inline void SetParticlePosition(G4ThreeVector) override{};
 
   private:
 

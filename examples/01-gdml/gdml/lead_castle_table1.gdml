@@ -24,7 +24,7 @@
 	  <quantity name="cavity_x_1" type="length" value="cavity_width_1" unit="mm"/>
 	  <quantity name="cavity_y_1" type="length" value="cavity_depth_1" unit="mm"/>
 	  <quantity name="cavity_z_1" type="length" value="cavity_height_1" unit="mm"/>
-	  
+
 	  <quantity name="top_x_1" type="length" value="top_width_1" unit="mm"/>
 	  <quantity name="top_y_1" type="length" value="top_depth_1" unit="mm"/>
 	  <quantity name="top_z_1" type="length" value="top_height_1" unit="mm"/>
@@ -36,7 +36,7 @@
 	  <position name="pos_cavity_base_1" y="(inner_cavity_y_1/2+(base_y_1-inner_cavity_y_1)/4)" z="(inner_cavity_z_1-cavity_z_1)/2" />
 	  <position name="pos_top_1" z="-(base_z_1+top_z_1)/2" />
 	  <position name="pos_front_1" y="(base_y_1+front_y_1)/2" z="(base_z_1-front_z_1)/2" />
-	  
+
 	  <position name="center" x="0" y="0" z="0" />
 
  </define>
@@ -54,27 +54,27 @@
 	 <box name="cavity_base_1" x="cavity_x_1" y="cavity_y_1" z="cavity_z_1"/>
 	 <box name="top_lead_castle_1" x="top_x_1" y="top_y_1" z="top_z_1"/>
 	 <box name="front_1" x="front_x_1" y="front_y_1" z="front_z_1"/>
-	 
+
 	 <union name="total_cavity_1" >
 		 <first ref="inner_cavity_base_1"/> <second ref="cavity_base_1"/>
 		 <positionref ref="pos_cavity_base_1" />
 	 </union>
-	 
+
 	 <subtraction name="base_cavity_1" >
 		 <first ref="base_lead_castle_1"/> <second ref="total_cavity_1"/>
 		 <positionref ref="center" />
 	 </subtraction>
-	
+
 
 	 <union name="top_base_1" >
 		 <first ref="base_cavity_1"/> <second ref="top_lead_castle_1"/>
 		 <positionref ref="pos_top_1" />
-	 </union>  
-	 
+	 </union>
+
 	 <union name="final_lead_castle_1" >
 		 <first ref="top_base_1"/> <second ref="front_1"/>
 		 <positionref ref="pos_front_1" />
-	 </union>  
+	 </union>
 
  </solids>
 
@@ -96,4 +96,3 @@
  </setup>
 
 </gdml>
-

@@ -12,10 +12,10 @@ class RMGStackingAction : public G4UserStackingAction {
     RMGStackingAction(RMGEventAction*);
     ~RMGStackingAction() = default;
 
-    RMGStackingAction           (RMGStackingAction const&) = delete;
+    RMGStackingAction(RMGStackingAction const&) = delete;
     RMGStackingAction& operator=(RMGStackingAction const&) = delete;
-    RMGStackingAction           (RMGStackingAction&&)      = delete;
-    RMGStackingAction& operator=(RMGStackingAction&&)      = delete;
+    RMGStackingAction(RMGStackingAction&&) = delete;
+    RMGStackingAction& operator=(RMGStackingAction&&) = delete;
 
     G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack) override;
     void NewStage() override;

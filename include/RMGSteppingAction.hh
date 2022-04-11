@@ -12,10 +12,10 @@ class RMGSteppingAction : public G4UserSteppingAction {
     RMGSteppingAction(RMGEventAction*);
     ~RMGSteppingAction() = default;
 
-    RMGSteppingAction           (RMGSteppingAction const&) = delete;
+    RMGSteppingAction(RMGSteppingAction const&) = delete;
     RMGSteppingAction& operator=(RMGSteppingAction const&) = delete;
-    RMGSteppingAction           (RMGSteppingAction&&)      = delete;
-    RMGSteppingAction& operator=(RMGSteppingAction&&)      = delete;
+    RMGSteppingAction(RMGSteppingAction&&) = delete;
+    RMGSteppingAction& operator=(RMGSteppingAction&&) = delete;
 
     void UserSteppingAction(const G4Step*) override;
 

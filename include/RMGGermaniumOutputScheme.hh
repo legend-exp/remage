@@ -10,8 +10,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    inline RMGGermaniumOutputScheme(G4AnalysisManager* ana_man) :
-      RMGVOutputScheme(ana_man) {}
+    inline RMGGermaniumOutputScheme(G4AnalysisManager* ana_man) : RMGVOutputScheme(ana_man) {}
 
     void clear() override;
     void AssignOutputNames(G4AnalysisManager* ana_man) override;

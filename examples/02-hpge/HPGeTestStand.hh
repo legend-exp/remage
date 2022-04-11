@@ -3,10 +3,11 @@
 
 #include "RMGHardware.hh"
 
-class HPGeTestStand: public RMGHardware {
+class HPGeTestStand : public RMGHardware {
 
-    public:
-        G4VPhysicalVolume* DefineGeometry();
+  public:
+
+    G4VPhysicalVolume* DefineGeometry();
 };
 
 #endif

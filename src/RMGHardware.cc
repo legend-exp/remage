@@ -3,15 +3,15 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "G4VPhysicalVolume.hh"
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolume.hh"
-#include "G4UserLimits.hh"
 #include "G4GDMLParser.hh"
+#include "G4LogicalVolume.hh"
+#include "G4PhysicalVolumeStore.hh"
 #include "G4SDManager.hh"
+#include "G4UserLimits.hh"
+#include "G4VPhysicalVolume.hh"
 
-#include "RMGMaterialTable.hh"
 #include "RMGLog.hh"
+#include "RMGMaterialTable.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
 
@@ -40,22 +40,22 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
-  }
-  else {
+  } else {
     fWorld = this->DefineGeometry();
-    if (!fWorld) RMGLog::Out(RMGLog::fatal, "DefineGeometry() returned nullptr. ",
-        "Did you forget to reimplement the base class method?");
+    if (!fWorld)
+      RMGLog::Out(RMGLog::fatal, "DefineGeometry() returned nullptr. ",
+          "Did you forget to reimplement the base class method?");
   }
 
   // TODO: build and return world volume?
 
   for (const auto& el : fPhysVolStepLimits) {
-    RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first, el.second);
+    RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first,
+        el.second);
     auto vol = RMGNavigationTools::FindPhysicalVolume(el.first);
     if (!vol) {
       RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
-    }
-    else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+    } else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
   }
 
   // TODO: create sensitive region for special production cuts
@@ -81,17 +81,17 @@ void RMGHardware::ConstructSDandField() {
     // initialize a concrete detector, if not done yet
     // TODO: allow user to register custom detectors
     if (active_dets.find(v.type) == active_dets.end()) {
-      RMGLog::Out(RMGLog::debug, "Registering new sensitive detector of type ", magic_enum::enum_name(v.type));
+      RMGLog::Out(RMGLog::debug, "Registering new sensitive detector of type ",
+          magic_enum::enum_name(v.type));
 
       G4VSensitiveDetector* obj = nullptr;
       switch (v.type) {
-        case DetectorType::kOptical :
-          obj = new RMGOpticalDetector();
-          break;
-        case DetectorType::kGermanium :
-        case DetectorType::kLAr :
-        default : RMGLog::Out(RMGLog::fatal, "No behaviour for sensitive detector type '",
-                      magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
+        case DetectorType::kOptical: obj = new RMGOpticalDetector(); break;
+        case DetectorType::kGermanium:
+        case DetectorType::kLAr:
+        default:
+          RMGLog::Out(RMGLog::fatal, "No behaviour for sensitive detector type '",
+              magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
       }
       sd_man->AddNewDetector(obj);
       active_dets.emplace(v.type, obj);
@@ -110,8 +110,8 @@ void RMGHardware::ConstructSDandField() {
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
 }
 
-void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name,
-    int uid, int copy_nr) {
+void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
+    int copy_nr) {
 
   for (const auto& [k, v] : fDetectorMetadata) {
     if (v.uid == uid) RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
@@ -123,12 +123,14 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
 
   // FIXME: can this be done with emplace?
   auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid}});
-  if (!r_value.second) RMGLog::OutFormat(RMGLog::warning,
-      "Physical volume '{}' (copy number {}) has already been registered as detector",
-      pv_name, copy_nr);
+  if (!r_value.second)
+    RMGLog::OutFormat(RMGLog::warning,
+        "Physical volume '{}' (copy number {}) has already been registered as detector", pv_name,
+        copy_nr);
 
-  RMGLog::OutFormat(RMGLog::detail, "Registered physical volume '{}' (copy nr. {}) as {} detector type",
-      pv_name, copy_nr, magic_enum::enum_name(type));
+  RMGLog::OutFormat(RMGLog::detail,
+      "Registered physical volume '{}' (copy nr. {}) as {} detector type", pv_name, copy_nr,
+      magic_enum::enum_name(type));
 }
 
 void RMGHardware::DefineCommands() {
@@ -137,17 +139,17 @@ void RMGHardware::DefineCommands() {
       "Commands for controlling geometry definitions");
 
   fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
-    .SetGuidance("Use GDML file for geometry definition")
-    .SetParameterName("filename", false)
-    .SetStates(G4State_PreInit);
+      .SetGuidance("Use GDML file for geometry definition")
+      .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
-    .SetGuidance("Print list of defined physical volumes")
-    .SetStates(G4State_Idle);
+      .SetGuidance("Print list of defined physical volumes")
+      .SetStates(G4State_Idle);
 
   fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
-    .SetGuidance("Print list of defined physical volumes")
-    .SetStates(G4State_Idle);
+      .SetGuidance("Print list of defined physical volumes")
+      .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

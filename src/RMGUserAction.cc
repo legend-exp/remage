@@ -1,12 +1,12 @@
 #include "RMGUserAction.hh"
 
+#include "RMGEventAction.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
 #include "RMGRunAction.hh"
-#include "RMGEventAction.hh"
 #include "RMGStackingAction.hh"
-#include "RMGTrackingAction.hh"
 #include "RMGSteppingAction.hh"
+#include "RMGTrackingAction.hh"
 
 void RMGUserAction::BuildForMaster() const {
 
@@ -17,7 +17,8 @@ void RMGUserAction::BuildForMaster() const {
 void RMGUserAction::Build() const {
 
   auto generator_primary = new RMGMasterGenerator();
-  auto run_action = new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled());
+  auto run_action =
+      new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled());
   auto event_action = new RMGEventAction(run_action);
 
   this->SetUserAction(generator_primary);

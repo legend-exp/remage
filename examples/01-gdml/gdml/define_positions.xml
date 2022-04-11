@@ -1,9 +1,9 @@
-<constant name="position_detector_fromcryostat_z" value="7.0" /> 
-<constant name="position_holder_fromcryostat_z"   value="6.0" /> 
-<constant name="position_wrap_fromcryostat_z"     value="4.5" /> 
- 
-<constant name="position_source_fromcryostat_phi" value="0.0" /> 
-<constant name="position_source_fromcryostat_r"   value="0.0" /> 
-<constant name="position_source_fromcryostat_x"   value="0.0" /> 
-<constant name="position_source_fromcryostat_y"   value="-0.0" /> 
+<constant name="position_detector_fromcryostat_z" value="7.0" />
+<constant name="position_holder_fromcryostat_z"   value="6.0" />
+<constant name="position_wrap_fromcryostat_z"     value="4.5" />
+
+<constant name="position_source_fromcryostat_phi" value="0.0" />
+<constant name="position_source_fromcryostat_r"   value="0.0" />
+<constant name="position_source_fromcryostat_x"   value="0.0" />
+<constant name="position_source_fromcryostat_y"   value="-0.0" />
 <constant name="position_source_fromcryostat_z"   value="78.5" />

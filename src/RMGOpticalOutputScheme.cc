@@ -1,14 +1,14 @@
 #include "RMGOpticalOutputScheme.hh"
 
-#include "G4Event.hh"
 #include "G4AnalysisManager.hh"
-#include "G4SDManager.hh"
+#include "G4Event.hh"
 #include "G4HCtable.hh"
+#include "G4SDManager.hh"
 
-#include "RMGManager.hh"
-#include "RMGLog.hh"
-#include "RMGOpticalDetector.hh"
 #include "RMGHardware.hh"
+#include "RMGLog.hh"
+#include "RMGManager.hh"
+#include "RMGOpticalDetector.hh"
 
 void RMGOpticalOutputScheme::clear() {
   detector_uid.clear();
@@ -32,8 +32,8 @@ void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
     return;
   }
 
-  auto hit_coll = dynamic_cast<RMGOpticalDetectorHitsCollection*>(
-      event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll =
+      dynamic_cast<RMGOpticalDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
@@ -43,8 +43,7 @@ void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
   if (hit_coll->entries() <= 0) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
     return;
-  }
-  else {
+  } else {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 

@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "G4GeneralParticleSource.hh"
 #include "G4ThreeVector.hh"
 #include "RMGVGenerator.hh"
-#include "G4GeneralParticleSource.hh"
 
 class G4Event;
 class RMGGeneratorGPS : public RMGVGenerator {
@@ -18,7 +18,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
     inline ~RMGGeneratorGPS() = default;
 
-    inline void GeneratePrimariesKinematics(G4Event *event) override {
+    inline void GeneratePrimariesKinematics(G4Event* event) override {
       fParticleSource->GeneratePrimaryVertex(event);
     }
 

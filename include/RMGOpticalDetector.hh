@@ -4,9 +4,9 @@
 #include <memory>
 #include <string>
 
-#include "G4VHit.hh"
-#include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#include "G4THitsCollection.hh"
+#include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
 class RMGOpticalDetectorHit : public G4VHit {
@@ -16,15 +16,15 @@ class RMGOpticalDetectorHit : public G4VHit {
     RMGOpticalDetectorHit() = default;
     ~RMGOpticalDetectorHit() = default;
 
-    RMGOpticalDetectorHit           (RMGOpticalDetectorHit const&) = delete;
+    RMGOpticalDetectorHit(RMGOpticalDetectorHit const&) = delete;
     RMGOpticalDetectorHit& operator=(RMGOpticalDetectorHit const&) = delete;
-    RMGOpticalDetectorHit           (RMGOpticalDetectorHit&&)      = delete;
-    RMGOpticalDetectorHit& operator=(RMGOpticalDetectorHit&&)      = delete;
+    RMGOpticalDetectorHit(RMGOpticalDetectorHit&&) = delete;
+    RMGOpticalDetectorHit& operator=(RMGOpticalDetectorHit&&) = delete;
 
     bool operator==(const RMGOpticalDetectorHit&) const;
 
     inline void* operator new(size_t);
-    inline void  operator delete(void*);
+    inline void operator delete(void*);
 
     // getters
     inline int GetDetectorUID() { return fDetectorUID; }
@@ -57,10 +57,10 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
     RMGOpticalDetector();
     ~RMGOpticalDetector() = default;
 
-    RMGOpticalDetector           (RMGOpticalDetector const&) = delete;
+    RMGOpticalDetector(RMGOpticalDetector const&) = delete;
     RMGOpticalDetector& operator=(RMGOpticalDetector const&) = delete;
-    RMGOpticalDetector           (RMGOpticalDetector&&)      = delete;
-    RMGOpticalDetector& operator=(RMGOpticalDetector&&)      = delete;
+    RMGOpticalDetector(RMGOpticalDetector&&) = delete;
+    RMGOpticalDetector& operator=(RMGOpticalDetector&&) = delete;
 
     void Initialize(G4HCofThisEvent* hit_coll) override;
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
@@ -77,13 +77,13 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
 extern G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator;
 
 inline void* RMGOpticalDetectorHit::operator new(size_t) {
-  if(!RMGOpticalDetectorHitAllocator)
-      RMGOpticalDetectorHitAllocator = new G4Allocator<RMGOpticalDetectorHit>;
-  return (void *) RMGOpticalDetectorHitAllocator->MallocSingle();
+  if (!RMGOpticalDetectorHitAllocator)
+    RMGOpticalDetectorHitAllocator = new G4Allocator<RMGOpticalDetectorHit>;
+  return (void*)RMGOpticalDetectorHitAllocator->MallocSingle();
 }
 
-inline void RMGOpticalDetectorHit::operator delete(void *hit) {
-  RMGOpticalDetectorHitAllocator->FreeSingle((RMGOpticalDetectorHit*) hit);
+inline void RMGOpticalDetectorHit::operator delete(void* hit) {
+  RMGOpticalDetectorHitAllocator->FreeSingle((RMGOpticalDetectorHit*)hit);
 }
 
 #endif

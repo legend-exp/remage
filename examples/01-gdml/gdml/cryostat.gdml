@@ -15,12 +15,12 @@
 
 	  <quantity name="cryostat_z" type="length" value="cryostat_height" unit="mm"/>
 	  <quantity name="cryostat_radius" type="length" value="cryostat_width/2" unit="mm"/>
-	  
+
 	  <quantity name="cryostat_cavity_radius" type="length" value="(cryostat_width-2*cryostat_thickness)/2" unit="mm"/>
 
 	  <quantity name="start_cavity_z" type="length" value="position_cryostat_cavity_fromTop" unit="mm"/>
 	  <quantity name="end_cavity_z" type="length" value="(cryostat_height-position_cryostat_cavity_fromBottom)" unit="mm"/>
-  
+
  </define>
 
 
@@ -52,7 +52,7 @@
 
 
  <solids>
-	 
+
 	 <polycone name="cryostat" startphi="0" deltaphi="TWOPI" aunit="rad">
                  <zplane rmin="0" rmax="cryostat_radius" z="0" />
                  <zplane rmin="0" rmax="cryostat_radius" z="start_cavity_z" />
@@ -67,7 +67,7 @@
 
  <structure>
 	 <volume name="Cryostat">
-		 <materialref ref="EN_AW-2011T8"/> 
+		 <materialref ref="EN_AW-2011T8"/>
 		 <solidref ref="cryostat"/>
 	 </volume>
  </structure>
@@ -78,4 +78,3 @@
  </setup>
 
 </gdml>
-

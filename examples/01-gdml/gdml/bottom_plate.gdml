@@ -11,17 +11,17 @@
 
  <define>
 
-	&define_lead_castle;		
+	&define_lead_castle;
 
 	  <quantity name="bottom_plate_x" type="length" value="bottom_plate_width" unit="mm"/>
-	  <quantity name="bottom_plate_y" type="length" value="bottom_plate_depth" unit="mm"/> 
+	  <quantity name="bottom_plate_y" type="length" value="bottom_plate_depth" unit="mm"/>
 	  <quantity name="bottom_plate_z" type="length" value="bottom_plate_height" unit="mm"/>
 
 	  <quantity name="cavity_bottom_plate_x" type="length" value="cavity_bottom_plate_width" unit="mm"/>
 	  <quantity name="cavity_bottom_plate_y" type="length" value="cavity_bottom_plate_depth" unit="mm"/>
 	  <quantity name="cavity_bottom_plate_z" type="length" value="cavity_bottom_plate_height" unit="mm"/>
 
-	  <position name="pos_cavity_bottom_plate" y="(bottom_plate_y)/2"/> 
+	  <position name="pos_cavity_bottom_plate" y="(bottom_plate_y)/2"/>
 
    </define>
 
@@ -35,7 +35,7 @@
  <solids>
          <box name="bottom_plate" x="bottom_plate_x" y="bottom_plate_y" z="bottom_plate_z"/>
          <box name="cavity_bottom_plate" x="cavity_bottom_plate_x" y="cavity_bottom_plate_y" z="cavity_bottom_plate_z"/>
-	 
+
          <subtraction name="final_bottom_plate" >
                  <first ref="bottom_plate"/> <second ref="cavity_bottom_plate"/>
                  <positionref ref="pos_cavity_bottom_plate" />
@@ -57,4 +57,3 @@
  </setup>
 
 </gdml>
-
