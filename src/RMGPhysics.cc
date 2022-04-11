@@ -175,6 +175,7 @@ void RMGPhysics::ConstructOptical() {
   G4OpticalParameters* op_par = G4OpticalParameters::Instance();
   op_par->SetScintTrackSecondariesFirst(true);
   op_par->SetScintByParticleType(true);
+  op_par->SetBoundaryInvokeSD(true);
 
   // scintillation process
   auto scint_proc = new G4Scintillation("Scintillation");

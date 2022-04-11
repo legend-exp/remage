@@ -98,15 +98,19 @@ void RMGHardware::ConstructSDandField() {
     }
 
     // now assign logical volumes to the sensitive detector
-    // TODO: Trying to add the same logical volume more than once generates warnings and ignores the subsequent requests.
     const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
     if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
-    this->SetSensitiveDetector(pv->GetLogicalVolume(), active_dets[v.type]);
+    const auto lv = pv->GetLogicalVolume();
+    // only add the SD to the LV if not already present.
+    if (lv->GetSensitiveDetector() != active_dets[v.type]) {
+      this->SetSensitiveDetector(lv, active_dets[v.type]);
+    }
 
-    RMGLog::OutFormat(RMGLog::debug, "Registered new sensitive detector volume of type {}: {} (uid={})",
+    RMGLog::OutFormat(RMGLog::debug, "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
       magic_enum::enum_name(v.type),
-      pv->GetLogicalVolume()->GetName().c_str(),
-      v.uid );
+      pv->GetName().c_str(),
+      v.uid,
+      lv->GetName().c_str() );
   }
 
   std::string vec_repr = "";
