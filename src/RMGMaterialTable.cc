@@ -120,7 +120,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
 
   auto lar_mpt = new G4MaterialPropertiesTable();
 
-  /* lar_dielectric_constant(wavelenght)
+  /* lar_dielectric_constant(wavelength)
    *
    * Calculates the dielectric constant of LAr with the Bideau-Sellmeier formula.
    * See: A. Bideau-Mehu et al., "Measurement of refractive indices of Ne, Ar,
@@ -142,7 +142,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
     else return (1. + 2. * eps) / (1. - eps); // solve Clausius-Mossotti
   };
 
-  /* lar_rayleigh_length(wavelenght, temperature)
+  /* lar_rayleigh_length(wavelength, temperature)
    *
    * Calculates the Rayleigh scattering length using equations given in
    * G. M. Seidel at al., "Rayleigh scattering in rare-gas liquids",
@@ -160,7 +160,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
     double h;
     h = lar_dielectric_const(lambda);
     if (h < 1.00000001) h = 1.00000001;     // just a precaution
-    h = (h - 1.0) * (h + 2.0);              // the "dielectric constant" dependance
+    h = (h - 1.0) * (h + 2.0);              // the "dielectric constant" dependence
     h *= h;                                 // take the square
     h *= lar_kt * temp * k;                 // compressibility * temp * Boltzmann constant
     h /= lambda * lambda * lambda * lambda; // (lambda)^4
@@ -171,7 +171,7 @@ void RMGMaterialTable::InitializeLArOpticalProperties() {
     return 1. / h;
   };
 
-  /* lar_scint_spectrum(wavelenght)
+  /* lar_scint_spectrum(wavelength)
    *
    * The formula describes only the peak at 128 nm, not the whole spectrum.
    * However, the intensity drops by several orders of magnitude out of the

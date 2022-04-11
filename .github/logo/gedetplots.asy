@@ -351,7 +351,7 @@ struct SemiCoax {
         this.profile.all = this.profile.pplus -- this.profile.groove -- this.profile.nplus;
     }
 
-    // define how to write the name (reimplement wirtual function)
+    // define how to write the name (reimplement virtual function)
     void draw_name(picture pic=currentpicture, pair pos=(0,0)) {
         label(rotate(90)*Label("\large\texttt{" + this.name + "}"),
               pos - (this.radius, this.height/2) + (3,3), align=NE);
@@ -439,7 +439,7 @@ struct InvCoax {
         this.profile.all = this.profile.pplus -- this.profile.groove -- this.profile.nplus;
     }
 
-    // define how to write the name (reimplement wirtual function)
+    // define how to write the name (reimplement virtual function)
     void draw_name(picture pic=currentpicture, pair pos=(0,0)) {
         label(rotate(90)*Label("\large\texttt{" + this.name + "}"),
               pos - (this.radius, this.height/2) + (3,3), align=NE);

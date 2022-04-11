@@ -62,7 +62,7 @@ void RMGRunAction::SetupAnalysisManager() {
     RMGLog::OutFormatDev(RMGLog::debug,
         "Initializing output scheme for sensitive detector type '{}'", magic_enum::enum_name(d_type));
 
-    // instatiate concrete output scheme class
+    // instantiate concrete output scheme class
     // TODO: allow for library user to register own output scheme
     switch (d_type) {
       case RMGHardware::kOptical:

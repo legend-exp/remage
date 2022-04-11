@@ -13,7 +13,7 @@ foreach(_comp ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
   endif()
 endforeach()
 
-# now look for remage dependencies as well, with the correct compoents remage was compiled with
+# now look for remage dependencies as well, with the correct components remage was compiled with
 include(CMakeFindDependencyMacro)
 
 find_dependency(Geant4 @RMG_G4_MINIMUM_VERSION@ REQUIRED COMPONENTS @g4_components@)

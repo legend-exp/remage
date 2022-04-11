@@ -8,7 +8,7 @@
 
   <constant name="TWOPI" value="2.*pi"/>
 
-  <quantity name="max_radius" type="lenght"  value="44.5" unit="mm"/>
+  <quantity name="max_radius" type="length"  value="44.5" unit="mm"/>
 
   <quantity name="outer_height" type="length" value="95.1" unit="mm"/>
   <quantity name="inner_height" type="length" value="92.0" unit="mm"/>
@@ -20,13 +20,13 @@
 
   <quantity name="edge_height" type="length" value="1.3" unit="mm"/>
 
-  <quantity name="pos_bottom_ring_z" type="lenght"  value="51.4" unit="mm"/>
-  <quantity name="pos_top_ring_z" type="lenght"  value="14.0" unit="mm"/>
+  <quantity name="pos_bottom_ring_z" type="length"  value="51.4" unit="mm"/>
+  <quantity name="pos_top_ring_z" type="length"  value="14.0" unit="mm"/>
 
-  <quantity name="end_top_ring_z" type="lenght" value="22.6"  unit="mm"/>
-  <quantity name="end_bottom_ring_z" type="lenght" value="60.0"  unit="mm"/>
-  <quantity name="end_bottom_cyl_outer_z" type="lenght" value="120.5" unit="mm" />
-  <quantity name="end_bottom_cyl_inner_z" type="lenght" value="111.0" unit="mm" />
+  <quantity name="end_top_ring_z" type="length" value="22.6"  unit="mm"/>
+  <quantity name="end_bottom_ring_z" type="length" value="60.0"  unit="mm"/>
+  <quantity name="end_bottom_cyl_outer_z" type="length" value="120.5" unit="mm" />
+  <quantity name="end_bottom_cyl_inner_z" type="length" value="111.0" unit="mm" />
 
 
  </define>

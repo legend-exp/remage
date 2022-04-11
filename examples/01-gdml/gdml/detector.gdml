@@ -8,7 +8,7 @@
 
 	<constant name="TWOPI" value="2.*pi"/>
 
-	<quantity name="detector_height" type="lenght" value="75.2" unit="mm" />
+	<quantity name="detector_height" type="length" value="75.2" unit="mm" />
 	<quantity name="detector_radius" type="length" value="40.0" unit="mm"/>
 
 	<quantity name="well_height" type="length" value="42.0" unit="mm"/>
