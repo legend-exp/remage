@@ -1,3 +1,4 @@
+/RMG/Processes/OpticalPhysics true
 /run/initialize
 
 /RMG/Generator/Confine Volume
