@@ -1,4 +1,4 @@
-<img src=".github/remage-logo.png" alt="remage logo" align="left" height="200">
+<img src=".github/logo/remage-logo.png" alt="remage logo" align="left" height="200">
 
 # remage
 
