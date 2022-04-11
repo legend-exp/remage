@@ -17,18 +17,21 @@ bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {
+  if (!vol) RMGLog::OutDev(RMGLog::fatal, "Input G4VSolid* is nullptr");
   auto entity = vol->GetEntityType();
   if (entity == "G4Sphere") return RMGGeneratorUtil::rand(dynamic_cast<const G4Sphere*>(vol), on_surface);
   if (entity == "G4Orb")    return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(vol), on_surface);
   if (entity == "G4Box")    return RMGGeneratorUtil::rand(dynamic_cast<const G4Box*>(vol), on_surface);
   if (entity == "G4Tubs")   return RMGGeneratorUtil::rand(dynamic_cast<const G4Tubs*>(vol), on_surface);
   else {
-    RMGLog::Out(RMGLog::fatal, "'", entity, "' is not supported (implement me)");
+    RMGLog::OutDev(RMGLog::fatal, "'", entity, "' is not supported (implement me)");
     return G4ThreeVector();
   }
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
+
+  if (!box) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
 
   auto dx = box->GetXHalfLength();
   auto dy = box->GetYHalfLength();
@@ -60,6 +63,8 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
 
+  if (!sphere) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
+
   auto r1 = sphere->GetInnerRadius();
   auto r2 = sphere->GetOuterRadius();
   auto phi1 = sphere->GetStartPhiAngle();
@@ -85,10 +90,13 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Orb* orb, bool on_surface) {
+  if (!orb) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
   return RMGGeneratorUtil::rand(new G4Sphere(orb->GetName(), 0, orb->GetRadius(), 0, CLHEP::twopi, 0, CLHEP::pi), on_surface);
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
+
+  if (!tub) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
 
   auto r1 = tub->GetInnerRadius();
   auto r2 = tub->GetOuterRadius();

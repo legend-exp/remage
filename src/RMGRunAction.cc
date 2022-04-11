@@ -38,6 +38,12 @@ RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency) :
 
 void RMGRunAction::SetupAnalysisManager() {
 
+  auto rmg_man = RMGManager::GetRMGManager();
+  if (rmg_man->GetDetectorConstruction()->GetActiveDetectorList().empty()) {
+    rmg_man->EnablePersistency(false);
+    fIsPersistencyEnabled = false;
+  }
+
   RMGLog::Out(RMGLog::debug, "Setting up analysis manager");
 
   auto ana_man = G4AnalysisManager::Instance();

@@ -24,8 +24,7 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
   G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s):
 
   rotation(r),
-  translation(t),
-  containment_check(true) {
+  translation(t) {
 
   if (!v and !s) RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
 
@@ -42,14 +41,14 @@ RMGVertexConfinement::SampleableObject::~SampleableObject() {
   }
 }
 
-const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() {
+const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() const {
   auto choice = total_surface * G4UniformRand();
   double w = 0;
   for (const auto& o : data) {
     if (choice > w and choice <= w+o.surface) return o;
     w += o.surface;
     if (w >= total_surface) {
-      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unespectedly failed ",
+      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unexpectedly failed ",
           "(out-of-range error). Returning last object");
       return data.back();
     }
@@ -57,14 +56,14 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return data.back();
 }
 
-const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand() {
+const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand() const {
   auto choice = total_volume * G4UniformRand();
   double w = 0;
   for (const auto& o : data) {
     if (choice > w and choice <= w+o.volume) return o;
     w += o.volume;
     if (w >= total_surface) {
-      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unespectedly failed ",
+      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unexpectedly failed ",
           "(out-of-range error). Returning last object");
       return data.back();
     }
@@ -72,7 +71,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return data.back();
 }
 
-bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) {
+bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   for (const auto& o : data) {
     if (o.physical_volume) {
@@ -100,10 +99,7 @@ void RMGVertexConfinement::SampleableObjectCollection::emplace_back(G4VPhysicalV
 /* ========================================================================================== */
 
 RMGVertexConfinement::RMGVertexConfinement() :
-  RMGVVertexGenerator("VolumeConfinement"),
-  fSamplingMode(SamplingMode::kUnionAll),
-  fOnSurface(false),
-  fBoundingSolidType("Sphere") {
+  RMGVVertexGenerator("VolumeConfinement") {
 
   this->DefineCommands();
 }
@@ -194,7 +190,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
     // use bounding solid for all other cases
     else {
-      RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding box with containment check");
+      RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding solid with ",
+          "containment check (currently a ", fBoundingSolidType, ")");
       el.containment_check = true;
       auto solid_extent = solid->GetExtent(); // do not call multiple times, the function does not cache the result!
       if (fBoundingSolidType == "Sphere") {
@@ -316,20 +313,21 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       }
 
       // choose a volume component randomly
-      SampleableObject choice;
+      SampleableObject choice_nonconst;
       bool physical_first;
       if (fOnSurface) {
         physical_first = fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface;
-        choice = physical_first ?
+        choice_nonconst = physical_first ?
           fPhysicalVolumes.SurfaceWeightedRand() :
           fGeomVolumeSolids.SurfaceWeightedRand();
       }
       else {
         physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
-        choice = physical_first ?
+        choice_nonconst = physical_first ?
           fPhysicalVolumes.VolumeWeightedRand() :
           fGeomVolumeSolids.VolumeWeightedRand();
       }
+      const auto& choice = choice_nonconst;
 
       // shoot in the first region
       int calls = 0;
@@ -337,18 +335,21 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
         if (choice.containment_check) { // this can effectively happen only with physical volumes
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
-            vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+            vertex = choice.translation + choice.rotation
+                     * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           }
           if (calls >= RMGVVertexGenerator::fMaxAttempts) {
             RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently sampleable and ",
-                "try, eventually, to increase the threshold through the dedicated macro command. Returning dummy vertex");
+                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
+                "sampleable and try, eventually, to increase the threshold through the dedicated ",
+                "macro command. Returning dummy vertex");
             vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
             return;
           }
         }
         else {
-          vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+          vertex = choice.translation + choice.rotation
+                   * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
         }
 
         // is it also in the other volume class (geometrical/physical)?
@@ -358,8 +359,9 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
       if (calls >= RMGVVertexGenerator::fMaxAttempts) {
         RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-            RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently sampleable and ",
-            "try, eventually, to increase the threshold through the dedicated macro command. Returning dummy vertex");
+            RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
+            "sampleable and try, eventually, to increase the threshold through the dedicated ",
+            "macro command. Returning dummy vertex");
       }
 
       // everything has failed so return the dummy vertex
@@ -374,36 +376,43 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
             "no physical or no geometrical volumes have been added");
       }
 
-      auto choice = fOnSurface ?
+      const auto choice = fOnSurface ?
         fPhysicalVolumes.SurfaceWeightedRand() :
         fPhysicalVolumes.VolumeWeightedRand();
 
-      RMGLog::OutDev(RMGLog::debug, "Chosen random volume: ", choice.physical_volume->GetName());
-      RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
+      RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
+          choice.physical_volume->GetName(), choice.physical_volume->GetCopyNo());
+      RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ",
+          RMGVVertexGenerator::fMaxAttempts);
 
       int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
         if (choice.containment_check) {
-          vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+          vertex = choice.translation + choice.rotation
+                   * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
-            vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+            vertex = choice.translation + choice.rotation
+                     * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
             RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex/CLHEP::cm, " cm");
           }
           if (calls >= RMGVVertexGenerator::fMaxAttempts) {
             RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently sampleable and ",
-                "try, eventually, to increase the threshold through the dedicated macro command. Returning dummy vertex");
+                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
+                "sampleable and try, eventually, to increase the threshold through the dedicated ",
+                "macro command. Returning dummy vertex");
             vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
             return;
           }
         }
         else {
-          vertex = choice.translation + choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+          vertex = choice.translation + choice.rotation
+                   * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex/CLHEP::cm, " cm");
         }
 
-        RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex/CLHEP::cm, " cm", " after ", calls, " iterations, returning");
+        RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex/CLHEP::cm, " cm",
+            " after ", calls, " iterations, returning");
         return;
       }
 

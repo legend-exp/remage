@@ -1,5 +1,5 @@
-#ifndef _RMG_GENERATOR_VOLUME_CONFINEMENT_HH_
-#define _RMG_GENERATOR_VOLUME_CONFINEMENT_HH_
+#ifndef _RMG_VERTEX_CONFINEMENT_HH_
+#define _RMG_VERTEX_CONFINEMENT_HH_
 
 #include <vector>
 #include <regex>
@@ -21,16 +21,16 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     struct GenericGeometricalSolidData {
       std::string g4_name = "";
       G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
-      double      sphere_inner_radius = 0;
-      double      sphere_outer_radius = -1;
-      double      cylinder_inner_radius = 0;
-      double      cylinder_outer_radius = -1;
-      double      cylinder_height = -1;
-      double      cylinder_starting_angle = 0;
-      double      cylinder_spanning_angle = CLHEP::twopi;
-      double      box_x_length = -1;
-      double      box_y_length = -1;
-      double      box_z_length = -1;
+      double sphere_inner_radius = 0;
+      double sphere_outer_radius = -1;
+      double cylinder_inner_radius = 0;
+      double cylinder_outer_radius = -1;
+      double cylinder_height = -1;
+      double cylinder_starting_angle = 0;
+      double cylinder_spanning_angle = CLHEP::twopi;
+      double box_x_length = -1;
+      double box_y_length = -1;
+      double box_z_length = -1;
     };
 
     enum SamplingMode {
@@ -63,34 +63,34 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
       ~SampleableObject();
 
-      G4VPhysicalVolume* physical_volume;
-      G4VSolid*          sampling_solid;
+      G4VPhysicalVolume* physical_volume = nullptr;
+      G4VSolid*          sampling_solid = nullptr;
       G4RotationMatrix   rotation;
       G4ThreeVector      translation;
       double             volume;
       double             surface;
-      bool               containment_check;
+      bool               containment_check = true;
     };
 
     struct SampleableObjectCollection {
 
-      inline SampleableObjectCollection() : total_volume(0), total_surface(0) {}
+      SampleableObjectCollection() = default;
       inline ~SampleableObjectCollection() { data.clear(); }
 
-      const SampleableObject& SurfaceWeightedRand();
-      const SampleableObject& VolumeWeightedRand();
-      bool IsInside(const G4ThreeVector& point);
+      const SampleableObject& SurfaceWeightedRand() const;
+      const SampleableObject& VolumeWeightedRand() const;
+      bool IsInside(const G4ThreeVector& point) const;
 
       // emulate std::vector
       void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix& r, G4ThreeVector& t, G4VSolid* s);
       void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
-      inline bool empty() { return data.empty(); }
+      inline bool empty() const { return data.empty(); }
       inline SampleableObject& back() { return data.back(); }
       inline void clear() { data.clear(); }
 
       std::vector<SampleableObject> data;
-      double total_volume;
-      double total_surface;
+      double total_volume = 0;
+      double total_surface = 0;
     };
 
   private:
@@ -105,9 +105,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     SampleableObjectCollection fPhysicalVolumes;
     SampleableObjectCollection fGeomVolumeSolids;
 
-    SamplingMode fSamplingMode;
-    bool         fOnSurface;
-    std::string  fBoundingSolidType;
+    SamplingMode fSamplingMode = kUnionAll;
+    bool         fOnSurface = false;
+    std::string  fBoundingSolidType = "Sphere";
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);

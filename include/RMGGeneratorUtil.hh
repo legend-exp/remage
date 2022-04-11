@@ -1,5 +1,5 @@
-#ifndef _RMGGENERATORUTIL_HH
-#define _RMGGENERATORUTIL_HH
+#ifndef _RMG_GENERATOR_UTIL_HH
+#define _RMG_GENERATOR_UTIL_HH
 
 #include "globals.hh"
 #include "G4ThreeVector.hh"
