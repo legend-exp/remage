@@ -127,8 +127,8 @@ message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 add_subdirectory(src)
 # add_subdirectory(data)
 add_subdirectory(doc)
-enable_testing()
-add_subdirectory(test)
+# enable_testing()
+# add_subdirectory(test)
 
 # export targets for dependent projects
 install(
