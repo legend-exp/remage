@@ -10,7 +10,7 @@ Simulation framework for germanium detector experiments
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/gipert/remage?logo=github)
 ![License](https://img.shields.io/github/license/gipert/remage)
 
-🚧 Work in progress...
+🚧 *Under development* 🚧
 
 <p></p>
 
@@ -26,14 +26,12 @@ generators, standard output classes, etc).
 
 * Modern CMake-based build system
 * Support for modern [Geant4](https://geant4.web.cern.ch), including
-
     * Multithreading
     * [VecGeom](https://gitlab.cern.ch/VecGeom/VecGeom) support for vectorized
       solids
     * [GDML](https://gdml.web.cern.ch/GDML) support
     * Multiple output file formats ([ROOT](https://root.cern.ch),
       [HDF5](https://www.hdfgroup.org/solutions/hdf5)...)
-
 * Fast third-party cosmic muon generator (through
   [EcoMug](https://doi.org/10.1016/j.nima.2021.165732))
 * Third-party double-beta decay generator (through
