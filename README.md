@@ -23,18 +23,21 @@ then benefit from a predefined set of tools to perform common actions (physics
 generators, standard output classes, etc).
 
 ### Main features
+
 * Modern CMake-based build system
 * Support for modern [Geant4](https://geant4.web.cern.ch), including
+
     * Multithreading
     * [VecGeom](https://gitlab.cern.ch/VecGeom/VecGeom) support for vectorized
       solids
     * [GDML](https://gdml.web.cern.ch/GDML) support
-    * Fast third-party cosmic muon generator (through
-      [EcoMug](https://doi.org/10.1016/j.nima.2021.165732))
-    * Third-party double-beta decay generator (through
-      [bxdecay0](https://github.com/BxCppDev/bxdecay0))
-    * Common output schemes for HPGe and optical detectors
     * Multiple output file formats ([ROOT](https://root.cern.ch),
       [HDF5](https://www.hdfgroup.org/solutions/hdf5)...)
-    * GPU-offloading of optical photon tracking (through
-      [Opticks](https://doi.org/10.1051/epjconf/201921402027))
+
+* Fast third-party cosmic muon generator (through
+  [EcoMug](https://doi.org/10.1016/j.nima.2021.165732))
+* Third-party double-beta decay generator (through
+  [bxdecay0](https://github.com/BxCppDev/bxdecay0))
+* Common output schemes for HPGe and optical detectors
+* GPU-offloading of optical photon tracking (through
+  [Opticks](https://doi.org/10.1051/epjconf/201921402027))
