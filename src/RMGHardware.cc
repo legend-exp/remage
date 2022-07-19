@@ -115,6 +115,18 @@ void RMGHardware::ConstructSDandField() {
   for (const auto& d : fActiveDetectors) vec_repr += std::string(magic_enum::enum_name(d)) + ", ";
   if (vec_repr.size() > 2) vec_repr.erase(vec_repr.size() - 2);
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
+
+  // copy birks constant from material properties, as it cannot be specified in GDML
+  for (G4Material* mat : *G4Material::GetMaterialTable()) {
+    auto mpt = mat->GetMaterialPropertiesTable();
+    if (!mpt) continue;
+    if (!mpt->ConstPropertyExists("BIRKSCONSTANT")) continue;
+
+    G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
+    mat->GetIonisation()->SetBirksConstant(bc);
+    RMGLog::OutFormat(RMGLog::debug, "Birks constant of material {} set to {} mm/MeV from GDML",
+		mat->GetName(), bc / (CLHEP::mm / CLHEP::MeV));
+  }
 }
 
 void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
@@ -122,7 +134,7 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
 
   for (const auto& [k, v] : fDetectorMetadata) {
     if (v.uid == uid) {
-      RMGLog::Out(RMGLog::error, "UID ", uid, " has already been assigned");
+      RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
       return;
     }
   }
