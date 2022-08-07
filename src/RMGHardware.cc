@@ -125,7 +125,7 @@ void RMGHardware::ConstructSDandField() {
     G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
     mat->GetIonisation()->SetBirksConstant(bc);
     RMGLog::OutFormat(RMGLog::debug, "Birks constant of material {} set to {} mm/MeV from GDML",
-		mat->GetName(), bc / (CLHEP::mm / CLHEP::MeV));
+        mat->GetName(), bc / (CLHEP::mm / CLHEP::MeV));
   }
 }
 
