@@ -28,11 +28,11 @@ class RMGOpticalDetectorHit : public G4VHit {
 
     // getters
     inline int GetDetectorUID() { return fDetectorUID; }
-    inline int GetPhotoelectrons() { return fPhotoElectrons; }
+    inline float GetPhotonEnergy() { return fPhotonEnergy; }
 
     // setters
     inline void SetDetectorUID(int id) { fDetectorUID = id; }
-    inline void AddPhotoElectron() { fPhotoElectrons++; }
+    inline void SetPhotonEnergy(float energy) { fPhotonEnergy = energy; }
 
     void Print() override;
     // TODO
@@ -41,7 +41,7 @@ class RMGOpticalDetectorHit : public G4VHit {
   private:
 
     int fDetectorUID = -1;
-    int fPhotoElectrons = 0;
+    float fPhotonEnergy = 0.;
 };
 
 typedef G4THitsCollection<RMGOpticalDetectorHit> RMGOpticalDetectorHitsCollection;
