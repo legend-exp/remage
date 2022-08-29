@@ -23,8 +23,7 @@ G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) con
 }
 
 void RMGOpticalDetectorHit::Print() {
-  RMGLog::Out(RMGLog::debug, "Detector UID: ", fDetectorUID);
-  RMGLog::Out(RMGLog::debug, "Number of photoelectrons: ", fPhotoElectrons);
+  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Energy: {}", fDetectorUID, fPhotonEnergy);
 }
 
 RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
@@ -89,23 +88,13 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 
   RMGLog::OutDev(RMGLog::debug, "Hit in optical detector nr. ", det_uid, " detected");
 
-  RMGOpticalDetectorHit* hit = nullptr;
+  float energy = step->GetTotalEnergyDeposit() / CLHEP::eV;
 
   // initialize hit object for uid, if not already there
-  const auto& hit_vec = fHitsCollection->GetVector();
-  const auto& result = std::find_if(hit_vec->begin(), hit_vec->end(),
-      [&det_uid](RMGOpticalDetectorHit* h) { return h->GetDetectorUID() == (int)det_uid; });
-
-  if (result == hit_vec->end()) {
-    RMGLog::OutDev(RMGLog::debug, "No hit object found, initializing");
-    hit = new RMGOpticalDetectorHit();
-    hit->SetDetectorUID(det_uid);
-    fHitsCollection->insert(hit);
-  } else hit = *result;
-
-  // integrate hit info
-  RMGLog::OutDev(RMGLog::debug, "Adding hit data to detector hit container");
-  hit->AddPhotoElectron();
+  RMGOpticalDetectorHit* hit = new RMGOpticalDetectorHit();
+  hit->SetDetectorUID(det_uid);
+  hit->SetPhotonEnergy(energy);
+  fHitsCollection->insert(hit);
 
   return true;
 }
