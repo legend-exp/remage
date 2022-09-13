@@ -9,9 +9,12 @@
 #include "RMGTrackingAction.hh"
 
 void RMGUserAction::BuildForMaster() const {
-
-  // the master thread does not simulate anything
-  this->SetUserAction(new RMGRunAction(RMGManager::GetRMGManager()->IsPersistencyEnabled()));
+  // the master thread does not simulate anything.
+  // initialize the master generator also on the master thread, to make sure that particle source
+  // commands are available early on (following a note in G4GeneralParticleSourceMessenger.hh).
+  auto generator_primary = new RMGMasterGenerator();
+  this->SetUserAction(
+      new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled()));
 }
 
 void RMGUserAction::Build() const {
