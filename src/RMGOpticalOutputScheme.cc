@@ -12,12 +12,12 @@
 
 void RMGOpticalOutputScheme::clear() {
   detector_uid.clear();
-  photoelectrons.clear();
+  photon_energies.clear();
 }
 
 void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->CreateNtupleIColumn("opt_detid", detector_uid);
-  ana_man->CreateNtupleIColumn("opt_pe_nr", photoelectrons);
+  ana_man->CreateNtupleFColumn("opt_ph_ene", photon_energies);
 }
 
 void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
@@ -55,7 +55,7 @@ void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
       hit->Print();
 
       detector_uid.push_back(hit->GetDetectorUID());
-      photoelectrons.push_back(hit->GetPhotoelectrons());
+      photon_energies.push_back(hit->GetPhotonEnergy());
     }
   }
 }

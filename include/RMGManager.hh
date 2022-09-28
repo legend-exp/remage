@@ -70,6 +70,8 @@ class RMGManager {
     void SetLogLevelFile(std::string level);
     inline void SetLogToFileName(std::string filename) { RMGLog::OpenLogFile(filename); }
 
+    inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
+
   private:
 
     void SetUpDefaultG4RunManager();

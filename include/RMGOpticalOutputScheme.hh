@@ -19,7 +19,7 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
   private:
 
     std::vector<int> detector_uid;
-    std::vector<int> photoelectrons;
+    std::vector<float> photon_energies;
 };
 
 #endif
