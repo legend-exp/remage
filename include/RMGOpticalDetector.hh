@@ -5,6 +5,7 @@
 #include <string>
 
 #include "G4Allocator.hh"
+#include "G4GenericMessenger.hh"
 #include "G4THitsCollection.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"

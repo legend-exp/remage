@@ -10,7 +10,6 @@
 #include "G4Region.hh"
 #include "G4VUserDetectorConstruction.hh"
 
-#include "RMGMaterialTable.hh"
 #include "RMGNavigationTools.hh"
 
 class G4GenericMessenger;
@@ -53,16 +52,13 @@ class RMGHardware : public G4VUserDetectorConstruction {
     inline void SetMaxStepLimit(std::string name, double max_step) {
       fPhysVolStepLimits.insert_or_assign(name, max_step);
     }
-    static inline RMGMaterialTable::BathMaterial GetBathMaterial() { return fBathMaterial; }
     inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
 
   private:
 
     std::vector<std::string> fGDMLFiles;
-    std::unique_ptr<RMGMaterialTable> fMaterialTable = nullptr;
     std::map<std::string, double> fPhysVolStepLimits;
-    static RMGMaterialTable::BathMaterial fBathMaterial;
 
     // one for each physical volume
     std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;

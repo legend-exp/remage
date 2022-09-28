@@ -12,7 +12,6 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGLog.hh
     ${_root}/include/RMGManager.hh
     ${_root}/include/RMGMasterGenerator.hh
-    ${_root}/include/RMGMaterialTable.hh
     ${_root}/include/RMGNavigationTools.hh
     ${_root}/include/RMGOpticalDetector.hh
     ${_root}/include/RMGOpticalOutputScheme.hh
@@ -37,7 +36,6 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGManager.cc
     ${_root}/src/RMGMasterGenerator.cc
-    ${_root}/src/RMGMaterialTable.cc
     ${_root}/src/RMGNavigationTools.cc
     ${_root}/src/RMGOpticalDetector.cc
     ${_root}/src/RMGOpticalOutputScheme.cc

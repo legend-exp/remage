@@ -4,6 +4,7 @@
 namespace fs = std::filesystem;
 
 #include "G4GDMLParser.hh"
+#include "G4GenericMessenger.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4SDManager.hh"
@@ -11,19 +12,12 @@ namespace fs = std::filesystem;
 #include "G4VPhysicalVolume.hh"
 
 #include "RMGLog.hh"
-#include "RMGMaterialTable.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
-RMGMaterialTable::BathMaterial RMGHardware::fBathMaterial = RMGMaterialTable::BathMaterial::kAir;
-
-RMGHardware::RMGHardware() {
-  fMaterialTable = std::make_unique<RMGMaterialTable>();
-
-  this->DefineCommands();
-}
+RMGHardware::RMGHardware() { this->DefineCommands(); }
 
 G4VPhysicalVolume* RMGHardware::Construct() {
 
