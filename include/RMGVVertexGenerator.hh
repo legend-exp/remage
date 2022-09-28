@@ -10,7 +10,6 @@
 
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
-#include "globals.hh"
 
 #if RMG_HAS_BXDECAY0
 class RMGVVertexGenerator : public bxdecay0_g4::VertexGeneratorInterface {

@@ -1,5 +1,5 @@
-#ifndef _RMGGENERATORSPS_HH_
-#define _RMGGENERATORSPS_HH_
+#ifndef _RMG_GENERATOR_GPS_HH_
+#define _RMG_GENERATOR_GPS_HH_
 
 #include <memory>
 

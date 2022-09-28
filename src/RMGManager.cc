@@ -74,7 +74,6 @@ void RMGManager::Initialize() {
   }
   RMGLog::Out(RMGLog::detail, "Available graphic systems: ", _str);
 
-
   if (!fUserAction) {
     RMGLog::Out(RMGLog::debug, "Initializing default user action class");
     fUserAction = new RMGUserAction();
@@ -106,7 +105,7 @@ void RMGManager::Run() {
     RMGLog::Out(RMGLog::summary, "Entering interactive mode");
     auto cval = std::getenv("DISPLAY");
     auto val = cval == nullptr ? std::string("") : std::string(cval);
-    if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_CSH=1");
+    if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
     session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
   }
 

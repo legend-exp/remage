@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "G4VUserPrimaryGeneratorAction.hh"
-#include "globals.hh"
 
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
@@ -14,7 +13,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   public:
 
-    enum ConfinementCode {
+    enum Confinement {
       kUnConfined,
       kVolume
     };
@@ -39,17 +38,17 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     void GeneratePrimaries(G4Event* event) override;
 
     inline RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
-    inline ConfinementCode GetConfinementCode() const { return fConfinementCode; }
+    inline Confinement GetConfinement() const { return fConfinement; }
 
-    void SetConfinementCode(ConfinementCode code);
-    void SetConfinementCodeString(std::string code);
+    void SetConfinement(Confinement code);
+    void SetConfinementString(std::string code);
     void SetUserGenerator(RMGVGenerator* gen);
     void SetGenerator(Generator gen);
     void SetGeneratorString(std::string gen);
 
   private:
 
-    ConfinementCode fConfinementCode;
+    Confinement fConfinement;
     std::unique_ptr<RMGVVertexGenerator> fVertexGenerator;
 
     Generator fGenerator;

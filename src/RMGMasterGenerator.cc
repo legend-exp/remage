@@ -18,7 +18,7 @@
 #include "RMGTools.hh"
 
 RMGMasterGenerator::RMGMasterGenerator()
-    : fConfinementCode(RMGMasterGenerator::ConfinementCode::kUnConfined), fVertexGenerator(nullptr),
+    : fConfinement(RMGMasterGenerator::Confinement::kUnConfined), fVertexGenerator(nullptr),
       fGenerator(RMGMasterGenerator::Generator::kUndefined), fGeneratorObj(nullptr) {
 
   this->DefineCommands();
@@ -33,7 +33,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
   // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
   // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
   // about the vertex position from outside, in particular in this function here).
-  if (fGenerator != Generator::kBxDecay0 and fConfinementCode != ConfinementCode::kUnConfined) {
+  if (fGenerator != Generator::kBxDecay0 and fConfinement != Confinement::kUnConfined) {
     auto vertex = G4ThreeVector();
     fVertexGenerator->GeneratePrimariesVertex(vertex);
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
@@ -42,24 +42,24 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
   fGeneratorObj->GeneratePrimariesKinematics(event);
 }
 
-void RMGMasterGenerator::SetConfinementCode(RMGMasterGenerator::ConfinementCode code) {
+void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
 
-  fConfinementCode = code;
+  fConfinement = code;
 
-  switch (fConfinementCode) {
-    case ConfinementCode::kUnConfined:
+  switch (fConfinement) {
+    case Confinement::kUnConfined:
       fVertexGenerator =
           std::unique_ptr<RMGVVertexGenerator>(new RMGVVertexGenerator("DummyGenerator"));
       break;
-    case ConfinementCode::kVolume:
+    case Confinement::kVolume:
       fVertexGenerator = std::unique_ptr<RMGVertexConfinement>(new RMGVertexConfinement());
       break;
     default:
-      RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '", fConfinementCode,
+      RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '", fConfinement,
           "' specified (implement me)");
   }
   RMGLog::OutFormat(RMGLog::debug, "Primary vertex confinement strategy set to {}",
-      magic_enum::enum_name<RMGMasterGenerator::ConfinementCode>(code));
+      magic_enum::enum_name<RMGMasterGenerator::Confinement>(code));
 }
 
 void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
@@ -78,7 +78,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGenerator.get());
 #else
       RMGLog::OutFormat(RMGLog::fatal,
-          "BxDecay0 not available, please recompile remage with -DRMG_USE_BXDECAY0=ON");
+          "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON");
 #endif
       break;
     case RMGMasterGenerator::Generator::kCosmicMuons:
@@ -94,10 +94,10 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       magic_enum::enum_name<RMGMasterGenerator::Generator>(gen));
 }
 
-void RMGMasterGenerator::SetConfinementCodeString(std::string code) {
+void RMGMasterGenerator::SetConfinementString(std::string code) {
   try {
-    this->SetConfinementCode(
-        RMGTools::ToEnum<RMGMasterGenerator::ConfinementCode>(code, "confinement code"));
+    this->SetConfinement(
+        RMGTools::ToEnum<RMGMasterGenerator::Confinement>(code, "confinement code"));
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -118,10 +118,10 @@ void RMGMasterGenerator::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/",
       "Commands for controlling generators");
 
-  fMessenger->DeclareMethod("Confine", &RMGMasterGenerator::SetConfinementCodeString)
+  fMessenger->DeclareMethod("Confine", &RMGMasterGenerator::SetConfinementString)
       .SetGuidance("Select primary confinement strategy")
       .SetParameterName("strategy", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGMasterGenerator::ConfinementCode>())
+      .SetCandidates(RMGTools::GetCandidates<RMGMasterGenerator::Confinement>())
       .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
 
