@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "G4GenericMessenger.hh"
 #include "G4Region.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "G4GenericMessenger.hh"
 
 #include "RMGNavigationTools.hh"
 
