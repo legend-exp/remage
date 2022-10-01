@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv) {
 
-  // RMGLog::SetLogLevel(RMGLog::debug);
+  RMGLog::SetLogLevel(RMGLog::debug);
 
   RMGManager manager("02-hpge", argc, argv);
   manager.SetUserInit(new HPGeTestStand());

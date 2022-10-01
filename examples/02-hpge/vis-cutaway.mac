@@ -1,6 +1,6 @@
 /run/initialize
 
-/vis/open OGLIQt
+/vis/open OIQt
 /vis/scene/create
 
 /vis/viewer/set/style surface
