@@ -9,10 +9,10 @@
 
 #include "G4Region.hh"
 #include "G4VUserDetectorConstruction.hh"
+#include "G4GenericMessenger.hh"
 
 #include "RMGNavigationTools.hh"
 
-class G4GenericMessenger;
 class G4VPhysicalVolume;
 class RMGHardware : public G4VUserDetectorConstruction {
 
