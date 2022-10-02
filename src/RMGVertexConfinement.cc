@@ -37,7 +37,8 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
 
 RMGVertexConfinement::SampleableObject::~SampleableObject() {
   if (sampling_solid and sampling_solid != physical_volume->GetLogicalVolume()->GetSolid()) {
-    delete sampling_solid;
+    // FIXME: the following generates a double delete. But who's deleting it first?
+    // delete sampling_solid;
   }
 }
 
