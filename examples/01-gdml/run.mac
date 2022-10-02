@@ -6,6 +6,9 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume Detector_PV
 
-/RMG/Generator/Select G4gun
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/ion 27 60
+/gps/energy 0 eV
 
-/run/beamOn 10
+/run/beamOn 1000

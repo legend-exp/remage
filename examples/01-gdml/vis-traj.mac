@@ -3,7 +3,7 @@
 # /RMG/Geometry/PrintListOfLogicalVolumes
 # /RMG/Geometry/PrintListOfPhysicalVolumes
 
-/vis/open OGLIQt
+/vis/open OIQt
 /vis/scene/create
 /vis/sceneHandler/attach
 
