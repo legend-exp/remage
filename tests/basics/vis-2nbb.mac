@@ -1,0 +1,22 @@
+/run/initialize
+
+/vis/open OIQt
+/vis/scene/create
+/vis/sceneHandler/attach
+
+/vis/drawVolume Detector_PV
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Detector_PV
+
+/RMG/Generator/Select BxDecay0
+/bxdecay0/generator/dbd Ge76 2345 1 0
+
+/run/beamOn 1000

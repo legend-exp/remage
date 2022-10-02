@@ -3,7 +3,13 @@
 /doc/latex
 build
 .local
+
+# G4 outputs
 *.root
+*.hdf5
+
+# G4 visualization
+bookmarkFile
 
 compile_commands.json
 

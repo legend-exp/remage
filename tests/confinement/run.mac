@@ -1,0 +1,10 @@
+/run/initialize
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Box
+
+/RMG/Generator/Select GPS
+/gps/particle geantino
+/gps/energy 0 eV
+
+/run/beamOn 10000

@@ -1,0 +1,27 @@
+/run/initialize
+
+/vis/open OIQt
+/vis/scene/create
+/vis/sceneHandler/attach
+
+/vis/drawVolume
+
+/vis/geometry/set/forceSolid Detector
+/vis/geometry/set/forceSolid Source_Encapsulated
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Source_Encapsulated_PV
+
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/ion 27 60
+/gps/energy 0 eV
+
+/run/beamOn 10
