@@ -2,10 +2,10 @@
 
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
+#include "G4Material.hh"
+#include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
 #include "G4UnitsTable.hh"
-#include "G4NistManager.hh"
-#include "G4Material.hh"
 
 namespace u = CLHEP;
 
@@ -42,14 +42,14 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
   auto LAr = man->FindOrBuildMaterial("G4_lAr");
 
   auto mat_enr_ge = new G4Material("CryogenicEnrichedGermanium", density = 5.56, n_components = 1,
-    state = G4State::kStateSolid, temperature = LAr->GetTemperature(), pressure = LAr->GetPressure());
+      state = G4State::kStateSolid, temperature = LAr->GetTemperature(),
+      pressure = LAr->GetPressure());
 
   mat_enr_ge->AddElement(el_enr_ge, n_atoms = 1);
 
   auto world_s = new G4Box("WorldLAr", 0.5 * CLHEP::m, 0.5 * CLHEP::m, 0.5 * CLHEP::m);
 
-  auto world_l =
-      new G4LogicalVolume(world_s, LAr, "WorldLAr");
+  auto world_l = new G4LogicalVolume(world_s, LAr, "WorldLAr");
 
   auto world_p = new G4PVPlacement(nullptr, G4ThreeVector(), world_l, "World", 0, false, 0);
 
