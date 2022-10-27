@@ -91,8 +91,8 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
   auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
 
   if (on_surface) {
-    auto A1 = delta_cos_theta * delta_phi * r1 * r1;
-    auto A2 = delta_cos_theta * delta_phi * r2 * r2;
+    auto A1 = r1 * r1;
+    auto A2 = r2 * r2;
     auto side = _g4rand() * (A1 + A2);
     if (side <= A1) return s2_point * r1;
     else return s2_point * r2;
