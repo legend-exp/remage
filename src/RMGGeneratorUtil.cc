@@ -68,17 +68,21 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
 
   if (!sphere) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
 
+  // phi is the equatorial angle [0, 2*pi]
+  // theta is the other one [0, pi]
+
   auto r1 = sphere->GetInnerRadius();
   auto r2 = sphere->GetOuterRadius();
   auto phi1 = sphere->GetStartPhiAngle();
   auto delta_phi = sphere->GetDeltaPhiAngle();
   auto cos_theta1 = sphere->GetCosStartTheta();
-  auto delta_cos_theta = std::abs(sphere->GetCosEndTheta() - cos_theta1);
+  auto delta_cos_theta = sphere->GetCosEndTheta() - cos_theta1;
 
-  auto phi = phi1 + delta_phi * _g4rand();
-  auto cos_theta = delta_cos_theta * _g4rand() + cos_theta1;
-  auto s2_point =
-      G4ThreeVector(std::cos(phi), std::sin(phi), cos_theta) / std::sqrt(1 + cos_theta * cos_theta);
+  auto phi = phi1 + delta_phi * _g4rand();                   // random phi
+  auto cos_theta = delta_cos_theta * _g4rand() + cos_theta1; // random cos(theta)
+  auto sin_theta = std::sqrt(1 - cos_theta * cos_theta);     // ...and sin(theta)
+  // the sampled 3D point on unit sphere
+  auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
 
   if (on_surface) {
     auto A1 = delta_cos_theta * delta_phi * r1 * r1;
@@ -87,7 +91,8 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
     if (side <= A1) return s2_point * r1;
     else return s2_point * r2;
   } else {
-    auto R = _g4rand() * (r2 - r1) + r1;
+    auto u = _g4rand();
+    auto R = std::cbrt(u * r2 * r2 * r2 + (1 - u) * r1 * r1 * r1); // random radius
     return s2_point * R;
   }
 }
