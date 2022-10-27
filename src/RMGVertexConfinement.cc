@@ -65,7 +65,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   for (const auto& o : data) {
     if (choice > w and choice <= w + o.volume) return o;
     w += o.volume;
-    if (w >= total_surface) {
+    if (w >= total_volume) {
       RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unexpectedly failed ",
           "(out-of-range error). Returning last object");
       return data.back();
