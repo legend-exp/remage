@@ -6,6 +6,7 @@
 
 # /vis/viewer/set/defaultColour black
 # /vis/viewer/set/background white
+/vis/scene/add/axes 0 0 0 3 m
 
 /vis/scene/add/trajectories smooth
 /vis/modeling/trajectories/create/drawByCharge
@@ -14,12 +15,3 @@
 
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate
-
-/RMG/Generator/Confine Volume
-/RMG/Generator/Confinement/Physical/AddVolume Box
-
-/RMG/Generator/Select GPS
-/gps/particle e-
-/gps/energy 1 eV
-
-/run/beamOn 500
