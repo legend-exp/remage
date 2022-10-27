@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <array>
 #include <numeric>
-#include <algorithm>
 
 #include "RMGGeneratorUtil.hh"
 
@@ -44,9 +44,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
 
   if (on_surface) {
     std::array<double, 3> A = {4 * dx * dy, 4 * dx * dz, 4 * dy * dz};
-    std::sort(A.begin(), A.end());
 
-    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);;
+    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
+    ;
     auto face_sign = _g4rand() <= 0.5 ? -1 : 1;
     double x, y, z;
 
@@ -91,6 +91,12 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
   auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
 
   if (on_surface) {
+
+    if (delta_phi != CLHEP::twopi or sphere->GetDeltaThetaAngle() != CLHEP::pi) {
+      RMGLog::OutDev(RMGLog::fatal, "Surface sampling on spherical sectors not implemented yet");
+    }
+
+    // choose between inner or outer surfaces
     auto A1 = r1 * r1;
     auto A2 = r2 * r2;
     auto side = _g4rand() * (A1 + A2);
@@ -122,22 +128,32 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
 
   auto phi = a + delta_a * _g4rand();
   auto z = h * (_g4rand() - 0.5);
+  auto R = _g4rand() * (r2 - r1) + r1;
   auto s1_point = G4ThreeVector(std::cos(phi), std::sin(phi), 0);
 
   if (on_surface) {
-    auto A1 = delta_a * r1 * h;
-    auto A2 = delta_a * r2 * h;
-    auto A3 = delta_a * (r2 * r2 - r1 * r1);
-    auto face = _g4rand() * (A1 + A2 + A3 * 2);
-    if (face <= A1) return s1_point * r1 + G4ThreeVector(0, 0, z);
-    else if (face > A1 and face <= A2) return s1_point * r2 + G4ThreeVector(0, 0, z);
-    else {
+    // choose between inner, outer, top/bottom, side1/side2 surfaces
+    std::array<double, 4> A = {
+        // areas
+        delta_a * r1 * h,                                 // inner
+        delta_a * r2 * h,                                 // outer
+        delta_a * (r2 * r2 - r1 * r1),                    // top/bottom, (twice)
+        (delta_a != CLHEP::twopi) ? 2 * (r2 - r1) * h : 0 // sides (twice) (might not be there)
+    };
+    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
+
+    if (face <= A[0]) { // inner
+      return s1_point * r1 + G4ThreeVector(0, 0, z);
+    } else if (face > A[0] and face <= A[0] + A[1]) { // outer
+      return s1_point * r2 + G4ThreeVector(0, 0, z);
+    } else if (face > A[0] + A[1] and face <= A[0] + A[1] + A[2]) { // top or bottom
       auto face_sign = _g4rand() <= 0.5 ? 1 : -1;
-      auto R = _g4rand() * (r2 - r1) + r1;
       return s1_point * R + G4ThreeVector(0, 0, face_sign * h / 2);
+    } else { // sides
+      auto angle = _g4rand() <= 0.5 ? a : a + delta_a;
+      return R * G4ThreeVector(std::cos(angle), std::sin(angle)) + G4ThreeVector(0, 0, z);
     }
   } else {
-    auto R = _g4rand() * (r2 - r1) + r1;
     return s1_point * R + G4ThreeVector(0, 0, z);
   }
 }
