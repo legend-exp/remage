@@ -71,8 +71,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         G4VSolid* sampling_solid = nullptr;
         G4RotationMatrix rotation;
         G4ThreeVector translation;
-        double volume;
-        double surface;
+        double volume = -1;
+        double surface = -1;
         bool containment_check = true;
     };
 
@@ -86,8 +86,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         bool IsInside(const G4ThreeVector& point) const;
 
         // emulate std::vector
-        void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix& r, G4ThreeVector& t, G4VSolid* s);
-        void emplace_back(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
+        void emplace_back(G4VPhysicalVolume* v, const G4RotationMatrix& r, const G4ThreeVector& t,
+            G4VSolid* s);
         inline bool empty() const { return data.empty(); }
         inline SampleableObject& back() { return data.back(); }
         inline void clear() { data.clear(); }

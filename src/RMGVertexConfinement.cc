@@ -26,13 +26,18 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
 
       rotation(r), translation(t) {
 
+  // at least one volume must be specified
   if (!v and !s) RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
 
-  physical_volume = v;
-  sampling_solid = s;
+  this->physical_volume = v;
+  this->sampling_solid = s;
 
-  if (physical_volume) volume = physical_volume->GetLogicalVolume()->GetSolid()->GetCubicVolume();
-  else volume = sampling_solid->GetCubicVolume();
+  // should use the physical volume properties, if available
+  const auto& solid =
+      physical_volume ? physical_volume->GetLogicalVolume()->GetSolid() : sampling_solid;
+
+  this->volume = solid->GetCubicVolume();
+  this->surface = solid->GetSurfaceArea();
 }
 
 RMGVertexConfinement::SampleableObject::~SampleableObject() {
@@ -50,7 +55,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
     if (choice > w and choice <= w + o.surface) return o;
     w += o.surface;
     if (w >= total_surface) {
-      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unexpectedly failed ",
+      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables failed unexpectedly ",
           "(out-of-range error). Returning last object");
       return data.back();
     }
@@ -66,7 +71,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
     if (choice > w and choice <= w + o.volume) return o;
     w += o.volume;
     if (w >= total_volume) {
-      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables unexpectedly failed ",
+      RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables failed unexpectedly ",
           "(out-of-range error). Returning last object");
       return data.back();
     }
@@ -87,17 +92,24 @@ bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVec
 }
 
 void RMGVertexConfinement::SampleableObjectCollection::emplace_back(G4VPhysicalVolume* v,
-    G4RotationMatrix& r, G4ThreeVector& t, G4VSolid* s) {
-  data.emplace_back(v, r, t, s);
-  total_volume += data.back().volume;
-  total_surface += data.back().surface;
-}
+    const G4RotationMatrix& r, const G4ThreeVector& t, G4VSolid* s) {
 
-void RMGVertexConfinement::SampleableObjectCollection::emplace_back(G4VPhysicalVolume* v,
-    G4RotationMatrix r, G4ThreeVector t, G4VSolid* s) {
-  data.emplace_back(v, r, t, s);
-  total_volume += data.back().volume;
-  total_surface += data.back().surface;
+  this->data.emplace_back(v, r, t, s);
+
+  const auto& _v = this->data.back().volume;
+  const auto& _s = this->data.back().surface;
+
+  if (_v > 0) this->total_volume += _v;
+  else
+    RMGLog::Out(RMGLog::error, "One of the sampled solids has no volume attribute, ",
+        "will not add it to the total volume of the collection. ",
+        "this will affect sampling from multiple solids.");
+
+  if (_s > 0) this->total_surface += _s;
+  else
+    RMGLog::Out(RMGLog::error, "One of the sampled solids has no surface attribute, ",
+        "will not add it to the total surface of the collection. ",
+        "this will affect sampling from multiple solids.");
 }
 
 /* ========================================================================================== */
@@ -125,6 +137,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           std::regex_match(std::to_string((*it)->GetCopyNo()),
               std::regex(fPhysicalVolumeCopyNrRegexes.at(i)))) {
 
+        // insert it in our collection
+        // do not specify a bounding solid at this stage
         fPhysicalVolumes.emplace_back(*it, G4RotationMatrix(), G4ThreeVector(), nullptr);
 
         RMGLog::OutFormat(RMGLog::detail, " · '{}[{}]', mass = {}", (*it)->GetName().c_str(),
@@ -144,6 +158,12 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     RMGLog::Out(RMGLog::error,
         "No physical volumes names found matching any of the specified patterns");
     return;
+  }
+
+  if (fOnSurface) {
+    RMGLog::Out(RMGLog::detail, "Will sample points on the surface of the objects");
+  } else {
+    RMGLog::Out(RMGLog::detail, "Will sample points in the bulk of the objects");
   }
 
   auto world_volume =
@@ -259,6 +279,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
   if (!fGeomVolumeSolids.empty()) return;
 
+  // no physical volume is specified!
   for (const auto& d : fGeomVolumeData) {
     if (d.g4_name == "Sphere") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
@@ -473,6 +494,13 @@ void RMGVertexConfinement::DefineCommands() {
 
   fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/",
       "Commands for controlling primary confinement"));
+
+  fMessengers.back()
+      ->DeclareProperty("SampleOnSurface", fOnSurface)
+      .SetGuidance("If true (or omitted argument), sample on the surface of solids")
+      .SetParameterName("flag", true)
+      .SetStates(G4State_Idle)
+      .SetToBeBroadcasted(true);
 
   fMessengers.back()
       ->DeclareMethod("SamplingMode", &RMGVertexConfinement::SetSamplingModeString)
