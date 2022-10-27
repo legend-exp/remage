@@ -1,5 +1,7 @@
 /run/initialize
 
+/RMG/Manager/Logging/LogLevelScreen detail
+
 /vis/open OIQt
 /vis/drawVolume
 /vis/sceneHandler/attach

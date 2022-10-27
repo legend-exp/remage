@@ -1,0 +1,13 @@
+/control/execute vis.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/Physical/AddVolume Box
+/RMG/Generator/Confinement/Physical/AddVolume Orb
+/RMG/Generator/Confinement/Physical/AddVolume Tubs
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 2000
