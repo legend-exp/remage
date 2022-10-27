@@ -1,3 +1,7 @@
+#include <array>
+#include <numeric>
+#include <algorithm>
+
 #include "RMGGeneratorUtil.hh"
 
 #include "Randomize.hh"
@@ -39,16 +43,18 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
   auto dz = box->GetZHalfLength();
 
   if (on_surface) {
-    auto A1 = 4 * dx * dy, A2 = 4 * dx * dz, A3 = 4 * dy * dz;
-    auto face = _g4rand() * (A1 + A2 + A3);
+    std::array<double, 3> A = {4 * dx * dy, 4 * dx * dz, 4 * dy * dz};
+    std::sort(A.begin(), A.end());
+
+    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);;
     auto face_sign = _g4rand() <= 0.5 ? -1 : 1;
     double x, y, z;
 
-    if (face <= A1) {
+    if (face <= A[0]) {
       x = dx * (2 * _g4rand() - 1);
       y = dy * (2 * _g4rand() - 1);
       z = dz * face_sign;
-    } else if (face > A1 and face <= A2) {
+    } else if (face > A[0] and face <= A[0] + A[1]) {
       x = dx * (2 * _g4rand() - 1);
       y = dy * face_sign;
       z = dz * (2 * _g4rand() - 1);
