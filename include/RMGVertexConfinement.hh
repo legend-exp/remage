@@ -7,7 +7,7 @@
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
-#include "globals.hh"
+#include "G4UnitsTable.hh"
 
 #include "RMGVVertexGenerator.hh"
 
@@ -117,9 +117,19 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void SetSamplingModeString(std::string mode);
     void AddGeometricalVolumeString(std::string solid);
     GenericGeometricalSolidData& SafeBack();
-    inline void SetGeomVolumeCenter(G4ThreeVector& v) { this->SafeBack().volume_center = v; }
+
+    // FIXME: there is no easy way to set the position vector all at once with
+    // G4GenericMessenger. Only ::DeclarePropertyWithUnit() accepts vectors and
+    // one cannot call functions with more than 2 arguments (3 coordinated + 1
+    // units needed). Ugly!
+    inline void SetGeomVolumeCenter(const G4ThreeVector& v) { this->SafeBack().volume_center = v; }
+    inline void SetGeomVolumeCenterX(double x) { this->SafeBack().volume_center.setX(x); }
+    inline void SetGeomVolumeCenterY(double y) { this->SafeBack().volume_center.setY(y); }
+    inline void SetGeomVolumeCenterZ(double z) { this->SafeBack().volume_center.setZ(z); }
+
     inline void SetGeomSphereInnerRadius(double r) { this->SafeBack().sphere_inner_radius = r; }
     inline void SetGeomSphereOuterRadius(double r) { this->SafeBack().sphere_outer_radius = r; }
+
     inline void SetGeomCylinderInnerRadius(double r) { this->SafeBack().cylinder_inner_radius = r; }
     inline void SetGeomCylinderOuterRadius(double r) { this->SafeBack().cylinder_outer_radius = r; }
     inline void SetGeomCylinderHeight(double h) { this->SafeBack().cylinder_height = h; }
@@ -129,9 +139,11 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     inline void SetGeomCylinderSpanningAngle(double a) {
       this->SafeBack().cylinder_spanning_angle = a;
     }
+
     inline void SetGeomBoxXLength(double x) { this->SafeBack().box_x_length = x; }
     inline void SetGeomBoxYLength(double y) { this->SafeBack().box_y_length = y; }
     inline void SetGeomBoxZLength(double z) { this->SafeBack().box_z_length = z; }
+
     void DefineCommands();
 };
 

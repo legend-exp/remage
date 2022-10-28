@@ -20,6 +20,10 @@
 
 #include "RMGTools.hh"
 
+// This structure must contain at least a non-null pointer, between the first
+// and the last argument. The idea is that
+//  - physical volumes get always a bounding box assigned, but later
+//  - purely geometrical volumes only have the G4VSolid member defined
 RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r,
     G4ThreeVector t, G4VSolid* s)
     :
@@ -171,7 +175,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   if (!world_volume) RMGLog::Out(RMGLog::fatal, "World volume not defined");
 
   // now inspect the solids the physical volumes refer to and configure the
-  // appropriate sampling strategy
+  // appropriate sampling strategy, i.e. setting the sampling solid and
+  // containment check flag
   for (auto&& el : fPhysicalVolumes.data) {
 
     RMGLog::OutFormatDev(RMGLog::debug, "Inspecting volume '{}'", el.physical_volume->GetName());
@@ -185,8 +190,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     auto solid = log_vol->GetSolid();
     auto solid_type = log_vol->GetSolid()->GetEntityType();
 
-    // if the solid is simple one can avoid using bounding volumes for sampling
-    // both volume and native surface sampling are available
+    // if the solid is simple one can avoid using bounding volumes for
+    // sampling.  Both volume and native surface sampling are available
     if (RMGGeneratorUtil::IsSampleable(solid_type)) {
       RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
@@ -206,13 +211,11 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
-    else if (solid_type == "G4SubtractionSolid") {
+    else if (solid_type == "G4SubtractionSolid" and RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
       RMGLog::OutDev(RMGLog::debug,
           "Is a subtraction solid, sampling from constituent solid with containment check");
-      if (RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
-        el.sampling_solid = solid->GetConstituentSolid(0);
-        el.containment_check = true;
-      }
+      el.sampling_solid = solid->GetConstituentSolid(0);
+      el.containment_check = true;
     }
     // use bounding solid for all other cases
     else {
@@ -233,7 +236,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         RMGLog::Out(RMGLog::fatal, "Bounding solid type '", fBoundingSolidType,
             "' not supported (implement me)");
       }
-    }
+    } // sampling_solid and containment_check must hold a valid value at this point
 
     // determine solid transformation w.r.t. world volume reference
 
@@ -279,7 +282,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
   if (!fGeomVolumeSolids.empty()) return;
 
-  // no physical volume is specified!
+  // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
     if (d.g4_name == "Sphere") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
@@ -320,6 +323,8 @@ void RMGVertexConfinement::Reset() {
 
 void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
+  // configure sampling volumes (does not do anything if this is not the first
+  // call)
   this->InitializePhysicalVolumes();
   this->InitializeGeometricalVolumes();
 
@@ -355,7 +360,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
 
-        if (choice.containment_check) { // this can effectively happen only with physical volumes
+        if (choice.containment_check) { // this can effectively happen only with physical volumes, at the moment
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
             vertex = choice.translation +
                      choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
@@ -547,10 +552,25 @@ void RMGVertexConfinement::DefineCommands() {
       .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
 
+  // FIXME: see comment in .hh
   fMessengers.back()
-      ->DeclareMethodWithUnit("CenterPosition", "cm", &RMGVertexConfinement::SetGeomVolumeCenter)
-      .SetGuidance("Set center position")
-      .SetParameterName("point", false)
+      ->DeclareMethodWithUnit("CenterPositionX", "cm", &RMGVertexConfinement::SetGeomVolumeCenterX)
+      .SetGuidance("Set center position (X coordinate")
+      .SetParameterName("value", false)
+      .SetStates(G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("CenterPositionY", "cm", &RMGVertexConfinement::SetGeomVolumeCenterY)
+      .SetGuidance("Set center position (Y coordinate")
+      .SetParameterName("value", false)
+      .SetStates(G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("CenterPositionZ", "cm", &RMGVertexConfinement::SetGeomVolumeCenterZ)
+      .SetGuidance("Set center position (Z coordinate")
+      .SetParameterName("value", false)
       .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
 
