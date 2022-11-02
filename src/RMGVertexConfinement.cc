@@ -158,7 +158,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
   }
 
-  if (fPhysicalVolumes.empty()) {
+  if (!fPhysicalVolumeNameRegexes.empty() and fPhysicalVolumes.empty()) {
     RMGLog::Out(RMGLog::error,
         "No physical volumes names found matching any of the specified patterns");
     return;
@@ -211,7 +211,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
-    else if (solid_type == "G4SubtractionSolid" and RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
+    else if (solid_type == "G4SubtractionSolid" and
+             RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
       RMGLog::OutDev(RMGLog::debug,
           "Is a subtraction solid, sampling from constituent solid with containment check");
       el.sampling_solid = solid->GetConstituentSolid(0);
@@ -300,11 +301,12 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
     }
     // else if (...)
     else {
-      RMGLog::Out(RMGLog::error, "Geometrical solid '", d.g4_name, "' not known! (Implement me?)");
+      RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
+          d.g4_name);
     }
 
     RMGLog::OutFormat(RMGLog::detail,
-        "Added geometrical solid of type '%s' with volume %g cm3 and surface %g cm2",
+        "Added geometrical solid of type '{}' with volume {} cm3 and surface {} cm2",
         fGeomVolumeSolids.back().sampling_solid->GetEntityType().c_str(),
         fGeomVolumeSolids.back().volume / CLHEP::cm3, fGeomVolumeSolids.back().surface / CLHEP::cm2);
   }
@@ -587,7 +589,7 @@ void RMGVertexConfinement::DefineCommands() {
       .SetToBeBroadcasted(true);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomSphereInnerRadius)
+      ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomSphereOuterRadius)
       .SetGuidance("Set outer radius")
       .SetParameterName("L", false)
       .SetRange("L > 0")

@@ -14,6 +14,9 @@ world_s = geant4.solid.Box(
 world_l = geant4.LogicalVolume(world_s, "G4_Pb", "World", reg)
 reg.setWorld(world_l)
 
+# solids that can be sampled natively
+#####################################
+
 # box
 box_s = geant4.solid.Box("Box", 1, 1, 1, reg, lunit="m")
 box_l = geant4.LogicalVolume(box_s, "G4_Pb", "Box", reg)
@@ -33,6 +36,27 @@ geant4.PhysicalVolume([pi/4, pi/4, -pi/4], [0, 0, 2, "m"], sphere_l, "Sphere", w
 tubs_s = geant4.solid.Tubs("Tubs", 0.2, 0.5, 1.2, pi/3, 4*pi/3, reg, lunit="m")
 tubs_l = geant4.LogicalVolume(tubs_s, "G4_Pb", "Tubs", reg)
 geant4.PhysicalVolume([-pi/4, pi/4, pi/4], [-2, 0, 0, "m"], tubs_l, "Tubs", world_l, reg)
+
+# complex solids
+################
+
+# box with spherical hole (subtraction)
+box2_s = geant4.solid.Box("Box2", 1, 1, 1, reg, lunit="m")
+hole_s = geant4.solid.Orb("Hole", 0.6, reg, lunit="m")
+boxwhole_s = geant4.solid.Subtraction("BoxWithHole", box2_s, hole_s, [[0, 0, 0], [0, 0, 0]], reg)
+boxwhole_l = geant4.LogicalVolume(boxwhole_s, "G4_Pb", "BoxWithHole", reg)
+geant4.PhysicalVolume([pi/4, -pi/4, pi/4], [0, 0, 0, "m"], boxwhole_l, "BoxWithHole", world_l, reg)
+
+# box and sphere (union)
+boxnorb_s = geant4.solid.Union("BoxAndOrb", box2_s, hole_s, [[0, 0, 0], [0, 0, 0]], reg)
+boxnorb_l = geant4.LogicalVolume(boxnorb_s, "G4_Pb", "BoxAndOrb", reg)
+geant4.PhysicalVolume([pi/4, -pi/4, pi/4], [2, 2, 0, "m"], boxnorb_l, "BoxAndOrb", world_l, reg)
+
+# above box with hole inside a mother orb
+orb_s = geant4.solid.Orb("MotherOrb", 1, reg, lunit="m")
+orb_l = geant4.LogicalVolume(orb_s, "G4_Pb", "MotherOrb", reg)
+geant4.PhysicalVolume([0, 0, 0], [0, 0, 0, "m"], boxnorb_l, "BoxAndOrb2", orb_l, reg)
+geant4.PhysicalVolume([0, 0, 0], [2, 2, 2, "m"], orb_l, "MotherOrb", world_l, reg)
 
 world_l.checkOverlaps(recursive=True)
 
