@@ -65,7 +65,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         SampleableObject() = default;
         SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
-        ~SampleableObject();
+        // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
+        ~SampleableObject() = default;
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;

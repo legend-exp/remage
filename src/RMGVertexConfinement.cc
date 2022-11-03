@@ -44,22 +44,6 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
   this->surface = solid->GetSurfaceArea();
 }
 
-RMGVertexConfinement::SampleableObject::~SampleableObject() {
-  // we don't always own sampling_solid
-  if (this->physical_volume) {
-    const auto phy_solid = this->physical_volume->GetLogicalVolume()->GetSolid();
-    if (this->sampling_solid == phy_solid) return; // simple native sampling...
-    if (phy_solid->GetEntityType() == "G4SubtractionSolid" and
-        this->sampling_solid == phy_solid->GetConstituentSolid(0)) { // ...or with containment check
-      return;
-    }
-  } else if (this->sampling_solid) {
-    RMGLog::OutFormatDev(RMGLog::debug, "deleting sampling_solid ({})", sampling_solid->GetName());
-    // FIXME: the following generates early delete / double delete
-    // delete this->sampling_solid;
-  }
-}
-
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::
     SurfaceWeightedRand() const {
 
