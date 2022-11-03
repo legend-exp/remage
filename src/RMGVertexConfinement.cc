@@ -45,42 +45,49 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
 }
 
 RMGVertexConfinement::SampleableObject::~SampleableObject() {
-  if (sampling_solid and sampling_solid != physical_volume->GetLogicalVolume()->GetSolid()) {
-    // FIXME: the following generates a double delete. But who's deleting it first?
+  if (sampling_solid and physical_volume and sampling_solid != physical_volume->GetLogicalVolume()->GetSolid()) {
+    // FIXME: the following generates a double delete when sampling complex
+    // solids. But who's deleting it first? Needs debugging
     // delete sampling_solid;
   }
 }
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::
     SurfaceWeightedRand() const {
-  auto choice = total_surface * G4UniformRand();
+
+  if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
+
+  auto choice = this->total_surface * G4UniformRand();
   double w = 0;
-  for (const auto& o : data) {
+  for (const auto& o : this->data) {
     if (choice > w and choice <= w + o.surface) return o;
     w += o.surface;
-    if (w >= total_surface) {
+    if (w >= this->total_surface) {
       RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables failed unexpectedly ",
           "(out-of-range error). Returning last object");
-      return data.back();
+      return this->data.back();
     }
   }
-  return data.back();
+  return this->data.back();
 }
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::
     VolumeWeightedRand() const {
-  auto choice = total_volume * G4UniformRand();
+
+  if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
+
+  auto choice = this->total_volume * G4UniformRand();
   double w = 0;
-  for (const auto& o : data) {
+  for (const auto& o : this->data) {
     if (choice > w and choice <= w + o.volume) return o;
     w += o.volume;
-    if (w >= total_volume) {
+    if (w >= this->total_volume) {
       RMGLog::Out(RMGLog::error, "Sampling from collection of sampleables failed unexpectedly ",
           "(out-of-range error). Returning last object");
-      return data.back();
+      return this->data.back();
     }
   }
-  return data.back();
+  return this->data.back();
 }
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
@@ -125,7 +132,7 @@ RMGVertexConfinement::RMGVertexConfinement() : RMGVVertexGenerator("VolumeConfin
 
 void RMGVertexConfinement::InitializePhysicalVolumes() {
 
-  if (!fPhysicalVolumes.empty()) return;
+  if (!fPhysicalVolumes.empty() or fPhysicalVolumeNameRegexes.empty()) return;
 
   auto volume_store = G4PhysicalVolumeStore::GetInstance();
 
@@ -164,11 +171,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     return;
   }
 
-  if (fOnSurface) {
-    RMGLog::Out(RMGLog::detail, "Will sample points on the surface of the objects");
-  } else {
-    RMGLog::Out(RMGLog::detail, "Will sample points in the bulk of the objects");
-  }
+  RMGLog::Out(RMGLog::detail, "Will sample points in the ", fOnSurface ? "surface" : "bulk",
+      " of physical volumes");
 
   auto world_volume =
       G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();
@@ -305,11 +309,16 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
           d.g4_name);
     }
 
-    RMGLog::OutFormat(RMGLog::detail,
-        "Added geometrical solid of type '{}' with volume {} cm3 and surface {} cm2",
-        fGeomVolumeSolids.back().sampling_solid->GetEntityType().c_str(),
-        fGeomVolumeSolids.back().volume / CLHEP::cm3, fGeomVolumeSolids.back().surface / CLHEP::cm2);
+    fGeomVolumeSolids.back().containment_check = false;
+
+    RMGLog::Out(RMGLog::detail, "Added geometrical solid of type '",
+        fGeomVolumeSolids.back().sampling_solid->GetEntityType(), "' with volume ",
+        G4BestUnit(fGeomVolumeSolids.back().volume, "Volume"), "and surface ",
+        G4BestUnit(fGeomVolumeSolids.back().surface, "Surface"));
   }
+
+  RMGLog::Out(RMGLog::detail, "Will sample points in the ", fOnSurface ? "surface" : "bulk",
+      " of geometrical volumes");
 }
 
 void RMGVertexConfinement::Reset() {
@@ -401,17 +410,27 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
     }
 
     case SamplingMode::kUnionAll: {
+      // strategy: just sample uniformly in/on all geometrical and physical volumes
 
-      if (fGeomVolumeSolids.empty() and fPhysicalVolumes.empty()) {
+      // merge everything in a single container and use that
+      auto all_volumes = fGeomVolumeSolids;
+      all_volumes.insert(fPhysicalVolumes);
+
+      if (all_volumes.empty()) {
         RMGLog::Out(RMGLog::fatal, "'UnionAll' mode is set but ",
             "no physical or no geometrical volumes have been added");
       }
 
-      const auto choice = fOnSurface ? fPhysicalVolumes.SurfaceWeightedRand()
-                                     : fPhysicalVolumes.VolumeWeightedRand();
+      const auto choice =
+          fOnSurface ? all_volumes.SurfaceWeightedRand() : all_volumes.VolumeWeightedRand();
 
-      RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
-          choice.physical_volume->GetName(), choice.physical_volume->GetCopyNo());
+      if (choice.physical_volume) {
+        RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
+            choice.physical_volume->GetName(), choice.physical_volume->GetCopyNo());
+      } else {
+        RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}'",
+            choice.sampling_solid->GetName());
+      }
       RMGLog::OutDev(RMGLog::debug,
           "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
 
@@ -625,7 +644,7 @@ void RMGVertexConfinement::DefineCommands() {
       .SetToBeBroadcasted(true);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("StartingAngle", "cm",
+      ->DeclareMethodWithUnit("StartingAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderStartingAngle)
       .SetGuidance("Set starting angle")
       .SetParameterName("A", false)
@@ -633,7 +652,7 @@ void RMGVertexConfinement::DefineCommands() {
       .SetToBeBroadcasted(true);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("SpanningAngle", "cm",
+      ->DeclareMethodWithUnit("SpanningAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderSpanningAngle)
       .SetGuidance("Set spanning angle")
       .SetParameterName("A", false)
