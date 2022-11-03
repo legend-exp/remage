@@ -8,7 +8,6 @@
 /RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionY 2 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionZ 2 m
-
 /RMG/Generator/Confinement/Geometrical/Sphere/InnerRadius 0 m
 /RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius 0.7 m
 
@@ -16,7 +15,6 @@
 /RMG/Generator/Confinement/Geometrical/CenterPositionX -2 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionY -2 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionZ -2 m
-
 /RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius 0.4 m
 /RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 0.7 m
 /RMG/Generator/Confinement/Geometrical/Cylinder/Height 1.0 m
@@ -27,7 +25,6 @@
 /RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionY 0 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionZ -2 m
-
 /RMG/Generator/Confinement/Geometrical/Box/XLength 0.7 m
 /RMG/Generator/Confinement/Geometrical/Box/YLength 0.5 m
 /RMG/Generator/Confinement/Geometrical/Box/ZLength 1.2 m
