@@ -285,7 +285,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
 void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
-  if (!fGeomVolumeSolids.empty()) return;
+  if (!fGeomVolumeSolids.empty() or fGeomVolumeData.empty()) return;
 
   // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
