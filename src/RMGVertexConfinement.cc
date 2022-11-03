@@ -45,10 +45,18 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
 }
 
 RMGVertexConfinement::SampleableObject::~SampleableObject() {
-  if (sampling_solid and physical_volume and sampling_solid != physical_volume->GetLogicalVolume()->GetSolid()) {
-    // FIXME: the following generates a double delete when sampling complex
-    // solids. But who's deleting it first? Needs debugging
-    // delete sampling_solid;
+  // we don't always own sampling_solid
+  if (this->physical_volume) {
+    const auto phy_solid = this->physical_volume->GetLogicalVolume()->GetSolid();
+    if (this->sampling_solid == phy_solid) return; // simple native sampling...
+    if (phy_solid->GetEntityType() == "G4SubtractionSolid" and
+        this->sampling_solid == phy_solid->GetConstituentSolid(0)) { // ...or with containment check
+      return;
+    }
+  } else if (this->sampling_solid) {
+    RMGLog::OutFormatDev(RMGLog::debug, "deleting sampling_solid ({})", sampling_solid->GetName());
+    // FIXME: the following generates early delete / double delete
+    // delete this->sampling_solid;
   }
 }
 
@@ -285,22 +293,23 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
 void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
+  // if collections are not empty, assume initialization to be already done and skip
   if (!fGeomVolumeSolids.empty() or fGeomVolumeData.empty()) return;
 
   // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
     if (d.g4_name == "Sphere") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Sphere("RMGVertexConfinement::fGeomSamplingShape", d.sphere_inner_radius,
+          new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere", d.sphere_inner_radius,
               d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
     } else if (d.g4_name == "Cylinder") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Tubs("RMGVertexConfinement::fGeomSamplingShape", d.cylinder_inner_radius,
+          new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder", d.cylinder_inner_radius,
               d.cylinder_outer_radius, 0.5 * d.cylinder_height, d.cylinder_starting_angle,
               d.cylinder_spanning_angle));
     } else if (d.g4_name == "Box") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Box("RMGVertexConfinement::fGeomSamplingShape", 0.5 * d.box_x_length,
+          new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box", 0.5 * d.box_x_length,
               0.5 * d.box_y_length, 0.5 * d.box_z_length));
     }
     // else if (...)
