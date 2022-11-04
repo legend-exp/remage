@@ -110,10 +110,23 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Orb* orb, bool on_surface) {
+
   if (!orb) RMGLog::OutDev(RMGLog::fatal, "Input solid is nullptr");
-  return RMGGeneratorUtil::rand(new G4Sphere(orb->GetName(), 0, orb->GetRadius(), 0, CLHEP::twopi,
-                                    0, CLHEP::pi),
-      on_surface);
+
+  auto r = orb->GetRadius();
+
+  auto phi = CLHEP::twopi * _g4rand();                   // random phi
+  auto cos_theta = 2 * _g4rand() - 1;                    // random cos(theta)
+  auto sin_theta = std::sqrt(1 - cos_theta * cos_theta); // ...and sin(theta)
+  // the sampled 3D point on unit sphere
+  auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
+
+  if (on_surface) return s2_point * r;
+  else {
+    auto u = _g4rand();
+    auto R = std::cbrt(u * r * r * r); // random radius
+    return s2_point * R;
+  }
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {

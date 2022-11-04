@@ -223,12 +223,14 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           solid->GetExtent(); // do not call multiple times, the function does not cache the result!
       if (fBoundingSolidType == "Sphere") {
         el.sampling_solid =
-            new G4Orb("RMGVertexConfinement::fBoundingSphere", solid_extent.GetExtentRadius());
+            new G4Orb(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingSphere",
+                solid_extent.GetExtentRadius());
       } else if (fBoundingSolidType == "Box") {
-        el.sampling_solid = new G4Box("RMGVertexConfinement::fBoundingBox",
-            solid_extent.GetXmax() - solid_extent.GetXmin(),
-            solid_extent.GetYmax() - solid_extent.GetYmin(),
-            solid_extent.GetZmax() - solid_extent.GetZmin());
+        el.sampling_solid =
+            new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
+                solid_extent.GetXmax() - solid_extent.GetXmin(),
+                solid_extent.GetYmax() - solid_extent.GetYmin(),
+                solid_extent.GetZmax() - solid_extent.GetZmin());
       } else {
         RMGLog::Out(RMGLog::fatal, "Bounding solid type '", fBoundingSolidType,
             "' not supported (implement me)");
@@ -284,17 +286,20 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
   for (const auto& d : fGeomVolumeData) {
     if (d.g4_name == "Sphere") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere", d.sphere_inner_radius,
-              d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
+          new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere/" +
+                           std::to_string(fGeomVolumeSolids.size() + 1),
+              d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
     } else if (d.g4_name == "Cylinder") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder", d.cylinder_inner_radius,
-              d.cylinder_outer_radius, 0.5 * d.cylinder_height, d.cylinder_starting_angle,
-              d.cylinder_spanning_angle));
+          new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder/" +
+                         std::to_string(fGeomVolumeSolids.size() + 1),
+              d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
+              d.cylinder_starting_angle, d.cylinder_spanning_angle));
     } else if (d.g4_name == "Box") {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box", 0.5 * d.box_x_length,
-              0.5 * d.box_y_length, 0.5 * d.box_z_length));
+          new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box/" +
+                        std::to_string(fGeomVolumeSolids.size() + 1),
+              0.5 * d.box_x_length, 0.5 * d.box_y_length, 0.5 * d.box_z_length));
     }
     // else if (...)
     else {
@@ -571,22 +576,19 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareMethodWithUnit("CenterPositionX", "cm", &RMGVertexConfinement::SetGeomVolumeCenterX)
       .SetGuidance("Set center position (X coordinate")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("CenterPositionY", "cm", &RMGVertexConfinement::SetGeomVolumeCenterY)
       .SetGuidance("Set center position (Y coordinate")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("CenterPositionZ", "cm", &RMGVertexConfinement::SetGeomVolumeCenterZ)
       .SetGuidance("Set center position (Z coordinate")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Sphere/",
@@ -597,16 +599,14 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set inner radius")
       .SetParameterName("L", false)
       .SetRange("L >= 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomSphereOuterRadius)
       .SetGuidance("Set outer radius")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Cylinder/",
@@ -617,40 +617,35 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set inner radius")
       .SetParameterName("L", false)
       .SetRange("L >= 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomCylinderOuterRadius)
       .SetGuidance("Set outer radius")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("Height", "cm", &RMGVertexConfinement::SetGeomCylinderHeight)
       .SetGuidance("Set height")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("StartingAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderStartingAngle)
       .SetGuidance("Set starting angle")
       .SetParameterName("A", false)
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("SpanningAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderSpanningAngle)
       .SetGuidance("Set spanning angle")
       .SetParameterName("A", false)
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Box/",
@@ -661,24 +656,21 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set X length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("YLength", "cm", &RMGVertexConfinement::SetGeomBoxYLength)
       .SetGuidance("Set Y length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("ZLength", "cm", &RMGVertexConfinement::SetGeomBoxZLength)
       .SetGuidance("Set Z length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
+      .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
