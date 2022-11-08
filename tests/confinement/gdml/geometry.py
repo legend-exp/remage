@@ -58,6 +58,11 @@ orb_l = geant4.LogicalVolume(orb_s, "G4_Pb", "MotherOrb", reg)
 geant4.PhysicalVolume([0, 0, 0], [0, 0, 0, "m"], boxnorb_l, "BoxAndOrb2", orb_l, reg)
 geant4.PhysicalVolume([0, 0, 0], [2, 2, 2, "m"], orb_l, "MotherOrb", world_l, reg)
 
+# polycone
+poly_s = geant4.solid.Polycone("Polycone", 0, 2*pi, [-0.5, 0.5], [0, 0], [0.5, 0.3], reg, lunit="m")
+poly_l = geant4.LogicalVolume(poly_s, "G4_Pb", "Polycone", reg)
+geant4.PhysicalVolume([0, 0, 0], [0, 0, -2, "m"], poly_l, "Polycone", world_l, reg)
+
 world_l.checkOverlaps(recursive=True)
 
 w = gdml.Writer()

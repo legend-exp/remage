@@ -120,7 +120,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = kUnionAll;
     bool fOnSurface = false;
-    std::string fBoundingSolidType = "Sphere";
+    std::string fBoundingSolidType = "Box";
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);

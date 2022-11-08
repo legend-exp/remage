@@ -21,9 +21,9 @@
 #include "RMGTools.hh"
 
 // This structure must contain at least a non-null pointer, between the first
-// and the last argument. The idea is that
-//  - physical volumes get always a bounding box assigned, but later
-//  - purely geometrical volumes only have the G4VSolid member defined
+// and the last argument. The idea is that:
+//  - physical volumes get always a bounding box assigned, but at later time
+//  - purely geometrical volumes only have the sampling_solid member defined
 RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r,
     G4ThreeVector t, G4VSolid* s)
     :
@@ -40,6 +40,7 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
   const auto& solid =
       physical_volume ? physical_volume->GetLogicalVolume()->GetSolid() : sampling_solid;
 
+  // NOTE: these functions use Monte Carlo methods when the solid is complex
   this->volume = solid->GetCubicVolume();
   this->surface = solid->GetSurfaceArea();
 }
@@ -222,6 +223,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       auto solid_extent =
           solid->GetExtent(); // do not call multiple times, the function does not cache the result!
       if (fBoundingSolidType == "Sphere") {
+        // the extent radius is computed as sqrt(dX^2 + dY^2 + dZ^2) / 2
+        // TODO: validate this
         el.sampling_solid =
             new G4Orb(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingSphere",
                 solid_extent.GetExtentRadius());

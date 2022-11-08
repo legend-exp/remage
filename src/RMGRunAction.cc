@@ -168,6 +168,8 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     if (n_ev < 100) RMGLog::Out(RMGLog::warning, "Event processing time might be inaccurate");
   }
 
+  // TODO: print message about vertex generation efficiency
+
   // reset print modulo
   // TODO: if it's user specified, it shouldn't be reset
   RMGManager::GetRMGManager()->SetPrintModulo(-1);

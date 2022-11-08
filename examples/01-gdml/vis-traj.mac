@@ -1,8 +1,5 @@
 /run/initialize
 
-# /RMG/Geometry/PrintListOfLogicalVolumes
-# /RMG/Geometry/PrintListOfPhysicalVolumes
-
 /vis/open OIQt
 /vis/scene/create
 /vis/sceneHandler/attach
@@ -28,5 +25,3 @@
 /gps/energy 0 eV
 
 /run/beamOn 10
-
-/vis/viewer/flush

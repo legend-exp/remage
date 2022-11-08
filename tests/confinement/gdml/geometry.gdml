@@ -19,6 +19,10 @@
 			<second ref="Hole"/>
 		</union>
 		<orb name="MotherOrb" r="1" lunit="m"/>
+		<polycone name="Polycone" startphi="0" deltaphi="6.283185307179586" lunit="m" aunit="rad">
+			<zplane rmin="0" rmax="0.5" z="-0.5"/>
+			<zplane rmin="0" rmax="0.3" z="0.5"/>
+		</polycone>
 	</solids>
 	<structure>
 		<volume name="Box">
@@ -51,6 +55,10 @@
 			<physvol name="BoxAndOrb2">
 				<volumeref ref="BoxAndOrb"/>
 			</physvol>
+		</volume>
+		<volume name="Polycone">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Polycone"/>
 		</volume>
 		<volume name="World">
 			<materialref ref="G4_Pb"/>
@@ -86,6 +94,10 @@
 			<physvol name="MotherOrb">
 				<volumeref ref="MotherOrb"/>
 				<position name="MotherOrb_pos" x="2.000000000000000" y="2.000000000000000" z="2.000000000000000" unit="m"/>
+			</physvol>
+			<physvol name="Polycone">
+				<volumeref ref="Polycone"/>
+				<position name="Polycone_pos" x="0.000000000000000" y="0.000000000000000" z="-2.000000000000000" unit="m"/>
 			</physvol>
 		</volume>
 	</structure>
