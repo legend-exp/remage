@@ -1,11 +1,10 @@
-#include "RMGOpticalDetector.hh"
+#include "RMGGermaniumDetector.hh"
 
 #include <map>
 #include <stdexcept>
 
 #include "G4GenericMessenger.hh"
 #include "G4HCofThisEvent.hh"
-#include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 #include "G4ThreeVector.hh"
@@ -15,18 +14,20 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
-G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator = nullptr;
+G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator = nullptr;
 
 // NOTE: does this make sense?
-G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) const {
+G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right) const {
   return (this == &right) ? true : false;
 }
 
-void RMGOpticalDetectorHit::Print() {
-  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Energy: {}", fDetectorUID, fPhotonEnergy);
+void RMGGermaniumDetectorHit::Print() {
+  RMGLog::OutFormat(
+    RMGLog::debug, "Detector UID: {} / Energy: {}",
+    this->detector_uid, this->energy_deposition);
 }
 
-RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
+RMGGermaniumDetector::RMGGermaniumDetector() : G4VSensitiveDetector("Germanium") {
 
   // declare only one hit collection.
   // NOTE: names in the respective output scheme class must match this
@@ -35,11 +36,11 @@ RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
   this->DefineCommands();
 }
 
-void RMGOpticalDetector::Initialize(G4HCofThisEvent* hit_coll) {
+void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection = new RMGOpticalDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
+  fHitsCollection = new RMGGermaniumDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
       G4VSensitiveDetector::collectionName[0]);
 
   // associate it with the G4HCofThisEvent object
@@ -47,33 +48,28 @@ void RMGOpticalDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
-bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
+bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing optical detector hits");
+  RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
 
-  // optical photon?
-  auto particle = step->GetTrack()->GetDefinition();
-  if (particle != G4OpticalPhoton::OpticalPhotonDefinition()) return false;
-
-  // this is actually irrelevant as optical photons do not truly carry the energy deposited
   if (step->GetTotalEnergyDeposit() <= 0)
-    return false; // This yields the photon wavelength (in energy units)
+    return false;
 
   // Get the physical volume of the detection point (post step). A step starts
   // at PreStepPoint and ends at PostStepPoint. If a boundary is reached, the
   // PostStepPoint belongs logically to the next volume. As we write down the
-  // hit when the photon reaches the boundary we need to check the
+  // hit when the particle reaches the boundary we need to check the
   // PostStepPoint here
   const auto pv_name = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
   const auto pv_copynr = step->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber();
 
-  // check if physical volume is registered as optical detector
+  // check if physical volume is registered as germanium detector
   auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGHardware::kOptical) {
+    if (d_type != RMGHardware::kGermanium) {
       RMGLog::OutFormatDev(RMGLog::debug,
-          "Volume '{}' (copy nr. {} not registered as optical detector", pv_name, pv_copynr);
+          "Volume '{}' (copy nr. {} not registered as germanium detector", pv_name, pv_copynr);
       return false;
     }
   } catch (const std::out_of_range& e) {
@@ -85,24 +81,21 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   // retrieve unique id for persistency
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in optical detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
 
-  float energy = step->GetTotalEnergyDeposit() / CLHEP::eV;
-
-  // initialize hit object for uid, if not already there
-  RMGOpticalDetectorHit* hit = new RMGOpticalDetectorHit();
-  hit->SetDetectorUID(det_uid);
-  hit->SetPhotonEnergy(energy);
+  RMGGermaniumDetectorHit* hit = new RMGGermaniumDetectorHit();
+  hit->detector_uid = det_uid;
+  hit->energy_deposition = step->GetTotalEnergyDeposit() / CLHEP::keV;
   fHitsCollection->insert(hit);
 
   return true;
 }
 
-void RMGOpticalDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) { return; }
+void RMGGermaniumDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) { return; }
 
-void RMGOpticalDetector::DefineCommands() {
+void RMGGermaniumDetector::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Detector/Optical/",
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Detector/Germanium/",
       "Commands for controlling stuff");
 }
 

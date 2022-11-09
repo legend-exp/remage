@@ -26,22 +26,12 @@ class RMGGermaniumDetectorHit : public G4VHit {
     inline void* operator new(size_t);
     inline void operator delete(void*);
 
-    // getters
-    inline int GetDetectorUID() { return fDetectorUID; }
-    inline int GetPhotoelectrons() { return fPhotoElectrons; }
-
-    // setters
-    inline void SetDetectorUID(int id) { fDetectorUID = id; }
-    inline void AddPhotoElectron() { fPhotoElectrons++; }
-
     void Print() override;
     // TODO
     // void Draw() override;
 
-  private:
-
-    int fDetectorUID = -1;
-    int fPhotoElectrons = 0;
+    int detector_uid = -1;
+    float energy_deposition = -1;
 };
 
 typedef G4THitsCollection<RMGGermaniumDetectorHit> RMGGermaniumDetectorHitsCollection;

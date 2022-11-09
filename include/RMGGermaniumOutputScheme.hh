@@ -12,14 +12,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     inline RMGGermaniumOutputScheme(G4AnalysisManager* ana_man) : RMGVOutputScheme(ana_man) {}
 
-    void clear() override;
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
     void EndOfEventAction(const G4Event*) override;
-
-  private:
-
-    std::vector<int> detector_uid;
-    std::vector<int> photoelectrons;
 };
 
 #endif

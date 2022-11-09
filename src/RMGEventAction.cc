@@ -61,9 +61,7 @@ void RMGEventAction::EndOfEventAction(const G4Event* event) {
     fRunAction->GetOutputDataFields(d_type)->EndOfEventAction(event);
   }
 
-  if (RMGManager::GetRMGManager()->IsPersistencyEnabled()) {
-    G4AnalysisManager::Instance()->AddNtupleRow();
-  }
+  // NOTE: G4analysisManager::AddNtupleRow() must be called here for event-oriented output
 }
 
 void RMGEventAction::DefineCommands() {

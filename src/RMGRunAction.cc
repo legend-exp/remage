@@ -9,6 +9,7 @@
 #include "G4RunManager.hh"
 
 #include "RMGEventAction.hh"
+#include "RMGGermaniumOutputScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
@@ -69,12 +70,18 @@ void RMGRunAction::SetupAnalysisManager() {
         fOutputDataFields.emplace(d_type, std::make_unique<RMGOpticalOutputScheme>(ana_man));
         fOutputDataFields[d_type]->AssignOutputNames(ana_man);
         break;
+      case RMGHardware::kGermanium:
+        fOutputDataFields.emplace(d_type, std::make_unique<RMGGermaniumOutputScheme>(ana_man));
+        fOutputDataFields[d_type]->AssignOutputNames(ana_man);
+        break;
       default:
-        RMGLog::Out(RMGLog::fatal, "No output scheme sensitive detector type '",
+        RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
             magic_enum::enum_name(d_type), "' implemented (implement me)");
     }
   }
 
+  // now that all ntuple columns have been created, declare the initialization
+  // finished
   ana_man->FinishNtuple();
 }
 

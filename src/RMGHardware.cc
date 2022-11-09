@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
 
+#include "RMGGermaniumDetector.hh"
 #include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
@@ -81,10 +82,10 @@ void RMGHardware::ConstructSDandField() {
       G4VSensitiveDetector* obj = nullptr;
       switch (v.type) {
         case DetectorType::kOptical: obj = new RMGOpticalDetector(); break;
-        case DetectorType::kGermanium:
+        case DetectorType::kGermanium: obj = new RMGGermaniumDetector(); break;
         case DetectorType::kLAr:
         default:
-          RMGLog::Out(RMGLog::fatal, "No behaviour for sensitive detector type '",
+          RMGLog::OutDev(RMGLog::fatal, "No behaviour for sensitive detector type '",
               magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
       }
       sd_man->AddNewDetector(obj);
@@ -165,6 +166,8 @@ void RMGHardware::DefineCommands() {
   fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
+
+  // TODO: RegisterDetector() UI command interface
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

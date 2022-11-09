@@ -9,6 +9,8 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGeneratorG4Gun.hh
     ${_root}/include/RMGGeneratorGPS.hh
     ${_root}/include/RMGGeneratorUtil.hh
+    ${_root}/include/RMGGermaniumDetector.hh
+    ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGLog.hh
     ${_root}/include/RMGManager.hh
     ${_root}/include/RMGMasterGenerator.hh
@@ -33,6 +35,8 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGEventAction.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc
+    ${_root}/src/RMGGermaniumDetector.cc
+    ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGManager.cc
     ${_root}/src/RMGMasterGenerator.cc

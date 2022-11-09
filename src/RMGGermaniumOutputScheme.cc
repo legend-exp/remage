@@ -10,16 +10,13 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
-void RMGGermaniumOutputScheme::clear() {
-  detector_uid.clear();
-  photoelectrons.clear();
-}
-
+// invoked in RMGRunAction::SetupAnalysisManager()
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  ana_man->CreateNtupleIColumn("opt_detid", detector_uid);
-  ana_man->CreateNtupleIColumn("opt_pe_nr", photoelectrons);
+  ana_man->CreateNtupleIColumn("ge_detid");
+  ana_man->CreateNtupleDColumn("ge_edep");
 }
 
+// invoked in RMGEventAction::EndOfEventAction()
 void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
 
@@ -54,8 +51,12 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
       if (!hit) continue;
       hit->Print();
 
-      detector_uid.push_back(hit->GetDetectorUID());
-      photoelectrons.push_back(hit->GetPhotoelectrons());
+      auto ana_man = G4AnalysisManager::Instance();
+      ana_man->FillNtupleIColumn(0, hit->detector_uid);
+      ana_man->FillNtupleDColumn(1, hit->energy_deposition);
+
+      // NOTE: must be called here for hit-oriented output
+      ana_man->AddNtupleRow();
     }
   }
 }

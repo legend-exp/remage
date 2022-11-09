@@ -2,6 +2,8 @@
 
 /run/initialize
 
+/RMG/Output/FileName output.root
+
 # /RMG/Geometry/PrintListOfLogicalVolumes
 # /RMG/Geometry/PrintListOfPhysicalVolumes
 
@@ -16,4 +18,4 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume HPGe
 
-/run/beamOn 100000
+/run/beamOn 100

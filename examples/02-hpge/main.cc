@@ -10,6 +10,8 @@ int main(int argc, char** argv) {
   RMGManager manager("02-hpge", argc, argv);
   manager.SetUserInit(new HPGeTestStand());
 
+  manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe", 0);
+
   std::string macro = argc > 1 ? argv[1] : "";
   if (!macro.empty()) manager.IncludeMacroFile(macro);
 
