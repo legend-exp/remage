@@ -35,6 +35,7 @@ RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency)
   if (fIsPersistencyEnabled) { this->SetupAnalysisManager(); }
 }
 
+// called in the run action constructor
 void RMGRunAction::SetupAnalysisManager() {
 
   auto rmg_man = RMGManager::GetRMGManager();

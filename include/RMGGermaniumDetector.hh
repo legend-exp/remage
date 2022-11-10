@@ -8,6 +8,7 @@
 #include "G4THitsCollection.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
+#include "G4ThreeVector.hh"
 
 class RMGGermaniumDetectorHit : public G4VHit {
 
@@ -27,11 +28,11 @@ class RMGGermaniumDetectorHit : public G4VHit {
     inline void operator delete(void*);
 
     void Print() override;
-    // TODO
-    // void Draw() override;
+    void Draw() override;
 
     int detector_uid = -1;
     float energy_deposition = -1;
+    G4ThreeVector position;
 };
 
 typedef G4THitsCollection<RMGGermaniumDetectorHit> RMGGermaniumDetectorHitsCollection;
