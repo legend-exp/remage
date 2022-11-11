@@ -127,6 +127,7 @@ void RMGHardware::ConstructSDandField() {
 void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
     int copy_nr) {
 
+  // sanity check
   for (const auto& [k, v] : fDetectorMetadata) {
     if (v.uid == uid) {
       RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
@@ -134,19 +135,20 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
     }
   }
 
-  // this must be done here to inform the run action in time
+  // register type of detector to inform the run action
   fActiveDetectors.insert(type);
 
   // FIXME: can this be done with emplace?
   auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid}});
-  if (!r_value.second)
+  if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(RMGLog::warning,
         "Physical volume '{}' (copy number {}) has already been registered as detector", pv_name,
         copy_nr);
-
-  RMGLog::OutFormat(RMGLog::detail,
-      "Registered physical volume '{}' (copy nr. {}) as {} detector type", pv_name, copy_nr,
-      magic_enum::enum_name(type));
+  } else {
+    RMGLog::OutFormat(RMGLog::detail,
+        "Registered physical volume '{}' (copy nr. {}) as {} detector type", pv_name, copy_nr,
+        magic_enum::enum_name(type));
+  }
 }
 
 void RMGHardware::DefineCommands() {

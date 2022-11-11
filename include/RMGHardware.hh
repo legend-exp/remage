@@ -60,7 +60,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     std::vector<std::string> fGDMLFiles;
     std::map<std::string, double> fPhysVolStepLimits;
 
-    // one for each physical volume
+    // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;
     std::set<DetectorType> fActiveDetectors;
 

@@ -14,6 +14,7 @@
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "G4HadronicProcessStore.hh"
 #include "G4IonConstructor.hh"
 #include "G4IonTable.hh"
 #include "G4LeptonConstructor.hh"
@@ -222,6 +223,7 @@ void RMGPhysics::SetCuts() {
 
   RMGLog::Out(RMGLog::debug, "Setting particle cut values");
 
+  G4HadronicProcessStore::Instance()->SetVerbose(G4VModularPhysicsList::verboseLevel);
   // special for low energy physics
   G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250 * u::eV, 100. * u::GeV);
 

@@ -11,8 +11,6 @@
 #include "G4MTRunManager.hh"
 #endif
 #include "G4GenericMessenger.hh"
-#include "G4RunManager.hh"
-#include "G4RunManagerFactory.hh"
 #include "G4UIExecutive.hh"
 #include "G4UImanager.hh"
 #include "G4VUserPhysicsList.hh"
@@ -47,9 +45,6 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
   // limit Geant4 stacktrace dumping to segfaults
   G4Backtrace::DefaultSignals() = std::set<int>{ SIGSEGV };
 
-  // FIXME: I don't like this here
-  this->SetUpDefaultG4RunManager();
-
   this->DefineCommands();
 }
 
@@ -61,17 +56,22 @@ void RMGManager::Initialize() {
 
   RMGLog::Out(RMGLog::detail, "Initializing application");
 
-  if (!fG4RunManager) this->SetUpDefaultG4RunManager();
+  if (!fG4RunManager) {
+    if (fNThreads == 1) {
+      this->SetUpDefaultG4RunManager(G4RunManagerType::Serial);
+      RMGLog::Out(RMGLog::detail, "Execution is sequential (one-threaded)");
+    } else {
+      this->SetUpDefaultG4RunManager();
+      if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
+      else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
+      fG4RunManager->SetNumberOfThreads(fNThreads);
+      RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
+    }
+  }
+
   if (!fPhysicsList) this->SetUpDefaultProcessesList();
   if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
-
-  if (!this->IsExecSequential()) {
-    if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
-    else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
-    fG4RunManager->SetNumberOfThreads(fNThreads);
-    RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
-  } else RMGLog::Out(RMGLog::detail, "Execution is sequential (one-threaded)");
 
   std::string _str = "";
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
@@ -126,7 +126,7 @@ void RMGManager::Run() {
   }
 }
 
-void RMGManager::SetUpDefaultG4RunManager() {
+void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
   RMGLog::Out(RMGLog::debug, "Initializing default run manager");
 
   // Suppress the Geant4 header:
@@ -135,7 +135,7 @@ void RMGManager::SetUpDefaultG4RunManager() {
   std::cout.rdbuf(nullptr);
 
   fG4RunManager = std::unique_ptr<G4RunManager>(
-      G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
+      G4RunManagerFactory::CreateRunManager(type));
   fG4RunManager->SetVerboseLevel(0);
 
   // restore buffer

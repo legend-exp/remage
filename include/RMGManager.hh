@@ -7,6 +7,7 @@
 #include "globals.hh"
 
 #include "G4RunManager.hh"
+#include "G4RunManagerFactory.hh"
 #include "G4VisManager.hh"
 
 #include "RMGLog.hh"
@@ -74,7 +75,7 @@ class RMGManager {
 
   private:
 
-    void SetUpDefaultG4RunManager();
+    void SetUpDefaultG4RunManager(G4RunManagerType type = G4RunManagerType::Default);
     void SetUpDefaultG4VisManager();
     void SetUpDefaultDetectorConstruction();
     void SetUpDefaultProcessesList();
@@ -87,7 +88,7 @@ class RMGManager {
     bool fBatchMode = false;
     bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
-    int fNThreads = 0;
+    int fNThreads = 1;
     std::string fOutputFile = "detector-hits.root";
 
     static RMGManager* fRMGManager;
