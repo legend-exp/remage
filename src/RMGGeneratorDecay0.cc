@@ -10,6 +10,7 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGene
   if (!prim_gen) RMGLog::OutDev(RMGLog::fatal, "Primary position generator is nullptr");
 
   fDecay0G4Generator = std::make_unique<bxdecay0_g4::PrimaryGeneratorAction>();
+  // NOTE: BxDecay0's primary generator action will own the pointer
   fDecay0G4Generator->SetVertexGenerator(prim_gen);
 }
 

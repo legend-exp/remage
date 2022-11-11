@@ -26,14 +26,16 @@ RMGMasterGenerator::RMGMasterGenerator()
 
 void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
 
-  if (!fVertexGenerator)
-    RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
   // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
   // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
   // about the vertex position from outside, in particular in this function here).
   if (fGenerator != Generator::kBxDecay0 and fConfinement != Confinement::kUnConfined) {
+
+    if (!fVertexGenerator)
+      RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
+
     auto vertex = G4ThreeVector();
     fVertexGenerator->GeneratePrimariesVertex(vertex);
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
@@ -75,7 +77,9 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       break;
     case RMGMasterGenerator::Generator::kBxDecay0:
 #if RMG_HAS_BXDECAY0
-      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGenerator.get());
+      // NOTE: release ownership here, BxDecay0 will own the pointer (sigh...)
+      // fVertexGenerator will hold nullptr after a call to release()
+      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGenerator.release());
 #else
       RMGLog::OutFormat(RMGLog::fatal,
           "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON");
