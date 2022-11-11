@@ -18,6 +18,7 @@
 #include "G4VUserPhysicsList.hh"
 #include "G4VisExecutive.hh"
 #include "G4VisManager.hh"
+#include "G4Backtrace.hh"
 #include "Randomize.hh"
 
 #include "ProjectInfo.hh"
@@ -39,8 +40,12 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
   fRMGManager = this;
 
 #if RMG_HAS_ROOT
+  // turn off ROOT's stacktrace
   gEnv->SetValue("Root.Stacktrace", 0);
 #endif
+
+  // limit Geant4 stacktrace dumping to segfaults
+  G4Backtrace::DefaultSignals() = std::set<int>{ SIGSEGV };
 
   // FIXME: I don't like this here
   this->SetUpDefaultG4RunManager();
