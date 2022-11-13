@@ -28,22 +28,32 @@
 	<solids>
 		<box name="WorldAir" x="5" y="5" z="5" lunit="m"/>
 		<box name="LAr" x="4" y="4" z="4" lunit="m"/>
-		<box name="Detector" x="1" y="1" z="1" lunit="m"/>
+		<box name="Detector1" x="1" y="1" z="1" lunit="m"/>
+		<box name="Detector2" x="1" y="1" z="1" lunit="m"/>
 		<opticalsurface name="surface_sipm" model="GLISUR" finish="polished" type="dielectric_metal" value="1.0">
 			<property name="REFLECTIVITY" ref="SIPMREFLECTIVITY"/>
 			<property name="EFFICIENCY" ref="SIPMEFFICIENCY"/>
 		</opticalsurface>
 	</solids>
 	<structure>
-		<volume name="Detector">
+		<volume name="Detector1">
 			<materialref ref="MetalSiliconSiPM"/>
-			<solidref ref="Detector"/>
+			<solidref ref="Detector1"/>
+		</volume>
+		<volume name="Detector2">
+			<materialref ref="MetalSiliconSiPM"/>
+			<solidref ref="Detector2"/>
 		</volume>
 		<volume name="LAr">
 			<materialref ref="LiquidArgon"/>
 			<solidref ref="LAr"/>
-			<physvol name="Detector">
-				<volumeref ref="Detector"/>
+			<physvol name="Detector1">
+				<volumeref ref="Detector1"/>
+				<position name="Detector1_pos" x="0" y="0" z="1" unit="m"/>
+			</physvol>
+			<physvol name="Detector2">
+				<volumeref ref="Detector2"/>
+				<position name="Detector2_pos" x="0" y="0" z="-1" unit="m"/>
 			</physvol>
 		</volume>
 		<volume name="WorldAir">
@@ -54,7 +64,10 @@
 			</physvol>
 		</volume>
 		<skinsurface name="skinsurface_sipm" surfaceproperty="surface_sipm">
-			<volumeref ref="Detector"/>
+			<volumeref ref="Detector1"/>
+		</skinsurface>
+		<skinsurface name="skinsurface_sipm" surfaceproperty="surface_sipm">
+			<volumeref ref="Detector2"/>
 		</skinsurface>
 	</structure>
 	<setup name="Default" version="1.0">
