@@ -72,6 +72,14 @@ class RMGManager {
     inline void SetLogToFileName(std::string filename) { RMGLog::OpenLogFile(filename); }
 
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
+    inline int RegisterNtuple(int det_uid) {
+      auto res = fNtupleIDs.emplace(det_uid, fNtupleIDs.size());
+      if (!res.second)
+        RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
+            det_uid);
+      return this->GetNtupleID(det_uid);
+    }
+    inline int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
 
   private:
 
@@ -90,6 +98,9 @@ class RMGManager {
     int fPrintModulo = -1;
     int fNThreads = 1;
     std::string fOutputFile = "detector-hits.root";
+    // track internal id of detector NTuples
+    std::map<int, int> fNtupleIDs;
+
 
     static RMGManager* fRMGManager;
 

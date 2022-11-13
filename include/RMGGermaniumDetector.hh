@@ -6,9 +6,9 @@
 
 #include "G4Allocator.hh"
 #include "G4THitsCollection.hh"
+#include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
-#include "G4ThreeVector.hh"
 
 class RMGGermaniumDetectorHit : public G4VHit {
 
@@ -32,7 +32,8 @@ class RMGGermaniumDetectorHit : public G4VHit {
 
     int detector_uid = -1;
     float energy_deposition = -1;
-    G4ThreeVector position;
+    G4ThreeVector global_position;
+    double global_time = -1;
 };
 
 typedef G4THitsCollection<RMGGermaniumDetectorHit> RMGGermaniumDetectorHitsCollection;

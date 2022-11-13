@@ -1,8 +1,6 @@
 #ifndef _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 #define _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 
-#include <vector>
-
 #include "RMGVOutputScheme.hh"
 
 class G4Event;

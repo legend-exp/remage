@@ -10,21 +10,32 @@
 #include "RMGManager.hh"
 #include "RMGOpticalDetector.hh"
 
-void RMGOpticalOutputScheme::clear() {
-  detector_uid.clear();
-  photon_energies.clear();
-}
+namespace u = CLHEP;
 
+// invoked in RMGRunAction::SetupAnalysisManager()
 void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  ana_man->CreateNtupleIColumn("opt_detid", detector_uid);
-  ana_man->CreateNtupleFColumn("opt_ph_ene", photon_energies);
+
+  auto rmg_man = RMGManager::GetRMGManager();
+  const auto det_cons = rmg_man->GetDetectorConstruction();
+  const auto detectors = det_cons->GetDetectorMetadataMap();
+
+  for (auto&& det : detectors) {
+    if (det.second.type != RMGHardware::kOptical) continue;
+
+    auto id = rmg_man->RegisterNtuple(det.second.uid);
+    ana_man->CreateNtuple(this->GetNtupleName(det.second.uid), "Event data");
+
+    ana_man->CreateNtupleIColumn(id, "evtid");
+    ana_man->CreateNtupleDColumn(id, "wavelength");
+    ana_man->CreateNtupleDColumn(id, "time");
+
+    ana_man->FinishNtuple(id);
+  }
 }
 
+// invoked in RMGEventAction::EndOfEventAction()
 void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
-
-  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
-  auto active_dets = det_cons->GetActiveDetectorList();
 
   auto hit_coll_id = sd_man->GetCollectionID("Optical/Hits");
   if (hit_coll_id < 0) {
@@ -47,15 +58,26 @@ void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
-  if (RMGManager::GetRMGManager()->IsPersistencyEnabled()) {
+  auto rmg_man = RMGManager::GetRMGManager();
+  if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
 
     for (auto hit : *hit_coll->GetVector()) {
       if (!hit) continue;
       hit->Print();
 
-      detector_uid.push_back(hit->GetDetectorUID());
-      photon_energies.push_back(hit->GetPhotonEnergy());
+      const auto evt = rmg_man->GetG4RunManager()->GetCurrentEvent();
+      if (!evt) RMGLog::OutDev(RMGLog::fatal, "Current event is nullptr, this should not happen!");
+
+      auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
+
+      const auto ana_man = G4AnalysisManager::Instance();
+      ana_man->FillNtupleIColumn(ntupleid, 0, evt->GetEventID());
+      ana_man->FillNtupleDColumn(ntupleid, 1, hit->photon_wavelength / u::nm);
+      ana_man->FillNtupleDColumn(ntupleid, 2, hit->global_time / u::ns);
+
+      // NOTE: must be called here for hit-oriented output
+      ana_man->AddNtupleRow(ntupleid);
     }
   }
 }

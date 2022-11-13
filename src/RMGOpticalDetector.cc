@@ -23,7 +23,8 @@ G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) con
 }
 
 void RMGOpticalDetectorHit::Print() {
-  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Energy: {}", fDetectorUID, fPhotonEnergy);
+  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Wavelength: {} nm", this->detector_uid,
+      this->photon_wavelength / CLHEP::nm);
 }
 
 RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
@@ -56,15 +57,15 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   if (particle != G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
   // this is actually irrelevant as optical photons do not truly carry the energy deposited
-  if (step->GetTotalEnergyDeposit() <= 0)
-    return false; // This yields the photon wavelength (in energy units)
+  // This yields the photon wavelength (in energy units)
+  if (step->GetTotalEnergyDeposit() == 0) return false;
 
   // Get the physical volume of the detection point (post step). A step starts
   // at PreStepPoint and ends at PostStepPoint. If a boundary is reached, the
   // PostStepPoint belongs logically to the next volume. As we write down the
   // hit when the photon reaches the boundary we need to check the
   // PostStepPoint here
-  const auto pv_name = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+  const auto pv_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
   const auto pv_copynr = step->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber();
 
   // check if physical volume is registered as optical detector
@@ -87,12 +88,13 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 
   RMGLog::OutDev(RMGLog::debug, "Hit in optical detector nr. ", det_uid, " detected");
 
-  float energy = step->GetTotalEnergyDeposit() / CLHEP::eV;
-
   // initialize hit object for uid, if not already there
   RMGOpticalDetectorHit* hit = new RMGOpticalDetectorHit();
-  hit->SetDetectorUID(det_uid);
-  hit->SetPhotonEnergy(energy);
+  hit->detector_uid = det_uid;
+  hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
+  hit->global_time = step->GetPreStepPoint()->GetGlobalTime();
+
+  // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
 
   return true;

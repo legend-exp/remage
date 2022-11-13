@@ -10,13 +10,13 @@
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #endif
+#include "G4Backtrace.hh"
 #include "G4GenericMessenger.hh"
 #include "G4UIExecutive.hh"
 #include "G4UImanager.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4VisExecutive.hh"
 #include "G4VisManager.hh"
-#include "G4Backtrace.hh"
 #include "Randomize.hh"
 
 #include "ProjectInfo.hh"
@@ -43,7 +43,7 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
 #endif
 
   // limit Geant4 stacktrace dumping to segfaults
-  G4Backtrace::DefaultSignals() = std::set<int>{ SIGSEGV };
+  G4Backtrace::DefaultSignals() = std::set<int>{SIGSEGV};
 
   this->DefineCommands();
 }
@@ -65,7 +65,8 @@ void RMGManager::Initialize() {
       if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
       else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
       fG4RunManager->SetNumberOfThreads(fNThreads);
-      RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
+      RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)",
+          fNThreads);
     }
   }
 
@@ -134,8 +135,7 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
   std::streambuf* orig_buf = std::cout.rdbuf();
   std::cout.rdbuf(nullptr);
 
-  fG4RunManager = std::unique_ptr<G4RunManager>(
-      G4RunManagerFactory::CreateRunManager(type));
+  fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager(type));
   fG4RunManager->SetVerboseLevel(0);
 
   // restore buffer

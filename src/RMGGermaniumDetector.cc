@@ -2,15 +2,18 @@
 
 #include <map>
 #include <stdexcept>
+#include <string>
 
 #include "G4AffineTransform.hh"
+#include "G4Circle.hh"
 #include "G4GenericMessenger.hh"
 #include "G4HCofThisEvent.hh"
+#include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 #include "G4Track.hh"
+#include "G4UnitsTable.hh"
 #include "G4VVisManager.hh"
-#include "G4Circle.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
@@ -24,14 +27,17 @@ G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right)
 }
 
 void RMGGermaniumDetectorHit::Print() {
-  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Energy: {}", this->detector_uid,
-      this->energy_deposition);
+  // TODO: add all fields
+  RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
+      " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
+      " / Position: ", this->global_position / CLHEP::m, " m",
+      " / Time: ", this->global_time / CLHEP::ns, " ns");
 }
 
 void RMGGermaniumDetectorHit::Draw() {
-  auto vis_man = G4VVisManager::GetConcreteInstance();
-  if (vis_man) {
-    G4Circle circle(position);
+  const auto vis_man = G4VVisManager::GetConcreteInstance();
+  if (vis_man and this->energy_deposition > 0) {
+    G4Circle circle(this->global_position);
     circle.SetScreenSize(5);
     circle.SetFillStyle(G4Circle::filled);
     circle.SetVisAttributes(G4VisAttributes(G4Colour(1, 0, 0)));
@@ -65,18 +71,20 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
 
-  if (step->GetTotalEnergyDeposit() <= 0) return false;
+  // return if no energy is deposited
+  if (step->GetTotalEnergyDeposit() == 0) return false;
+  // ignore optical photons
+  if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
-  // Get the physical volume of the detection point (post step). A step starts
-  // at PreStepPoint and ends at PostStepPoint. If a boundary is reached, the
-  // PostStepPoint belongs logically to the next volume. As we write down the
-  // hit when the particle reaches the boundary we need to check the
-  // PostStepPoint here
-  const auto pv_name = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-  const auto pv_copynr = step->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber();
+  // we're going to use info from the pre-step point
+  const auto prestep = step->GetPreStepPoint();
+
+  // locate us
+  const auto pv_name = prestep->GetTouchableHandle()->GetVolume()->GetName();
+  const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
   // check if physical volume is registered as germanium detector
-  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+  const auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGHardware::kGermanium) {
@@ -85,7 +93,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
       return false;
     }
   } catch (const std::out_of_range& e) {
-    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {} not registered as detector",
+    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {}) not registered as detector",
         pv_name, pv_copynr);
     return false;
   }
@@ -95,10 +103,14 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
 
+  // create a new hit and fill it
   RMGGermaniumDetectorHit* hit = new RMGGermaniumDetectorHit();
   hit->detector_uid = det_uid;
-  hit->energy_deposition = step->GetTotalEnergyDeposit() / CLHEP::keV;
-  hit->position = step->GetPreStepPoint()->GetPosition();
+  hit->energy_deposition = step->GetTotalEnergyDeposit();
+  hit->global_position = prestep->GetPosition();
+  hit->global_time = prestep->GetGlobalTime();
+
+  // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
 
   return true;

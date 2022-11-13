@@ -55,9 +55,6 @@ void RMGRunAction::SetupAnalysisManager() {
 
   auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
 
-  // create ntuples
-  ana_man->CreateNtuple("events", "Event data");
-
   // do it only for activated detectors (have to ask to the manager)
   for (const auto& d_type : det_cons->GetActiveDetectorList()) {
 
@@ -80,10 +77,6 @@ void RMGRunAction::SetupAnalysisManager() {
             magic_enum::enum_name(d_type), "' implemented (implement me)");
     }
   }
-
-  // now that all ntuple columns have been created, declare the initialization
-  // finished
-  ana_man->FinishNtuple();
 }
 
 void RMGRunAction::BeginOfRunAction(const G4Run*) {
