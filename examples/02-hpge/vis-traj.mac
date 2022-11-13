@@ -1,4 +1,4 @@
-/RMG/Manager/Logging/LogLevelScreen summary
+/RMG/Manager/Logging/LogLevelScreen debug
 
 /run/initialize
 
@@ -15,15 +15,17 @@
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate
 
-/RMG/Generator/Confine Volume
-/RMG/Generator/Confinement/Physical/AddVolume HPGe
-
 /RMG/Generator/Select GPS
-/gps/particle ion
-/gps/ion 27 60
-/gps/energy 0 eV
+/gps/particle gamma
+/gps/ang/type iso
+/gps/ang/mintheta 0 deg
+/gps/ang/maxtheta 60 deg
+/gps/position 0 0 10 cm
+/gps/energy 10 MeV
 
+# /RMG/Generator/Confine Volume
+# /RMG/Generator/Confinement/Physical/AddVolume HPGe1
 # /RMG/Generator/Select BxDecay0
 # /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/run/beamOn 10
+/run/beamOn 100

@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv) {
 
-  RMGLog::SetLogLevel(RMGLog::debug);
+  // RMGLog::SetLogLevel(RMGLog::debug);
 
   RMGManager manager("03-optics", argc, argv);
   manager.GetDetectorConstruction()->IncludeGDMLFile("gdml/geometry.gdml");

@@ -1,5 +1,9 @@
+# /RMG/Manager/Logging/LogLevelScreen debug
+
 /RMG/Processes/OpticalPhysics true
 /run/initialize
+
+/RMG/Output/FileName output.root
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume LAr
@@ -12,4 +16,4 @@
 /gps/ang/type     iso
 /gps/polarization 1 1 1
 
-/run/beamOn 100
+/run/beamOn 100000

@@ -47,18 +47,32 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
   mat_enr_ge->AddElement(el_enr_ge, n_atoms = 1);
 
-  auto world_s = new G4Box("WorldLAr", 0.5 * CLHEP::m, 0.5 * CLHEP::m, 0.5 * CLHEP::m);
+  auto world_s = new G4Box("WorldLAr", 0.5 * u::m, 0.5 * u::m, 0.5 * u::m);
 
   auto world_l = new G4LogicalVolume(world_s, LAr, "WorldLAr");
 
   auto world_p = new G4PVPlacement(nullptr, G4ThreeVector(), world_l, "World", 0, false, 0);
 
-  auto hpge_s = new G4Box("HPGe", 5 * CLHEP::cm, 5 * CLHEP::cm, 5 * CLHEP::cm);
+  auto hpge_s = new G4Box("HPGe", 5 * u::cm, 5 * u::cm, 5 * u::cm);
 
-  auto hpge_l =
-      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe");
+  auto hpge1_l =
+      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe1");
+  auto hpge2_l =
+      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe2");
+  auto hpge3_l =
+      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe3");
+  auto hpge4_l =
+      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe4");
 
-  new G4PVPlacement(nullptr, G4ThreeVector(), hpge_l, "HPGe", world_l, false, 0);
+  auto spacing = 5.5 * u::cm;
+  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, +spacing, 0), hpge1_l, "HPGe1", world_l, false,
+      0);
+  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, -spacing, 0), hpge2_l, "HPGe2", world_l, false,
+      0);
+  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, +spacing, 0), hpge3_l, "HPGe3", world_l, false,
+      0);
+  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, -spacing, 0), hpge4_l, "HPGe4", world_l, false,
+      0);
 
   return world_p;
 }
