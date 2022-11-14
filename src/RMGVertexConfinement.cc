@@ -192,7 +192,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     if (RMGGeneratorUtil::IsSampleable(solid_type)) {
       RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
-      // if there are no daugthers one can avoid doing containment checks
+      // if there are no daughters one can avoid doing containment checks
       if (log_vol->GetNoDaughters() > 0) {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
         el.containment_check = true;
