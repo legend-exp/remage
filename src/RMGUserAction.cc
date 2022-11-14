@@ -14,14 +14,14 @@ void RMGUserAction::BuildForMaster() const {
   // commands are available early on (following a note in G4GeneralParticleSourceMessenger.hh).
   auto generator_primary = new RMGMasterGenerator();
   this->SetUserAction(
-      new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled()));
+      new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled()));
 }
 
 void RMGUserAction::Build() const {
 
   auto generator_primary = new RMGMasterGenerator();
   auto run_action =
-      new RMGRunAction(generator_primary, RMGManager::GetRMGManager()->IsPersistencyEnabled());
+      new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled());
   auto event_action = new RMGEventAction(run_action);
 
   this->SetUserAction(generator_primary);

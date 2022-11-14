@@ -84,7 +84,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
   // check if physical volume is registered as germanium detector
-  const auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGHardware::kGermanium) {

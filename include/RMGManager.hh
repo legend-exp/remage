@@ -31,7 +31,7 @@ class RMGManager {
     RMGManager& operator=(RMGManager&&) = delete;
 
     // getters
-    static inline RMGManager* GetRMGManager() { return fRMGManager; }
+    static inline RMGManager* Instance() { return fRMGManager; }
     G4RunManager* GetG4RunManager();
     G4VisManager* GetG4VisManager();
     RMGHardware* GetDetectorConstruction();

@@ -24,7 +24,7 @@ RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
-  auto print_modulo = RMGManager::GetRMGManager()->GetPrintModulo();
+  auto print_modulo = RMGManager::Instance()->GetPrintModulo();
   if ((event->GetEventID() + 1) % print_modulo == 0) {
 
     auto current_run = dynamic_cast<const RMGRun*>(G4RunManager::GetRunManager()->GetCurrentRun());
@@ -49,12 +49,12 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
         elapsed_h, elapsed_m, elapsed_s);
   }
 
-  if (RMGManager::GetRMGManager()->IsPersistencyEnabled()) { fRunAction->ClearOutputDataFields(); }
+  if (RMGManager::Instance()->IsPersistencyEnabled()) { fRunAction->ClearOutputDataFields(); }
 }
 
 void RMGEventAction::EndOfEventAction(const G4Event* event) {
 
-  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+  auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   auto active_dets = det_cons->GetActiveDetectorList();
 
   for (const auto& d_type : active_dets) {

@@ -15,7 +15,7 @@ namespace u = CLHEP;
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
-  auto rmg_man = RMGManager::GetRMGManager();
+  auto rmg_man = RMGManager::Instance();
   const auto det_cons = rmg_man->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
@@ -61,7 +61,7 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
-  auto rmg_man = RMGManager::GetRMGManager();
+  auto rmg_man = RMGManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
 

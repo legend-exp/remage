@@ -38,7 +38,7 @@ RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency)
 // called in the run action constructor
 void RMGRunAction::SetupAnalysisManager() {
 
-  auto rmg_man = RMGManager::GetRMGManager();
+  auto rmg_man = RMGManager::Instance();
   if (rmg_man->GetDetectorConstruction()->GetActiveDetectorList().empty()) {
     rmg_man->EnablePersistency(false);
     fIsPersistencyEnabled = false;
@@ -51,9 +51,9 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  if (!RMGManager::GetRMGManager()->IsExecSequential()) ana_man->SetNtupleMerging(true);
+  if (!RMGManager::Instance()->IsExecSequential()) ana_man->SetNtupleMerging(true);
 
-  auto det_cons = RMGManager::GetRMGManager()->GetDetectorConstruction();
+  auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
 
   // do it only for activated detectors (have to ask to the manager)
   for (const auto& d_type : det_cons->GetActiveDetectorList()) {
@@ -83,7 +83,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "Start of run action");
 
-  auto manager = RMGManager::GetRMGManager();
+  auto manager = RMGManager::Instance();
 
   if (fIsPersistencyEnabled) {
     auto ana_man = G4AnalysisManager::Instance();
@@ -173,7 +173,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
   // reset print modulo
   // TODO: if it's user specified, it shouldn't be reset
-  RMGManager::GetRMGManager()->SetPrintModulo(-1);
+  RMGManager::Instance()->SetPrintModulo(-1);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
