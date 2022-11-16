@@ -6,8 +6,8 @@
 
 #include "RMGVVertexGenerator.hh"
 
-#include "G4ThreeVector.hh"
 #include "G4GenericMessenger.hh"
+#include "G4ThreeVector.hh"
 
 class G4Event;
 class G4VAnalysisReader;
