@@ -102,26 +102,31 @@ void RMGManager::Initialize() {
 
 void RMGManager::Run() {
 
-  if (fBatchMode and fMacroFileNames.empty()) {
+  // desired behavior
+  // - by default (nothing is specified), open an interactive session
+  // - if macro is specified, run and quit
+  // - if macro is specified and fInteractive is true, do not quit afterwards
+
+  if (!fInteractive and fMacroFileNames.empty()) {
     RMGLog::Out(RMGLog::fatal, "Batch mode has been requested but no macro file has been set");
   }
 
-  std::unique_ptr<G4UIExecutive> session = nullptr;
-  if (!fBatchMode) {
-    RMGLog::Out(RMGLog::summary, "Entering interactive mode");
-    auto cval = std::getenv("DISPLAY");
-    auto val = cval == nullptr ? std::string("") : std::string(cval);
-    if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
-    session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
-  }
+  // configure UI
+  RMGLog::Out(RMGLog::summary, "Entering interactive mode");
+  auto cval = std::getenv("DISPLAY");
+  auto val = cval == nullptr ? std::string("") : std::string(cval);
+  if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
+  auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
 
+  // eventually execute macros
   auto UI = G4UImanager::GetUIpointer();
   for (const auto& macro : fMacroFileNames) {
     RMGLog::Out(RMGLog::summary, "Loading macro file: ", macro);
     UI->ApplyCommand("/control/execute " + macro);
   }
 
-  if (!fBatchMode) {
+  // if interactive mode is requested, do not quit and start a session
+  if (fInteractive) {
     session->SetPrompt(RMGLog::Colorize<RMGLog::Ansi::unspecified>("remage> ", G4cout, true));
     session->SessionStart();
   }
@@ -246,6 +251,12 @@ void RMGManager::DefineCommands() {
   fMessenger->DeclareMethod("Include", &RMGManager::IncludeMacroFile)
       .SetGuidance("Include macro file")
       .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareMethod("Interactive", &RMGManager::SetInteractive)
+      .SetGuidance("Enable interactive mode")
+      .SetParameterName("flag", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareMethod("PrintProgressModulo", &RMGManager::SetPrintModulo)

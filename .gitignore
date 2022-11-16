@@ -10,6 +10,8 @@ build
 
 # G4 visualization
 bookmarkFile
+*.pdf
+*.iv
 
 compile_commands.json
 
