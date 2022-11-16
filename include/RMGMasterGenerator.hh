@@ -15,7 +15,8 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
     enum Confinement {
       kUnConfined,
-      kVolume
+      kVolume,
+      kFromFile,
     };
 
     enum Generator {

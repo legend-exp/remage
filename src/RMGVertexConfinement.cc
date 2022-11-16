@@ -333,7 +333,7 @@ void RMGVertexConfinement::Reset() {
   fBoundingSolidType = "Sphere";
 }
 
-void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
+bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
   // configure sampling volumes (does not do anything if this is not the first
   // call)
@@ -383,7 +383,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
                 "sampleable and try, eventually, to increase the threshold through the dedicated ",
                 "macro command. Returning dummy vertex");
             vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-            return;
+            return false;
           }
         } else {
           vertex = choice.translation +
@@ -392,9 +392,9 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
         // is it also in the other volume class (geometrical/physical)?
         if (physical_first) {
-          if (fGeomVolumeSolids.IsInside(vertex)) return;
+          if (fGeomVolumeSolids.IsInside(vertex)) return true;
         } else {
-          if (fPhysicalVolumes.IsInside(vertex)) return;
+          if (fPhysicalVolumes.IsInside(vertex)) return true;
         }
       }
 
@@ -407,7 +407,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
       // everything has failed so return the dummy vertex
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-      return;
+      return false;
     }
 
     case SamplingMode::kUnionAll: {
@@ -453,7 +453,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
                 "sampleable and try, eventually, to increase the threshold through the dedicated ",
                 "macro command. Returning dummy vertex");
             vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-            return;
+            return false;
           }
         } else {
           vertex = choice.translation +
@@ -463,7 +463,7 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
         RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ",
             calls, " iterations, returning");
-        return;
+        return true;
       }
 
       if (calls >= RMGVVertexGenerator::fMaxAttempts) {
@@ -476,13 +476,13 @@ void RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
       // everything has failed so return the dummy vertex
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-      return;
+      return false;
     }
 
     default: {
       RMGLog::Out(RMGLog::error, "Sampling mode not implemented, returning dummy vertex");
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-      return;
+      return false;
     }
   }
 }

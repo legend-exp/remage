@@ -40,7 +40,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     RMGVertexConfinement();
 
-    void GeneratePrimariesVertex(G4ThreeVector& v) override;
+    bool GeneratePrimariesVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
     inline void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr = ".*") {

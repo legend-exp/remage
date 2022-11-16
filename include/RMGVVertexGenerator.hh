@@ -28,7 +28,10 @@ class RMGVVertexGenerator {
     RMGVVertexGenerator(RMGVVertexGenerator&&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator&&) = delete;
 
-    virtual inline void GeneratePrimariesVertex(G4ThreeVector& v) { v = kDummyPrimaryPosition; }
+    virtual inline bool GeneratePrimariesVertex(G4ThreeVector& v) {
+      v = kDummyPrimaryPosition;
+      return false;
+    }
     inline void SetMaxAttempts(int val) { fMaxAttempts = val; }
     inline int GetMaxAttempts() { return fMaxAttempts; }
 

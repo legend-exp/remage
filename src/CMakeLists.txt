@@ -26,6 +26,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGTrackingAction.hh
     ${_root}/include/RMGUserAction.hh
     ${_root}/include/RMGVertexConfinement.hh
+    ${_root}/include/RMGVertexFromFile.hh
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh)
@@ -49,7 +50,8 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGSteppingAction.cc
     ${_root}/src/RMGTrackingAction.cc
     ${_root}/src/RMGUserAction.cc
-    ${_root}/src/RMGVertexConfinement.cc)
+    ${_root}/src/RMGVertexConfinement.cc
+    ${_root}/src/RMGVertexFromFile.cc)
 
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)

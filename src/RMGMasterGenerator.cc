@@ -3,6 +3,7 @@
 #include "ProjectInfo.hh"
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
+#include "RMGManager.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
 #include "RMGVertexConfinement.hh"
@@ -11,6 +12,7 @@
 #endif
 #include "RMGGeneratorCosmicMuons.hh"
 #include "RMGLog.hh"
+#include "RMGVertexFromFile.hh"
 
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
@@ -28,19 +30,28 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
 
   if (!fGeneratorObj) RMGLog::Out(RMGLog::fatal, "No primary generator specified!");
 
-  // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex position,
-  // and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is instructed
-  // about the vertex position from outside, in particular in this function here).
+  // invoke vertex position generator, if specified
   if (fGenerator != Generator::kBxDecay0 and fConfinement != Confinement::kUnConfined) {
+    // HACK: The BxDecay0 generator takes the responsibility for shooting the primary vertex
+    // position, and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is
+    // instructed about the vertex position from outside, in particular in this function here).
 
     if (!fVertexGenerator)
       RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
 
     auto vertex = G4ThreeVector();
-    fVertexGenerator->GeneratePrimariesVertex(vertex);
+    auto done = fVertexGenerator->GeneratePrimariesVertex(vertex);
+    if (!done) { // try aborting gracefully
+      RMGLog::Out(RMGLog::error,
+          "Primary vertex generation did not succeed, trying to abort the run gracefully");
+      RMGManager::Instance()->GetG4RunManager()->AbortRun();
+    }
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
+
     fGeneratorObj->SetParticlePosition(vertex);
   }
+
+  // invoke generator (might also provide the vertex position)
   fGeneratorObj->GeneratePrimariesKinematics(event);
 }
 
@@ -50,12 +61,10 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
 
   switch (fConfinement) {
     case Confinement::kUnConfined:
-      fVertexGenerator =
-          std::unique_ptr<RMGVVertexGenerator>(new RMGVVertexGenerator("DummyGenerator"));
+      fVertexGenerator = std::make_unique<RMGVVertexGenerator>("DummyGenerator");
       break;
-    case Confinement::kVolume:
-      fVertexGenerator = std::unique_ptr<RMGVertexConfinement>(new RMGVertexConfinement());
-      break;
+    case Confinement::kVolume: fVertexGenerator = std::make_unique<RMGVertexConfinement>(); break;
+    case Confinement::kFromFile: fVertexGenerator = std::make_unique<RMGVertexFromFile>(); break;
     default:
       RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '", fConfinement,
           "' specified (implement me)");
@@ -69,13 +78,9 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
   fGenerator = gen;
 
   switch (fGenerator) {
-    case RMGMasterGenerator::Generator::kG4gun:
-      fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>();
-      break;
-    case RMGMasterGenerator::Generator::kGPS:
-      fGeneratorObj = std::make_unique<RMGGeneratorGPS>();
-      break;
-    case RMGMasterGenerator::Generator::kBxDecay0:
+    case Generator::kG4gun: fGeneratorObj = std::make_unique<RMGGeneratorG4Gun>(); break;
+    case Generator::kGPS: fGeneratorObj = std::make_unique<RMGGeneratorGPS>(); break;
+    case Generator::kBxDecay0:
 #if RMG_HAS_BXDECAY0
       // NOTE: release ownership here, BxDecay0 will own the pointer (sigh...)
       // fVertexGenerator will hold nullptr after a call to release()
@@ -85,11 +90,11 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
           "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON");
 #endif
       break;
-    case RMGMasterGenerator::Generator::kCosmicMuons:
+    case Generator::kCosmicMuons:
       // fGeneratorObj = std::make_unique<RMGGeneratorCosmicMuons>();
       // break;
-    case RMGMasterGenerator::Generator::kUndefined:
-    case RMGMasterGenerator::Generator::kUserDefined: break;
+    case Generator::kUndefined:
+    case Generator::kUserDefined: break;
     default:
       RMGLog::Out(RMGLog::fatal, "No known implementation for generator '", fGenerator,
           "' (implement me)");

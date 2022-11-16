@@ -10,7 +10,6 @@
 
 class G4Event;
 class G4ParticleGun;
-class RMGGeneratorG4GunMessenger;
 class RMGGeneratorG4Gun : public RMGVGenerator {
 
   public:
