@@ -1,20 +1,7 @@
-/run/initialize
-
-/vis/open OIQt
-/vis/scene/create
-/vis/sceneHandler/attach
-
-/vis/drawVolume
+/control/execute macros/vis.mac
 
 /vis/geometry/set/forceSolid Detector
 /vis/geometry/set/forceSolid Source_Encapsulated
-
-/vis/viewer/set/defaultColour black
-/vis/viewer/set/background white
-
-/vis/scene/add/trajectories smooth
-/vis/scene/add/hits
-/vis/scene/endOfEventAction accumulate
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume Source_Encapsulated_PV
@@ -25,3 +12,5 @@
 /gps/energy 0 eV
 
 /run/beamOn 10
+
+/vis/ogl/export vis-co60.pdf
