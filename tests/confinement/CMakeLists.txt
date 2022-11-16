@@ -3,7 +3,5 @@ project(remage-test-confinement)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-find_package(remage REQUIRED COMPONENTS GDML)
-
-add_executable(${CMAKE_PROJECT_NAME} main.cc)
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC RMG::remage)
+add_executable(${PROJECT_NAME} main.cc)
+target_link_libraries(${PROJECT_NAME} PUBLIC remage)

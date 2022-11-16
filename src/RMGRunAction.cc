@@ -51,7 +51,11 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
+  // TODO remove me
+  ana_man->SetVerboseLevel(10);
+
   if (!RMGManager::Instance()->IsExecSequential()) ana_man->SetNtupleMerging(true);
+  else ana_man->SetNtupleMerging(false);
 
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
 
@@ -131,9 +135,8 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   }
 
   if (fIsPersistencyEnabled) {
-    auto ana_man = G4AnalysisManager::Instance();
-    ana_man->Write();
-    ana_man->CloseFile();
+    G4AnalysisManager::Instance()->Write();
+    G4AnalysisManager::Instance()->CloseFile();
   }
 
   if (this->IsMaster()) {

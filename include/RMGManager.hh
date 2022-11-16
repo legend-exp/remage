@@ -53,7 +53,7 @@ class RMGManager {
     }
     inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
-    inline void SetBatchMode(bool flag = true) { fBatchMode = flag; }
+    inline void SetInteractive(bool flag = true) { fInteractive = flag; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
     inline void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
@@ -93,7 +93,7 @@ class RMGManager {
     char** fArgv;
     std::vector<std::string> fMacroFileNames;
     bool fIsRandControlled = false;
-    bool fBatchMode = false;
+    bool fInteractive = false;
     bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
     int fNThreads = 1;

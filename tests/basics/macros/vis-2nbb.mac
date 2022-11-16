@@ -1,4 +1,4 @@
-/run/initialize
+/control/execute macros/vis.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume Detector_PV
@@ -6,4 +6,6 @@
 /RMG/Generator/Select BxDecay0
 /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/run/beamOn 1000
+/run/beamOn 10
+
+/vis/ogl/export vis-2nbb.pdf

@@ -1,0 +1,16 @@
+/run/initialize
+
+/vis/open OGL
+/vis/sceneHandler/attach
+
+/vis/drawVolume
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/viewer/set/upVector 0 0 -1
+/vis/viewer/set/viewpointVector 1 1 0.5
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate

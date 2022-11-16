@@ -7,6 +7,8 @@ int main(int argc, char** argv) {
   // RMGLog::SetLogLevel(RMGLog::debug);
 
   RMGManager manager("basic", argc, argv);
+  // manager.SetInteractive(true);
+
   manager.GetDetectorConstruction()->IncludeGDMLFile("gdml/main.gdml");
 
   std::string macro = argc > 1 ? argv[1] : "";
