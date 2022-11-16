@@ -2,18 +2,22 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'releases/**'
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
+  release:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
   test_on_linux:
-    name: Test on Linux (Ubuntu LTS)
+    name: Test on Linux containers (Ubuntu LTS)
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,28 +32,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build project
-      run: .github/workflows/build.sh
-
-  # test_in_legend_container:
-  #   name: Test in LEGEND container (CentOS Linux)
-  #   runs-on: ubuntu-latest
-  #   container: docker://legendexp/legend-base:latest
-
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Build project
-  #     run: scl enable devtoolset-8 -- .github/workflows/build.sh
-
-  # test_on_macos:
-  #   name: Test on macOS
-  #   runs-on: macos-latest
-
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Get dependencies
-  #     run: brew install --force-bottle root geant4
-  #   - name: Build project
-  #     run: .github/workflows/build.sh
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
+        make test
 
   build_docs:
     name: Build and deploy documentation
@@ -61,7 +50,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build docs with Doxygen
       run: |
-        cd .. && mkdir build && cd build && cmake ../remage
+        cd ..
+        mkdir build
+        cd build
+        cmake ../remage
         make doc
 
 # vim: expandtab tabstop=2 shiftwidth=2

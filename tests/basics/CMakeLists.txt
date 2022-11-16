@@ -3,10 +3,8 @@ project(remage-test-basics)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-find_package(remage REQUIRED COMPONENTS GDML)
-
 add_executable(${PROJECT_NAME} main.cc)
-target_link_libraries(${PROJECT_NAME} PUBLIC RMG::remage)
+target_link_libraries(${PROJECT_NAME} PUBLIC remage)
 
 # collect auxiliary files
 file(GLOB _aux RELATIVE ${PROJECT_SOURCE_DIR} macros/*.mac gdml/*)
@@ -19,10 +17,9 @@ foreach(_file ${_aux})
         COPYONLY)
 endforeach()
 
-add_custom_target(test
-    COMMENT "Running ${PROJECT_NAME} tests..."
-    COMMAND ${PROJECT_NAME} macros/print-volumes.mac
-    COMMAND ${PROJECT_NAME} macros/run-2nbb.mac
-    COMMAND ${PROJECT_NAME} macros/vis-2nbb.mac
-    COMMAND ${PROJECT_NAME} macros/vis-co60.mac
-    VERBATIM)
+set(_macros "print-volumes.mac;vis-co60.mac")
+
+# TODO: labels
+foreach(_mac ${_macros})
+    add_test(NAME ${_mac} COMMAND ${PROJECT_NAME} macros/${_mac})
+endforeach()

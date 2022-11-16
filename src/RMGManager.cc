@@ -107,16 +107,21 @@ void RMGManager::Run() {
   // - if macro is specified, run and quit
   // - if macro is specified and fInteractive is true, do not quit afterwards
 
+  // FIXME: logic here does not work. There is no way to do interactive visualization
+
   if (!fInteractive and fMacroFileNames.empty()) {
     RMGLog::Out(RMGLog::fatal, "Batch mode has been requested but no macro file has been set");
   }
 
   // configure UI
-  RMGLog::Out(RMGLog::summary, "Entering interactive mode");
-  auto cval = std::getenv("DISPLAY");
-  auto val = cval == nullptr ? std::string("") : std::string(cval);
-  if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
-  auto session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
+  std::unique_ptr<G4UIExecutive> session = nullptr;
+  if (fInteractive) {
+    RMGLog::Out(RMGLog::summary, "Entering interactive mode");
+    auto cval = std::getenv("DISPLAY");
+    auto val = cval == nullptr ? std::string("") : std::string(cval);
+    if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
+    session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
+  }
 
   // eventually execute macros
   auto UI = G4UImanager::GetUIpointer();

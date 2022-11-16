@@ -123,12 +123,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
-# all the code is located under src/
 add_subdirectory(src)
-# add_subdirectory(data)
 add_subdirectory(doc)
-# enable_testing()
-# add_subdirectory(test)
+
+include(CTest)
+add_subdirectory(tests)
 
 # export targets for dependent projects
 install(
