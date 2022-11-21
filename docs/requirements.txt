@@ -1,5 +1,6 @@
 breathe
 furo
+setuptools-scm
 sphinx
 sphinx-copybutton
 sphinx-inline-tabs
