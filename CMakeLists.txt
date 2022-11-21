@@ -124,7 +124,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
 add_subdirectory(src)
-add_subdirectory(doc)
+
+option(RMG_BUILD_DOCS "Build ${CMAKE_PROJECT_NAME} documentation" OFF)
+if(RMG_BUILD_DOCS)
+  add_subdirectory(docs)
+endif()
 
 include(CTest)
 add_subdirectory(tests)
