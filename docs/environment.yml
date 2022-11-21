@@ -2,6 +2,15 @@ name: remage-docs
 
 channels:
   - conda-forge
+  - default
 
 dependencies:
+  - python=3.10
+  - doxygen
   - breathe
+  - furo
+  - myst-parser
+  - setuptools-scm
+  - sphinx
+  - sphinx-copybutton
+  - sphinx-inline-tabs

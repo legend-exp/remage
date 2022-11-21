@@ -1,8 +1,5 @@
 version: 2
 
-conda:
-  environment: docs/environment.yml
-
 sphinx:
   configuration: docs/source/conf.py
   fail_on_warning: true
@@ -12,13 +9,12 @@ formats:
   - pdf
 
 build:
-  os: "ubuntu-22.04"
+  os: ubuntu-22.04
   tools:
-    python: "3.10"
+    python: mambaforge-4.10
   jobs:
     pre_install:
       - cp docs/source/conf.py.in docs/source/conf.py
 
-python:
-   install:
-     - requirements: docs/requirements.txt
+conda:
+  environment: docs/environment.yml
