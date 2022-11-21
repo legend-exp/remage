@@ -13,10 +13,6 @@ set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
 set(DOXYGEN_INDEX_FILE ${DOXYGEN_OUTPUT_DIR}/html/index.html)
 configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
-# also copy aux files
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DoxyfileDefault
-               ${CMAKE_CURRENT_BINARY_DIR}/DoxyfileDefault COPYONLY)
-
 # Doxygen won't create this for us
 file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
 
@@ -26,7 +22,6 @@ add_custom_command(
   COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
   DEPENDS ${DOXYFILE_IN} ${REMAGE_PUBLIC_HEADERS}
   MAIN_DEPENDENCY ${DOXYFILE_OUT}
-  ${CMAKE_CURRENT_BINARY_DIR}/DoxyfileDefault
   COMMENT "Running Doxygen")
 
 add_custom_target(

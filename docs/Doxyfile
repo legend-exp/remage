@@ -2,8 +2,8 @@
 
 PROJECT_NAME = "remage"
 PROJECT_BRIEF = Simulation framework for HPGe-based experiments
-INPUT = "@DOXYGEN_INPUT_DIR@/include" "@DOXYGEN_INPUT_DIR@/src"
-OUTPUT_DIRECTORY = "@DOXYGEN_OUTPUT_DIR@"
+INPUT = "..//include" "..//src"
+OUTPUT_DIRECTORY = "../build"
 GENERATE_XML = YES
 XML_PROGRAMLISTING = NO
 WARN_IF_UNDOCUMENTED = NO

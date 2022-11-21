@@ -1,5 +1,6 @@
 /include/ProjectInfo.hh
 /docs/source/conf.py
+/docs/source/_build
 build
 .local
 

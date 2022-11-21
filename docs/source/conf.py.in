@@ -37,7 +37,7 @@ breathe_projects = {}
 
 if on_rtd:
     input_dir = "../"
-    output_dir = "build"
+    output_dir = "../build"
     configure_doxyfile(input_dir, output_dir)
     subprocess.call("cd ..; doxygen", shell=True)
     breathe_projects["remage"] = output_dir + "/xml"
