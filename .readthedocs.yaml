@@ -6,3 +6,7 @@ sphinx:
 formats:
   - epub
   - pdf
+
+python:
+   install:
+   - requirements: docs/requirements.txt
