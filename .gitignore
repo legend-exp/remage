@@ -1,6 +1,5 @@
 /include/ProjectInfo.hh
-/doc/html
-/doc/latex
+/docs/source/conf.py
 build
 .local
 
