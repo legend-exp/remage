@@ -40,20 +40,4 @@ jobs:
         make install
         make test
 
-  build_docs:
-    name: Build and deploy documentation
-    runs-on: ubuntu-latest
-    needs: test_on_linux
-    container: docker://gipert/remage-base:latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build docs with Doxygen
-      run: |
-        cd ..
-        mkdir build
-        cd build
-        cmake ../remage
-        make doc
-
 # vim: expandtab tabstop=2 shiftwidth=2
