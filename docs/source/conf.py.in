@@ -1,10 +1,21 @@
 import os
 import subprocess
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if on_rtd:
-    subprocess.call('cd ..; doxygen', shell=True)
+def configure_doxyfile(input_dir, output_dir):
+    with open('Doxyfile.in', 'r') as file:
+        filedata = file.read()
+
+    filedata = filedata.replace('@DOXYGEN_INPUT_DIR@', input_dir)
+    filedata = filedata.replace('@DOXYGEN_OUTPUT_DIR@', output_dir)
+
+    with open('Doxyfile', 'w') as file:
+        file.write(filedata)
+
+
+project = "remage"
+copyright = "2020, the LEGEND Collaboration"
+author = "Luigi Pertoldi"
 
 extensions = [
     "sphinx.ext.mathjax",
@@ -14,16 +25,24 @@ extensions = [
     "breathe",
     "myst_parser",
 ]
-breathe_projects = {'remage': '../xml'}
+
 breathe_default_project = "remage"
 highlight_language = 'c++'
-
-project = "remage"
-copyright = "2020, the LEGEND Collaboration"
-author = "Luigi Pertoldi"
-version = "@PROJECT_VERSION@"
-
 html_logo = '../../.github/logo/remage-logo.png'
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+breathe_projects = {}
+
+if on_rtd:
+    input_dir = '../../'
+    output_dir = 'build'
+    configure_doxyfile(input_dir, output_dir)
+    subprocess.call('cd ..; doxygen', shell=True)
+    breathe_projects['remage'] = output_dir + '/xml'
+else:
+    breathe_projects = {'remage': '../xml'}
+    version = "@PROJECT_VERSION@"
 
 # Furo theme
 html_theme = "furo"
