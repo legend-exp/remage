@@ -1,5 +1,6 @@
 breathe
 furo
+myst-parser
 setuptools-scm
 sphinx
 sphinx-copybutton
