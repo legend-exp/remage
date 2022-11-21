@@ -2,6 +2,13 @@ name: remage-docs
 
 channels:
   - conda-forge
+  - default
 
 dependencies:
   - breathe
+  - furo
+  - myst-parser
+  - setuptools-scm
+  - sphinx
+  - sphinx-copybutton
+  - sphinx-inline-tabs
