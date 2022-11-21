@@ -36,7 +36,7 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 breathe_projects = {}
 
 if on_rtd:
-    input_dir = "../../"
+    input_dir = "../"
     output_dir = "build"
     configure_doxyfile(input_dir, output_dir)
     subprocess.call("cd ..; doxygen", shell=True)
