@@ -47,7 +47,8 @@ add_custom_command(
           ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${DOXYGEN_INDEX_FILE}
-  MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in
+  MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in
   COMMENT "Generating Sphinx docs")
 
 # Nice named target so we can run the job easily

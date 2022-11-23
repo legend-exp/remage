@@ -4,6 +4,7 @@
 #include "G4GenericMessenger.hh"
 #include "G4Orb.hh"
 #include "G4PhysicalVolumeStore.hh"
+#include "G4Run.hh"
 #include "G4Sphere.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4TransportationManager.hh"
@@ -330,7 +331,7 @@ void RMGVertexConfinement::Reset() {
   fGeomVolumeSolids.clear();
   fSamplingMode = RMGVertexConfinement::kUnionAll;
   fOnSurface = false;
-  fBoundingSolidType = "Sphere";
+  fBoundingSolidType = "Box";
 }
 
 bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
@@ -342,6 +343,8 @@ bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
 
   RMGLog::OutDev(RMGLog::debug,
       "Sampling mode: ", magic_enum::enum_name<RMGVertexConfinement::SamplingMode>(fSamplingMode));
+
+  int calls = 0;
 
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
@@ -369,11 +372,12 @@ bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       const auto& choice = choice_nonconst;
 
       // shoot in the first region
-      int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
+        fTrials++;
 
         if (choice.containment_check) { // this can effectively happen only with physical volumes, at the moment
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
+            fTrials++;
             vertex = choice.translation +
                      choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           }
@@ -435,13 +439,14 @@ bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
       RMGLog::OutDev(RMGLog::debug,
           "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
 
-      int calls = 0;
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
+        fTrials++;
 
         if (choice.containment_check) {
           vertex = choice.translation +
                    choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
+            fTrials++;
             vertex = choice.translation +
                      choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
             RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm,
@@ -515,6 +520,13 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
         "' before setting any geometrical parameter value");
   }
   return fGeomVolumeData.back();
+}
+
+void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
+  auto n_ev = run->GetNumberOfEventToBeProcessed();
+  auto avg_iter = fTrials * 1. / n_ev;
+  RMGLog::OutFormat(RMGLog::summary, "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% efficiency)",
+      avg_iter, 100 / avg_iter);
 }
 
 void RMGVertexConfinement::DefineCommands() {

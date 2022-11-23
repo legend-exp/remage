@@ -11,6 +11,7 @@
 #include "G4ThreeVector.hh"
 #include "G4UImessenger.hh"
 
+class G4Run;
 #if RMG_HAS_BXDECAY0
 class RMGVVertexGenerator : public bxdecay0_g4::VertexGeneratorInterface {
 #else
@@ -27,6 +28,9 @@ class RMGVVertexGenerator {
     RMGVVertexGenerator& operator=(RMGVVertexGenerator const&) = delete;
     RMGVVertexGenerator(RMGVVertexGenerator&&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator&&) = delete;
+
+    virtual inline void BeginOfRunAction(const G4Run*){};
+    virtual inline void EndOfRunAction(const G4Run*){};
 
     virtual inline bool GeneratePrimariesVertex(G4ThreeVector& v) {
       v = kDummyPrimaryPosition;

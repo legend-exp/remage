@@ -104,6 +104,9 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   }
 
   if (fRMGMasterGenerator) {
+    if (fRMGMasterGenerator->GetVertexGenerator()) {
+      fRMGMasterGenerator->GetVertexGenerator()->BeginOfRunAction(fRMGRun);
+    }
     if (fRMGMasterGenerator->GetGenerator()) {
       fRMGMasterGenerator->GetGenerator()->BeginOfRunAction(fRMGRun);
     }
@@ -132,17 +135,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "End of run action");
 
-  if (fRMGMasterGenerator) {
-    if (fRMGMasterGenerator->GetGenerator()) {
-      fRMGMasterGenerator->GetGenerator()->EndOfRunAction(fRMGRun);
-    }
-  }
-
-  if (fIsPersistencyEnabled) {
-    G4AnalysisManager::Instance()->Write();
-    G4AnalysisManager::Instance()->CloseFile();
-  }
-
+  // report some stats
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
 
@@ -176,7 +169,19 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     if (n_ev < 100) RMGLog::Out(RMGLog::warning, "Event processing time might be inaccurate");
   }
 
-  // TODO: print message about vertex generation efficiency
+  if (fRMGMasterGenerator) {
+    if (fRMGMasterGenerator->GetVertexGenerator()) {
+      fRMGMasterGenerator->GetVertexGenerator()->EndOfRunAction(fRMGRun);
+    }
+    if (fRMGMasterGenerator->GetGenerator()) {
+      fRMGMasterGenerator->GetGenerator()->EndOfRunAction(fRMGRun);
+    }
+  }
+
+  if (fIsPersistencyEnabled) {
+    G4AnalysisManager::Instance()->Write();
+    G4AnalysisManager::Instance()->CloseFile();
+  }
 
   // reset print modulo
   // TODO: if it's user specified, it shouldn't be reset

@@ -40,6 +40,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     RMGVertexConfinement();
 
+    void EndOfRunAction(const G4Run* run) override;
+
     bool GeneratePrimariesVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
@@ -121,6 +123,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     SamplingMode fSamplingMode = kUnionAll;
     bool fOnSurface = false;
     std::string fBoundingSolidType = "Box";
+    long fTrials = 0;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);
