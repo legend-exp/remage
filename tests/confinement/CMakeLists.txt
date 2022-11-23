@@ -17,13 +17,8 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-set(_macros
-  complex-volume.mac
-  geometrical.mac
-  native-surface.mac
-  geometrical-and-physical.mac
-  geometrical-or-physical.mac
-  native-volume.mac)
+set(_macros complex-volume.mac geometrical.mac native-surface.mac geometrical-and-physical.mac
+            geometrical-or-physical.mac native-volume.mac)
 
 # TODO: labels
 foreach(_mac ${_macros})

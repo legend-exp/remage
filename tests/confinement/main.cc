@@ -15,8 +15,7 @@ int main(int argc, char** argv) {
   if (arg1 == "-i") {
     manager.SetInteractive();
     if (!arg2.empty()) manager.IncludeMacroFile(arg2);
-  }
-  else if (!arg1.empty()) manager.IncludeMacroFile(arg1);
+  } else if (!arg1.empty()) manager.IncludeMacroFile(arg1);
 
   manager.Initialize();
   manager.Run();
