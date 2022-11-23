@@ -9,8 +9,14 @@ int main(int argc, char** argv) {
   RMGManager manager("basic", argc, argv);
   manager.GetDetectorConstruction()->IncludeGDMLFile("gdml/geometry.gdml");
 
-  std::string macro = argc > 1 ? argv[1] : "";
-  if (!macro.empty()) manager.IncludeMacroFile(macro);
+  std::string arg1 = argc > 1 ? argv[1] : "";
+  std::string arg2 = argc > 2 ? argv[2] : "";
+  std::string macro;
+  if (arg1 == "-i") {
+    manager.SetInteractive();
+    if (!arg2.empty()) manager.IncludeMacroFile(arg2);
+  }
+  else if (!arg1.empty()) manager.IncludeMacroFile(arg1);
 
   manager.Initialize();
   manager.Run();

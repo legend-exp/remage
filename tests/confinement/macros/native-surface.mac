@@ -1,4 +1,4 @@
-/control/execute vis.mac
+/control/execute macros/vis.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/SampleOnSurface true
@@ -11,3 +11,5 @@
 /gps/energy 1 eV
 
 /run/beamOn 2000
+
+/vis/ogl/export native-surface.pdf

@@ -1,14 +1,18 @@
 /run/initialize
 
-/RMG/Manager/Logging/LogLevelScreen detail
+# /RMG/Manager/Logging/LogLevelScreen detail
 
-/vis/open OIQt
+/vis/open OGL
 /vis/drawVolume
 /vis/sceneHandler/attach
 
+/vis/viewer/set/lineSegmentsPerCircle 10
 # /vis/viewer/set/defaultColour black
 # /vis/viewer/set/background white
-/vis/scene/add/axes 0 0 0 3 m
+# /vis/scene/add/axes 0 0 0 3 m
+
+/vis/viewer/set/upVector 0 0 -1
+/vis/viewer/set/viewpointVector -1 1 1
 
 /vis/scene/add/trajectories smooth
 /vis/modeling/trajectories/create/drawByCharge

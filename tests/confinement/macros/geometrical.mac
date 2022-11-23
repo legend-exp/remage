@@ -1,4 +1,4 @@
-/control/execute vis.mac
+/control/execute macros/vis.mac
 
 /RMG/Generator/Confine Volume
 
@@ -23,7 +23,7 @@
 
 /RMG/Generator/Confinement/Geometrical/AddSolid Box
 /RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
-/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 2 m
 /RMG/Generator/Confinement/Geometrical/CenterPositionZ -2 m
 /RMG/Generator/Confinement/Geometrical/Box/XLength 0.7 m
 /RMG/Generator/Confinement/Geometrical/Box/YLength 0.5 m
@@ -34,3 +34,5 @@
 /gps/energy 1 eV
 
 /run/beamOn 5000
+
+/vis/ogl/export geometrical.pdf

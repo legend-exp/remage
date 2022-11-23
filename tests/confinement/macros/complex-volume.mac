@@ -1,4 +1,4 @@
-/control/execute vis.mac
+/control/execute macros/vis.mac
 
 /RMG/Generator/Confine Volume
 
@@ -15,3 +15,5 @@
 /gps/energy 1 eV
 
 /run/beamOn 5000
+
+/vis/ogl/export complex-volume.pdf
