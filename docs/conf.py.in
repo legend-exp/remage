@@ -1,0 +1,61 @@
+import os
+import subprocess
+import setuptools_scm
+
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+
+
+project = "remage"
+copyright = "2020, the LEGEND Collaboration"
+author = "Luigi Pertoldi"
+
+extensions = [
+    "sphinx.ext.mathjax",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.graphviz",
+    "sphinx_copybutton",
+    "sphinx_inline_tabs",
+    "exhale",
+    "breathe",
+    "myst_parser",
+]
+
+exhale_args = {
+    "containmentFolder":     "./api",
+    "rootFileName":          "index.rst",
+    "doxygenStripFromPath":  "..",
+    "rootFileTitle":         "API reference",
+    "createTreeView":        True,
+    "exhaleExecutesDoxygen": False,
+}
+
+breathe_projects = {}
+
+if on_rtd:
+    # assume build has been prepared in .readthedocs.yml
+    breathe_projects["remage"] = "_doxygen/xml"
+    version = setuptools_scm.get_version("..")
+    html_logo = "../.github/logo/remage-logo.png"
+else:
+    # if not on RTD, use CMake variables
+    doxyout = "@DOXYGEN_OUTPUT_DIR@"
+    breathe_projects["remage"] = f"{doxyout}/xml"
+
+    # also deploy Doxygen docs
+    subprocess.call(f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True)
+
+    version = "@PROJECT_VERSION@"
+    html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
+
+breathe_default_project = "remage"
+highlight_language = "c++"
+html_extra_path = ["extra"]
+
+# Furo theme
+html_theme = "furo"
+html_theme_options = {
+    "source_repository": "https://github.com/legend-exp/remage",
+    "source_branch": "main",
+    "source_directory": "docs/source",
+}
+html_title = f"{project} {version}"

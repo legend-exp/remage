@@ -1,8 +1,8 @@
 version: 2
 
 sphinx:
-  configuration: docs/source/conf.py
-  fail_on_warning: true
+  configuration: docs/conf.py
+  fail_on_warning: false
 
 formats:
   - epub
@@ -13,10 +13,12 @@ build:
   tools:
     python: mambaforge-4.10
   jobs:
-    pre_install:
-      - cp docs/source/conf.py.in docs/source/conf.py
-    post_build:
-      - cp -r docs/build/html docs/source/_build/html/doxygen
+    pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
+      - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g docs/Doxyfile.in > docs/Doxyfile
+      - cd docs && doxygen
+      - mkdir -p docs/extra/doxygen
+      - cp -r docs/_doxygen/html/* docs/extra/doxygen
+      - cp docs/conf.py.in docs/conf.py
 
 conda:
   environment: docs/environment.yml

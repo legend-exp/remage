@@ -8,6 +8,7 @@ dependencies:
   - python=3.10
   - doxygen
   - breathe
+  - exhale
   - furo
   - myst-parser
   - setuptools-scm
