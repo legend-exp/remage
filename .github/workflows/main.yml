@@ -38,6 +38,6 @@ jobs:
         cmake ..
         make
         make install
-        make test
+        ctest --output-on-failure
 
 # vim: expandtab tabstop=2 shiftwidth=2
