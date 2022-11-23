@@ -43,7 +43,7 @@ if on_rtd:
     breathe_projects["remage"] = "_doxygen/xml"
     version = setuptools_scm.get_version("..")
     html_logo = "../.github/logo/remage-logo.png"
-    warnings_filter_config = "docs/known-warnings.txt"
+    warnings_filter_config = "known-warnings.txt"
 else:
     # if not on RTD, use CMake variables
     doxyout = "@DOXYGEN_OUTPUT_DIR@"
