@@ -1,0 +1,3 @@
+# Each line should contain the regular expression of a known Sphinx warning
+# that should be filtered out
+.*Duplicate C\+\+ declaration, also defined at.*

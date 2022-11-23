@@ -1,8 +1,14 @@
+import sys
 import os
 import subprocess
 import setuptools_scm
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+
+if on_rtd:
+    sys.path.append(os.path.abspath("extensions"))
+else:
+    sys.path.append("@PROJECT_SOURCE_DIR@/docs/extensions")
 
 
 project = "remage"
@@ -18,6 +24,7 @@ extensions = [
     "exhale",
     "breathe",
     "myst_parser",
+    "remage.warnings_filter",
 ]
 
 exhale_args = {
@@ -36,6 +43,7 @@ if on_rtd:
     breathe_projects["remage"] = "_doxygen/xml"
     version = setuptools_scm.get_version("..")
     html_logo = "../.github/logo/remage-logo.png"
+    warnings_filter_config = "docs/known-warnings.txt"
 else:
     # if not on RTD, use CMake variables
     doxyout = "@DOXYGEN_OUTPUT_DIR@"
@@ -46,6 +54,7 @@ else:
 
     version = "@PROJECT_VERSION@"
     html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
+    warnings_filter_config = "@PROJECT_SOURCE_DIR@/docs/known-warnings.txt"
 
 breathe_default_project = "remage"
 highlight_language = "c++"
@@ -59,3 +68,6 @@ html_theme_options = {
     "source_directory": "docs/source",
 }
 html_title = f"{project} {version}"
+
+# warnings filtering
+warnings_filter_silent = False

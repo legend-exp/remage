@@ -23,3 +23,5 @@ compile_commands.json
 *.DS_Store
 *.swp
 *.swo
+.mypy_cache
+__pycache__
