@@ -10,7 +10,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC remage)
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac gdml/*.gdml)
+  macros/*.mac gdml/*.gdml gdml/*.xml)
 
 # copy them to the build area
 foreach(_file ${_aux})
@@ -22,5 +22,7 @@ set(_macros complex-volume.mac geometrical.mac native-surface.mac geometrical-an
 
 # TODO: labels
 foreach(_mac ${_macros})
-  add_test(NAME ${_mac} COMMAND ${PROJECT_NAME} macros/${_mac})
+  add_test(NAME confinement/${_mac}
+    COMMAND ${PROJECT_NAME} macros/${_mac}
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endforeach()
