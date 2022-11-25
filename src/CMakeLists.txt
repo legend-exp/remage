@@ -72,6 +72,11 @@ if(ROOT_FOUND)
   target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
 endif()
 
+# executable for CLI
+add_executable(${CMAKE_PROJECT_NAME}-cli ${_root}/src/remage.cc)
+target_link_libraries(${CMAKE_PROJECT_NAME}-cli PUBLIC remage)
+set_target_properties(${CMAKE_PROJECT_NAME}-cli PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
+
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 

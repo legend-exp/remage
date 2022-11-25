@@ -87,9 +87,9 @@ void RMGLog::StartupInfo() {
   message += "                           |___/      \n";
 
   // write message to screen
-  if (RMGLog::fMinimumLogLevelScreen < RMGLog::nothing) G4cout << message << G4endl;
+  if (RMGLog::fMinimumLogLevelScreen <= RMGLog::summary) G4cout << message << G4endl;
 
-  if (RMGLog::IsOpen() && RMGLog::fMinimumLogLevelFile < RMGLog::nothing)
+  if (RMGLog::IsOpen() && RMGLog::fMinimumLogLevelFile <= RMGLog::summary)
     RMGLog::fOutputFileStream << message;
 
   fFirstOutputDone = true;

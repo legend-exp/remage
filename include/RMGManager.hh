@@ -54,6 +54,7 @@ class RMGManager {
     inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
     inline void SetInteractive(bool flag = true) { fInteractive = flag; }
+    inline void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
     inline void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
