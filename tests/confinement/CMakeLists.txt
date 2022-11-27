@@ -14,4 +14,7 @@ set(_macros complex-volume.mac geometrical.mac native-surface.mac geometrical-an
 
 foreach(_mac ${_macros})
   add_test(NAME confinement/${_mac} COMMAND remage-cli -g gdml/geometry.gdml -- macros/${_mac})
+  add_test(NAME confinement-mt/${_mac} COMMAND remage-cli -g gdml/geometry.gdml -t 2
+                                               macros/${_mac})
+  set_tests_properties(confinement-mt/${_mac} PROPERTIES LABELS mt)
 endforeach()

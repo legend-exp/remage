@@ -6,6 +6,6 @@
 /RMG/Generator/Select BxDecay0
 /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/run/beamOn 10
+/run/beamOn 100
 
 /vis/ogl/export vis-2nbb.pdf

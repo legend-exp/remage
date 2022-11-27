@@ -11,6 +11,6 @@
 /gps/ion 27 60
 /gps/energy 0 eV
 
-/run/beamOn 10
+/run/beamOn 100
 
 /vis/ogl/export vis-co60.pdf
