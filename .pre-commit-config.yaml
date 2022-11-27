@@ -2,6 +2,7 @@ ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
 
+exclude: ^include/(fmt|magic_enum|CLI11)/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.4.0
@@ -36,4 +37,3 @@ repos:
   hooks:
    - id: clang-format
      types_or: [c++]
-     exclude: ^include/(fmt|magic_enum)/

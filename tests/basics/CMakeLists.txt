@@ -1,11 +1,3 @@
-cmake_minimum_required(VERSION 3.8)
-project(remage-test-basics)
-
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
-
-add_executable(${PROJECT_NAME} main.cc)
-target_link_libraries(${PROJECT_NAME} PUBLIC remage)
-
 # collect auxiliary files
 file(
   GLOB _aux
@@ -21,10 +13,8 @@ set(_macros print-volumes.mac vis-co60.mac)
 set(_macros_extra run-2nbb.mac vis-2nbb.mac)
 
 foreach(_mac ${_macros} ${_macros_extra})
-  add_test(NAME basics/${_mac}
-    COMMAND ${PROJECT_NAME} macros/${_mac}
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  add_test(NAME basics/${_mac} COMMAND remage-cli -g gdml/main.gdml -- macros/${_mac})
 endforeach()
 
-string(PREPEND ${_test_names} ${_macros_extra})
-set_tests_properties(${_test_names} PROPERTIES LABELS extra)
+list(TRANSFORM _macros_extra PREPEND "basics/")
+set_tests_properties(${_macros_extra} PROPERTIES LABELS extra)

@@ -1,18 +1,18 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
   remage
   VERSION 0.1.0
   DESCRIPTION "Simulation framework for HPGe-based experiments"
   LANGUAGES C CXX) # C is needed for GEANT4's HDF5 support
 
-message(STATUS "${CMAKE_PROJECT_NAME} version ${CMAKE_PROJECT_VERSION}")
+message(STATUS "remage version ${CMAKE_PROJECT_VERSION}")
 
 if(WIN32)
-  message(FATAL_ERROR "${CMAKE_PROJECT_NAME} is not supported on Windows")
+  message(FATAL_ERROR "remage is not supported on Windows")
 endif()
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-  message(STATUS "${CMAKE_PROJECT_NAME} requires an out-of-source build.")
+  message(STATUS "remage requires an out-of-source build.")
   message(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")
   message(STATUS " - CMakeCache.txt")
   message(STATUS " - CMakeFiles")
@@ -84,7 +84,7 @@ endif()
 # Define useful Geant4 functions and macros
 include(${Geant4_USE_FILE})
 
-option(RMG_USE_ROOT "Build ${CMAKE_PROJECT_NAME} with ROOT support" OFF)
+option(RMG_USE_ROOT "Build remage with ROOT support" OFF)
 
 # Find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
@@ -100,7 +100,7 @@ else()
   endif()
 endif()
 
-option(RMG_USE_BXDECAY0 "Build ${CMAKE_PROJECT_NAME} with BxDecay0 support" OFF)
+option(RMG_USE_BXDECAY0 "Build remage with BxDecay0 support" OFF)
 
 # find BxDecay0
 find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} QUIET COMPONENTS Geant4)
@@ -125,7 +125,7 @@ message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
 add_subdirectory(src)
 
-option(RMG_BUILD_DOCS "Build ${CMAKE_PROJECT_NAME} documentation" OFF)
+option(RMG_BUILD_DOCS "Build remage documentation" OFF)
 if(RMG_BUILD_DOCS)
   add_subdirectory(docs)
 endif()
@@ -135,27 +135,26 @@ add_subdirectory(tests)
 
 # export targets for dependent projects
 install(
-  EXPORT ${CMAKE_PROJECT_NAME}Targets
+  EXPORT remageTargets
   NAMESPACE RMG::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # add support for find_package()
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  ${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
+  ${CMAKE_SOURCE_DIR}/cmake/remageConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # create version file
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake"
   VERSION "${PROJECT_VERSION}"
   COMPATIBILITY AnyNewerVersion)
 
 # install
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/remageConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # write useful post-install setup scripts
 include(Toolchain)
@@ -164,4 +163,4 @@ create_mage_toolchain()
 include(DependencyGraph)
 gen_dep_graph(pdf)
 
-message(STATUS "${CMAKE_PROJECT_NAME} install prefix set to ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "remage install prefix set to ${CMAKE_INSTALL_PREFIX}")

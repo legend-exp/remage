@@ -59,42 +59,41 @@ if(BxDecay0_FOUND)
   list(APPEND PROJECT_SOURCES ${_root}/src/RMGGeneratorDecay0.cc)
 endif()
 
-add_library(${CMAKE_PROJECT_NAME} SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
+add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
 # link against dependent libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${Geant4_LIBRARIES})
+target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC BxDecay0::BxDecay0 BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage PUBLIC BxDecay0::BxDecay0 BxDecay0::BxDecay0_Geant4)
 endif()
 
 if(ROOT_FOUND)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
+  target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
 endif()
 
 # executable for CLI
-add_executable(${CMAKE_PROJECT_NAME}-cli ${_root}/src/remage.cc)
-target_link_libraries(${CMAKE_PROJECT_NAME}-cli PUBLIC remage)
-set_target_properties(${CMAKE_PROJECT_NAME}-cli PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
+add_executable(remage-cli ${_root}/src/remage.cc)
+target_link_libraries(remage-cli PUBLIC remage)
+set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
-target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-target_include_directories(
-  ${CMAKE_PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>"
-                               $<INSTALL_INTERFACE:include>)
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>"
+                                         $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
 set_target_properties(
-  ${CMAKE_PROJECT_NAME}
+  remage
   PROPERTIES VERSION ${PROJECT_VERSION}
              SOVERSION ${PROJECT_VERSION_MAJOR}
-             INTERFACE_${CMAKE_PROJECT_NAME}_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
+             INTERFACE_remage_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
 
 set_property(
-  TARGET ${CMAKE_PROJECT_NAME}
+  TARGET remage
   APPEND
-  PROPERTY COMPATIBLE_INTERFACE_STRING ${CMAKE_PROJECT_NAME}_MAJOR_VERSION)
+  PROPERTY COMPATIBLE_INTERFACE_STRING remage_MAJOR_VERSION)
 
 # write ProjectInfo.hh
 # no need to install, it is included in the header list above
@@ -103,8 +102,8 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in
 
 # install CMake targets
 install(
-  TARGETS ${CMAKE_PROJECT_NAME}
-  EXPORT ${CMAKE_PROJECT_NAME}Targets
+  TARGETS remage
+  EXPORT remageTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
