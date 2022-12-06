@@ -80,11 +80,7 @@ void RMGManager::Initialize() {
   }
   RMGLog::Out(RMGLog::detail, "Available graphic systems: ", _str);
 
-  if (!fUserAction) {
-    RMGLog::Out(RMGLog::debug, "Initializing default user action class");
-    fUserAction = new RMGUserAction();
-  }
-
+  if (!fUserAction) this->SetUpDefaultUserAction();
   if (!fDetectorConstruction) this->SetUpDefaultDetectorConstruction();
 
   fG4RunManager->SetUserInitialization(fDetectorConstruction);
@@ -150,6 +146,11 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
 
   // restore buffer
   std::cout.rdbuf(orig_buf);
+}
+
+void RMGManager::SetUpDefaultUserAction() {
+  RMGLog::Out(RMGLog::debug, "Initializing default user action class");
+  fUserAction = new RMGUserAction();
 }
 
 void RMGManager::SetUpDefaultProcessesList() {

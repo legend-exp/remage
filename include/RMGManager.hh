@@ -53,6 +53,7 @@ class RMGManager {
     }
     inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
+    inline void SetUserInit(RMGUserAction* ua) { fUserAction = ua; }
     inline void SetInteractive(bool flag = true) { fInteractive = flag; }
     inline void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
@@ -88,6 +89,7 @@ class RMGManager {
     void SetUpDefaultG4VisManager();
     void SetUpDefaultDetectorConstruction();
     void SetUpDefaultProcessesList();
+    void SetUpDefaultUserAction();
 
     std::string fApplicationName;
     int fArgc;
