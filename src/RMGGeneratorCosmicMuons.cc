@@ -20,7 +20,7 @@
 
 namespace u = CLHEP;
 
-RMGGeneratorCosmicMuons::RMGGeneratorCosmicMuons() {
+RMGGeneratorCosmicMuons::RMGGeneratorCosmicMuons() : RMGVGenerator("CosmicMuons") {
   this->DefineCommands();
 
   // docs: https://doi.org/10.1016/j.nima.2021.165732
@@ -28,10 +28,10 @@ RMGGeneratorCosmicMuons::RMGGeneratorCosmicMuons() {
   fGun = std::make_unique<G4ParticleGun>();
 }
 
-void RMGGeneratorCosmicMuons::BeginOfRunAction() {
+void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
 
   // TODO: get this info from detector construction
-  const auto world_side = 50 * u::m;
+  const auto world_side = fSkyPlaneHeight; /*50* u::m*/
 
   RMGLog::Out(RMGLog::debug, "Configuring EcoMug");
 
@@ -127,6 +127,13 @@ void RMGGeneratorCosmicMuons::DefineCommands() {
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 
+  fMessenger->DeclarePropertyWithUnit("SkyPlaneHeight", "m", fSkyPlaneHeight)
+      .SetGuidance("Height of the sky, if it has a planar shape")
+      .SetParameterName("l", false)
+      .SetRange("l > 0")
+      .SetToBeBroadcasted(true)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
   fMessenger->DeclarePropertyWithUnit("MomentumMin", "GeV/c", fMomentumMin)
       .SetGuidance("Minimum momentum of the generated muon")
       .SetParameterName("p", false)
@@ -137,7 +144,7 @@ void RMGGeneratorCosmicMuons::DefineCommands() {
   fMessenger->DeclarePropertyWithUnit("MomentumMax", "GeV/c", fMomentumMax)
       .SetGuidance("Maximum momentum of the generated muon")
       .SetParameterName("p", false)
-      .SetRange("p > 0 && a <= 1000")
+      .SetRange("p > 0 && p <= 1000")
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 

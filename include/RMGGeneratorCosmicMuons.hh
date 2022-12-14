@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "RMGVGenerator.hh"
+
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
@@ -14,7 +16,7 @@
 namespace u = CLHEP;
 
 // TODO: must inherit from RMGVGenerator
-class RMGGeneratorCosmicMuons : public G4VUserPrimaryGeneratorAction {
+class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
 
@@ -31,9 +33,14 @@ class RMGGeneratorCosmicMuons : public G4VUserPrimaryGeneratorAction {
     RMGGeneratorCosmicMuons(RMGGeneratorCosmicMuons&&) = delete;
     RMGGeneratorCosmicMuons& operator=(RMGGeneratorCosmicMuons&&) = delete;
 
-    void GeneratePrimaries(G4Event* event) override;
-    void BeginOfRunAction();
-    inline void EndOfRunAction() {}
+    void GeneratePrimaries(G4Event* event);
+    void GeneratePrimariesKinematics(G4Event* event) override{
+      this->GeneratePrimaries(event);
+    }
+    virtual void SetParticlePosition(G4ThreeVector vec) override {};
+
+    void BeginOfRunAction(const G4Run*);
+    inline void EndOfRunAction(const G4Run*) {}
 
   private:
 
@@ -46,6 +53,7 @@ class RMGGeneratorCosmicMuons : public G4VUserPrimaryGeneratorAction {
 
     SkyShape fSkyShape = kSphere;
     float fSkyPlaneSize = -1;
+    float fSkyPlaneHeight = 50;
 
     float fSpherePositionThetaMin = 0 * u::deg;
     float fSpherePositionThetaMax = 90 * u::deg;
