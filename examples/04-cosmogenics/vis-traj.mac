@@ -2,7 +2,9 @@
 
 /run/initialize
 
-/vis/open OIQt
+/vis/open OGL #OIQt
+/vis/ogl/set/printFilename test.pdf
+
 /vis/scene/create
 /vis/sceneHandler/attach
 
@@ -15,17 +17,12 @@
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate
 
-/RMG/Generator/Select GPS
-/gps/particle gamma
-/gps/ang/type iso
-/gps/ang/mintheta 0 deg
-/gps/ang/maxtheta 60 deg
-/gps/position 0 0 10 cm
-/gps/energy 10 MeV
+/RMG/Processes/Realm CosmicRays
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select CosmicMuons
 
-# /RMG/Generator/Confine Volume
-# /RMG/Generator/Confinement/Physical/AddVolume HPGe1
-# /RMG/Generator/Select BxDecay0
-# /bxdecay0/generator/dbd Ge76 2345 1 0
-
-/run/beamOn 100
+/RMG/Generator/CosmicMuons/SkyShape Plane
+/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.05
+/vis/viewer/addCutawayPlane 0 0 0 m 1 0 0
+/run/beamOn 1
+/vis/ogl/export

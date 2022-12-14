@@ -5,10 +5,13 @@
 
 /RMG/Output/FileName output.root
 
+/run/setCut 3 cm
+
+/RMG/Processes/Realm CosmicRays
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select CosmicMuons
 
 /RMG/Generator/CosmicMuons/SkyShape Plane
-/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.01
+/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.05
 
-/run/beamOn 1000
+/run/beamOn 10000
