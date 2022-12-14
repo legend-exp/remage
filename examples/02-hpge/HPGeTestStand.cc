@@ -41,7 +41,7 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
   auto LAr = man->FindOrBuildMaterial("G4_lAr");
 
-  auto mat_enr_ge = new G4Material("CryogenicEnrichedGermanium", density = 5.56, n_components = 1,
+  auto mat_enr_ge = new G4Material("CryogenicEnrichedGermanium", density = 5.56 * u::g / (u::cm * u::cm * u::cm), n_components = 1,
       state = G4State::kStateSolid, temperature = LAr->GetTemperature(),
       pressure = LAr->GetPressure());
 

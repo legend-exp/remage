@@ -2,7 +2,7 @@
 
 /run/initialize
 
-/RMG/Output/FileName output.hdf5
+/RMG/Output/FileName output.root
 
 # /RMG/Geometry/PrintListOfLogicalVolumes
 # /RMG/Geometry/PrintListOfPhysicalVolumes
