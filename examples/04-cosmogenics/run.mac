@@ -1,0 +1,14 @@
+# /RMG/Manager/Logging/LogLevelScreen debug
+#/tracking/verbose 1
+
+/run/initialize
+
+/RMG/Output/FileName output.root
+
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select CosmicMuons
+
+/RMG/Generator/CosmicMuons/SkyShape Plane
+/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.01
+
+/run/beamOn 1000
