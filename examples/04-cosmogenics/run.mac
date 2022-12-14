@@ -5,7 +5,6 @@
 
 /RMG/Output/FileName output.root
 
-/run/setCut 3 cm
 
 /RMG/Processes/Realm CosmicRays
 /RMG/Generator/Confine UnConfined
