@@ -232,6 +232,8 @@ void RMGPhysics::SetCuts() {
   this->SetCutValue(fStepCuts.positron, "e+");
   this->SetCutValue(fStepCuts.proton, "proton");
   this->SetCutValue(fStepCuts.alpha, "alpha");
+  this->SetCutValue(fStepCuts.muon, "mu+");
+  this->SetCutValue(fStepCuts.muon, "mu-");
   this->SetCutValue(fStepCuts.generic_ion, "GenericIon");
 
   if (G4RegionStore::GetInstance()) {
@@ -291,6 +293,7 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
     case RMGPhysics::PhysicsRealm::kCosmicRays:
       RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
+      fStepCuts.muon = 3 * u::cm;
       fStepCuts.gamma = 5 * u::cm;
       fStepCuts.electron = 1 * u::cm;
       fStepCuts.positron = 1 * u::cm;

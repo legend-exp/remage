@@ -1,0 +1,28 @@
+/RMG/Manager/Logging/LogLevelScreen debug
+
+/run/initialize
+
+/vis/open OGL #OIQt
+/vis/ogl/set/printFilename test.pdf
+
+/vis/scene/create
+/vis/sceneHandler/attach
+
+/vis/drawVolume
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Processes/Realm CosmicRays
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select CosmicMuons
+
+/RMG/Generator/CosmicMuons/SkyShape Plane
+/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.05
+/vis/viewer/addCutawayPlane 0 0 0 m 1 0 0
+/run/beamOn 1
+/vis/ogl/export

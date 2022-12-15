@@ -91,8 +91,8 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
 #endif
       break;
     case Generator::kCosmicMuons:
-      // fGeneratorObj = std::make_unique<RMGGeneratorCosmicMuons>();
-      // break;
+      fGeneratorObj = std::make_unique<RMGGeneratorCosmicMuons>();
+      break;
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
