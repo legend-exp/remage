@@ -1,10 +1,10 @@
 #ifndef _RMG_GENERATOR_MUSUN_READER_HH_
 #define _RMG_GENERATOR_MUSUN_READER_HH_
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-struct MUSUN_OUTPUT{
+struct MUSUN_OUTPUT {
     int nEvent;
     int particleID;
     float energy;
@@ -17,29 +17,26 @@ struct MUSUN_OUTPUT{
 
 class RMGReaderMUSUN {
 
-    private:
+  private:
 
-        RMGReaderMUSUN(){};
+    RMGReaderMUSUN(){};
 
-        std::string kFileName;
-        std::ifstream kInStream;
-        static RMGReaderMUSUN* kInstance;
+    std::string kFileName;
+    std::ifstream kInStream;
+    static RMGReaderMUSUN* kInstance;
 
-    public:
+  public:
 
-        RMGReaderMUSUN(const RMGReaderMUSUN &) = delete;
-        RMGReaderMUSUN &operator=(const RMGReaderMUSUN &) = delete;
+    RMGReaderMUSUN(const RMGReaderMUSUN&) = delete;
+    RMGReaderMUSUN& operator=(const RMGReaderMUSUN&) = delete;
 
-        static RMGReaderMUSUN *getInstance()
-        {
-            if(kInstance == NULL)
-                kInstance = new RMGReaderMUSUN();
-            return kInstance;
-        }
-        void SetInputFile(std::string fileName);
-        MUSUN_OUTPUT ReadNextLine();
-        bool IsEOF(){return kInStream.peek() == EOF;}
-
+    static RMGReaderMUSUN* getInstance() {
+      if (kInstance == NULL) kInstance = new RMGReaderMUSUN();
+      return kInstance;
+    }
+    void SetInputFile(std::string fileName);
+    MUSUN_OUTPUT ReadNextLine();
+    bool IsEOF() { return kInStream.peek() == EOF; }
 };
 
 

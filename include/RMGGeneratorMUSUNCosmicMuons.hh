@@ -37,11 +37,11 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     inline void EndOfRunAction(const G4Run*) {}
 
   private:
+
     void DefineCommands();
     void SetMUSUNFile(G4String fileName);
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
-
 };
 
 #endif

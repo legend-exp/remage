@@ -28,26 +28,26 @@ RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MU
 
 void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 
-    if(RMGReaderMUSUN::getInstance()->IsEOF())
-        RMGLog::Out(RMGLog::fatal, "MUSUN file is at EOF at BeginOfRunAction! File must be empty or incorrect path.");
-
+  if (RMGReaderMUSUN::getInstance()->IsEOF())
+    RMGLog::Out(RMGLog::fatal,
+        "MUSUN file is at EOF at BeginOfRunAction! File must be empty or incorrect path.");
 }
 
 void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
 
-  if(RMGReaderMUSUN::getInstance()->IsEOF())
-    RMGLog::Out(RMGLog::fatal, "Primary generator trying to generate more muons than lines in the input MUSUN file!");
-    
+  if (RMGReaderMUSUN::getInstance()->IsEOF())
+    RMGLog::Out(RMGLog::fatal,
+        "Primary generator trying to generate more muons than lines in the input MUSUN file!");
+
   RMGReaderMUSUN* readerInstance = RMGReaderMUSUN::getInstance();
   MUSUN_OUTPUT data = readerInstance->ReadNextLine();
 
-    G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
-  if(data.particleID == 10)
-    fGun->SetParticleDefinition(theParticleTable->FindParticle("mu-"));
-  else
-    fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
+  G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
+  if (data.particleID == 10) fGun->SetParticleDefinition(theParticleTable->FindParticle("mu-"));
+  else fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
 
-  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", data.x * u::cm / u::m, data.y  * u::cm / u::m, data.z * u::cm / u::m);
+  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", data.x * u::cm / u::m,
+      data.y * u::cm / u::m, data.z * u::cm / u::m);
   fGun->SetParticlePosition({data.x * u::cm, data.y * u::cm, data.z * u::cm});
 
   G4ThreeVector d_cart(1, 1, 1);
@@ -56,8 +56,8 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   d_cart.setMag(1 * u::m);
   fGun->SetParticleMomentumDirection(d_cart);
 
-  RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
-      data.theta / u::deg, data.phi / u::deg);
+  RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg", data.theta / u::deg,
+      data.phi / u::deg);
 
   RMGLog::OutFormat(RMGLog::debug, "...energy {:.4g} GeV", data.energy);
   fGun->SetParticleEnergy(data.energy * u::GeV);
@@ -65,10 +65,9 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   fGun->GeneratePrimaryVertex(event);
 }
 
-void RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile(G4String fileName)
-{
-    RMGReaderMUSUN* readerInstance = RMGReaderMUSUN::getInstance();
-    readerInstance->SetInputFile(fileName);
+void RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile(G4String fileName) {
+  RMGReaderMUSUN* readerInstance = RMGReaderMUSUN::getInstance();
+  readerInstance->SetInputFile(fileName);
 }
 
 void RMGGeneratorMUSUNCosmicMuons::DefineCommands() {
