@@ -21,7 +21,6 @@ class RMGReaderMUSUN {
 
         RMGReaderMUSUN(){};
 
-
         std::string kFileName;
         std::ifstream kInStream;
         static RMGReaderMUSUN* kInstance;
@@ -40,7 +39,6 @@ class RMGReaderMUSUN {
         void SetInputFile(std::string fileName);
         MUSUN_OUTPUT ReadNextLine();
         bool IsEOF(){return kInStream.peek() == EOF;}
-
 
 };
 

@@ -2,7 +2,7 @@
 
 /run/initialize
 
-/vis/open OIQt
+/vis/open OGL #OIQt
 /vis/scene/create
 /vis/sceneHandler/attach
 
@@ -15,17 +15,9 @@
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate
 
-/RMG/Generator/Select GPS
-/gps/particle gamma
-/gps/ang/type iso
-/gps/ang/mintheta 0 deg
-/gps/ang/maxtheta 60 deg
-/gps/position 0 0 10 cm
-/gps/energy 10 MeV
+/RMG/Generator/Select MUSUNCosmicMuons
 
-# /RMG/Generator/Confine Volume
-# /RMG/Generator/Confinement/Physical/AddVolume HPGe1
-# /RMG/Generator/Select BxDecay0
-# /bxdecay0/generator/dbd Ge76 2345 1 0
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_10k_events.dat
 
-/run/beamOn 100
+/run/beamOn 10
+

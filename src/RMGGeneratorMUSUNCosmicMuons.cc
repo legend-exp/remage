@@ -47,7 +47,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   else
     fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
 
-  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", data.x, data.y, data.z);
+  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", data.x * u::cm / u::m, data.y  * u::cm / u::m, data.z * u::cm / u::m);
   fGun->SetParticlePosition({data.x * u::cm, data.y * u::cm, data.z * u::cm});
 
   G4ThreeVector d_cart(1, 1, 1);
@@ -59,7 +59,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
       data.theta / u::deg, data.phi / u::deg);
 
-  RMGLog::OutFormat(RMGLog::debug, "...energy {:.4g} GeV/c^2", data.energy);
+  RMGLog::OutFormat(RMGLog::debug, "...energy {:.4g} GeV", data.energy);
   fGun->SetParticleEnergy(data.energy * u::GeV);
 
   fGun->GeneratePrimaryVertex(event);
