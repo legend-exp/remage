@@ -1,3 +1,6 @@
+// Modified by Luigi Pertoldi <gipert@pm.me> in 2022
+//
+// Original copyright statement:
 /*
  * Copyright (C) 2007-2018, the BAT core developer team
  * All rights reserved.
