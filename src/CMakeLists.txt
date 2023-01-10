@@ -53,6 +53,11 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc)
 
+# Write ProjectInfo.hh
+# no need to install, it is included in the header list above
+configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
+               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
 
@@ -60,6 +65,12 @@ if(BxDecay0_FOUND)
 endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
+
+# Ensure clients are aware of the minimum C++ standard we were compiled with
+target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
+                                         $<INSTALL_INTERFACE:include>)
 
 # link against dependent libraries
 target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
@@ -71,11 +82,6 @@ endif()
 if(ROOT_FOUND)
   target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
 endif()
-
-# executable for CLI
-add_executable(remage-cli ${_root}/src/remage.cc)
-target_link_libraries(remage-cli PUBLIC remage)
-set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -95,10 +101,11 @@ set_property(
   APPEND
   PROPERTY COMPATIBLE_INTERFACE_STRING remage_MAJOR_VERSION)
 
-# write ProjectInfo.hh
-# no need to install, it is included in the header list above
-configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+
+# executable for CLI
+add_executable(remage-cli ${_root}/src/remage.cc)
+target_link_libraries(remage-cli PUBLIC remage)
+set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
 # install CMake targets
 install(
