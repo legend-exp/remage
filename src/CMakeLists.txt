@@ -1,7 +1,7 @@
 # List here manually all source files. Using GLOB is bad, see:
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
-set(_root ${CMAKE_SOURCE_DIR})
+set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGEventAction.hh
@@ -80,7 +80,7 @@ set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>"
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
                                          $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
@@ -97,8 +97,8 @@ set_property(
 
 # write ProjectInfo.hh
 # no need to install, it is included in the header list above
-configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-               ${CMAKE_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
+               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
 
 # install CMake targets
 install(

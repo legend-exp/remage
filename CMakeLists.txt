@@ -22,7 +22,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # include path for custom modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules/)
 include(Colors)
 
 # get install directories names
@@ -142,7 +142,7 @@ install(
 # add support for find_package()
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  ${CMAKE_SOURCE_DIR}/cmake/remageConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
+  ${PROJECT_SOURCE_DIR}/cmake/remageConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # create version file
