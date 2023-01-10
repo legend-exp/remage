@@ -1,4 +1,4 @@
-// other useful GEANT4 exported variables:
+// other useful Geant4 exported variables:
 //   G4VIS_USE_<DRIVER>
 //   G4VIS_USE_OPENGLX
 //   G4GEOM_USE_USOLIDS
