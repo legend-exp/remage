@@ -142,7 +142,8 @@ install(
 # add support for find_package()
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  ${PROJECT_SOURCE_DIR}/cmake/remageConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
+  ${PROJECT_SOURCE_DIR}/cmake/remageConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # create version file

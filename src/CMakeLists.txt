@@ -105,7 +105,6 @@ set_property(
   APPEND
   PROPERTY COMPATIBLE_INTERFACE_STRING remage_MAJOR_VERSION)
 
-
 # executable for CLI
 add_executable(remage-cli ${_root}/src/remage.cc)
 target_link_libraries(remage-cli PUBLIC remage)
