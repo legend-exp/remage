@@ -1,3 +1,5 @@
+// Modified by Luigi Pertoldi <gipert@pm.me> in 2022
+
 #ifndef _RMGLOG_HH_
 #define _RMGLOG_HH_
 
