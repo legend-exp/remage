@@ -22,7 +22,7 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
     fReader = G4Hdf5AnalysisReader::Instance();
 #else
     RMGLog::Out(RMGLog::fatal,
-        "HDF5 input not available, please recompile GEANT4 with HDF5 support");
+        "HDF5 input not available, please recompile Geant4 with HDF5 support");
 #endif
   } else if (ext == "csv") fReader = G4CsvAnalysisReader::Instance();
   else if (ext == "xml") fReader = G4XmlAnalysisReader::Instance();

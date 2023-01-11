@@ -2,7 +2,7 @@
 
 macro(create_mage_toolchain)
   # create and eventually install configuration scripts
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/project-config.in
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/project-config.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
 
   # don't install project-config on windows
@@ -12,7 +12,7 @@ macro(create_mage_toolchain)
   endif()
 
   execute_process(COMMAND ${mgdo_CONFIG_EXECUTABLE} --prefix OUTPUT_VARIABLE MGDODIR)
-  set(MAGEDIR ${CMAKE_SOURCE_DIR})
+  set(MAGEDIR ${PROJECT_SOURCE_DIR})
 
   find_program(Geant4_CONFIG_EXECUTABLE geant4-config)
   execute_process(

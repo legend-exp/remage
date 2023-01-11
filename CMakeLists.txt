@@ -3,7 +3,7 @@ project(
   remage
   VERSION 0.1.0
   DESCRIPTION "Simulation framework for HPGe-based experiments"
-  LANGUAGES C CXX) # C is needed for GEANT4's HDF5 support
+  LANGUAGES C CXX) # C is needed for Geant4's HDF5 support
 
 message(STATUS "remage version ${CMAKE_PROJECT_VERSION}")
 
@@ -22,7 +22,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # include path for custom modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules/)
 include(Colors)
 
 # get install directories names
@@ -41,43 +41,43 @@ set(RMG_BXDECAY0_MINIMUM_VERSION 1.0.10)
 # Find Geant4
 find_package(Geant4 ${RMG_G4_MINIMUM_VERSION} REQUIRED)
 if(Geant4_FOUND)
-  message(STATUS "Found GEANT4 v" ${Geant4_VERSION})
+  message(STATUS "Found Geant4 v" ${Geant4_VERSION})
 endif()
 
 # check for optional components
 find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml ui_all vis_all)
 
 if(Geant4_hdf5_FOUND)
-  message(STATUS "GEANT4 compiled with HDF5 support - enabling feature")
+  message(STATUS "Geant4 compiled with HDF5 support - enabling feature")
   list(APPEND g4_components hdf5)
   list(APPEND remage_components HDF5)
 else()
-  message(STATUS "GEANT4 lacks HDF5 support - disabling feature")
+  message(STATUS "Geant4 lacks HDF5 support - disabling feature")
 endif()
 
 if(Geant4_usolids_FOUND)
-  message(STATUS "GEANT4 compiled with VecGeom support - enabling feature")
+  message(STATUS "Geant4 compiled with VecGeom support - enabling feature")
   list(APPEND g4_components usolids)
   list(APPEND remage_components VecGeom)
 else()
-  message(STATUS "GEANT4 lacks VecGeom support - disabling feature")
+  message(STATUS "Geant4 lacks VecGeom support - disabling feature")
 endif()
 
 if(Geant4_multithreaded_FOUND)
-  message(STATUS "GEANT4 compiled with multithreading support - enabling feature")
+  message(STATUS "Geant4 compiled with multithreading support - enabling feature")
   list(APPEND g4_components multithreaded)
   list(APPEND remage_components Multithreaded)
 else()
-  message(STATUS "GEANT4 lacks multithreading support - disabling feature")
+  message(STATUS "Geant4 lacks multithreading support - disabling feature")
 endif()
 
 if(Geant4_gdml_FOUND)
-  message(STATUS "GEANT4 compiled with GDML support - enabling feature")
+  message(STATUS "Geant4 compiled with GDML support - enabling feature")
   set(RMG_HAS_GDML 1)
   list(APPEND g4_components gdml)
   list(APPEND remage_components GDML)
 else()
-  message(STATUS "GEANT4 lacks GDML support - disabling feature")
+  message(STATUS "Geant4 lacks GDML support - disabling feature")
   set(RMG_HAS_GDML 0)
 endif()
 
@@ -142,7 +142,8 @@ install(
 # add support for find_package()
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  ${CMAKE_SOURCE_DIR}/cmake/remageConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
+  ${PROJECT_SOURCE_DIR}/cmake/remageConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/remage)
 
 # create version file

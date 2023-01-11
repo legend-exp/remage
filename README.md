@@ -14,7 +14,7 @@ Simulation framework for germanium detector experiments
 
 <p></p>
 
-The *remage* project aims to provide a modern GEANT4-based C++ library to to
+The *remage* project aims to provide a modern Geant4-based C++ library to to
 efficiently simulate particle physics processes in typical germanium detector
 experiments. The library is setup-agnostic, and therefore the only mandatory
 user action is to provide a geometrical implementation of the experimental

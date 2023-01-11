@@ -1,7 +1,7 @@
 # List here manually all source files. Using GLOB is bad, see:
 # https://cmake.org/cmake/help/latest/command/file.html?highlight=Note#filesystem
 
-set(_root ${CMAKE_SOURCE_DIR})
+set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGEventAction.hh
@@ -53,6 +53,11 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc)
 
+# Write ProjectInfo.hh
+# no need to install, it is included in the header list above
+configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
+               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
 
@@ -60,6 +65,16 @@ if(BxDecay0_FOUND)
 endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
+
+# Ensure clients are aware of the minimum C++ standard we were compiled with
+target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
+                                         $<INSTALL_INTERFACE:include>)
+
+# Must use FMT_HEADER_ONLY absolutely everywhere or will get undefined symbols at link time
+# TODO: Use imported target so we can make this transparent and also allow use of external fmt
+target_compile_definitions(remage PUBLIC FMT_HEADER_ONLY)
 
 # link against dependent libraries
 target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
@@ -72,15 +87,10 @@ if(ROOT_FOUND)
   target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
 endif()
 
-# executable for CLI
-add_executable(remage-cli ${_root}/src/remage.cc)
-target_link_libraries(remage-cli PUBLIC remage)
-set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
-
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>"
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
                                          $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
@@ -95,10 +105,10 @@ set_property(
   APPEND
   PROPERTY COMPATIBLE_INTERFACE_STRING remage_MAJOR_VERSION)
 
-# write ProjectInfo.hh
-# no need to install, it is included in the header list above
-configure_file(${CMAKE_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-               ${CMAKE_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+# executable for CLI
+add_executable(remage-cli ${_root}/src/remage.cc)
+target_link_libraries(remage-cli PUBLIC remage)
+set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
 # install CMake targets
 install(
