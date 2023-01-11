@@ -63,11 +63,6 @@ void RMGRunAction::SetupAnalysisManager() {
 
   auto ana_man = G4AnalysisManager::Instance();
 
-  // HACK: https://geant4-forum.web.cern.ch/t/output-file-is-empty-if-hdf5-type/9252/2
-  // TODO: wait for v11.0.4 to be released and set lower bound
-  ana_man->CreateH1("dummy", "dummy", 10, 0, 10);
-  ana_man->SetHistoDirectoryName("dummy");
-
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
   ana_man->SetNtupleDirectoryName("hit");
 
