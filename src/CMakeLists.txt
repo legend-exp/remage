@@ -80,7 +80,7 @@ target_compile_definitions(remage PUBLIC FMT_HEADER_ONLY)
 target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
-  target_link_libraries(remage PUBLIC BxDecay0::BxDecay0 BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0 BxDecay0::BxDecay0_Geant4)
 endif()
 
 if(ROOT_FOUND)

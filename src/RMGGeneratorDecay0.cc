@@ -17,6 +17,11 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
+#include "ProjectInfo.hh"
+#if RMG_HAS_BXDECAY0
+#include "bxdecay0_g4/primary_generator_action.hh"
+#endif
+
 RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGenerator("Decay0") {
 
   if (!RMGManager::Instance()->IsExecSequential())
@@ -28,6 +33,9 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGene
   // NOTE: BxDecay0's primary generator action will own the pointer
   fDecay0G4Generator->SetVertexGenerator(prim_gen);
 }
+
+// Need non-inline, i.e. not in header/class body, destructor to hide BXDecay0 from consumers
+RMGGeneratorDecay0::~RMGGeneratorDecay0() = default; // NOLINT
 
 void RMGGeneratorDecay0::GeneratePrimariesKinematics(G4Event* event) {
   fDecay0G4Generator->GeneratePrimaries(event);

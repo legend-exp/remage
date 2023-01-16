@@ -43,6 +43,9 @@ RMGGeneratorCosmicMuons::RMGGeneratorCosmicMuons() : RMGVGenerator("CosmicMuons"
   fGun = std::make_unique<G4ParticleGun>();
 }
 
+// Need non-inline, i.e. not in header/class body, destructor to hide EcoMug from consumers
+RMGGeneratorCosmicMuons::~RMGGeneratorCosmicMuons() = default; // NOLINT
+
 void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
 
   // TODO: get this info from detector construction
