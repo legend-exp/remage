@@ -26,7 +26,7 @@
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
-#include "EcoMug/EcoMug.h"
+class EcoMug;
 
 namespace u = CLHEP;
 
@@ -41,7 +41,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     };
 
     RMGGeneratorCosmicMuons();
-    ~RMGGeneratorCosmicMuons() = default;
+    ~RMGGeneratorCosmicMuons();
 
     RMGGeneratorCosmicMuons(RMGGeneratorCosmicMuons const&) = delete;
     RMGGeneratorCosmicMuons& operator=(RMGGeneratorCosmicMuons const&) = delete;
@@ -56,7 +56,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   private:
 
-    std::unique_ptr<EcoMug> fEcoMug = nullptr;
+    std::unique_ptr<EcoMug> fEcoMug;
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;

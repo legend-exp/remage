@@ -23,10 +23,9 @@
 
 #include "G4ThreeVector.hh"
 
-#include "ProjectInfo.hh"
-#if RMG_HAS_BXDECAY0
-#include "bxdecay0_g4/primary_generator_action.hh"
-#endif
+namespace bxdecay0_g4 {
+  class PrimaryGeneratorAction;
+}
 
 class G4Event;
 class RMGGeneratorDecay0 : public RMGVGenerator {
@@ -35,7 +34,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
     RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
     RMGGeneratorDecay0() = delete;
-    inline ~RMGGeneratorDecay0() = default;
+    ~RMGGeneratorDecay0();
 
     RMGGeneratorDecay0(RMGGeneratorDecay0 const&) = delete;
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0 const&) = delete;
@@ -47,7 +46,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
   private:
 
-    std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator = nullptr;
+    std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
 };
 
 #endif
