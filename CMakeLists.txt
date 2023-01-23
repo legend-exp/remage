@@ -41,6 +41,12 @@ if(NOT TARGET uninstall)
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
 endif()
 
+# Only report new/updated install files
+set(CMAKE_INSTALL_MESSAGE LAZY)
+
+# Only allow installs relative to CMAKE_INSTALL_PREFIX
+set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION ON)
+
 # Set default build type
 include(BuildType)
 
