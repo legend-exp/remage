@@ -33,6 +33,12 @@ set(CMAKE_INSTALL_LIBDIR lib)
 # Set default build type
 include(BuildType)
 
+# Copy .clang-tidy file to build dir to ensure clang-tidy always picks up the correct one
+# no matter where out build dir is relative to the source dir
+if(EXISTS "${PROJECT_SOURCE_DIR}/.clang-tidy")
+  configure_file("${PROJECT_SOURCE_DIR}/.clang-tidy" "${PROJECT_BINARY_DIR}/.clang-tidy" COPYONLY)
+endif()
+
 # Find dependencies
 set(RMG_G4_MINIMUM_VERSION 11.0.3)
 set(RMG_ROOT_MINIMUM_VERSION 6.06)

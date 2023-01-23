@@ -1,11 +1,19 @@
+---
+Checks: "-*, \
+  modernize-deprecated-headers, \
+  modernize-make-shared, \
+  modernize-make-unique, \
+  modernize-redundant-void-arg, \
+  modernize-use-auto, \
+  modernize-use-equals-default, \
+  modernize-use-nullptr, \
+  modernize-use-using, \
+  performance-faster-string-find, \
+  performance-for-range-copy, \
+  performance-inefficient-string-concatenation, \
+  performance-trivially-destructible, \
+  readability-delete-null-pointer, \
+  readability-duplicate-include, \
+  readability-string-compare"
 FormatStyle: file
-
-Checks: '
-  modernize-*,
-  performance-*,
-  readability-*,
-  bugprone-*,
-  -modernize-use-trailing-return-type,
-'
-
 HeaderFilterRegex: 'include/.*.hh'
