@@ -51,7 +51,7 @@ class RMGGermaniumDetectorHit : public G4VHit {
     double global_time = -1;
 };
 
-typedef G4THitsCollection<RMGGermaniumDetectorHit> RMGGermaniumDetectorHitsCollection;
+using RMGGermaniumDetectorHitsCollection = G4THitsCollection<RMGGermaniumDetectorHit>;
 
 class G4Step;
 class G4HCofThisEvent;

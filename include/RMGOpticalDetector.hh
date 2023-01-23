@@ -51,7 +51,7 @@ class RMGOpticalDetectorHit : public G4VHit {
     double global_time = -1;
 };
 
-typedef G4THitsCollection<RMGOpticalDetectorHit> RMGOpticalDetectorHitsCollection;
+using RMGOpticalDetectorHitsCollection = G4THitsCollection<RMGOpticalDetectorHit>;
 
 class G4Step;
 class G4HCofThisEvent;

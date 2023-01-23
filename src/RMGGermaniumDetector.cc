@@ -119,7 +119,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
-  RMGGermaniumDetectorHit* hit = new RMGGermaniumDetectorHit();
+  auto* hit = new RMGGermaniumDetectorHit();
   hit->detector_uid = det_uid;
   hit->energy_deposition = step->GetTotalEnergyDeposit();
   hit->global_position = prestep->GetPosition();

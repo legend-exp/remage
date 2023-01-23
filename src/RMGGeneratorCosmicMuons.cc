@@ -15,7 +15,7 @@
 
 #include "RMGGeneratorCosmicMuons.hh"
 
-#include "math.h"
+#include <cmath>
 
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"

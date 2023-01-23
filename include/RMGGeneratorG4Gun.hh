@@ -30,7 +30,7 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
   public:
 
     inline RMGGeneratorG4Gun() : RMGVGenerator("G4Gun") {
-      fParticleGun = std::unique_ptr<G4ParticleGun>(new G4ParticleGun());
+      fParticleGun = std::make_unique<G4ParticleGun>();
     }
     inline ~RMGGeneratorG4Gun() = default;
 
