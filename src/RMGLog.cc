@@ -13,7 +13,7 @@
 
 #include "RMGLog.hh"
 
-#include "ProjectInfo.hh"
+#include "RMGConfig.hh"
 
 #if RMG_HAS_ROOT
 #include <TError.h>

@@ -53,10 +53,10 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc)
 
-# Write ProjectInfo.hh
+# Write RMGConfig.hh
 # no need to install, it is included in the header list above
-configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGConfig.hh.in
+               ${PROJECT_SOURCE_DIR}/include/RMGConfig.hh @ONLY)
 
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
