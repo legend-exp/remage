@@ -15,7 +15,7 @@
 
 #include "RMGMasterGenerator.hh"
 
-#include "ProjectInfo.hh"
+#include "RMGConfig.hh"
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
 #include "RMGManager.hh"

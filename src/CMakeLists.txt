@@ -53,10 +53,10 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc)
 
-# Write ProjectInfo.hh
+# Write RMGConfig.hh
 # no need to install, it is included in the header list above
-configure_file(${PROJECT_SOURCE_DIR}/cmake/ProjectInfo.hh.in
-               ${PROJECT_SOURCE_DIR}/include/ProjectInfo.hh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGConfig.hh.in
+               ${PROJECT_SOURCE_DIR}/include/RMGConfig.hh @ONLY)
 
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
@@ -80,11 +80,11 @@ target_compile_definitions(remage PUBLIC FMT_HEADER_ONLY)
 target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
 
 if(BxDecay0_FOUND)
-  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0 BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
 endif()
 
 if(ROOT_FOUND)
-  target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree ROOT::Hist)
+  target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree)
 endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
@@ -121,4 +121,8 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # install headers
-install(DIRECTORY ../include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(
+  DIRECTORY ../include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  PATTERN "CLI11" EXCLUDE
+  PATTERN "EcoMug" EXCLUDE)

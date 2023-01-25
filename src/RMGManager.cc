@@ -34,7 +34,7 @@
 #include "G4VisManager.hh"
 #include "Randomize.hh"
 
-#include "ProjectInfo.hh"
+#include "RMGConfig.hh"
 #include "RMGHardware.hh"
 #include "RMGPhysics.hh"
 #include "RMGTools.hh"

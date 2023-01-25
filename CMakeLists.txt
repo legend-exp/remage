@@ -30,6 +30,23 @@ include(GNUInstallDirs)
 # we prefer just 'lib' over 'lib64'
 set(CMAKE_INSTALL_LIBDIR lib)
 
+# Add uninstall target if required
+if(NOT TARGET uninstall)
+  configure_file(cmake/cmake_uninstall.cmake.in "${PROJECT_BINARY_DIR}/cmake_uninstall.cmake"
+                 @ONLY)
+
+  add_custom_target(
+    uninstall
+    COMMAND "${CMAKE_COMMAND}" -P "${PROJECT_BINARY_DIR}/cmake_uninstall.cmake"
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+endif()
+
+# Only report new/updated install files
+set(CMAKE_INSTALL_MESSAGE LAZY)
+
+# Only allow installs relative to CMAKE_INSTALL_PREFIX
+set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION ON)
+
 # Set default build type
 include(BuildType)
 

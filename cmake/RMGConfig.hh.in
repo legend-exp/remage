@@ -1,3 +1,6 @@
+#ifndef _RMGCONFIG_HH_
+#define _RMGCONFIG_HH_
+
 // other useful Geant4 exported variables:
 //   G4VIS_USE_<DRIVER>
 //   G4VIS_USE_OPENGLX
@@ -7,3 +10,5 @@
 #define RMG_HAS_ROOT @ROOT_FOUND@
 #define RMG_HAS_BXDECAY0 @BxDecay0_FOUND@
 #define RMG_HAS_GDML @RMG_HAS_GDML@
+
+#endif

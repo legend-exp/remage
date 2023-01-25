@@ -24,7 +24,6 @@
 #include "G4ThreeVector.hh"
 #include "Randomize.hh"
 
-#include "ProjectInfo.hh"
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"

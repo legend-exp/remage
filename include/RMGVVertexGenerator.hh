@@ -16,7 +16,7 @@
 #ifndef _RMG_GENERATOR_PRIMARY_POSITION_HH_
 #define _RMG_GENERATOR_PRIMARY_POSITION_HH_
 
-#include "ProjectInfo.hh"
+#include "RMGConfig.hh"
 #if RMG_HAS_BXDECAY0
 #include "bxdecay0_g4/vertex_generator_interface.hh"
 #endif

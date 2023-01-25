@@ -17,7 +17,7 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
-#include "ProjectInfo.hh"
+#include "RMGConfig.hh"
 #if RMG_HAS_BXDECAY0
 #include "bxdecay0_g4/primary_generator_action.hh"
 #endif
