@@ -104,7 +104,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   RMGLog::OutDev(RMGLog::debug, "Hit in optical detector nr. ", det_uid, " detected");
 
   // initialize hit object for uid, if not already there
-  RMGOpticalDetectorHit* hit = new RMGOpticalDetectorHit();
+  auto* hit = new RMGOpticalDetectorHit();
   hit->detector_uid = det_uid;
   hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
   hit->global_time = step->GetPreStepPoint()->GetGlobalTime();

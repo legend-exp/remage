@@ -28,7 +28,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
   public:
 
     inline RMGGeneratorGPS() : RMGVGenerator("GPS") {
-      fParticleSource = std::unique_ptr<G4GeneralParticleSource>(new G4GeneralParticleSource());
+      fParticleSource = std::make_unique<G4GeneralParticleSource>();
     }
 
     inline ~RMGGeneratorGPS() = default;
