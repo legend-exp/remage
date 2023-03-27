@@ -170,9 +170,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
     };
     auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
 
-    if (face <= A[0]) { // inner
+    if (face <= A[0]) {                                             // inner
       return s1_point * r1 + G4ThreeVector(0, 0, z);
-    } else if (face > A[0] and face <= A[0] + A[1]) { // outer
+    } else if (face > A[0] and face <= A[0] + A[1]) {               // outer
       return s1_point * r2 + G4ThreeVector(0, 0, z);
     } else if (face > A[0] + A[1] and face <= A[0] + A[1] + A[2]) { // top or bottom
       auto face_sign = _g4rand() <= 0.5 ? 1 : -1;
