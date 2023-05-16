@@ -6,6 +6,7 @@
 /docs/api
 /docs/extra
 build
+install
 .local
 .vscode
 
