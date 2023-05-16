@@ -7,6 +7,7 @@
 /docs/extra
 build
 .local
+.vscode
 
 # G4 outputs
 *.root
@@ -25,3 +26,4 @@ compile_commands.json
 *.swo
 .mypy_cache
 __pycache__
+examples/05-MUSUN/MUSUN_10k_events.dat

@@ -11,7 +11,7 @@
 #include "RMGGeneratorDecay0.hh"
 #endif
 #include "RMGGeneratorCosmicMuons.hh"
-#include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeneratorMUSUN.hh"
 #include "RMGLog.hh"
 #include "RMGVertexFromFile.hh"
 
@@ -96,7 +96,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       // break;
 
     case Generator::kMUSUNCosmicMuons: 
-      fGeneratorObj = std::make_unique<RMGGeneratorMUSUNCosmicMuons>(); break;
+      fGeneratorObj = std::make_unique<RMGGeneratorMUSUN>(); break;
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
