@@ -1,8 +1,8 @@
-/RMG/Manager/Logging/LogLevelScreen debug
+# /RMG/Manager/Logging/LogLevelScreen debug
 
 /run/initialize
 
-/vis/open OIQt
+/vis/open OI
 /vis/scene/create
 /vis/sceneHandler/attach
 

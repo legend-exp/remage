@@ -83,7 +83,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     void DefineCommands();
 
     G4VPhysicalVolume* fWorld = nullptr;
-    // G4Region* fSensitiveRegion = new G4Region("SensitiveRegion");
+    G4Region* fSensitiveRegion = new G4Region("SensitiveRegion");
 };
 
 #endif

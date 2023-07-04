@@ -68,10 +68,21 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     } else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
   }
 
-  // TODO: create sensitive region for special production cuts
-  // auto det_lv = RMGNavigationTools::FindLogicalVolume("Detector");
-  // det_lv->SetRegion(fSensitiveRegion);
-  // fSensitiveRegion->AddRootLogicalVolume(det_lv);
+  for (const auto& [k, v] : fDetectorMetadata) {
+    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
+    if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
+    const auto lv = pv->GetLogicalVolume();
+    // only set to sensitive region if not already done
+    if (lv->GetRegion()) {
+      RMGLog::OutFormatDev(RMGLog::debug, "Logical volume {} is already assigned to region {}",
+          lv->GetName(), lv->GetRegion()->GetName());
+    } else {
+      RMGLog::OutFormat(RMGLog::debug, "Assigning logical volume {} to region {}", lv->GetName(),
+          fSensitiveRegion->GetName());
+      lv->SetRegion(fSensitiveRegion);
+      fSensitiveRegion->AddRootLogicalVolume(lv);
+    }
+  }
 
   return fWorld;
 }

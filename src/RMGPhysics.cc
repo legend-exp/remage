@@ -233,15 +233,20 @@ void RMGPhysics::ConstructOptical() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: define multiple sensitive regions? look in detector construction too
 void RMGPhysics::SetCuts() {
 
   RMGLog::Out(RMGLog::debug, "Setting particle cut values");
 
+  // ask G4HadronicProcessStore to respect the global verbosity level
   G4HadronicProcessStore::Instance()->SetVerbose(G4VModularPhysicsList::verboseLevel);
+
+  // default production thresholds for the world volume
+  this->SetCutsWithDefault();
+
   // special for low energy physics
   G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250 * u::eV, 100. * u::GeV);
 
+  // set cut values for the default region (world volume)
   this->SetCutValue(fStepCuts.gamma, "gamma");
   this->SetCutValue(fStepCuts.electron, "e-");
   this->SetCutValue(fStepCuts.positron, "e+");
@@ -251,23 +256,26 @@ void RMGPhysics::SetCuts() {
   this->SetCutValue(fStepCuts.muon, "mu-");
   this->SetCutValue(fStepCuts.generic_ion, "GenericIon");
 
-  if (G4RegionStore::GetInstance()) {
-    if (G4RegionStore::GetInstance()->size() > 1) {
-      // Set different cuts for the sensitive region
-      auto region = G4RegionStore::GetInstance()->GetRegion("SensitiveRegion", false);
-      if (region) {
-        RMGLog::Out(RMGLog::detail, "Register cuts for SensitiveRegion ");
-        auto cuts = region->GetProductionCuts();
-        if (!cuts) cuts = new G4ProductionCuts;
-        cuts->SetProductionCut(fStepCutsSensitive.gamma, "gamma");
-        cuts->SetProductionCut(fStepCutsSensitive.electron, "e-");
-        cuts->SetProductionCut(fStepCutsSensitive.positron, "e+");
-        cuts->SetProductionCut(fStepCutsSensitive.proton, "proton");
-        cuts->SetProductionCut(fStepCutsSensitive.alpha, "alpha");
-        cuts->SetProductionCut(fStepCutsSensitive.generic_ion, "GenericIon");
-        region->SetProductionCuts(cuts);
-      }
-    }
+  // set different cuts for the sensitive region
+  // the G4Region "SensitiveRegion" is created in RMGHardware, but this
+  // behavior might be changed in a derived class, so careful here!
+  // second argument is verbosity, setting to false to avoid warning printout
+  // if region is not found. we are going to check ourselves
+  auto region = G4RegionStore::GetInstance()->GetRegion("SensitiveRegion", false);
+  if (region) {
+    RMGLog::Out(RMGLog::detail, "Register cuts for G4Region 'SensitiveRegion'");
+    auto cuts = region->GetProductionCuts();
+    if (!cuts) cuts = new G4ProductionCuts;
+    cuts->SetProductionCut(fStepCutsSensitive.gamma, "gamma");
+    cuts->SetProductionCut(fStepCutsSensitive.electron, "e-");
+    cuts->SetProductionCut(fStepCutsSensitive.positron, "e+");
+    cuts->SetProductionCut(fStepCutsSensitive.proton, "proton");
+    cuts->SetProductionCut(fStepCutsSensitive.alpha, "alpha");
+    cuts->SetProductionCut(fStepCutsSensitive.generic_ion, "GenericIon");
+    region->SetProductionCuts(cuts);
+  } else {
+    RMGLog::Out(RMGLog::warning, "Could not find G4Region 'SensitiveRegion' in the store. ",
+        "No special production cuts applied");
   }
 }
 
