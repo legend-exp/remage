@@ -5,8 +5,6 @@
 
 int main(int argc, char** argv) {
 
-  // RMGLog::SetLogLevel(RMGLog::debug);
-
   RMGManager manager("02-hpge", argc, argv);
   manager.SetUserInit(new HPGeTestStand());
 
@@ -15,7 +13,13 @@ int main(int argc, char** argv) {
   manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe3", 2);
   manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe4", 3);
 
-  std::string macro = argc > 1 ? argv[1] : "";
+  std::string macro;
+  if (argc == 2) macro = argv[1];
+  else if (argc == 3) macro = argv[2];
+  else RMGLog::Out(RMGLog::fatal, "Bad command line options");
+
+  if (argc > 1 and std::string(argv[1]) == "-i") { manager.SetInteractive(); }
+
   if (!macro.empty()) manager.IncludeMacroFile(macro);
 
   manager.Initialize();
