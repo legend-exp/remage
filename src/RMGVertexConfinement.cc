@@ -349,7 +349,7 @@ void RMGVertexConfinement::Reset() {
   fBoundingSolidType = "Box";
 }
 
-bool RMGVertexConfinement::GeneratePrimariesVertex(G4ThreeVector& vertex) {
+bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
 
   // configure sampling volumes (does not do anything if this is not the first
   // call)

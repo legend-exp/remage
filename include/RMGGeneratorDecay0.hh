@@ -41,7 +41,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     RMGGeneratorDecay0(RMGGeneratorDecay0&&) = delete;
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0&&) = delete;
 
-    void GeneratePrimariesKinematics(G4Event*) override;
+    void GeneratePrimaries(G4Event*) override;
     inline void SetParticlePosition(G4ThreeVector) override{};
 
   private:

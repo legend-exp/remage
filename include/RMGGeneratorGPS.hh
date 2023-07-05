@@ -33,7 +33,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
     inline ~RMGGeneratorGPS() = default;
 
-    inline void GeneratePrimariesKinematics(G4Event* event) override {
+    inline void GeneratePrimaries(G4Event* event) override {
       fParticleSource->GeneratePrimaryVertex(event);
     }
 

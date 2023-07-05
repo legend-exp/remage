@@ -47,7 +47,7 @@ class RMGVVertexGenerator {
     virtual inline void BeginOfRunAction(const G4Run*){};
     virtual inline void EndOfRunAction(const G4Run*){};
 
-    virtual inline bool GeneratePrimariesVertex(G4ThreeVector& v) {
+    virtual inline bool GenerateVertex(G4ThreeVector& v) {
       v = kDummyPrimaryPosition;
       return false;
     }
@@ -55,7 +55,7 @@ class RMGVVertexGenerator {
     inline int GetMaxAttempts() { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0
-    inline void ShootVertex(G4ThreeVector& v) { GeneratePrimariesVertex(v); }
+    inline void ShootVertex(G4ThreeVector& v) { GenerateVertex(v); }
 #endif
 
   protected:
@@ -64,7 +64,7 @@ class RMGVVertexGenerator {
     int fMaxAttempts = 100;
     const G4ThreeVector kDummyPrimaryPosition = G4ThreeVector(0, 0, 0);
 
-    std::unique_ptr<G4UImessenger> fG4Messenger;
+    std::unique_ptr<G4UImessenger> fMessenger;
 };
 
 #endif

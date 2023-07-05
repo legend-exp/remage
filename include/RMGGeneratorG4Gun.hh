@@ -39,7 +39,7 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
     RMGGeneratorG4Gun(RMGGeneratorG4Gun&&) = delete;
     RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun&&) = delete;
 
-    inline void GeneratePrimariesKinematics(G4Event* event) override {
+    inline void GeneratePrimaries(G4Event* event) override {
       fParticleGun->GeneratePrimaryVertex(event);
     }
     inline void SetParticlePosition(G4ThreeVector vec) override {

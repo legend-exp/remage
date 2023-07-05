@@ -37,7 +37,7 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGene
 // Need non-inline, i.e. not in header/class body, destructor to hide BXDecay0 from consumers
 RMGGeneratorDecay0::~RMGGeneratorDecay0() = default; // NOLINT
 
-void RMGGeneratorDecay0::GeneratePrimariesKinematics(G4Event* event) {
+void RMGGeneratorDecay0::GeneratePrimaries(G4Event* event) {
   fDecay0G4Generator->GeneratePrimaries(event);
 }
 
