@@ -59,6 +59,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
 
   // TODO: build and return world volume?
 
+  // attach user max step sizes to logical volumes
   for (const auto& el : fPhysVolStepLimits) {
     RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first,
         el.second);

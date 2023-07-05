@@ -251,10 +251,6 @@ void RMGPhysics::SetCuts() {
   this->SetCutValue(fStepCuts.electron, "e-");
   this->SetCutValue(fStepCuts.positron, "e+");
   this->SetCutValue(fStepCuts.proton, "proton");
-  this->SetCutValue(fStepCuts.alpha, "alpha");
-  this->SetCutValue(fStepCuts.muon, "mu+");
-  this->SetCutValue(fStepCuts.muon, "mu-");
-  this->SetCutValue(fStepCuts.generic_ion, "GenericIon");
 
   // set different cuts for the sensitive region
   // the G4Region "SensitiveRegion" is created in RMGHardware, but this
@@ -270,8 +266,6 @@ void RMGPhysics::SetCuts() {
     cuts->SetProductionCut(fStepCutsSensitive.electron, "e-");
     cuts->SetProductionCut(fStepCutsSensitive.positron, "e+");
     cuts->SetProductionCut(fStepCutsSensitive.proton, "proton");
-    cuts->SetProductionCut(fStepCutsSensitive.alpha, "alpha");
-    cuts->SetProductionCut(fStepCutsSensitive.generic_ion, "GenericIon");
     region->SetProductionCuts(cuts);
   } else {
     RMGLog::Out(RMGLog::warning, "Could not find G4Region 'SensitiveRegion' in the store. ",
@@ -316,13 +310,10 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
     case RMGPhysics::PhysicsRealm::kCosmicRays:
       RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.muon = 3 * u::cm;
       fStepCuts.gamma = 5 * u::cm;
       fStepCuts.electron = 1 * u::cm;
       fStepCuts.positron = 1 * u::cm;
       fStepCuts.proton = 5 * u::mm;
-      fStepCuts.alpha = 5 * u::mm;
-      fStepCuts.generic_ion = 5 * u::mm;
 
       fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
       fStepCutsSensitive.gamma = 30 * u::mm;
