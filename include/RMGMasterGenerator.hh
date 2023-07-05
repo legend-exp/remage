@@ -54,7 +54,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     void GeneratePrimaries(G4Event* event) override;
 
     inline RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
-    inline RMGVVertexGenerator* GetVertexGenerator() { return fVertexGenerator.get(); }
+    inline RMGVVertexGenerator* GetVertexGenerator() { return fVertexGeneratorObj.get(); }
     inline Confinement GetConfinement() const { return fConfinement; }
 
     void SetConfinement(Confinement code);
@@ -66,7 +66,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
   private:
 
     Confinement fConfinement;
-    std::unique_ptr<RMGVVertexGenerator> fVertexGenerator;
+    std::unique_ptr<RMGVVertexGenerator> fVertexGeneratorObj;
 
     Generator fGenerator;
     std::unique_ptr<RMGVGenerator> fGeneratorObj;

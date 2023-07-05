@@ -35,7 +35,7 @@
 #include "RMGTools.hh"
 
 RMGMasterGenerator::RMGMasterGenerator()
-    : fConfinement(RMGMasterGenerator::Confinement::kUnConfined), fVertexGenerator(nullptr),
+    : fConfinement(RMGMasterGenerator::Confinement::kUnConfined), fVertexGeneratorObj(nullptr),
       fGenerator(RMGMasterGenerator::Generator::kUndefined), fGeneratorObj(nullptr) {
 
   this->DefineCommands();
@@ -51,12 +51,12 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
     // position, and this conflicts with the design I had in mind here (i.e. that a RMGVGenerator is
     // instructed about the vertex position from outside, in particular in this function here).
 
-    if (!fVertexGenerator)
+    if (!fVertexGeneratorObj)
       RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
 
     // ask the vertex generator to generate a vertex
     auto vertex = G4ThreeVector();
-    auto done = fVertexGenerator->GenerateVertex(vertex);
+    auto done = fVertexGeneratorObj->GenerateVertex(vertex);
     if (!done) { // try aborting gracefully
       RMGLog::Out(RMGLog::error,
           "Primary vertex generation did not succeed, trying to abort the run gracefully");
@@ -78,10 +78,12 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
 
   switch (fConfinement) {
     case Confinement::kUnConfined:
-      fVertexGenerator = std::make_unique<RMGVVertexGenerator>("DummyGenerator");
+      fVertexGeneratorObj = std::make_unique<RMGVVertexGenerator>("DummyGenerator");
       break;
-    case Confinement::kVolume: fVertexGenerator = std::make_unique<RMGVertexConfinement>(); break;
-    case Confinement::kFromFile: fVertexGenerator = std::make_unique<RMGVertexFromFile>(); break;
+    case Confinement::kVolume:
+      fVertexGeneratorObj = std::make_unique<RMGVertexConfinement>();
+      break;
+    case Confinement::kFromFile: fVertexGeneratorObj = std::make_unique<RMGVertexFromFile>(); break;
     default:
       RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '", fConfinement,
           "' specified (implement me)");
@@ -100,8 +102,8 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
     case Generator::kBxDecay0:
 #if RMG_HAS_BXDECAY0
       // NOTE: release ownership here, BxDecay0 will own the pointer (sigh...)
-      // fVertexGenerator will hold nullptr after a call to release()
-      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGenerator.release());
+      // fVertexGeneratorObj will hold nullptr after a call to release()
+      fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGeneratorObj.release());
 #else
       RMGLog::OutFormat(RMGLog::fatal,
           "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON");
