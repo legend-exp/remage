@@ -51,7 +51,7 @@ class RMGVGenerator {
   protected:
 
     std::string fGeneratorName;
-    std::unique_ptr<G4UImessenger> fG4Messenger;
+    std::unique_ptr<G4UImessenger> fMessenger;
     int fReportingFrequency = 1000;
 };
 

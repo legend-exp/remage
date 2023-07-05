@@ -64,7 +64,7 @@ class RMGVVertexGenerator {
     int fMaxAttempts = 100;
     const G4ThreeVector kDummyPrimaryPosition = G4ThreeVector(0, 0, 0);
 
-    std::unique_ptr<G4UImessenger> fG4Messenger;
+    std::unique_ptr<G4UImessenger> fMessenger;
 };
 
 #endif
