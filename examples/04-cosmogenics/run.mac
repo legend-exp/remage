@@ -1,4 +1,4 @@
-# /RMG/Manager/Logging/LogLevelScreen debug
+# /RMG/Manager/Logging/LogLevel debug
 #/tracking/verbose 1
 
 /run/initialize

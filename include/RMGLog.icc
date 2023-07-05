@@ -18,22 +18,11 @@
 #include "magic_enum/magic_enum.hpp"
 
 template <typename T>
-inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg, bool prefixed, bool do_flush) {
-
-  // open log file if not opened
-  if (RMGLog::IsOpen()) {
-    // write message in to log file
-    if (loglevelfile >= RMGLog::fMinimumLogLevelFile) {
-      if (prefixed) RMGLog::fOutputFileStream << RMGLog::GetPrefix(loglevelfile, RMGLog::fOutputFileStream);
-      RMGLog::fOutputFileStream << msg;
-      if (do_flush) RMGLog::fOutputFileStream << std::flush;
-    }
-  }
-
+inline void RMGLog::Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed, bool do_flush) {
   // write message to screen
-  if (loglevelscreen >= RMGLog::fMinimumLogLevelScreen) {
-    std::ostream& strm = loglevelscreen > RMGLog::LogLevel::warning ? G4cout : G4cerr;
-    if (prefixed) strm << RMGLog::GetPrefix(loglevelscreen, strm);
+  if (loglevel >= RMGLog::fMinimumLogLevel) {
+    std::ostream& strm = loglevel > RMGLog::LogLevel::warning ? G4cout : G4cerr;
+    if (prefixed) strm << RMGLog::GetPrefix(loglevel, strm);
     strm << msg;
     if (do_flush) strm << std::flush;
   }
@@ -42,15 +31,15 @@ inline void RMGLog::Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglev
 // ---------------------------------------------------------
 
 template <typename T>
-inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& message) {
+inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
   // if this is the first call to Out(), call StartupInfo() first
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
 
-  RMGLog::Print(loglevelfile, loglevelscreen, message, true);
-  RMGLog::Print(loglevelfile, loglevelscreen, "\n", false);
+  RMGLog::Print(loglevel, message, true);
+  RMGLog::Print(loglevel, "\n", false);
 
   // throw exception if error is fatal
-  if (loglevelfile == fatal or loglevelscreen == fatal) {
+  if (loglevel == fatal) {
     throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
   }
 }
@@ -58,17 +47,17 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevel
 // ---------------------------------------------------------
 
 template <typename T, typename... Args>
-inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& t, const Args&... args) {
+inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... args) {
 
   // if this is the first call to Out(), call StartupInfo() first
   if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
 
-  RMGLog::Print(loglevelfile, loglevelscreen, t, true, false);
-  (RMGLog::Print(loglevelfile, loglevelscreen, args, false, false), ...);
-  RMGLog::Print(loglevelfile, loglevelscreen, "\n", false);
+  RMGLog::Print(loglevel, t, true, false);
+  (RMGLog::Print(loglevel, args, false, false), ...);
+  RMGLog::Print(loglevel, "\n", false);
 
   // throw exception if error is fatal
-  if (loglevelfile == fatal or loglevelscreen == fatal) {
+  if (loglevel == fatal) {
     throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
   }
 }
@@ -76,9 +65,9 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevel
 // ---------------------------------------------------------
 
 template <typename... Args>
-inline void RMGLog::OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const std::string& fmt, const Args&... args) {
+inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
     try {
-        RMGLog::Out(loglevelfile, loglevelscreen, fmt::format(fmt, args...));
+        RMGLog::Out(loglevel, fmt::format(fmt, args...));
     }
     catch (fmt::v8::format_error& e) {
         RMGLog::Out(RMGLog::error, "fmt library exception caugth: ", e.what());

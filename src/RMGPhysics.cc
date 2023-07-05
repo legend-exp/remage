@@ -58,7 +58,7 @@ RMGPhysics::RMGPhysics() : G4VModularPhysicsList() {
   G4VUserPhysicsList::defaultCutValue = 0.1 * u::mm;
   this->SetPhysicsRealm(RMGPhysics::kDoubleBetaDecay);
 
-  G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevelScreen() <= RMGLog::debug ? 1 : 0;
+  G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevel() <= RMGLog::debug ? 1 : 0;
 
   this->DefineCommands();
 }
