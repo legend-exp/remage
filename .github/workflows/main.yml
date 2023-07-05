@@ -39,11 +39,15 @@ jobs:
         cmake ..
         make
         make install
-    - name: Run test suite
-      if: ${{ matrix.container_version }} != "slim"
-      run: ctest --output-on-failure
-    - name: Run test suite
-      if: ${{ matrix.container_version }} == "slim"
-      run: ctest --output-on-failure --label-exclude extra
+    - name: Run full test suite
+      if: ${{ matrix.container_version != 'slim' }}
+      run: |
+        cd build
+        ctest --output-on-failure
+    - name: Run minimal test suite
+      if: ${{ matrix.container_version == 'slim' }}
+      run: |
+        cd build
+        ctest --output-on-failure --label-exclude extra
 
 # vim: expandtab tabstop=2 shiftwidth=2
