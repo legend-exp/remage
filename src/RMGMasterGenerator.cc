@@ -54,6 +54,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
     if (!fVertexGenerator)
       RMGLog::Out(RMGLog::fatal, "No primary position generator (confinement) specified!");
 
+    // ask the vertex generator to generate a vertex
     auto vertex = G4ThreeVector();
     auto done = fVertexGenerator->GeneratePrimariesVertex(vertex);
     if (!done) { // try aborting gracefully
@@ -63,11 +64,12 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
     }
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
 
+    // pass the generated vertex to the actual generator
     fGeneratorObj->SetParticlePosition(vertex);
   }
 
-  // invoke generator (might also provide the vertex position)
-  fGeneratorObj->GeneratePrimariesKinematics(event);
+  // now invoke generator. might also generate the vertex position if unset
+  fGeneratorObj->GeneratePrimaries(event);
 }
 
 void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {

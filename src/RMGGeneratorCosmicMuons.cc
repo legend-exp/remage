@@ -85,7 +85,7 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
   // fEcoMug->SetSeed(CLHEP::HepRandom::getTheSeed());
 }
 
-void RMGGeneratorCosmicMuons::GeneratePrimariesKinematics(G4Event* event) {
+void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
 
   fEcoMug->Generate();
 

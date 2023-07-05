@@ -48,7 +48,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     RMGGeneratorCosmicMuons(RMGGeneratorCosmicMuons&&) = delete;
     RMGGeneratorCosmicMuons& operator=(RMGGeneratorCosmicMuons&&) = delete;
 
-    void GeneratePrimariesKinematics(G4Event* event) override;
+    void GeneratePrimaries(G4Event* event) override;
     void SetParticlePosition(G4ThreeVector vec) override{};
 
     void BeginOfRunAction(const G4Run*) override;
