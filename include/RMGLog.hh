@@ -11,7 +11,6 @@
  * @version 1.0
  * @date 08.2008
  * @details This class manages log messages for printing on the screen
- * and into a log file
  */
 
 /*
@@ -50,7 +49,7 @@ class RMGLog {
     // definition of log level
 
     /**
-     * Enumerator for the amount of details to put into the log file */
+     * Enumerator for the amount of details to put into the log */
     enum LogLevel {
       debug = 0,   ///< Print everything, including debug info
       detail = 1,  ///< Print all details of operation
@@ -85,14 +84,9 @@ class RMGLog {
     /** @{ */
 
     /**
-     * Returns the minimum log level for file output.
-     * @return log level */
-    static inline RMGLog::LogLevel GetLogLevelFile() { return fMinimumLogLevelFile; }
-
-    /**
      * Returns the minimum log level for screen output.
      * @return log level */
-    static inline RMGLog::LogLevel GetLogLevelScreen() { return fMinimumLogLevelScreen; }
+    static inline RMGLog::LogLevel GetLogLevel() { return fMinimumLogLevel; }
 
     /**
      * Returns true if the loglevel is prefixed to every message.
@@ -104,32 +98,9 @@ class RMGLog {
     /** @{ */
 
     /**
-     * Sets the minimum log level for file output.
-     * @param loglevel log level */
-    static inline void SetLogLevelFile(RMGLog::LogLevel loglevel) {
-      fMinimumLogLevelFile = loglevel;
-    }
-
-    /**
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
-    static inline void SetLogLevelScreen(RMGLog::LogLevel loglevel) {
-      fMinimumLogLevelScreen = loglevel;
-    }
-
-    /**
-     * Sets the minimum log level for file and screen output.
-     * @param loglevelfile log level for file
-     * @param loglevelscreen log level for screen */
-    static inline void SetLogLevel(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen) {
-      fMinimumLogLevelFile = loglevelfile;
-      fMinimumLogLevelScreen = loglevelscreen;
-    }
-
-    /**
-     * Sets the minimum log level for file and screen output.
-     * @param loglevel log level */
-    static inline void SetLogLevel(RMGLog::LogLevel loglevel) { SetLogLevel(loglevel, loglevel); }
+    static inline void SetLogLevel(RMGLog::LogLevel loglevel) { fMinimumLogLevel = loglevel; }
 
     /**
      * Toggle if the loglevel is prefixed to every message. */
@@ -140,53 +111,24 @@ class RMGLog {
     /** @{ */
 
     /**
-     * Opens log file and sets minimum log levels for file and screen output.
-     * @param filename log filename
-     * @param loglevelfile minimum log level for file output
-     * @param loglevelscreen minimum log level for screen output */
-    static void OpenLogFile(const std::string& filename);
-
-    /**
-     * @returns true if log file is open or false if not. */
-    static inline bool IsOpen() { return fOutputFileStream.is_open(); }
-
-    /**
-     * Closes the log file */
-    static inline void CloseLog() { fOutputFileStream.close(); }
-
-    /**
-     * Writes string to the file and screen log if the log level is equal or greater than the minimum
-     * @param loglevelfile loglevel for the current message
-     * @param loglevelscreen loglevel for the current message
-     * @param message string to write to the file and screen log */
-    template<typename T>
-    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg);
+     * Writes string to the screen log if the log level is equal or greater than the minimum
+     * @param loglevel loglevel for the current message
+     * @param message string to write to the screen log */
+    template<typename T> static void Out(RMGLog::LogLevel loglevel, const T& msg);
 
     template<typename T, typename... Args>
-    static void Out(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
-        const T& msg_first, const Args&... msg_other);
+    static void Out(RMGLog::LogLevel loglevel, const T& msg_first, const Args&... msg_other);
 
     template<typename... Args>
-    static void OutFormat(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen,
-        const std::string& fmt, const Args&... args);
-
-    template<typename... Args>
-    static inline void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt,
-        const Args&... args) {
-      RMGLog::OutFormat(loglevel, loglevel, fmt, args...);
-    }
-
-    template<typename T> static inline void Out(RMGLog::LogLevel loglevel, const T& msg) {
-      RMGLog::Out(loglevel, loglevel, msg);
-    }
+    static void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args);
 
     template<typename T, typename... Args>
     static inline void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
-      RMGLog::Out(loglevel, loglevel, msg_first, msg_other...);
+      RMGLog::Out(loglevel, msg_first, msg_other...);
     }
 
     /**
-     * Writes startup information onto screen and into a logfile */
+     * Writes startup information onto screen */
     static void StartupInfo();
 
     /**
@@ -203,8 +145,8 @@ class RMGLog {
   private:
 
     template<typename T>
-    static void Print(RMGLog::LogLevel loglevelfile, RMGLog::LogLevel loglevelscreen, const T& msg,
-        bool prefixed = true, bool do_flush = true);
+    static void Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed = true,
+        bool do_flush = true);
 
     /**
      * Converts a log level to a string
@@ -216,16 +158,8 @@ class RMGLog {
     static std::string fVersion;
 
     /**
-     * The minimum file log level */
-    static RMGLog::LogLevel fMinimumLogLevelFile;
-
-    /**
      * The minimum screen log level */
-    static RMGLog::LogLevel fMinimumLogLevelScreen;
-
-    /**
-     * The output stream for the file log */
-    static std::ofstream fOutputFileStream;
+    static RMGLog::LogLevel fMinimumLogLevel;
 
     /**
      * Specifies whether there were output printouts already */

@@ -38,7 +38,7 @@ class RMGManager {
 
     RMGManager() = delete;
     RMGManager(std::string app_name, int argc, char** argv);
-    ~RMGManager();
+    ~RMGManager() = default;
 
     RMGManager(RMGManager const&) = delete;
     RMGManager& operator=(RMGManager const&) = delete;
@@ -84,9 +84,7 @@ class RMGManager {
     void SetRandSystemEntropySeed();
     inline bool GetRandIsControlled() { return fIsRandControlled; }
 
-    void SetLogLevelScreen(std::string level);
-    void SetLogLevelFile(std::string level);
-    inline void SetLogToFileName(std::string filename) { RMGLog::OpenLogFile(filename); }
+    void SetLogLevel(std::string level);
 
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
     inline int RegisterNtuple(int det_uid) {

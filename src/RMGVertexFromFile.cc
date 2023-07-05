@@ -43,7 +43,7 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   else if (ext == "xml") fReader = G4XmlAnalysisReader::Instance();
   else { RMGLog::OutFormat(RMGLog::fatal, "File Extension '.{}' not recognized!"); }
 
-  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) fReader->SetVerboseLevel(10);
+  if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
 
   fReader->SetFileName(name);
 }

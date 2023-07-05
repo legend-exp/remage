@@ -63,10 +63,6 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
   this->DefineCommands();
 }
 
-RMGManager::~RMGManager() {
-  if (RMGLog::IsOpen()) RMGLog::CloseLog();
-}
-
 void RMGManager::Initialize() {
 
   RMGLog::Out(RMGLog::detail, "Initializing application");
@@ -203,15 +199,9 @@ G4VUserPhysicsList* RMGManager::GetProcessesList() {
   return fPhysicsList;
 }
 
-void RMGManager::SetLogLevelScreen(std::string level) {
+void RMGManager::SetLogLevel(std::string level) {
   try {
-    RMGLog::SetLogLevelScreen(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
-  } catch (const std::bad_cast&) { return; }
-}
-
-void RMGManager::SetLogLevelFile(std::string level) {
-  try {
-    RMGLog::SetLogLevelFile(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
+    RMGLog::SetLogLevel(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -289,21 +279,10 @@ void RMGManager::DefineCommands() {
   fLogMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Logging/",
       "Commands for controlling application logging");
 
-  fLogMessenger->DeclareMethod("LogLevelScreen", &RMGManager::SetLogLevelScreen)
+  fLogMessenger->DeclareMethod("LogLevel", &RMGManager::SetLogLevel)
       .SetGuidance("Set verbosity level on screen")
       .SetParameterName("level", false)
       .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fLogMessenger->DeclareMethod("LogLevelFile", &RMGManager::SetLogLevelFile)
-      .SetGuidance("Set verbosity level on file")
-      .SetParameterName("level", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fLogMessenger->DeclareMethod("LogToFile", &RMGManager::SetLogToFileName)
-      .SetGuidance("Set filename for dumping application output")
-      .SetParameterName("filename", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Randomization/",

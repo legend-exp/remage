@@ -66,7 +66,7 @@ void RMGRunAction::SetupAnalysisManager() {
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
   ana_man->SetNtupleDirectoryName("hit");
 
-  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
+  if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
   if (!RMGManager::Instance()->IsExecSequential()) ana_man->SetNtupleMerging(true);

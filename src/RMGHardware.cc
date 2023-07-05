@@ -91,7 +91,7 @@ void RMGHardware::ConstructSDandField() {
 
   // set up G4SDManager
   auto sd_man = G4SDManager::GetSDMpointer();
-  if (RMGLog::GetLogLevelScreen() <= RMGLog::debug) sd_man->SetVerboseLevel(1);
+  if (RMGLog::GetLogLevel() <= RMGLog::debug) sd_man->SetVerboseLevel(1);
   else sd_man->SetVerboseLevel(0);
 
   // map holding a list of sensitive detectors to activate

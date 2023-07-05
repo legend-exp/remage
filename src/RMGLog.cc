@@ -28,11 +28,7 @@
 #include <memory>
 #include <unistd.h> // for isatty()
 
-std::ofstream RMGLog::fOutputFileStream;
-
-RMGLog::LogLevel RMGLog::fMinimumLogLevelFile = RMGLog::debug;
-
-RMGLog::LogLevel RMGLog::fMinimumLogLevelScreen = RMGLog::summary;
+RMGLog::LogLevel RMGLog::fMinimumLogLevel = RMGLog::summary;
 
 bool RMGLog::fFirstOutputDone = false;
 
@@ -57,29 +53,6 @@ RMGLog::RMGLog() {
 
 // ---------------------------------------------------------
 
-void RMGLog::OpenLogFile(const std::string& filename) {
-
-#if RMG_HAS_ROOT
-  // suppress the ROOT Info printouts
-  gErrorIgnoreLevel = 2000;
-#endif
-
-  // first close and flush and existing log file
-  CloseLog();
-
-  // open log file
-  RMGLog::fOutputFileStream.open(filename.data());
-
-  if (!RMGLog::fOutputFileStream.is_open()) {
-    G4cerr << " Could not open log file " << filename << ". " << G4endl;
-    return;
-  }
-
-  RMGLog::Out(RMGLog::summary, RMGLog::summary, "Opening logfile " + filename);
-}
-
-// ---------------------------------------------------------
-
 void RMGLog::StartupInfo() {
 
   std::string message = "";
@@ -90,10 +63,7 @@ void RMGLog::StartupInfo() {
   message += "                           |___/      \n";
 
   // write message to screen
-  if (RMGLog::fMinimumLogLevelScreen <= RMGLog::summary) G4cout << message << G4endl;
-
-  if (RMGLog::IsOpen() && RMGLog::fMinimumLogLevelFile <= RMGLog::summary)
-    RMGLog::fOutputFileStream << message;
+  if (RMGLog::fMinimumLogLevel <= RMGLog::summary) G4cout << message << G4endl;
 
   fFirstOutputDone = true;
 }
