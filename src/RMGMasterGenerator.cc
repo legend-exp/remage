@@ -56,7 +56,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
 
     // ask the vertex generator to generate a vertex
     auto vertex = G4ThreeVector();
-    auto done = fVertexGenerator->GeneratePrimariesVertex(vertex);
+    auto done = fVertexGenerator->GenerateVertex(vertex);
     if (!done) { // try aborting gracefully
       RMGLog::Out(RMGLog::error,
           "Primary vertex generation did not succeed, trying to abort the run gracefully");

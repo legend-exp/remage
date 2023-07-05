@@ -48,7 +48,7 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   fReader->SetFileName(name);
 }
 
-bool RMGVertexFromFile::GeneratePrimariesVertex(G4ThreeVector& vertex) {
+bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
   auto ntupleid = fReader->GetNtuple("vertices");
   if (ntupleid >= 0) {

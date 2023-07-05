@@ -38,7 +38,7 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
     RMGVertexFromFile(RMGVertexFromFile&&) = delete;
     RMGVertexFromFile& operator=(RMGVertexFromFile&&) = delete;
 
-    bool GeneratePrimariesVertex(G4ThreeVector&) override;
+    bool GenerateVertex(G4ThreeVector&) override;
 
     void OpenFile(std::string& name);
 
