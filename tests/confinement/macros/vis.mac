@@ -1,8 +1,8 @@
 /run/initialize
 
-# /RMG/Manager/Logging/LogLevel detail
+/RMG/Manager/Logging/LogLevel debug
 
-/vis/open OI
+/vis/open OGL
 /vis/drawVolume
 /vis/sceneHandler/attach
 

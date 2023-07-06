@@ -249,6 +249,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       // function does not cache the result!
       solid->BoundingLimits(lim_min, lim_max);
 
+      RMGLog::OutDev(RMGLog::debug, "Bounding box coordinates: min = ", lim_min, ", max = ", lim_max);
+
       el.sampling_solid =
           new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
               lim_max.getX() - lim_min.getX(), lim_max.getY() - lim_min.getY(),

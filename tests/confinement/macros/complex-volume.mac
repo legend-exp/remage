@@ -1,7 +1,5 @@
 /control/execute macros/vis.mac
 
-/RMG/Manager/Logging/LogLevel detail
-
 /RMG/Generator/Confine Volume
 
 /RMG/Generator/Confinement/Physical/AddVolume BoxWithHole
