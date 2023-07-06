@@ -30,7 +30,6 @@ class EcoMug;
 
 namespace u = CLHEP;
 
-// TODO: must inherit from RMGVGenerator
 class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
@@ -49,7 +48,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     RMGGeneratorCosmicMuons& operator=(RMGGeneratorCosmicMuons&&) = delete;
 
     void GeneratePrimaries(G4Event* event) override;
-    void SetParticlePosition(G4ThreeVector vec) override{};
+    void SetParticlePosition(G4ThreeVector) override {}
 
     void BeginOfRunAction(const G4Run*) override;
     inline void EndOfRunAction(const G4Run*) override {}
