@@ -72,7 +72,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void Reset();
 
     inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
-    inline void SetBoundingSolidType(std::string type) { fBoundingSolidType = type; }
 
     inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -137,7 +136,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = kUnionAll;
     bool fOnSurface = false;
-    std::string fBoundingSolidType = "Box";
     long fTrials = 0;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;

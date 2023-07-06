@@ -2,8 +2,6 @@
 
 /RMG/Generator/Confine Volume
 
-/RMG/Generator/Confinement/FallbackBoundingVolumeType Sphere # or Box
-
 /RMG/Generator/Confinement/Physical/AddVolume BoxWithHole
 /RMG/Generator/Confinement/Physical/AddVolume BoxAndOrb
 /RMG/Generator/Confinement/Physical/AddVolume MotherOrb
