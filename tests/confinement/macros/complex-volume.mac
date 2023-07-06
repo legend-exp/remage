@@ -1,8 +1,8 @@
 /control/execute macros/vis.mac
 
-/RMG/Generator/Confine Volume
+/RMG/Manager/Logging/LogLevel detail
 
-/RMG/Generator/Confinement/FallbackBoundingVolumeType Sphere # or Box
+/RMG/Generator/Confine Volume
 
 /RMG/Generator/Confinement/Physical/AddVolume BoxWithHole
 /RMG/Generator/Confinement/Physical/AddVolume BoxAndOrb

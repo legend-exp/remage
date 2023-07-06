@@ -233,27 +233,26 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
     // use bounding solid for all other cases
     else {
-      RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding solid with ",
-          "containment check (currently a ", fBoundingSolidType, ")");
+      RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding box with ",
+          "containment check");
       el.containment_check = true;
-      auto solid_extent =
-          solid->GetExtent(); // do not call multiple times, the function does not cache the result!
-      if (fBoundingSolidType == "Sphere") {
-        // the extent radius is computed as sqrt(dX^2 + dY^2 + dZ^2) / 2
-        // TODO: validate this
-        el.sampling_solid =
-            new G4Orb(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingSphere",
-                solid_extent.GetExtentRadius());
-      } else if (fBoundingSolidType == "Box") {
-        el.sampling_solid =
-            new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
-                solid_extent.GetXmax() - solid_extent.GetXmin(),
-                solid_extent.GetYmax() - solid_extent.GetYmin(),
-                solid_extent.GetZmax() - solid_extent.GetZmin());
-      } else {
-        RMGLog::Out(RMGLog::fatal, "Bounding solid type '", fBoundingSolidType,
-            "' not supported (implement me)");
-      }
+
+      // to get a guaranteed bounding solid we rely on G4VSolid::BoundingLimits()
+      // the function, implemented for each G4 solid, calculates the dimensions
+      // of a bounding box. NOTE: it's possible to obtain a radius through
+      // G4VSolid::GetExtent::GetExtentRadius(), but it's always computed as
+      // sqrt(dX^2 + dY^2 + dZ^2) / 2, i.e. the smallest sphere containing the
+      // bounding box. Such a sphere is always less efficient than the box!
+
+      G4ThreeVector lim_min, lim_max;
+      // NOTE: do not call G4VSolid::BoundingLimits() multiple times, the
+      // function does not cache the result!
+      solid->BoundingLimits(lim_min, lim_max);
+
+      el.sampling_solid =
+          new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
+              lim_max.getX() - lim_min.getX(), lim_max.getY() - lim_min.getY(),
+              lim_max.getZ() - lim_min.getZ());
     } // sampling_solid and containment_check must hold a valid value at this point
 
     // determine solid transformation w.r.t. world volume reference
@@ -346,7 +345,6 @@ void RMGVertexConfinement::Reset() {
   fGeomVolumeSolids.clear();
   fSamplingMode = RMGVertexConfinement::kUnionAll;
   fOnSurface = false;
-  fBoundingSolidType = "Box";
 }
 
 bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
@@ -561,13 +559,6 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Select sampling mode for volume confinement")
       .SetParameterName("mode", false)
       .SetCandidates(RMGTools::GetCandidates<RMGVertexConfinement::SamplingMode>())
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
-
-  fMessengers.back()
-      ->DeclareMethod("FallbackBoundingVolumeType", &RMGVertexConfinement::SetBoundingSolidType)
-      .SetGuidance("Select fallback bounding volume type for complex solids")
-      .SetParameterName("solid", false)
       .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
 

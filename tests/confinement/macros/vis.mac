@@ -2,7 +2,7 @@
 
 # /RMG/Manager/Logging/LogLevel detail
 
-/vis/open OGL
+/vis/open OI
 /vis/drawVolume
 /vis/sceneHandler/attach
 

@@ -72,7 +72,9 @@ class RMGHardware : public G4VUserDetectorConstruction {
 
   private:
 
+    /// List of GDML files to load
     std::vector<std::string> fGDMLFiles;
+    /// Mapping between physical volume names and maximum (user) step size to apply
     std::map<std::string, double> fPhysVolStepLimits;
 
     // one element for each sensitive detector physical volume
@@ -82,7 +84,12 @@ class RMGHardware : public G4VUserDetectorConstruction {
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
 
+    /// The world volume
     G4VPhysicalVolume* fWorld = nullptr;
+
+    /** Region used to assign special production cuts
+     *  for sensitive volumes. Logical volumes of sensitive volumes should be
+     *  added to it. */
     G4Region* fSensitiveRegion = new G4Region("SensitiveRegion");
 };
 
