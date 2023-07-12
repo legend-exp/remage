@@ -253,8 +253,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
       el.sampling_solid =
           new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
-              lim_max.getX() - lim_min.getX(), lim_max.getY() - lim_min.getY(),
-              lim_max.getZ() - lim_min.getZ());
+              (lim_max.getX() - lim_min.getX()) / 2, (lim_max.getY() - lim_min.getY()) / 2,
+              (lim_max.getZ() - lim_min.getZ()) / 2);
     } // sampling_solid and containment_check must hold a valid value at this point
 
     // determine solid transformation w.r.t. world volume reference
