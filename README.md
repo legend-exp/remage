@@ -22,7 +22,8 @@ setup (supported specification languages are C++, GDML and more). The user can
 then benefit from a predefined set of tools to perform common actions (physics
 generators, standard output classes, etc).
 
-> **Warning** Under heavy development
+> **Warning**
+> Under heavy development
 
 ### Main features
 
