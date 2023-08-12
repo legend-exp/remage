@@ -187,4 +187,12 @@ create_mage_toolchain()
 include(DependencyGraph)
 gen_dep_graph(pdf)
 
-message(STATUS "remage install prefix set to ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "")
+message(STATUS "WWW: remage install prefix set to ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "WWW: if the install location is non-standard, don't forget to")
+message(STATUS "WWW: update the relevant environment variables:")
+message(STATUS "WWW:   export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH")
+message(STATUS "WWW:   export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
+message(
+  STATUS "WWW:   export CMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}/lib/cmake:$CMAKE_PREFIX_PATH")
+message(STATUS "")

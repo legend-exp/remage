@@ -57,7 +57,6 @@ else:
     warnings_filter_config = "@PROJECT_SOURCE_DIR@/docs/known-warnings.txt"
 
 breathe_default_project = "remage"
-highlight_language = "c++"
 html_extra_path = ["extra"]
 
 # Furo theme
