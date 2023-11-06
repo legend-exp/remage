@@ -5,7 +5,7 @@ ci:
 exclude: ^include/(fmt|magic_enum|CLI11)/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
@@ -27,13 +27,13 @@ repos:
     additional_dependencies: [pyyaml]
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.5
+  rev: v2.2.6
   hooks:
   - id: codespell
     args: ["-L", "hist"]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v16.0.6
+  rev: v17.0.4
   hooks:
    - id: clang-format
      types_or: [c++]
