@@ -29,9 +29,9 @@ class RMGVOutputScheme {
   public:
 
     inline RMGVOutputScheme(G4AnalysisManager* ana_man) { this->AssignOutputNames(ana_man); }
-    virtual inline void clear(){};
-    virtual inline void AssignOutputNames(G4AnalysisManager*){};
-    virtual inline void EndOfEventAction(const G4Event*){};
+    virtual inline void clear() {};
+    virtual inline void AssignOutputNames(G4AnalysisManager*) {};
+    virtual inline void EndOfEventAction(const G4Event*) {};
     inline std::string GetNtupleName(int det_uid) { return fmt::format("det{:03}", det_uid); }
 };
 

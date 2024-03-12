@@ -44,8 +44,8 @@ class RMGVVertexGenerator {
     RMGVVertexGenerator(RMGVVertexGenerator&&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator&&) = delete;
 
-    virtual inline void BeginOfRunAction(const G4Run*){};
-    virtual inline void EndOfRunAction(const G4Run*){};
+    virtual inline void BeginOfRunAction(const G4Run*) {};
+    virtual inline void EndOfRunAction(const G4Run*) {};
 
     virtual inline bool GenerateVertex(G4ThreeVector& v) {
       v = kDummyPrimaryPosition;
