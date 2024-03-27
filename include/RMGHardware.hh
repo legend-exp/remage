@@ -26,6 +26,7 @@
 #include "G4Region.hh"
 #include "G4VUserDetectorConstruction.hh"
 
+#include "RMGHardwareMessenger.hh"
 #include "RMGNavigationTools.hh"
 
 class G4VPhysicalVolume;
@@ -56,6 +57,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     };
 
     void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr = 0);
+    void RegisterDetectorCmd(const std::string& parameters);
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
     inline const auto& GetDetectorMetadata(std::pair<std::string, int> det) {
       return fDetectorMetadata.at(det);
@@ -80,8 +82,10 @@ class RMGHardware : public G4VUserDetectorConstruction {
     // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;
     std::set<DetectorType> fActiveDetectors;
+    bool fActiveDetectorsInitialized = false;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::unique_ptr<RMGHardwareMessenger> fHwMessenger;
     void DefineCommands();
 
     /// The world volume

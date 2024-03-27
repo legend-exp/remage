@@ -33,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
 
 set(PROJECT_SOURCES
     ${_root}/src/RMGHardware.cc
+    ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc
