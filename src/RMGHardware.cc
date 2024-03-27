@@ -23,10 +23,13 @@ namespace fs = std::filesystem;
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4SDManager.hh"
+#include "G4Tokenizer.hh"
+#include "G4UIparameter.hh"
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
 
 #include "RMGGermaniumDetector.hh"
+#include "RMGHardwareMessenger.hh"
 #include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
@@ -131,6 +134,7 @@ void RMGHardware::ConstructSDandField() {
     RMGLog::OutFormat(RMGLog::debug,
         "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
         magic_enum::enum_name(v.type), pv->GetName().c_str(), v.uid, lv->GetName().c_str());
+    fActiveDetectorsInitialized = true;
   }
 
   std::string vec_repr = "";
@@ -153,6 +157,11 @@ void RMGHardware::ConstructSDandField() {
 
 void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
     int copy_nr) {
+  if (fActiveDetectorsInitialized) {
+    RMGLog::Out(RMGLog::error,
+        "Active detectors cannot be mutated after constructing the detector.");
+    return;
+  }
 
   // sanity check
   for (const auto& [k, v] : fDetectorMetadata) {
@@ -178,6 +187,24 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
   }
 }
 
+void RMGHardware::RegisterDetectorCmd(const std::string& parameters) {
+  G4Tokenizer next(parameters);
+
+  auto type_str = next();
+  auto type = magic_enum::enum_cast<DetectorType>(type_str);
+  if (!type.has_value()) {
+    RMGLog::OutFormat(RMGLog::error, "Invalid detector type {} in command", type_str);
+    return;
+  }
+  auto pv_name = next();
+  const int uid = std::stoi(next());
+  int copy_nr = 0;
+  auto copy_nr_str = next();
+  if (!copy_nr_str.empty()) copy_nr = std::stoi(copy_nr_str);
+
+  this->RegisterDetector(type.value(), pv_name, uid, copy_nr);
+}
+
 void RMGHardware::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
@@ -196,7 +223,8 @@ void RMGHardware::DefineCommands() {
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
 
-  // TODO: RegisterDetector() UI command interface
+  // RegisterDetector cannot be defined with the G4GenericMessenger (it has to many parameters).
+  fHwMessenger = std::make_unique<RMGHardwareMessenger>(this);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
