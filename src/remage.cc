@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
   bool interactive = false;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
+  std::string output;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
   app.add_flag("-q", quiet, "Print only warnings and errors");
@@ -41,6 +42,7 @@ int main(int argc, char** argv) {
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
   app.add_option("-t,--threads", nthreads, "Number of threads");
   app.add_option("-g,--gdml-files", gdmls, "GDML files");
+  app.add_option("-o,--output-file", output, "Output file for detector hits");
   app.add_option("macros", macros, "Macro files");
 
   CLI11_PARSE(app, argc, argv);
@@ -61,6 +63,7 @@ int main(int argc, char** argv) {
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
   for (const auto& m : macros) manager.IncludeMacroFile(m);
+  if (!output.empty()) manager.SetOutputFileName(output);
 
   manager.Initialize();
   manager.Run();
