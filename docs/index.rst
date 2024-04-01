@@ -82,6 +82,7 @@ through the ``remage`` executable:
      -i,--interactive            Run in interactive mode
      -t,--threads INT            Number of threads
      -g,--gdml-files TEXT ...    GDML files
+     -o,--output-file TEXT       Output file for detector hits
 
 Advanced applications can extend |remage| and link against ``libremage`` with the
 usual CMake syntax:
