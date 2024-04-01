@@ -28,7 +28,7 @@
 
 namespace CLI {
   namespace detail {
-    bool lexical_cast(std::string input, RMGLog::LogLevel &output) {
+    bool lexical_cast(std::string input, RMGLog::LogLevel& output) {
       try {
         output = static_cast<RMGLog::LogLevel>(std::stoll(input));
         return true;
@@ -38,8 +38,8 @@ namespace CLI {
         return r.has_value();
       }
     }
-  }
-}
+  } // namespace detail
+} // namespace CLI
 
 #include "CLI11/CLI11.hpp"
 
@@ -61,9 +61,7 @@ int main(int argc, char** argv) {
 
   app.add_flag("-q", quiet, "Print only warnings and errors");
   app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_option("-l,--log-level", loglevel, log_level_desc)
-    ->type_name("LEVEL")
-    ->default_val("summary");
+  app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
   app.add_option("-t,--threads", nthreads, "Number of threads");
