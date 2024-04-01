@@ -59,6 +59,7 @@ class RMGRunAction : public G4UserRunAction {
 
     RMGRun* fRMGRun = nullptr;
     bool fIsPersistencyEnabled = false;
+    bool fIsAnaManInitialized = false;
     RMGMasterGenerator* fRMGMasterGenerator = nullptr;
 
     std::map<RMGHardware::DetectorType, std::unique_ptr<RMGVOutputScheme>> fOutputDataFields;
