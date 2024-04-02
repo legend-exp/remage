@@ -23,6 +23,7 @@
 
 #include "G4RunManager.hh"
 #include "G4RunManagerFactory.hh"
+#include "G4Threading.hh"
 #include "G4VisManager.hh"
 
 #include "RMGLog.hh"
@@ -89,8 +90,13 @@ class RMGManager {
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
     inline int RegisterNtuple(int det_uid) {
       auto res = fNtupleIDs.emplace(det_uid, fNtupleIDs.size());
-      if (!res.second)
+      // RegisterNtuple will be called from different threads, with the same arguments.
+      // Registering _new_ ntuples should only be possible from the main thread.
+      if (!res.second && G4Threading::IsMasterThread())
         RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
+            det_uid);
+      else if (res.second && !G4Threading::IsMasterThread())
+        RMGLog::OutFormatDev(RMGLog::fatal, "Registering detector with UID {} from worker thread",
             det_uid);
       return this->GetNtupleID(det_uid);
     }

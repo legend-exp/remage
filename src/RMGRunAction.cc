@@ -65,8 +65,7 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  if (!RMGManager::Instance()->IsExecSequential()) ana_man->SetNtupleMerging(true);
-  else ana_man->SetNtupleMerging(false);
+  ana_man->SetNtupleMerging(!RMGManager::Instance()->IsExecSequential());
 
   // do it only for activated detectors (have to ask to the manager)
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
