@@ -11,5 +11,7 @@ WARN_IF_UNDOCUMENTED = NO
 HAVE_DOT = YES
 DOT_PATH = $(DOXYGEN_DOT_PATH)
 
-EXCLUDE_SYMBOLS = "CLI::*" "FMT_*" "_g4rand"
-EXCLUDE_PATHS = "@DOXYGEN_INPUT_DIR@/src/remage.cc"
+# Exclude symbols commonly used by libraries.
+EXCLUDE_SYMBOLS = "CLI::*" "CLI" "FMT_*" "_g4rand" "bxdecay0_g4"
+# Exclude CLI utility.
+EXCLUDE = "@DOXYGEN_INPUT_DIR@/src/remage.cc"
