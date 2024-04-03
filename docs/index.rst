@@ -69,20 +69,22 @@ through the ``remage`` executable:
 
    $ remage --help
    remage: simulation framework for germanium experiments
-   Usage: src/remage [OPTIONS] [macros...]
+   Usage: ./src/remage [OPTIONS] [macros...]
 
    Positionals:
-     macros TEXT ...             Macro files
+     macros FILE ...             Macro files
 
    Options:
      -h,--help                   Print this help message and exit
      -q                          Print only warnings and errors
-     -v [0]                      Verbosity
-     -l,--log-level ENUM         Logging level
+     -v [0]                      Increase verbosity
+     -l,--log-level LEVEL [summary] 
+                                 Logging level debug|detail|summary|warning|error|fatal|nothing
      -i,--interactive            Run in interactive mode
      -t,--threads INT            Number of threads
-     -g,--gdml-files TEXT ...    GDML files
-     -o,--output-file TEXT       Output file for detector hits
+     -g,--gdml-files FILE ...    GDML files
+     -o,--output-file FILE       Output file for detector hits
+
 
 Advanced applications can extend |remage| and link against ``libremage`` with the
 usual CMake syntax:
