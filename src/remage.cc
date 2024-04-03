@@ -16,11 +16,32 @@
 #include <string>
 #include <vector>
 
-#include "CLI11/CLI11.hpp"
-
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif
+#include "fmt/core.h"
+#include "magic_enum/magic_enum.hpp"
+
+namespace CLI {
+  namespace detail {
+    bool lexical_cast(std::string input, RMGLog::LogLevel& output) {
+      try {
+        output = static_cast<RMGLog::LogLevel>(std::stoll(input));
+        return true;
+      } catch (...) {
+        auto r = magic_enum::enum_cast<RMGLog::LogLevel>(input);
+        if (r.has_value()) output = r.value();
+        return r.has_value();
+      }
+    }
+  } // namespace detail
+} // namespace CLI
+
+#include "CLI11/CLI11.hpp"
 
 int main(int argc, char** argv) {
 
@@ -32,16 +53,23 @@ int main(int argc, char** argv) {
   bool interactive = false;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
+  std::string output;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
+  auto log_level_strings = magic_enum::enum_names<RMGLog::LogLevel>();
+  auto log_level_desc = fmt::format("Logging level {}", fmt::join(log_level_strings, "|"));
+
   app.add_flag("-q", quiet, "Print only warnings and errors");
-  app.add_flag("-v", verbosity, "Verbosity");
-  app.add_option("-l,--log-level", loglevel, "Logging level");
+  app.add_flag("-v", verbosity, "Increase verbosity");
+  app.add_option("-l,--log-level", loglevel, log_level_desc.c_str())
+      ->type_name("LEVEL")
+      ->default_val("summary");
 
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
   app.add_option("-t,--threads", nthreads, "Number of threads");
-  app.add_option("-g,--gdml-files", gdmls, "GDML files");
-  app.add_option("macros", macros, "Macro files");
+  app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
+  app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
+  app.add_option("macros", macros, "Macro files")->type_name("FILE");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -61,6 +89,7 @@ int main(int argc, char** argv) {
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
   for (const auto& m : macros) manager.IncludeMacroFile(m);
+  if (!output.empty()) manager.SetOutputFileName(output);
 
   manager.Initialize();
   manager.Run();
