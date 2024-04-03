@@ -78,7 +78,7 @@ through the ``remage`` executable:
      -h,--help                   Print this help message and exit
      -q                          Print only warnings and errors
      -v [0]                      Increase verbosity
-     -l,--log-level LEVEL [summary] 
+     -l,--log-level LEVEL [summary]
                                  Logging level debug|detail|summary|warning|error|fatal|nothing
      -i,--interactive            Run in interactive mode
      -t,--threads INT            Number of threads
