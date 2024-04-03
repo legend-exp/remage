@@ -39,19 +39,15 @@ G4Run* RMGRunAction::GenerateRun() {
   return fRMGRun;
 }
 
-RMGRunAction::RMGRunAction(bool persistency) : fIsPersistencyEnabled(persistency) {
-
-  if (fIsPersistencyEnabled) { this->SetupAnalysisManager(); }
-}
+RMGRunAction::RMGRunAction(bool persistency) : fIsPersistencyEnabled(persistency) {}
 
 RMGRunAction::RMGRunAction(RMGMasterGenerator* gene, bool persistency)
-    : fIsPersistencyEnabled(persistency), fRMGMasterGenerator(gene) {
+    : fIsPersistencyEnabled(persistency), fRMGMasterGenerator(gene) {}
 
-  if (fIsPersistencyEnabled) { this->SetupAnalysisManager(); }
-}
-
-// called in the run action constructor
+// called at the begin of the run action.
 void RMGRunAction::SetupAnalysisManager() {
+  if (fIsAnaManInitialized) return;
+  fIsAnaManInitialized = true;
 
   auto rmg_man = RMGManager::Instance();
   if (rmg_man->GetDetectorConstruction()->GetActiveDetectorList().empty()) {
@@ -69,8 +65,7 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  if (!RMGManager::Instance()->IsExecSequential()) ana_man->SetNtupleMerging(true);
-  else ana_man->SetNtupleMerging(false);
+  ana_man->SetNtupleMerging(!RMGManager::Instance()->IsExecSequential());
 
   // do it only for activated detectors (have to ask to the manager)
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
@@ -103,6 +98,9 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   auto manager = RMGManager::Instance();
 
+  if (fIsPersistencyEnabled) this->SetupAnalysisManager();
+
+  // Check again, SetupAnalysisManager might have modified fIsPersistencyEnabled.
   if (fIsPersistencyEnabled) {
     auto ana_man = G4AnalysisManager::Instance();
     // TODO: realpath

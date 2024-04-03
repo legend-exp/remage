@@ -84,13 +84,10 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
       if (!hit) continue;
       hit->Print();
 
-      const auto evt = rmg_man->GetG4RunManager()->GetCurrentEvent();
-      if (!evt) RMGLog::OutDev(RMGLog::fatal, "Current event is nullptr, this should not happen!");
-
       const auto ana_man = G4AnalysisManager::Instance();
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
-      ana_man->FillNtupleIColumn(ntupleid, 0, evt->GetEventID());
+      ana_man->FillNtupleIColumn(ntupleid, 0, event->GetEventID());
       ana_man->FillNtupleDColumn(ntupleid, 1, hit->energy_deposition / u::keV);
       ana_man->FillNtupleDColumn(ntupleid, 2, hit->global_time / u::ns);
       ana_man->FillNtupleDColumn(ntupleid, 3, hit->global_position.getX() / u::m);
