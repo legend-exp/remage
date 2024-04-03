@@ -57,11 +57,11 @@ int main(int argc, char** argv) {
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
   auto log_level_strings = magic_enum::enum_names<RMGLog::LogLevel>();
-  auto log_level_desc = fmt::format("Logging level {}", fmt::join(log_level_strings, "|")).c_str();
+  auto log_level_desc = fmt::format("Logging level {}", fmt::join(log_level_strings, "|"));
 
   app.add_flag("-q", quiet, "Print only warnings and errors");
   app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
+  app.add_option("-l,--log-level", loglevel, log_level_desc.c_str())->type_name("LEVEL")->default_val("summary");
 
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
   app.add_option("-t,--threads", nthreads, "Number of threads");
