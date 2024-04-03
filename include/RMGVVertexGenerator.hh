@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_GENERATOR_PRIMARY_POSITION_HH_
-#define _RMG_GENERATOR_PRIMARY_POSITION_HH_
+#ifndef _RMG_V_VERTEX_GENERARTOR_HH_
+#define _RMG_V_VERTEX_GENERARTOR_HH_
 
 #include "RMGConfig.hh"
 #if RMG_HAS_BXDECAY0

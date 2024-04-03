@@ -1,5 +1,5 @@
-#ifndef _RMGCONFIG_HH_
-#define _RMGCONFIG_HH_
+#ifndef _RMG_CONFIG_HH_
+#define _RMG_CONFIG_HH_
 
 // other useful Geant4 exported variables:
 //   G4VIS_USE_<DRIVER>

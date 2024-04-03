@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMGVGENERATOR_HH_
-#define _RMGVGENERATOR_HH_
+#ifndef _RMG_V_GENERATOR_HH_
+#define _RMG_V_GENERATOR_HH_
 
 #include <memory>
 

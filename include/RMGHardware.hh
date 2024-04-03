@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_MANAGEMENT_DETECTOR_CONSTRUCTION_HH_
-#define _RMG_MANAGEMENT_DETECTOR_CONSTRUCTION_HH_
+#ifndef _RMG_HARDWARE_HH_
+#define _RMG_HARDWARE_HH_
 
 #include <map>
 #include <memory>

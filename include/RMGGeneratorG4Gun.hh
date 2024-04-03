@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMGGENERATORG4GUN_HH_
-#define _RMGGENERATORG4GUN_HH_
+#ifndef _RMG_GENERATOR_G4GUN_HH_
+#define _RMG_GENERATOR_G4GUN_HH_
 
 #include <memory>
 
