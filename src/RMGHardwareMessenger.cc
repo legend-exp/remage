@@ -15,30 +15,33 @@
 
 #include "RMGHardwareMessenger.hh"
 
-#include "RMGHardware.hh"
+#include "G4Tokenizer.hh"
 
-#ifndef FMT_HEADER_ONLY
-#define FMT_HEADER_ONLY
-#endif
-#include "fmt/core.h"
-#include "magic_enum/magic_enum.hpp"
+#include "RMGHardware.hh"
+#include "RMGTools.hh"
 
 RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
-  auto detector_types = magic_enum::enum_names<RMGHardware::DetectorType>();
-  auto options = fmt::format("{}", fmt::join(detector_types, "|"));
-
   fRegisterCmd = new G4UIcommand("/RMG/Geometry/RegisterDetector", this);
   fRegisterCmd->SetGuidance("register a sensitive detector");
   fRegisterCmd->SetGuidance("[usage] /RMG/Geometry/RegisterDetector T PV ID [C]");
-  fRegisterCmd->SetGuidance(fmt::format("        T:(str) {}", options).c_str());
-  fRegisterCmd->SetGuidance("        PV:(s) physvol");
-  fRegisterCmd->SetGuidance("        ID:(int) unique detector id");
-  fRegisterCmd->SetGuidance("        C:(int) copy nr (default 0)");
 
-  fRegisterCmd->SetParameter(new G4UIparameter("type", 's', false));
-  fRegisterCmd->SetParameter(new G4UIparameter("pv_name", 's', false));
-  fRegisterCmd->SetParameter(new G4UIparameter("uid", 'i', false));
-  fRegisterCmd->SetParameter(new G4UIparameter("copy_nr", 'i', true));
+  auto p_type = new G4UIparameter("type", 's', false);
+  p_type->SetParameterCandidates(RMGTools::GetCandidates<RMGHardware::DetectorType>().c_str());
+  p_type->SetGuidance("Detector type");
+  fRegisterCmd->SetParameter(p_type);
+
+  auto p_pv = new G4UIparameter("pv_name", 's', false);
+  p_pv->SetGuidance("Detector physical volume");
+  fRegisterCmd->SetParameter(p_pv);
+
+  auto p_uid = new G4UIparameter("uid", 'i', false);
+  p_uid->SetGuidance("unique detector id");
+  fRegisterCmd->SetParameter(p_uid);
+
+  auto p_copy = new G4UIparameter("copy_nr", 'i', true);
+  p_copy->SetGuidance("copy nr (default 0)");
+  p_copy->SetDefaultValue("0");
+  fRegisterCmd->SetParameter(p_copy);
 
   fRegisterCmd->AvailableForStates(G4State_PreInit);
 }
@@ -46,7 +49,21 @@ RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
 RMGHardwareMessenger::~RMGHardwareMessenger() { delete fRegisterCmd; }
 
 void RMGHardwareMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
-  if (command == fRegisterCmd) fHardware->RegisterDetectorCmd(newValues);
+  if (command == fRegisterCmd) RegisterDetectorCmd(newValues);
+}
+
+void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
+  G4Tokenizer next(parameters);
+
+  auto type_str = next();
+  auto type = RMGTools::ToEnum<RMGHardware::DetectorType>(std::string(type_str), "detector type");
+  auto pv_name = next();
+  const int uid = std::stoi(next());
+  int copy_nr = 0;
+  auto copy_nr_str = next();
+  if (!copy_nr_str.empty()) copy_nr = std::stoi(copy_nr_str);
+
+  fHardware->RegisterDetector(type, pv_name, uid, copy_nr);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -23,8 +23,6 @@ namespace fs = std::filesystem;
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4SDManager.hh"
-#include "G4Tokenizer.hh"
-#include "G4UIparameter.hh"
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
 
@@ -185,24 +183,6 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
         "Registered physical volume '{}' (copy nr. {}) as {} detector type", pv_name, copy_nr,
         magic_enum::enum_name(type));
   }
-}
-
-void RMGHardware::RegisterDetectorCmd(const std::string& parameters) {
-  G4Tokenizer next(parameters);
-
-  auto type_str = next();
-  auto type = magic_enum::enum_cast<DetectorType>(type_str);
-  if (!type.has_value()) {
-    RMGLog::OutFormat(RMGLog::error, "Invalid detector type {} in command", type_str);
-    return;
-  }
-  auto pv_name = next();
-  const int uid = std::stoi(next());
-  int copy_nr = 0;
-  auto copy_nr_str = next();
-  if (!copy_nr_str.empty()) copy_nr = std::stoi(copy_nr_str);
-
-  this->RegisterDetector(type.value(), pv_name, uid, copy_nr);
 }
 
 void RMGHardware::DefineCommands() {

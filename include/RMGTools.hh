@@ -23,10 +23,6 @@
 #include <vector>
 
 namespace RMGTools {
-
-  template<typename T> T ToEnum(std::string);
-
-  template<typename T> std::string GetCandidates();
 } // namespace RMGTools
 
 #include "RMGTools.icc"

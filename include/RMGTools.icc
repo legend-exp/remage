@@ -34,12 +34,12 @@ namespace RMGTools {
     }
 
     template <typename T>
-    std::string GetCandidates() {
+    std::string GetCandidates(const char delim=' ') {
         auto v = magic_enum::enum_names<T>();
         std::string cand = "";
         for (const auto& s : v) {
             auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
-            cand += std::string(name) + " ";
+            cand += std::string(name) + delim;
         }
         return cand.substr(0, cand.size()-1);
     }
