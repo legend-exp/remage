@@ -16,8 +16,7 @@
 #ifndef _RMG_TOOLS_HH_
 #define _RMG_TOOLS_HH_
 
-namespace RMGTools {
-} // namespace RMGTools
+namespace RMGTools {} // namespace RMGTools
 
 #include "RMGTools.icc"
 
