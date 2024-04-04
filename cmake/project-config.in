@@ -45,7 +45,7 @@ includedir="${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/${package}"
 
 usage() {
     cat <<EOF
-Usage: mage-config [OPTIONS]
+Usage: @PROJECT_NAME@-config [OPTIONS]
 General options:
     --prefix
     --version
@@ -89,9 +89,6 @@ while test $# -gt 0 ; do
     shift
 done
 
-# The library order matters - MaGe has lot's of tangled internal dependencies
-libs="-lwaveform -lmanagement -ltonscalegeometry -lmjdemonstrator -llegendgeometry -lgerdageometry -lmjgeometry -lmunichteststand -llngsgesetups -lmaterials -lgenerators -lgeometry -lprocesses -ldatabase -llegendio -lgerdaio -lmjio -lio"
-
 # ---------------------------------------------------------------------
 # From xft-config:
 
@@ -100,14 +97,11 @@ if test "$echo_prefix" = "yes" ; then
 fi
 
 if test "$echo_cflags" = "yes" ; then
-    cflags="-I${includedir}"
-    echo $cflags
+    echo "-I${includedir}"
 fi
 
 if test "$echo_libs" = "yes" ; then
     if test "${libdir}" != "/usr/lib" ; then
-        echo -L${libdir} $libs
-    else
-        echo $libs
+        echo -L${libdir}
     fi
 fi
