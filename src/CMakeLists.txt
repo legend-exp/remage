@@ -70,8 +70,8 @@ add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
-                                         $<INSTALL_INTERFACE:include>)
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/remage>"
+                                         $<INSTALL_INTERFACE:include/remage>)
 
 # Must use FMT_HEADER_ONLY absolutely everywhere or will get undefined symbols at link time
 # TODO: Use imported target so we can make this transparent and also allow use of external fmt
@@ -123,7 +123,7 @@ install(
 # install headers
 install(
   DIRECTORY ../include/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/remage
   PATTERN "CLI11" EXCLUDE
   PATTERN "EcoMug" EXCLUDE)
 
