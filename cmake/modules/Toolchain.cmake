@@ -6,5 +6,5 @@ macro(create_mage_toolchain)
                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config @ONLY)
 
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
 endmacro()
