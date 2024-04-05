@@ -259,11 +259,6 @@ void RMGManager::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/",
       "General commands for controlling the application");
 
-  fMessenger->DeclareMethod("Include", &RMGManager::IncludeMacroFile)
-      .SetGuidance("Include macro file")
-      .SetParameterName("filename", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
-
   fMessenger->DeclareMethod("Interactive", &RMGManager::SetInteractive)
       .SetGuidance("Enable interactive mode")
       .SetParameterName("flag", true)

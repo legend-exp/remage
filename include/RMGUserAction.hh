@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_MANAGEMENT_USER_ACTION_HH_
-#define _RMG_MANAGEMENT_USER_ACTION_HH_
+#ifndef _RMG_USER_ACTION_HH_
+#define _RMG_USER_ACTION_HH_
 
 #include "G4VUserActionInitialization.hh"
 

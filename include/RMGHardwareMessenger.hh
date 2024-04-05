@@ -32,6 +32,8 @@ class RMGHardwareMessenger : public G4UImessenger {
 
     RMGHardware* fHardware;
     G4UIcommand* fRegisterCmd;
+
+    void RegisterDetectorCmd(const std::string& parameters);
 };
 
 #endif

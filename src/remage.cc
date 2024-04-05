@@ -19,11 +19,8 @@
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGTools.hh"
 
-#ifndef FMT_HEADER_ONLY
-#define FMT_HEADER_ONLY
-#endif
-#include "fmt/core.h"
 #include "magic_enum/magic_enum.hpp"
 
 namespace CLI {
@@ -56,8 +53,7 @@ int main(int argc, char** argv) {
   std::string output;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
-  auto log_level_strings = magic_enum::enum_names<RMGLog::LogLevel>();
-  auto log_level_desc = fmt::format("Logging level {}", fmt::join(log_level_strings, "|"));
+  auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
   app.add_flag("-q", quiet, "Print only warnings and errors");
   app.add_flag("-v", verbosity, "Increase verbosity");

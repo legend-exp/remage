@@ -359,12 +359,12 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
       .SetGuidance("Add optical processes to the physics list")
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
       .SetGuidance("Add low energy electromagnetic processes to the physics list")
       .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)
       .SetGuidance("")
