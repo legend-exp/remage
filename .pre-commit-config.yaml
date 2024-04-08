@@ -5,7 +5,7 @@ ci:
 exclude: ^include/(fmt|magic_enum|CLI11)/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
@@ -33,7 +33,7 @@ repos:
     args: ["-L", "hist"]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v18.1.2
+  rev: v18.1.3
   hooks:
    - id: clang-format
      types_or: [c++]
