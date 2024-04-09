@@ -16,6 +16,7 @@
 #ifndef _RMG_STEPPING_ACTION_HH_
 #define _RMG_STEPPING_ACTION_HH_
 
+#include "G4GenericMessenger.hh"
 #include "G4UserSteppingAction.hh"
 
 class G4Step;
@@ -34,9 +35,15 @@ class RMGSteppingAction : public G4UserSteppingAction {
 
     void UserSteppingAction(const G4Step*) override;
 
+    void SetDaughterKillLifetime(double max_lifetime);
+
   private:
 
     RMGEventAction* fEventAction = nullptr;
+    double fDaughterKillLifetime = -1;
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif
