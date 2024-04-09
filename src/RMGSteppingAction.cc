@@ -15,12 +15,74 @@
 
 #include "RMGSteppingAction.hh"
 
+#include "G4GenericMessenger.hh"
+#include "G4Ions.hh"
 #include "G4Step.hh"
 
 #include "RMGEventAction.hh"
+#include "RMGLog.hh"
 
-RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
+RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {
 
-void RMGSteppingAction::UserSteppingAction(const G4Step* /*step*/) {}
+  this->DefineCommands();
+}
+
+void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
+
+  // Kill _daughter_ nuclei with a lifetime longer than a user-defined threshold. This applies to
+  // the defined half-life of the particle, and not the sampled time to the decay of the secondary
+  // nucleus.
+  if (fDaughterKillLifetime > 0) {
+    auto track = step->GetTrack();
+    auto particle_type = track->GetDefinition()->GetParticleType();
+
+    if (particle_type == "nucleus" && track->GetParentID() > 0 &&
+        track->GetKineticEnergy() < 0.1 * CLHEP::keV) {
+      auto ion = static_cast<G4Ions*>(track->GetDefinition());
+      double lifetime = ion->GetPDGLifeTime();
+      double excitation = ion->GetExcitationEnergy();
+
+      // inspired by G4RadioactiveDecay::IsApplicable
+      if (lifetime > fDaughterKillLifetime && excitation <= 0) {
+        RMGLog::OutFormat(RMGLog::debug, "Killing daughter nucleus {} (lifetime={} us)",
+            ion->GetParticleName(), lifetime / CLHEP::us);
+
+        // note: UserSteppingAction is not called after step 0. Secondaries might be generated if
+        // RadioactiveDecay takes place at step 1.
+        auto new_status = track->GetCurrentStepNumber() > 1 ? fStopAndKill : fKillTrackAndSecondaries;
+        track->SetTrackStatus(new_status);
+      }
+    }
+  }
+}
+
+void RMGSteppingAction::SetDaughterKillLifetime(double max_lifetime) {
+
+  fDaughterKillLifetime = max_lifetime;
+  if (fDaughterKillLifetime > 0) {
+    RMGLog::OutFormat(RMGLog::summary,
+        "Enabled killing of daughter nuclei with a lifetime longer than {} us.",
+        fDaughterKillLifetime / CLHEP::us);
+  }
+}
+
+void RMGSteppingAction::DefineCommands() {
+
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/Stepping/",
+      "Commands for controlling physics processes");
+
+  fMessenger
+      ->DeclareMethodWithUnit("DaughterNucleusMaxLifetime", "us",
+          &RMGSteppingAction::SetDaughterKillLifetime)
+      .SetGuidance("Determines which unstable daughter nuclei will be killed, if they are at rest, "
+                   "depending on their lifetime.")
+      .SetGuidance("This applies to the defined lifetime of the nucleus, and not on the sampled "
+                   "actual halflife of the simulated particle.")
+      .SetGuidance("Set to -1 to disable this feature.")
+      .SetParameterName("max_lifetime", false)
+      .SetDefaultValue("-1")
+      .SetStates(G4State_PreInit);
+}
+
 
 // vim: tabstop=2 shiftwidth=2 expandtab
