@@ -23,20 +23,18 @@
 
 #include "magic_enum/magic_enum.hpp"
 
-namespace CLI {
-  namespace detail {
-    bool lexical_cast(std::string input, RMGLog::LogLevel& output) {
-      try {
-        output = static_cast<RMGLog::LogLevel>(std::stoll(input));
-        return true;
-      } catch (...) {
-        auto r = magic_enum::enum_cast<RMGLog::LogLevel>(input);
-        if (r.has_value()) output = r.value();
-        return r.has_value();
-      }
+namespace CLI::detail {
+  bool lexical_cast(std::string input, RMGLog::LogLevel& output) {
+    try {
+      output = static_cast<RMGLog::LogLevel>(std::stoll(input));
+      return true;
+    } catch (...) {
+      auto r = magic_enum::enum_cast<RMGLog::LogLevel>(input);
+      if (r.has_value()) output = r.value();
+      return r.has_value();
     }
-  } // namespace detail
-} // namespace CLI
+  }
+} // namespace CLI::detail
 
 #include "CLI11/CLI11.hpp"
 

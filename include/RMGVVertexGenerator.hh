@@ -55,7 +55,7 @@ class RMGVVertexGenerator {
     inline int GetMaxAttempts() { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0
-    inline void ShootVertex(G4ThreeVector& v) { GenerateVertex(v); }
+    inline void ShootVertex(G4ThreeVector& v) override { GenerateVertex(v); }
 #endif
 
   protected:

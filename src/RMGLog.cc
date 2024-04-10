@@ -56,11 +56,13 @@ RMGLog::RMGLog() {
 void RMGLog::StartupInfo() {
 
   std::string message = "";
-  message += "  _ __ ___ _ __ ___   __ _  __ _  ___ \n";
-  message += " | '__/ _ \\ '_ ` _ \\ / _` |/ _` |/ _ \\\n";
-  message += " | | |  __/ | | | | | (_| | (_| |  __/\n";
-  message += " |_|  \\___|_| |_| |_|\\__,_|\\__, |\\___| v" + RMGLog::fVersion + "\n";
-  message += "                           |___/      \n";
+  // clang-format off
+  message += R"(  _ __ ___ _ __ ___   __ _  __ _  ___ )" "\n";
+  message += R"( | '__/ _ \ '_ ` _ \ / _` |/ _` |/ _ \)" "\n";
+  message += R"( | | |  __/ | | | | | (_| | (_| |  __/)" "\n";
+  message += R"( |_|  \___|_| |_| |_|\__,_|\__, |\___| v)" + RMGLog::fVersion + "\n";
+  message += R"(                           |___/      )" "\n";
+  // clang-format on
 
   // write message to screen
   if (RMGLog::fMinimumLogLevel <= RMGLog::summary) G4cout << message << G4endl;

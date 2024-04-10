@@ -34,9 +34,7 @@
 
 #include "RMGTools.hh"
 
-RMGMasterGenerator::RMGMasterGenerator()
-    : fConfinement(RMGMasterGenerator::Confinement::kUnConfined), fVertexGeneratorObj(nullptr),
-      fGenerator(RMGMasterGenerator::Generator::kUndefined), fGeneratorObj(nullptr) {
+RMGMasterGenerator::RMGMasterGenerator() : fVertexGeneratorObj(nullptr), fGeneratorObj(nullptr) {
 
   this->DefineCommands();
 }

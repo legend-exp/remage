@@ -51,7 +51,7 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
   auto world_l = new G4LogicalVolume(world_s, LAr, "WorldLAr");
 
-  auto world_p = new G4PVPlacement(nullptr, G4ThreeVector(), world_l, "World", 0, false, 0);
+  auto world_p = new G4PVPlacement(nullptr, G4ThreeVector(), world_l, "World", nullptr, false, 0);
 
   auto hpge_s = new G4Box("HPGe", 5 * u::cm, 5 * u::cm, 5 * u::cm);
 

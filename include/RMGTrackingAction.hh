@@ -31,8 +31,8 @@ class RMGTrackingAction : public G4UserTrackingAction {
     RMGTrackingAction(RMGTrackingAction&&) = delete;
     RMGTrackingAction& operator=(RMGTrackingAction&&) = delete;
 
-    virtual void PreUserTrackingAction(const G4Track*) override;
-    virtual void PostUserTrackingAction(const G4Track*) override;
+    void PreUserTrackingAction(const G4Track*) override;
+    void PostUserTrackingAction(const G4Track*) override;
     inline G4TrackingManager* GetTrackingManager() {
       return G4UserTrackingAction::fpTrackingManager;
     };
