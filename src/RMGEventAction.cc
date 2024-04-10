@@ -32,10 +32,7 @@
 #include "fmt/chrono.h"
 #include "magic_enum/magic_enum.hpp"
 
-RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action) {
-
-  this->DefineCommands();
-}
+RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action) {}
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
@@ -77,12 +74,6 @@ void RMGEventAction::EndOfEventAction(const G4Event* event) {
   }
 
   // NOTE: G4analysisManager::AddNtupleRow() must be called here for event-oriented output
-}
-
-void RMGEventAction::DefineCommands() {
-
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
-      "Commands for controlling the event actions");
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -31,8 +31,8 @@
 class G4VUserPhysicsList;
 class RMGHardware;
 class RMGUserAction;
-class RMGManagerMessenger;
 class G4GenericMessenger;
+class G4UIExecutive;
 class RMGManager {
 
   public:
@@ -109,6 +109,8 @@ class RMGManager {
     void SetUpDefaultDetectorConstruction();
     void SetUpDefaultProcessesList();
     void SetUpDefaultUserAction();
+
+    std::unique_ptr<G4UIExecutive> StartInteractiveSession();
 
     std::string fApplicationName;
     int fArgc;

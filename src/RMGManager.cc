@@ -107,12 +107,22 @@ void RMGManager::Initialize() {
   }
 }
 
+std::unique_ptr<G4UIExecutive> RMGManager::StartInteractiveSession() {
+
+  RMGLog::Out(RMGLog::summary, "Entering interactive mode");
+  auto cval = std::getenv("DISPLAY");
+  auto val = cval == nullptr ? std::string("") : std::string(cval);
+  if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
+  return std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
+}
+
 void RMGManager::Run() {
 
   // desired behavior
   // - by default (nothing is specified), open an interactive session
   // - if macro is specified, run and quit
   // - if macro is specified and fInteractive is true, do not quit afterwards
+  // - a macro can request interactive mode
 
   // FIXME: logic here does not work. There is no way to do interactive visualization
 
@@ -122,13 +132,7 @@ void RMGManager::Run() {
 
   // configure UI
   std::unique_ptr<G4UIExecutive> session = nullptr;
-  if (fInteractive) {
-    RMGLog::Out(RMGLog::summary, "Entering interactive mode");
-    auto cval = std::getenv("DISPLAY");
-    auto val = cval == nullptr ? std::string("") : std::string(cval);
-    if (val.empty()) RMGLog::Out(RMGLog::warning, "DISPLAY not set, forcing G4UI_USE_TCSH=1");
-    session = std::make_unique<G4UIExecutive>(fArgc, fArgv, val.empty() ? "tcsh" : "");
-  }
+  if (fInteractive) { session = StartInteractiveSession(); }
 
   // eventually execute macros
   auto UI = G4UImanager::GetUIpointer();
@@ -139,6 +143,7 @@ void RMGManager::Run() {
 
   // if interactive mode is requested, do not quit and start a session
   if (fInteractive) {
+    if (!session) session = StartInteractiveSession();
     session->SetPrompt(RMGLog::Colorize<RMGLog::Ansi::unspecified>("remage> ", G4cout, true));
     session->SessionStart();
   }
@@ -259,9 +264,9 @@ void RMGManager::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/",
       "General commands for controlling the application");
 
-  fMessenger->DeclareMethod("Interactive", &RMGManager::SetInteractive)
+  fMessenger->DeclareProperty("Interactive", fInteractive)
       .SetGuidance("Enable interactive mode")
-      .SetParameterName("flag", true)
+      .SetParameterName("interactive", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle);
 
@@ -275,7 +280,7 @@ void RMGManager::DefineCommands() {
       "Commands for controlling application logging");
 
   fLogMessenger->DeclareMethod("LogLevel", &RMGManager::SetLogLevel)
-      .SetGuidance("Set verbosity level on screen")
+      .SetGuidance("Set verbosity level of application log")
       .SetParameterName("level", false)
       .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
       .SetStates(G4State_PreInit, G4State_Idle);
