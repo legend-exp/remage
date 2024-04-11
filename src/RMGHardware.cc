@@ -55,7 +55,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     fWorld = this->DefineGeometry();
     if (!fWorld)
       RMGLog::Out(RMGLog::fatal, "DefineGeometry() returned nullptr. ",
-          "Did you forget to reimplement the base class method?");
+          "Did you forget to reimplement the base class method, or to specify a GDML file?");
   }
 
   // TODO: build and return world volume?

@@ -366,19 +366,23 @@ void RMGPhysics::DefineCommands() {
       .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
       .SetStates(G4State_PreInit);
 
+  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)
-      .SetGuidance("")
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Set correlated gamma emission flag")
+      .SetCandidates("0 1")
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("GammaTwoJMAX", &RMGPhysics::SetGammaTwoJMAX)
-      .SetGuidance("")
+      .SetGuidance("Set max 2J for sampling of angular correlations")
       .SetParameterName("x", false)
       .SetRange("x > 0")
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetStates(G4State_PreInit);
 
+  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("StoreICLevelData", &RMGPhysics::SetStoreICLevelData)
-      .SetGuidance("")
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetGuidance("Store e- internal conversion data")
+      .SetCandidates("0 1")
+      .SetStates(G4State_PreInit);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

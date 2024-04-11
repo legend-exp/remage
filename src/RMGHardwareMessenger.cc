@@ -23,7 +23,6 @@
 RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
   fRegisterCmd = new G4UIcommand("/RMG/Geometry/RegisterDetector", this);
   fRegisterCmd->SetGuidance("register a sensitive detector");
-  fRegisterCmd->SetGuidance("[usage] /RMG/Geometry/RegisterDetector T PV ID [C]");
 
   auto p_type = new G4UIparameter("type", 's', false);
   p_type->SetParameterCandidates(RMGTools::GetCandidates<RMGHardware::DetectorType>().c_str());

@@ -23,7 +23,6 @@
 #include "G4VModularPhysicsList.hh"
 #include "globals.hh"
 
-class RMGProcessesMessenger;
 class RMGPhysics : public G4VModularPhysicsList {
 
   public:
