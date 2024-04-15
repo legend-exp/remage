@@ -53,7 +53,7 @@
 
 namespace u = CLHEP;
 
-RMGPhysics::RMGPhysics() : G4VModularPhysicsList() {
+RMGPhysics::RMGPhysics() {
 
   G4VUserPhysicsList::defaultCutValue = 0.1 * u::mm;
   this->SetPhysicsRealm(RMGPhysics::kDoubleBetaDecay);
@@ -91,21 +91,12 @@ void RMGPhysics::ConstructParticle() {
 
   RMGLog::Out(RMGLog::detail, "Constructing particles");
 
-  G4BosonConstructor boson_const;
-  G4LeptonConstructor lepton_const;
-  G4MesonConstructor meson_const;
-  G4BaryonConstructor baryon_const;
-  G4IonConstructor ion_const;
-  G4ShortLivedConstructor short_lived_const;
-
-  boson_const.ConstructParticle();
-  lepton_const.ConstructParticle();
-  meson_const.ConstructParticle();
-  baryon_const.ConstructParticle();
-  ion_const.ConstructParticle();
-  short_lived_const.ConstructParticle();
-
-  return;
+  G4BosonConstructor::ConstructParticle();
+  G4LeptonConstructor::ConstructParticle();
+  G4MesonConstructor::ConstructParticle();
+  G4BaryonConstructor::ConstructParticle();
+  G4IonConstructor::ConstructParticle();
+  G4ShortLivedConstructor::ConstructParticle();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,9 +151,9 @@ void RMGPhysics::ConstructProcess() {
   // e+/e- nuclear interactions
   RMGLog::Out(RMGLog::detail, "Adding extra electromagnetic physics");
   auto em_extra_physics = new G4EmExtraPhysics(G4VModularPhysicsList::verboseLevel);
-  em_extra_physics->Synch("on");
-  em_extra_physics->GammaNuclear("on");
-  em_extra_physics->MuonNuclear("on");
+  em_extra_physics->Synch(true);
+  em_extra_physics->GammaNuclear(true);
+  em_extra_physics->MuonNuclear(true);
   em_extra_physics->ConstructProcess();
 
   if (fConstructOptical) this->ConstructOptical();

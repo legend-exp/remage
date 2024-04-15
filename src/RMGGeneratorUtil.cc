@@ -28,10 +28,8 @@
 #endif
 
 bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
-  if (g4_solid_type == "G4Box" or g4_solid_type == "G4Orb" or g4_solid_type == "G4Sphere" or
-      g4_solid_type == "G4Tubs")
-    return true;
-  else return false;
+  return g4_solid_type == "G4Box" or g4_solid_type == "G4Orb" or g4_solid_type == "G4Sphere" or
+         g4_solid_type == "G4Tubs";
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {

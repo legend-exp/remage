@@ -34,7 +34,7 @@ G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator
 
 // NOTE: does this make sense?
 G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) const {
-  return (this == &right) ? true : false;
+  return this == &right;
 }
 
 void RMGOpticalDetectorHit::Print() {
@@ -115,7 +115,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   return true;
 }
 
-void RMGOpticalDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) { return; }
+void RMGOpticalDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
 
 void RMGOpticalDetector::DefineCommands() {
 

@@ -8,9 +8,17 @@ Checks: "-*, \
   performance-for-range-copy, \
   performance-inefficient-string-concatenation, \
   performance-trivially-destructible, \
-  readability-delete-null-pointer, \
-  readability-duplicate-include, \
-  readability-string-compare"
+  readability-*, \
+  -readability-magic-numbers, \
+  -readability-convert-member-functions-to-static, \
+  -readability-isolate-declaration, \
+  -readability-implicit-bool-conversion, \
+  -readability-else-after-return, \
+  -readability-braces-around-statements, \
+  -readability-named-parameter, \
+  -readability-identifier-length, \
+  -readability-qualified-auto, \
+  -readability-function-cognitive-complexity"
 
 CheckOptions:
 - key: modernize-use-override.IgnoreDestructors

@@ -55,7 +55,7 @@ RMGLog::RMGLog() {
 
 void RMGLog::StartupInfo() {
 
-  std::string message = "";
+  std::string message;
   // clang-format off
   message += R"(  _ __ ___ _ __ ___   __ _  __ _  ___ )" "\n";
   message += R"( | '__/ _ \ '_ ` _ \ / _` |/ _` |/ _ \)" "\n";

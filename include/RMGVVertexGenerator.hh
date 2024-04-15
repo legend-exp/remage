@@ -52,7 +52,7 @@ class RMGVVertexGenerator {
       return false;
     }
     inline void SetMaxAttempts(int val) { fMaxAttempts = val; }
-    inline int GetMaxAttempts() { return fMaxAttempts; }
+    [[nodiscard]] inline int GetMaxAttempts() const { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0
     inline void ShootVertex(G4ThreeVector& v) override { GenerateVertex(v); }

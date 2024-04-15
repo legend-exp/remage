@@ -34,7 +34,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
   public:
 
     struct GenericGeometricalSolidData {
-        std::string g4_name = "";
+        std::string g4_name;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
         double sphere_inner_radius = 0;
         double sphere_outer_radius = -1;
@@ -100,7 +100,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         [[nodiscard]] const SampleableObject& SurfaceWeightedRand() const;
         [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
-        [[nodiscard]] bool IsInside(const G4ThreeVector& point) const;
+        [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         // emulate std::vector
         [[nodiscard]] size_t size() const { return data.size(); }

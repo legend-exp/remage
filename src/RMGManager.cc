@@ -85,7 +85,7 @@ void RMGManager::Initialize() {
   if (!fG4VisManager) this->SetUpDefaultG4VisManager();
   fG4VisManager->Initialize();
 
-  std::string _str = "";
+  std::string _str;
   for (const auto& i : fG4VisManager->GetAvailableGraphicsSystems()) {
     _str += i->GetNickname() + " ";
   }

@@ -38,7 +38,7 @@ G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAlloc
 
 // NOTE: does this make sense?
 G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right) const {
-  return (this == &right) ? true : false;
+  return this == &right;
 }
 
 void RMGGermaniumDetectorHit::Print() {
@@ -131,7 +131,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   return true;
 }
 
-void RMGGermaniumDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) { return; }
+void RMGGermaniumDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
 
 void RMGGermaniumDetector::DefineCommands() {
 

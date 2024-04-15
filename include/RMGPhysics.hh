@@ -72,7 +72,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetPhysicsRealmString(std::string realm);
     void SetLowEnergyEMOptionString(std::string option);
     void SetUseGammaAngCorr(bool);
-    void SetGammaTwoJMAX(int two_j_max);
+    void SetGammaTwoJMAX(int max_two_j);
     void SetStoreICLevelData(bool);
 
   protected:
