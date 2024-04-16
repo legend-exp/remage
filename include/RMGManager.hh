@@ -52,12 +52,12 @@ class RMGManager {
     G4VisManager* GetG4VisManager();
     RMGHardware* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
-    inline int GetPrintModulo() { return fPrintModulo; }
+    [[nodiscard]] inline int GetPrintModulo() const { return fPrintModulo; }
 
     inline bool IsExecSequential() {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
-    inline bool IsPersistencyEnabled() { return fIsPersistencyEnabled; }
+    [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
     inline const std::string& GetOutputFileName() { return fOutputFile; }
 
     // setters
@@ -83,7 +83,7 @@ class RMGManager {
     void SetRandEngineSeed(long seed);
     void SetRandEngineInternalSeed(int index);
     void SetRandSystemEntropySeed();
-    inline bool GetRandIsControlled() { return fIsRandControlled; }
+    [[nodiscard]] inline bool GetRandIsControlled() const { return fIsRandControlled; }
 
     void SetLogLevel(std::string level);
 

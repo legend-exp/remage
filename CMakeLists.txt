@@ -47,6 +47,9 @@ set(CMAKE_INSTALL_MESSAGE LAZY)
 # Only allow installs relative to CMAKE_INSTALL_PREFIX
 set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION ON)
 
+# export compile commands, e.g. for use by clang-tidy.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set default build type
 include(BuildType)
 

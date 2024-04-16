@@ -26,7 +26,7 @@ class RMGHardwareMessenger : public G4UImessenger {
     RMGHardwareMessenger(RMGHardware* hw);
     ~RMGHardwareMessenger();
 
-    void SetNewValue(G4UIcommand* command, G4String newValues);
+    void SetNewValue(G4UIcommand* command, G4String newValues) override;
 
   private:
 

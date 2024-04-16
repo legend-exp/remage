@@ -28,10 +28,8 @@
 #endif
 
 bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
-  if (g4_solid_type == "G4Box" or g4_solid_type == "G4Orb" or g4_solid_type == "G4Sphere" or
-      g4_solid_type == "G4Tubs")
-    return true;
-  else return false;
+  return g4_solid_type == "G4Box" or g4_solid_type == "G4Orb" or g4_solid_type == "G4Sphere" or
+         g4_solid_type == "G4Tubs";
 }
 
 G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {
@@ -45,7 +43,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {
     return RMGGeneratorUtil::rand(dynamic_cast<const G4Tubs*>(vol), on_surface);
   else {
     RMGLog::OutDev(RMGLog::fatal, "'", entity, "' is not supported (implement me)");
-    return G4ThreeVector();
+    return {};
   }
 }
 
@@ -78,10 +76,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
       y = dy * (2 * _g4rand() - 1);
       z = dz * (2 * _g4rand() - 1);
     }
-    return G4ThreeVector(x, y, z);
+    return {x, y, z};
   } else {
-    return G4ThreeVector(dx * (2 * _g4rand() - 1), dy * (2 * _g4rand() - 1),
-        dz * (2 * _g4rand() - 1));
+    return {dx * (2 * _g4rand() - 1), dy * (2 * _g4rand() - 1), dz * (2 * _g4rand() - 1)};
   }
 }
 

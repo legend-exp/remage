@@ -7,7 +7,7 @@ class HPGeTestStand : public RMGHardware {
 
   public:
 
-    G4VPhysicalVolume* DefineGeometry();
+    G4VPhysicalVolume* DefineGeometry() override;
 };
 
 #endif

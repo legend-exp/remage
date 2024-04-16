@@ -2,7 +2,7 @@ ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
 
-exclude: ^include/(fmt|magic_enum|CLI11)/
+exclude: ^include/(fmt|magic_enum|CLI11|EcoMug)/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.6.0
@@ -31,6 +31,14 @@ repos:
   hooks:
   - id: codespell
     args: ["-L", "hist"]
+
+- repo: local
+  hooks:
+   - id: clang-tidy
+     name: clang-tidy
+     entry: bash -c 'command -V clang-tidy >&- 2>&-; if [[ $? == 0 && -d build ]]; then clang-tidy -fix -fix-errors -quiet -p=build "$@"; fi'
+     language: system
+     types_or: [c++]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: v18.1.3

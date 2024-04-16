@@ -20,6 +20,7 @@
 #include <string>
 
 #include "G4Allocator.hh"
+#include "G4GenericMessenger.hh"
 #include "G4THitsCollection.hh"
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
@@ -56,7 +57,6 @@ using RMGGermaniumDetectorHitsCollection = G4THitsCollection<RMGGermaniumDetecto
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
-class G4GenericMessenger;
 class RMGGermaniumDetector : public G4VSensitiveDetector {
 
   public:

@@ -23,7 +23,6 @@
 
 class RMGRunAction;
 class G4GenericMessenger;
-class RMGVOutputManager;
 class RMGEventAction : public G4UserEventAction {
 
   public:

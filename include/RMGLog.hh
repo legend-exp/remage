@@ -114,10 +114,10 @@ class RMGLog {
      * Writes string to the screen log if the log level is equal or greater than the minimum
      * @param loglevel loglevel for the current message
      * @param message string to write to the screen log */
-    template<typename T> static void Out(RMGLog::LogLevel loglevel, const T& msg);
+    template<typename T> static void Out(RMGLog::LogLevel loglevel, const T& message);
 
     template<typename T, typename... Args>
-    static void Out(RMGLog::LogLevel loglevel, const T& msg_first, const Args&... msg_other);
+    static void Out(RMGLog::LogLevel loglevel, const T& msg_first, const Args&... args);
 
     template<typename... Args>
     static void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args);

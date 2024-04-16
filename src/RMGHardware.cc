@@ -135,7 +135,7 @@ void RMGHardware::ConstructSDandField() {
     fActiveDetectorsInitialized = true;
   }
 
-  std::string vec_repr = "";
+  std::string vec_repr;
   for (const auto& d : fActiveDetectors) vec_repr += std::string(magic_enum::enum_name(d)) + ", ";
   if (vec_repr.size() > 2) vec_repr.erase(vec_repr.size() - 2);
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);

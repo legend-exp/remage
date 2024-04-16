@@ -34,7 +34,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
   public:
 
     struct GenericGeometricalSolidData {
-        std::string g4_name = "";
+        std::string g4_name;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
         double sphere_inner_radius = 0;
         double sphere_outer_radius = -1;
@@ -98,19 +98,19 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         SampleableObjectCollection() = default;
         inline ~SampleableObjectCollection() { data.clear(); }
 
-        const SampleableObject& SurfaceWeightedRand() const;
-        const SampleableObject& VolumeWeightedRand() const;
-        bool IsInside(const G4ThreeVector& point) const;
+        [[nodiscard]] const SampleableObject& SurfaceWeightedRand() const;
+        [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
+        [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         // emulate std::vector
-        size_t size() const { return data.size(); }
+        [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         void emplace_back(G4VPhysicalVolume* v, const G4RotationMatrix& r, const G4ThreeVector& t,
             G4VSolid* s);
         inline void push_back(const SampleableObject& obj) {
           this->emplace_back(obj.physical_volume, obj.rotation, obj.translation, obj.sampling_solid);
         }
-        inline bool empty() const { return data.empty(); }
+        [[nodiscard]] inline bool empty() const { return data.empty(); }
         inline SampleableObject& back() { return data.back(); }
         inline void clear() { data.clear(); }
         inline void insert(SampleableObjectCollection& other) {
