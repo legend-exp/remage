@@ -15,6 +15,8 @@
 
 #include "RMGVertexConfinement.hh"
 
+#include <chrono>
+
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
 #include "G4Orb.hh"
@@ -350,7 +352,18 @@ void RMGVertexConfinement::Reset() {
 }
 
 bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
+  auto time_sampling_start = std::chrono::high_resolution_clock::now();
 
+  bool res = ActualGenerateVertex(vertex);
+
+  auto time_sampling_end = std::chrono::high_resolution_clock::now();
+  fVertexGenerationTime +=
+      std::chrono::duration_cast<std::chrono::nanoseconds>(time_sampling_end - time_sampling_start);
+
+  return res;
+}
+
+bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
   // configure sampling volumes (does not do anything if this is not the first
   // call)
   this->InitializePhysicalVolumes();
@@ -537,11 +550,19 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
   return fGeomVolumeData.back();
 }
 
+void RMGVertexConfinement::BeginOfRunAction(const G4Run* run) {
+  // Reset all timers and counters before the next run.
+  fTrials = 0;
+  fVertexGenerationTime = std::chrono::nanoseconds::zero();
+}
+
 void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
   auto n_ev = run->GetNumberOfEventToBeProcessed();
   auto avg_iter = fTrials * 1. / n_ev;
   RMGLog::OutFormat(RMGLog::summary, "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% efficiency)",
       avg_iter, 100 / avg_iter);
+  RMGLog::OutFormat(RMGLog::summary, "Stats: average time to sample a vertex was {:.5f} us/event",
+      fVertexGenerationTime.count() / n_ev / 1000.0);
 }
 
 void RMGVertexConfinement::DefineCommands() {

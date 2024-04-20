@@ -16,6 +16,7 @@
 #ifndef _RMG_VERTEX_CONFINEMENT_HH_
 #define _RMG_VERTEX_CONFINEMENT_HH_
 
+#include <chrono>
 #include <regex>
 #include <vector>
 
@@ -55,6 +56,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     RMGVertexConfinement();
 
+    void BeginOfRunAction(const G4Run* run) override;
     void EndOfRunAction(const G4Run* run) override;
 
     bool GenerateVertex(G4ThreeVector& v) override;
@@ -126,6 +128,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     void InitializePhysicalVolumes();
     void InitializeGeometricalVolumes();
+    bool ActualGenerateVertex(G4ThreeVector& v);
 
     std::vector<std::string> fPhysicalVolumeNameRegexes;
     std::vector<std::string> fPhysicalVolumeCopyNrRegexes;
@@ -136,7 +139,10 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = kUnionAll;
     bool fOnSurface = false;
+
+    // counters used for the current run.
     long fTrials = 0;
+    std::chrono::nanoseconds fVertexGenerationTime;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);
