@@ -148,14 +148,14 @@ void RMGMasterGenerator::DefineCommands() {
       .SetGuidance("Select primary confinement strategy")
       .SetParameterName("strategy", false)
       .SetCandidates(RMGTools::GetCandidates<RMGMasterGenerator::Confinement>())
-      .SetStates(G4State_Idle)
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   fMessenger->DeclareMethod("Select", &RMGMasterGenerator::SetGeneratorString)
       .SetGuidance("Select event generator")
       .SetParameterName("generator", false)
       .SetCandidates(RMGTools::GetCandidates<RMGMasterGenerator::Generator>())
-      .SetStates(G4State_Idle)
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 }
 
