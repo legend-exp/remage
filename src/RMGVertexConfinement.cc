@@ -16,6 +16,7 @@
 #include "RMGVertexConfinement.hh"
 
 #include <chrono>
+#include <optional>
 
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
@@ -306,18 +307,18 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
   // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
-    if (d.g4_name == "Sphere") {
+    if (d.solid_type == kSphere) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere/" +
                            std::to_string(fGeomVolumeSolids.size() + 1),
               d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
-    } else if (d.g4_name == "Cylinder") {
+    } else if (d.solid_type == kCylinder) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder/" +
                          std::to_string(fGeomVolumeSolids.size() + 1),
               d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
               d.cylinder_starting_angle, d.cylinder_spanning_angle));
-    } else if (d.g4_name == "Box") {
+    } else if (d.solid_type == kBox) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box/" +
                         std::to_string(fGeomVolumeSolids.size() + 1),
@@ -326,7 +327,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
     // else if (...)
     else {
       RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
-          d.g4_name);
+          d.solid_type);
     }
 
     fGeomVolumeSolids.back().containment_check = false;
@@ -370,7 +371,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
   this->InitializeGeometricalVolumes();
 
   RMGLog::OutDev(RMGLog::debug,
-      "Sampling mode: ", magic_enum::enum_name<RMGVertexConfinement::SamplingMode>(fSamplingMode));
+      "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
 
   int calls = 0;
 
@@ -522,8 +523,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
 void RMGVertexConfinement::SetSamplingModeString(std::string mode) {
   try {
-    this->SetSamplingMode(
-        RMGTools::ToEnum<RMGVertexConfinement::SamplingMode>(mode, "sampling mode"));
+    this->SetSamplingMode(RMGTools::ToEnum<SamplingMode>(mode, "sampling mode"));
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -539,12 +539,12 @@ void RMGVertexConfinement::AddPhysicalVolumeNameRegex(std::string name, std::str
 
 void RMGVertexConfinement::AddGeometricalVolumeString(std::string solid) {
   GenericGeometricalSolidData data;
-  data.g4_name = solid;
+  data.solid_type = RMGTools::ToEnum<GeometricalSolidType>(solid, "solid type");
   fGeomVolumeData.push_back(data);
 }
 
 RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBack(
-    std::string solid_type) {
+    std::optional<GeometricalSolidType> solid_type) {
   if (fGeomVolumeData.empty()) {
     RMGLog::Out(RMGLog::fatal, "Must call /RMG/Generator/Confinement/Geometrical/AddSolid",
         "' before setting any geometrical parameter value");
@@ -553,8 +553,8 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
     RMGLog::Out(RMGLog::fatal,
         "Solids for vertex confinement have already been initialized, no change possible!");
   }
-  if (!solid_type.empty() && fGeomVolumeData.back().g4_name != solid_type) {
-    RMGLog::Out(RMGLog::fatal, "Trying to modify non-{} as {}", solid_type, solid_type);
+  if (!solid_type.has_value() && fGeomVolumeData.back().solid_type != solid_type) {
+    RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
   }
   return fGeomVolumeData.back();
 }
@@ -596,7 +596,7 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareMethod("SamplingMode", &RMGVertexConfinement::SetSamplingModeString)
       .SetGuidance("Select sampling mode for volume confinement")
       .SetParameterName("mode", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGVertexConfinement::SamplingMode>())
+      .SetCandidates(RMGTools::GetCandidates<SamplingMode>())
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
@@ -628,7 +628,7 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareMethod("AddSolid", &RMGVertexConfinement::AddGeometricalVolumeString)
       .SetGuidance("Add geometrical solid to sample primaries from")
       .SetParameterName("solid", false)
-      .SetCandidates("Sphere Box Cylinder")
+      .SetCandidates(RMGTools::GetCandidates<GeometricalSolidType>())
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 

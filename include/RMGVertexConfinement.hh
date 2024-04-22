@@ -17,6 +17,7 @@
 #define _RMG_VERTEX_CONFINEMENT_HH_
 
 #include <chrono>
+#include <optional>
 #include <regex>
 #include <vector>
 
@@ -34,8 +35,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
 
+    enum GeometricalSolidType {
+      kSphere,
+      kCylinder,
+      kBox,
+    };
+
     struct GenericGeometricalSolidData {
-        std::string g4_name;
+        GeometricalSolidType solid_type;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
         double sphere_inner_radius = 0;
         double sphere_outer_radius = -1;
@@ -143,7 +150,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);
     void AddGeometricalVolumeString(std::string solid);
-    GenericGeometricalSolidData& SafeBack(std::string solid_type = "");
+    GenericGeometricalSolidData& SafeBack(
+        std::optional<GeometricalSolidType> solid_type = std::nullopt);
 
     // FIXME: there is no easy way to set the position vector all at once with
     // G4GenericMessenger. Only ::DeclarePropertyWithUnit() accepts vectors and
@@ -155,29 +163,29 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     inline void SetGeomVolumeCenterZ(double z) { this->SafeBack().volume_center.setZ(z); }
 
     inline void SetGeomSphereInnerRadius(double r) {
-      this->SafeBack("Sphere").sphere_inner_radius = r;
+      this->SafeBack(kSphere).sphere_inner_radius = r;
     }
     inline void SetGeomSphereOuterRadius(double r) {
-      this->SafeBack("Sphere").sphere_outer_radius = r;
+      this->SafeBack(kSphere).sphere_outer_radius = r;
     }
 
     inline void SetGeomCylinderInnerRadius(double r) {
-      this->SafeBack("Cylinder").cylinder_inner_radius = r;
+      this->SafeBack(kCylinder).cylinder_inner_radius = r;
     }
     inline void SetGeomCylinderOuterRadius(double r) {
-      this->SafeBack("Cylinder").cylinder_outer_radius = r;
+      this->SafeBack(kCylinder).cylinder_outer_radius = r;
     }
-    inline void SetGeomCylinderHeight(double h) { this->SafeBack("Cylinder").cylinder_height = h; }
+    inline void SetGeomCylinderHeight(double h) { this->SafeBack(kCylinder).cylinder_height = h; }
     inline void SetGeomCylinderStartingAngle(double a) {
-      this->SafeBack("Cylinder").cylinder_starting_angle = a;
+      this->SafeBack(kCylinder).cylinder_starting_angle = a;
     }
     inline void SetGeomCylinderSpanningAngle(double a) {
-      this->SafeBack("Cylinder").cylinder_spanning_angle = a;
+      this->SafeBack(kCylinder).cylinder_spanning_angle = a;
     }
 
-    inline void SetGeomBoxXLength(double x) { this->SafeBack("Box").box_x_length = x; }
-    inline void SetGeomBoxYLength(double y) { this->SafeBack("Box").box_y_length = y; }
-    inline void SetGeomBoxZLength(double z) { this->SafeBack("Box").box_z_length = z; }
+    inline void SetGeomBoxXLength(double x) { this->SafeBack(kBox).box_x_length = x; }
+    inline void SetGeomBoxYLength(double y) { this->SafeBack(kBox).box_y_length = y; }
+    inline void SetGeomBoxZLength(double z) { this->SafeBack(kBox).box_z_length = z; }
 
     void DefineCommands();
 };
