@@ -27,6 +27,7 @@
 #endif
 #include "G4Backtrace.hh"
 #include "G4GenericMessenger.hh"
+#include "G4StateManager.hh"
 #include "G4UIExecutive.hh"
 #include "G4UImanager.hh"
 #include "G4VUserPhysicsList.hh"
@@ -35,6 +36,7 @@
 #include "Randomize.hh"
 
 #include "RMGConfig.hh"
+#include "RMGExceptionHandler.hh"
 #include "RMGHardware.hh"
 #include "RMGPhysics.hh"
 #include "RMGTools.hh"
@@ -156,6 +158,9 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
   // save underlying buffer and set null (only standard output)
   std::streambuf* orig_buf = std::cout.rdbuf();
   std::cout.rdbuf(nullptr);
+
+  fExceptionHandler = new RMGExceptionHandler();
+  G4StateManager::GetStateManager()->SetExceptionHandler(fExceptionHandler);
 
   fG4RunManager = std::unique_ptr<G4RunManager>(G4RunManagerFactory::CreateRunManager(type));
   fG4RunManager->SetVerboseLevel(0);

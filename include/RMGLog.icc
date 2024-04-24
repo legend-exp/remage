@@ -19,6 +19,12 @@
 
 template <typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed, bool do_flush) {
+  if (loglevel >= RMGLog::error) {
+    fHadError = true;
+  } else if (loglevel == RMGLog::warning) {
+    fHadWarning = true;
+  }
+
   // write message to screen
   if (loglevel >= RMGLog::fMinimumLogLevel) {
     std::ostream& strm = loglevel > RMGLog::LogLevel::warning ? G4cout : G4cerr;
@@ -70,7 +76,7 @@ inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt,
         RMGLog::Out(loglevel, fmt::format(fmt, args...));
     }
     catch (fmt::v8::format_error& e) {
-        RMGLog::Out(RMGLog::error, "fmt library exception caugth: ", e.what());
+        RMGLog::Out(RMGLog::error, "fmt library exception caught: ", e.what());
     }
 }
 
