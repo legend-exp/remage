@@ -566,7 +566,8 @@ void RMGVertexConfinement::BeginOfRunAction(const G4Run* run) {
 }
 
 void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
-  auto n_ev = run->GetNumberOfEventToBeProcessed();
+  auto n_ev = run->GetNumberOfEvent();
+  if (n_ev == 0) return;
   auto avg_iter = fTrials * 1. / n_ev;
   RMGLog::OutFormat(RMGLog::summary, "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% efficiency)",
       avg_iter, 100 / avg_iter);
