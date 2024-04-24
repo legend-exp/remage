@@ -45,7 +45,7 @@ jobs:
       run: |
         cd build
         ctest -R confinement/geometrical.mac --output-on-failure
-        cat -v Testing/Temporary/LastTest.log
+        cat -v  Testing/Temporary/LastTest.log
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
       run: |
