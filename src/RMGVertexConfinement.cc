@@ -44,10 +44,8 @@
 //  - physical volumes get always a bounding box assigned, but at later time
 //  - purely geometrical volumes only have the sampling_solid member defined
 RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r,
-    G4ThreeVector t, G4VSolid* s)
-    :
-
-      rotation(r), translation(t) {
+    G4ThreeVector t, G4VSolid* s, bool cc)
+    : rotation(r), translation(t), containment_check(cc) {
 
   // at least one volume must be specified
   if (!v and !s) RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
@@ -115,9 +113,9 @@ bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVec
 }
 
 void RMGVertexConfinement::SampleableObjectCollection::emplace_back(G4VPhysicalVolume* v,
-    const G4RotationMatrix& r, const G4ThreeVector& t, G4VSolid* s) {
+    const G4RotationMatrix& r, const G4ThreeVector& t, G4VSolid* s, bool cc) {
 
-  this->data.emplace_back(v, r, t, s);
+  this->data.emplace_back(v, r, t, s, cc);
 
   const auto& _v = this->data.back().volume;
   const auto& _s = this->data.back().surface;
@@ -164,8 +162,9 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         // do not specify a bounding solid at this stage
         fPhysicalVolumes.emplace_back(*it, G4RotationMatrix(), G4ThreeVector(), nullptr);
 
-        RMGLog::OutFormat(RMGLog::detail, " · '{}[{}]', mass = {}", (*it)->GetName().c_str(),
-            (*it)->GetCopyNo(), std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Mass")));
+        RMGLog::OutFormat(RMGLog::detail, " · '{}[{}]', volume = {}", (*it)->GetName().c_str(),
+            (*it)->GetCopyNo(),
+            std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Volume")));
 
         found = true;
       }

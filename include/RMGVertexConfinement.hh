@@ -85,7 +85,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     struct SampleableObject {
 
         SampleableObject() = default;
-        SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s);
+        SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s,
+            bool cc = true);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
 
@@ -111,9 +112,10 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         void emplace_back(G4VPhysicalVolume* v, const G4RotationMatrix& r, const G4ThreeVector& t,
-            G4VSolid* s);
+            G4VSolid* s, bool cc = true);
         inline void push_back(const SampleableObject& obj) {
-          this->emplace_back(obj.physical_volume, obj.rotation, obj.translation, obj.sampling_solid);
+          this->emplace_back(obj.physical_volume, obj.rotation, obj.translation, obj.sampling_solid,
+              obj.containment_check);
         }
         [[nodiscard]] inline bool empty() const { return data.empty(); }
         inline SampleableObject& back() { return data.back(); }
