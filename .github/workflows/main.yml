@@ -44,11 +44,11 @@ jobs:
       if: ${{ matrix.container_version != 'slim' }}
       run: |
         cd build
-        ctest --output-on-failure
+        ctest --output-on-failure --label-exclude 'vis'
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
       run: |
         cd build
-        ctest --output-on-failure --label-exclude extra
+        ctest --output-on-failure --label-exclude 'extra|vis'
 
 # vim: expandtab tabstop=2 shiftwidth=2

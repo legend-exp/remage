@@ -1,0 +1,3 @@
+/run/initialize
+
+/RMG/Manager/Logging/LogLevel debug
