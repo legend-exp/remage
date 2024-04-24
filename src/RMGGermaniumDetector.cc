@@ -121,6 +121,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   // create a new hit and fill it
   auto* hit = new RMGGermaniumDetectorHit();
   hit->detector_uid = det_uid;
+  hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
   hit->global_position = prestep->GetPosition();
   hit->global_time = prestep->GetGlobalTime();
