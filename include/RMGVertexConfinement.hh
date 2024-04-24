@@ -18,9 +18,11 @@
 
 #include <chrono>
 #include <optional>
+#include <queue>
 #include <regex>
 #include <vector>
 
+#include "G4GenericMessenger.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
@@ -30,7 +32,6 @@
 
 class G4VPhysicalVolume;
 class G4VSolid;
-class G4GenericMessenger;
 class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
@@ -130,6 +131,15 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     };
 
   private:
+
+    struct VolumeTreeEntry {
+        G4VPhysicalVolume* physvol;
+
+        G4ThreeVector vol_global_translation; // origin
+        G4RotationMatrix vol_global_rotation; // identity
+        std::vector<G4RotationMatrix> partial_rotations;
+        std::vector<G4ThreeVector> partial_translations;
+    };
 
     void InitializePhysicalVolumes();
     void InitializeGeometricalVolumes();

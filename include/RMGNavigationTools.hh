@@ -16,6 +16,7 @@
 #ifndef _RMG_NAVIGATION_TOOLS_HH_
 #define _RMG_NAVIGATION_TOOLS_HH_
 
+#include <set>
 #include <string>
 
 #include "G4LogicalVolume.hh"
@@ -30,6 +31,7 @@ namespace RMGNavigationTools {
   G4LogicalVolume* FindLogicalVolume(std::string name);
   G4VPhysicalVolume* FindPhysicalVolume(std::string name, int copy_nr = 0);
   G4VPhysicalVolume* FindDirectMother(G4VPhysicalVolume* volume);
+  std::set<G4VPhysicalVolume*> FindDirectMothers(G4VPhysicalVolume* volume);
 
   void PrintListOfLogicalVolumes();
   void PrintListOfPhysicalVolumes();

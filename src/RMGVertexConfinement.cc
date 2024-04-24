@@ -192,6 +192,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   // now inspect the solids the physical volumes refer to and configure the
   // appropriate sampling strategy, i.e. setting the sampling solid and
   // containment check flag
+  std::vector<SampleableObject> new_obj_from_inspection;
   for (auto&& el : fPhysicalVolumes.data) {
 
     RMGLog::OutFormatDev(RMGLog::debug, "Inspecting volume '{}'", el.physical_volume->GetName());
@@ -259,44 +260,83 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
               (lim_max.getZ() - lim_min.getZ()) / 2);
     } // sampling_solid and containment_check must hold a valid value at this point
 
+
     // determine solid transformation w.r.t. world volume reference
 
-    G4ThreeVector vol_global_translation; // origin
-    G4RotationMatrix vol_global_rotation; // identity
-    std::vector<G4RotationMatrix> partial_rotations;
-    std::vector<G4ThreeVector> partial_translations;
+    // found paths to the mother volume.
+    std::vector<VolumeTreeEntry> trees;
 
-    for (auto v = el.physical_volume; v != world_volume; v = RMGNavigationTools::FindDirectMother(v)) {
+    // queue for paths to the mother volume that still have to be searched.
+    std::queue<VolumeTreeEntry> q;
+    q.push({el.physical_volume});
 
-      if (!v)
-        RMGLog::Out(RMGLog::fatal, "nullptr detected in loop condition, this is unexpected. ",
-            "Blame RMGPhysVolNavigator::FindDirectMother?");
+    for (; !q.empty(); q.pop()) {
+      auto v = q.front();
 
-      partial_rotations.push_back(v->GetObjectRotationValue());
-      partial_translations.push_back(v->GetObjectTranslation());
+      if (!v.physvol)
+        RMGLog::OutDev(RMGLog::fatal, "nullptr detected in loop condition, this is unexpected. ",
+            "Blame RMGNavigationTools::FindDirectMother?");
 
-      vol_global_rotation = partial_rotations.back() * vol_global_rotation;
-    }
-    // world volume not included in loop
-    partial_translations.emplace_back(); // origin
-    partial_rotations.emplace_back();    // identity
+      v.partial_rotations.push_back(v.physvol->GetObjectRotationValue());
+      v.partial_translations.push_back(v.physvol->GetObjectTranslation());
 
-    // partial_rotations[0] and partial_translations[0] refer to the target
-    // volume partial_rotations[1] and partial_translations[1], to the direct
-    // mother, etc. It is necessary to rotate with respect to the frame of the
-    // mother. If there are no rotations (or only the target volume is
-    // rotated): rotations are identity matrices and vol_global_translation =
-    // sum(partial_translations)
-    for (size_t i = 0; i < partial_translations.size() - 1; i++) {
-      G4ThreeVector tmp = partial_translations[i];
-      for (size_t j = i + 1; j < partial_rotations.size() - 1; j++) { tmp *= partial_rotations[j]; }
-      vol_global_translation += tmp;
+      v.vol_global_rotation = v.partial_rotations.back() * v.vol_global_rotation;
+
+      for (auto m : RMGNavigationTools::FindDirectMothers(v.physvol)) {
+        if (m != world_volume) {
+          auto v_m = VolumeTreeEntry(v); // create a copy of the current helper object.
+          v_m.physvol = m;
+          q.push(v_m);
+        } else { // we finished that branch!
+          trees.push_back(v);
+        }
+      }
     }
 
-    // assign transformation to sampling solid
-    el.rotation = vol_global_rotation;
-    el.translation = vol_global_translation;
+    RMGLog::OutFormatDev(RMGLog::debug, "Found {} ways to reach world volume from {}", trees.size(),
+        el.physical_volume->GetName());
+
+    // finalize all found paths to the mother volume.
+    for (auto&& v : trees) {
+      // world volume not included in loop
+      v.partial_translations.emplace_back(); // origin
+      v.partial_rotations.emplace_back();    // identity
+
+      // partial_rotations[0] and partial_translations[0] refer to the target
+      // volume partial_rotations[1] and partial_translations[1], to the direct
+      // mother, etc. It is necessary to rotate with respect to the frame of the
+      // mother. If there are no rotations (or only the target volume is
+      // rotated): rotations are identity matrices and vol_global_translation =
+      // sum(partial_translations)
+      for (size_t i = 0; i < v.partial_translations.size() - 1; i++) {
+        G4ThreeVector tmp = v.partial_translations[i];
+        for (size_t j = i + 1; j < v.partial_rotations.size() - 1; j++) {
+          tmp *= v.partial_rotations[j];
+        }
+        v.vol_global_translation += tmp;
+      }
+    }
+
+    if (trees.empty())
+      RMGLog::OutDev(RMGLog::fatal, "No path to world volume found, that should not be!");
+    // assign first found transformation to current sampling solid
+    el.rotation = trees[0].vol_global_rotation;
+    el.translation = trees[0].vol_global_translation;
+
+    // we found more than one path to the mother volume. Append them to the list of sampling
+    // solids separately.
+    for (size_t i = 1; i < trees.size(); ++i) {
+      const auto& v = trees.at(i);
+      new_obj_from_inspection.emplace_back(el.physical_volume, v.vol_global_rotation,
+          v.vol_global_translation, el.sampling_solid, el.containment_check);
+    }
   }
+
+  // finally add all newly found sampling solids (this os not done directly above as this
+  // invalidates old iterators).
+  for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.push_back(s); }
+
+  RMGLog::Out(RMGLog::detail, "Sampling from ", fPhysicalVolumes.size(), " physical volumes");
 }
 
 void RMGVertexConfinement::InitializeGeometricalVolumes() {

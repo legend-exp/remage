@@ -53,6 +53,18 @@ G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
 
 G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volume) {
 
+  auto ancestors = RMGNavigationTools::FindDirectMothers(volume);
+
+  if (ancestors.size() != 1) {
+    RMGLog::Out(RMGLog::fatal, "Could not find a unique direct mother volume, ",
+        "this cannot be! Returning first ancestor in the list");
+  }
+
+  return *ancestors.begin();
+}
+
+std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(G4VPhysicalVolume* volume) {
+
   std::set<G4VPhysicalVolume*> ancestors;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
     if (v->GetLogicalVolume()->IsAncestor(volume)) ancestors.insert(v);
@@ -78,12 +90,7 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
     else it++;
   }
 
-  if (ancestors.size() != 1) {
-    RMGLog::Out(RMGLog::error, "Could not find a unique direct mother volume, ",
-        "this cannot be! Returning first ancestor in the list");
-  }
-
-  return *ancestors.begin();
+  return ancestors;
 }
 
 void RMGNavigationTools::PrintListOfLogicalVolumes() {
