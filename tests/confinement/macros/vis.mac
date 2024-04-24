@@ -19,5 +19,8 @@
 /vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
 /vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
 
+/vis/geometry/set/forceSolid
+/vis/geometry/set/colour all 10 1 1 1 0.3
+
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate

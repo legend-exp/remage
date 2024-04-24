@@ -1,4 +1,4 @@
-/control/execute macros/vis.mac
+/control/execute macros/init.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/SampleOnSurface true
