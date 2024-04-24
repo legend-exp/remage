@@ -4,6 +4,7 @@
 set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
+    ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh
     ${_root}/include/RMGGeneratorG4Gun.hh
@@ -32,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGVVertexGenerator.hh)
 
 set(PROJECT_SOURCES
+    ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc

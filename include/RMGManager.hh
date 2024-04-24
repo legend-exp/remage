@@ -26,6 +26,7 @@
 #include "G4Threading.hh"
 #include "G4VisManager.hh"
 
+#include "RMGExceptionHandler.hh"
 #include "RMGLog.hh"
 
 class G4VUserPhysicsList;
@@ -102,6 +103,13 @@ class RMGManager {
     }
     inline int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
 
+    [[nodiscard]] inline bool HadWarning() const {
+      return fExceptionHandler->HadWarning() || RMGLog::HadWarning();
+    }
+    [[nodiscard]] inline bool HadError() const {
+      return fExceptionHandler->HadError() || RMGLog::HadError();
+    }
+
   private:
 
     void SetUpDefaultG4RunManager(G4RunManagerType type = G4RunManagerType::Default);
@@ -134,6 +142,7 @@ class RMGManager {
     G4VUserPhysicsList* fPhysicsList = nullptr;
     RMGHardware* fDetectorConstruction = nullptr;
     RMGUserAction* fUserAction = nullptr;
+    RMGExceptionHandler* fExceptionHandler = nullptr;
 
     // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;

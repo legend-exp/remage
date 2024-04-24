@@ -31,6 +31,8 @@
 RMGLog::LogLevel RMGLog::fMinimumLogLevel = RMGLog::summary;
 
 bool RMGLog::fFirstOutputDone = false;
+bool RMGLog::fHadWarning = false;
+bool RMGLog::fHadError = false;
 
 bool RMGLog::fUsePrefix = true;
 

@@ -107,8 +107,12 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     if (this->IsMaster())
       RMGLog::Out(RMGLog::summary, "Opening output file: ", manager->GetOutputFileName());
     ana_man->OpenFile(manager->GetOutputFileName());
-  } else {
-    if (this->IsMaster()) RMGLog::Out(RMGLog::warning, "Object persistency disabled");
+  } else if (this->IsMaster()) {
+    // Warn user if persistency is disabled if there are detectors defined.
+    auto level = manager->GetDetectorConstruction()->GetActiveDetectorList().empty()
+                     ? RMGLog::summary
+                     : RMGLog::warning;
+    RMGLog::Out(level, "Object persistency disabled");
   }
 
   if (fRMGMasterGenerator) {
@@ -174,7 +178,8 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
         "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
         total_sec_hres / n_ev, n_ev / total_sec_hres);
 
-    if (n_ev < 100) RMGLog::Out(RMGLog::warning, "Event processing time might be inaccurate");
+    if (n_ev < 100)
+      RMGLog::Out(RMGLog::summary, "Stats: Event processing time might be inaccurate");
   }
 
   if (fRMGMasterGenerator) {

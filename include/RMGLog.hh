@@ -140,6 +140,9 @@ class RMGLog {
     template<RMGLog::Ansi color, typename T>
     static std::string Colorize(const T& msg, std::ostream& os, bool bold = false);
 
+    inline static bool HadWarning() { return fHadWarning; }
+    inline static bool HadError() { return fHadError; }
+
     /** @} */
 
   private:
@@ -164,6 +167,14 @@ class RMGLog {
     /**
      * Specifies whether there were output printouts already */
     static bool fFirstOutputDone;
+
+    /**
+     * Specifies whether there was any warning logged yet */
+    static bool fHadWarning;
+
+    /**
+     * Specifies whether there was any error logged yet */
+    static bool fHadError;
 
     /**
      * Include a prefix before each message? */
