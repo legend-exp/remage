@@ -151,9 +151,17 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
 
+    int n_ev = fRMGRun->GetNumberOfEvent();
+    int n_ev_requested = fRMGRun->GetNumberOfEventToBeProcessed();
+
     RMGLog::OutFormat(RMGLog::summary,
         "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
-        fRMGRun->GetRunID(), fRMGRun->GetNumberOfEventToBeProcessed(), fmt::localtime(time_now));
+        fRMGRun->GetRunID(), n_ev, fmt::localtime(time_now));
+    if (n_ev != n_ev_requested) {
+      RMGLog::OutFormat(RMGLog::warning,
+          "Run nr. {:d} only simulated {:d} events, out of {:d} events requested!",
+          fRMGRun->GetRunID(), n_ev, n_ev_requested);
+    }
 
     auto start_time = fRMGRun->GetStartTime();
     auto tot_elapsed_s =
@@ -171,9 +179,9 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
         "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds", elapsed_d,
         elapsed_h, elapsed_m, elapsed_s);
 
-    auto total_sec_hres = std::chrono::duration<double>(time_now - fRMGRun->GetStartTime()).count();
+    auto total_sec_hres =
+        (double)std::chrono::duration<double>(time_now - fRMGRun->GetStartTime()).count();
 
-    double n_ev = fRMGRun->GetNumberOfEvent();
     RMGLog::OutFormat(RMGLog::summary,
         "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
         total_sec_hres / n_ev, n_ev / total_sec_hres);
