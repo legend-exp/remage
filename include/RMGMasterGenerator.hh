@@ -23,7 +23,9 @@
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
 
+class G4Event;
 class G4GenericMessenger;
+class G4Run;
 class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   public:

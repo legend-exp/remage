@@ -15,6 +15,9 @@
 
 #include "RMGVertexConfinement.hh"
 
+#include <chrono>
+#include <optional>
+
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
 #include "G4Orb.hh"
@@ -304,18 +307,18 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
   // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
-    if (d.g4_name == "Sphere") {
+    if (d.solid_type == kSphere) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere/" +
                            std::to_string(fGeomVolumeSolids.size() + 1),
               d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
-    } else if (d.g4_name == "Cylinder") {
+    } else if (d.solid_type == kCylinder) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder/" +
                          std::to_string(fGeomVolumeSolids.size() + 1),
               d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
               d.cylinder_starting_angle, d.cylinder_spanning_angle));
-    } else if (d.g4_name == "Box") {
+    } else if (d.solid_type == kBox) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box/" +
                         std::to_string(fGeomVolumeSolids.size() + 1),
@@ -324,7 +327,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
     // else if (...)
     else {
       RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
-          d.g4_name);
+          d.solid_type);
     }
 
     fGeomVolumeSolids.back().containment_check = false;
@@ -350,14 +353,25 @@ void RMGVertexConfinement::Reset() {
 }
 
 bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
+  auto time_sampling_start = std::chrono::high_resolution_clock::now();
 
+  bool res = ActualGenerateVertex(vertex);
+
+  auto time_sampling_end = std::chrono::high_resolution_clock::now();
+  fVertexGenerationTime +=
+      std::chrono::duration_cast<std::chrono::nanoseconds>(time_sampling_end - time_sampling_start);
+
+  return res;
+}
+
+bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
   // configure sampling volumes (does not do anything if this is not the first
   // call)
   this->InitializePhysicalVolumes();
   this->InitializeGeometricalVolumes();
 
   RMGLog::OutDev(RMGLog::debug,
-      "Sampling mode: ", magic_enum::enum_name<RMGVertexConfinement::SamplingMode>(fSamplingMode));
+      "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
 
   int calls = 0;
 
@@ -509,32 +523,46 @@ bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
 
 void RMGVertexConfinement::SetSamplingModeString(std::string mode) {
   try {
-    this->SetSamplingMode(
-        RMGTools::ToEnum<RMGVertexConfinement::SamplingMode>(mode, "sampling mode"));
+    this->SetSamplingMode(RMGTools::ToEnum<SamplingMode>(mode, "sampling mode"));
   } catch (const std::bad_cast&) { return; }
 }
 
-void RMGVertexConfinement::AddPhysicalVolumeString(std::string expr) {
-  if (expr.find(' ') == std::string::npos) this->AddPhysicalVolumeNameRegex(expr);
-  else {
-    auto name = expr.substr(0, expr.find_first_of(' '));
-    auto copy_nr = expr.substr(expr.find_first_of(' ') + 1, std::string::npos);
-    this->AddPhysicalVolumeNameRegex(name, copy_nr);
+void RMGVertexConfinement::AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr) {
+  if (copy_nr.empty()) copy_nr = ".*"; // for default arg from messenger.
+  if (!fPhysicalVolumes.empty()) {
+    RMGLog::Out(RMGLog::fatal,
+        "Volumes for vertex confinement have already been initialized, no change possible!");
   }
+  fPhysicalVolumeNameRegexes.emplace_back(name);
+  fPhysicalVolumeCopyNrRegexes.emplace_back(copy_nr);
 }
 
 void RMGVertexConfinement::AddGeometricalVolumeString(std::string solid) {
   GenericGeometricalSolidData data;
-  data.g4_name = solid;
+  data.solid_type = RMGTools::ToEnum<GeometricalSolidType>(solid, "solid type");
   fGeomVolumeData.push_back(data);
 }
 
-RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBack() {
+RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBack(
+    std::optional<GeometricalSolidType> solid_type) {
   if (fGeomVolumeData.empty()) {
     RMGLog::Out(RMGLog::fatal, "Must call /RMG/Generator/Confinement/Geometrical/AddSolid",
         "' before setting any geometrical parameter value");
   }
+  if (!fGeomVolumeSolids.empty()) {
+    RMGLog::Out(RMGLog::fatal,
+        "Solids for vertex confinement have already been initialized, no change possible!");
+  }
+  if (!solid_type.has_value() && fGeomVolumeData.back().solid_type != solid_type) {
+    RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
+  }
   return fGeomVolumeData.back();
+}
+
+void RMGVertexConfinement::BeginOfRunAction(const G4Run* run) {
+  // Reset all timers and counters before the next run.
+  fTrials = 0;
+  fVertexGenerationTime = std::chrono::nanoseconds::zero();
 }
 
 void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
@@ -542,6 +570,8 @@ void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
   auto avg_iter = fTrials * 1. / n_ev;
   RMGLog::OutFormat(RMGLog::summary, "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% efficiency)",
       avg_iter, 100 / avg_iter);
+  RMGLog::OutFormat(RMGLog::summary, "Stats: average time to sample a vertex was {:.5f} us/event",
+      fVertexGenerationTime.count() / n_ev / 1000.0);
 }
 
 void RMGVertexConfinement::DefineCommands() {
@@ -550,18 +580,24 @@ void RMGVertexConfinement::DefineCommands() {
       "Commands for controlling primary confinement"));
 
   fMessengers.back()
+      ->DeclareMethod("Reset", &RMGVertexConfinement::Reset)
+      .SetGuidance("Reset all parameters of vertex confinement, so that it can be reconfigured.")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
       ->DeclareProperty("SampleOnSurface", fOnSurface)
       .SetGuidance("If true (or omitted argument), sample on the surface of solids")
       .SetParameterName("flag", true)
-      .SetStates(G4State_Idle)
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   fMessengers.back()
       ->DeclareMethod("SamplingMode", &RMGVertexConfinement::SetSamplingModeString)
       .SetGuidance("Select sampling mode for volume confinement")
       .SetParameterName("mode", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGVertexConfinement::SamplingMode>())
-      .SetStates(G4State_Idle)
+      .SetCandidates(RMGTools::GetCandidates<SamplingMode>())
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   fMessengers.back()
@@ -569,7 +605,7 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set maximum number of attempts for sampling primary positions in a volume")
       .SetParameterName("N", false)
       .SetRange("N > 0")
-      .SetStates(G4State_Idle)
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   fMessengers.push_back(
@@ -577,10 +613,11 @@ void RMGVertexConfinement::DefineCommands() {
           "Commands for setting physical volumes up for primary confinement"));
 
   fMessengers.back()
-      ->DeclareMethod("AddVolume", &RMGVertexConfinement::AddPhysicalVolumeString)
-      .SetGuidance("Add physical volume to sample primaries from")
-      .SetParameterName("regex", false)
-      .SetStates(G4State_Idle)
+      ->DeclareMethod("AddVolume", &RMGVertexConfinement::AddPhysicalVolumeNameRegex)
+      .SetGuidance("Add physical volume(s) to sample primaries from.")
+      .SetParameterName(0, "regex", false, false)
+      .SetParameterName(1, "copy_nr_regex", true, false)
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   fMessengers.push_back(
@@ -591,27 +628,28 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareMethod("AddSolid", &RMGVertexConfinement::AddGeometricalVolumeString)
       .SetGuidance("Add geometrical solid to sample primaries from")
       .SetParameterName("solid", false)
-      .SetStates(G4State_Idle)
+      .SetCandidates(RMGTools::GetCandidates<GeometricalSolidType>())
+      .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
   // FIXME: see comment in .hh
   fMessengers.back()
       ->DeclareMethodWithUnit("CenterPositionX", "cm", &RMGVertexConfinement::SetGeomVolumeCenterX)
-      .SetGuidance("Set center position (X coordinate")
+      .SetGuidance("Set center position (X coordinate)")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("CenterPositionY", "cm", &RMGVertexConfinement::SetGeomVolumeCenterY)
-      .SetGuidance("Set center position (Y coordinate")
+      .SetGuidance("Set center position (Y coordinate)")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("CenterPositionZ", "cm", &RMGVertexConfinement::SetGeomVolumeCenterZ)
-      .SetGuidance("Set center position (Z coordinate")
+      .SetGuidance("Set center position (Z coordinate)")
       .SetParameterName("value", false)
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Sphere/",
@@ -622,14 +660,14 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set inner radius")
       .SetParameterName("L", false)
       .SetRange("L >= 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomSphereOuterRadius)
       .SetGuidance("Set outer radius")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Cylinder/",
@@ -640,35 +678,35 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set inner radius")
       .SetParameterName("L", false)
       .SetRange("L >= 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("OuterRadius", "cm", &RMGVertexConfinement::SetGeomCylinderOuterRadius)
       .SetGuidance("Set outer radius")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("Height", "cm", &RMGVertexConfinement::SetGeomCylinderHeight)
       .SetGuidance("Set height")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("StartingAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderStartingAngle)
       .SetGuidance("Set starting angle")
       .SetParameterName("A", false)
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("SpanningAngle", "deg",
           &RMGVertexConfinement::SetGeomCylinderSpanningAngle)
       .SetGuidance("Set spanning angle")
       .SetParameterName("A", false)
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Geometrical/Box/",
@@ -679,21 +717,21 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set X length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("YLength", "cm", &RMGVertexConfinement::SetGeomBoxYLength)
       .SetGuidance("Set Y length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("ZLength", "cm", &RMGVertexConfinement::SetGeomBoxZLength)
       .SetGuidance("Set Z length")
       .SetParameterName("L", false)
       .SetRange("L > 0")
-      .SetStates(G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
