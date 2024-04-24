@@ -553,7 +553,7 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
     RMGLog::Out(RMGLog::fatal,
         "Solids for vertex confinement have already been initialized, no change possible!");
   }
-  if (!solid_type.has_value() && fGeomVolumeData.back().solid_type != solid_type) {
+  if (solid_type.has_value() && fGeomVolumeData.back().solid_type != solid_type) {
     RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
   }
   return fGeomVolumeData.back();
