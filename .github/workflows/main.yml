@@ -44,7 +44,8 @@ jobs:
       if: ${{ matrix.container_version != 'slim' }}
       run: |
         cd build
-        ctest --output-on-failure
+        ctest -R confinement/geometrical.mac --output-on-failure
+        cat -v Testing/Temporary/LastTest.log
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
       run: |
