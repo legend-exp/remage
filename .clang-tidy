@@ -25,4 +25,4 @@ CheckOptions:
   value: true
 
 FormatStyle: file
-HeaderFilterRegex: 'include/.*.hh'
+HeaderFilterRegex: 'include/.*\.(hh|icc)'
