@@ -1,6 +1,7 @@
 /control/execute macros/init.mac
 
 /RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/ForceContainmentCheck true
 
 /RMG/Generator/Confinement/SamplingMode IntersectPhysicalWithGeometrical
 

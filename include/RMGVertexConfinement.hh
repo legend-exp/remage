@@ -154,6 +154,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = kUnionAll;
     bool fOnSurface = false;
+    bool fForceContainmentCheck = false;
 
     // counters used for the current run.
     long fTrials = 0;
