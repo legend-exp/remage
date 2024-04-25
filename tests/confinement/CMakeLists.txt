@@ -20,7 +20,8 @@ foreach(_mac ${_macros})
                                                test-out.root -- macros/${_mac})
   set_tests_properties(confinement-mt/${_mac} PROPERTIES LABELS mt)
 
-  add_test(NAME confinement-vis/${_mac} COMMAND remage-cli -g gdml/geometry.gdml -o test-out.root
-                                                -- macros/vis.mac macros/${_mac})
+  add_test(NAME confinement-vis/${_mac}
+           COMMAND remage-cli -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
+                   macros/${_mac} macros/_vis-export.mac)
   set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS vis)
 endforeach()
