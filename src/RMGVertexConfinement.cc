@@ -389,6 +389,7 @@ void RMGVertexConfinement::Reset() {
   fGeomVolumeSolids.clear();
   fSamplingMode = RMGVertexConfinement::kUnionAll;
   fOnSurface = false;
+  fForceContainmentCheck = false;
 }
 
 bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
@@ -460,6 +461,14 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         } else {
           vertex = choice.translation +
                    choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
+          if (fForceContainmentCheck) {
+            auto is_inside = physical_first ? fPhysicalVolumes.IsInside(vertex)
+                                            : fGeomVolumeSolids.IsInside(vertex);
+            if (!is_inside)
+              RMGLog::OutDev(RMGLog::error,
+                  "Generated vertex not inside sampling volumes (forced containment check): ",
+                  vertex / CLHEP::cm, " cm");
+          }
         }
 
         // is it also in the other volume class (geometrical/physical)?
@@ -532,6 +541,11 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           vertex = choice.translation +
                    choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
+          if (fForceContainmentCheck && !all_volumes.IsInside(vertex)) {
+            RMGLog::OutDev(RMGLog::error,
+                "Generated vertex not inside sampling volumes (forced containment check): ",
+                vertex / CLHEP::cm, " cm");
+          }
         }
 
         RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ",
@@ -647,6 +661,15 @@ void RMGVertexConfinement::DefineCommands() {
       .SetRange("N > 0")
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareProperty("ForceContainmentCheck", fForceContainmentCheck)
+      .SetGuidance("If true (or omitted argument), perform a containment check even after sampling "
+                   "from a natively sampleable object. This is only an extra sanity check that does"
+                   "not alter the behaviour.")
+      .SetParameterName("flag", true)
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(false);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Physical/",
