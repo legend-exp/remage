@@ -1,4 +1,4 @@
-/control/execute macros/init.mac
+/control/execute macros/_init.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/ForceContainmentCheck true
@@ -36,4 +36,4 @@
 
 /run/beamOn 5000
 
-/vis/ogl/export geometrical.pdf
+/control/alias export-fn geometrical.pdf

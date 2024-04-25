@@ -1,4 +1,4 @@
-/control/execute macros/init.mac
+/control/execute macros/_init.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/ForceContainmentCheck true
@@ -21,4 +21,4 @@
 
 /run/beamOn 2000
 
-/vis/ogl/export geometrical-or-physical.pdf
+/control/alias export-fn geometrical-or-physical.pdf

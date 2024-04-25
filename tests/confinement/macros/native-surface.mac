@@ -1,4 +1,4 @@
-/control/execute macros/init.mac
+/control/execute macros/_init.mac
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/ForceContainmentCheck true
@@ -13,4 +13,4 @@
 
 /run/beamOn 2000
 
-/vis/ogl/export native-surface.pdf
+/control/alias export-fn native-surface.pdf
