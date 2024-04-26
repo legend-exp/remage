@@ -29,6 +29,8 @@
 
 namespace u = CLHEP;
 
+RMGOpticalOutputScheme::RMGOpticalOutputScheme() { this->DefineCommands(); }
+
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
@@ -56,7 +58,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 }
 
 // invoked in RMGEventAction::EndOfEventAction()
-void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
+void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
 
   auto hit_coll_id = sd_man->GetCollectionID("Optical/Hits");
@@ -100,5 +102,7 @@ void RMGOpticalOutputScheme::EndOfEventAction(const G4Event* event) {
     }
   }
 }
+
+void RMGOpticalOutputScheme::DefineCommands() {}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

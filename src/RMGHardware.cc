@@ -28,10 +28,12 @@ namespace fs = std::filesystem;
 #include "G4VPhysicalVolume.hh"
 
 #include "RMGGermaniumDetector.hh"
+#include "RMGGermaniumOutputScheme.hh"
 #include "RMGHardwareMessenger.hh"
 #include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
+#include "RMGOpticalOutputScheme.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -115,9 +117,16 @@ void RMGHardware::ConstructSDandField() {
           magic_enum::enum_name(v.type));
 
       G4VSensitiveDetector* obj = nullptr;
+      std::shared_ptr<RMGVOutputScheme> output;
       switch (v.type) {
-        case DetectorType::kOptical: obj = new RMGOpticalDetector(); break;
-        case DetectorType::kGermanium: obj = new RMGGermaniumDetector(); break;
+        case DetectorType::kOptical:
+          obj = new RMGOpticalDetector();
+          output = std::make_shared<RMGOpticalOutputScheme>();
+          break;
+        case DetectorType::kGermanium:
+          obj = new RMGGermaniumDetector();
+          output = std::make_shared<RMGGermaniumOutputScheme>();
+          break;
         case DetectorType::kLAr:
         default:
           RMGLog::OutDev(RMGLog::fatal, "No behaviour for sensitive detector type '",
@@ -125,6 +134,7 @@ void RMGHardware::ConstructSDandField() {
       }
       sd_man->AddNewDetector(obj);
       active_dets.emplace(v.type, obj);
+      fActiveOutputSchemes.insert({v.type, output});
     }
 
     // now assign logical volumes to the sensitive detector
@@ -139,13 +149,14 @@ void RMGHardware::ConstructSDandField() {
     RMGLog::OutFormat(RMGLog::debug,
         "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
         magic_enum::enum_name(v.type), pv->GetName().c_str(), v.uid, lv->GetName().c_str());
-    fActiveDetectorsInitialized = true;
   }
 
   std::string vec_repr;
   for (const auto& d : fActiveDetectors) vec_repr += std::string(magic_enum::enum_name(d)) + ", ";
   if (vec_repr.size() > 2) vec_repr.erase(vec_repr.size() - 2);
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
+
+  fActiveDetectorsInitialized = true;
 
   // copy birks constant from material properties, as it cannot be specified in GDML
   for (G4Material* mat : *G4Material::GetMaterialTable()) {

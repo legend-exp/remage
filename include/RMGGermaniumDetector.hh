@@ -77,9 +77,6 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
   private:
 
     RMGGermaniumDetectorHitsCollection* fHitsCollection = nullptr;
-
-    std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
-    void DefineCommands();
 };
 
 extern G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator;

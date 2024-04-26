@@ -16,6 +16,12 @@
 #ifndef _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 #define _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 
+#include <set>
+
+#include "G4AnalysisManager.hh"
+#include "G4GenericMessenger.hh"
+
+#include "RMGGermaniumDetector.hh"
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
@@ -23,10 +29,26 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    inline RMGGermaniumOutputScheme(G4AnalysisManager* ana_man) : RMGVOutputScheme(ana_man) {}
+    RMGGermaniumOutputScheme();
 
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
-    void EndOfEventAction(const G4Event*) override;
+    void StoreEvent(const G4Event*) override;
+    bool ShouldDiscardEvent(const G4Event*) override;
+
+    inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
+    inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
+    inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
+
+  private:
+
+    RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
+
+    double fEdepCutLow = -1;
+    double fEdepCutHigh = -1;
+    std::set<int> fEdepCutDetectors;
 };
 
 #endif

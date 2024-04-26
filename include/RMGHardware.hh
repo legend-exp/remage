@@ -28,6 +28,7 @@
 
 #include "RMGHardwareMessenger.hh"
 #include "RMGNavigationTools.hh"
+#include "RMGVOutputScheme.hh"
 
 class G4VPhysicalVolume;
 class RMGHardware : public G4VUserDetectorConstruction {
@@ -63,6 +64,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
       return fDetectorMetadata.at(det);
     }
     inline const auto& GetActiveDetectorList() { return fActiveDetectors; }
+    inline auto GetActiveOutputScheme(DetectorType type) { return fActiveOutputSchemes.at(type); }
 
     inline void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
@@ -84,6 +86,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;
     std::set<DetectorType> fActiveDetectors;
+    std::map<DetectorType, std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
     bool fActiveDetectorsInitialized = false;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;

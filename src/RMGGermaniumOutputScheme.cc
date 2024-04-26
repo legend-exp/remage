@@ -29,6 +29,8 @@
 
 namespace u = CLHEP;
 
+RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() { this->DefineCommands(); }
+
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
@@ -59,14 +61,13 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   }
 }
 
-// invoked in RMGEventAction::EndOfEventAction()
-void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
+RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
 
   auto hit_coll_id = sd_man->GetCollectionID("Germanium/Hits");
   if (hit_coll_id < 0) {
     RMGLog::OutDev(RMGLog::error, "Could not find hit collection Germanium/Hits");
-    return;
+    return nullptr;
   }
 
   auto hit_coll = dynamic_cast<RMGGermaniumDetectorHitsCollection*>(
@@ -74,8 +75,43 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
-    return;
+    return nullptr;
   }
+
+  return hit_coll;
+}
+
+// invoked in RMGEventAction::EndOfEventAction()
+bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
+  // exit fast if no threshold is configured.
+  if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
+
+  auto hit_coll = GetHitColl(event);
+  if (!hit_coll) return false;
+
+  // check defined energy threshold.
+  double event_edep = 0.;
+
+  for (auto hit : *hit_coll->GetVector()) {
+    if (!hit) continue;
+    if (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end())
+      event_edep += hit->energy_deposition;
+  }
+
+  if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
+      (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
+    RMGLog::Out(RMGLog::debug, "Discarding event - energy threshold has not been met", event_edep,
+        fEdepCutLow, fEdepCutHigh);
+    return true;
+  }
+
+  return false;
+}
+
+// invoked in RMGEventAction::EndOfEventAction()
+void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
+  auto hit_coll = GetHitColl(event);
+  if (!hit_coll) return;
 
   if (hit_coll->entries() <= 0) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
@@ -107,6 +143,29 @@ void RMGGermaniumOutputScheme::EndOfEventAction(const G4Event* event) {
       ana_man->AddNtupleRow(ntupleid);
     }
   }
+}
+
+void RMGGermaniumOutputScheme::DefineCommands() {
+
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/",
+      "Commands for controlling output from hits in germanium detectors.");
+
+  fMessenger->DeclareMethodWithUnit("SetEdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
+      .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetEdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
+      .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethod("AddDetectorForEdepThreshold", &RMGGermaniumOutputScheme::AddEdepCutDetector)
+      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
+      .SetParameterName("det_uid", false)
+      .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

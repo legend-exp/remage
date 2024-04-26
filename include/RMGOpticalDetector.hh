@@ -76,9 +76,6 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
   private:
 
     RMGOpticalDetectorHitsCollection* fHitsCollection = nullptr;
-
-    std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
-    void DefineCommands();
 };
 
 extern G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator;

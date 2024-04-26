@@ -18,6 +18,9 @@
 
 #include <vector>
 
+#include "G4AnalysisManager.hh"
+#include "G4GenericMessenger.hh"
+
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
@@ -25,10 +28,15 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    inline RMGOpticalOutputScheme(G4AnalysisManager* ana_man) : RMGVOutputScheme(ana_man) {}
+    RMGOpticalOutputScheme();
 
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
-    void EndOfEventAction(const G4Event*) override;
+    void StoreEvent(const G4Event*) override;
+
+  private:
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif
