@@ -54,7 +54,7 @@ class RMGRunAction : public G4UserRunAction {
       return fOutputDataFields.at(d_type);
     }
     inline void ClearOutputDataFields() {
-      for (auto& el : fOutputDataFields) el.second->clear();
+      for (auto& el : fOutputDataFields) el.second->ClearBeforeEvent();
     }
 
   private:
@@ -66,7 +66,7 @@ class RMGRunAction : public G4UserRunAction {
 
     int fCurrentPrintModulo = -1;
 
-    std::map<RMGHardware::DetectorType, std::unique_ptr<RMGVOutputScheme>> fOutputDataFields;
+    std::map<RMGHardware::DetectorType, std::shared_ptr<RMGVOutputScheme>> fOutputDataFields;
 };
 
 #endif

@@ -42,8 +42,8 @@ G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right)
 }
 
 void RMGGermaniumDetectorHit::Print() {
-  // TODO: add all fields
   RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
+      " / Particle: ", this->particle_type,
       " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
       " / Position: ", this->global_position / CLHEP::m, " m",
       " / Time: ", this->global_time / CLHEP::ns, " ns");
@@ -65,8 +65,6 @@ RMGGermaniumDetector::RMGGermaniumDetector() : G4VSensitiveDetector("Germanium")
   // declare only one hit collection.
   // NOTE: names in the respective output scheme class must match this
   G4VSensitiveDetector::collectionName.insert("Hits");
-
-  this->DefineCommands();
 }
 
 void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
@@ -133,11 +131,5 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 }
 
 void RMGGermaniumDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
-
-void RMGGermaniumDetector::DefineCommands() {
-
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Detector/Germanium/",
-      "Commands for controlling stuff");
-}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -47,8 +47,6 @@ RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
   // declare only one hit collection.
   // NOTE: names in the respective output scheme class must match this
   G4VSensitiveDetector::collectionName.insert("Hits");
-
-  this->DefineCommands();
 }
 
 void RMGOpticalDetector::Initialize(G4HCofThisEvent* hit_coll) {
@@ -116,11 +114,5 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 }
 
 void RMGOpticalDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
-
-void RMGOpticalDetector::DefineCommands() {
-
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Detector/Optical/",
-      "Commands for controlling stuff");
-}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

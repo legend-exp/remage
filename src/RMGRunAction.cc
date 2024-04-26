@@ -71,24 +71,13 @@ void RMGRunAction::SetupAnalysisManager() {
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   for (const auto& d_type : det_cons->GetActiveDetectorList()) {
 
-    RMGLog::OutFormatDev(RMGLog::debug,
-        "Initializing output scheme for sensitive detector type '{}'", magic_enum::enum_name(d_type));
-
-    // instantiate concrete output scheme class
-    // TODO: allow for library user to register own output scheme
-    switch (d_type) {
-      case RMGHardware::kOptical:
-        fOutputDataFields.emplace(d_type, std::make_unique<RMGOpticalOutputScheme>(ana_man));
-        fOutputDataFields[d_type]->AssignOutputNames(ana_man);
-        break;
-      case RMGHardware::kGermanium:
-        fOutputDataFields.emplace(d_type, std::make_unique<RMGGermaniumOutputScheme>(ana_man));
-        fOutputDataFields[d_type]->AssignOutputNames(ana_man);
-        break;
-      default:
-        RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
-            magic_enum::enum_name(d_type), "' implemented (implement me)");
+    fOutputDataFields[d_type] = det_cons->GetActiveOutputScheme(d_type);
+    if (!fOutputDataFields[d_type]) {
+      RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
+          magic_enum::enum_name(d_type), "' implemented (implement me)");
     }
+
+    fOutputDataFields[d_type]->AssignOutputNames(ana_man);
   }
 }
 
