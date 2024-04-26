@@ -36,7 +36,7 @@ RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
-  auto print_modulo = RMGManager::Instance()->GetPrintModulo();
+  auto print_modulo = fRunAction->GetCurrentRunPrintModulo();
   if ((event->GetEventID() + 1) % print_modulo == 0) {
 
     auto current_run = dynamic_cast<const RMGRun*>(G4RunManager::GetRunManager()->GetCurrentRun());

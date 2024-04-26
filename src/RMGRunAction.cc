@@ -138,9 +138,10 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   auto g4manager = G4RunManager::GetRunManager();
   auto tot_events = g4manager->GetNumberOfEventsToBeProcessed();
-  if (manager->GetPrintModulo() <= 0 and tot_events >= 100)
-    manager->SetPrintModulo(tot_events / 10);
-  else if (tot_events < 100) manager->SetPrintModulo(100);
+
+  fCurrentPrintModulo = manager->GetPrintModulo();
+  if (fCurrentPrintModulo <= 0 and tot_events >= 100) fCurrentPrintModulo = tot_events / 10;
+  else if (tot_events < 100) fCurrentPrintModulo = 100;
 }
 
 void RMGRunAction::EndOfRunAction(const G4Run*) {
@@ -203,10 +204,6 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     G4AnalysisManager::Instance()->Write();
     G4AnalysisManager::Instance()->CloseFile();
   }
-
-  // reset print modulo
-  // TODO: if it's user specified, it shouldn't be reset
-  RMGManager::Instance()->SetPrintModulo(-1);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
