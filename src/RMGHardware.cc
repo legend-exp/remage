@@ -43,7 +43,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   if (!fGDMLFiles.empty()) {
     RMGLog::Out(RMGLog::debug, "Setting up G4GDMLParser");
     G4GDMLParser parser;
-    parser.SetOverlapCheck(true);
+    parser.SetOverlapCheck(!fGDMLDisableOverlapCheck);
     for (const auto& file : fGDMLFiles) {
       RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
@@ -57,8 +57,6 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       RMGLog::Out(RMGLog::fatal, "DefineGeometry() returned nullptr. ",
           "Did you forget to reimplement the base class method, or to specify a GDML file?");
   }
-
-  // TODO: build and return world volume?
 
   // attach user max step sizes to logical volumes
   for (const auto& el : fPhysVolStepLimits) {
@@ -189,6 +187,11 @@ void RMGHardware::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
       "Commands for controlling geometry definitions");
+
+  fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
+      .SetGuidance("Disable the automatic overlap check after loading a GDML file")
+      .SetStates(G4State_PreInit)
+      .SetToBeBroadcasted(false);
 
   fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
       .SetGuidance("Use GDML file for geometry definition")
