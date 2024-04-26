@@ -30,7 +30,7 @@ class RMGVGenerator {
 
     RMGVGenerator() = delete;
 
-    inline RMGVGenerator(std::string name) : fGeneratorName(name){};
+    inline RMGVGenerator(std::string name) : fGeneratorName(name) {};
 
     virtual inline ~RMGVGenerator() = default;
 
