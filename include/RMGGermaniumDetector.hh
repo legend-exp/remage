@@ -47,6 +47,7 @@ class RMGGermaniumDetectorHit : public G4VHit {
     void Draw() override;
 
     int detector_uid = -1;
+    int particle_type = -1;
     float energy_deposition = -1;
     G4ThreeVector global_position;
     double global_time = -1;
