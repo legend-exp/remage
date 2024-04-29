@@ -15,9 +15,11 @@ else()
 endif()
 
 # build flags for special ASAN build.
-set(CMAKE_C_FLAGS_ASAN "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer")
+set(CMAKE_C_FLAGS_ASAN
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer")
 
-set(CMAKE_CXX_FLAGS_ASAN "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_ASAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer")
 
 set(CMAKE_EXE_LINKER_FLAGS_ASAN
     "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address,undefined -static-libasan")
