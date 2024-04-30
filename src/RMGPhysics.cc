@@ -189,22 +189,18 @@ void RMGPhysics::ConstructProcess() {
     switch(fHadronicPhysicsListOption) {
       case RMGPhysics::HadronicPhysicsListOption::kQGSP_BIC_HP:        
         hPhysics = new G4HadronPhysicsQGSP_BIC_HP(G4VModularPhysicsList::verboseLevel);
-        fPhysicsListHadrons = "QGSP_BIC_HP";
         RMGLog::Out(RMGLog::detail, "Using QGSP_BIC_HP");
         break;
       case RMGPhysics::HadronicPhysicsListOption::kQGSP_BERT_HP:        
         hPhysics = new G4HadronPhysicsQGSP_BERT_HP(G4VModularPhysicsList::verboseLevel);
-        fPhysicsListHadrons = "QGSP_BERT_HP";
         RMGLog::Out(RMGLog::detail, "Using QGSP_BERT_HP");
         break;
       case RMGPhysics::HadronicPhysicsListOption::kFTFP_BERT_HP:        
         hPhysics = new G4HadronPhysicsFTFP_BERT_HP(G4VModularPhysicsList::verboseLevel);
-        fPhysicsListHadrons = "FTFP_BERT_HP";
         RMGLog::Out(RMGLog::detail, "Using FTFP_BERT_HP");
         break;
       case RMGPhysics::HadronicPhysicsListOption::kShielding:        
         hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
-        fPhysicsListHadrons = "Shielding";
         RMGLog::Out(RMGLog::detail, "Using Shielding");
         break;
     }
