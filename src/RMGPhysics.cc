@@ -186,8 +186,21 @@ void RMGPhysics::ConstructProcess() {
   if(fUseHadPhys)  
   {
     RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
-    G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
-    hElasticPhysics->ConstructProcess();
+    //G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
+    //hElasticPhysics->ConstructProcess();
+
+    G4HadronElasticProcess* process1 = new G4HadronElasticProcess();
+    pManager->AddDiscreteProcess(process1);
+    G4ParticleHPElastic*  model1a = new G4ParticleHPElastic();
+    process1->RegisterMe(model1a);
+    process1->AddDataSet(new G4ParticleHPElasticData());
+    
+    if (fUseThermalScattering) {
+      model1a->SetMinEnergy(4*u::eV);   
+      G4ParticleHPThermalScattering* model1b = new G4ParticleHPThermalScattering();
+      process1->RegisterMe(model1b);
+      process1->AddDataSet(new G4ParticleHPThermalScatteringData());
+    }
     
     G4VPhysicsConstructor* hPhysics = 0;
     switch(fHadronicPhysicsListOption) {
@@ -220,19 +233,6 @@ void RMGPhysics::ConstructProcess() {
     ionPhysics->ConstructProcess();
 
   }   
-
-  RMGLog::Out(RMGLog::detail, "Adding ion physics");
-  G4ParticleHPElastic*  model1a = new G4ParticleHPElastic();
-  process1->RegisterMe(model1a);
-  process1->AddDataSet(new G4ParticleHPElasticData());
-  
-  RMGLog::Out(RMGLog::detail, "Adding ion physics");
-  if (fUseThermalScattering) {
-    model1a->SetMinEnergy(4*eV);   
-    G4ParticleHPThermalScattering* model1b = new G4ParticleHPThermalScattering();
-    process1->RegisterMe(model1b);
-    process1->AddDataSet(new G4ParticleHPThermalScatteringData());
-  }
 
   // Add decays
   RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
@@ -446,6 +446,11 @@ void RMGPhysics::DefineCommands() {
       .SetGuidance("Add hadronic processes to the physics list")
       .SetCandidates(RMGTools::GetCandidates<RMGPhysics::HadronicPhysicsListOption>())
       .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("ThermalScattering", &RMGPhysics::SetUseThermalScattering)
+      .SetGuidance("Use thermal scattering cross sections for neutrons")
+      .SetCandidate("0 1")
+      .SetStates(G4States_PreInit);
 
   // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)

@@ -82,6 +82,8 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetLowEnergyEMOptionString(std::string option);
     void SetHadronicPhysicsListOptionString(std::string option);
 
+    void SetUseThermalScattering(bool val){fUseThermalScattering = val;}
+
     void SetUseGammaAngCorr(bool);
     void SetGammaTwoJMAX(int max_two_j);
     void SetStoreICLevelData(bool);
@@ -100,6 +102,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     bool fConstructOptical = false;
     bool fUseLowEnergyEM = false;
     bool fUseHadPhys = false;
+    bool fUseThermalScattering = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kShielding;
 
