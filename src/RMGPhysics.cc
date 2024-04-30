@@ -159,6 +159,60 @@ void RMGPhysics::ConstructProcess() {
   if (fConstructOptical) this->ConstructOptical();
   else RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
 
+  // Hadronic Physics
+
+  /*
+  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false );
+  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
+  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
+  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false );
+  G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( false );
+  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false );
+  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
+  */
+
+  if(!fUseNoHadPhysFlag)  
+  {
+    RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
+    G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
+    hElasticPhysics->ConstructProcess();
+    
+    G4VPhysicsConstructor* hPhysics = 0;
+    switch(fHadronicPhysicsListOption) {
+      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BIC_HP:        
+        hPhysics = new G4HadronPhysicsQGSP_BIC_HP(G4VModularPhysicsList::verboseLevel);
+        fPhysicsListHadrons = "QGSP_BIC_HP";
+        RMGLog::Out(RMGLog::detail, "Using QGSP_BIC_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BERT_HP:        
+        hPhysics = new G4HadronPhysicsQGSP_BERT_HP(G4VModularPhysicsList::verboseLevel);
+        fPhysicsListHadrons = "QGSP_BERT_HP";
+        RMGLog::Out(RMGLog::detail, "Using QGSP_BERT_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kFTFP_BERT_HP:        
+        hPhysics = new G4HadronPhysicsFTFP_BERT_HP(G4VModularPhysicsList::verboseLevel);
+        fPhysicsListHadrons = "FTFP_BERT_HP";
+        RMGLog::Out(RMGLog::detail, "Using FTFP_BERT_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kShielding:        
+        hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
+        fPhysicsListHadrons = "Shielding";
+        RMGLog::Out(RMGLog::detail, "Using Shielding");
+        break;
+    }
+    RMGLog::Out(RMGLog::detail, "Adding hadronic inelastic physics");
+    hPhysics->ConstructProcess();
+    
+    RMGLog::Out(RMGLog::detail, "Adding stopping physics");
+    G4VPhysicsConstructor* stoppingPhysics = new G4StoppingPhysics(G4VModularPhysicsList::verboseLevel);
+    stoppingPhysics->ConstructProcess();
+
+    RMGLog::Out(RMGLog::detail, "Adding ion physics");
+    G4VPhysicsConstructor* ionPhysics = new G4IonPhysics(G4VModularPhysicsList::verboseLevel);
+    ionPhysics->ConstructProcess();
+
+  }   
+
   // Add decays
   RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
   auto decay_physics = new G4DecayPhysics(G4VModularPhysicsList::verboseLevel);
@@ -167,6 +221,7 @@ void RMGPhysics::ConstructProcess() {
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
