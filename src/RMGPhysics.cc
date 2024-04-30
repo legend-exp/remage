@@ -50,6 +50,10 @@
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
 #include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsShielding.hh"
+#include "G4ParticleHPElastic.hh"
+#include "G4ParticleHPElasticData.hh"
+#include "G4ParticleHPThermalScattering.hh"
+#include "G4ParticleHPThermalScatteringData.hh"
 #include "G4RegionStore.hh"
 #include "G4RunManagerKernel.hh"
 #include "G4Scintillation.hh"
@@ -179,7 +183,7 @@ void RMGPhysics::ConstructProcess() {
   G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
   */
 
-  if(!fUseNoHadPhysFlag)  
+  if(fUseHadPhys)  
   {
     RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
     G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
@@ -216,6 +220,19 @@ void RMGPhysics::ConstructProcess() {
     ionPhysics->ConstructProcess();
 
   }   
+
+  RMGLog::Out(RMGLog::detail, "Adding ion physics");
+  G4ParticleHPElastic*  model1a = new G4ParticleHPElastic();
+  process1->RegisterMe(model1a);
+  process1->AddDataSet(new G4ParticleHPElasticData());
+  
+  RMGLog::Out(RMGLog::detail, "Adding ion physics");
+  if (fUseThermalScattering) {
+    model1a->SetMinEnergy(4*eV);   
+    G4ParticleHPThermalScattering* model1b = new G4ParticleHPThermalScattering();
+    process1->RegisterMe(model1b);
+    process1->AddDataSet(new G4ParticleHPThermalScatteringData());
+  }
 
   // Add decays
   RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
@@ -385,6 +402,15 @@ void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
   try {
     fLowEnergyEMOption =
         RMGTools::ToEnum<RMGPhysics::LowEnergyEMOption>(option, "low energy EM option");
+    fUseLowEnergyEM = true;
+  } catch (const std::bad_cast&) { return; }
+}
+
+void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
+  try {
+    fHadronicPhysicsListOption =
+        RMGTools::ToEnum<RMGPhysics::HadronicPhysicsListOption>(option, "hadronic physics list option");
+    fUseHadPhys = true;
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -414,6 +440,11 @@ void RMGPhysics::DefineCommands() {
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
       .SetGuidance("Add low energy electromagnetic processes to the physics list")
       .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("HadronicPhysics", &RMGPhysics::SetHadronicPhysicsListOptionString)
+      .SetGuidance("Add hadronic processes to the physics list")
+      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::HadronicPhysicsListOption>())
       .SetStates(G4State_PreInit);
 
   // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).

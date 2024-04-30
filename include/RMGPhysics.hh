@@ -78,7 +78,10 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetCuts() override;
     void SetPhysicsRealm(PhysicsRealm realm);
     void SetPhysicsRealmString(std::string realm);
+
     void SetLowEnergyEMOptionString(std::string option);
+    void SetHadronicPhysicsListOptionString(std::string option);
+
     void SetUseGammaAngCorr(bool);
     void SetGammaTwoJMAX(int max_two_j);
     void SetStoreICLevelData(bool);
@@ -95,8 +98,8 @@ class RMGPhysics : public G4VModularPhysicsList {
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
     bool fConstructOptical = false;
-    bool fUseLowEnergyEM = true;
-    bool fUseNoHadPhysFlag = false;
+    bool fUseLowEnergyEM = false;
+    bool fUseHadPhys = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kShielding;
 
