@@ -15,15 +15,41 @@
 
 #include "RMGStackingAction.hh"
 
+#include "G4EventManager.hh"
+#include "G4OpticalPhoton.hh"
+#include "G4Track.hh"
+
 #include "RMGEventAction.hh"
+#include "RMGGermaniumOutputScheme.hh"
+#include "RMGHardware.hh"
+#include "RMGManager.hh"
+#include "RMGOpticalOutputScheme.hh"
+#include "RMGRunAction.hh"
 
-RMGStackingAction::RMGStackingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
+RMGStackingAction::RMGStackingAction(RMGRunAction* runaction) : fRunAction(runaction) {}
 
-G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* /*aTrack*/) {
+G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aTrack) {
+  // defer tracking of optical photons.
+  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
   return fUrgent;
 }
 
-void RMGStackingAction::NewStage() {}
+void RMGStackingAction::NewStage() {
+  auto ge_output = fRunAction->GetOutputDataFields(RMGHardware::DetectorType::kGermanium);
+  if (ge_output == nullptr) return;
+
+  bool discard_photons =
+      (dynamic_cast<RMGGermaniumOutputScheme&>(*ge_output)).GetDiscardPhotonsIfNoGermaniumEdep();
+  if (!discard_photons) return;
+
+  auto run_man = RMGManager::Instance()->GetG4RunManager();
+  const auto event = run_man->GetCurrentEvent();
+  if (ge_output->ShouldDiscardEvent(event)) {
+    // discard all waiting events, as there was no energy deposition in Germanium.
+    auto stack_man = G4EventManager::GetEventManager()->GetStackManager();
+    stack_man->clear();
+  }
+}
 
 void RMGStackingAction::PrepareNewEvent() {}
 

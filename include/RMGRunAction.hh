@@ -50,8 +50,10 @@ class RMGRunAction : public G4UserRunAction {
 
     [[nodiscard]] inline int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
 
-    inline auto& GetOutputDataFields(RMGHardware::DetectorType d_type) {
-      return fOutputDataFields.at(d_type);
+    inline std::shared_ptr<RMGVOutputScheme> GetOutputDataFields(RMGHardware::DetectorType d_type) {
+      auto it = fOutputDataFields.find(d_type);
+      if (it != fOutputDataFields.end()) return (*it).second;
+      return nullptr;
     }
     inline void ClearOutputDataFields() {
       for (auto& el : fOutputDataFields) el.second->ClearBeforeEvent();

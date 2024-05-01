@@ -166,6 +166,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
       .SetParameterName("det_uid", false)
       .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
+      .SetGuidance("Disable the automatic overlap check after loading a GDML file")
+      .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
