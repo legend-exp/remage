@@ -27,3 +27,10 @@ set_tests_properties(${_macros_extra} PROPERTIES LABELS extra)
 
 list(TRANSFORM _macros_vis PREPEND "basics/")
 set_tests_properties(${_macros_vis} PROPERTIES LABELS vis)
+
+# further specific tests.
+
+# expect two overlaps from this prepared geometry.
+add_test(NAME basics/overlaps.mac COMMAND remage-cli -- macros/overlaps.mac)
+set_tests_properties(basics/overlaps.mac PROPERTIES PASS_REGULAR_EXPRESSION
+                                                    "GeomVol1002.*GeomVol1002")

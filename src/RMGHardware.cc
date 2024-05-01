@@ -20,6 +20,7 @@ namespace fs = std::filesystem;
 
 #include "G4GDMLParser.hh"
 #include "G4GenericMessenger.hh"
+#include "G4GeomTestVolume.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4SDManager.hh"
@@ -43,7 +44,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   if (!fGDMLFiles.empty()) {
     RMGLog::Out(RMGLog::debug, "Setting up G4GDMLParser");
     G4GDMLParser parser;
-    parser.SetOverlapCheck(!fGDMLDisableOverlapCheck);
+    parser.SetOverlapCheck(false); // overlap check is performed below.
     for (const auto& file : fGDMLFiles) {
       RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
@@ -51,6 +52,14 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
+
+    // Check for overlaps, but with no verbose output.
+    if (!fGDMLDisableOverlapCheck) {
+      RMGLog::Out(RMGLog::summary, "Checking for overlaps in GDML geometry...");
+      auto test_vol =
+          new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
+      test_vol->TestOverlapInTree();
+    }
   } else {
     fWorld = this->DefineGeometry();
     if (!fWorld)
@@ -190,6 +199,11 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
       .SetGuidance("Disable the automatic overlap check after loading a GDML file")
+      .SetStates(G4State_PreInit)
+      .SetToBeBroadcasted(false);
+
+  fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
+      .SetGuidance("Change the number of points sampled for overlap checks")
       .SetStates(G4State_PreInit)
       .SetToBeBroadcasted(false);
 
