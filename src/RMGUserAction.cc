@@ -42,7 +42,7 @@ void RMGUserAction::Build() const {
   this->SetUserAction(generator_primary);
   this->SetUserAction(event_action);
   this->SetUserAction(run_action);
-  this->SetUserAction(new RMGStackingAction(event_action));
+  this->SetUserAction(new RMGStackingAction(run_action));
   this->SetUserAction(new RMGSteppingAction(event_action));
   this->SetUserAction(new RMGTrackingAction(event_action));
 }

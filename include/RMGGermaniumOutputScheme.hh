@@ -39,6 +39,10 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
+    [[nodiscard]] inline bool GetDiscardPhotonsIfNoGermaniumEdep() const {
+      return fDiscardPhotonsIfNoGermaniumEdep;
+    }
+
   private:
 
     RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);
@@ -49,6 +53,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     double fEdepCutLow = -1;
     double fEdepCutHigh = -1;
     std::set<int> fEdepCutDetectors;
+
+    bool fDiscardPhotonsIfNoGermaniumEdep = false;
 };
 
 #endif

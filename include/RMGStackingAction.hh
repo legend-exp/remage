@@ -19,12 +19,12 @@
 #include "G4UserStackingAction.hh"
 
 class G4Track;
-class RMGEventAction;
+class RMGRunAction;
 class RMGStackingAction : public G4UserStackingAction {
 
   public:
 
-    RMGStackingAction(RMGEventAction*);
+    RMGStackingAction(RMGRunAction*);
     ~RMGStackingAction() = default;
 
     RMGStackingAction(RMGStackingAction const&) = delete;
@@ -38,7 +38,7 @@ class RMGStackingAction : public G4UserStackingAction {
 
   private:
 
-    RMGEventAction* fEventAction = nullptr;
+    RMGRunAction* fRunAction = nullptr;
 };
 
 #endif
