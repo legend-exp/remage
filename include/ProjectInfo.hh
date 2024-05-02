@@ -1,0 +1,9 @@
+// other useful GEANT4 exported variables:
+//   G4VIS_USE_<DRIVER>
+//   G4VIS_USE_OPENGLX
+//   G4GEOM_USE_USOLIDS
+//   G4MULTITHREADED
+#define RMG_PROJECT_VERSION "0.1.0"
+#define RMG_HAS_ROOT 1
+#define RMG_HAS_BXDECAY0 1
+#define RMG_HAS_GDML 1

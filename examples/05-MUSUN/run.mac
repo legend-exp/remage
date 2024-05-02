@@ -1,0 +1,16 @@
+# /RMG/Manager/Logging/LogLevelScreen debug
+
+#/tracking/verbose 1
+
+/run/initialize
+
+/RMG/Output/FileName output.root
+
+
+
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select MUSUNCosmicMuons
+
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_10k_events.csv
+
+/run/beamOn 1000
