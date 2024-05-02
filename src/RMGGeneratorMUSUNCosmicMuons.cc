@@ -44,8 +44,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
 
   // Check if the original file exists / the tmp file does not exist
   std::ifstream originalFile(pathToFile);
-  if (!originalFile)
-    RMGLog::Out(RMGLog::fatal, "MUSUN file not found! Exit.");
+  if (!originalFile) RMGLog::Out(RMGLog::fatal, "MUSUN file not found! Exit.");
 
   if (std::filesystem::exists((std::string)fPathToTmpFile)) {
     RMGLog::Out(RMGLog::warning, "Temporary file already exists. Deleting it.");
@@ -77,21 +76,20 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
 
   // Based on the number of columns, add additional columns
   if (numColumns == 8) {
-      header_template += "#column double theta\n"
-                          "#column double phi\n";
+    header_template += "#column double theta\n"
+                       "#column double phi\n";
   } else if (numColumns == 9) {
-      header_template += "#column double px\n"
-                          "#column double py\n"
-                          "#column double pz\n";
-  }
-  else
-    RMGLog::Out(RMGLog::fatal, "MUSUN format not identified! It has " + to_string(numColumns) + " columns. Exit.");
+    header_template += "#column double px\n"
+                       "#column double py\n"
+                       "#column double pz\n";
+  } else
+    RMGLog::Out(RMGLog::fatal,
+        "MUSUN format not identified! It has " + to_string(numColumns) + " columns. Exit.");
 
 
   // Create a temporary file and write the header
   std::ofstream tmpFile(fPathToTmpFile);
-  if (!tmpFile) 
-    RMGLog::Out(RMGLog::fatal, "Unable to create temporary file! Exit.");
+  if (!tmpFile) RMGLog::Out(RMGLog::fatal, "Unable to create temporary file! Exit.");
 
   tmpFile << header_template;
 
@@ -101,7 +99,6 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
   // Close files
   originalFile.close();
   tmpFile.close();
-
 }
 
 void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
