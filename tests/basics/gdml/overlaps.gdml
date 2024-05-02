@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="World" x="10" y="10" z="10" lunit="m"/>
+		<box name="Box" x="1" y="1" z="1" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="Box">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Box"/>
+		</volume>
+		<volume name="World">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="World"/>
+			<physvol name="Box1">
+				<volumeref ref="Box"/>
+				<position name="Box_pos" x="0" y="0" z="0" unit="m"/>
+				<rotation name="Box_rot" x="0" y="0" z="0" unit="rad"/>
+			</physvol>
+			<physvol name="Box2">
+				<volumeref ref="Box"/>
+				<position name="Box_pos" x="0" y="0.5" z="0" unit="m"/>
+				<rotation name="Box_rot" x="0" y="0" z="0" unit="rad"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="World"/>
+	</setup>
+</gdml>
