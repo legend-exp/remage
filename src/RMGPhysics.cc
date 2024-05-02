@@ -192,9 +192,11 @@ void RMGPhysics::ConstructProcess() {
     G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
     hElasticPhysics->ConstructProcess(); 
 
-    RMGLog::Out(RMGLog::detail, "Adding neutron thermal scattering elastic physics");
-    G4VPhysicsConstructor* hThermalScatteringPhysics = new G4ThermalNeutrons(G4VModularPhysicsList::verboseLevel);
-    hThermalScatteringPhysics->ConstructProcess(); 
+    if(fUseThermalScattering){
+      RMGLog::Out(RMGLog::detail, "Adding neutron thermal scattering elastic physics");
+      G4VPhysicsConstructor* hThermalScatteringPhysics = new G4ThermalNeutrons(G4VModularPhysicsList::verboseLevel);
+      hThermalScatteringPhysics->ConstructProcess(); 
+    }
 
     G4VPhysicsConstructor* hPhysics = 0;
     switch(fHadronicPhysicsListOption) {
