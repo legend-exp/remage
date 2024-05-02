@@ -9,11 +9,6 @@
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
-
-#include "G4ThreeVector.hh"
-
-#include "ProjectInfo.hh"
-
 namespace u = CLHEP;
 
 class G4Event;
