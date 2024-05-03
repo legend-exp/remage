@@ -15,17 +15,17 @@
 #include "RMGManager.hh"
 #include "RMGTools.hh"
 
-#include "G4CsvAnalysisReader.hh"
 #include "G4AutoLock.hh"
+#include "G4CsvAnalysisReader.hh"
 
 #include <filesystem>
 #include <vector>
 
 namespace u = CLHEP;
 namespace {
- G4Mutex RMGGeneratorMUSUNCosmicMuonsDestrMutex = G4MUTEX_INITIALIZER; 
- G4Mutex RMGGeneratorMUSUNCosmicMuonsMutex = G4MUTEX_INITIALIZER; 
-}
+  G4Mutex RMGGeneratorMUSUNCosmicMuonsDestrMutex = G4MUTEX_INITIALIZER;
+  G4Mutex RMGGeneratorMUSUNCosmicMuonsMutex = G4MUTEX_INITIALIZER;
+} // namespace
 
 G4CsvAnalysisReader* RMGGeneratorMUSUNCosmicMuons::fAnalysisReader = 0;
 RMGGeneratorMUSUNCosmicMuons_Data* RMGGeneratorMUSUNCosmicMuons::input_data = 0;
@@ -112,13 +112,13 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
 void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 
   G4AutoLock lock(&RMGGeneratorMUSUNCosmicMuonsMutex);
-  if(!fAnalysisReader){
+  if (!fAnalysisReader) {
     PrepareCopy(fPathToFile);
     using G4AnalysisReader = G4CsvAnalysisReader;
     fAnalysisReader = G4AnalysisReader::Instance();
     fAnalysisReader->SetVerboseLevel(1);
     fAnalysisReader->SetFileName(fPathToTmpFile);
-    G4int ntupleId = fAnalysisReader->GetNtuple("MUSUN",fPathToTmpFile);
+    G4int ntupleId = fAnalysisReader->GetNtuple("MUSUN", fPathToTmpFile);
     if (ntupleId < 0) RMGLog::Out(RMGLog::fatal, "Temp MUSUN file not found! Exit.");
 
     input_data = new RMGGeneratorMUSUNCosmicMuons_Data;
@@ -142,7 +142,10 @@ void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
 
   std::filesystem::remove((std::string)fPathToTmpFile);
 
-  if(fAnalysisReader) { delete fAnalysisReader; fAnalysisReader=0; }
+  if (fAnalysisReader) {
+    delete fAnalysisReader;
+    fAnalysisReader = 0;
+  }
 
   lock.unlock();
 }
@@ -151,7 +154,7 @@ void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
 void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
 
   G4AutoLock lock(&RMGGeneratorMUSUNCosmicMuonsMutex);
-  
+
 
   fAnalysisReader->GetNtupleRow();
 
@@ -159,8 +162,8 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   if (input_data->fType == 10) fGun->SetParticleDefinition(theParticleTable->FindParticle("mu-"));
   else fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
 
-  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", input_data->fX * u::cm / u::m,
-      input_data->fY * u::cm / u::m, input_data->fZ * u::cm / u::m);
+  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m",
+      input_data->fX * u::cm / u::m, input_data->fY * u::cm / u::m, input_data->fZ * u::cm / u::m);
   fGun->SetParticlePosition({input_data->fX * u::cm, input_data->fY * u::cm, input_data->fZ * u::cm});
 
   if (input_data->fTheta != 0 && input_data->fPhi != 0) {
@@ -169,13 +172,13 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
     d_cart.setPhi(input_data->fPhi);     // in rad
     d_cart.setMag(1 * u::m);
     fGun->SetParticleMomentumDirection(d_cart);
-    RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg", input_data->fTheta / u::deg,
-        input_data->fPhi / u::deg);
+    RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
+        input_data->fTheta / u::deg, input_data->fPhi / u::deg);
   } else {
     G4ThreeVector d_cart(input_data->fPx, input_data->fPy, input_data->fPz);
     fGun->SetParticleMomentumDirection(d_cart);
-    RMGLog::OutFormat(RMGLog::debug, "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) deg", input_data->fPx,
-        input_data->fPy, input_data->fPz);
+    RMGLog::OutFormat(RMGLog::debug, "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) deg",
+        input_data->fPx, input_data->fPy, input_data->fPz);
   }
 
 
