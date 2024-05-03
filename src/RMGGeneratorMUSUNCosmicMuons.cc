@@ -184,7 +184,6 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   fGun->SetParticleEnergy(input_data->fEkin * u::GeV);
 
   fGun->GeneratePrimaryVertex(event);
-
 }
 
 void RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile(G4String pathToFile) { fPathToFile = pathToFile; }
