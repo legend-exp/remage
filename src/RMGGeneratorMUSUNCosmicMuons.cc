@@ -28,12 +28,12 @@ RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MU
   fGun = std::make_unique<G4ParticleGun>();
 }
 
-void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
+void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
   /*
-  The working assumption is that the user uses the output directly from MUSUN, i.e. there is no header. 
-  To allow proper multiprocessing, we want the file to be read using G4CsvAnalysisReader. 
-  To do this, we copy the file to /var/tmp with the appropriate header. 
-  To determine the header format, we need to determine the number of columns. 
+  The working assumption is that the user uses the output directly from MUSUN, i.e. there is no header.
+  To allow proper multiprocessing, we want the file to be read using G4CsvAnalysisReader.
+  To do this, we copy the file to /var/tmp with the appropriate header.
+  To determine the header format, we need to determine the number of columns.
   */
 
   // Define fPathToTmpFile
@@ -58,7 +58,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
   }
   std::istringstream iss(firstLine);
   std::vector<std::string> tokens(std::istream_iterator<std::string>{iss},
-                                  std::istream_iterator<std::string>());
+      std::istream_iterator<std::string>());
   int numColumns = tokens.size();
 
   // Define header template
