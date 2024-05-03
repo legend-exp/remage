@@ -140,21 +140,19 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
   G4AutoLock lock(&RMGGeneratorMUSUNCosmicMuonsDestrMutex);
 
-  std::filesystem::remove((std::string)fPathToTmpFile);
-
   if (fAnalysisReader) {
+    std::filesystem::remove((std::string)fPathToTmpFile);
     delete fAnalysisReader;
     fAnalysisReader = 0;
+    delete input_data;
+    input_data = 0;
   }
-
-  lock.unlock();
 }
 
 
 void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
 
   G4AutoLock lock(&RMGGeneratorMUSUNCosmicMuonsMutex);
-
 
   fAnalysisReader->GetNtupleRow();
 
@@ -181,13 +179,11 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
         input_data->fPx, input_data->fPy, input_data->fPz);
   }
 
-
   RMGLog::OutFormat(RMGLog::debug, "...energy {:.4g} GeV", input_data->fEkin);
   fGun->SetParticleEnergy(input_data->fEkin * u::GeV);
 
   fGun->GeneratePrimaryVertex(event);
 
-  lock.unlock();
 }
 
 void RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile(G4String pathToFile) { fPathToFile = pathToFile; }
