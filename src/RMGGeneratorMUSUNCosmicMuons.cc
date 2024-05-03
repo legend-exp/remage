@@ -142,12 +142,11 @@ void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
 
   if (fAnalysisReader) {
     std::filesystem::remove((std::string)fPathToTmpFile);
-    //delete fAnalysisReader;
-    //fAnalysisReader = 0;
-    //delete input_data;
-    //input_data = 0;
+    // delete fAnalysisReader;
+    // fAnalysisReader = 0;
+    // delete input_data;
+    // input_data = 0;
   }
-
 }
 
 
