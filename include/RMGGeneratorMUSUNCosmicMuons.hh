@@ -13,19 +13,18 @@
 
 namespace u = CLHEP;
 
-struct RMGGeneratorMUSUNCosmicMuons_Data
-{
-  G4int fID;
-  G4int fType;
-  G4double fEkin;
-  G4double fX;
-  G4double fY;
-  G4double fZ;
-  G4double fTheta;
-  G4double fPhi;
-  G4double fPx;
-  G4double fPy;
-  G4double fPz;
+struct RMGGeneratorMUSUNCosmicMuons_Data {
+    G4int fID;
+    G4int fType;
+    G4double fEkin;
+    G4double fX;
+    G4double fY;
+    G4double fZ;
+    G4double fTheta;
+    G4double fPhi;
+    G4double fPx;
+    G4double fPy;
+    G4double fPz;
 };
 
 
