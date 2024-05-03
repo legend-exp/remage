@@ -9,7 +9,25 @@
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
+#include "G4CsvAnalysisReader.hh"
+
 namespace u = CLHEP;
+
+struct RMGGeneratorMUSUNCosmicMuons_Data
+{
+  G4int fID;
+  G4int fType;
+  G4double fEkin;
+  G4double fX;
+  G4double fY;
+  G4double fZ;
+  G4double fTheta;
+  G4double fPhi;
+  G4double fPx;
+  G4double fPy;
+  G4double fPz;
+};
+
 
 class G4Event;
 class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
@@ -43,17 +61,9 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     G4String fPathToTmpFolder = "/var/tmp/";
     G4String fPathToTmpFile = "";
 
-    G4int fID;
-    G4int fType;
-    G4double fEkin;
-    G4double fX;
-    G4double fY;
-    G4double fZ;
-    G4double fTheta;
-    G4double fPhi;
-    G4double fPx;
-    G4double fPy;
-    G4double fPz;
+    static G4CsvAnalysisReader* fAnalysisReader;
+
+    static RMGGeneratorMUSUNCosmicMuons_Data* input_data;
 };
 
 #endif
