@@ -9,7 +9,8 @@ int main(int argc, char** argv) {
 
   RMGManager manager("05-MUSUN", argc, argv);
   manager.SetUserInit(new HPGeTestStand());
-
+  manager.SetNumberOfThreads(2);
+  manager.EnablePersistency();
   manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe1", 0);
   manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe2", 1);
   manager.GetDetectorConstruction()->RegisterDetector(RMGHardware::kGermanium, "HPGe3", 2);
