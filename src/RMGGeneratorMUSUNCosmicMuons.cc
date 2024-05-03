@@ -39,7 +39,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
   // Define fPathToTmpFile
   std::filesystem::path originalFilePath((std::string)pathToFile);
   G4String fileName = originalFilePath.filename().string();
-  fPathToTmpFile = fPathToTmpFolder + fileName;
+  fPathToTmpFile = fPathToTmpFolder + fileName; //.substr(0, fileName.find_last_of(".")) + "_nt_MUSUN.csv";
 
   // Check if the original file exists / the tmp file does not exist
   std::ifstream originalFile(pathToFile);
@@ -93,6 +93,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile){
   tmpFile << header_template;
 
   // Copy contents from original file to temporary file
+  tmpFile << firstLine << std::endl;
   tmpFile << originalFile.rdbuf();
 
   // Close files
@@ -108,8 +109,8 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
   auto analysisReader = G4AnalysisReader::Instance();
   analysisReader->SetVerboseLevel(1);
   analysisReader->SetFileName(fPathToTmpFile);
-  G4int ntupleId = analysisReader->GetNtuple("MUSUN");
-  if (ntupleId < 0) RMGLog::Out(RMGLog::fatal, "MUSUN file not found!");
+  G4int ntupleId = analysisReader->GetNtuple("MUSUN",fPathToTmpFile);
+  if (ntupleId < 0) RMGLog::Out(RMGLog::fatal, "Temp MUSUN file not found! Exit.");
 
   analysisReader->SetNtupleIColumn(0, "ID", fID);
   analysisReader->SetNtupleIColumn(0, "type", fType);
@@ -122,6 +123,7 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
   analysisReader->SetNtupleDColumn(0, "px", fPx);
   analysisReader->SetNtupleDColumn(0, "py", fPy);
   analysisReader->SetNtupleDColumn(0, "pz", fPz);
+
 }
 
 void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
