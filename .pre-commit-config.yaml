@@ -30,7 +30,7 @@ repos:
   rev: v2.2.6
   hooks:
   - id: codespell
-    args: ["-L", "hist"]
+    args: ["-L", "hist,manuel"]
 
 - repo: local
   hooks:
