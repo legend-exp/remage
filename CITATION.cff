@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: remage
+doi: TODO
+date-released: 2024-05-05
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Pertoldi
+    given-names: Luigi
+    orcid: https://orcid.org/0000-0002-0467-2571
+  - family-names: Huber
+    given-names: Manuel
+    email: info@manuelhu.de
+  - family-names: Neuberger
+    given-names: Moritz
+    orcid: https://orcid.org/0009-0001-8471-9076
+  - family-names: Morgan
+    given-names: Benjamin
+    orcid: https://orcid.org/0000-0003-3604-0883
