@@ -16,6 +16,7 @@
 #ifndef _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 #define _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 
+#include <optional>
 #include <set>
 
 #include "G4AnalysisManager.hh"
@@ -34,14 +35,12 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
     void StoreEvent(const G4Event*) override;
     bool ShouldDiscardEvent(const G4Event*) override;
+    std::optional<bool> StackingActionNewStage(int) override;
+    std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
     inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
-
-    [[nodiscard]] inline bool GetDiscardPhotonsIfNoGermaniumEdep() const {
-      return fDiscardPhotonsIfNoGermaniumEdep;
-    }
 
   private:
 
