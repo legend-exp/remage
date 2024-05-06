@@ -1,0 +1,22 @@
+/RMG/Manager/Logging/LogLevel debug
+
+/run/initialize
+
+/vis/open OGL #OIQt
+/vis/scene/create
+/vis/sceneHandler/attach
+
+/vis/drawVolume
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Generator/Select MUSUNCosmicMuons
+
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_10k_events.dat
+
+/run/beamOn 10

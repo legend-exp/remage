@@ -6,7 +6,9 @@
 /docs/api
 /docs/extra
 build
+install
 .local
+.vscode
 
 # G4 outputs
 *.root
@@ -25,6 +27,7 @@ compile_commands.json
 *.swo
 .mypy_cache
 __pycache__
+*.dat
 
 # python
 .venv
