@@ -20,6 +20,7 @@
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
 #include "G4HCtable.hh"
+#include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 
 #include "RMGGermaniumDetector.hh"
@@ -143,6 +144,23 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->AddNtupleRow(ntupleid);
     }
   }
+}
+
+std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
+    int stage) {
+  if (stage != 0) return std::nullopt;
+  // defer tracking of optical photons.
+  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
+  return fUrgent;
+}
+
+std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int stage) {
+  if (stage != 0) return std::nullopt;
+  if (!fDiscardPhotonsIfNoGermaniumEdep) return true;
+  auto run_man = RMGManager::Instance()->GetG4RunManager();
+  const auto event = run_man->GetCurrentEvent();
+  // discard all waiting events, as there was no energy deposition in Germanium.
+  return !ShouldDiscardEvent(event);
 }
 
 void RMGGermaniumOutputScheme::DefineCommands() {

@@ -38,6 +38,7 @@ class RMGStackingAction : public G4UserStackingAction {
 
   private:
 
+    int fStage = 0;
     RMGRunAction* fRunAction = nullptr;
 };
 

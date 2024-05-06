@@ -52,9 +52,10 @@ class RMGRunAction : public G4UserRunAction {
 
     inline std::shared_ptr<RMGVOutputScheme> GetOutputDataFields(RMGHardware::DetectorType d_type) {
       auto it = fOutputDataFields.find(d_type);
-      if (it != fOutputDataFields.end()) return (*it).second;
+      if (it != fOutputDataFields.end()) return it->second;
       return nullptr;
     }
+    [[nodiscard]] inline const auto& GetAllOutputDataFields() { return fOutputDataFields; }
     inline void ClearOutputDataFields() {
       for (auto& el : fOutputDataFields) el.second->ClearBeforeEvent();
     }

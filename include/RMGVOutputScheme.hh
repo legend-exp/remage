@@ -16,9 +16,12 @@
 #ifndef _RMG_V_OUTPUT_SCHEME_HH_
 #define _RMG_V_OUTPUT_SCHEME_HH_
 
+#include <optional>
 #include <string>
 
 #include "G4AnalysisManager.hh"
+#include "G4Track.hh"
+#include "G4UserStackingAction.hh"
 
 #include "fmt/format.h"
 
@@ -36,6 +39,13 @@ class RMGVOutputScheme {
     virtual inline void ClearBeforeEvent() {}
     virtual inline bool ShouldDiscardEvent(const G4Event*) { return false; }
     virtual inline void StoreEvent(const G4Event*) {}
+
+    // hook into RMGStackingAction.
+    virtual inline std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*,
+        const int) {
+      return std::nullopt;
+    }
+    virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
     inline std::string GetNtupleName(int det_uid) { return fmt::format("det{:03}", det_uid); }
 };
