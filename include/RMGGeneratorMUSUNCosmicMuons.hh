@@ -43,7 +43,7 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     RMGGeneratorMUSUNCosmicMuons& operator=(RMGGeneratorMUSUNCosmicMuons&&) = delete;
 
     void GeneratePrimaries(G4Event* event);
-    virtual void SetParticlePosition(G4ThreeVector) override {};
+    virtual void SetParticlePosition(G4ThreeVector) override{};
 
 
     void BeginOfRunAction(const G4Run*);
