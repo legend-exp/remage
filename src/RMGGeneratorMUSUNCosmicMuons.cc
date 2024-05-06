@@ -1,7 +1,7 @@
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 
 #include <filesystem>
-#include <math>
+#include <cmath>
 #include <vector>
 
 #include "G4GenericMessenger.hh"
