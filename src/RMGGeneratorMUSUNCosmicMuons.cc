@@ -15,6 +15,7 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
+#include "RMGVGenerator.hh"
 
 #include "G4AutoLock.hh"
 #include "G4CsvAnalysisReader.hh"
