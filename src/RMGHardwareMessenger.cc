@@ -16,6 +16,7 @@
 #include "RMGHardwareMessenger.hh"
 
 #include "G4Tokenizer.hh"
+#include "G4UIcommand.hh"
 
 #include "RMGHardware.hh"
 #include "RMGTools.hh"
@@ -42,6 +43,12 @@ RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
   p_copy->SetDefaultValue("0");
   fRegisterCmd->SetParameter(p_copy);
 
+  auto p_reuse = new G4UIparameter("allow_id_reuse", 'b', true);
+  p_reuse->SetGuidance(
+      "append this volume to a previously allocated unique detector id, instead of erroring out.");
+  p_reuse->SetDefaultValue("false");
+  fRegisterCmd->SetParameter(p_reuse);
+
   fRegisterCmd->AvailableForStates(G4State_PreInit);
 }
 
@@ -61,8 +68,11 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   int copy_nr = 0;
   auto copy_nr_str = next();
   if (!copy_nr_str.empty()) copy_nr = std::stoi(copy_nr_str);
+  bool allow_reuse = false;
+  auto allow_reuse_str = next();
+  if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
 
-  fHardware->RegisterDetector(type, pv_name, uid, copy_nr);
+  fHardware->RegisterDetector(type, pv_name, uid, copy_nr, allow_reuse);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
