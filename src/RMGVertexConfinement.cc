@@ -268,7 +268,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
     // queue for paths to the mother volume that still have to be searched.
     std::queue<VolumeTreeEntry> q;
-    q.push({el.physical_volume});
+    q.emplace(el.physical_volume);
 
     for (; !q.empty(); q.pop()) {
       auto v = q.front();
@@ -612,7 +612,7 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
   return fGeomVolumeData.back();
 }
 
-void RMGVertexConfinement::BeginOfRunAction(const G4Run* run) {
+void RMGVertexConfinement::BeginOfRunAction(const G4Run*) {
   // Reset all timers and counters before the next run.
   fTrials = 0;
   fVertexGenerationTime = std::chrono::nanoseconds::zero();
