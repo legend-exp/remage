@@ -1,7 +1,8 @@
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 
-#include "RMGVGenerator.hh"
-#include "math.h"
+#include <filesystem>
+#include <math>
+#include <vector>
 
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
@@ -14,12 +15,10 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
+#include "RMGVGenerator.hh"
 
 #include "G4AutoLock.hh"
 #include "G4CsvAnalysisReader.hh"
-
-#include <filesystem>
-#include <vector>
 
 namespace u = CLHEP;
 namespace {
@@ -142,12 +141,11 @@ void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
 
   if (fAnalysisReader) {
     std::filesystem::remove((std::string)fPathToTmpFile);
-    //delete fAnalysisReader;
-    //fAnalysisReader = 0;
-    //delete input_data;
-    //input_data = 0;
+    // delete fAnalysisReader;
+    // fAnalysisReader = 0;
+    // delete input_data;
+    // input_data = 0;
   }
-
 }
 
 
