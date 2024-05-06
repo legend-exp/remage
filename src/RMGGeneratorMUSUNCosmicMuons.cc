@@ -1,7 +1,8 @@
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 
-#include "RMGVGenerator.hh"
-#include "math.h"
+#include <filesystem>
+#include <math>
+#include <vector>
 
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
