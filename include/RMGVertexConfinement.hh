@@ -133,6 +133,10 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
   private:
 
     struct VolumeTreeEntry {
+        VolumeTreeEntry() = delete;
+        VolumeTreeEntry(const VolumeTreeEntry&) = default;
+        inline VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
+
         G4VPhysicalVolume* physvol;
 
         G4ThreeVector vol_global_translation; // origin
