@@ -10,6 +10,7 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 
 #include "G4CsvAnalysisReader.hh"
+#include <filesystem>
 
 namespace u = CLHEP;
 
@@ -57,7 +58,7 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     G4String fPathToFile = "";
-    G4String fPathToTmpFolder = "/var/tmp/";
+    std::filesystem::path fPathToTmpFolder;
     G4String fPathToTmpFile = "";
 
     static G4CsvAnalysisReader* fAnalysisReader;

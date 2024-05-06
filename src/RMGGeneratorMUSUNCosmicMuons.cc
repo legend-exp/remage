@@ -33,6 +33,7 @@ RMGGeneratorMUSUNCosmicMuons_Data* RMGGeneratorMUSUNCosmicMuons::input_data = 0;
 RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MUSUNCosmicMuons") {
   this->DefineCommands();
   fGun = std::make_unique<G4ParticleGun>();
+  fPathToTmpFolder = std::filesystem::temp_directory_path();
 }
 
 void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
@@ -45,9 +46,8 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
 
   // Define fPathToTmpFile
   std::filesystem::path originalFilePath((std::string)pathToFile);
-  G4String fileName = originalFilePath.filename().string();
-  fPathToTmpFile =
-      fPathToTmpFolder + fileName; //.substr(0, fileName.find_last_of(".")) + "_nt_MUSUN.csv";
+  std::filesystem::path fileName = originalFilePath.filename();
+  fPathToTmpFile = (G4String) (fPathToTmpFolder / fileName); //.substr(0, fileName.find_last_of(".")) + "_nt_MUSUN.csv";
 
   // Check if the original file exists / the tmp file does not exist
   std::ifstream originalFile(pathToFile);
