@@ -161,18 +161,20 @@ void RMGHardware::ConstructSDandField() {
 }
 
 void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
-    int copy_nr) {
+    int copy_nr, bool allow_uid_reuse) {
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error,
         "Active detectors cannot be mutated after constructing the detector.");
     return;
   }
 
-  // sanity check
-  for (const auto& [k, v] : fDetectorMetadata) {
-    if (v.uid == uid) {
-      RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
-      return;
+  // sanity check for duplicate uids.
+  if (!allow_uid_reuse) {
+    for (const auto& [k, v] : fDetectorMetadata) {
+      if (v.uid == uid) {
+        RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
+        return;
+      }
     }
   }
 
@@ -187,8 +189,8 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
         copy_nr);
   } else {
     RMGLog::OutFormat(RMGLog::detail,
-        "Registered physical volume '{}' (copy nr. {}) as {} detector type", pv_name, copy_nr,
-        magic_enum::enum_name(type));
+        "Registered physical volume '{}' (copy nr. {}) as {} detector type (uid={})", pv_name,
+        copy_nr, magic_enum::enum_name(type), uid);
   }
 }
 

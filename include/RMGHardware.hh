@@ -56,7 +56,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
         int uid;
     };
 
-    void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr = 0);
+    void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr = 0,
+        bool allow_uid_reuse = false);
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
     inline const auto& GetDetectorMetadata(const std::pair<std::string, int>& det) {
       return fDetectorMetadata.at(det);

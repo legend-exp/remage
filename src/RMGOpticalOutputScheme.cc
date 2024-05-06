@@ -15,6 +15,8 @@
 
 #include "RMGOpticalOutputScheme.hh"
 
+#include <set>
+
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
 #include "G4HCtable.hh"
@@ -34,8 +36,13 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   const auto det_cons = rmg_man->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
+  std::set<int> registered_uids;
   for (auto&& det : detectors) {
     if (det.second.type != RMGHardware::kOptical) continue;
+
+    // do not register the ntuple twice if two detectors share their uid.
+    auto had_uid = registered_uids.emplace(det.second.uid);
+    if (!had_uid.second) continue;
 
     auto id = rmg_man->RegisterNtuple(det.second.uid);
     ana_man->CreateNtuple(this->GetNtupleName(det.second.uid), "Event data");
