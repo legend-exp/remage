@@ -46,7 +46,8 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
   // Define fPathToTmpFile
   std::filesystem::path originalFilePath((std::string)pathToFile);
   std::filesystem::path fileName = originalFilePath.filename();
-  fPathToTmpFile = (G4String) (fPathToTmpFolder / fileName); //.substr(0, fileName.find_last_of(".")) + "_nt_MUSUN.csv";
+  fPathToTmpFile = (G4String)(fPathToTmpFolder /
+                              fileName); //.substr(0, fileName.find_last_of(".")) + "_nt_MUSUN.csv";
 
   // Check if the original file exists / the tmp file does not exist
   std::ifstream originalFile(pathToFile);
