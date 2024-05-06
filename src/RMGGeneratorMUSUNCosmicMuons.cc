@@ -20,9 +20,6 @@
 #include "G4AutoLock.hh"
 #include "G4CsvAnalysisReader.hh"
 
-#include <filesystem>
-#include <vector>
-
 namespace u = CLHEP;
 namespace {
   G4Mutex RMGGeneratorMUSUNCosmicMuonsDestrMutex = G4MUTEX_INITIALIZER;
