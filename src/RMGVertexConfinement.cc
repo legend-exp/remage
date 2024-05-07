@@ -254,10 +254,15 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
       RMGLog::OutDev(RMGLog::debug, "Bounding box coordinates: min = ", lim_min, ", max = ", lim_max);
 
+      // the origin of the local coordinates of the non-sampleable solid is not necessarily at its
+      // barycenter. However, the coordinate origin of a G4Box is always its barycenter.
+      double bb_x = std::max(std::abs(lim_max.getX()), std::abs(lim_min.getX()));
+      double bb_y = std::max(std::abs(lim_max.getY()), std::abs(lim_min.getY()));
+      double bb_z = std::max(std::abs(lim_max.getZ()), std::abs(lim_min.getZ()));
+
       el.sampling_solid =
-          new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox",
-              (lim_max.getX() - lim_min.getX()) / 2, (lim_max.getY() - lim_min.getY()) / 2,
-              (lim_max.getZ() - lim_min.getZ()) / 2);
+          new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox", bb_x,
+              bb_y, bb_z);
     } // sampling_solid and containment_check must hold a valid value at this point
 
 
