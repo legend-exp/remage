@@ -112,10 +112,10 @@ bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVec
   return false;
 }
 
-void RMGVertexConfinement::SampleableObjectCollection::emplace_back(G4VPhysicalVolume* v,
-    const G4RotationMatrix& r, const G4ThreeVector& t, G4VSolid* s, bool cc) {
+template<typename... Args>
+void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... args) {
 
-  this->data.emplace_back(v, r, t, s, cc);
+  this->data.emplace_back(std::forward<Args>(args)...);
 
   const auto& _v = this->data.back().volume;
   const auto& _s = this->data.back().surface;
@@ -339,7 +339,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
   // finally add all newly found sampling solids (this os not done directly above as this
   // invalidates old iterators).
-  for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.push_back(s); }
+  for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.emplace_back(s); }
 
   RMGLog::Out(RMGLog::detail, "Sampling from ", fPhysicalVolumes.size(), " physical volumes");
 }
