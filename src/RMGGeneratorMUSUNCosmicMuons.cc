@@ -26,8 +26,8 @@ namespace {
   G4Mutex RMGGeneratorMUSUNCosmicMuonsMutex = G4MUTEX_INITIALIZER;
 } // namespace
 
-G4CsvAnalysisReader* RMGGeneratorMUSUNCosmicMuons::fAnalysisReader = 0;
-RMGGeneratorMUSUNCosmicMuons_Data* RMGGeneratorMUSUNCosmicMuons::input_data = 0;
+G4CsvAnalysisReader* RMGGeneratorMUSUNCosmicMuons::fAnalysisReader = nullptr;
+RMGGeneratorMUSUNCosmicMuons_Data* RMGGeneratorMUSUNCosmicMuons::input_data = nullptr;
 
 RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MUSUNCosmicMuons") {
   this->DefineCommands();
