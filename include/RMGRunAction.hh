@@ -48,7 +48,7 @@ class RMGRunAction : public G4UserRunAction {
     void BeginOfRunAction(const G4Run*) override;
     void EndOfRunAction(const G4Run*) override;
 
-    inline int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
+    [[nodiscard]] inline int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
 
     inline auto& GetOutputDataFields(RMGHardware::DetectorType d_type) {
       return fOutputDataFields.at(d_type);
