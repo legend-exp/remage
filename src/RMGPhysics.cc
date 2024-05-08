@@ -71,7 +71,7 @@ namespace u = CLHEP;
 RMGPhysics::RMGPhysics() {
 
   G4VUserPhysicsList::defaultCutValue = 0.1 * u::mm;
-  this->SetPhysicsRealm(RMGPhysics::kDoubleBetaDecay);
+  this->SetPhysicsRealm(PhysicsRealm::kDoubleBetaDecay);
 
   G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevel() <= RMGLog::debug ? 1 : 0;
 
@@ -123,41 +123,40 @@ void RMGPhysics::ConstructProcess() {
   // EM Physics
   G4VPhysicsConstructor* em_constructor = nullptr;
   RMGLog::Out(RMGLog::detail, "Adding electromagnetic physics");
-  if (fUseLowEnergyEM) {
-    switch (fLowEnergyEMOption) {
-      // from https://geant4.web.cern.ch/node/1731
-      case RMGPhysics::LowEnergyEMOption::kOption1:
-        em_constructor = new G4EmStandardPhysics_option1(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 1");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kOption2:
-        em_constructor = new G4EmStandardPhysics_option2(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 2");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kOption3:
-        em_constructor = new G4EmStandardPhysics_option3(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 3");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kOption4:
-        em_constructor = new G4EmStandardPhysics_option4(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 4");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kPenelope:
-        em_constructor = new G4EmPenelopePhysics(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using Penelope Physics");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kLivermorePolarized:
-        em_constructor = new G4EmLivermorePolarizedPhysics(G4VModularPhysicsList::verboseLevel);
-        RMGLog::Out(RMGLog::detail, "Using Livermore-Polarized Physics");
-        break;
-      case RMGPhysics::LowEnergyEMOption::kLivermore:
-        RMGLog::Out(RMGLog::detail, "Using Livermore/LowEnergy electromagnetic physics");
-        em_constructor = new G4EmLivermorePhysics(G4VModularPhysicsList::verboseLevel);
-        break;
-    }
-  } else {
-    RMGLog::Out(RMGLog::detail, "Using Standard electromagnetic physics");
-    em_constructor = new G4EmStandardPhysics(G4VModularPhysicsList::verboseLevel);
+  switch (fLowEnergyEMOption) {
+    case LowEnergyEMOption::kNone:
+      RMGLog::Out(RMGLog::detail, "Using Standard electromagnetic physics");
+      em_constructor = new G4EmStandardPhysics(G4VModularPhysicsList::verboseLevel);
+      break;
+    // from https://geant4.web.cern.ch/node/1731
+    case LowEnergyEMOption::kOption1:
+      em_constructor = new G4EmStandardPhysics_option1(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 1");
+      break;
+    case LowEnergyEMOption::kOption2:
+      em_constructor = new G4EmStandardPhysics_option2(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 2");
+      break;
+    case LowEnergyEMOption::kOption3:
+      em_constructor = new G4EmStandardPhysics_option3(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 3");
+      break;
+    case LowEnergyEMOption::kOption4:
+      em_constructor = new G4EmStandardPhysics_option4(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using EmPhysics Option 4");
+      break;
+    case LowEnergyEMOption::kPenelope:
+      em_constructor = new G4EmPenelopePhysics(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using Penelope Physics");
+      break;
+    case LowEnergyEMOption::kLivermorePolarized:
+      em_constructor = new G4EmLivermorePolarizedPhysics(G4VModularPhysicsList::verboseLevel);
+      RMGLog::Out(RMGLog::detail, "Using Livermore-Polarized Physics");
+      break;
+    case LowEnergyEMOption::kLivermore:
+      RMGLog::Out(RMGLog::detail, "Using Livermore/LowEnergy electromagnetic physics");
+      em_constructor = new G4EmLivermorePhysics(G4VModularPhysicsList::verboseLevel);
+      break;
   }
 
   em_constructor->ConstructProcess();
@@ -186,7 +185,7 @@ void RMGPhysics::ConstructProcess() {
   G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
   */
 
-  if (fUseHadPhys) {
+  if (fHadronicPhysicsListOption != HadronicPhysicsListOption::kNone) {
     RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
     G4VPhysicsConstructor* hElasticPhysics =
         new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
@@ -199,21 +198,23 @@ void RMGPhysics::ConstructProcess() {
       hThermalScatteringPhysics->ConstructProcess();
     }
 
-    G4VPhysicsConstructor* hPhysics = 0;
+    G4VPhysicsConstructor* hPhysics = nullptr;
     switch (fHadronicPhysicsListOption) {
-      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BIC_HP:
+      case HadronicPhysicsListOption::kNone:
+        throw std::domain_error("Got unexpected HadronicPhysicsListOption::kNone");
+      case HadronicPhysicsListOption::kQGSP_BIC_HP:
         hPhysics = new G4HadronPhysicsQGSP_BIC_HP(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using QGSP_BIC_HP");
         break;
-      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BERT_HP:
+      case HadronicPhysicsListOption::kQGSP_BERT_HP:
         hPhysics = new G4HadronPhysicsQGSP_BERT_HP(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using QGSP_BERT_HP");
         break;
-      case RMGPhysics::HadronicPhysicsListOption::kFTFP_BERT_HP:
+      case HadronicPhysicsListOption::kFTFP_BERT_HP:
         hPhysics = new G4HadronPhysicsFTFP_BERT_HP(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using FTFP_BERT_HP");
         break;
-      case RMGPhysics::HadronicPhysicsListOption::kShielding:
+      case HadronicPhysicsListOption::kShielding:
         hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Shielding");
         break;
@@ -340,7 +341,7 @@ void RMGPhysics::SetCuts() {
 
 void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
   switch (realm) {
-    case RMGPhysics::PhysicsRealm::kDoubleBetaDecay:
+    case PhysicsRealm::kDoubleBetaDecay:
       RMGLog::Out(RMGLog::summary, "Realm set to DoubleBetaDecay");
       // The default values for the energy thresholds are tuned to 100 keV
       // in natural germanium (i.e., the BBdecay realm)
@@ -355,7 +356,7 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
       fStepCutsSensitive.positron = 0.1 * u::mm;
       break;
 
-    case RMGPhysics::PhysicsRealm::kDarkMatter:
+    case PhysicsRealm::kDarkMatter:
       RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
       // These values are tuned to ~1 keV for gamma, e+, e- in
       // natural germanium.
@@ -370,7 +371,7 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
       fStepCutsSensitive.positron = 0.5 * u::um;
       break;
 
-    case RMGPhysics::PhysicsRealm::kCosmicRays:
+    case PhysicsRealm::kCosmicRays:
       RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
       fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
       fStepCuts.gamma = 5 * u::cm;
@@ -384,7 +385,7 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
       fStepCutsSensitive.positron = 40 * u::um;
       break;
 
-    case RMGPhysics::PhysicsRealm::kLArScintillation:
+    case PhysicsRealm::kLArScintillation:
       RMGLog::Out(RMGLog::warning, "LAr scintillation realm unimplemented");
   }
 
@@ -396,23 +397,20 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 
 void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
   try {
-    fLowEnergyEMOption =
-        RMGTools::ToEnum<RMGPhysics::LowEnergyEMOption>(option, "low energy EM option");
-    fUseLowEnergyEM = true;
+    fLowEnergyEMOption = RMGTools::ToEnum<LowEnergyEMOption>(option, "low energy EM option");
   } catch (const std::bad_cast&) { return; }
 }
 
 void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
   try {
-    fHadronicPhysicsListOption = RMGTools::ToEnum<RMGPhysics::HadronicPhysicsListOption>(option,
-        "hadronic physics list option");
-    fUseHadPhys = true;
+    fHadronicPhysicsListOption =
+        RMGTools::ToEnum<HadronicPhysicsListOption>(option, "hadronic physics list option");
   } catch (const std::bad_cast&) { return; }
 }
 
 void RMGPhysics::SetPhysicsRealmString(std::string realm) {
   try {
-    this->SetPhysicsRealm(RMGTools::ToEnum<RMGPhysics::PhysicsRealm>(realm, "physics realm"));
+    this->SetPhysicsRealm(RMGTools::ToEnum<PhysicsRealm>(realm, "physics realm"));
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -426,7 +424,7 @@ void RMGPhysics::DefineCommands() {
   fMessenger->DeclareMethod("Realm", &RMGPhysics::SetPhysicsRealmString)
       .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
       .SetParameterName("realm", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::PhysicsRealm>())
+      .SetCandidates(RMGTools::GetCandidates<PhysicsRealm>())
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
@@ -435,14 +433,17 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
       .SetGuidance("Add low energy electromagnetic processes to the physics list")
-      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
+      .SetCandidates(RMGTools::GetCandidates<LowEnergyEMOption>())
+      .SetDefaultValue(RMGTools::GetCandidate(LowEnergyEMOption::kLivermore))
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("HadronicPhysics", &RMGPhysics::SetHadronicPhysicsListOptionString)
       .SetGuidance("Add hadronic processes to the physics list")
-      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::HadronicPhysicsListOption>())
+      .SetCandidates(RMGTools::GetCandidates<HadronicPhysicsListOption>())
+      .SetDefaultValue(RMGTools::GetCandidate(HadronicPhysicsListOption::kShielding))
       .SetStates(G4State_PreInit);
 
+  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("ThermalScattering", &RMGPhysics::SetUseThermalScattering)
       .SetGuidance("Use thermal scattering cross sections for neutrons")
       .SetCandidates("0 1")

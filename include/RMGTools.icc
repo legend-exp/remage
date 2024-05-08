@@ -43,6 +43,13 @@ namespace RMGTools {
         }
         return cand.substr(0, cand.size()-1);
     }
+
+    template <typename T>
+    std::string GetCandidate(T t) {
+        auto s = magic_enum::enum_name<T>(t);
+        auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
+        return std::string(name);
+    }
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab ft=cpp

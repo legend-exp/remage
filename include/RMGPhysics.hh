@@ -34,28 +34,30 @@ class RMGPhysics : public G4VModularPhysicsList {
     RMGPhysics(RMGPhysics&&) = delete;
     RMGPhysics& operator=(RMGPhysics&&) = delete;
 
-    enum PhysicsRealm {
+    enum class PhysicsRealm {
       kDoubleBetaDecay,
       kDarkMatter,
       kCosmicRays,
       kLArScintillation
     };
 
-    enum LowEnergyEMOption {
+    enum class LowEnergyEMOption {
       kOption1,
       kOption2,
       kOption3,
       kOption4,
       kPenelope,
       kLivermore,
-      kLivermorePolarized
+      kLivermorePolarized,
+      kNone
     };
 
-    enum HadronicPhysicsListOption {
+    enum class HadronicPhysicsListOption {
       kQGSP_BIC_HP,
       kQGSP_BERT_HP,
       kFTFP_BERT_HP,
-      kShielding
+      kShielding,
+      kNone
     };
 
 
@@ -100,11 +102,9 @@ class RMGPhysics : public G4VModularPhysicsList {
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
     bool fConstructOptical = false;
-    bool fUseLowEnergyEM = false;
-    bool fUseHadPhys = false;
     bool fUseThermalScattering = false;
-    LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
-    HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kShielding;
+    LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kNone;
+    HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
