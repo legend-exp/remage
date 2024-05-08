@@ -36,7 +36,9 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     // always store vertex data, so that results are not skewed if events are discarded.
     [[nodiscard]] inline bool StoreAlways() const override { return true; }
 
-    inline std::string GetNtupleName(int) const override {
+  protected:
+
+    [[nodiscard]] inline std::string GetNtupleName(int) const override {
       throw std::logic_error("vertex output scheme has no detectors");
     }
 

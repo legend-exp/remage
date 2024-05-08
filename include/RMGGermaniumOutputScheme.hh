@@ -42,6 +42,10 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
+  protected:
+
+    [[nodiscard]] inline std::string GetNtuplenameFlat() const override { return "germanium"; }
+
   private:
 
     RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);

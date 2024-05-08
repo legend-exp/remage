@@ -60,6 +60,9 @@ class RMGManager {
     }
     [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
     inline const std::string& GetOutputFileName() { return fOutputFile; }
+    [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
+      return fOutputNtuplePerDetector;
+    }
 
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) {
@@ -130,6 +133,7 @@ class RMGManager {
     int fPrintModulo = -1;
     int fNThreads = 1;
     std::string fOutputFile = "detector-hits.root";
+    bool fOutputNtuplePerDetector = true;
     // track internal id of detector NTuples
     std::map<int, int> fNtupleIDs;
 
