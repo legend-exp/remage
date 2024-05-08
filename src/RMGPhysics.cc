@@ -29,8 +29,16 @@
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "G4HadronElasticPhysicsHP.hh"
+#include "G4HadronElasticProcess.hh"
+#include "G4HadronPhysicsFTFP_BERT_HP.hh"
+#include "G4HadronPhysicsQGSP_BERT_HP.hh"
+#include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
+#include "G4HadronPhysicsQGSP_BIC_HP.hh"
+#include "G4HadronPhysicsShielding.hh"
 #include "G4HadronicProcessStore.hh"
 #include "G4IonConstructor.hh"
+#include "G4IonPhysics.hh"
 #include "G4IonTable.hh"
 #include "G4LeptonConstructor.hh"
 #include "G4MesonConstructor.hh"
@@ -40,6 +48,11 @@
 #include "G4OpRayleigh.hh"
 #include "G4OpWLS.hh"
 #include "G4OpticalParameters.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleHPElastic.hh"
+#include "G4ParticleHPElasticData.hh"
+#include "G4ParticleHPThermalScattering.hh"
+#include "G4ParticleHPThermalScatteringData.hh"
 #include "G4ProcessManager.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4RegionStore.hh"
@@ -47,6 +60,8 @@
 #include "G4Scintillation.hh"
 #include "G4ShortLivedConstructor.hh"
 #include "G4StepLimiter.hh"
+#include "G4StoppingPhysics.hh"
+#include "G4ThermalNeutrons.hh"
 
 #include "RMGLog.hh"
 #include "RMGTools.hh"
@@ -158,6 +173,63 @@ void RMGPhysics::ConstructProcess() {
 
   if (fConstructOptical) this->ConstructOptical();
   else RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
+
+  // Hadronic Physics
+
+  /*
+  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false );
+  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
+  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
+  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false );
+  G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( false );
+  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false );
+  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
+  */
+
+  if (fUseHadPhys) {
+    RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
+    G4VPhysicsConstructor* hElasticPhysics =
+        new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
+    hElasticPhysics->ConstructProcess();
+
+    if (fUseThermalScattering) {
+      RMGLog::Out(RMGLog::detail, "Adding neutron thermal scattering elastic physics");
+      G4VPhysicsConstructor* hThermalScatteringPhysics =
+          new G4ThermalNeutrons(G4VModularPhysicsList::verboseLevel);
+      hThermalScatteringPhysics->ConstructProcess();
+    }
+
+    G4VPhysicsConstructor* hPhysics = 0;
+    switch (fHadronicPhysicsListOption) {
+      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BIC_HP:
+        hPhysics = new G4HadronPhysicsQGSP_BIC_HP(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using QGSP_BIC_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kQGSP_BERT_HP:
+        hPhysics = new G4HadronPhysicsQGSP_BERT_HP(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using QGSP_BERT_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kFTFP_BERT_HP:
+        hPhysics = new G4HadronPhysicsFTFP_BERT_HP(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using FTFP_BERT_HP");
+        break;
+      case RMGPhysics::HadronicPhysicsListOption::kShielding:
+        hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using Shielding");
+        break;
+    }
+    RMGLog::Out(RMGLog::detail, "Adding hadronic inelastic physics");
+    hPhysics->ConstructProcess();
+
+    RMGLog::Out(RMGLog::detail, "Adding stopping physics");
+    G4VPhysicsConstructor* stoppingPhysics =
+        new G4StoppingPhysics(G4VModularPhysicsList::verboseLevel);
+    stoppingPhysics->ConstructProcess();
+
+    RMGLog::Out(RMGLog::detail, "Adding ion physics");
+    G4VPhysicsConstructor* ionPhysics = new G4IonPhysics(G4VModularPhysicsList::verboseLevel);
+    ionPhysics->ConstructProcess();
+  }
 
   // Add decays
   RMGLog::Out(RMGLog::detail, "Adding radioactive decay physics");
@@ -326,6 +398,15 @@ void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
   try {
     fLowEnergyEMOption =
         RMGTools::ToEnum<RMGPhysics::LowEnergyEMOption>(option, "low energy EM option");
+    fUseLowEnergyEM = true;
+  } catch (const std::bad_cast&) { return; }
+}
+
+void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
+  try {
+    fHadronicPhysicsListOption = RMGTools::ToEnum<RMGPhysics::HadronicPhysicsListOption>(option,
+        "hadronic physics list option");
+    fUseHadPhys = true;
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -355,6 +436,16 @@ void RMGPhysics::DefineCommands() {
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
       .SetGuidance("Add low energy electromagnetic processes to the physics list")
       .SetCandidates(RMGTools::GetCandidates<RMGPhysics::LowEnergyEMOption>())
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("HadronicPhysics", &RMGPhysics::SetHadronicPhysicsListOptionString)
+      .SetGuidance("Add hadronic processes to the physics list")
+      .SetCandidates(RMGTools::GetCandidates<RMGPhysics::HadronicPhysicsListOption>())
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("ThermalScattering", &RMGPhysics::SetUseThermalScattering)
+      .SetGuidance("Use thermal scattering cross sections for neutrons")
+      .SetCandidates("0 1")
       .SetStates(G4State_PreInit);
 
   // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).

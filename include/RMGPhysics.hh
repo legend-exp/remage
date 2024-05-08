@@ -51,6 +51,14 @@ class RMGPhysics : public G4VModularPhysicsList {
       kLivermorePolarized
     };
 
+    enum HadronicPhysicsListOption {
+      kQGSP_BIC_HP,
+      kQGSP_BERT_HP,
+      kFTFP_BERT_HP,
+      kShielding
+    };
+
+
     // TODO: cut for optical photon?
     struct StepCutStore {
         StepCutStore() = default;
@@ -70,7 +78,12 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetCuts() override;
     void SetPhysicsRealm(PhysicsRealm realm);
     void SetPhysicsRealmString(std::string realm);
+
     void SetLowEnergyEMOptionString(std::string option);
+    void SetHadronicPhysicsListOptionString(std::string option);
+
+    void SetUseThermalScattering(bool val) { fUseThermalScattering = val; }
+
     void SetUseGammaAngCorr(bool);
     void SetGammaTwoJMAX(int max_two_j);
     void SetStoreICLevelData(bool);
@@ -87,8 +100,11 @@ class RMGPhysics : public G4VModularPhysicsList {
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
     bool fConstructOptical = false;
-    bool fUseLowEnergyEM = true;
+    bool fUseLowEnergyEM = false;
+    bool fUseHadPhys = false;
+    bool fUseThermalScattering = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
+    HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kShielding;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
