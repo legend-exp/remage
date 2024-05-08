@@ -48,9 +48,18 @@ class RMGVOutputScheme {
     }
     virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
-    virtual inline std::string GetNtupleName(int det_uid) const {
-      return fmt::format("det{:03}", det_uid);
+    inline void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
+
+  protected:
+
+    [[nodiscard]] virtual inline std::string GetNtupleName(int det_uid) const {
+      return fNtuplePerDetector ? fmt::format("det{:03}", det_uid) : GetNtuplenameFlat();
     }
+    [[nodiscard]] virtual inline std::string GetNtuplenameFlat() const {
+      throw new std::logic_error("GetNtuplenameFlat not implemented");
+    }
+
+    bool fNtuplePerDetector = true;
 };
 
 #endif

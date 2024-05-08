@@ -73,6 +73,7 @@ void RMGRunAction::SetupAnalysisManager() {
 
     fOutputDataFields.emplace_back(oscheme);
 
+    oscheme->SetNtuplePerDetector(RMGManager::Instance()->GetOutputNtuplePerDetector());
     oscheme->AssignOutputNames(ana_man);
   }
 }

@@ -39,6 +39,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
+  std::set<std::string> registered_ntuples;
   for (auto&& det : detectors) {
     if (det.second.type != RMGHardware::kOptical) continue;
 
@@ -46,10 +47,15 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     auto had_uid = registered_uids.emplace(det.second.uid);
     if (!had_uid.second) continue;
 
+    auto ntuple_name = this->GetNtupleName(det.second.uid);
+    auto had_name = registered_ntuples.emplace(ntuple_name);
+    if (!had_name.second) continue;
+
     auto id = rmg_man->RegisterNtuple(det.second.uid);
-    ana_man->CreateNtuple(this->GetNtupleName(det.second.uid), "Event data");
+    ana_man->CreateNtuple(ntuple_name, "Event data");
 
     ana_man->CreateNtupleIColumn(id, "evtid");
+    if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleDColumn(id, "wavelength");
     ana_man->CreateNtupleDColumn(id, "time");
 
@@ -85,6 +91,7 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
   auto rmg_man = RMGManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
+    const auto ana_man = G4AnalysisManager::Instance();
 
     for (auto hit : *hit_coll->GetVector()) {
       if (!hit) continue;
@@ -92,10 +99,13 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
 
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
-      const auto ana_man = G4AnalysisManager::Instance();
-      ana_man->FillNtupleIColumn(ntupleid, 0, event->GetEventID());
-      ana_man->FillNtupleDColumn(ntupleid, 1, hit->photon_wavelength / u::nm);
-      ana_man->FillNtupleDColumn(ntupleid, 2, hit->global_time / u::ns);
+      int col_id = 0;
+      ana_man->FillNtupleIColumn(ntupleid, col_id++, event->GetEventID());
+      if (!fNtuplePerDetector) {
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
+      }
+      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->photon_wavelength / u::nm);
+      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
