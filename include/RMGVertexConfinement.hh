@@ -22,6 +22,7 @@
 #include <regex>
 #include <vector>
 
+#include "G4AutoLock.hh"
 #include "G4GenericMessenger.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
@@ -57,7 +58,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         double box_z_length = -1;
     };
 
-    enum SamplingMode {
+    enum class SamplingMode {
       kIntersectPhysicalWithGeometrical,
       kUnionAll
     };
@@ -149,10 +150,17 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     std::vector<std::string> fPhysicalVolumeCopyNrRegexes;
 
     std::vector<GenericGeometricalSolidData> fGeomVolumeData;
-    SampleableObjectCollection fPhysicalVolumes;
-    SampleableObjectCollection fGeomVolumeSolids;
 
-    SamplingMode fSamplingMode = kUnionAll;
+    static G4Mutex fGeometryMutex;
+    // the final geometry data is shared between all threads and protected by fGeometryMutex.
+    // this is to prevent problems in G4SolidStore, which is apparently not safe to mutate from
+    // multiple threads. note that some operations that just appear to read static data might also
+    // mutate the G4SolidStore temporarily, e.g. G4SubstractionSolid::GetCubicVolume()
+    static SampleableObjectCollection fPhysicalVolumes;
+    static SampleableObjectCollection fGeomVolumeSolids;
+    static bool fVolumesInitialized;
+
+    SamplingMode fSamplingMode = SamplingMode::kUnionAll;
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
 
