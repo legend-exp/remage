@@ -18,6 +18,7 @@
 #include <chrono>
 #include <optional>
 
+#include "G4AutoLock.hh"
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
 #include "G4Orb.hh"
@@ -39,6 +40,10 @@
 
 #include "RMGTools.hh"
 
+namespace {
+  G4Mutex RMGVertexConfinementGeometryMutex = G4MUTEX_INITIALIZER;
+} // namespace
+
 // This structure must contain at least a non-null pointer, between the first
 // and the last argument. The idea is that:
 //  - physical volumes get always a bounding box assigned, but at later time
@@ -57,6 +62,9 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
   const auto& solid =
       physical_volume ? physical_volume->GetLogicalVolume()->GetSolid() : sampling_solid;
 
+  // apparently, not all calls to GetCubicVolume/GetSurfaceArea are be thread-safe (i.e. on
+  // intersection solids they temporarily mutates the global solid store)...
+  G4AutoLock lock(&RMGVertexConfinementGeometryMutex);
   // NOTE: these functions use Monte Carlo methods when the solid is complex
   this->volume = solid->GetCubicVolume();
   this->surface = solid->GetSurfaceArea();
