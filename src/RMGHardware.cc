@@ -212,13 +212,11 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
       .SetGuidance("Disable the automatic overlap check after loading a GDML file")
-      .SetStates(G4State_PreInit)
-      .SetToBeBroadcasted(false);
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
       .SetGuidance("Change the number of points sampled for overlap checks")
-      .SetStates(G4State_PreInit)
-      .SetToBeBroadcasted(false);
+      .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
       .SetGuidance("Use GDML file for geometry definition")

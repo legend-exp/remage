@@ -18,6 +18,7 @@
 #include <chrono>
 #include <optional>
 
+#include "G4AutoLock.hh"
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
 #include "G4Orb.hh"
@@ -39,6 +40,12 @@
 
 #include "RMGTools.hh"
 
+G4Mutex RMGVertexConfinement::fGeometryMutex = G4MUTEX_INITIALIZER;
+// state shared between threads and protected by fGeometryMutex. See .hh file for details!
+RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fGeomVolumeSolids = {};
+RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fPhysicalVolumes = {};
+bool RMGVertexConfinement::fVolumesInitialized = false;
+
 // This structure must contain at least a non-null pointer, between the first
 // and the last argument. The idea is that:
 //  - physical volumes get always a bounding box assigned, but at later time
@@ -57,7 +64,8 @@ RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G
   const auto& solid =
       physical_volume ? physical_volume->GetLogicalVolume()->GetSolid() : sampling_solid;
 
-  // NOTE: these functions use Monte Carlo methods when the solid is complex
+  // NOTE: these functions use Monte Carlo methods when the solid is complex. Also note, that
+  // they are not thread-safe in all cases!
   this->volume = solid->GetCubicVolume();
   this->surface = solid->GetSurfaceArea();
 }
@@ -387,12 +395,16 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 }
 
 void RMGVertexConfinement::Reset() {
+  // take lock, just not to race with the fVolumesInitialized flag elsewhere.
+  G4AutoLock lock(&fGeometryMutex);
+  fVolumesInitialized = true;
+  fPhysicalVolumes.clear();
+  fGeomVolumeSolids.clear();
+
   fPhysicalVolumeNameRegexes.clear();
   fPhysicalVolumeCopyNrRegexes.clear();
-  fPhysicalVolumes.clear();
   fGeomVolumeData.clear();
-  fGeomVolumeSolids.clear();
-  fSamplingMode = RMGVertexConfinement::kUnionAll;
+  fSamplingMode = SamplingMode::kUnionAll;
   fOnSurface = false;
   fForceContainmentCheck = false;
 }
@@ -412,8 +424,14 @@ bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
 bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
   // configure sampling volumes (does not do anything if this is not the first
   // call)
-  this->InitializePhysicalVolumes();
-  this->InitializeGeometricalVolumes();
+  if (!fVolumesInitialized) {
+    G4AutoLock lock(&fGeometryMutex);
+    if (!fVolumesInitialized) {
+      this->InitializePhysicalVolumes();
+      this->InitializeGeometricalVolumes();
+      fVolumesInitialized = true;
+    }
+  }
 
   RMGLog::OutDev(RMGLog::debug,
       "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
@@ -674,7 +692,7 @@ void RMGVertexConfinement::DefineCommands() {
                    "not alter the behaviour.")
       .SetParameterName("flag", true)
       .SetStates(G4State_PreInit, G4State_Idle)
-      .SetToBeBroadcasted(false);
+      .SetToBeBroadcasted(true);
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/Physical/",
