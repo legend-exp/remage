@@ -359,18 +359,18 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
   // no physical volume is specified nor at initialization or later
   for (const auto& d : fGeomVolumeData) {
-    if (d.solid_type == kSphere) {
+    if (d.solid_type == GeometricalSolidType::kSphere) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere/" +
                            std::to_string(fGeomVolumeSolids.size() + 1),
               d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
-    } else if (d.solid_type == kCylinder) {
+    } else if (d.solid_type == GeometricalSolidType::kCylinder) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder/" +
                          std::to_string(fGeomVolumeSolids.size() + 1),
               d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
               d.cylinder_starting_angle, d.cylinder_spanning_angle));
-    } else if (d.solid_type == kBox) {
+    } else if (d.solid_type == GeometricalSolidType::kBox) {
       fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box/" +
                         std::to_string(fGeomVolumeSolids.size() + 1),

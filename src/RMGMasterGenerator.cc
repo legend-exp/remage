@@ -84,8 +84,8 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       break;
     case Confinement::kFromFile: fVertexGeneratorObj = std::make_unique<RMGVertexFromFile>(); break;
     default:
-      RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '", fConfinement,
-          "' specified (implement me)");
+      RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
+          static_cast<int>(fConfinement), "' specified (implement me)");
   }
   RMGLog::OutFormat(RMGLog::debug, "Primary vertex confinement strategy set to {}",
       magic_enum::enum_name<RMGMasterGenerator::Confinement>(code));
@@ -117,8 +117,8 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
-      RMGLog::Out(RMGLog::fatal, "No known implementation for generator '", fGenerator,
-          "' (implement me)");
+      RMGLog::Out(RMGLog::fatal, "No known implementation for generator '",
+          static_cast<int>(fGenerator), "' (implement me)");
   }
   RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}",
       magic_enum::enum_name<RMGMasterGenerator::Generator>(gen));
