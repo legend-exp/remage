@@ -37,7 +37,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
 
-    enum GeometricalSolidType {
+    enum class GeometricalSolidType {
       kSphere,
       kCylinder,
       kBox,
@@ -184,29 +184,37 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     inline void SetGeomVolumeCenterZ(double z) { this->SafeBack().volume_center.setZ(z); }
 
     inline void SetGeomSphereInnerRadius(double r) {
-      this->SafeBack(kSphere).sphere_inner_radius = r;
+      this->SafeBack(GeometricalSolidType::kSphere).sphere_inner_radius = r;
     }
     inline void SetGeomSphereOuterRadius(double r) {
-      this->SafeBack(kSphere).sphere_outer_radius = r;
+      this->SafeBack(GeometricalSolidType::kSphere).sphere_outer_radius = r;
     }
 
     inline void SetGeomCylinderInnerRadius(double r) {
-      this->SafeBack(kCylinder).cylinder_inner_radius = r;
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
     }
     inline void SetGeomCylinderOuterRadius(double r) {
-      this->SafeBack(kCylinder).cylinder_outer_radius = r;
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_outer_radius = r;
     }
-    inline void SetGeomCylinderHeight(double h) { this->SafeBack(kCylinder).cylinder_height = h; }
+    inline void SetGeomCylinderHeight(double h) {
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_height = h;
+    }
     inline void SetGeomCylinderStartingAngle(double a) {
-      this->SafeBack(kCylinder).cylinder_starting_angle = a;
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_starting_angle = a;
     }
     inline void SetGeomCylinderSpanningAngle(double a) {
-      this->SafeBack(kCylinder).cylinder_spanning_angle = a;
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_spanning_angle = a;
     }
 
-    inline void SetGeomBoxXLength(double x) { this->SafeBack(kBox).box_x_length = x; }
-    inline void SetGeomBoxYLength(double y) { this->SafeBack(kBox).box_y_length = y; }
-    inline void SetGeomBoxZLength(double z) { this->SafeBack(kBox).box_z_length = z; }
+    inline void SetGeomBoxXLength(double x) {
+      this->SafeBack(GeometricalSolidType::kBox).box_x_length = x;
+    }
+    inline void SetGeomBoxYLength(double y) {
+      this->SafeBack(GeometricalSolidType::kBox).box_y_length = y;
+    }
+    inline void SetGeomBoxZLength(double z) {
+      this->SafeBack(GeometricalSolidType::kBox).box_z_length = z;
+    }
 
     void DefineCommands();
 };

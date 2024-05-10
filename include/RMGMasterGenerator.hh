@@ -30,13 +30,13 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   public:
 
-    enum Confinement {
+    enum class Confinement {
       kUnConfined,
       kVolume,
       kFromFile,
     };
 
-    enum Generator {
+    enum class Generator {
       kG4gun,
       kGPS,
       kBxDecay0,
@@ -68,10 +68,10 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   private:
 
-    Confinement fConfinement{RMGMasterGenerator::Confinement::kUnConfined};
+    Confinement fConfinement{Confinement::kUnConfined};
     std::unique_ptr<RMGVVertexGenerator> fVertexGeneratorObj;
 
-    Generator fGenerator{RMGMasterGenerator::Generator::kUndefined};
+    Generator fGenerator{Generator::kUndefined};
     std::unique_ptr<RMGVGenerator> fGeneratorObj;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;

@@ -34,7 +34,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
 
-    enum SkyShape {
+    enum class SkyShape {
       kPlane,
       kSphere
     };
@@ -62,7 +62,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     void DefineCommands();
     void SetSkyShape(std::string shape);
 
-    SkyShape fSkyShape = kSphere;
+    SkyShape fSkyShape = SkyShape::kSphere;
     float fSkyPlaneSize = -1;
     float fSkyPlaneHeight = 50;
 
