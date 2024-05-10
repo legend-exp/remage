@@ -153,7 +153,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
 
   auto phi = a + delta_a * _g4rand();
   auto z = h * (_g4rand() - 0.5);
-  auto R = _g4rand() * (r2 - r1) + r1;
+  auto R = std::sqrt(_g4rand() * (r2 * r2 - r1 * r1) + r1 * r1);
   auto s1_point = G4ThreeVector(std::cos(phi), std::sin(phi), 0);
 
   if (on_surface) {
