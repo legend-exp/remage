@@ -38,6 +38,7 @@ class RMGVOutputScheme {
     // functions for individual events.
     virtual inline void ClearBeforeEvent() {}
     virtual inline bool ShouldDiscardEvent(const G4Event*) { return false; }
+    [[nodiscard]] virtual inline bool StoreAlways() const { return false; }
     virtual inline void StoreEvent(const G4Event*) {}
 
     // hook into RMGStackingAction.
@@ -47,7 +48,9 @@ class RMGVOutputScheme {
     }
     virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
-    inline std::string GetNtupleName(int det_uid) { return fmt::format("det{:03}", det_uid); }
+    virtual inline std::string GetNtupleName(int det_uid) const {
+      return fmt::format("det{:03}", det_uid);
+    }
 };
 
 #endif
