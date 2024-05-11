@@ -16,8 +16,6 @@
 #ifndef _RMG_RUN_ACTION_HH_
 #define _RMG_RUN_ACTION_HH_
 
-#include <chrono>
-#include <map>
 #include <memory>
 #include <vector>
 
@@ -50,14 +48,9 @@ class RMGRunAction : public G4UserRunAction {
 
     [[nodiscard]] inline int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
 
-    inline std::shared_ptr<RMGVOutputScheme> GetOutputDataFields(RMGHardware::DetectorType d_type) {
-      auto it = fOutputDataFields.find(d_type);
-      if (it != fOutputDataFields.end()) return it->second;
-      return nullptr;
-    }
     [[nodiscard]] inline const auto& GetAllOutputDataFields() { return fOutputDataFields; }
     inline void ClearOutputDataFields() {
-      for (auto& el : fOutputDataFields) el.second->ClearBeforeEvent();
+      for (auto& el : fOutputDataFields) el->ClearBeforeEvent();
     }
 
   private:
@@ -69,7 +62,7 @@ class RMGRunAction : public G4UserRunAction {
 
     int fCurrentPrintModulo = -1;
 
-    std::map<RMGHardware::DetectorType, std::shared_ptr<RMGVOutputScheme>> fOutputDataFields;
+    std::vector<std::shared_ptr<RMGVOutputScheme>> fOutputDataFields;
 };
 
 #endif

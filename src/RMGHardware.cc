@@ -134,7 +134,12 @@ void RMGHardware::ConstructSDandField() {
       }
       sd_man->AddNewDetector(obj);
       active_dets.emplace(v.type, obj);
-      fActiveOutputSchemes.insert({v.type, output});
+
+      if (!output) {
+        RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
+            magic_enum::enum_name(v.type), "' implemented (implement me)");
+      }
+      fActiveOutputSchemes.emplace_back(output);
     }
 
     // now assign logical volumes to the sensitive detector

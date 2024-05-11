@@ -66,17 +66,16 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
 void RMGEventAction::EndOfEventAction(const G4Event* event) {
 
-  auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
-  auto active_dets = det_cons->GetActiveDetectorList();
+  auto oschemes = fRunAction->GetAllOutputDataFields();
 
   // Check if any OutputScheme wants to discard this event.
-  for (const auto& d_type : active_dets) {
-    bool discard_event = fRunAction->GetOutputDataFields(d_type)->ShouldDiscardEvent(event);
+  for (const auto& oscheme : oschemes) {
+    bool discard_event = oscheme->ShouldDiscardEvent(event);
     if (discard_event) return;
   }
 
-  for (const auto& d_type : active_dets) {
-    fRunAction->GetOutputDataFields(d_type)->StoreEvent(event);
+  for (const auto& oscheme : oschemes) {
+    oscheme->StoreEvent(event);
   }
 
   // NOTE: G4analysisManager::AddNtupleRow() must be called here for event-oriented output

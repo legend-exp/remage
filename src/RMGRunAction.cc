@@ -69,15 +69,11 @@ void RMGRunAction::SetupAnalysisManager() {
 
   // do it only for activated detectors (have to ask to the manager)
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
-  for (const auto& d_type : det_cons->GetActiveDetectorList()) {
+  for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
 
-    fOutputDataFields[d_type] = det_cons->GetActiveOutputScheme(d_type);
-    if (!fOutputDataFields[d_type]) {
-      RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
-          magic_enum::enum_name(d_type), "' implemented (implement me)");
-    }
+    fOutputDataFields.emplace_back(oscheme);
 
-    fOutputDataFields[d_type]->AssignOutputNames(ana_man);
+    oscheme->AssignOutputNames(ana_man);
   }
 }
 
