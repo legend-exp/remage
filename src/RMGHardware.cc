@@ -34,6 +34,7 @@ namespace fs = std::filesystem;
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
 #include "RMGOpticalOutputScheme.hh"
+#include "RMGVertexOutputScheme.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -159,6 +160,11 @@ void RMGHardware::ConstructSDandField() {
     RMGLog::OutFormat(RMGLog::debug,
         "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
         magic_enum::enum_name(v.type), pv->GetName().c_str(), v.uid, lv->GetName().c_str());
+  }
+
+  // also store primary vertex data, if we have any other output.
+  if (!fActiveOutputSchemes.empty()) {
+    fActiveOutputSchemes.emplace_back(std::make_shared<RMGVertexOutputScheme>());
   }
 
   std::string vec_repr;

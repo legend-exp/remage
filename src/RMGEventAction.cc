@@ -69,13 +69,14 @@ void RMGEventAction::EndOfEventAction(const G4Event* event) {
   auto oschemes = fRunAction->GetAllOutputDataFields();
 
   // Check if any OutputScheme wants to discard this event.
+  bool discard_event = false;
   for (const auto& oscheme : oschemes) {
-    bool discard_event = oscheme->ShouldDiscardEvent(event);
-    if (discard_event) return;
+    discard_event = discard_event || oscheme->ShouldDiscardEvent(event);
+    if (discard_event) continue;
   }
 
   for (const auto& oscheme : oschemes) {
-    oscheme->StoreEvent(event);
+    if (oscheme->StoreAlways() || !discard_event) oscheme->StoreEvent(event);
   }
 
   // NOTE: G4analysisManager::AddNtupleRow() must be called here for event-oriented output
