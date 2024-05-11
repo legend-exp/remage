@@ -29,7 +29,7 @@ RMGStackingAction::RMGStackingAction(RMGRunAction* runaction) : fRunAction(runac
 G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aTrack) {
   std::optional<G4ClassificationOfNewTrack> new_status = std::nullopt;
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
-    auto request_status = el.second->StackingActionClassify(aTrack, fStage);
+    auto request_status = el->StackingActionClassify(aTrack, fStage);
     if (!request_status.has_value()) continue; // this output scheme does not care.
 
     if (!new_status.has_value() || new_status.value() == request_status.value()) {
@@ -48,7 +48,7 @@ void RMGStackingAction::NewStage() {
   // we can have only one result from all output schemes, if we have
   std::optional<bool> should_do_stage = std::nullopt;
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
-    auto request_stage = el.second->StackingActionNewStage(fStage);
+    auto request_stage = el->StackingActionNewStage(fStage);
     if (!request_stage.has_value()) continue; // this output scheme does not care.
 
     if (!should_do_stage.has_value() || should_do_stage.value() == request_stage.value()) {
