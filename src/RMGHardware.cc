@@ -37,6 +37,10 @@ namespace fs = std::filesystem;
 
 #include "magic_enum/magic_enum.hpp"
 
+G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> RMGHardware::fActiveOutputSchemes = {};
+
+G4ThreadLocal bool RMGHardware::fActiveDetectorsInitialized = false;
+
 RMGHardware::RMGHardware() { this->DefineCommands(); }
 
 G4VPhysicalVolume* RMGHardware::Construct() {
@@ -99,6 +103,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
 }
 
 void RMGHardware::ConstructSDandField() {
+  // setup thread-local data, called once for the master thread and once for each worker thread.
 
   // set up G4SDManager
   auto sd_man = G4SDManager::GetSDMpointer();

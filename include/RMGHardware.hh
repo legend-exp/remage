@@ -86,8 +86,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
     // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;
     std::set<DetectorType> fActiveDetectors;
-    std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
-    bool fActiveDetectorsInitialized = false;
+    static G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
+    static G4ThreadLocal bool fActiveDetectorsInitialized;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<RMGHardwareMessenger> fHwMessenger;
