@@ -29,8 +29,8 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->RegisterNtuple(-1);
-  ana_man->CreateNtuple("vertices", "Primary vertex data");
+  auto vid = RMGManager::Instance()->RegisterNtuple(-1,
+      ana_man->CreateNtuple("vertices", "Primary vertex data"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time");
@@ -42,8 +42,8 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()->RegisterNtuple(-2);
-    ana_man->CreateNtuple("particles", "Primary particle data");
+    auto pid = RMGManager::Instance()->RegisterNtuple(-2,
+        ana_man->CreateNtuple("particles", "Primary particle data"));
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");

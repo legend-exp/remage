@@ -48,6 +48,8 @@
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
+G4ThreadLocal std::map<int, int> RMGManager::fNtupleIDs = {};
+
 RMGManager::RMGManager(std::string app_name, int argc, char** argv)
     : fApplicationName(app_name), fArgc(argc), fArgv(argv) {
 
