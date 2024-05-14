@@ -55,9 +55,8 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
     partial += elapsed_m * 60;
     long elapsed_s = tot_elapsed_s - partial;
 
-    // FIXME: how to cast the percentage to int?
-    RMGLog::OutFormat(RMGLog::summary, "Processing event nr. {:d} ({:.0f}%), at {:d} days, {:d} hours, {:d} minutes and {} seconds",
-        event->GetEventID() + 1, (event->GetEventID() + 1) * 100. / tot_events, elapsed_d,
+    RMGLog::OutFormat(RMGLog::summary, "Processing event nr. {:d} ({:d}%), at {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
+        event->GetEventID() + 1, (int)((event->GetEventID() + 1) * 100. / tot_events), elapsed_d,
         elapsed_h, elapsed_m, elapsed_s);
   }
 
