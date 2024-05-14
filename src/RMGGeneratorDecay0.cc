@@ -14,10 +14,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "RMGGeneratorDecay0.hh"
-#include "RMGLog.hh"
-#include "RMGManager.hh"
 
 #include "RMGConfig.hh"
+#include "RMGLog.hh"
+#include "RMGManager.hh"
 #if RMG_HAS_BXDECAY0
 #include "bxdecay0_g4/primary_generator_action.hh"
 #endif

@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <vector>
 
+#include "G4AutoLock.hh"
+#include "G4CsvAnalysisReader.hh"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleMomentum.hh"
@@ -16,9 +18,6 @@
 #include "RMGManager.hh"
 #include "RMGTools.hh"
 #include "RMGVGenerator.hh"
-
-#include "G4AutoLock.hh"
-#include "G4CsvAnalysisReader.hh"
 
 namespace u = CLHEP;
 namespace {

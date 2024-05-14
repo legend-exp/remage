@@ -1,16 +1,16 @@
 #ifndef _RMG_GENERATOR_MUSUN_COSMIC_MUONS_HH_
 #define _RMG_GENERATOR_MUSUN_COSMIC_MUONS_HH_
 
-#include "RMGVGenerator.hh"
-#include "RMGVVertexGenerator.hh"
+#include <filesystem>
 
 #include "CLHEP/Units/SystemOfUnits.h"
+#include "G4CsvAnalysisReader.hh"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
-#include "G4CsvAnalysisReader.hh"
-#include <filesystem>
+#include "RMGVGenerator.hh"
+#include "RMGVVertexGenerator.hh"
 
 namespace u = CLHEP;
 

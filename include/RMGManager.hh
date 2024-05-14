@@ -19,12 +19,11 @@
 #include <memory>
 #include <vector>
 
-#include "globals.hh"
-
 #include "G4RunManager.hh"
 #include "G4RunManagerFactory.hh"
 #include "G4Threading.hh"
 #include "G4VisManager.hh"
+#include "globals.hh"
 
 #include "RMGExceptionHandler.hh"
 #include "RMGLog.hh"

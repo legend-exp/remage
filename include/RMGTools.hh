@@ -18,8 +18,9 @@
 
 #include <stdexcept>
 
-#include "RMGLog.hh"
 #include "globals.hh"
+
+#include "RMGLog.hh"
 
 #include "magic_enum/magic_enum.hpp"
 

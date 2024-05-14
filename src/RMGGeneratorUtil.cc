@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "RMGGeneratorUtil.hh"
+
 #include <algorithm>
 #include <array>
 #include <numeric>
-
-#include "RMGGeneratorUtil.hh"
 
 #include "Randomize.hh"
 

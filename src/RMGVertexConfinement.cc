@@ -37,7 +37,6 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGNavigationTools.hh"
-
 #include "RMGTools.hh"
 
 G4Mutex RMGVertexConfinement::fGeometryMutex = G4MUTEX_INITIALIZER;
