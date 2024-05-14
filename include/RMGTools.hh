@@ -16,9 +16,40 @@
 #ifndef _RMG_TOOLS_HH_
 #define _RMG_TOOLS_HH_
 
-namespace RMGTools {} // namespace RMGTools
+#include <stdexcept>
 
-#include "RMGTools.icc"
+#include "RMGLog.hh"
+#include "globals.hh"
+
+#include "magic_enum/magic_enum.hpp"
+
+namespace RMGTools {
+
+  template<typename T> T ToEnum(const std::string name, std::string prop_name = "property") {
+    auto result = magic_enum::enum_cast<T>(name);
+    if (!result.has_value()) result = magic_enum::enum_cast<T>("k" + name);
+    if (!result.has_value()) {
+      RMGLog::OutFormat(RMGLog::error, "Illegal '{}' {} specified", name, prop_name);
+      throw std::bad_cast();
+    } else return result.value();
+  }
+
+  template<typename T> std::string GetCandidates(const char delim = ' ') {
+    auto v = magic_enum::enum_names<T>();
+    std::string cand;
+    for (const auto& s : v) {
+      auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
+      cand += std::string(name) + delim;
+    }
+    return cand.substr(0, cand.size() - 1);
+  }
+
+  template<typename T> std::string GetCandidate(T t) {
+    auto s = magic_enum::enum_name<T>(t);
+    auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
+    return std::string(name);
+  }
+} // namespace RMGTools
 
 #endif
 
