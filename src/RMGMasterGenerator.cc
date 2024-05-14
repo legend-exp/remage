@@ -15,25 +15,24 @@
 
 #include "RMGMasterGenerator.hh"
 
-#include "RMGConfig.hh"
-#include "RMGGeneratorG4Gun.hh"
-#include "RMGGeneratorGPS.hh"
-#include "RMGManager.hh"
-#include "RMGVGenerator.hh"
-#include "RMGVVertexGenerator.hh"
-#include "RMGVertexConfinement.hh"
-#if RMG_HAS_BXDECAY0
-#include "RMGGeneratorDecay0.hh"
-#endif
-#include "RMGGeneratorCosmicMuons.hh"
-#include "RMGGeneratorMUSUNCosmicMuons.hh"
-#include "RMGLog.hh"
-#include "RMGVertexFromFile.hh"
-
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
 
+#include "RMGConfig.hh"
+#include "RMGGeneratorCosmicMuons.hh"
+#if RMG_HAS_BXDECAY0
+#include "RMGGeneratorDecay0.hh"
+#endif
+#include "RMGGeneratorG4Gun.hh"
+#include "RMGGeneratorGPS.hh"
+#include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGLog.hh"
+#include "RMGManager.hh"
 #include "RMGTools.hh"
+#include "RMGVGenerator.hh"
+#include "RMGVVertexGenerator.hh"
+#include "RMGVertexConfinement.hh"
+#include "RMGVertexFromFile.hh"
 
 RMGMasterGenerator::RMGMasterGenerator() : fVertexGeneratorObj(nullptr), fGeneratorObj(nullptr) {
 

@@ -16,6 +16,7 @@
 #include "RMGTrackingAction.hh"
 
 #include "G4Track.hh"
+
 #include "RMGEventAction.hh"
 
 RMGTrackingAction::RMGTrackingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}

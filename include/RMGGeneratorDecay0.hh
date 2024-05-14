@@ -18,10 +18,10 @@
 
 #include <memory>
 
+#include "G4ThreeVector.hh"
+
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
-
-#include "G4ThreeVector.hh"
 
 namespace bxdecay0_g4 {
   class PrimaryGeneratorAction;

@@ -18,10 +18,10 @@
 
 #include <memory>
 
-#include "RMGVGenerator.hh"
-
 #include "G4ParticleGun.hh"
 #include "G4ThreeVector.hh"
+
+#include "RMGVGenerator.hh"
 
 class G4Event;
 class G4ParticleGun;

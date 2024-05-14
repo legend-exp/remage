@@ -19,10 +19,10 @@
 #include <memory>
 #include <string>
 
-#include "RMGVVertexGenerator.hh"
-
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
+
+#include "RMGVVertexGenerator.hh"
 
 class G4VAnalysisReader;
 class RMGVertexFromFile : public RMGVVertexGenerator {

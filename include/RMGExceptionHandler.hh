@@ -19,9 +19,8 @@
 #include <memory>
 #include <vector>
 
-#include "globals.hh"
-
 #include "G4ExceptionHandler.hh"
+#include "globals.hh"
 
 #include "RMGLog.hh"
 
