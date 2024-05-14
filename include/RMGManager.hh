@@ -92,15 +92,10 @@ class RMGManager {
     void SetLogLevel(std::string level);
 
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
-    inline int RegisterNtuple(int det_uid) {
-      auto res = fNtupleIDs.emplace(det_uid, fNtupleIDs.size());
-      // RegisterNtuple will be called from different threads, with the same arguments.
-      // Registering _new_ ntuples should only be possible from the main thread.
-      if (!res.second && G4Threading::IsMasterThread())
+    inline int RegisterNtuple(int det_uid, int ntuple_id) {
+      auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
+      if (!res.second)
         RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
-            det_uid);
-      else if (res.second && !G4Threading::IsMasterThread())
-        RMGLog::OutFormatDev(RMGLog::fatal, "Registering detector with UID {} from worker thread",
             det_uid);
       return this->GetNtupleID(det_uid);
     }
@@ -135,7 +130,7 @@ class RMGManager {
     std::string fOutputFile = "detector-hits.root";
     bool fOutputNtuplePerDetector = true;
     // track internal id of detector NTuples
-    std::map<int, int> fNtupleIDs;
+    static G4ThreadLocal std::map<int, int> fNtupleIDs;
 
 
     static RMGManager* fRMGManager;

@@ -52,8 +52,8 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     auto had_name = registered_ntuples.emplace(ntuple_name);
     if (!had_name.second) continue;
 
-    auto id = rmg_man->RegisterNtuple(det.second.uid);
-    ana_man->CreateNtuple(ntuple_name, "Event data");
+    auto id =
+        rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
