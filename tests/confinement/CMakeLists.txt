@@ -24,4 +24,6 @@ foreach(_mac ${_macros})
            COMMAND remage-cli -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
                    macros/${_mac} macros/_vis-export.mac)
   set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS vis)
+  set_tests_properties(confinement-vis/${_mac} PROPERTIES SKIP_REGULAR_EXPRESSION
+                                                          "couldn't open display")
 endforeach()

@@ -27,6 +27,7 @@ set_tests_properties(${_macros_extra} PROPERTIES LABELS extra)
 
 list(TRANSFORM _macros_vis PREPEND "basics/")
 set_tests_properties(${_macros_vis} PROPERTIES LABELS vis)
+set_tests_properties(${_macros_vis} PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # further specific tests.
 
