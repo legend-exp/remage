@@ -15,6 +15,11 @@
 
 #include "RMGUserAction.hh"
 
+#include <memory>
+
+#include "G4MultiSteppingAction.hh"
+#include "G4MultiTrackingAction.hh"
+
 #include "RMGEventAction.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
@@ -39,12 +44,32 @@ void RMGUserAction::Build() const {
       new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled());
   auto event_action = new RMGEventAction(run_action);
 
+  // Add the remage-internal stepping action and optional user-specified custom stepping actions.
+  const auto user_stepping_actions = RMGManager::Instance()->GetUserInit()->GetSteppingActions();
+  G4UserSteppingAction* stepping_action = new RMGSteppingAction(event_action);
+  if (!user_stepping_actions.empty()) {
+    auto multi_stepping_action = new G4MultiSteppingAction();
+    multi_stepping_action->push_back(std::unique_ptr<G4UserSteppingAction>(stepping_action));
+    for (auto const& step : user_stepping_actions) { multi_stepping_action->push_back(step()); }
+    stepping_action = multi_stepping_action;
+  }
+
+  // Add the remage-internal tracking action and optional user-specified custom stepping actions.
+  const auto user_tracking_actions = RMGManager::Instance()->GetUserInit()->GetTrackingActions();
+  G4UserTrackingAction* tracking_action = new RMGTrackingAction(event_action);
+  if (!user_tracking_actions.empty()) {
+    auto multi_tracking_action = new G4MultiTrackingAction();
+    multi_tracking_action->push_back(std::unique_ptr<G4UserTrackingAction>(tracking_action));
+    for (auto const& step : user_tracking_actions) { multi_tracking_action->push_back(step()); }
+    tracking_action = multi_tracking_action;
+  }
+
   this->SetUserAction(generator_primary);
   this->SetUserAction(event_action);
   this->SetUserAction(run_action);
   this->SetUserAction(new RMGStackingAction(run_action));
-  this->SetUserAction(new RMGSteppingAction(event_action));
-  this->SetUserAction(new RMGTrackingAction(event_action));
+  this->SetUserAction(stepping_action);
+  this->SetUserAction(tracking_action);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

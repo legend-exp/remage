@@ -21,13 +21,13 @@
 #include <string>
 #include <vector>
 
-#include "G4Threading.hh"
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #endif
 #include "G4Backtrace.hh"
 #include "G4GenericMessenger.hh"
 #include "G4StateManager.hh"
+#include "G4Threading.hh"
 #include "G4UIExecutive.hh"
 #include "G4UImanager.hh"
 #include "G4VUserPhysicsList.hh"
@@ -41,6 +41,7 @@
 #include "RMGPhysics.hh"
 #include "RMGTools.hh"
 #include "RMGUserAction.hh"
+#include "RMGUserInit.hh"
 
 #if RMG_HAS_ROOT
 #include "TEnv.h"
@@ -63,6 +64,8 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
 
   // limit Geant4 stacktrace dumping to segfaults
   G4Backtrace::DefaultSignals() = std::set<int>{SIGSEGV};
+
+  fUserInit = std::make_shared<RMGUserInit>();
 
   this->DefineCommands();
 }

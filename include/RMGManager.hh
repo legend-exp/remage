@@ -27,6 +27,7 @@
 
 #include "RMGExceptionHandler.hh"
 #include "RMGLog.hh"
+#include "RMGUserInit.hh"
 
 class G4VUserPhysicsList;
 class RMGHardware;
@@ -52,6 +53,7 @@ class RMGManager {
     G4VisManager* GetG4VisManager();
     RMGHardware* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
+    [[nodiscard]] inline auto GetUserInit() const { return fUserInit; }
     [[nodiscard]] inline int GetPrintModulo() const { return fPrintModulo; }
 
     inline bool IsExecSequential() {
@@ -72,7 +74,7 @@ class RMGManager {
     }
     inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
     inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
-    inline void SetUserInit(RMGUserAction* ua) { fUserAction = ua; }
+
     inline void SetInteractive(bool flag = true) { fInteractive = flag; }
     inline void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
     inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
@@ -137,10 +139,13 @@ class RMGManager {
     std::unique_ptr<G4RunManager> fG4RunManager = nullptr;
     std::unique_ptr<G4VisManager> fG4VisManager = nullptr;
 
+    RMGExceptionHandler* fExceptionHandler = nullptr;
     G4VUserPhysicsList* fPhysicsList = nullptr;
     RMGHardware* fDetectorConstruction = nullptr;
+
     RMGUserAction* fUserAction = nullptr;
-    RMGExceptionHandler* fExceptionHandler = nullptr;
+    // store partial custom actions to be used later in RMGUserAction
+    std::shared_ptr<RMGUserInit> fUserInit;
 
     // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;
