@@ -1,0 +1,1074 @@
+remage macro command reference
+===============================
+
+Command directory path : /RMG/
+------------------------------
+
+* **Sub-directories**:
+    * */RMG/Manager/*: ``General commands for controlling the application``
+        * */RMG/Output/*: ``Commands for controlling the simulation output``
+        * */RMG/Processes/*: ``Commands for controlling physics processes``
+        * */RMG/Geometry/*: ``Commands for controlling geometry definitions``
+        * */RMG/Generator/*: ``Commands for controlling generators``
+        * */RMG/Confinement/*: ``...Title not available...``
+
+Command directory path : /RMG/Manager/
+--------------------------------------
+
+General commands for controlling the application
+
+* **Sub-directories**:
+    * */RMG/Manager/Logging/*: ``Commands for controlling application logging``
+        * */RMG/Manager/Randomization/*: ``Commands for controlling randomization settings``
+        * *Interactive*: ``Enable interactive mode``
+        * *PrintProgressModulo*: ``How many processed events before progress information is displayed``
+
+Command /RMG/Manager/Interactive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Enable interactive mode
+
+* **Parameter**: ``interactive``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``True``
+    * **Default value**: ``true``
+
+Command /RMG/Manager/PrintProgressModulo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+How many processed events before progress information is displayed
+
+* **Range of parameters**: ``n > 0``
+* **Parameter**: ``n``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Manager/Logging/
+----------------------------------------------
+
+Commands for controlling application logging
+
+* **Sub-directories**:
+    * *LogLevel*: ``Set verbosity level of application log``
+
+Command /RMG/Manager/Logging/LogLevel
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set verbosity level of application log
+
+* **Parameter**: ``level``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``debug detail summary warning error fatal nothing``
+
+Command directory path : /RMG/Manager/Randomization/
+----------------------------------------------------
+
+Commands for controlling randomization settings
+
+* **Sub-directories**:
+    * *RandomEngine*: ``Select the random engine (CLHEP)``
+        * *Seed*: ``Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)``
+        * *InternalSeed*: ``Select the initial seed for randomization by using the internal CLHEP table``
+        * *UseSystemEntropy*: ``Select a random initial seed from system entropy``
+
+Command /RMG/Manager/Randomization/RandomEngine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select the random engine (CLHEP)
+
+* **Parameter**: ``name``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+
+Command /RMG/Manager/Randomization/Seed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)
+
+* **Range of parameters**: ``n >= 0``
+* **Parameter**: ``n``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+    * **Default value**: ``1``
+
+Command /RMG/Manager/Randomization/InternalSeed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select the initial seed for randomization by using the internal CLHEP table
+
+* **Range of parameters**: ``index >= 0 && index < 430``
+* **Parameter**: ``index``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Manager/Randomization/UseSystemEntropy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select a random initial seed from system entropy
+
+Command directory path : /RMG/Output/
+-------------------------------------
+
+Commands for controlling the simulation output
+
+* **Sub-directories**:
+    * */RMG/Output/Germanium/*: ``Commands for controlling output from hits in germanium detectors.``
+        * */RMG/Output/Vertex/*: ``Commands for controlling output of primary vertices.``
+        * */RMG/Output/Scintillator/*: ``Commands for controlling output from hits in scintillator detectors.``
+        * *FileName*: ``Set output file name for object persistency``
+        * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
+
+Command /RMG/Output/FileName
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set output file name for object persistency
+
+* **Parameter**: ``filename``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/NtuplePerDetector
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
+
+* **Parameter**: ``tree_per_det``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Output/Germanium/
+-----------------------------------------------
+
+Commands for controlling output from hits in germanium detectors.
+
+* **Sub-directories**:
+    * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
+        * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
+        * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
+        * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors.``
+
+Command /RMG/Output/Germanium/SetEdepCutLow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set a lower energy cut that has to be met for this event to be stored.
+
+* **Parameter**: ``threshold``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``keV``
+    * **Candidates**: ``eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule``
+
+Command /RMG/Output/Germanium/SetEdepCutHigh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set an upper energy cut that has to be met for this event to be stored.
+
+* **Parameter**: ``threshold``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``keV``
+    * **Candidates**: ``eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule``
+
+Command /RMG/Output/Germanium/AddDetectorForEdepThreshold
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Take this detector into account for the filtering by /EdepThreshold.
+
+* **Parameter**: ``det_uid``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Discard optical photons (before simulating them), if no edep in germanium detectors.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Output/Vertex/
+--------------------------------------------
+
+Commands for controlling output of primary vertices.
+
+* **Sub-directories**:
+    * *StorePrimaryParticleInformation*: ``Store information on primary particle details (not only vertex data).``
+        * *SkipPrimaryVertexOutput*: ``Do not store vertex/primary particle data.``
+
+Command /RMG/Output/Vertex/StorePrimaryParticleInformation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Store information on primary particle details (not only vertex data).
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Vertex/SkipPrimaryVertexOutput
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Do not store vertex/primary particle data.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Output/Scintillator/
+--------------------------------------------------
+
+Commands for controlling output from hits in scintillator detectors.
+
+* **Sub-directories**:
+    * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
+        * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
+        * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
+
+Command /RMG/Output/Scintillator/SetEdepCutLow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set a lower energy cut that has to be met for this event to be stored.
+
+* **Parameter**: ``threshold``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``keV``
+    * **Candidates**: ``eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule``
+
+Command /RMG/Output/Scintillator/SetEdepCutHigh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set an upper energy cut that has to be met for this event to be stored.
+
+* **Parameter**: ``threshold``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``keV``
+    * **Candidates**: ``eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule``
+
+Command /RMG/Output/Scintillator/AddDetectorForEdepThreshold
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Take this detector into account for the filtering by /EdepThreshold.
+
+* **Parameter**: ``det_uid``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Processes/
+----------------------------------------
+
+Commands for controlling physics processes
+
+* **Sub-directories**:
+    * */RMG/Processes/Stepping/*: ``Commands for controlling physics processes``
+        * *Realm*: ``Set simulation realm (cut values for particles in (sensitive) detector``
+        * *OpticalPhysics*: ``Add optical processes to the physics list``
+        * *LowEnergyEMPhysics*: ``Add low energy electromagnetic processes to the physics list``
+        * *HadronicPhysics*: ``Add hadronic processes to the physics list``
+        * *ThermalScattering*: ``Use thermal scattering cross sections for neutrons``
+        * *EnableGammaAngularCorrelation*: ``Set correlated gamma emission flag``
+        * *GammaTwoJMAX*: ``Set max 2J for sampling of angular correlations``
+        * *StoreICLevelData*: ``Store e- internal conversion data``
+
+Command /RMG/Processes/Realm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set simulation realm (cut values for particles in (sensitive) detector
+
+* **Parameter**: ``realm``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``DoubleBetaDecay DarkMatter CosmicRays LArScintillation``
+
+Command /RMG/Processes/OpticalPhysics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add optical processes to the physics list
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Processes/LowEnergyEMPhysics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add low energy electromagnetic processes to the physics list
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Default value**: ``Livermore``
+    * **Candidates**: ``Option1 Option2 Option3 Option4 Penelope Livermore LivermorePolarized None``
+
+Command /RMG/Processes/HadronicPhysics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add hadronic processes to the physics list
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Default value**: ``Shielding``
+    * **Candidates**: ``QGSP_BIC_HP QGSP_BERT_HP FTFP_BERT_HP Shielding None``
+
+Command /RMG/Processes/ThermalScattering
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use thermal scattering cross sections for neutrons
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+    * **Candidates**: ``0 1``
+
+Command /RMG/Processes/EnableGammaAngularCorrelation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set correlated gamma emission flag
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+    * **Candidates**: ``0 1``
+
+Command /RMG/Processes/GammaTwoJMAX
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set max 2J for sampling of angular correlations
+
+* **Range of parameters**: ``x > 0``
+* **Parameter**: ``x``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Processes/StoreICLevelData
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Store e- internal conversion data
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+    * **Candidates**: ``0 1``
+
+Command directory path : /RMG/Processes/Stepping/
+-------------------------------------------------
+
+Commands for controlling physics processes
+
+* **Sub-directories**:
+    * *DaughterNucleusMaxLifetime*: ``Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.``
+
+Command /RMG/Processes/Stepping/DaughterNucleusMaxLifetime
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
+
+* This applies to the defined lifetime of the nucleus, and not on the sampled actual halflife of the simulated particle.
+* Set to -1 to disable this feature.
+* **Parameter**: ``max_lifetime``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+    * **Default value**: ``-1``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``us``
+    * **Candidates**: ``s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year``
+
+Command directory path : /RMG/Geometry/
+---------------------------------------
+
+Commands for controlling geometry definitions
+
+* **Sub-directories**:
+    * *GDMLDisableOverlapCheck*: ``Disable the automatic overlap check after loading a GDML file``
+        * *GDMLOverlapCheckNumPoints*: ``Change the number of points sampled for overlap checks``
+        * *IncludeGDMLFile*: ``Use GDML file for geometry definition``
+        * *PrintListOfLogicalVolumes*: ``Print list of defined physical volumes``
+        * *PrintListOfPhysicalVolumes*: ``Print list of defined physical volumes``
+        * *RegisterDetector*: ``register a sensitive detector``
+
+Command /RMG/Geometry/GDMLDisableOverlapCheck
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Disable the automatic overlap check after loading a GDML file
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Geometry/GDMLOverlapCheckNumPoints
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Change the number of points sampled for overlap checks
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Geometry/IncludeGDMLFile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use GDML file for geometry definition
+
+* **Parameter**: ``filename``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+
+Command /RMG/Geometry/PrintListOfLogicalVolumes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Print list of defined physical volumes
+
+Command /RMG/Geometry/PrintListOfPhysicalVolumes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Print list of defined physical volumes
+
+Command /RMG/Geometry/RegisterDetector
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+register a sensitive detector
+
+* **Parameter**: ``type``
+* Detector type
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``Germanium Optical Scintillator``
+* **Parameter**: ``pv_name``
+* Detector physical volume
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+* **Parameter**: ``uid``
+* unique detector id
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``copy_nr``
+* copy nr (default 0)
+    * **Parameter type**: ``i``
+    * **Omittable**: ``True``
+    * **Default value**: ``0``
+* **Parameter**: ``allow_id_reuse``
+* append this volume to a previously allocated unique detector id, instead of erroring out.
+    * **Parameter type**: ``b``
+    * **Omittable**: ``True``
+    * **Default value**: ``false``
+
+Command directory path : /RMG/Generator/
+----------------------------------------
+
+Commands for controlling generators
+
+* **Sub-directories**:
+    * */RMG/Generator/MUSUNCosmicMuons/*: ``Commands for controlling the MUSUN µ generator``
+        * */RMG/Generator/CosmicMuons/*: ``Commands for controlling the µ generator``
+        * */RMG/Generator/Confinement/*: ``Commands for controlling primary confinement``
+        * *Confine*: ``Select primary confinement strategy``
+        * *Select*: ``Select event generator``
+
+Command /RMG/Generator/Confine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select primary confinement strategy
+
+* **Parameter**: ``strategy``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``UnConfined Volume FromFile``
+
+Command /RMG/Generator/Select
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select event generator
+
+* **Parameter**: ``generator``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``G4gun GPS BxDecay0 CosmicMuons MUSUNCosmicMuons UserDefined Undefined``
+
+Command directory path : /RMG/Generator/MUSUNCosmicMuons/
+---------------------------------------------------------
+
+Commands for controlling the MUSUN µ generator
+
+* **Sub-directories**:
+    * *SetMUSUNFile*: ``Set the MUSUN input file``
+
+Command /RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the MUSUN input file
+
+* **Parameter**: ``MUSUNFileName``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Generator/CosmicMuons/
+----------------------------------------------------
+
+Commands for controlling the µ generator
+
+* **Sub-directories**:
+    * *SkyShape*: ``Geometrical shape of the µ generation surface``
+        * *SkyPlaneSize*: ``Length of the side of the sky, if it has a planar shape``
+        * *SkyPlaneHeight*: ``Height of the sky, if it has a planar shape``
+        * *MomentumMin*: ``Minimum momentum of the generated muon``
+        * *MomentumMax*: ``Maximum momentum of the generated muon``
+        * *ThetaMin*: ``Minimum azimutal angle of the generated muon momentum``
+        * *ThetaMax*: ``Maximum azimutal angle of the generated muon momentum``
+        * *PhiMin*: ``Minimum zenith angle of the generated muon momentum``
+        * *PhiMax*: ``Maximum zenith angle of the generated muon momentum``
+        * *SpherePositionThetaMin*: ``Minimum azimutal angle of the generated muon position on the sphere``
+        * *SpherePositionThetaMax*: ``Maximum azimutal angle of the generated muon position on the sphere``
+        * *SpherePositionPhiMin*: ``Minimum zenith angle of the generated muon position on the sphere``
+        * *SpherePositionPhiMax*: ``Maximum zenith angle of the generated muon position on the sphere``
+
+Command /RMG/Generator/CosmicMuons/SkyShape
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Geometrical shape of the µ generation surface
+
+* **Parameter**: ``shape``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``Plane Sphere``
+
+Command /RMG/Generator/CosmicMuons/SkyPlaneSize
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Length of the side of the sky, if it has a planar shape
+
+* **Range of parameters**: ``l > 0``
+* **Parameter**: ``l``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``m``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/CosmicMuons/SkyPlaneHeight
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Height of the sky, if it has a planar shape
+
+* **Range of parameters**: ``l > 0``
+* **Parameter**: ``l``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``m``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/CosmicMuons/MomentumMin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Minimum momentum of the generated muon
+
+* **Range of parameters**: ``p >= 0 && p < 1000``
+* **Parameter**: ``p``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``GeV/c``
+    * **Candidates**: ``eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c``
+
+Command /RMG/Generator/CosmicMuons/MomentumMax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Maximum momentum of the generated muon
+
+* **Range of parameters**: ``p > 0 && p <= 1000``
+* **Parameter**: ``p``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``GeV/c``
+    * **Candidates**: ``eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c``
+
+Command /RMG/Generator/CosmicMuons/ThetaMin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Minimum azimutal angle of the generated muon momentum
+
+* **Range of parameters**: ``a >= 0 && a < 90``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/ThetaMax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Maximum azimutal angle of the generated muon momentum
+
+* **Range of parameters**: ``a > 0 && a <= 90``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/PhiMin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Minimum zenith angle of the generated muon momentum
+
+* **Range of parameters**: ``a >= 0 && a < 360``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/PhiMax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Maximum zenith angle of the generated muon momentum
+
+* **Range of parameters**: ``a > 0 && a <= 360``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/SpherePositionThetaMin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Minimum azimutal angle of the generated muon position on the sphere
+
+* **Range of parameters**: ``a >= 0 && a < 90``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/SpherePositionThetaMax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Maximum azimutal angle of the generated muon position on the sphere
+
+* **Range of parameters**: ``a > 0 && a <= 90``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/SpherePositionPhiMin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Minimum zenith angle of the generated muon position on the sphere
+
+* **Range of parameters**: ``a >= 0 && a < 360``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/CosmicMuons/SpherePositionPhiMax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Maximum zenith angle of the generated muon position on the sphere
+
+* **Range of parameters**: ``a > 0 && a <= 360``
+* **Parameter**: ``a``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command directory path : /RMG/Generator/Confinement/
+----------------------------------------------------
+
+Commands for controlling primary confinement
+
+* **Sub-directories**:
+    * */RMG/Generator/Confinement/Physical/*: ``Commands for setting physical volumes up for primary confinement``
+        * */RMG/Generator/Confinement/Geometrical/*: ``Commands for setting geometrical volumes up for primary confinement``
+        * *Reset*: ``Reset all parameters of vertex confinement, so that it can be reconfigured.``
+        * *SampleOnSurface*: ``If true (or omitted argument), sample on the surface of solids``
+        * *SamplingMode*: ``Select sampling mode for volume confinement``
+        * *MaxSamplingTrials*: ``Set maximum number of attempts for sampling primary positions in a volume``
+        * *ForceContainmentCheck*: ``If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.``
+
+Command /RMG/Generator/Confinement/Reset
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Reset all parameters of vertex confinement, so that it can be reconfigured.
+
+Command /RMG/Generator/Confinement/SampleOnSurface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If true (or omitted argument), sample on the surface of solids
+
+* **Parameter**: ``flag``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``True``
+
+Command /RMG/Generator/Confinement/SamplingMode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select sampling mode for volume confinement
+
+* **Parameter**: ``mode``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``IntersectPhysicalWithGeometrical UnionAll``
+
+Command /RMG/Generator/Confinement/MaxSamplingTrials
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set maximum number of attempts for sampling primary positions in a volume
+
+* **Range of parameters**: ``N > 0``
+* **Parameter**: ``N``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Generator/Confinement/ForceContainmentCheck
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.
+
+* **Parameter**: ``flag``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``True``
+
+Command directory path : /RMG/Generator/Confinement/Physical/
+-------------------------------------------------------------
+
+Commands for setting physical volumes up for primary confinement
+
+* **Sub-directories**:
+    * *AddVolume*: ``Add physical volume(s) to sample primaries from.``
+
+Command /RMG/Generator/Confinement/Physical/AddVolume
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add physical volume(s) to sample primaries from.
+
+* **Parameter**: ``regex``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+* **Parameter**: ``copy_nr_regex``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+
+Command directory path : /RMG/Generator/Confinement/Geometrical/
+----------------------------------------------------------------
+
+Commands for setting geometrical volumes up for primary confinement
+
+* **Sub-directories**:
+    * */RMG/Generator/Confinement/Geometrical/Sphere/*: ``Commands for setting geometrical dimensions of a sampling sphere``
+        * */RMG/Generator/Confinement/Geometrical/Cylinder/*: ``Commands for setting geometrical dimensions of a sampling cylinder``
+        * */RMG/Generator/Confinement/Geometrical/Box/*: ``Commands for setting geometrical dimensions of a sampling box``
+        * *AddSolid*: ``Add geometrical solid to sample primaries from``
+        * *CenterPositionX*: ``Set center position (X coordinate)``
+        * *CenterPositionY*: ``Set center position (Y coordinate)``
+        * *CenterPositionZ*: ``Set center position (Z coordinate)``
+
+Command /RMG/Generator/Confinement/Geometrical/AddSolid
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add geometrical solid to sample primaries from
+
+* **Parameter**: ``solid``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
+    * **Candidates**: ``Sphere Cylinder Box``
+
+Command /RMG/Generator/Confinement/Geometrical/CenterPositionX
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set center position (X coordinate)
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/CenterPositionY
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set center position (Y coordinate)
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/CenterPositionZ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set center position (Z coordinate)
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command directory path : /RMG/Generator/Confinement/Geometrical/Sphere/
+-----------------------------------------------------------------------
+
+Commands for setting geometrical dimensions of a sampling sphere
+
+* **Sub-directories**:
+    * *InnerRadius*: ``Set inner radius``
+        * *OuterRadius*: ``Set outer radius``
+
+Command /RMG/Generator/Confinement/Geometrical/Sphere/InnerRadius
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set inner radius
+
+* **Range of parameters**: ``L >= 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set outer radius
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command directory path : /RMG/Generator/Confinement/Geometrical/Cylinder/
+-------------------------------------------------------------------------
+
+Commands for setting geometrical dimensions of a sampling cylinder
+
+* **Sub-directories**:
+    * *InnerRadius*: ``Set inner radius``
+        * *OuterRadius*: ``Set outer radius``
+        * *Height*: ``Set height``
+        * *StartingAngle*: ``Set starting angle``
+        * *SpanningAngle*: ``Set spanning angle``
+
+Command /RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set inner radius
+
+* **Range of parameters**: ``L >= 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set outer radius
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Cylinder/Height
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set height
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Cylinder/StartingAngle
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set starting angle
+
+* **Parameter**: ``A``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command /RMG/Generator/Confinement/Geometrical/Cylinder/SpanningAngle
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set spanning angle
+
+* **Parameter**: ``A``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``deg``
+    * **Candidates**: ``rad mrad deg radian milliradian degree``
+
+Command directory path : /RMG/Generator/Confinement/Geometrical/Box/
+--------------------------------------------------------------------
+
+Commands for setting geometrical dimensions of a sampling box
+
+* **Sub-directories**:
+    * *XLength*: ``Set X length``
+        * *YLength*: ``Set Y length``
+        * *ZLength*: ``Set Z length``
+
+Command /RMG/Generator/Confinement/Geometrical/Box/XLength
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set X length
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Box/YLength
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set Y length
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command /RMG/Generator/Confinement/Geometrical/Box/ZLength
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set Z length
+
+* **Range of parameters**: ``L > 0``
+* **Parameter**: ``L``
+    * **Parameter type**: ``d``
+    * **Omittable**: ``False``
+* **Parameter**: ``Unit``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``True``
+    * **Default value**: ``cm``
+    * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command directory path : /RMG/Confinement/
+------------------------------------------
+
+* **Sub-directories**:
+    * */RMG/Confinement/FromFile/*: ``Commands for controlling reading event vertex positions from file``
+
+Command directory path : /RMG/Confinement/FromFile/
+---------------------------------------------------
+
+Commands for controlling reading event vertex positions from file
+
+* **Sub-directories**:
+    * *FileName*: ``Set name of the file containing vertex positions. See the documentation for a specification of the format.``
+
+Command /RMG/Confinement/FromFile/FileName
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set name of the file containing vertex positions. See the documentation for a specification of the format.
+
+* **Parameter**: ``filename``
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``

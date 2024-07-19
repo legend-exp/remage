@@ -104,6 +104,7 @@ Next steps
     :maxdepth: 2
 
     api/index
+    Geant4 command interface <rmg-commands>
     Good ol' Doxygen <https://remage.readthedocs.io/en/latest/doxygen/annotated.html>
 
 .. |remage| replace:: *remage*

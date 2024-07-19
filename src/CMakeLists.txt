@@ -121,6 +121,14 @@ add_executable(remage-cli ${_root}/src/remage.cc)
 target_link_libraries(remage-cli PUBLIC remage)
 set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
+# executable for dumping all docs
+add_executable(remage-doc-dump EXCLUDE_FROM_ALL ${_root}/src/remage-doc-dump.cc)
+target_link_libraries(remage-doc-dump PUBLIC remage)
+set_target_properties(remage-doc-dump PROPERTIES OUTPUT_NAME remage-doc-dump)
+if(BxDecay0_FOUND)
+  target_link_libraries(remage-doc-dump PRIVATE BxDecay0::BxDecay0_Geant4)
+endif()
+
 # install CMake targets
 install(
   TARGETS remage

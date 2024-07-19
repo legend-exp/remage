@@ -16,19 +16,8 @@
 #ifndef _RMG_EXCEPTION_HANDLER_HH_
 #define _RMG_EXCEPTION_HANDLER_HH_
 
-#include <memory>
-#include <vector>
-
 #include "G4ExceptionHandler.hh"
-#include "globals.hh"
 
-#include "RMGLog.hh"
-
-class G4VUserPhysicsList;
-class RMGHardware;
-class RMGUserAction;
-class G4GenericMessenger;
-class G4UIExecutive;
 class RMGExceptionHandler : public G4ExceptionHandler {
 
   public:

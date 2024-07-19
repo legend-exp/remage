@@ -19,15 +19,12 @@
 #include <sstream>
 
 #include "G4AnalysisManager.hh"
-#include "G4GenericMessenger.hh"
 #include "G4RunManager.hh"
 
-#include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGRun.hh"
 #include "RMGRunAction.hh"
-#include "RMGUserAction.hh"
 
 #include "fmt/chrono.h"
 #include "magic_enum/magic_enum.hpp"

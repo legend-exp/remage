@@ -7,7 +7,6 @@
 #include "G4CsvAnalysisReader.hh"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
-#include "G4VUserPrimaryGeneratorAction.hh"
 
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"

@@ -18,13 +18,10 @@
 #include <map>
 #include <stdexcept>
 
-#include "G4GenericMessenger.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
-#include "G4ThreeVector.hh"
-#include "G4Track.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
