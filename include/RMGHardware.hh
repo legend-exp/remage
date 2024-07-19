@@ -49,7 +49,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     enum DetectorType {
       kGermanium,
       kOptical,
-      kLAr
+      kScintillator,
     };
 
     struct DetectorMetadata {
