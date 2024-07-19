@@ -196,7 +196,8 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
-      .SetGuidance("Disable the automatic overlap check after loading a GDML file")
+      .SetGuidance(
+          "Discard optical photons (before simulating them), if no edep in germanium detectors.")
       .SetStates(G4State_Idle);
 }
 

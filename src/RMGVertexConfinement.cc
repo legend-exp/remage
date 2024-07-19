@@ -688,7 +688,7 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareProperty("ForceContainmentCheck", fForceContainmentCheck)
       .SetGuidance("If true (or omitted argument), perform a containment check even after sampling "
                    "from a natively sampleable object. This is only an extra sanity check that does"
-                   "not alter the behaviour.")
+                   " not alter the behaviour.")
       .SetParameterName("flag", true)
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
