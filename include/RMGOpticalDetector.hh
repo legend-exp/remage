@@ -20,7 +20,6 @@
 #include <string>
 
 #include "G4Allocator.hh"
-#include "G4GenericMessenger.hh"
 #include "G4THitsCollection.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
@@ -56,7 +55,6 @@ using RMGOpticalDetectorHitsCollection = G4THitsCollection<RMGOpticalDetectorHit
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
-class G4GenericMessenger;
 class RMGOpticalDetector : public G4VSensitiveDetector {
 
   public:

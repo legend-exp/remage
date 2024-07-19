@@ -22,7 +22,6 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
-#include "G4VUserPrimaryGeneratorAction.hh"
 
 #include "RMGVGenerator.hh"
 

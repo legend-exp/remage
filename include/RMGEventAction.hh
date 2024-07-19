@@ -22,7 +22,6 @@
 #include "G4UserEventAction.hh"
 
 class RMGRunAction;
-class G4GenericMessenger;
 class RMGEventAction : public G4UserEventAction {
 
   public:
