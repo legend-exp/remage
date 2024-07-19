@@ -34,6 +34,8 @@ namespace fs = std::filesystem;
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
 #include "RMGOpticalOutputScheme.hh"
+#include "RMGScintillatorDetector.hh"
+#include "RMGScintillatorOutputScheme.hh"
 #include "RMGVertexOutputScheme.hh"
 
 #include "magic_enum/magic_enum.hpp"
@@ -133,7 +135,10 @@ void RMGHardware::ConstructSDandField() {
           obj = new RMGGermaniumDetector();
           output = std::make_shared<RMGGermaniumOutputScheme>();
           break;
-        case DetectorType::kLAr:
+        case DetectorType::kScintillator:
+          obj = new RMGScintillatorDetector();
+          output = std::make_shared<RMGScintillatorOutputScheme>();
+          break;
         default:
           RMGLog::OutDev(RMGLog::fatal, "No behaviour for sensitive detector type '",
               magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
