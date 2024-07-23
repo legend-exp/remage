@@ -58,14 +58,14 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
-    ana_man->CreateNtupleDColumn(id, "edep");
-    ana_man->CreateNtupleDColumn(id, "time");
-    ana_man->CreateNtupleDColumn(id, "xloc_pre");
-    ana_man->CreateNtupleDColumn(id, "yloc_pre");
-    ana_man->CreateNtupleDColumn(id, "zloc_pre");
-    ana_man->CreateNtupleDColumn(id, "xloc_post");
-    ana_man->CreateNtupleDColumn(id, "yloc_post");
-    ana_man->CreateNtupleDColumn(id, "zloc_post");
+    ana_man->CreateNtupleDColumn(id, "edep_in_keV");
+    ana_man->CreateNtupleDColumn(id, "time_in_ns");
+    ana_man->CreateNtupleDColumn(id, "xloc_pre_in_m");
+    ana_man->CreateNtupleDColumn(id, "yloc_pre_in_m");
+    ana_man->CreateNtupleDColumn(id, "zloc_pre_in_m");
+    ana_man->CreateNtupleDColumn(id, "xloc_post_in_m");
+    ana_man->CreateNtupleDColumn(id, "yloc_post_in_m");
+    ana_man->CreateNtupleDColumn(id, "zloc_post_in_m");
     ana_man->CreateNtupleDColumn(id, "v_pre");
     ana_man->CreateNtupleDColumn(id, "v_post");
 

@@ -58,11 +58,11 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
-    ana_man->CreateNtupleDColumn(id, "edep");
-    ana_man->CreateNtupleDColumn(id, "time");
-    ana_man->CreateNtupleDColumn(id, "xloc");
-    ana_man->CreateNtupleDColumn(id, "yloc");
-    ana_man->CreateNtupleDColumn(id, "zloc");
+    ana_man->CreateNtupleDColumn(id, "edep_in_keV");
+    ana_man->CreateNtupleDColumn(id, "time_in_ns");
+    ana_man->CreateNtupleDColumn(id, "xloc_in_m");
+    ana_man->CreateNtupleDColumn(id, "yloc_in_m");
+    ana_man->CreateNtupleDColumn(id, "zloc_in_m");
 
     ana_man->FinishNtuple(id);
   }

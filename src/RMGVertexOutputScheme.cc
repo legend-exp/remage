@@ -33,10 +33,10 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       ana_man->CreateNtuple("vertices", "Primary vertex data"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
-  ana_man->CreateNtupleDColumn(vid, "time");
-  ana_man->CreateNtupleDColumn(vid, "xloc");
-  ana_man->CreateNtupleDColumn(vid, "yloc");
-  ana_man->CreateNtupleDColumn(vid, "zloc");
+  ana_man->CreateNtupleDColumn(vid, "time_in_ns");
+  ana_man->CreateNtupleDColumn(vid, "xloc_in_m");
+  ana_man->CreateNtupleDColumn(vid, "yloc_in_m");
+  ana_man->CreateNtupleDColumn(vid, "zloc_in_m");
   ana_man->CreateNtupleIColumn(vid, "n_part");
 
   ana_man->FinishNtuple(vid);
@@ -48,10 +48,10 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");
     ana_man->CreateNtupleIColumn(pid, "particle");
-    ana_man->CreateNtupleDColumn(pid, "px");
-    ana_man->CreateNtupleDColumn(pid, "py");
-    ana_man->CreateNtupleDColumn(pid, "pz");
-    ana_man->CreateNtupleDColumn(pid, "ekin");
+    ana_man->CreateNtupleDColumn(pid, "px_in_MeV");
+    ana_man->CreateNtupleDColumn(pid, "py_in_MeV");
+    ana_man->CreateNtupleDColumn(pid, "pz_in_MeV");
+    ana_man->CreateNtupleDColumn(pid, "ekin_in_MeV");
 
     ana_man->FinishNtuple(pid);
   }
