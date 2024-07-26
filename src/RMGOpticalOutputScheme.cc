@@ -56,8 +56,8 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
-    ana_man->CreateNtupleDColumn(id, "wavelength");
-    ana_man->CreateNtupleDColumn(id, "time");
+    ana_man->CreateNtupleDColumn(id, "wavelength_in_nm");
+    ana_man->CreateNtupleDColumn(id, "time_in_ns");
 
     ana_man->FinishNtuple(id);
   }
