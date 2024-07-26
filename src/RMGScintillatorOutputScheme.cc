@@ -66,8 +66,8 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleDColumn(id, "xloc_post_in_m");
     ana_man->CreateNtupleDColumn(id, "yloc_post_in_m");
     ana_man->CreateNtupleDColumn(id, "zloc_post_in_m");
-    ana_man->CreateNtupleDColumn(id, "v_pre");
-    ana_man->CreateNtupleDColumn(id, "v_post");
+    ana_man->CreateNtupleDColumn(id, "beta_pre");
+    ana_man->CreateNtupleDColumn(id, "beta_post");
 
     ana_man->FinishNtuple(id);
   }
