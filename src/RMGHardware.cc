@@ -31,6 +31,7 @@ namespace fs = std::filesystem;
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGHardwareMessenger.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGOpticalDetector.hh"
 #include "RMGOpticalOutputScheme.hh"
@@ -170,6 +171,11 @@ void RMGHardware::ConstructSDandField() {
   // also store primary vertex data, if we have any other output.
   if (!fActiveOutputSchemes.empty()) {
     fActiveOutputSchemes.emplace_back(std::make_shared<RMGVertexOutputScheme>());
+  }
+
+  // Also add user-provided output schemes.
+  for (const auto& os : RMGManager::Instance()->GetUserInit()->GetOutputSchemes()) {
+    fActiveOutputSchemes.emplace_back(os());
   }
 
   std::string vec_repr;

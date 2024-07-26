@@ -29,6 +29,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGTools.hh
     ${_root}/include/RMGTrackingAction.hh
     ${_root}/include/RMGUserAction.hh
+    ${_root}/include/RMGUserInit.hh
     ${_root}/include/RMGVertexConfinement.hh
     ${_root}/include/RMGVertexFromFile.hh
     ${_root}/include/RMGVGenerator.hh
