@@ -66,8 +66,8 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleDColumn(id, "xloc_post_in_m");
     ana_man->CreateNtupleDColumn(id, "yloc_post_in_m");
     ana_man->CreateNtupleDColumn(id, "zloc_post_in_m");
-    ana_man->CreateNtupleDColumn(id, "beta_pre");
-    ana_man->CreateNtupleDColumn(id, "beta_post");
+    ana_man->CreateNtupleDColumn(id, "v_pre_in_m\\ns");
+    ana_man->CreateNtupleDColumn(id, "v_post_in_m\\ns");
 
     ana_man->FinishNtuple(id);
   }
@@ -157,8 +157,8 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getX() / u::m);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getY() / u::m);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getZ() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_pre);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_post);
+      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_pre / u::m * u::ns);
+      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_post / u::m * u::ns);
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
