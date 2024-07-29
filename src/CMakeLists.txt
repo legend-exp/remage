@@ -136,6 +136,14 @@ add_custom_target(
   COMMAND ${_root}/docs/g4manual2rst.py ${CMAKE_BINARY_DIR}/rmg-manual.txt
   WORKING_DIRECTORY ${_root}/docs)
 
+# executable for converting remage output HDF5 with ntuples to LH5 tables
+if(Geant4_hdf5_FOUND)
+  add_executable(remage-to-lh5 ${_root}/src/remage-to-lh5.cc)
+  target_include_directories(remage-to-lh5 PRIVATE ${HDF5_INCLUDE_DIRS})
+  target_link_libraries(remage-to-lh5 PUBLIC remage ${HDF5_CXX_LIBRARIES})
+  set_target_properties(remage-to-lh5 PROPERTIES OUTPUT_NAME remage-to-lh5)
+endif()
+
 # install CMake targets
 install(
   TARGETS remage
@@ -153,5 +161,8 @@ install(
   PATTERN "CLI11" EXCLUDE
   PATTERN "EcoMug" EXCLUDE)
 
-# install CLI binary
+# install CLI binaries
 install(TARGETS remage-cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+if(Geant4_hdf5_FOUND)
+  install(TARGETS remage-to-lh5 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
