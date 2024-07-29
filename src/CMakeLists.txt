@@ -123,12 +123,17 @@ target_link_libraries(remage-cli PUBLIC remage)
 set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
 
 # executable for dumping all docs
-add_executable(remage-doc-dump EXCLUDE_FROM_ALL ${_root}/src/remage-doc-dump.cc)
-target_link_libraries(remage-doc-dump PUBLIC remage)
-set_target_properties(remage-doc-dump PROPERTIES OUTPUT_NAME remage-doc-dump)
+add_executable(remage-doc-dump-cli EXCLUDE_FROM_ALL ${_root}/src/remage-doc-dump.cc)
+target_link_libraries(remage-doc-dump-cli PUBLIC remage)
+set_target_properties(remage-doc-dump-cli PROPERTIES OUTPUT_NAME remage-doc-dump)
 if(BxDecay0_FOUND)
-  target_link_libraries(remage-doc-dump PRIVATE BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4)
 endif()
+add_custom_target(
+  remage-doc-dump
+  COMMAND remage-doc-dump-cli --manual ${CMAKE_BINARY_DIR}/rmg-manual.txt
+  COMMAND ${_root}/docs/g4manual2rst.py ${CMAKE_BINARY_DIR}/rmg-manual.txt
+  WORKING_DIRECTORY ${_root}/docs)
 
 # install CMake targets
 install(

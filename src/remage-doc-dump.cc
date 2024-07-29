@@ -32,6 +32,8 @@
 #include "RMGVertexFromFile.hh"
 #include "RMGVertexOutputScheme.hh"
 
+#include "CLI11/CLI11.hpp"
+
 void init_extra() {
   // initialize non-default things that have messengers.
   // add here other things in the future.
@@ -50,8 +52,11 @@ void init_extra() {
 }
 
 int main(int argc, char** argv) {
-  std::string dir = ".";
-  if (argc > 1) dir = argv[1];
+  CLI::App app{"remage-doc-dump"};
+  std::string html_dir, manual_file;
+  app.add_option("--html", html_dir, "GDML files")->type_name("FILE");
+  app.add_option("--manual", manual_file, "Output file for detector hits")->type_name("FILE");
+  CLI11_PARSE(app, argc, argv);
 
   RMGLog::SetLogLevel(RMGLog::summary);
 
@@ -60,23 +65,25 @@ int main(int argc, char** argv) {
 
   init_extra();
 
-  if (dir != ".") {
-    RMGLog::Out(RMGLog::summary, "Set output directory to ", dir);
-    auto path = std::filesystem::path(dir);
+  auto UI = G4UImanager::GetUIpointer();
+
+  if (!html_dir.empty()) {
+    RMGLog::Out(RMGLog::summary, "Export HTML to ", html_dir);
+    auto path = std::filesystem::path(html_dir);
     std::filesystem::create_directories(path);
     std::filesystem::current_path(path);
+
+    UI->ApplyCommand("/control/createHTML /RMG/");
   }
 
-  auto UI = G4UImanager::GetUIpointer();
-  RMGLog::Out(RMGLog::summary, "Export HTML");
-  UI->ApplyCommand("/control/createHTML /RMG/");
-
-  RMGLog::Out(RMGLog::summary, "Export TXT");
-  std::ofstream out("rmg-manual.txt");
-  std::streambuf* coutbuf = std::cout.rdbuf();
-  std::cout.rdbuf(out.rdbuf());
-  UI->ApplyCommand("/control/manual /RMG/");
-  std::cout.rdbuf(coutbuf);
+  if (!manual_file.empty()) {
+    RMGLog::Out(RMGLog::summary, "Export TXT to ", manual_file);
+    std::ofstream out(manual_file);
+    std::streambuf* coutbuf = std::cout.rdbuf();
+    std::cout.rdbuf(out.rdbuf());
+    UI->ApplyCommand("/control/manual /RMG/");
+    std::cout.rdbuf(coutbuf);
+  }
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
