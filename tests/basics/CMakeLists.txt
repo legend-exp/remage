@@ -22,6 +22,13 @@ foreach(_mac ${_macros})
   set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS mt)
 endforeach()
 
+if(BxDecay0_THREADSAFE)
+  foreach(_mac ${_macros_extra})
+    add_test(NAME basics-mt/${_mac} COMMAND remage-cli -g gdml/main.gdml -t 2 macros/${_mac})
+    set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS "mt extra")
+  endforeach()
+endif()
+
 list(TRANSFORM _macros_extra PREPEND "basics/")
 set_tests_properties(${_macros_extra} PROPERTIES LABELS extra)
 

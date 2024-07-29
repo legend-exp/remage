@@ -24,8 +24,10 @@
 
 RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGenerator("Decay0") {
 
+#if !RMG_HAS_BXDECAY0_THREADSAFE
   if (!RMGManager::Instance()->IsExecSequential())
     RMGLog::Out(RMGLog::fatal, "BxDecay0 is not thread-safe (yet). Re-run in sequential mode.");
+#endif
 
   if (!prim_gen) RMGLog::OutDev(RMGLog::fatal, "Primary position generator is nullptr");
 
