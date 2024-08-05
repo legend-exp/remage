@@ -10,11 +10,11 @@ Command directory path : /RMG/
 
 * **Sub-directories**:
     * */RMG/Manager/*: ``General commands for controlling the application``
-        * */RMG/Output/*: ``Commands for controlling the simulation output``
-        * */RMG/Processes/*: ``Commands for controlling physics processes``
-        * */RMG/Geometry/*: ``Commands for controlling geometry definitions``
-        * */RMG/Generator/*: ``Commands for controlling generators``
-        * */RMG/Confinement/*: ``...Title not available...``
+    * */RMG/Output/*: ``Commands for controlling the simulation output``
+    * */RMG/Processes/*: ``Commands for controlling physics processes``
+    * */RMG/Geometry/*: ``Commands for controlling geometry definitions``
+    * */RMG/Generator/*: ``Commands for controlling generators``
+    * */RMG/Confinement/*: ``...Title not available...``
 
 Command directory path : /RMG/Manager/
 --------------------------------------
@@ -23,9 +23,10 @@ General commands for controlling the application
 
 * **Sub-directories**:
     * */RMG/Manager/Logging/*: ``Commands for controlling application logging``
-        * */RMG/Manager/Randomization/*: ``Commands for controlling randomization settings``
-        * *Interactive*: ``Enable interactive mode``
-        * *PrintProgressModulo*: ``How many processed events before progress information is displayed``
+    * */RMG/Manager/Randomization/*: ``Commands for controlling randomization settings``
+* **Commands**:
+    * *Interactive*: ``Enable interactive mode``
+    * *PrintProgressModulo*: ``How many processed events before progress information is displayed``
 
 Command /RMG/Manager/Interactive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -52,7 +53,7 @@ Command directory path : /RMG/Manager/Logging/
 
 Commands for controlling application logging
 
-* **Sub-directories**:
+* **Commands**:
     * *LogLevel*: ``Set verbosity level of application log``
 
 Command /RMG/Manager/Logging/LogLevel
@@ -70,11 +71,11 @@ Command directory path : /RMG/Manager/Randomization/
 
 Commands for controlling randomization settings
 
-* **Sub-directories**:
+* **Commands**:
     * *RandomEngine*: ``Select the random engine (CLHEP)``
-        * *Seed*: ``Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)``
-        * *InternalSeed*: ``Select the initial seed for randomization by using the internal CLHEP table``
-        * *UseSystemEntropy*: ``Select a random initial seed from system entropy``
+    * *Seed*: ``Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)``
+    * *InternalSeed*: ``Select the initial seed for randomization by using the internal CLHEP table``
+    * *UseSystemEntropy*: ``Select a random initial seed from system entropy``
 
 Command /RMG/Manager/Randomization/RandomEngine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -118,10 +119,11 @@ Commands for controlling the simulation output
 
 * **Sub-directories**:
     * */RMG/Output/Germanium/*: ``Commands for controlling output from hits in germanium detectors.``
-        * */RMG/Output/Vertex/*: ``Commands for controlling output of primary vertices.``
-        * */RMG/Output/Scintillator/*: ``Commands for controlling output from hits in scintillator detectors.``
-        * *FileName*: ``Set output file name for object persistency``
-        * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
+    * */RMG/Output/Vertex/*: ``Commands for controlling output of primary vertices.``
+    * */RMG/Output/Scintillator/*: ``Commands for controlling output from hits in scintillator detectors.``
+* **Commands**:
+    * *FileName*: ``Set output file name for object persistency``
+    * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
 
 Command /RMG/Output/FileName
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -146,11 +148,11 @@ Command directory path : /RMG/Output/Germanium/
 
 Commands for controlling output from hits in germanium detectors.
 
-* **Sub-directories**:
+* **Commands**:
     * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
-        * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
-        * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
-        * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors.``
+    * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
+    * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
+    * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors.``
 
 Command /RMG/Output/Germanium/SetEdepCutLow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -203,9 +205,9 @@ Command directory path : /RMG/Output/Vertex/
 
 Commands for controlling output of primary vertices.
 
-* **Sub-directories**:
+* **Commands**:
     * *StorePrimaryParticleInformation*: ``Store information on primary particle details (not only vertex data).``
-        * *SkipPrimaryVertexOutput*: ``Do not store vertex/primary particle data.``
+    * *SkipPrimaryVertexOutput*: ``Do not store vertex/primary particle data.``
 
 Command /RMG/Output/Vertex/StorePrimaryParticleInformation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -230,10 +232,10 @@ Command directory path : /RMG/Output/Scintillator/
 
 Commands for controlling output from hits in scintillator detectors.
 
-* **Sub-directories**:
+* **Commands**:
     * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
-        * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
-        * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
+    * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
+    * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
 
 Command /RMG/Output/Scintillator/SetEdepCutLow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -279,14 +281,15 @@ Commands for controlling physics processes
 
 * **Sub-directories**:
     * */RMG/Processes/Stepping/*: ``Commands for controlling physics processes``
-        * *Realm*: ``Set simulation realm (cut values for particles in (sensitive) detector``
-        * *OpticalPhysics*: ``Add optical processes to the physics list``
-        * *LowEnergyEMPhysics*: ``Add low energy electromagnetic processes to the physics list``
-        * *HadronicPhysics*: ``Add hadronic processes to the physics list``
-        * *ThermalScattering*: ``Use thermal scattering cross sections for neutrons``
-        * *EnableGammaAngularCorrelation*: ``Set correlated gamma emission flag``
-        * *GammaTwoJMAX*: ``Set max 2J for sampling of angular correlations``
-        * *StoreICLevelData*: ``Store e- internal conversion data``
+* **Commands**:
+    * *Realm*: ``Set simulation realm (cut values for particles in (sensitive) detector``
+    * *OpticalPhysics*: ``Add optical processes to the physics list``
+    * *LowEnergyEMPhysics*: ``Add low energy electromagnetic processes to the physics list``
+    * *HadronicPhysics*: ``Add hadronic processes to the physics list``
+    * *ThermalScattering*: ``Use thermal scattering cross sections for neutrons``
+    * *EnableGammaAngularCorrelation*: ``Set correlated gamma emission flag``
+    * *GammaTwoJMAX*: ``Set max 2J for sampling of angular correlations``
+    * *StoreICLevelData*: ``Store e- internal conversion data``
 
 Command /RMG/Processes/Realm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -374,7 +377,7 @@ Command directory path : /RMG/Processes/Stepping/
 
 Commands for controlling physics processes
 
-* **Sub-directories**:
+* **Commands**:
     * *DaughterNucleusMaxLifetime*: ``Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.``
 
 Command /RMG/Processes/Stepping/DaughterNucleusMaxLifetime
@@ -399,13 +402,13 @@ Command directory path : /RMG/Geometry/
 
 Commands for controlling geometry definitions
 
-* **Sub-directories**:
+* **Commands**:
     * *GDMLDisableOverlapCheck*: ``Disable the automatic overlap check after loading a GDML file``
-        * *GDMLOverlapCheckNumPoints*: ``Change the number of points sampled for overlap checks``
-        * *IncludeGDMLFile*: ``Use GDML file for geometry definition``
-        * *PrintListOfLogicalVolumes*: ``Print list of defined physical volumes``
-        * *PrintListOfPhysicalVolumes*: ``Print list of defined physical volumes``
-        * *RegisterDetector*: ``register a sensitive detector``
+    * *GDMLOverlapCheckNumPoints*: ``Change the number of points sampled for overlap checks``
+    * *IncludeGDMLFile*: ``Use GDML file for geometry definition``
+    * *PrintListOfLogicalVolumes*: ``Print list of defined physical volumes``
+    * *PrintListOfPhysicalVolumes*: ``Print list of defined physical volumes``
+    * *RegisterDetector*: ``register a sensitive detector``
 
 Command /RMG/Geometry/GDMLDisableOverlapCheck
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -480,10 +483,11 @@ Commands for controlling generators
 
 * **Sub-directories**:
     * */RMG/Generator/MUSUNCosmicMuons/*: ``Commands for controlling the MUSUN µ generator``
-        * */RMG/Generator/CosmicMuons/*: ``Commands for controlling the µ generator``
-        * */RMG/Generator/Confinement/*: ``Commands for controlling primary confinement``
-        * *Confine*: ``Select primary confinement strategy``
-        * *Select*: ``Select event generator``
+    * */RMG/Generator/CosmicMuons/*: ``Commands for controlling the µ generator``
+    * */RMG/Generator/Confinement/*: ``Commands for controlling primary confinement``
+* **Commands**:
+    * *Confine*: ``Select primary confinement strategy``
+    * *Select*: ``Select event generator``
 
 Command /RMG/Generator/Confine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -510,7 +514,7 @@ Command directory path : /RMG/Generator/MUSUNCosmicMuons/
 
 Commands for controlling the MUSUN µ generator
 
-* **Sub-directories**:
+* **Commands**:
     * *SetMUSUNFile*: ``Set the MUSUN input file``
 
 Command /RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile
@@ -527,20 +531,20 @@ Command directory path : /RMG/Generator/CosmicMuons/
 
 Commands for controlling the µ generator
 
-* **Sub-directories**:
+* **Commands**:
     * *SkyShape*: ``Geometrical shape of the µ generation surface``
-        * *SkyPlaneSize*: ``Length of the side of the sky, if it has a planar shape``
-        * *SkyPlaneHeight*: ``Height of the sky, if it has a planar shape``
-        * *MomentumMin*: ``Minimum momentum of the generated muon``
-        * *MomentumMax*: ``Maximum momentum of the generated muon``
-        * *ThetaMin*: ``Minimum azimutal angle of the generated muon momentum``
-        * *ThetaMax*: ``Maximum azimutal angle of the generated muon momentum``
-        * *PhiMin*: ``Minimum zenith angle of the generated muon momentum``
-        * *PhiMax*: ``Maximum zenith angle of the generated muon momentum``
-        * *SpherePositionThetaMin*: ``Minimum azimutal angle of the generated muon position on the sphere``
-        * *SpherePositionThetaMax*: ``Maximum azimutal angle of the generated muon position on the sphere``
-        * *SpherePositionPhiMin*: ``Minimum zenith angle of the generated muon position on the sphere``
-        * *SpherePositionPhiMax*: ``Maximum zenith angle of the generated muon position on the sphere``
+    * *SkyPlaneSize*: ``Length of the side of the sky, if it has a planar shape``
+    * *SkyPlaneHeight*: ``Height of the sky, if it has a planar shape``
+    * *MomentumMin*: ``Minimum momentum of the generated muon``
+    * *MomentumMax*: ``Maximum momentum of the generated muon``
+    * *ThetaMin*: ``Minimum azimutal angle of the generated muon momentum``
+    * *ThetaMax*: ``Maximum azimutal angle of the generated muon momentum``
+    * *PhiMin*: ``Minimum zenith angle of the generated muon momentum``
+    * *PhiMax*: ``Maximum zenith angle of the generated muon momentum``
+    * *SpherePositionThetaMin*: ``Minimum azimutal angle of the generated muon position on the sphere``
+    * *SpherePositionThetaMax*: ``Maximum azimutal angle of the generated muon position on the sphere``
+    * *SpherePositionPhiMin*: ``Minimum zenith angle of the generated muon position on the sphere``
+    * *SpherePositionPhiMax*: ``Maximum zenith angle of the generated muon position on the sphere``
 
 Command /RMG/Generator/CosmicMuons/SkyShape
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -739,12 +743,13 @@ Commands for controlling primary confinement
 
 * **Sub-directories**:
     * */RMG/Generator/Confinement/Physical/*: ``Commands for setting physical volumes up for primary confinement``
-        * */RMG/Generator/Confinement/Geometrical/*: ``Commands for setting geometrical volumes up for primary confinement``
-        * *Reset*: ``Reset all parameters of vertex confinement, so that it can be reconfigured.``
-        * *SampleOnSurface*: ``If true (or omitted argument), sample on the surface of solids``
-        * *SamplingMode*: ``Select sampling mode for volume confinement``
-        * *MaxSamplingTrials*: ``Set maximum number of attempts for sampling primary positions in a volume``
-        * *ForceContainmentCheck*: ``If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.``
+    * */RMG/Generator/Confinement/Geometrical/*: ``Commands for setting geometrical volumes up for primary confinement``
+* **Commands**:
+    * *Reset*: ``Reset all parameters of vertex confinement, so that it can be reconfigured.``
+    * *SampleOnSurface*: ``If true (or omitted argument), sample on the surface of solids``
+    * *SamplingMode*: ``Select sampling mode for volume confinement``
+    * *MaxSamplingTrials*: ``Set maximum number of attempts for sampling primary positions in a volume``
+    * *ForceContainmentCheck*: ``If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.``
 
 Command /RMG/Generator/Confinement/Reset
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -794,7 +799,7 @@ Command directory path : /RMG/Generator/Confinement/Physical/
 
 Commands for setting physical volumes up for primary confinement
 
-* **Sub-directories**:
+* **Commands**:
     * *AddVolume*: ``Add physical volume(s) to sample primaries from.``
 
 Command /RMG/Generator/Confinement/Physical/AddVolume
@@ -816,12 +821,13 @@ Commands for setting geometrical volumes up for primary confinement
 
 * **Sub-directories**:
     * */RMG/Generator/Confinement/Geometrical/Sphere/*: ``Commands for setting geometrical dimensions of a sampling sphere``
-        * */RMG/Generator/Confinement/Geometrical/Cylinder/*: ``Commands for setting geometrical dimensions of a sampling cylinder``
-        * */RMG/Generator/Confinement/Geometrical/Box/*: ``Commands for setting geometrical dimensions of a sampling box``
-        * *AddSolid*: ``Add geometrical solid to sample primaries from``
-        * *CenterPositionX*: ``Set center position (X coordinate)``
-        * *CenterPositionY*: ``Set center position (Y coordinate)``
-        * *CenterPositionZ*: ``Set center position (Z coordinate)``
+    * */RMG/Generator/Confinement/Geometrical/Cylinder/*: ``Commands for setting geometrical dimensions of a sampling cylinder``
+    * */RMG/Generator/Confinement/Geometrical/Box/*: ``Commands for setting geometrical dimensions of a sampling box``
+* **Commands**:
+    * *AddSolid*: ``Add geometrical solid to sample primaries from``
+    * *CenterPositionX*: ``Set center position (X coordinate)``
+    * *CenterPositionY*: ``Set center position (Y coordinate)``
+    * *CenterPositionZ*: ``Set center position (Z coordinate)``
 
 Command /RMG/Generator/Confinement/Geometrical/AddSolid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -880,9 +886,9 @@ Command directory path : /RMG/Generator/Confinement/Geometrical/Sphere/
 
 Commands for setting geometrical dimensions of a sampling sphere
 
-* **Sub-directories**:
+* **Commands**:
     * *InnerRadius*: ``Set inner radius``
-        * *OuterRadius*: ``Set outer radius``
+    * *OuterRadius*: ``Set outer radius``
 
 Command /RMG/Generator/Confinement/Geometrical/Sphere/InnerRadius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -919,12 +925,12 @@ Command directory path : /RMG/Generator/Confinement/Geometrical/Cylinder/
 
 Commands for setting geometrical dimensions of a sampling cylinder
 
-* **Sub-directories**:
+* **Commands**:
     * *InnerRadius*: ``Set inner radius``
-        * *OuterRadius*: ``Set outer radius``
-        * *Height*: ``Set height``
-        * *StartingAngle*: ``Set starting angle``
-        * *SpanningAngle*: ``Set spanning angle``
+    * *OuterRadius*: ``Set outer radius``
+    * *Height*: ``Set height``
+    * *StartingAngle*: ``Set starting angle``
+    * *SpanningAngle*: ``Set spanning angle``
 
 Command /RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1004,10 +1010,10 @@ Command directory path : /RMG/Generator/Confinement/Geometrical/Box/
 
 Commands for setting geometrical dimensions of a sampling box
 
-* **Sub-directories**:
+* **Commands**:
     * *XLength*: ``Set X length``
-        * *YLength*: ``Set Y length``
-        * *ZLength*: ``Set Z length``
+    * *YLength*: ``Set Y length``
+    * *ZLength*: ``Set Z length``
 
 Command /RMG/Generator/Confinement/Geometrical/Box/XLength
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1065,7 +1071,7 @@ Command directory path : /RMG/Confinement/FromFile/
 
 Commands for controlling reading event vertex positions from file
 
-* **Sub-directories**:
+* **Commands**:
     * *FileName*: ``Set name of the file containing vertex positions. See the documentation for a specification of the format.``
 
 Command /RMG/Confinement/FromFile/FileName

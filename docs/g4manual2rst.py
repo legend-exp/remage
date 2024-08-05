@@ -36,6 +36,7 @@ def remove_whitespace_lines_end(lines: list):
 idx = 0
 in_cmdblock = False
 lastlevel = -1
+leveldiff = 0
 
 for line in inlines:
     if re.match(r"Command directory path : /RMG/", line):
@@ -43,22 +44,32 @@ for line in inlines:
         outlines.extend(["", line, "-" * len(line), ""])
         in_cmdblock = True
         lastlevel = -1
+        leveldiff = 0
     elif re.match(r"Command /RMG/", line):
         remove_whitespace_lines_end(outlines)
         outlines.extend(["", line, "^" * len(line), ""])
         in_cmdblock = True
         lastlevel = -1
+        leveldiff = 0
     elif in_cmdblock and (line == "Guidance :"):
         pass
     elif in_cmdblock and (inlines[idx - 1] == "Guidance :") and not line.startswith(" " * 2):
         outlines.extend([line, ""])
-    elif in_cmdblock and line == " Commands : " and not inlines[idx + 1].startswith(" " * 4):
+    elif in_cmdblock and line == " Commands : " and not inlines[idx + 1].startswith(" " * 3):
+        # ignore directories with no commands.
+        pass
+    elif in_cmdblock and line == " Sub-directories : " and inlines[idx + 1] == " Commands : ":
+        # ignore directories with no commands.
         pass
     elif in_cmdblock and line != "":
-        stripped_line = line.strip()
+        stripped_line = line.lstrip()
         indent = math.ceil((len(line) - len(stripped_line)) / 2)
-        if indent > lastlevel + 1:  # parts of the output have the wrong indentation.
-            indent = lastlevel + 1
+        if line.startswith(" Range of parameters :"):
+            indent = 0
+        stripped_line = stripped_line.rstrip()
+        if lastlevel == -1 and indent > lastlevel + 1:  # parts of the output have the wrong indentation.
+            leveldiff = indent
+        indent -= leveldiff
         m = re.match(r"(.*)( [:* ] ?)(.*)?$", line)
         if m:
             g = list(m.groups())
