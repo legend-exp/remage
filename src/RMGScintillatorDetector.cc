@@ -73,7 +73,8 @@ void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
           G4VSensitiveDetector::collectionName[0]);
 
   // associate it with the G4HCofThisEvent object
-  auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(G4VSensitiveDetector::collectionName[0]);
+  auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
+      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]);
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
