@@ -1,0 +1,9 @@
+# set the seed to a value that produced enough events in output files, so that we don't
+# have to generate high statistics for all ntuples to be filled.
+/RMG/Manager/Randomization/Seed 1403045780
+
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/run/initialize
+
+/RMG/Manager/Logging/LogLevel detail
