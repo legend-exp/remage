@@ -1,0 +1,18 @@
+/RMG/Output/NtuplePerDetector false
+
+/RMG/Geometry/RegisterDetector Scintillator scint1 1
+/RMG/Geometry/RegisterDetector Scintillator scint2 2
+/RMG/Geometry/RegisterDetector Germanium det1 11
+/RMG/Geometry/RegisterDetector Germanium det2 12
+
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine UnConfined
+
+/RMG/Generator/Select GPS
+/gps/position 0 0 0
+/gps/ang/type iso
+/gps/particle gamma
+/gps/energy 200 keV
+
+/run/beamOn 50

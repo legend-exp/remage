@@ -3,3 +3,4 @@ project(remage-tests)
 
 add_subdirectory(basics)
 add_subdirectory(confinement)
+add_subdirectory(output)

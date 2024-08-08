@@ -77,6 +77,15 @@ if(Geant4_hdf5_FOUND)
   message(STATUS "Geant4 compiled with HDF5 support - enabling feature")
   list(APPEND g4_components hdf5)
   list(APPEND remage_components HDF5)
+  # need to find HDF5 with CXX again, as Geant4 does not initialize this before,
+  # even when built with HDF5 enabled.
+  find_package(
+    HDF5
+    COMPONENTS CXX
+    REQUIRED)
+  if(NOT HDF5_FOUND)
+    message(STATUS "HDF5 lacks C++ support - disabling feature")
+  endif()
 else()
   message(STATUS "Geant4 lacks HDF5 support - disabling feature")
 endif()
