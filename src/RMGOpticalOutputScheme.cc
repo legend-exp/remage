@@ -39,7 +39,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
-  std::set<std::string> registered_ntuples;
+  std::map<std::string, int> registered_ntuples;
   for (auto&& det : detectors) {
     if (det.second.type != RMGHardware::kOptical) continue;
 
@@ -48,11 +48,16 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     if (!had_uid.second) continue;
 
     auto ntuple_name = this->GetNtupleName(det.second.uid);
-    auto had_name = registered_ntuples.emplace(ntuple_name);
-    if (!had_name.second) continue;
+    auto ntuple_reg = registered_ntuples.find(ntuple_name);
+    if (ntuple_reg != registered_ntuples.end()) {
+      // ntuple already exists, but also store the ntuple id for the other uid(s).
+      rmg_man->RegisterNtuple(det.second.uid, ntuple_reg->second);
+      continue;
+    }
 
     auto id =
         rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
+    registered_ntuples.emplace(ntuple_name, id);
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
