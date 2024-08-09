@@ -106,11 +106,8 @@ void RMGManager::Initialize() {
   fG4RunManager->SetUserInitialization(fUserAction);
 
   if (!fIsRandControlled) {
-    std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
-    std::random_device rd; // uses RDRND or /dev/urandom
-    auto rand_seed = dist(rd);
-    G4Random::setTheSeed(rand_seed);
-    RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
+    SetRandSystemEntropySeed();
+    fIsRandControlled = false;
   }
 }
 
@@ -221,18 +218,25 @@ void RMGManager::SetLogLevel(std::string level) {
 }
 
 void RMGManager::SetRandEngine(std::string name) {
+  if (fG4RunManager != nullptr && !IsExecSequential()) {
+    RMGLog::Out(RMGLog::error,
+        "SetRandEngine only works reliably in sequential mode or before initializing MT mode!");
+    return;
+  }
+
   if (name == "JamesRandom") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
-    RMGLog::Out(RMGLog::summary, "Using James random engine");
   } else if (name == "RanLux") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::RanluxEngine);
-    RMGLog::Out(RMGLog::summary, "Using RanLux random engine");
   } else if (name == "MTwist") {
     CLHEP::HepRandom::setTheEngine(new CLHEP::MTwistEngine);
-    RMGLog::Out(RMGLog::summary, "Using MTwist random engine");
+  } else if (name == "MixMaxRng") {
+    CLHEP::HepRandom::setTheEngine(new CLHEP::MixMaxRng);
   } else {
     RMGLog::Out(RMGLog::error, "'", name, "' random engine unknown");
   }
+
+  RMGLog::Out(RMGLog::summary, "Using ", CLHEP::HepRandom::getTheEngine()->name(), " random engine");
 }
 
 void RMGManager::SetRandEngineSeed(long seed) {
@@ -301,6 +305,7 @@ void RMGManager::DefineCommands() {
   fRandMessenger->DeclareMethod("RandomEngine", &RMGManager::SetRandEngine)
       .SetGuidance("Select the random engine (CLHEP)")
       .SetParameterName("name", false)
+      .SetCandidates("JamesRandom RanLux MTwist MixMaxRng")
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("Seed", &RMGManager::SetRandEngineSeed)
