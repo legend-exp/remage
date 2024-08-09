@@ -92,8 +92,18 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     // TODO: realpath
     if (this->IsMaster())
       RMGLog::Out(RMGLog::summary, "Opening output file: ", manager->GetOutputFileName());
-    ana_man->OpenFile(manager->GetOutputFileName());
-  } else if (this->IsMaster()) {
+    auto success = ana_man->OpenFile(manager->GetOutputFileName());
+
+    // If opening failed, disable persistency.
+    if (!success) {
+      if (this->IsMaster())
+        RMGLog::Out(RMGLog::error, "Failed opening output file ", manager->GetOutputFileName());
+      manager->EnablePersistency(false);
+      fIsPersistencyEnabled = false;
+    }
+  }
+
+  if (!fIsPersistencyEnabled && this->IsMaster()) {
     // Warn user if persistency is disabled if there are detectors defined.
     auto level = manager->GetDetectorConstruction()->GetActiveDetectorList().empty()
                      ? RMGLog::summary
