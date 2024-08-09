@@ -103,8 +103,9 @@ Next steps
 .. toctree::
     :maxdepth: 2
 
-    api/index
     Geant4 command interface <rmg-commands>
+    Output structure & LH5 output <output>
+    api/index
     Good ol' Doxygen <https://remage.readthedocs.io/en/latest/doxygen/annotated.html>
 
 .. |remage| replace:: *remage*
