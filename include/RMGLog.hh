@@ -106,6 +106,10 @@ class RMGLog {
      * Toggle if the loglevel is prefixed to every message. */
     static inline void SetPrefix(bool flag) { fUsePrefix = flag; }
 
+    /**
+     * Toggle if a startup message is shown before the first log message. */
+    static inline void SetInihibitStartupInfo(bool flag) { fFirstOutputDone = flag; }
+
     /** @} */
     /** \name Miscellaneous */
     /** @{ */
