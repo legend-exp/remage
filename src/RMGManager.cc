@@ -84,8 +84,14 @@ void RMGManager::Initialize() {
       if (fNThreads <= 0) fNThreads = G4Threading::G4GetNumberOfCores();
       else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
       fG4RunManager->SetNumberOfThreads(fNThreads);
-      RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)",
-          fNThreads);
+      if (!IsExecSequential())
+        RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)",
+            fNThreads);
+      else {
+        RMGLog::OutFormat(RMGLog::warning,
+            "multi-threaded execution with {} threads requested, but executing sequentially",
+            fNThreads);
+      }
     }
   }
 
