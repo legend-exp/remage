@@ -35,7 +35,8 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
-    ${_root}/include/RMGVertexOutputScheme.hh)
+    ${_root}/include/RMGVertexOutputScheme.hh
+    ${_root}/include/RMGWorkerInitialization.hh)
 
 set(PROJECT_SOURCES
     ${_root}/src/RMGExceptionHandler.cc

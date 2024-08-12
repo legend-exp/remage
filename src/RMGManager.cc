@@ -42,6 +42,7 @@
 #include "RMGTools.hh"
 #include "RMGUserAction.hh"
 #include "RMGUserInit.hh"
+#include "RMGWorkerInitialization.hh"
 
 #if RMG_HAS_ROOT
 #include "TEnv.h"
@@ -106,11 +107,8 @@ void RMGManager::Initialize() {
   fG4RunManager->SetUserInitialization(fUserAction);
 
   if (!fIsRandControlled) {
-    std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
-    std::random_device rd; // uses RDRND or /dev/urandom
-    auto rand_seed = dist(rd);
-    G4Random::setTheSeed(rand_seed);
-    RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
+    SetRandSystemEntropySeed();
+    fIsRandControlled = false;
   }
 }
 
@@ -172,6 +170,18 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
 
   // restore buffer
   std::cout.rdbuf(orig_buf);
+
+  // set the appropriate thread init for this run manager type. Use the actuial type to decide, and
+  // not the requested type: It is possible to override the resulting run manager type in the environment.
+  if (dynamic_cast<G4TaskRunManager*>(fG4RunManager.get()) != nullptr) {
+    fG4RunManager->SetUserInitialization(
+        new RMGWorkerInitialization<G4UserTaskThreadInitialization>());
+  } else if (dynamic_cast<G4MTRunManager*>(fG4RunManager.get()) != nullptr) {
+    fG4RunManager->SetUserInitialization(
+        new RMGWorkerInitialization<G4UserWorkerThreadInitialization>());
+  } else if (!IsExecSequential()) {
+    RMGLog::OutDev(RMGLog::fatal, "Unknown type of MT run manager.");
+  }
 }
 
 void RMGManager::SetUpDefaultUserAction() {
@@ -221,21 +231,44 @@ void RMGManager::SetLogLevel(std::string level) {
 }
 
 void RMGManager::SetRandEngine(std::string name) {
-  if (name == "JamesRandom") {
-    CLHEP::HepRandom::setTheEngine(new CLHEP::HepJamesRandom);
-    RMGLog::Out(RMGLog::summary, "Using James random engine");
-  } else if (name == "RanLux") {
-    CLHEP::HepRandom::setTheEngine(new CLHEP::RanluxEngine);
-    RMGLog::Out(RMGLog::summary, "Using RanLux random engine");
-  } else if (name == "MTwist") {
-    CLHEP::HepRandom::setTheEngine(new CLHEP::MTwistEngine);
-    RMGLog::Out(RMGLog::summary, "Using MTwist random engine");
-  } else {
-    RMGLog::Out(RMGLog::error, "'", name, "' random engine unknown");
+  fIsRandControlledAtEngineChange = fIsRandControlled;
+
+  fRandEngineName = name;
+  if (!ApplyRandEngineForCurrentThread()) {
+    RMGLog::Out(RMGLog::error, "'", fRandEngineName, "' random engine unknown");
   }
+  RMGLog::Out(RMGLog::summary, "Using ", CLHEP::HepRandom::getTheEngine()->name(), " random engine");
+}
+
+bool RMGManager::ApplyRandEngineForCurrentThread() {
+  CLHEP::HepRandomEngine* engine = nullptr;
+  if (fRandEngineName == "JamesRandom") {
+    engine = new CLHEP::HepJamesRandom;
+  } else if (fRandEngineName == "RanLux") {
+    // TODO: somehow need to propagate engine->getLuxury() if applying to WTs?
+    engine = new CLHEP::RanluxEngine;
+  } else if (fRandEngineName == "MTwist") {
+    engine = new CLHEP::MTwistEngine;
+  } else if (fRandEngineName == "MixMaxRng") {
+    engine = new CLHEP::MixMaxRng;
+  } else if (!fRandEngineName.empty()) {
+    return false;
+  }
+  if (engine != nullptr) { CLHEP::HepRandom::setTheEngine(engine); }
+  return true;
+}
+
+void RMGManager::CheckRandEngineMTState() {
+  if (fG4RunManager == nullptr || IsExecSequential() || GetRandIsControlled() ||
+      fIsRandControlledAtEngineChange || fRandEngineName.empty())
+    return;
+  RMGLog::Out(RMGLog::warning,
+      "Setting a random engine and a seed requires to set a seed before changing the rand engine "
+      "in MT mode. Otherwise results are non-deterministic.");
 }
 
 void RMGManager::SetRandEngineSeed(long seed) {
+  CheckRandEngineMTState();
   if (seed >= std::numeric_limits<long>::max()) {
     RMGLog::Out(RMGLog::error, "Seed ", seed, " is too large. Largest possible seed is ",
         std::numeric_limits<long>::max(), ". Setting seed to 0.");
@@ -247,6 +280,7 @@ void RMGManager::SetRandEngineSeed(long seed) {
 }
 
 void RMGManager::SetRandEngineInternalSeed(int index) {
+  CheckRandEngineMTState();
   long seeds[2];
   int table_index = index / 2;
   CLHEP::HepRandom::getTheTableSeeds(seeds, table_index);
@@ -301,6 +335,7 @@ void RMGManager::DefineCommands() {
   fRandMessenger->DeclareMethod("RandomEngine", &RMGManager::SetRandEngine)
       .SetGuidance("Select the random engine (CLHEP)")
       .SetParameterName("name", false)
+      .SetCandidates("JamesRandom RanLux MTwist MixMaxRng")
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("Seed", &RMGManager::SetRandEngineSeed)
