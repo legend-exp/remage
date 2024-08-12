@@ -4,11 +4,20 @@ set -euo pipefail
 
 rmg="$1"
 visit_hdf5="$2"
-macro="macros/$3"
+remage_to_lh5="$3"
+macro="macros/$4"
 
-output="${3/.mac/.hdf5}"
+output="${4/.mac/.hdf5}"
+output_lh5="${4/.mac/.lh5}"
 output_dump="${output}ls"
-output_exp="macros/${3/.mac/.hdf5ls}"
+output_dump_lh5="${output}ls-lh5"
+output_exp="macros/${4/.mac/.hdf5ls}"
+output_exp_lh5="macros/${4/.mac/.hdf5ls-lh5}"
+
+
+# -----------------------
+# TEST remage HDF5 output
+# -----------------------
 
 # run remage, produce hdf5 output.
 "$rmg" -g gdml/geometry.gdml -o "$output" -- "$macro"
@@ -21,3 +30,27 @@ output_exp="macros/${3/.mac/.hdf5ls}"
 #   - hits in all detectors (otherwise some (`/pages` dsets would be missing)
 #   - the correct det_uid/ntuple configuration
 diff "$output_dump" "$output_exp"
+
+# in-place convert the HDF file to LH5.
+"$remage_to_lh5" "$output"
+
+
+# ------------------------------
+# TEST remage-to-lh5 CLI utility
+# ------------------------------
+
+# extract written lh5 structure & compare with expectation.
+"$visit_hdf5" "$output" --dump-attrs > "$output_dump_lh5"
+diff "$output_dump_lh5" "$output_exp_lh5"
+
+
+# -----------------------------
+# TEST remage direct LH5 output
+# -----------------------------
+
+# run remage, produce lh5 output.
+"$rmg" -g gdml/geometry.gdml -o "$output_lh5" -- "$macro"
+
+# extract written lh5 structure & compare with expectation.
+"$visit_hdf5" "$output_lh5" --dump-attrs > "$output_dump_lh5"
+diff "$output_dump_lh5" "$output_exp_lh5"
