@@ -85,6 +85,7 @@ Select the random engine (CLHEP)
 * **Parameter**: ``name``
     * **Parameter type**: ``s``
     * **Omittable**: ``False``
+    * **Candidates**: ``JamesRandom RanLux MTwist``
 
 Command /RMG/Manager/Randomization/Seed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

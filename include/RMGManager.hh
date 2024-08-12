@@ -88,7 +88,9 @@ class RMGManager {
     void SetRandEngineSeed(long seed);
     void SetRandEngineInternalSeed(int index);
     void SetRandSystemEntropySeed();
+    bool ApplyRandEngineForCurrentThread();
     [[nodiscard]] inline bool GetRandIsControlled() const { return fIsRandControlled; }
+    [[nodiscard]] inline bool GetRandEngineSelected() const { return !fRandEngineName.empty(); }
 
     void SetLogLevel(std::string level);
 
@@ -116,6 +118,7 @@ class RMGManager {
     void SetUpDefaultDetectorConstruction();
     void SetUpDefaultProcessesList();
     void SetUpDefaultUserAction();
+    void CheckRandEngineMTState();
 
     std::unique_ptr<G4UIExecutive> StartInteractiveSession();
 
@@ -123,11 +126,15 @@ class RMGManager {
     int fArgc;
     char** fArgv;
     std::vector<std::string> fMacroFileNames;
-    bool fIsRandControlled = false;
     bool fInteractive = false;
     bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
     int fNThreads = 1;
+
+    bool fIsRandControlled = false;
+    bool fIsRandControlledAtEngineChange = false;
+    std::string fRandEngineName;
+
     std::string fOutputFile = "detector-hits.root";
     bool fOutputNtuplePerDetector = true;
     // track internal id of detector NTuples
