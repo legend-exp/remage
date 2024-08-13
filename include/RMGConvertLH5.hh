@@ -22,34 +22,48 @@
 #include <string>
 #include <vector>
 
+#include "RMGLog.hh"
+
 #include "H5Cpp.h"
 
 class RMGConvertLH5 {
 
   public:
 
-    static bool ConvertToLH5(std::string);
-    static bool ConvertToLH5Safer(std::string);
+    static bool ConvertToLH5(std::string, bool);
 
   private:
+
+    inline RMGConvertLH5(bool dry_run) : fDryRun(dry_run) {};
+
+    bool ConvertToLH5Internal(std::string);
 
     static inline const std::regex names_split_re = std::regex("(_in_.+?)?\\0");
     static inline const std::regex names_split_re_end = std::regex("(_in_.+?)$");
     static inline const std::string log_prefix = "ConvertLH5: ";
+    static inline const std::string log_prefix_dry = "ConvertLH5[dry-run]: ";
 
     static int iter_children(long int, const char*, const H5L_info_t*, void*);
     static std::vector<std::string> GetChildren(H5::Group&);
 
-    static void SetStringAttribute(H5::H5Object&, std::string, std::string);
+    void SetStringAttribute(H5::H5Object&, std::string, std::string);
 
-    static std::pair<std::string, std::vector<std::string>> ReadNullSepDataset(H5::Group&,
-        std::string, std::string);
+    std::pair<std::string, std::vector<std::string>> ReadNullSepDataset(H5::Group&, std::string,
+        std::string);
 
-    static H5::DataType FormToHDFDataType(std::string);
-    static std::string DataTypeToLGDO(H5::DataType);
-    static bool ConvertNTupleToTable(H5::Group&);
+    H5::DataType FormToHDFDataType(std::string);
+    std::string DataTypeToLGDO(H5::DataType);
+    bool ConvertNTupleToTable(H5::Group&);
 
-    static bool CheckGeantHeader(H5::Group&);
+    bool CheckGeantHeader(H5::Group&);
+
+    template<typename T, typename... Args>
+    inline void LH5Log(RMGLog::LogLevel loglevel, const T& t, const Args&... args) {
+      if (fDryRun && loglevel < RMGLog::error) return;
+      RMGLog::Out(loglevel, fDryRun ? log_prefix_dry : log_prefix, t, args...);
+    }
+
+    bool fDryRun;
 };
 
 #endif

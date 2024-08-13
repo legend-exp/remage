@@ -55,7 +55,7 @@ std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDatas
 
   // the last two bytes of the buffer will be NUL.
   if (storage_size < 2 || buf[storage_size - 1] != '\0' || buf[storage_size - 2] != '\0') {
-    RMGLog::Out(RMGLog::error, ntuple_log_prefix, "invalid ", dset_name, " dataset");
+    LH5Log(RMGLog::error, ntuple_log_prefix, "invalid ", dset_name, " dataset");
     return {"", vec};
   }
   std::string s(buf, storage_size - 2);
@@ -88,17 +88,17 @@ std::string RMGConvertLH5::DataTypeToLGDO(H5::DataType dtype) {
 
 bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   const std::string ntuple_name = det_group.getObjName();
-  const std::string ntuple_log_prefix = log_prefix + "ntuple " + ntuple_name + " - ";
-  RMGLog::Out(RMGLog::detail, ntuple_log_prefix, "visiting");
+  const std::string ntuple_log_prefix = "ntuple " + ntuple_name + " - ";
+  LH5Log(RMGLog::detail, ntuple_log_prefix, "visiting");
   if (!det_group.exists("names") || !det_group.exists("forms") || !det_group.exists("columns")) {
-    RMGLog::Out(RMGLog::error, ntuple_log_prefix, "missing names, forms or columns dataset");
+    LH5Log(RMGLog::error, ntuple_log_prefix, "missing names, forms or columns dataset");
     return false;
   }
 
   // read to check later if we received the correct column count.
   auto dset_columns = det_group.openDataSet("columns");
   if (dset_columns.getDataType() != H5::PredType::STD_U32LE) {
-    RMGLog::Out(RMGLog::error, ntuple_log_prefix, "invalid columns dataset");
+    LH5Log(RMGLog::error, ntuple_log_prefix, "invalid columns dataset");
     return false;
   }
   uint32_t expected_column_count;
@@ -111,7 +111,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
 
   if (names_string.empty() || forms_string.empty()) return false;
   if (names_parts.size() != forms_parts.size()) {
-    RMGLog::Out(RMGLog::error, ntuple_log_prefix, "mismatch in forms and names count");
+    LH5Log(RMGLog::error, ntuple_log_prefix, "mismatch in forms and names count");
     return false;
   }
 
@@ -136,7 +136,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   for (auto& column : columns) {
     // first check that we will not get name clashes later on.
     if (column.find("__tmp") != std::string::npos) {
-      RMGLog::Out(RMGLog::error, ntuple_log_prefix, "containing temporary column ", column);
+      LH5Log(RMGLog::error, ntuple_log_prefix, "containing temporary column ", column);
       return false;
     }
   }
@@ -152,7 +152,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       std::replace(lgdo_units.begin(), lgdo_units.end(), '\\', '/');
     }
 
-    RMGLog::Out(RMGLog::detail, ntuple_log_prefix, "column", lgdo_name, ", with units ", lgdo_units);
+    LH5Log(RMGLog::detail, ntuple_log_prefix, "column", lgdo_name, ", with units ", lgdo_units);
 
     // remove the column group with its child dataset, while preserving the data itself.
     std::string column_tmp = column + "__tmp";
@@ -163,7 +163,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       // create a new empty dataset, as we have none.
       auto col_idx = std::distance(names_parts.begin(),
           std::find(names_parts.begin(), names_parts.end(), column));
-      RMGLog::Out(RMGLog::warning, ntuple_log_prefix, "column ", lgdo_name,
+      LH5Log(RMGLog::warning, ntuple_log_prefix, "column ", lgdo_name,
           " - no data, creating with type ", forms_parts[col_idx]);
 
       hsize_t dset_dataspace_dim[1] = {0};
@@ -184,7 +184,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   }
 
   if (out_column_count != expected_column_count || out_column_count != names_parts.size()) {
-    RMGLog::Out(RMGLog::error, ntuple_log_prefix, "column count mismatch");
+    LH5Log(RMGLog::error, ntuple_log_prefix, "column count mismatch");
     return false;
   }
   return true;
@@ -208,22 +208,28 @@ bool RMGConvertLH5::CheckGeantHeader(H5::Group& header_group) {
   return writer == "exlib";
 }
 
-bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name) {
-  H5::H5File hfile(hdf5_file_name, H5F_ACC_RDWR);
+bool RMGConvertLH5::ConvertToLH5Internal(std::string hdf5_file_name) {
+  // using the core driver with no backing storage will allow to change the file purely in-memory.
+  // TODO: evaluate what this means for memory usage in case of large files?
+  H5::FileAccPropList fapl;
+  if (fDryRun) fapl.setCore(10 * 1024, false);
+  else fapl = H5::FileAccPropList::DEFAULT;
+
+  H5::H5File hfile(hdf5_file_name, H5F_ACC_RDWR, H5::FileCreatPropList::DEFAULT, fapl);
 
   // check that this file has been written by geant4/remage, and that we did not run this upgrade
   // script before (it will delete the header group below).
   if (!hfile.exists("header") || !hfile.exists("hit")) {
-    RMGLog::Out(RMGLog::error, log_prefix,
+    LH5Log(RMGLog::error,
         "not a remage HDF5 output file or already converted (missing header or hit groups)?");
     return false;
   }
   auto header_group = hfile.openGroup("header");
   if (!CheckGeantHeader(header_group)) {
-    RMGLog::Out(RMGLog::error, log_prefix, "not a remage HDF5 output file (invalid header)?");
+    LH5Log(RMGLog::error, "not a remage HDF5 output file (invalid header)?");
     return false;
   }
-  RMGLog::Out(RMGLog::detail, log_prefix, "Opened Geant4 HDF5 file ", hdf5_file_name);
+  LH5Log(RMGLog::detail, "Opened Geant4 HDF5 file ", hdf5_file_name);
 
   // rework the ntuples to LGDO tables.
   auto hit_group = hfile.openGroup("hit");
@@ -243,8 +249,7 @@ bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name) {
     if (histograms.empty()) {
       hfile.unlink("default_histograms");
     } else {
-      RMGLog::Out(RMGLog::warning, log_prefix,
-          "HDF5 file contains histograms, not yet supported to convert!");
+      LH5Log(RMGLog::warning, "HDF5 file contains histograms, not yet supported to convert!");
     }
   }
 
@@ -253,19 +258,20 @@ bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name) {
 
   hfile.close();
 
-  RMGLog::Out(RMGLog::summary, log_prefix, "Done updating HDF5 file ", hdf5_file_name, " to LH5");
+  LH5Log(RMGLog::summary, "Done updating HDF5 file ", hdf5_file_name, " to LH5");
 
   return ntuple_success;
 }
 
-bool RMGConvertLH5::ConvertToLH5Safer(std::string hdf5_file_name) {
+bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name, bool dry_run) {
+  auto conv = RMGConvertLH5(dry_run);
   try {
-    return ConvertToLH5(hdf5_file_name);
+    return conv.ConvertToLH5Internal(hdf5_file_name);
   } catch (const H5::Exception& e) {
-    RMGLog::Out(RMGLog::error, log_prefix, e.getDetailMsg());
+    conv.LH5Log(RMGLog::error, e.getDetailMsg());
     return false;
   } catch (const std::logic_error& e) {
-    RMGLog::Out(RMGLog::error, log_prefix, e.what());
+    conv.LH5Log(RMGLog::error, e.what());
     return false;
   }
 }
