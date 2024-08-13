@@ -1,6 +1,6 @@
 # executable for converting remage output HDF5 with ntuples to LH5 tables
 set(_visit_hdf5 "false")
-if(Geant4_hdf5_FOUND)
+if(RMG_HAS_HDF5)
   add_executable(test-visit-hdf5 EXCLUDE_FROM_ALL test-visit-hdf5.cc)
   target_include_directories(test-visit-hdf5 PRIVATE ${HDF5_INCLUDE_DIRS})
   target_link_libraries(test-visit-hdf5 PUBLIC ${HDF5_CXX_LIBRARIES})
@@ -33,6 +33,6 @@ list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra DEPENDS output/build-test-visit-hdf5)
 
 # Geant4 <= 11.0.3 is deleting non-empty HDF5 files after a successful run, so disable the tests.
-if(Geant4_VERSION VERSION_LESS "11.0.4" OR NOT Geant4_hdf5_FOUND)
+if(Geant4_VERSION VERSION_LESS "11.0.4" OR NOT RMG_HAS_HDF5)
   set_tests_properties(${_macros_hdf5} PROPERTIES DISABLED True)
 endif()

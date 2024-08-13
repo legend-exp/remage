@@ -16,8 +16,10 @@
 #ifndef _RMG_RUN_ACTION_HH_
 #define _RMG_RUN_ACTION_HH_
 
+#include <filesystem>
 #include <memory>
 #include <vector>
+namespace fs = std::filesystem;
 
 #include "G4AnalysisManager.hh"
 #include "G4UserRunAction.hh"
@@ -55,10 +57,16 @@ class RMGRunAction : public G4UserRunAction {
 
   private:
 
+    [[nodiscard]] std::pair<fs::path, fs::path> BuildOutputFile() const;
+    void PostprocessOutputFile() const;
+
     RMGRun* fRMGRun = nullptr;
     bool fIsPersistencyEnabled = false;
     bool fIsAnaManInitialized = false;
     RMGMasterGenerator* fRMGMasterGenerator = nullptr;
+    // a pair containing the actual Geant4 (temporary) file, and the original file name;
+    // possibly being equal.
+    std::pair<fs::path, fs::path> fCurrentOutputFile;
 
     int fCurrentPrintModulo = -1;
 

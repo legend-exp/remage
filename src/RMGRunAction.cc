@@ -18,11 +18,18 @@
 #include <cstdlib>
 #include <ctime>
 #include <limits>
+#include <random>
 
 #include "G4AnalysisManager.hh"
+#include "G4AnalysisUtilities.hh"
+#include "G4AutoLock.hh"
 #include "G4Run.hh"
 #include "G4RunManager.hh"
 
+#include "RMGConfig.hh"
+#if RMG_HAS_HDF5
+#include "RMGConvertLH5.hh"
+#endif
 #include "RMGEventAction.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGLog.hh"
@@ -89,15 +96,22 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   // Check again, SetupAnalysisManager might have modified fIsPersistencyEnabled.
   if (fIsPersistencyEnabled) {
     auto ana_man = G4AnalysisManager::Instance();
-    // TODO: realpath
-    if (this->IsMaster())
-      RMGLog::Out(RMGLog::summary, "Opening output file: ", manager->GetOutputFileName());
-    auto success = ana_man->OpenFile(manager->GetOutputFileName());
+    fCurrentOutputFile = BuildOutputFile();
+    auto fn = fCurrentOutputFile.first.string();
+    if (this->IsMaster()) {
+      std::string orig_fn;
+      if (fCurrentOutputFile.first != fCurrentOutputFile.second)
+        orig_fn = " (for " + fCurrentOutputFile.second.string() + ")";
+      RMGLog::Out(RMGLog::summary, "Opening output file: ", fn, orig_fn);
+    }
+    if (fCurrentOutputFile.first != fCurrentOutputFile.second && std::filesystem::exists(fn)) {
+      RMGLog::Out(RMGLog::fatal, "Temporary file ", fn, " already exists?");
+    }
+    auto success = ana_man->OpenFile(fn);
 
     // If opening failed, disable persistency.
     if (!success) {
-      if (this->IsMaster())
-        RMGLog::Out(RMGLog::error, "Failed opening output file ", manager->GetOutputFileName());
+      if (this->IsMaster()) RMGLog::Out(RMGLog::error, "Failed opening output file ", fn);
       manager->EnablePersistency(false);
       fIsPersistencyEnabled = false;
     }
@@ -199,6 +213,73 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   if (fIsPersistencyEnabled) {
     G4AnalysisManager::Instance()->Write();
     G4AnalysisManager::Instance()->CloseFile();
+
+    PostprocessOutputFile();
+  }
+}
+
+// Geant4 cannot handle LH5 files by default, and there is also no way to teach it another file
+// extension. So if the user specifies a LH5 file as output, we have to create a temporary file
+// with a hdf5 extensions. Later, we will rename it.
+
+std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
+  auto manager = RMGManager::Instance();
+
+  // TODO: realpath
+  auto path = fs::path(manager->GetOutputFileName());
+  auto ext = path.extension();
+  if (ext == ".lh5" || ext == ".LH5") {
+#if !RMG_HAS_HDF5
+    RMGLog::Out(RMGLog::fatal, "HDF5 and LH5 support is not available!");
+#endif
+    std::uniform_int_distribution<int> dist(10000, 99999);
+    std::random_device rd;
+
+    std::string new_fn =
+        ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
+    auto new_path = path.parent_path() / new_fn;
+    return {new_path, path};
+  }
+  return {path, path};
+}
+
+namespace {
+  G4Mutex RMGConvertLH5Mutex = G4MUTEX_INITIALIZER;
+}
+
+void RMGRunAction::PostprocessOutputFile() const {
+  if (fCurrentOutputFile.first == fCurrentOutputFile.second) return;
+
+  // HDF5 C++ might not be thread-safe?
+  G4AutoLock l(&RMGConvertLH5Mutex);
+
+  auto worker_tmp = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
+  auto worker_lh5 = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.second.string(), "lh5"));
+
+  if (!fs::exists(worker_tmp)) {
+    if (!this->IsMaster() || RMGManager::Instance()->IsExecSequential()) {
+      RMGLog::Out(RMGLog::error, "Temporary output file ", worker_tmp.string(),
+          " not found for conversion.");
+    }
+    return;
+  }
+
+#if RMG_HAS_HDF5
+  if (!RMGConvertLH5::ConvertToLH5Safer(worker_tmp.string())) {
+    RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(),
+        " to LH5 failed");
+  }
+#else
+  RMGLog::OutDev(RMGLog::fatal, "HDF5 and LH5 support is not available!");
+#endif
+
+  try {
+    fs::rename(worker_tmp, worker_lh5);
+    RMGLog::Out(RMGLog::summary, "Moved output file ", worker_tmp.string(), " to ",
+        worker_lh5.string());
+  } catch (const fs::filesystem_error& e) {
+    RMGLog::Out(RMGLog::error, "Moving output file ", worker_tmp.string(), " to ",
+        worker_lh5.string(), " failed: ", e.what());
   }
 }
 

@@ -77,6 +77,12 @@ if(BxDecay0_FOUND)
   list(APPEND PROJECT_SOURCES ${_root}/src/RMGGeneratorDecay0.cc)
 endif()
 
+if(RMG_HAS_HDF5)
+  list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGConvertLH5.hh)
+
+  list(APPEND PROJECT_SOURCES ${_root}/src/RMGConvertLH5.cc)
+endif()
+
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
@@ -98,6 +104,11 @@ endif()
 
 if(ROOT_FOUND)
   target_link_libraries(remage PUBLIC ROOT::Core ROOT::Tree)
+endif()
+
+if(RMG_HAS_HDF5)
+  target_include_directories(remage PRIVATE ${HDF5_INCLUDE_DIRS})
+  target_link_libraries(remage PUBLIC ${HDF5_CXX_LIBRARIES})
 endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
@@ -137,10 +148,9 @@ add_custom_target(
   WORKING_DIRECTORY ${_root}/docs)
 
 # executable for converting remage output HDF5 with ntuples to LH5 tables
-if(Geant4_hdf5_FOUND)
+if(RMG_HAS_HDF5)
   add_executable(remage-to-lh5 ${_root}/src/remage-to-lh5.cc)
-  target_include_directories(remage-to-lh5 PRIVATE ${HDF5_INCLUDE_DIRS})
-  target_link_libraries(remage-to-lh5 PUBLIC remage ${HDF5_CXX_LIBRARIES})
+  target_link_libraries(remage-to-lh5 PUBLIC remage)
   set_target_properties(remage-to-lh5 PROPERTIES OUTPUT_NAME remage-to-lh5)
 endif()
 
@@ -163,6 +173,6 @@ install(
 
 # install CLI binaries
 install(TARGETS remage-cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-if(Geant4_hdf5_FOUND)
+if(RMG_HAS_HDF5)
   install(TARGETS remage-to-lh5 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
