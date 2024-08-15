@@ -364,7 +364,7 @@ void RMGManager::DefineCommands() {
   fOutputMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
       "Commands for controlling the simulation output");
 
-  fOutputMessenger->DeclareProperty("FileName", fOutputFile)
+  fOutputMessenger->DeclareMethod("FileName", &RMGManager::SetOutputFileName)
       .SetGuidance("Set output file name for object persistency")
       .SetParameterName("filename", false)
       .SetStates(G4State_PreInit, G4State_Idle);
