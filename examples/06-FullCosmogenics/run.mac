@@ -1,0 +1,20 @@
+/RMG/Manager/Logging/LogLevel summary
+
+#/tracking/verbose 1
+
+/RMG/Processes/OpticalPhysics true
+/run/initialize
+
+#/process/optical/boundary/verbose 2
+
+/RMG/Output/NtuplePerDetector false
+
+/RMG/Detectors/Optical/UseQuantumEfficiency true
+/RMG/Detectors/Optical/SetQEFile build/R7081_QEWhitespace.csv
+
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select MUSUNCosmicMuons
+
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN/combined_file.dat
+
+/run/beamOn 100
