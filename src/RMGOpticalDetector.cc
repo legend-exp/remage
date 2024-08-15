@@ -80,8 +80,6 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   const auto pv_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
   const auto pv_copynr = step->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber();
 
-  const auto pvPre_name = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-
   // check if physical volume is registered as optical detector
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
