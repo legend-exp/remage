@@ -160,7 +160,7 @@ void RMGOpticalDetector::ReadDatasheet(G4String pathToDatasheet) {
 void RMGOpticalDetector::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Detectors/Optical/",
-      "Commands to controll behaviour of optical detectors");
+      "Commands to control behaviour of optical detectors");
 
   fMessenger->DeclareProperty("UseQuantumEfficiency", fUseQuantumEfficiency)
       .SetGuidance("Set whether the detectors will apply a quantum efficiency to optical photons")
@@ -172,7 +172,7 @@ void RMGOpticalDetector::DefineCommands() {
   // be specified. Could remove the first macro and just use a datasheet if specified and else not.
   fMessenger->DeclareMethod("SetQEFile", &RMGOpticalDetector::ReadDatasheet)
       .SetGuidance("Set the Datasheet filename from which the quantum efficiency will be read in."
-                   "Datasheet needs to exactly fullfill the required format.")
+                   "Datasheet needs to exactly fulfill the required format.")
       .SetParameterName("FileName", false)
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
