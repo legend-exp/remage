@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   std::string macro = argc > 1 ? argv[1] : "";
   if (!macro.empty()) manager.IncludeMacroFile(macro);
   else manager.SetInteractive(true);
-  std::string outputfilename = "build/output.csv";
+  std::string outputfilename = "build/output.root";
   manager.SetOutputFileName(outputfilename);
   manager.SetNumberOfThreads(1);
   manager.Initialize();

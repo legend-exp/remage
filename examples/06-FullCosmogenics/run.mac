@@ -10,11 +10,11 @@
 /RMG/Output/NtuplePerDetector false
 
 /RMG/Detectors/Optical/UseQuantumEfficiency true
-/RMG/Detectors/Optical/SetQEFile build/R7081_QEWhitespace.csv
+/RMG/Detectors/Optical/SetQEFile datasheets/R7081_QEWhitespace.csv
 
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select MUSUNCosmicMuons
 
-/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN/combined_file.dat
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN/MUSUN_100_events.csv
 
 /run/beamOn 100
