@@ -26,6 +26,7 @@ Optional dependencies
 
 - |root|_ 6.06 or higher
 - |bxdecay0|_ 1.0.10 or higher
+- |hdf5|_ C++ support for LH5 object persistency
 
 .. note::
 
@@ -86,6 +87,9 @@ through the ``remage`` executable:
      -o,--output-file FILE       Output file for detector hits
 
 
+Macro files can use all available upstream Geant4 macro commands, as well as the
+:doc:`remage macro interface <rmg-commands>`.
+
 Advanced applications can extend |remage| and link against ``libremage`` with the
 usual CMake syntax:
 
@@ -105,8 +109,16 @@ Next steps
 
     Geant4 command interface <rmg-commands>
     Output structure & LH5 output <output>
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Development
+
     api/index
     Good ol' Doxygen <https://remage.readthedocs.io/en/latest/doxygen/annotated.html>
+    Source Code <https://github.com/legend-exp/remage>
+    License <https://github.com/legend-exp/remage/blob/main/LICENSE>
+    Citation <https://doi.org/10.5281/zenodo.11115662>
 
 .. |remage| replace:: *remage*
 .. |geant4| replace:: Geant4
@@ -115,3 +127,5 @@ Next steps
 .. _root: https://root.cern.ch
 .. |bxdecay0| replace:: BxDecay0
 .. _bxdecay0: https://github.com/BxCppDev/bxdecay0
+.. |hdf5| replace:: HDF5
+.. _hdf5: https://www.hdfgroup.org/solutions/hdf5
