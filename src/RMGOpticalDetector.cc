@@ -96,14 +96,17 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   }
 
   // Apply quantum efficiency if required
-  if(fUseQuantumEfficiency){
-    if(!fQuantumEfficency) RMGLog::Out(RMGLog::fatal, "Quantum efficiency required but data does not exist! Exit. "
-                                                  "Specify a file with /RMG/Detectors/Optical/SetQEFile filepath!");
+  if (fUseQuantumEfficiency) {
+    if (!fQuantumEfficency)
+      RMGLog::Out(RMGLog::fatal, "Quantum efficiency required but data does not exist! Exit. "
+                                 "Specify a file with /RMG/Detectors/Optical/SetQEFile filepath!");
     // Wavelength in nm
-    G4double Wavelength = (CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit()) / CLHEP::nm;
+    G4double Wavelength =
+        (CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit()) / CLHEP::nm;
     // Use UniformRand() to randomly sample if the photon was detected or not
-    if(G4UniformRand() > fQuantumEfficency->Value(Wavelength)) {
-      RMGLog::OutDev(RMGLog::debug, "Filtering out hit with Wavelength: ", Wavelength, " nm due to quantum efficiency.");
+    if (G4UniformRand() > fQuantumEfficency->Value(Wavelength)) {
+      RMGLog::OutDev(RMGLog::debug, "Filtering out hit with Wavelength: ", Wavelength,
+          " nm due to quantum efficiency.");
       return false;
     }
   }
@@ -130,16 +133,16 @@ void RMGOpticalDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
 // Read in the whole Datasheet here, so that it is only done once.
 // Could be done during Initialization, but then its done each event.
 // Should be Threadsafe. Probably ;)
-void RMGOpticalDetector::ReadDatasheet(G4String pathToDatasheet) { 
+void RMGOpticalDetector::ReadDatasheet(G4String pathToDatasheet) {
 
   std::ifstream datafile(pathToDatasheet);
-  if(!datafile) RMGLog::Out(RMGLog::fatal, "Quantum efficiency data file not found! Exit.");
+  if (!datafile) RMGLog::Out(RMGLog::fatal, "Quantum efficiency data file not found! Exit.");
 
   fQuantumEfficency = new G4PhysicsOrderedFreeVector;
   // The Datasheet is assumed to have no header and be in the form of
   // Wavelength(nm) QuantumEfficiency
   std::string line;
-  while(std::getline(datafile, line)){
+  while (std::getline(datafile, line)) {
     std::istringstream iss(line);
     G4double wlen, queff;
 
@@ -148,11 +151,10 @@ void RMGOpticalDetector::ReadDatasheet(G4String pathToDatasheet) {
       RMGLog::Out(RMGLog::warning, "Skipping invalid line in datasheet: " + line);
       continue;
     }
-        
-    fQuantumEfficency->InsertValues(wlen,queff/100.);
+
+    fQuantumEfficency->InsertValues(wlen, queff / 100.);
   }
   datafile.close();
-  
 }
 
 void RMGOpticalDetector::DefineCommands() {
@@ -165,17 +167,16 @@ void RMGOpticalDetector::DefineCommands() {
       .SetParameterName("use_quantum_efficiency", false)
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
-  
-  // This creates redundancy, as it has to be said first to use a datasheet AND the datasheet has to be specified.
-  // Could remove the first macro and just use a datasheet if specified and else not.
+
+  // This creates redundancy, as it has to be said first to use a datasheet AND the datasheet has to
+  // be specified. Could remove the first macro and just use a datasheet if specified and else not.
   fMessenger->DeclareMethod("SetQEFile", &RMGOpticalDetector::ReadDatasheet)
-      .SetGuidance("Set the Datasheet filename from which the quantum efficiency will be read in." 
+      .SetGuidance("Set the Datasheet filename from which the quantum efficiency will be read in."
                    "Datasheet needs to exactly fullfill the required format.")
       .SetParameterName("FileName", false)
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 }
-
 
 
 // vim: tabstop=2 shiftwidth=2 expandtab

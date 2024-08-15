@@ -19,13 +19,12 @@
 #include <memory>
 #include <string>
 
-#include "G4GenericMessenger.hh"
-
 #include "G4Allocator.hh"
+#include "G4GenericMessenger.hh"
+#include "G4PhysicsOrderedFreeVector.hh"
 #include "G4THitsCollection.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
-#include "G4PhysicsOrderedFreeVector.hh"
 
 class RMGOpticalDetectorHit : public G4VHit {
 
@@ -80,10 +79,10 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
-    
+
     G4bool fUseQuantumEfficiency = false;
     void ReadDatasheet(G4String pathToDatasheet);
-    G4PhysicsOrderedFreeVector *fQuantumEfficency = nullptr;
+    G4PhysicsOrderedFreeVector* fQuantumEfficency = nullptr;
 };
 
 extern G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator;
