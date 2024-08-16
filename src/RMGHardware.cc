@@ -251,7 +251,7 @@ void RMGHardware::DefineCommands() {
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
-      .SetGuidance("Print list of defined physical volumes")
+      .SetGuidance("Print list of defined logical volumes")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
