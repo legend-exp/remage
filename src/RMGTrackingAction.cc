@@ -17,11 +17,14 @@
 
 #include "G4Track.hh"
 
-#include "RMGEventAction.hh"
+#include "RMGRunAction.hh"
 
-RMGTrackingAction::RMGTrackingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {}
+RMGTrackingAction::RMGTrackingAction(RMGRunAction* run_action) : fRunAction(run_action) {}
 
-void RMGTrackingAction::PreUserTrackingAction(const G4Track* /*aTrack*/) {}
+void RMGTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
+
+  for (auto& el : fRunAction->GetAllOutputDataFields()) { el->TrackingActionPre(aTrack); }
+}
 
 void RMGTrackingAction::PostUserTrackingAction(const G4Track* /*aTrack*/) {}
 

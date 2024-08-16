@@ -56,7 +56,7 @@ void RMGUserAction::Build() const {
 
   // Add the remage-internal tracking action and optional user-specified custom stepping actions.
   const auto user_tracking_actions = RMGManager::Instance()->GetUserInit()->GetTrackingActions();
-  G4UserTrackingAction* tracking_action = new RMGTrackingAction(event_action);
+  G4UserTrackingAction* tracking_action = new RMGTrackingAction(run_action);
   if (!user_tracking_actions.empty()) {
     auto multi_tracking_action = new G4MultiTrackingAction();
     multi_tracking_action->push_back(std::unique_ptr<G4UserTrackingAction>(tracking_action));
