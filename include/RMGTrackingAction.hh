@@ -18,12 +18,12 @@
 
 #include "G4UserTrackingAction.hh"
 
-class RMGEventAction;
+class RMGRunAction;
 class RMGTrackingAction : public G4UserTrackingAction {
 
   public:
 
-    RMGTrackingAction(RMGEventAction*);
+    RMGTrackingAction(RMGRunAction*);
     ~RMGTrackingAction() = default;
 
     RMGTrackingAction(RMGTrackingAction const&) = delete;
@@ -39,7 +39,7 @@ class RMGTrackingAction : public G4UserTrackingAction {
 
   private:
 
-    RMGEventAction* fEventAction = nullptr;
+    RMGRunAction* fRunAction = nullptr;
 };
 
 #endif
