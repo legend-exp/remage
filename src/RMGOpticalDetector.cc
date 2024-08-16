@@ -103,7 +103,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   auto* hit = new RMGOpticalDetectorHit();
   hit->detector_uid = det_uid;
   hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
-  hit->global_time = step->GetPreStepPoint()->GetGlobalTime();
+  hit->global_time = step->GetPostStepPoint()->GetGlobalTime();
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
