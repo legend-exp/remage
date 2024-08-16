@@ -122,6 +122,7 @@ Commands for controlling the simulation output
     * */RMG/Output/Germanium/*: ``Commands for controlling output from hits in germanium detectors.``
     * */RMG/Output/Vertex/*: ``Commands for controlling output of primary vertices.``
     * */RMG/Output/Scintillator/*: ``Commands for controlling output from hits in scintillator detectors.``
+    * */RMG/Output/IsotopeFilter/*: ``Commands for filtering event out by created isotopes.``
 * **Commands**:
     * *FileName*: ``Set output file name for object persistency``
     * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
@@ -283,6 +284,36 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter**: ``det_uid``
     * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Output/IsotopeFilter/
+---------------------------------------------------
+
+Commands for filtering event out by created isotopes.
+
+* **Commands**:
+    * *AddIsotope*: ``Add an isotope to the list. Only events that have this isotope at any point in time will be persisted.``
+    * *DiscardPhotonsIfIsotopeNotProduced*: ``Discard optical photons (before simulating them), if the specified isotopes had not been produced in this event.``
+
+Command /RMG/Output/IsotopeFilter/AddIsotope
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add an isotope to the list. Only events that have this isotope at any point in time will be persisted.
+
+* **Parameter**: ``A``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``Z``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Discard optical photons (before simulating them), if the specified isotopes had not been produced in this event.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
     * **Omittable**: ``False``
 
 Command directory path : /RMG/Processes/
