@@ -125,6 +125,7 @@ Commands for controlling the simulation output
 * **Commands**:
     * *FileName*: ``Set output file name for object persistency``
     * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
+    * *ActivateOutputScheme*: ``Activates the output scheme that had been registered under the given name.``
 
 Command /RMG/Output/FileName
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -142,6 +143,15 @@ Create a ntuple for each sensitive detector to store hits. Otherwise, store all 
 
 * **Parameter**: ``tree_per_det``
     * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/ActivateOutputScheme
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Activates the output scheme that had been registered under the given name.
+
+* **Parameter**: ``tree_per_det``
+    * **Parameter type**: ``s``
     * **Omittable**: ``False``
 
 Command directory path : /RMG/Output/Germanium/

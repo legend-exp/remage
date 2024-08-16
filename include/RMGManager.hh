@@ -111,6 +111,11 @@ class RMGManager {
       return fExceptionHandler->HadError() || RMGLog::HadError();
     }
 
+    // NOLINTNEXTLINE(readability-make-member-function-const)
+    inline void ActivateOptionalOutputScheme(std::string name) {
+      GetUserInit()->ActivateOptionalOutputScheme(name);
+    }
+
   private:
 
     void SetUpDefaultG4RunManager(G4RunManagerType type = G4RunManagerType::Default);

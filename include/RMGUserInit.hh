@@ -17,6 +17,7 @@
 #define _RMG_USER_INIT_HH_
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -25,6 +26,7 @@
 #include "G4UserSteppingAction.hh"
 #include "G4UserTrackingAction.hh"
 
+#include "RMGLog.hh"
 #include "RMGVOutputScheme.hh"
 
 class RMGUserInit {
@@ -43,6 +45,7 @@ class RMGUserInit {
     [[nodiscard]] inline auto GetSteppingActions() const { return fSteppingActions; }
     [[nodiscard]] inline auto GetTrackingActions() const { return fTrackingActions; }
     [[nodiscard]] inline auto GetOutputSchemes() const { return fOutputSchemes; }
+    [[nodiscard]] inline auto GetOptionalOutputSchemes() const { return fOptionalOutputSchemes; }
 
     // setters
     template<typename T, typename... Args> inline void AddSteppingAction(Args&&... args) {
@@ -57,10 +60,24 @@ class RMGUserInit {
       Add<T>(&fOutputSchemes, std::forward<Args>(args)...);
     }
 
+    template<typename T, typename... Args>
+    inline void AddOptionalOutputScheme(std::string name, Args&&... args) {
+      Add<T>(&fOptionalOutputSchemes, name, std::forward<Args>(args)...);
+    }
+
+    inline void ActivateOptionalOutputScheme(std::string name) {
+      auto it = fOptionalOutputSchemes.find(name);
+      if (it == fOptionalOutputSchemes.end()) {
+        RMGLog::Out(RMGLog::fatal, "Optional output scheme '", name, "' not found!");
+      }
+      fOutputSchemes.emplace_back((*it).second);
+    }
+
   private:
 
     template<typename T> using late_init_fn = std::function<std::unique_ptr<T>()>;
     template<typename T> using late_init_vec = std::vector<late_init_fn<T>>;
+    template<typename K, typename T> using late_init_map = std::map<K, late_init_fn<T>>;
 
     template<typename B, typename T, typename... Args>
     inline late_init_fn<B> CreateInit(Args&&... args) {
@@ -78,11 +95,20 @@ class RMGUserInit {
       auto create = CreateInit<B, T>(std::forward<Args>(args)...);
       vec->emplace_back(std::move(create));
     }
+    template<typename T, typename B, typename K, typename... Args>
+    inline void Add(late_init_map<K, B>* map, K k, Args&&... args) {
+      static_assert(std::is_base_of<B, T>::value);
+
+      // capture the passed arguments for the constructor to be called later.
+      auto create = CreateInit<B, T>(std::forward<Args>(args)...);
+      map->emplace(k, std::move(create));
+    }
 
     // store partial custom actions to be used later in RMGUserAction
     late_init_vec<G4UserSteppingAction> fSteppingActions;
     late_init_vec<G4UserTrackingAction> fTrackingActions;
     late_init_vec<RMGVOutputScheme> fOutputSchemes;
+    late_init_map<std::string, RMGVOutputScheme> fOptionalOutputSchemes;
 };
 
 #endif

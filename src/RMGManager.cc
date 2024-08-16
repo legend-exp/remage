@@ -374,6 +374,11 @@ void RMGManager::DefineCommands() {
                    "all hits of one detector type in one ntuple.")
       .SetParameterName("tree_per_det", false)
       .SetStates(G4State_PreInit, G4State_Idle);
+
+  fOutputMessenger->DeclareMethod("ActivateOutputScheme", &RMGManager::ActivateOptionalOutputScheme)
+      .SetGuidance("Activates the output scheme that had been registered under the given name.")
+      .SetParameterName("tree_per_det", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
