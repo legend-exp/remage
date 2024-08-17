@@ -85,7 +85,7 @@ Select the random engine (CLHEP)
 * **Parameter**: ``name``
     * **Parameter type**: ``s``
     * **Omittable**: ``False``
-    * **Candidates**: ``JamesRandom RanLux MTwist``
+    * **Candidates**: ``JamesRandom RanLux MTwist MixMaxRng``
 
 Command /RMG/Manager/Randomization/Seed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -407,7 +407,7 @@ Commands for controlling geometry definitions
     * *GDMLDisableOverlapCheck*: ``Disable the automatic overlap check after loading a GDML file``
     * *GDMLOverlapCheckNumPoints*: ``Change the number of points sampled for overlap checks``
     * *IncludeGDMLFile*: ``Use GDML file for geometry definition``
-    * *PrintListOfLogicalVolumes*: ``Print list of defined physical volumes``
+    * *PrintListOfLogicalVolumes*: ``Print list of defined logical volumes``
     * *PrintListOfPhysicalVolumes*: ``Print list of defined physical volumes``
     * *RegisterDetector*: ``register a sensitive detector``
 
@@ -441,7 +441,7 @@ Use GDML file for geometry definition
 Command /RMG/Geometry/PrintListOfLogicalVolumes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Print list of defined physical volumes
+Print list of defined logical volumes
 
 Command /RMG/Geometry/PrintListOfPhysicalVolumes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

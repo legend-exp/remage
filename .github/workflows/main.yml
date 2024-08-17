@@ -50,5 +50,12 @@ jobs:
       run: |
         cd build
         ctest --output-on-failure --label-exclude 'extra|vis'
+    - name: Compare checked-in doc dump with current result
+      if: ${{ matrix.container_version != 'slim' }}
+      run: |
+        cd build
+        cp ../docs/rmg-commands.rst ../docs/rmg-commands.rst.bak
+        make remage-doc-dump
+        diff ../docs/rmg-commands.rst ../docs/rmg-commands.rst.bak
 
 # vim: expandtab tabstop=2 shiftwidth=2
