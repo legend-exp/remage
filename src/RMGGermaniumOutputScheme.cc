@@ -163,19 +163,25 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
 std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
     int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  // defer tracking of optical photons.
+
+  // defer tracking of optical photons, irrespective of our settings.
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
-  return fUrgent;
+  return std::nullopt;
 }
 
 std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  if (!fDiscardPhotonsIfNoGermaniumEdep) return true;
+  // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
+  // force `true` on them).
+  if (!fDiscardPhotonsIfNoGermaniumEdep) return std::nullopt;
+
   auto run_man = RMGManager::Instance()->GetG4RunManager();
   const auto event = run_man->GetCurrentEvent();
-  // discard all waiting events, as there was no energy deposition in Germanium.
-  return !ShouldDiscardEvent(event);
+  // discard all waiting events, if there was no energy deposition in Germanium.
+  return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
 void RMGGermaniumOutputScheme::DefineCommands() {

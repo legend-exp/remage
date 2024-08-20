@@ -35,8 +35,7 @@ G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aT
     if (!new_status.has_value() || new_status.value() == request_status.value()) {
       new_status = request_status;
     } else {
-      RMGLog::Out(RMGLog::error,
-          "Conflicting requests for new track classification in RMGStackingAction.");
+      RMGLog::OutDev(RMGLog::error, "Conflicting requests for new track classification.");
     }
   }
 
@@ -45,7 +44,7 @@ G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aT
 }
 
 void RMGStackingAction::NewStage() {
-  // we can have only one result from all output schemes, if we have
+  // we can have only one result from all output schemes; if we have conflicting requests, we cannot continue.
   std::optional<bool> should_do_stage = std::nullopt;
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
     auto request_stage = el->StackingActionNewStage(fStage);
@@ -54,8 +53,7 @@ void RMGStackingAction::NewStage() {
     if (!should_do_stage.has_value() || should_do_stage.value() == request_stage.value()) {
       should_do_stage = request_stage;
     } else {
-      RMGLog::Out(RMGLog::error,
-          "Conflicting requests for new stage termination in RMGStackingAction.");
+      RMGLog::OutDev(RMGLog::error, "Conflicting requests for new stage termination.");
     }
   }
 

@@ -61,19 +61,25 @@ bool RMGIsotopeFilterOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
 std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterOutputScheme::
     StackingActionClassify(const G4Track* aTrack, int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
+
   // defer tracking of optical photons.
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
-  return fUrgent;
+  return std::nullopt;
 }
 
 std::optional<bool> RMGIsotopeFilterOutputScheme::StackingActionNewStage(const int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  if (!fDiscardPhotonsIfIsotopeNotProduced) return true;
+  // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
+  // force `true` on them).
+  if (!fDiscardPhotonsIfIsotopeNotProduced) return std::nullopt;
+
   auto run_man = RMGManager::Instance()->GetG4RunManager();
   const auto event = run_man->GetCurrentEvent();
-  // discard all waiting events, as there was none of the requested isotopes produced.
-  return !ShouldDiscardEvent(event);
+  // discard all waiting events, if there were none of the requested isotopes produced.
+  return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
 void RMGIsotopeFilterOutputScheme::DefineCommands() {
