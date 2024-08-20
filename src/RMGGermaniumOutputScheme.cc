@@ -19,6 +19,7 @@
 
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
+#include "G4EventManager.hh"
 #include "G4HCtable.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
@@ -178,8 +179,7 @@ std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int s
   // force `true` on them).
   if (!fDiscardPhotonsIfNoGermaniumEdep) return std::nullopt;
 
-  auto run_man = RMGManager::Instance()->GetG4RunManager();
-  const auto event = run_man->GetCurrentEvent();
+  const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
   // discard all waiting events, if there was no energy deposition in Germanium.
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }

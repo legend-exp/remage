@@ -18,10 +18,10 @@
 #include <set>
 
 #include "G4Event.hh"
+#include "G4EventManager.hh"
 #include "G4OpticalPhoton.hh"
 
 #include "RMGLog.hh"
-#include "RMGManager.hh"
 
 RMGIsotopeFilterOutputScheme::RMGIsotopeFilterOutputScheme() { this->DefineCommands(); }
 
@@ -76,8 +76,7 @@ std::optional<bool> RMGIsotopeFilterOutputScheme::StackingActionNewStage(const i
   // force `true` on them).
   if (!fDiscardPhotonsIfIsotopeNotProduced) return std::nullopt;
 
-  auto run_man = RMGManager::Instance()->GetG4RunManager();
-  const auto event = run_man->GetCurrentEvent();
+  const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
   // discard all waiting events, if there were none of the requested isotopes produced.
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
