@@ -207,8 +207,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
-      .SetGuidance(
-          "Discard optical photons (before simulating them), if no edep in germanium detectors.")
+      .SetGuidance("Discard optical photons (before simulating them), if no edep in germanium "
+                   "detectors occurred in the same event.")
+      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
+                   "germanium edep filter does not force the photons to be simulated.")
       .SetStates(G4State_Idle);
 }
 

@@ -87,8 +87,8 @@ void RMGIsotopeFilterOutputScheme::DefineCommands() {
       "Commands for filtering event out by created isotopes.");
 
   fMessenger->DeclareMethod("AddIsotope", &RMGIsotopeFilterOutputScheme::AddIsotope)
-      .SetGuidance("Add an isotope to the list. Only events that have this isotope at any point in "
-                   "time will be persisted.")
+      .SetGuidance("Add an isotope to the list. Only events that have a track with this isotope at "
+                   "any point in time will be persisted.")
       .SetParameterName(0, "A", false, false)
       .SetParameterName(1, "Z", false, false)
       .SetStates(G4State_Idle);
@@ -96,7 +96,9 @@ void RMGIsotopeFilterOutputScheme::DefineCommands() {
   fMessenger
       ->DeclareProperty("DiscardPhotonsIfIsotopeNotProduced", fDiscardPhotonsIfIsotopeNotProduced)
       .SetGuidance("Discard optical photons (before simulating them), if the specified isotopes "
-                   "had not been produced in this event.")
+                   "had not been produced in the same event.")
+      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
+                   "isotope filter does not force the photons to be simulated.")
       .SetStates(G4State_Idle);
 }
 
