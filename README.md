@@ -24,7 +24,8 @@ then benefit from a predefined set of tools to perform common actions (physics
 generators, standard output classes, etc).
 
 > [!WARNING]
-> Under heavy development
+> *remage* is still under heavy development. Users are advised to use a tagged
+> release for any workloads unrelated to remage development, if possible.
 
 ### Main features
 
