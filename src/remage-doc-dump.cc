@@ -23,6 +23,7 @@
 #include "RMGGeneratorCosmicMuons.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
+#include "RMGIsotopeFilterOutputScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGOpticalOutputScheme.hh"
@@ -43,6 +44,7 @@ void init_extra() {
   new RMGOpticalOutputScheme();
   new RMGVertexOutputScheme();
   new RMGScintillatorOutputScheme();
+  new RMGIsotopeFilterOutputScheme();
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();

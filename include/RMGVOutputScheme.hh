@@ -49,7 +49,7 @@ class RMGVOutputScheme {
     virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
     // hook into G4TrackingAction
-    virtual inline void TrackingActionPre(const G4Track* aTrack) {};
+    virtual inline void TrackingActionPre(const G4Track*) {};
 
     inline void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
 

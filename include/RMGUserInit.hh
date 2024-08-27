@@ -26,6 +26,7 @@
 #include "G4UserSteppingAction.hh"
 #include "G4UserTrackingAction.hh"
 
+#include "RMGIsotopeFilterOutputScheme.hh"
 #include "RMGLog.hh"
 #include "RMGVOutputScheme.hh"
 
@@ -63,6 +64,11 @@ class RMGUserInit {
     template<typename T, typename... Args>
     inline void AddOptionalOutputScheme(std::string name, Args&&... args) {
       Add<T>(&fOptionalOutputSchemes, name, std::forward<Args>(args)...);
+    }
+
+    // default output schemes
+    inline void RegisterDefaultOptionalOutputSchemes() {
+      AddOptionalOutputScheme<RMGIsotopeFilterOutputScheme>("IsotopeFilter");
     }
 
     inline void ActivateOptionalOutputScheme(std::string name) {

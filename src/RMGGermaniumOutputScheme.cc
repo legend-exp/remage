@@ -19,6 +19,7 @@
 
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
+#include "G4EventManager.hh"
 #include "G4HCtable.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
@@ -163,19 +164,24 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
 std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
     int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  // defer tracking of optical photons.
+
+  // defer tracking of optical photons, irrespective of our settings.
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
-  return fUrgent;
+  return std::nullopt;
 }
 
 std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int stage) {
+  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  if (!fDiscardPhotonsIfNoGermaniumEdep) return true;
-  auto run_man = RMGManager::Instance()->GetG4RunManager();
-  const auto event = run_man->GetCurrentEvent();
-  // discard all waiting events, as there was no energy deposition in Germanium.
-  return !ShouldDiscardEvent(event);
+  // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
+  // force `true` on them).
+  if (!fDiscardPhotonsIfNoGermaniumEdep) return std::nullopt;
+
+  const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
+  // discard all waiting events, if there was no energy deposition in Germanium.
+  return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
 void RMGGermaniumOutputScheme::DefineCommands() {
@@ -201,8 +207,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
-      .SetGuidance(
-          "Discard optical photons (before simulating them), if no edep in germanium detectors.")
+      .SetGuidance("Discard optical photons (before simulating them), if no edep in germanium "
+                   "detectors occurred in the same event.")
+      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
+                   "germanium edep filter does not force the photons to be simulated.")
       .SetStates(G4State_Idle);
 }
 

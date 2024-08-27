@@ -66,7 +66,9 @@ RMGManager::RMGManager(std::string app_name, int argc, char** argv)
   // limit Geant4 stacktrace dumping to segfaults
   G4Backtrace::DefaultSignals() = std::set<int>{SIGSEGV};
 
+  // initialize central hook for dependent applications to influence our output.
   fUserInit = std::make_shared<RMGUserInit>();
+  fUserInit->RegisterDefaultOptionalOutputSchemes();
 
   this->DefineCommands();
 }

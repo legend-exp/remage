@@ -35,6 +35,7 @@ def remove_whitespace_lines_end(lines: list):
 
 idx = 0
 in_cmdblock = False
+in_guidance = False
 lastlevel = -1
 leveldiff = 0
 
@@ -52,9 +53,14 @@ for line in inlines:
         lastlevel = -1
         leveldiff = 0
     elif in_cmdblock and (line == "Guidance :"):
-        pass
-    elif in_cmdblock and (inlines[idx - 1] == "Guidance :") and not line.startswith(" " * 2):
-        outlines.extend([line, ""])
+        in_guidance = True
+    elif in_cmdblock and in_guidance and not line.startswith(" "):
+        if line.startswith("note: "):
+            outlines.extend([".. note ::", "", (" " * 4) + line[6:], ""])
+        elif line.strip() == "":
+            in_guidance = False
+        elif line != "":
+            outlines.extend([line, ""])
     elif in_cmdblock and line == " Commands : " and not inlines[idx + 1].startswith(" " * 3):
         # ignore directories with no commands.
         pass
@@ -62,6 +68,8 @@ for line in inlines:
         # ignore directories with no commands.
         pass
     elif in_cmdblock and line != "":
+        in_guidance = False
+
         stripped_line = line.lstrip()
         indent = math.ceil((len(line) - len(stripped_line)) / 2)
         if line.startswith(" Range of parameters :"):

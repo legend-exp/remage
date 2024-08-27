@@ -122,6 +122,7 @@ Commands for controlling the simulation output
     * */RMG/Output/Germanium/*: ``Commands for controlling output from hits in germanium detectors.``
     * */RMG/Output/Vertex/*: ``Commands for controlling output of primary vertices.``
     * */RMG/Output/Scintillator/*: ``Commands for controlling output from hits in scintillator detectors.``
+    * */RMG/Output/IsotopeFilter/*: ``Commands for filtering event out by created isotopes.``
 * **Commands**:
     * *FileName*: ``Set output file name for object persistency``
     * *NtuplePerDetector*: ``Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.``
@@ -163,7 +164,7 @@ Commands for controlling output from hits in germanium detectors.
     * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
     * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
     * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
-    * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors.``
+    * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.``
 
 Command /RMG/Output/Germanium/SetEdepCutLow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -205,7 +206,11 @@ Take this detector into account for the filtering by /EdepThreshold.
 Command /RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Discard optical photons (before simulating them), if no edep in germanium detectors.
+Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+
+.. note ::
+
+    If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
 
 * **Parameter**: ``value``
     * **Parameter type**: ``b``
@@ -283,6 +288,40 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter**: ``det_uid``
     * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command directory path : /RMG/Output/IsotopeFilter/
+---------------------------------------------------
+
+Commands for filtering event out by created isotopes.
+
+* **Commands**:
+    * *AddIsotope*: ``Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.``
+    * *DiscardPhotonsIfIsotopeNotProduced*: ``Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.``
+
+Command /RMG/Output/IsotopeFilter/AddIsotope
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
+
+* **Parameter**: ``A``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``Z``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
+
+.. note ::
+
+    If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
     * **Omittable**: ``False``
 
 Command directory path : /RMG/Processes/
@@ -396,8 +435,10 @@ Command /RMG/Processes/Stepping/DaughterNucleusMaxLifetime
 
 Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
 
-* This applies to the defined lifetime of the nucleus, and not on the sampled actual halflife of the simulated particle.
-* Set to -1 to disable this feature.
+This applies to the defined lifetime of the nucleus, and not on the sampled actual halflife of the simulated particle.
+
+Set to -1 to disable this feature.
+
 * **Parameter**: ``max_lifetime``
     * **Parameter type**: ``d``
     * **Omittable**: ``False``
