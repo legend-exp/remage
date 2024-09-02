@@ -1,0 +1,26 @@
+/RMG/Manager/Logging/LogLevel summary
+
+#/tracking/verbose 1
+
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Processes/ThermalScattering 1
+/RMG/Processes/UseGrabmayrsGammaCascades true
+
+/RMG/Output/ActivateOutputScheme IsotopeOutputScheme
+
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64,155,GammaCascades/156Gd-100Entries.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64,157,GammaCascades/158Gd-100Entries.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation 1
+/run/initialize
+
+/RMG/Output/NtuplePerDetector false
+/RMG/Output/FileName Custom.root
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/ang/type iso
+/gps/energy 0.5 MeV
+
+#/RMG/Processes/Realm CosmicRays
+
+/run/beamOn 10000

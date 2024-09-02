@@ -1,0 +1,27 @@
+#/RMG/Processes/OpticalPhysics true
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Processes/ThermalScattering 1
+/RMG/Output/ActivateOutputScheme IsotopeFilter
+/run/initialize
+/vis/open OGL
+
+/vis/scene/create
+/vis/sceneHandler/attach
+
+/vis/drawVolume
+
+/vis/viewer/set/defaultColour black
+/vis/viewer/set/background white
+
+/vis/scene/add/trajectories smooth
+/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate
+
+/RMG/Output/IsotopeFilter/AddIsotope 77 32
+/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced true
+/RMG/Output/NtuplePerDetector false
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/ang/type iso
+/gps/energy 0.5 MeV

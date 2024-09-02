@@ -1,0 +1,22 @@
+/RMG/Manager/Logging/LogLevel summary
+
+#/tracking/verbose 1
+
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Processes/ThermalScattering 1
+
+/RMG/Output/ActivateOutputScheme IsotopeOutputScheme
+
+/run/initialize
+
+/RMG/Output/NtuplePerDetector false
+/RMG/Output/FileName Normal.root
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/ang/type iso
+/gps/energy 0.5 MeV
+
+#/RMG/Processes/Realm CosmicRays
+
+/run/beamOn 10000
