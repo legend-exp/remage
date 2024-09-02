@@ -42,6 +42,7 @@
 #include "G4IonTable.hh"
 #include "G4LeptonConstructor.hh"
 #include "G4MesonConstructor.hh"
+#include "G4NeutronCaptureProcess.hh"
 #include "G4NuclearLevelData.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpBoundaryProcess.hh"
@@ -49,6 +50,7 @@
 #include "G4OpWLS.hh"
 #include "G4OpticalParameters.hh"
 #include "G4ParticleDefinition.hh"
+#include "G4ParticleHPCaptureData.hh"
 #include "G4ParticleHPElastic.hh"
 #include "G4ParticleHPElasticData.hh"
 #include "G4ParticleHPThermalScattering.hh"
@@ -64,6 +66,7 @@
 #include "G4ThermalNeutrons.hh"
 
 #include "RMGLog.hh"
+#include "RMGNeutronCaptureProcess.hh"
 #include "RMGTools.hh"
 
 namespace u = CLHEP;
@@ -221,6 +224,34 @@ void RMGPhysics::ConstructProcess() {
     }
     RMGLog::Out(RMGLog::detail, "Adding hadronic inelastic physics");
     hPhysics->ConstructProcess();
+
+    if (fUseGrabmayrGammaCascades) {
+      // Apply RMG custom neutron capture
+      // Mostly similar to examples/extended/Hadr04
+      G4ProcessManager* pManager = G4Neutron::Neutron()->GetProcessManager();
+      G4ProcessVector* processVector = pManager->GetProcessList();
+      G4NeutronCaptureProcess* neutronCaptureProcess = nullptr;
+      // Find the existing neutron capture process
+      neutronCaptureProcess =
+          dynamic_cast<G4NeutronCaptureProcess*>(pManager->GetProcess("nCapture"));
+
+      // Overwrite the old Process, keeping all of the interactions
+      if (neutronCaptureProcess) {
+        RMGLog::Out(RMGLog::detail, "Overwriting NeutronCaptureProcess");
+        pManager->RemoveProcess(neutronCaptureProcess);
+        RMGNeutronCaptureProcess* RMGProcess = new RMGNeutronCaptureProcess();
+        // HP cross section data set not naturally in G4NeutronCaptureProcess
+        G4ParticleHPCaptureData* dataSet = new G4ParticleHPCaptureData();
+        RMGProcess->AddDataSet(dataSet);
+        // Move all interactions to the new process
+        for (auto& el : neutronCaptureProcess->GetHadronicInteractionList()) {
+          RMGProcess->RegisterMe(el);
+        }
+        pManager->AddDiscreteProcess(RMGProcess);
+      } else {
+        RMGLog::Out(RMGLog::error, "Could not apply custom neutron capture model");
+      }
+    }
 
     RMGLog::Out(RMGLog::detail, "Adding stopping physics");
     G4VPhysicsConstructor* stoppingPhysics =
@@ -465,6 +496,10 @@ void RMGPhysics::DefineCommands() {
   fMessenger->DeclareMethod("StoreICLevelData", &RMGPhysics::SetStoreICLevelData)
       .SetGuidance("Store e- internal conversion data")
       .SetCandidates("0 1")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("UseGrabmayrsGammaCascades", fUseGrabmayrGammaCascades)
+      .SetGuidance("Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.")
       .SetStates(G4State_PreInit);
 }
 

@@ -103,6 +103,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     StepCutStore fStepCutsSensitive;
     bool fConstructOptical = false;
     bool fUseThermalScattering = false;
+    bool fUseGrabmayrGammaCascades = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
 
