@@ -38,7 +38,7 @@ struct GammaCascadeLine {
 class RMGGrabmayrGCReader {
   public:
 
-    static RMGGrabmayrGCReader* GetInstance();
+    static G4ThreadLocal RMGGrabmayrGCReader* GetInstance();
     ~RMGGrabmayrGCReader();
     // RMGGrabmayrGCReader& operator=(const RMGGrabmayrGCReader&) = delete;
 
@@ -49,7 +49,7 @@ class RMGGrabmayrGCReader {
 
   private:
 
-    static RMGGrabmayrGCReader* instance;
+    static G4ThreadLocal RMGGrabmayrGCReader* instance;
     RMGGrabmayrGCReader();
     // std::vector<std::unique_ptr<std::ifstream>> files;
     //  map holding the corresponding file for each isotope

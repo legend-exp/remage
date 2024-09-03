@@ -6,7 +6,7 @@
 #include "RMGLog.hh"
 
 
-RMGGrabmayrGCReader* RMGGrabmayrGCReader::instance = nullptr;
+G4ThreadLocal RMGGrabmayrGCReader* RMGGrabmayrGCReader::instance = nullptr;
 
 RMGGrabmayrGCReader* RMGGrabmayrGCReader::GetInstance() {
   if (instance == nullptr) { instance = new RMGGrabmayrGCReader(); }

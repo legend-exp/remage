@@ -72,7 +72,6 @@ void RMGUserAction::Build() const {
   this->SetUserAction(new RMGStackingAction(run_action));
   this->SetUserAction(stepping_action);
   this->SetUserAction(tracking_action);
-  // Maybe add a check for multithreaded and only do this if not?
   RMGGrabmayrGCReader::GetInstance();
 }
 
