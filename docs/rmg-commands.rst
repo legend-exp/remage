@@ -1130,7 +1130,7 @@ Control Peters gamma cascade model
 
 * **Commands**:
     * *SetGammaCascadeRandomStartLocation*: ``Set the whether the start location in the gamma cascade file is random or not``
-    * *SetGammaCascadeFile*: ``Set the Z, A and /path/to/file for the gamma cascade employed upon neutron capture on said isotope``
+    * *SetGammaCascadeFile*: ``Set a gamma cascade file for neutron capture on a specified isotope``
 
 Command /RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1150,7 +1150,7 @@ Set the whether the start location in the gamma cascade file is random or not
 Command /RMG/GrabmayrGammaCascades/SetGammaCascadeFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Set the Z, A and /path/to/file for the gamma cascade employed upon neutron capture on said isotope
+Set a gamma cascade file for neutron capture on a specified isotope
 
 * **Parameter**: ``Z``
 * Z of isotope

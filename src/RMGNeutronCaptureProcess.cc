@@ -91,7 +91,7 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   G4ThreeVector location = aTrack.GetPosition();
   G4double time = aTrack.GetGlobalTime();
 
-  // Expect no deponition as the total energy will be distributed
+  // Expect no deposition as the total energy will be distributed
   theTotalResult->ProposeLocalEnergyDeposit(0.0);
   theTotalResult->ProposeTrackStatus(fStopAndKill);
   theTotalResult->ProposeEnergy(0.0);

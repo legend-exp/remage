@@ -37,8 +37,7 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
   std::pair<G4int, G4int> key = std::make_pair(z, a);
   auto it = fCascadeFiles.find(key);
   if (it == fCascadeFiles.end())
-    RMGLog::Out(RMGLog::fatal, "No Cascade exists for Isotope Z: " + std::to_string(z) +
-                                   " A: " + std::to_string(a) + " Exit!");
+    RMGLog::OutFormat(RMGLog::fatal, "Isotope Z: {} A: {} does not exist.", z, a);
   // read next line from file
   std::string line;
   do {
@@ -105,8 +104,7 @@ void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, cons
   std::unique_ptr<std::ifstream> file = std::make_unique<std::ifstream>(file_name);
 
   if (z == 0 || a == 0)
-    RMGLog::Out(RMGLog::fatal,
-        "Isotope Z:" + std::to_string(z) + " A: " + std::to_string(a) + " does not exist.");
+    RMGLog::OutFormat(RMGLog::fatal, "Isotope Z: {} A: {} does not exist.", z, a);
   if (!file || !file->is_open())
     RMGLog::Out(RMGLog::fatal, "Gamma cascade file: " + file_name + " not found! Exit.");
 
@@ -141,15 +139,14 @@ void RMGGrabmayrGCReader::DefineCommands() {
       .SetDefaultValue("0")
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  // SetGammaCascadeFile cannot be defined with the G4GenericMessenger (it has to many parameters).
+  // SetGammaCascadeFile cannot be defined with the G4GenericMessenger (it has too many parameters).
   fUIMessenger = std::make_unique<GCMessenger>(this);
 }
 
 
 RMGGrabmayrGCReader::GCMessenger::GCMessenger(RMGGrabmayrGCReader* reader) : fReader(reader) {
   fGammaFileCmd = new G4UIcommand("/RMG/GrabmayrGammaCascades/SetGammaCascadeFile", this);
-  fGammaFileCmd->SetGuidance("Set the Z, A and /path/to/file for the gamma cascade employed upon "
-                             "neutron capture on said isotope");
+  fGammaFileCmd->SetGuidance("Set a gamma cascade file for neutron capture on a specified isotope");
 
   auto p_Z = new G4UIparameter("Z", 'i', false);
   p_Z->SetGuidance("Z of isotope");

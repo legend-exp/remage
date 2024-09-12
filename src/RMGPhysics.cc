@@ -228,20 +228,19 @@ void RMGPhysics::ConstructProcess() {
     if (fUseGrabmayrGammaCascades) {
       // Apply RMG custom neutron capture
       // Mostly similar to examples/extended/Hadr04
-      G4ProcessManager* pManager = G4Neutron::Neutron()->GetProcessManager();
-      G4ProcessVector* processVector = pManager->GetProcessList();
-      G4NeutronCaptureProcess* neutronCaptureProcess = nullptr;
+      auto pManager = G4Neutron::Neutron()->GetProcessManager();
+      auto processVector = pManager->GetProcessList();
       // Find the existing neutron capture process
-      neutronCaptureProcess =
+      auto neutronCaptureProcess =
           dynamic_cast<G4NeutronCaptureProcess*>(pManager->GetProcess("nCapture"));
 
       // Overwrite the old Process, keeping all of the interactions
       if (neutronCaptureProcess) {
         RMGLog::Out(RMGLog::detail, "Overwriting NeutronCaptureProcess");
         pManager->RemoveProcess(neutronCaptureProcess);
-        RMGNeutronCaptureProcess* RMGProcess = new RMGNeutronCaptureProcess();
+        auto RMGProcess = new RMGNeutronCaptureProcess();
         // HP cross section data set not naturally in G4NeutronCaptureProcess
-        G4ParticleHPCaptureData* dataSet = new G4ParticleHPCaptureData();
+        auto dataSet = new G4ParticleHPCaptureData();
         RMGProcess->AddDataSet(dataSet);
         // Move all interactions to the new process
         for (auto& el : neutronCaptureProcess->GetHadronicInteractionList()) {
