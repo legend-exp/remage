@@ -70,18 +70,16 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
 }
 
 
-// Is there a better way dealing with the unique pointer?
-std::unique_ptr<std::ifstream> RMGGrabmayrGCReader::SetStartLocation(
-    std::unique_ptr<std::ifstream> file) {
-  if (!file || !file->is_open())
+void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) {
+  if (!file.is_open())
     RMGLog::Out(RMGLog::fatal, "The file is not open to set start location! Exit.");
-  file->clear();                 // clear EOF flag
-  file->seekg(0, std::ios::beg); // move to beginning of file
+  file.clear();                 // clear EOF flag
+  file.seekg(0, std::ios::beg); // move to beginning of file
   // Skip Header
   std::string line;
   int header_length = 0;
   do {
-    std::getline(*file, line);
+    std::getline(file, line);
     header_length++;
   } while (line[0] == '%' || (line.find("version") != std::string::npos));
 
@@ -89,45 +87,37 @@ std::unique_ptr<std::ifstream> RMGGrabmayrGCReader::SetStartLocation(
   if (fGammaCascadeRandomStartLocation) {
     int n_entries_in_file = 0;
     // Seems excessiv to read through the entire file, there has to be a quicker way?
-    while (std::getline(*file, line)) n_entries_in_file++;
+    while (std::getline(file, line)) n_entries_in_file++;
 
-    file->clear();                 // clear EOF flag
-    file->seekg(0, std::ios::beg); // move to beginning of file
+    file.clear();                 // clear EOF flag
+    file.seekg(0, std::ios::beg); // move to beginning of file
 
     int start_location = (int)(n_entries_in_file * G4UniformRand() + header_length);
 
     RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
-    for (int j = 0; j < start_location; j++) std::getline(*file, line);
+    for (int j = 0; j < start_location; j++) std::getline(file, line);
   }
-  return std::move(file);
 }
 
-void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4String& params) {
-  // Convert token to Z, A and path/to/file
-  G4Tokenizer tokenizer(params);
-  G4String zStr = tokenizer(",");
-  G4String aStr = tokenizer(",");
-  G4String file_name = tokenizer(" \t\n");
-  G4int z = G4UIcommand::ConvertToInt(zStr);
-  G4int a = G4UIcommand::ConvertToInt(aStr);
+void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, const G4String file_name) {
 
   RMGLog::Out(RMGLog::detail, "Opening file ", file_name);
   std::unique_ptr<std::ifstream> file = std::make_unique<std::ifstream>(file_name);
 
   if (z == 0 || a == 0)
-    RMGLog::Out(RMGLog::fatal, "Isotope Z:" + std::to_string(z) + " A: " + std::to_string(a) +
-                                   " does not exist. Are you sure you used the correct format?");
+    RMGLog::Out(RMGLog::fatal,
+        "Isotope Z:" + std::to_string(z) + " A: " + std::to_string(a) + " does not exist.");
   if (!file || !file->is_open())
     RMGLog::Out(RMGLog::fatal, "Gamma cascade file: " + file_name + " not found! Exit.");
 
-  file = SetStartLocation(std::move(file));
+  SetStartLocation(*file);
 
   fCascadeFiles.insert({{z, a}, std::move(file)});
 }
 
 void RMGGrabmayrGCReader::RandomizeFiles() {
   RMGLog::Out(RMGLog::detail, "(Un)-Randomizing start locations");
-  for (auto& el : fCascadeFiles) { el.second = SetStartLocation(std::move(el.second)); }
+  for (auto& el : fCascadeFiles) { SetStartLocation(*el.second); }
 }
 
 void RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation(const int answer) {
@@ -138,18 +128,10 @@ void RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation(const int answer) {
 }
 
 void RMGGrabmayrGCReader::DefineCommands() {
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/GrabmayrGammaCascades/",
+  fGenericMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/GrabmayrGammaCascades/",
       "Control Peters gamma cascade model");
 
-  fMessenger->DeclareMethod("SetGammaCascadeFile", &RMGGrabmayrGCReader::SetGammaCascadeFile)
-      .SetGuidance("Set the Z, A and /path/to/file for the gamma cascade upon neutron capture on "
-                   "Isotope Z, A Format: Z,A,/path/to/file")
-      .SetParameterName("Z,A,/path/to/file", false)
-      .SetDefaultValue("64,155,/path/to/file.txt")
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-
-  fMessenger
+  fGenericMessenger
       ->DeclareMethod("SetGammaCascadeRandomStartLocation",
           &RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation)
       .SetGuidance("Set the whether the start location in the gamma cascade file is random or not")
@@ -158,4 +140,44 @@ void RMGGrabmayrGCReader::DefineCommands() {
       .SetCandidates("0 1")
       .SetDefaultValue("0")
       .SetStates(G4State_PreInit, G4State_Idle);
+
+  // SetGammaCascadeFile cannot be defined with the G4GenericMessenger (it has to many parameters).
+  fUIMessenger = std::make_unique<GCMessenger>(this);
+}
+
+
+RMGGrabmayrGCReader::GCMessenger::GCMessenger(RMGGrabmayrGCReader* reader) : fReader(reader) {
+  fGammaFileCmd = new G4UIcommand("/RMG/GrabmayrGammaCascades/SetGammaCascadeFile", this);
+  fGammaFileCmd->SetGuidance("Set the Z, A and /path/to/file for the gamma cascade employed upon "
+                             "neutron capture on said isotope");
+
+  auto p_Z = new G4UIparameter("Z", 'i', false);
+  p_Z->SetGuidance("Z of isotope");
+  fGammaFileCmd->SetParameter(p_Z);
+
+  auto p_A = new G4UIparameter("A", 'i', false);
+  p_A->SetGuidance("A of isotope");
+  fGammaFileCmd->SetParameter(p_A);
+
+  auto p_file = new G4UIparameter("file", 's', false);
+  p_file->SetGuidance("/path/to/file of gamma cascade");
+  fGammaFileCmd->SetParameter(p_file);
+
+  fGammaFileCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+}
+
+RMGGrabmayrGCReader::GCMessenger::~GCMessenger() { delete fGammaFileCmd; }
+
+void RMGGrabmayrGCReader::GCMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
+  if (command == fGammaFileCmd) GammaFileCmd(newValues);
+}
+
+void RMGGrabmayrGCReader::GCMessenger::GammaFileCmd(const std::string& parameters) {
+  G4Tokenizer next(parameters);
+
+  auto Z = std::stoi(next());
+  auto A = std::stoi(next());
+  auto file = next();
+
+  fReader->SetGammaCascadeFile(Z, A, file);
 }

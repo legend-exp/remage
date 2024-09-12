@@ -54,15 +54,34 @@ class RMGGrabmayrGCReader {
     // std::vector<std::unique_ptr<std::ifstream>> files;
     //  map holding the corresponding file for each isotope
     std::map<std::pair<G4int, G4int>, std::unique_ptr<std::ifstream>> fCascadeFiles;
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::unique_ptr<G4GenericMessenger> fGenericMessenger;
     G4int fGammaCascadeRandomStartLocation = 0;
 
-    void SetGammaCascadeFile(const G4String& params);
+    void SetGammaCascadeFile(const G4int z, const G4int a, const G4String file_name);
     void SetGammaCascadeRandomStartLocation(const int answer);
-    std::unique_ptr<std::ifstream> SetStartLocation(std::unique_ptr<std::ifstream> file);
+    void SetStartLocation(std::ifstream& file);
 
     void RandomizeFiles();
     void DefineCommands();
+
+    // Nested messenger class
+    class GCMessenger : public G4UImessenger {
+      public:
+
+        GCMessenger(RMGGrabmayrGCReader* reader);
+        ~GCMessenger();
+
+        void SetNewValue(G4UIcommand* command, G4String newValues) override;
+
+      private:
+
+        RMGGrabmayrGCReader* fReader;
+        G4UIcommand* fGammaFileCmd;
+
+        void GammaFileCmd(const std::string& parameters);
+    };
+
+    std::unique_ptr<GCMessenger> fUIMessenger;
 };
 
 

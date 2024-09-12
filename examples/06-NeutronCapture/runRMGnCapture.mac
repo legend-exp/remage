@@ -8,8 +8,8 @@
 
 /RMG/Output/ActivateOutputScheme IsotopeOutputScheme
 
-/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64,155,GammaCascades/156Gd-100Entries.txt
-/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64,157,GammaCascades/158Gd-100Entries.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64 155 GammaCascades/156Gd-100Entries.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFile 64 157 GammaCascades/158Gd-100Entries.txt
 /RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation 1
 /run/initialize
 

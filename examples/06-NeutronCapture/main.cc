@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
   // RMGLog::SetLogLevel(RMGLog::debug);
 
-  RMGManager manager("TestNeutronCapture", argc, argv);
+  RMGManager manager("06-NeutronCapture", argc, argv);
   manager.SetUserInit(new HPGeTestStand());
 
   auto user_init = manager.GetUserInit();

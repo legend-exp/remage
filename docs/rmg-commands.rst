@@ -1129,18 +1129,8 @@ Command directory path : /RMG/GrabmayrGammaCascades/
 Control Peters gamma cascade model
 
 * **Commands**:
-    * *SetGammaCascadeFile*: ``Set the Z, A and /path/to/file for the gamma cascade upon neutron capture on Isotope Z, A Format: Z,A,/path/to/file``
     * *SetGammaCascadeRandomStartLocation*: ``Set the whether the start location in the gamma cascade file is random or not``
-
-Command /RMG/GrabmayrGammaCascades/SetGammaCascadeFile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Set the Z, A and /path/to/file for the gamma cascade upon neutron capture on Isotope Z, A Format: Z,A,/path/to/file
-
-* **Parameter**: ``Z,A,/path/to/file``
-    * **Parameter type**: ``s``
-    * **Omittable**: ``False``
-    * **Default value**: ``64,155,/path/to/file.txt``
+    * *SetGammaCascadeFile*: ``Set the Z, A and /path/to/file for the gamma cascade employed upon neutron capture on said isotope``
 
 Command /RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1156,6 +1146,24 @@ Set the whether the start location in the gamma cascade file is random or not
     * **Omittable**: ``False``
     * **Default value**: ``0``
     * **Candidates**: ``0 1``
+
+Command /RMG/GrabmayrGammaCascades/SetGammaCascadeFile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the Z, A and /path/to/file for the gamma cascade employed upon neutron capture on said isotope
+
+* **Parameter**: ``Z``
+* Z of isotope
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``A``
+* A of isotope
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``file``
+* /path/to/file of gamma cascade
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
 
 Command directory path : /RMG/Confinement/
 ------------------------------------------
