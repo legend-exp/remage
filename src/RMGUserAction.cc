@@ -21,6 +21,7 @@
 #include "G4MultiTrackingAction.hh"
 
 #include "RMGEventAction.hh"
+#include "RMGGrabmayrGCReader.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
 #include "RMGRunAction.hh"
@@ -35,6 +36,7 @@ void RMGUserAction::BuildForMaster() const {
   auto generator_primary = new RMGMasterGenerator();
   this->SetUserAction(
       new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled()));
+  RMGGrabmayrGCReader::GetInstance();
 }
 
 void RMGUserAction::Build() const {
@@ -70,6 +72,7 @@ void RMGUserAction::Build() const {
   this->SetUserAction(new RMGStackingAction(run_action));
   this->SetUserAction(stepping_action);
   this->SetUserAction(tracking_action);
+  RMGGrabmayrGCReader::GetInstance();
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

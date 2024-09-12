@@ -14,6 +14,7 @@ Command directory path : /RMG/
     * */RMG/Processes/*: ``Commands for controlling physics processes``
     * */RMG/Geometry/*: ``Commands for controlling geometry definitions``
     * */RMG/Generator/*: ``Commands for controlling generators``
+    * */RMG/GrabmayrGammaCascades/*: ``Control Peters gamma cascade model``
     * */RMG/Confinement/*: ``...Title not available...``
 
 Command directory path : /RMG/Manager/
@@ -340,6 +341,7 @@ Commands for controlling physics processes
     * *EnableGammaAngularCorrelation*: ``Set correlated gamma emission flag``
     * *GammaTwoJMAX*: ``Set max 2J for sampling of angular correlations``
     * *StoreICLevelData*: ``Store e- internal conversion data``
+    * *UseGrabmayrsGammaCascades*: ``Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.``
 
 Command /RMG/Processes/Realm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -421,6 +423,15 @@ Store e- internal conversion data
     * **Parameter type**: ``b``
     * **Omittable**: ``False``
     * **Candidates**: ``0 1``
+
+Command /RMG/Processes/UseGrabmayrsGammaCascades
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
 
 Command directory path : /RMG/Processes/Stepping/
 -------------------------------------------------
@@ -1111,6 +1122,48 @@ Set Z length
     * **Omittable**: ``True``
     * **Default value**: ``cm``
     * **Candidates**: ``pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi``
+
+Command directory path : /RMG/GrabmayrGammaCascades/
+----------------------------------------------------
+
+Control Peters gamma cascade model
+
+* **Commands**:
+    * *SetGammaCascadeRandomStartLocation*: ``Set the whether the start location in the gamma cascade file is random or not``
+    * *SetGammaCascadeFile*: ``Set a gamma cascade file for neutron capture on a specified isotope``
+
+Command /RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the whether the start location in the gamma cascade file is random or not
+
+0 = don't
+
+1 = do
+
+* **Parameter**: ``arg0``
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+    * **Default value**: ``0``
+    * **Candidates**: ``0 1``
+
+Command /RMG/GrabmayrGammaCascades/SetGammaCascadeFile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set a gamma cascade file for neutron capture on a specified isotope
+
+* **Parameter**: ``Z``
+* Z of isotope
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``A``
+* A of isotope
+    * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+* **Parameter**: ``file``
+* /path/to/file of gamma cascade
+    * **Parameter type**: ``s``
+    * **Omittable**: ``False``
 
 Command directory path : /RMG/Confinement/
 ------------------------------------------

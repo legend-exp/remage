@@ -13,10 +13,12 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGeneratorUtil.hh
     ${_root}/include/RMGGermaniumDetector.hh
     ${_root}/include/RMGGermaniumOutputScheme.hh
+    ${_root}/include/RMGGrabmayrGCReader.hh
     ${_root}/include/RMGIsotopeFilterOutputScheme.hh
     ${_root}/include/RMGLog.hh
     ${_root}/include/RMGManager.hh
     ${_root}/include/RMGMasterGenerator.hh
+    ${_root}/include/RMGNeutronCaptureProcess.hh
     ${_root}/include/RMGNavigationTools.hh
     ${_root}/include/RMGOpticalDetector.hh
     ${_root}/include/RMGOpticalOutputScheme.hh
@@ -49,11 +51,13 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGeneratorUtil.cc
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
+    ${_root}/src/RMGGrabmayrGCReader.cc
     ${_root}/src/RMGIsotopeFilterOutputScheme.cc
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGManager.cc
     ${_root}/src/RMGMasterGenerator.cc
     ${_root}/src/RMGNavigationTools.cc
+    ${_root}/src/RMGNeutronCaptureProcess.cc
     ${_root}/src/RMGOpticalDetector.cc
     ${_root}/src/RMGOpticalOutputScheme.cc
     ${_root}/src/RMGPhysics.cc
