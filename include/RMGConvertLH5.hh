@@ -30,18 +30,19 @@ class RMGConvertLH5 {
 
   public:
 
-    static bool ConvertToLH5(std::string, bool);
+    static bool ConvertToLH5(std::string, bool, bool part_of_batch = false);
+
+    inline static bool fIsStandalone = false;
 
   private:
 
-    inline RMGConvertLH5(bool dry_run) : fDryRun(dry_run) {};
+    inline RMGConvertLH5(std::string filename, bool dry_run, bool part_of_batch)
+        : fHdf5FileName(filename), fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
 
-    bool ConvertToLH5Internal(std::string);
+    bool ConvertToLH5Internal();
 
     static inline const std::regex names_split_re = std::regex("(_in_.+?)?\\0");
     static inline const std::regex names_split_re_end = std::regex("(_in_.+?)$");
-    static inline const std::string log_prefix = "ConvertLH5: ";
-    static inline const std::string log_prefix_dry = "ConvertLH5[dry-run]: ";
 
     static int iter_children(long int, const char*, const H5L_info_t*, void*);
     static std::vector<std::string> GetChildren(H5::Group&);
@@ -57,13 +58,16 @@ class RMGConvertLH5 {
 
     bool CheckGeantHeader(H5::Group&);
 
-    template<typename T, typename... Args>
-    inline void LH5Log(RMGLog::LogLevel loglevel, const T& t, const Args&... args) {
+    template<typename... Args> inline void LH5Log(RMGLog::LogLevel loglevel, const Args&... args) {
       if (fDryRun && loglevel < RMGLog::error) return;
-      RMGLog::Out(loglevel, fDryRun ? log_prefix_dry : log_prefix, t, args...);
+      std::string fn_prefix = fIsPartOfBatch ? " (" + fHdf5FileName + ")" : "";
+      RMGLog::Out(loglevel, "", fIsStandalone ? "" : "ConvertLH5", fDryRun ? "[dry-run]" : "",
+          fn_prefix, ": ", args...);
     }
 
+    std::string fHdf5FileName;
     bool fDryRun;
+    bool fIsPartOfBatch;
 };
 
 #endif

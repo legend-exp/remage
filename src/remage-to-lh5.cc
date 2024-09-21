@@ -37,13 +37,16 @@ int main(int argc, char** argv) {
   RMGLog::SetInihibitStartupInfo(true);
   if (verbosity) RMGLog::SetLogLevel(RMGLog::detail);
 
+  RMGConvertLH5::fIsStandalone = true;
+
   for (auto& file_name : file_names) {
     if (!fs::exists(file_name)) {
       RMGLog::OutFormat(RMGLog::error, "{} does not exist", file_name);
       continue;
     }
-    RMGConvertLH5::ConvertToLH5(file_name, true);
-    if (!dry_run) RMGConvertLH5::ConvertToLH5(file_name, false);
+    bool dry_run_success = RMGConvertLH5::ConvertToLH5(file_name, true, !file_names.empty());
+    if (!dry_run && dry_run_success)
+      RMGConvertLH5::ConvertToLH5(file_name, false, !file_names.empty());
   }
 
   return RMGLog::HadError() ? 1 : 0;

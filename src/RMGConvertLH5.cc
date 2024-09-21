@@ -208,14 +208,14 @@ bool RMGConvertLH5::CheckGeantHeader(H5::Group& header_group) {
   return writer == "exlib";
 }
 
-bool RMGConvertLH5::ConvertToLH5Internal(std::string hdf5_file_name) {
+bool RMGConvertLH5::ConvertToLH5Internal() {
   // using the core driver with no backing storage will allow to change the file purely in-memory.
   // TODO: evaluate what this means for memory usage in case of large files?
   H5::FileAccPropList fapl;
   if (fDryRun) fapl.setCore(10 * 1024, false);
   else fapl = H5::FileAccPropList::DEFAULT;
 
-  H5::H5File hfile(hdf5_file_name, H5F_ACC_RDWR, H5::FileCreatPropList::DEFAULT, fapl);
+  H5::H5File hfile(fHdf5FileName, H5F_ACC_RDWR, H5::FileCreatPropList::DEFAULT, fapl);
 
   // check that this file has been written by geant4/remage, and that we did not run this upgrade
   // script before (it will delete the header group below).
@@ -229,7 +229,7 @@ bool RMGConvertLH5::ConvertToLH5Internal(std::string hdf5_file_name) {
     LH5Log(RMGLog::error, "not a remage HDF5 output file (invalid header)?");
     return false;
   }
-  LH5Log(RMGLog::detail, "Opened Geant4 HDF5 file ", hdf5_file_name);
+  LH5Log(RMGLog::detail, "Opened Geant4 HDF5 file ", fHdf5FileName);
 
   // rework the ntuples to LGDO tables.
   auto hit_group = hfile.openGroup("hit");
@@ -258,15 +258,15 @@ bool RMGConvertLH5::ConvertToLH5Internal(std::string hdf5_file_name) {
 
   hfile.close();
 
-  LH5Log(RMGLog::summary, "Done updating HDF5 file ", hdf5_file_name, " to LH5");
+  LH5Log(RMGLog::summary, "Done updating HDF5 file ", fHdf5FileName, " to LH5");
 
   return ntuple_success;
 }
 
-bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name, bool dry_run) {
-  auto conv = RMGConvertLH5(dry_run);
+bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name, bool dry_run, bool part_of_batch) {
+  auto conv = RMGConvertLH5(hdf5_file_name, dry_run, part_of_batch);
   try {
-    return conv.ConvertToLH5Internal(hdf5_file_name);
+    return conv.ConvertToLH5Internal();
   } catch (const H5::Exception& e) {
     conv.LH5Log(RMGLog::error, e.getDetailMsg());
     return false;
