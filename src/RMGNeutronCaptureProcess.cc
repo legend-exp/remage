@@ -40,8 +40,6 @@ RMGNeutronCaptureProcess::RMGNeutronCaptureProcess(const G4String& processName)
   AddDataSet(new G4NeutronCaptureXS());
 }
 
-RMGNeutronCaptureProcess::~RMGNeutronCaptureProcess() {}
-
 G4bool RMGNeutronCaptureProcess::IsApplicable(const G4ParticleDefinition& aParticleType) {
   return (&aParticleType == G4Neutron::Neutron());
 }
@@ -51,7 +49,7 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   // Get the proposed result from the "normal" process
   G4VParticleChange* ProposedResult = G4HadronicProcess::PostStepDoIt(aTrack, aStep);
 
-  RMGGrabmayrGCReader* CascadeReader = RMGGrabmayrGCReader::GetInstance();
+  auto CascadeReader = RMGGrabmayrGCReader::GetInstance();
 
   G4int nSec = ProposedResult->GetNumberOfSecondaries();
   G4int z;
@@ -100,20 +98,20 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   theTotalResult->SetNumberOfSecondaries(input.m + 1);
   G4IonTable* theTable = G4IonTable::GetIonTable();
 
-  G4ParticleDefinition* particleDef_nuc = theTable->GetIon(z, a + 1, (double)(input.em * u::keV));
-  G4DynamicParticle* particle_nuc = new G4DynamicParticle(particleDef_nuc, G4RandomDirection());
-  G4Track* secondary_nuc = new G4Track(particle_nuc, time, location);
+  auto particleDef_nuc = theTable->GetIon(z, a + 1, (double)(input.em * u::keV));
+  auto particle_nuc = new G4DynamicParticle(particleDef_nuc, G4RandomDirection());
+  auto secondary_nuc = new G4Track(particle_nuc, time, location);
 
   // secondary_nuc->SetCreatorModelID(idModel); No idea what this should be. Not relevant?
   secondary_nuc->SetWeight(fWeight);
   secondary_nuc->SetTouchableHandle(aTrack.GetTouchableHandle());
   theTotalResult->AddSecondary(secondary_nuc);
 
+  auto particleDef_gamma = G4Gamma::Gamma();
   for (const G4int energy : input.eg) {
-    G4ParticleDefinition* particleDef_gamma = G4Gamma::Gamma();
-    G4DynamicParticle* particle_gamma =
+    auto particle_gamma =
         new G4DynamicParticle(particleDef_gamma, energy * u::keV, G4RandomDirection());
-    G4Track* secondary_gamma = new G4Track(particle_gamma, time, location);
+    auto secondary_gamma = new G4Track(particle_gamma, time, location);
     secondary_gamma->SetWeight(fWeight);
     secondary_gamma->SetTouchableHandle(aTrack.GetTouchableHandle());
     secondary_gamma->SetKineticEnergy(energy * u::keV);
