@@ -25,7 +25,7 @@ class RMGNeutronCaptureProcess : public G4HadronicProcess {
 
     explicit RMGNeutronCaptureProcess(const G4String& processName = "RMGnCapture");
 
-    virtual ~RMGNeutronCaptureProcess();
+    virtual ~RMGNeutronCaptureProcess() = default;
 
     G4bool IsApplicable(const G4ParticleDefinition& aParticleType) final;
 

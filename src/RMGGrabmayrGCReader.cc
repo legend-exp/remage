@@ -69,7 +69,7 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
 }
 
 
-void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) {
+void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
   if (!file.is_open())
     RMGLog::Out(RMGLog::fatal, "The file is not open to set start location! Exit.");
   file.clear();                 // clear EOF flag

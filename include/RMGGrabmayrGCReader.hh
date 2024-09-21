@@ -38,11 +38,11 @@ struct GammaCascadeLine {
 class RMGGrabmayrGCReader {
   public:
 
-    static G4ThreadLocal RMGGrabmayrGCReader* GetInstance();
+    static RMGGrabmayrGCReader* GetInstance();
     ~RMGGrabmayrGCReader();
     // RMGGrabmayrGCReader& operator=(const RMGGrabmayrGCReader&) = delete;
 
-    G4bool IsApplicable(G4int a, G4int z);
+    G4bool IsApplicable(G4int z, G4int a);
     void CloseFiles();
 
     GammaCascadeLine GetNextEntry(G4int z, G4int a);
@@ -57,9 +57,9 @@ class RMGGrabmayrGCReader {
     std::unique_ptr<G4GenericMessenger> fGenericMessenger;
     G4int fGammaCascadeRandomStartLocation = 0;
 
-    void SetGammaCascadeFile(const G4int z, const G4int a, const G4String file_name);
-    void SetGammaCascadeRandomStartLocation(const int answer);
-    void SetStartLocation(std::ifstream& file);
+    void SetGammaCascadeFile(G4int z, G4int a, G4String file_name);
+    void SetGammaCascadeRandomStartLocation(int answer);
+    void SetStartLocation(std::ifstream& file) const;
 
     void RandomizeFiles();
     void DefineCommands();
