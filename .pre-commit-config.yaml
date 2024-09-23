@@ -36,8 +36,9 @@ repos:
   hooks:
    - id: clang-tidy
      name: clang-tidy
-     entry: bash -c 'command -V clang-tidy >&- 2>&-; if [[ $? == 0 && -d build ]]; then clang-tidy -fix -fix-errors -quiet -p=build "$@"; fi'
+     entry: bash -c 'command -V run-clang-tidy >&- 2>&-; if [[ $? == 0 && -d build ]]; then run-clang-tidy -fix -quiet -p=build; fi'
      language: system
+     pass_filenames: false
      types_or: [c++]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
