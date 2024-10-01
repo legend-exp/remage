@@ -120,7 +120,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
           static_cast<int>(fGenerator), "' (implement me)");
   }
   RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}",
-      magic_enum::enum_name<RMGMasterGenerator::Generator>(gen));
+      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator));
 }
 
 void RMGMasterGenerator::SetConfinementString(std::string code) {
@@ -140,6 +140,9 @@ void RMGMasterGenerator::SetUserGenerator(RMGVGenerator* gen) {
 
   fGenerator = RMGMasterGenerator::Generator::kUserDefined;
   fGeneratorObj = std::unique_ptr<RMGVGenerator>(gen);
+
+  RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}",
+      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator));
 }
 
 void RMGMasterGenerator::DefineCommands() {

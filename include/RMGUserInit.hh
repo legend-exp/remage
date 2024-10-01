@@ -28,6 +28,7 @@
 
 #include "RMGIsotopeFilterOutputScheme.hh"
 #include "RMGLog.hh"
+#include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
 
 class RMGUserInit {
@@ -47,6 +48,7 @@ class RMGUserInit {
     [[nodiscard]] inline auto GetTrackingActions() const { return fTrackingActions; }
     [[nodiscard]] inline auto GetOutputSchemes() const { return fOutputSchemes; }
     [[nodiscard]] inline auto GetOptionalOutputSchemes() const { return fOptionalOutputSchemes; }
+    [[nodiscard]] inline auto GetUserGenerator() const { return fUserGenerator; }
 
     // setters
     template<typename T, typename... Args> inline void AddSteppingAction(Args&&... args) {
@@ -64,6 +66,10 @@ class RMGUserInit {
     template<typename T, typename... Args>
     inline void AddOptionalOutputScheme(std::string name, Args&&... args) {
       Add<T>(&fOptionalOutputSchemes, name, std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename... Args> inline void SetUserGenerator(Args&&... args) {
+      Set<T>(fUserGenerator, std::forward<Args>(args)...);
     }
 
     // default output schemes
@@ -109,12 +115,21 @@ class RMGUserInit {
       auto create = CreateInit<B, T>(std::forward<Args>(args)...);
       map->emplace(k, std::move(create));
     }
+    template<typename T, typename B, typename... Args>
+    inline void Set(late_init_fn<B>& fn, Args&&... args) {
+      static_assert(std::is_base_of<B, T>::value);
+
+      // capture the passed arguments for the constructor to be called later.
+      auto create = CreateInit<B, T>(std::forward<Args>(args)...);
+      fn.swap(create);
+    }
 
     // store partial custom actions to be used later in RMGUserAction
     late_init_vec<G4UserSteppingAction> fSteppingActions;
     late_init_vec<G4UserTrackingAction> fTrackingActions;
     late_init_vec<RMGVOutputScheme> fOutputSchemes;
     late_init_map<std::string, RMGVOutputScheme> fOptionalOutputSchemes;
+    late_init_fn<RMGVGenerator> fUserGenerator;
 };
 
 #endif
