@@ -30,10 +30,16 @@
 #include "RMGTrackingAction.hh"
 
 void RMGUserAction::BuildForMaster() const {
+
+  const auto user_init = RMGManager::Instance()->GetUserInit();
+
   // the master thread does not simulate anything.
   // initialize the master generator also on the master thread, to make sure that particle source
   // commands are available early on (following a note in G4GeneralParticleSourceMessenger.hh).
   auto generator_primary = new RMGMasterGenerator();
+  auto user_generator = user_init->GetUserGenerator();
+  if (user_generator) generator_primary->SetUserGenerator(user_generator().release());
+
   this->SetUserAction(
       new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled()));
   RMGGrabmayrGCReader::GetInstance();
@@ -41,13 +47,18 @@ void RMGUserAction::BuildForMaster() const {
 
 void RMGUserAction::Build() const {
 
+  const auto user_init = RMGManager::Instance()->GetUserInit();
+
   auto generator_primary = new RMGMasterGenerator();
+  auto user_generator = user_init->GetUserGenerator();
+  if (user_generator) generator_primary->SetUserGenerator(user_generator().release());
+
   auto run_action =
       new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled());
   auto event_action = new RMGEventAction(run_action);
 
   // Add the remage-internal stepping action and optional user-specified custom stepping actions.
-  const auto user_stepping_actions = RMGManager::Instance()->GetUserInit()->GetSteppingActions();
+  const auto user_stepping_actions = user_init->GetSteppingActions();
   G4UserSteppingAction* stepping_action = new RMGSteppingAction(event_action);
   if (!user_stepping_actions.empty()) {
     auto multi_stepping_action = new G4MultiSteppingAction();
@@ -57,7 +68,7 @@ void RMGUserAction::Build() const {
   }
 
   // Add the remage-internal tracking action and optional user-specified custom stepping actions.
-  const auto user_tracking_actions = RMGManager::Instance()->GetUserInit()->GetTrackingActions();
+  const auto user_tracking_actions = user_init->GetTrackingActions();
   G4UserTrackingAction* tracking_action = new RMGTrackingAction(run_action);
   if (!user_tracking_actions.empty()) {
     auto multi_tracking_action = new G4MultiTrackingAction();
