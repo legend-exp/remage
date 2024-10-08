@@ -94,7 +94,7 @@ class RMGPhysics : public G4VModularPhysicsList {
 
     void ConstructParticle() override;
     void ConstructProcess() override;
-    void ConstructOptical();
+    virtual void ConstructOptical();
 
   private:
 
