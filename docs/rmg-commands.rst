@@ -335,6 +335,7 @@ Commands for controlling physics processes
 * **Commands**:
     * *Realm*: ``Set simulation realm (cut values for particles in (sensitive) detector``
     * *OpticalPhysics*: ``Add optical processes to the physics list``
+    * *OpticalPhysicsMaxOneWLSPhoton*: ``Use a custom wavelegth shifting process that produces at maximum one secondary photon.``
     * *LowEnergyEMPhysics*: ``Add low energy electromagnetic processes to the physics list``
     * *HadronicPhysics*: ``Add hadronic processes to the physics list``
     * *ThermalScattering*: ``Use thermal scattering cross sections for neutrons``
@@ -357,6 +358,15 @@ Command /RMG/Processes/OpticalPhysics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Add optical processes to the physics list
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Processes/OpticalPhysicsMaxOneWLSPhoton
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 
 * **Parameter**: ``value``
     * **Parameter type**: ``b``

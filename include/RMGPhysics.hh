@@ -102,6 +102,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     StepCutStore fStepCuts;
     StepCutStore fStepCutsSensitive;
     bool fConstructOptical = false;
+    bool fUseOpticalCustomWLS = false;
     bool fUseThermalScattering = false;
     bool fUseGrabmayrGammaCascades = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
