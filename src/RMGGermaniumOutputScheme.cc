@@ -167,7 +167,7 @@ std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActi
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
 
-  // defer tracking of optical photons, irrespective of our settings.
+  // defer tracking of optical photons.
   if (fDiscardPhotonsIfNoGermaniumEdep &&
       aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition())
     return fWaiting;
