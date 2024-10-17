@@ -57,7 +57,8 @@ void RMGRunAction::SetupAnalysisManager() {
   fIsAnaManInitialized = true;
 
   auto rmg_man = RMGManager::Instance();
-  if (rmg_man->GetDetectorConstruction()->GetActiveDetectorList().empty()) {
+  auto det_cons = rmg_man->GetDetectorConstruction();
+  if (det_cons->GetAllActiveOutputSchemes().empty()) {
     rmg_man->EnablePersistency(false);
     fIsPersistencyEnabled = false;
   }
@@ -72,15 +73,14 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  ana_man->SetNtupleMerging(!RMGManager::Instance()->IsExecSequential());
+  ana_man->SetNtupleMerging(!rmg_man->IsExecSequential());
 
   // do it only for activated detectors (have to ask to the manager)
-  auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
 
     fOutputDataFields.emplace_back(oscheme);
 
-    oscheme->SetNtuplePerDetector(RMGManager::Instance()->GetOutputNtuplePerDetector());
+    oscheme->SetNtuplePerDetector(rmg_man->GetOutputNtuplePerDetector());
     oscheme->AssignOutputNames(ana_man);
   }
 }
@@ -119,7 +119,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   if (!fIsPersistencyEnabled && this->IsMaster()) {
     // Warn user if persistency is disabled if there are detectors defined.
-    auto level = manager->GetDetectorConstruction()->GetActiveDetectorList().empty()
+    auto level = manager->GetDetectorConstruction()->GetAllActiveOutputSchemes().empty()
                      ? RMGLog::summary
                      : RMGLog::warning;
     RMGLog::Out(level, "Object persistency disabled");
