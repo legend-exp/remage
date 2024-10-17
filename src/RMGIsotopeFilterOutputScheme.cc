@@ -65,7 +65,9 @@ std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterOutputScheme::
   if (stage != 0) return std::nullopt;
 
   // defer tracking of optical photons.
-  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return fWaiting;
+  if (fDiscardPhotonsIfIsotopeNotProduced &&
+      aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition())
+    return fWaiting;
   return std::nullopt;
 }
 
