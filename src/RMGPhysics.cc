@@ -67,6 +67,7 @@
 
 #include "RMGLog.hh"
 #include "RMGNeutronCaptureProcess.hh"
+#include "RMGOpWLSProcess.hh"
 #include "RMGTools.hh"
 
 namespace u = CLHEP;
@@ -292,12 +293,18 @@ void RMGPhysics::ConstructOptical() {
   auto absorption_proc = new G4OpAbsorption();
   auto boundary_proc = new G4OpBoundaryProcess();
   auto rayleigh_scatt_proc = new G4OpRayleigh();
-  auto wls_proc = new G4OpWLS();
+  G4VProcess* wls_proc = new G4OpWLS();
   auto cerenkov_proc = new G4Cerenkov();
 
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   wls_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+
+  if (fUseOpticalCustomWLS) {
+    auto wls_proc_wrapped = new RMGOpWLSProcess();
+    wls_proc_wrapped->RegisterProcess(wls_proc);
+    wls_proc = wls_proc_wrapped;
+  }
 
   GetParticleIterator()->reset();
   while ((*GetParticleIterator())()) {
@@ -459,6 +466,11 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
       .SetGuidance("Add optical processes to the physics list")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("OpticalPhysicsMaxOneWLSPhoton", fUseOpticalCustomWLS)
+      .SetGuidance(
+          "Use a custom wavelegth shifting process that produces at maximum one secondary photon.")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
