@@ -348,7 +348,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   // invalidates old iterators).
   for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.emplace_back(s); }
 
-  RMGLog::Out(RMGLog::detail, "Sampling from ", fPhysicalVolumes.size(), " physical volumes");
+  RMGLog::OutFormat(RMGLog::detail, "Sampling from {} physical volumes, volume = {}",
+      fPhysicalVolumes.size(), std::string(G4BestUnit(fPhysicalVolumes.total_volume, "Volume")));
 }
 
 void RMGVertexConfinement::InitializeGeometricalVolumes() {

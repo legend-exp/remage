@@ -152,7 +152,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       std::replace(lgdo_units.begin(), lgdo_units.end(), '\\', '/');
     }
 
-    LH5Log(RMGLog::detail, ntuple_log_prefix, "column", lgdo_name, ", with units ", lgdo_units);
+    LH5Log(RMGLog::detail, ntuple_log_prefix, "column ", lgdo_name, ", with units ", lgdo_units);
 
     // remove the column group with its child dataset, while preserving the data itself.
     std::string column_tmp = column + "__tmp";
