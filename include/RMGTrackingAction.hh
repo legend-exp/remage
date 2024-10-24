@@ -16,6 +16,9 @@
 #ifndef _RMG_TRACKING_ACTION_HH_
 #define _RMG_TRACKING_ACTION_HH_
 
+#include <memory>
+
+#include "G4GenericMessenger.hh"
 #include "G4UserTrackingAction.hh"
 
 class RMGRunAction;
@@ -40,6 +43,12 @@ class RMGTrackingAction : public G4UserTrackingAction {
   private:
 
     RMGRunAction* fRunAction = nullptr;
+    bool fResetInitialDecayTime = false;
+
+    void ResetInitialDecayTime(const G4Track*);
+
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif
