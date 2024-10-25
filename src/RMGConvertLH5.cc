@@ -44,14 +44,19 @@ void RMGConvertLH5::SetStringAttribute(H5::H5Object& obj, std::string attr_name,
 
 std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDataset(H5::Group& det_group,
     std::string dset_name, std::string ntuple_log_prefix) {
+  std::vector<std::string> vec;
+
+  auto dset = det_group.openDataSet(dset_name);
+  if (dset.getDataType().getClass() != H5T_STRING) {
+    LH5Log(RMGLog::error, ntuple_log_prefix, "invalid ", dset_name, " dataset");
+    return {"", vec};
+  }
+
   // note: the std::string-based API does not read the full string, because geant4 uses the wrong
   // data type (nul-terminated string vs. nul-padded string).
-  auto dset = det_group.openDataSet(dset_name);
   size_t storage_size = dset.getStorageSize();
   char* buf = new char[storage_size];
   dset.read(buf, dset.getStrType());
-
-  std::vector<std::string> vec;
 
   // the last two bytes of the buffer will be NUL.
   if (storage_size < 2 || buf[storage_size - 1] != '\0' || buf[storage_size - 2] != '\0') {
@@ -90,8 +95,16 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   const std::string ntuple_name = det_group.getObjName();
   const std::string ntuple_log_prefix = "ntuple " + ntuple_name + " - ";
   LH5Log(RMGLog::detail, ntuple_log_prefix, "visiting");
-  if (!det_group.exists("names") || !det_group.exists("forms") || !det_group.exists("columns")) {
+
+  if (!det_group.exists("names") || det_group.childObjType("names") != H5O_TYPE_DATASET ||
+      !det_group.exists("forms") || det_group.childObjType("forms") != H5O_TYPE_DATASET ||
+      !det_group.exists("columns") || det_group.childObjType("columns") != H5O_TYPE_DATASET) {
     LH5Log(RMGLog::error, ntuple_log_prefix, "missing names, forms or columns dataset");
+    return false;
+  }
+
+  if (det_group.attrExists("datatype") || det_group.attrExists("units")) {
+    LH5Log(RMGLog::error, ntuple_log_prefix, "to-be-written LGDO attributes already exist");
     return false;
   }
 
@@ -136,7 +149,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   for (auto& column : columns) {
     // first check that we will not get name clashes later on.
     if (column.find("__tmp") != std::string::npos) {
-      LH5Log(RMGLog::error, ntuple_log_prefix, "containing temporary column ", column);
+      LH5Log(RMGLog::error, ntuple_log_prefix, "already containing temporary column ", column);
       return false;
     }
   }
@@ -174,7 +187,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
 
     auto dset_column = det_group.openDataSet(lgdo_name);
     if (unit_sep_pos != std::string::npos) { SetStringAttribute(dset_column, "units", lgdo_units); }
-    // note: this simple boolean decision only works as G4 can only write float/double/int/string.
+    // note: this simple decision only works as G4 can only write float/double/int/string.
     // Other types with a distinct lgdo type are not possible to reach here.
     auto lgdo_dtype = DataTypeToLGDO(dset_column.getDataType());
     SetStringAttribute(dset_column, "datatype", "array<1>{" + lgdo_dtype + "}");
@@ -210,7 +223,7 @@ bool RMGConvertLH5::CheckGeantHeader(H5::Group& header_group) {
 
 bool RMGConvertLH5::ConvertToLH5Internal() {
   // using the core driver with no backing storage will allow to change the file purely in-memory.
-  // TODO: evaluate what this means for memory usage in case of large files?
+  // warning: this will internally approx. the full file size!
   H5::FileAccPropList fapl;
   if (fDryRun) fapl.setCore(10 * 1024, false);
   else fapl = H5::FileAccPropList::DEFAULT;
@@ -219,7 +232,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
 
   // check that this file has been written by geant4/remage, and that we did not run this upgrade
   // script before (it will delete the header group below).
-  if (!hfile.exists("header") || !hfile.exists("hit")) {
+  if (!hfile.exists("header") || hfile.childObjType("header") != H5O_TYPE_GROUP ||
+      !hfile.exists("hit") || hfile.childObjType("hit") != H5O_TYPE_GROUP) {
     LH5Log(RMGLog::error,
         "not a remage HDF5 output file or already converted (missing header or hit groups)?");
     return false;
@@ -243,7 +257,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   if (hit_group.attrExists("type")) hit_group.removeAttr("type");
 
   // check other things that geant4 might write into the file, and delete them if they are empty.
-  if (hfile.exists("default_histograms")) {
+  if (hfile.exists("default_histograms") &&
+      hfile.childObjType("default_histograms") == H5O_TYPE_GROUP) {
     auto histo_group = hfile.openGroup("default_histograms");
     auto histograms = GetChildren(histo_group);
     if (histograms.empty()) {
