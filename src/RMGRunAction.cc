@@ -265,13 +265,10 @@ void RMGRunAction::PostprocessOutputFile() const {
   }
 
 #if RMG_HAS_HDF5
-  if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), true)) {
-    RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(),
-        " to LH5 failed. The temporary output file is unchanged.");
-    return;
-  }
+  // note: do not do a dry-run here, as it takes a lot of memory.
   if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), false)) {
-    RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(), " to LH5 failed");
+    RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(),
+        " to LH5 failed. Data is potentially corrupted.");
     return;
   }
 #else

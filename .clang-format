@@ -49,7 +49,7 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '<[[:alnum:]._]+>'
+  - Regex:           '<[[:alnum:]._/]+>'
     Priority:        1
     CaseSensitive:   false
   - Regex:           '^"(G4|globals\.hh|Randomize\.hh|CLHEP)'

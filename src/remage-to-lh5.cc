@@ -15,6 +15,7 @@
 
 #include <filesystem>
 #include <string>
+#include <sys/resource.h>
 #include <vector>
 namespace fs = std::filesystem;
 
@@ -30,7 +31,8 @@ int main(int argc, char** argv) {
 
   CLI::App app{"remage-to-lh5: convert HDF5 file output files in-place to LH5"};
   app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_flag("-n,--dry-run", dry_run, "Do not modify the on-disk files, only test the changes");
+  app.add_flag("-n,--dry-run",
+      dry_run, "Do not modify the on-disk files, only test the changes (on a full in-memory copy of the file)");
   app.add_option("input_files", file_names, "Input HDF5 files")->type_name("FILE")->required();
   CLI11_PARSE(app, argc, argv);
 
@@ -44,9 +46,13 @@ int main(int argc, char** argv) {
       RMGLog::OutFormat(RMGLog::error, "{} does not exist", file_name);
       continue;
     }
-    bool dry_run_success = RMGConvertLH5::ConvertToLH5(file_name, true, !file_names.empty());
-    if (!dry_run && dry_run_success)
-      RMGConvertLH5::ConvertToLH5(file_name, false, !file_names.empty());
+    RMGConvertLH5::ConvertToLH5(file_name, dry_run, !file_names.empty());
+  }
+
+  struct rusage usage{};
+  if (!getrusage(RUSAGE_SELF, &usage)) {
+    RMGLog::OutFormat(RMGLog::debug, "peak memory usage: {} MiB",
+        usage.ru_maxrss / 1024); // maxrss is in kilobytes.
   }
 
   return RMGLog::HadError() ? 1 : 0;
