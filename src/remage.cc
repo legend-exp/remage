@@ -86,8 +86,8 @@ int main(int argc, char** argv) {
   manager.Initialize();
   manager.Run();
 
-  if (manager.HadWarning()) return 2;
-  return manager.HadError() ? 1 : 0;
+  if (manager.HadError()) return 1;
+  return manager.HadWarning() ? 2 : 0;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
