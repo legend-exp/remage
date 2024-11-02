@@ -34,9 +34,9 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
-  ana_man->CreateNtupleDColumn(vid, "xloc_in_m");
-  ana_man->CreateNtupleDColumn(vid, "yloc_in_m");
-  ana_man->CreateNtupleDColumn(vid, "zloc_in_m");
+  ana_man->CreateNtupleFColumn(vid, "xloc_in_m");
+  ana_man->CreateNtupleFColumn(vid, "yloc_in_m");
+  ana_man->CreateNtupleFColumn(vid, "zloc_in_m");
   ana_man->CreateNtupleIColumn(vid, "n_part");
 
   ana_man->FinishNtuple(vid);
@@ -77,9 +77,9 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
       int vcol_id = 0;
       ana_man->FillNtupleIColumn(vntupleid, vcol_id++, event->GetEventID());
       ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
-      ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetX0() / u::m);
-      ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetY0() / u::m);
-      ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetZ0() / u::m);
+      ana_man->FillNtupleFColumn(vntupleid, vcol_id++, primary_vertex->GetX0() / u::m);
+      ana_man->FillNtupleFColumn(vntupleid, vcol_id++, primary_vertex->GetY0() / u::m);
+      ana_man->FillNtupleFColumn(vntupleid, vcol_id++, primary_vertex->GetZ0() / u::m);
       ana_man->FillNtupleIColumn(vntupleid, vcol_id++, n_primaries);
 
       // NOTE: must be called here for hit-oriented output
