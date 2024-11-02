@@ -3,16 +3,40 @@ remage
 
 |remage| is a modern C++ simulation framework for germanium experiments.
 
-Building the project
+Pre-built binaries
+------------------
+
+The recommended and fastest way of running |remage| is through pre-built
+software containers. Stable releases are regularly made available `on Docker
+Hub <https://hub.docker.com/repository/docker/gipert/remage>`_. To obtain and
+run the latest just do:
+
+.. code-block:: console
+
+   $ docker run gipert/remage --help # just prints a help message
+
+If you prefer `Apptainer <https://apptainer.org/>`_, you can easily generate an image locally:
+
+.. code-block:: console
+
+  $ apptainer build remage_latest.sif docker://gipert/remage:latest
+  $ apptainer run remage_latest.sif --help
+
+If containers do not work for you, see the next section to learn how to build
+and install from source.
+
+Building from source
 --------------------
 
-Users are required to build the project themselves, since no official binaries
-are distributed, at the moment.
+In preparation for the actual build, users are required to obtain some
+dependencies.
 
 .. include:: _dependencies.rst
 
 Building
 ^^^^^^^^
+
+The build system is based on CMake:
 
 .. code-block:: console
 
@@ -22,8 +46,8 @@ Building
    $ cmake -DCMAKE_INSTALL_PREFIX=<optional prefix> ..
    $ make install
 
-Usage
------
+Quick start
+-----------
 
 .. warning::
    A proper user guide is not available yet. In the meanwhile, users can have a

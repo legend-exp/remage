@@ -28,7 +28,7 @@ Optional dependencies
 
    .. code-block:: console
 
-      $ [sudo] apptainer build remage-base_latest.sif docker://gipert/remage-base:latest
+      $ apptainer build remage-base_latest.sif docker://gipert/remage-base:latest
 
    For more details, have a look at `the documentation
    <https://apptainer.org/docs/user/main/build_a_container.html>`_.
