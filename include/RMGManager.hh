@@ -16,6 +16,7 @@
 #ifndef _RMG_MANAGER_HH_
 #define _RMG_MANAGER_HH_
 
+#include <atomic>
 #include <memory>
 #include <vector>
 
@@ -116,6 +117,12 @@ class RMGManager {
       GetUserInit()->ActivateOptionalOutputScheme(name);
     }
 
+    inline static void AbortRunGracefully() {
+      if (!fAbortRun.is_lock_free()) return;
+      fAbortRun = true;
+    }
+    inline static bool ShouldAbortRun() { return fAbortRun; }
+
   private:
 
     void SetUpDefaultG4RunManager(G4RunManagerType type = G4RunManagerType::Default);
@@ -147,6 +154,7 @@ class RMGManager {
 
 
     static RMGManager* fRMGManager;
+    static std::atomic<bool> fAbortRun;
 
     std::unique_ptr<G4RunManager> fG4RunManager = nullptr;
     std::unique_ptr<G4VisManager> fG4VisManager = nullptr;

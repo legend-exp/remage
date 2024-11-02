@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <csignal>
 #include <string>
 #include <vector>
 
@@ -37,6 +38,8 @@ namespace CLI::detail {
 } // namespace CLI::detail
 
 #include "CLI11/CLI11.hpp"
+
+void signal_handler(int) { RMGManager::AbortRunGracefully(); }
 
 int main(int argc, char** argv) {
 
@@ -74,6 +77,15 @@ int main(int argc, char** argv) {
   }
 
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
+
+  // handle signal to abort the current run.
+  struct sigaction sig;
+  sig.sa_handler = &signal_handler;
+  sigemptyset(&sig.sa_mask);
+  sig.sa_flags = 0;
+  if (sigaction(SIGUSR1, &sig, nullptr) != 0) {
+    RMGLog::Out(RMGLog::error, "signal install failed.");
+  }
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);
