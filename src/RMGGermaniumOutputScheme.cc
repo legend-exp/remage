@@ -64,7 +64,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
-    ana_man->CreateNtupleDColumn(id, "edep_in_keV");
+    ana_man->CreateNtupleFColumn(id, "edep_in_keV");
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
     ana_man->CreateNtupleFColumn(id, "xloc_in_m");
     ana_man->CreateNtupleFColumn(id, "yloc_in_m");
@@ -150,7 +150,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
       ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position.getX() / u::m);
       ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position.getY() / u::m);
