@@ -65,14 +65,14 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleIColumn(id, "particle");
     ana_man->CreateNtupleDColumn(id, "edep_in_keV");
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
-    ana_man->CreateNtupleDColumn(id, "xloc_pre_in_m");
-    ana_man->CreateNtupleDColumn(id, "yloc_pre_in_m");
-    ana_man->CreateNtupleDColumn(id, "zloc_pre_in_m");
-    ana_man->CreateNtupleDColumn(id, "xloc_post_in_m");
-    ana_man->CreateNtupleDColumn(id, "yloc_post_in_m");
-    ana_man->CreateNtupleDColumn(id, "zloc_post_in_m");
-    ana_man->CreateNtupleDColumn(id, "v_pre_in_m\\ns");
-    ana_man->CreateNtupleDColumn(id, "v_post_in_m\\ns");
+    ana_man->CreateNtupleFColumn(id, "xloc_pre_in_m");
+    ana_man->CreateNtupleFColumn(id, "yloc_pre_in_m");
+    ana_man->CreateNtupleFColumn(id, "zloc_pre_in_m");
+    ana_man->CreateNtupleFColumn(id, "xloc_post_in_m");
+    ana_man->CreateNtupleFColumn(id, "yloc_post_in_m");
+    ana_man->CreateNtupleFColumn(id, "zloc_post_in_m");
+    ana_man->CreateNtupleFColumn(id, "v_pre_in_m\\ns");
+    ana_man->CreateNtupleFColumn(id, "v_post_in_m\\ns");
 
     ana_man->FinishNtuple(id);
   }
@@ -156,14 +156,14 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_pre.getX() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_pre.getY() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_pre.getZ() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getX() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getY() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_position_post.getZ() / u::m);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_pre / u::m * u::ns);
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->velocity_post / u::m * u::ns);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getX() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getY() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getZ() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getX() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getY() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getZ() / u::m);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->velocity_pre / u::m * u::ns);
+      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->velocity_post / u::m * u::ns);
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
