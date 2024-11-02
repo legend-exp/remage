@@ -33,6 +33,13 @@ RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
+  if (RMGManager::ShouldAbortRun()) {
+    // the run should be aborted (e.g. by user signal).
+    RMGLog::Out(RMGLog::warning, "aborting run in event ", event->GetEventID() + 1);
+    G4RunManager::GetRunManager()->AbortRun(false);
+    return;
+  }
+
   auto print_modulo = fRunAction->GetCurrentRunPrintModulo();
   if ((event->GetEventID() + 1) % print_modulo == 0) {
 
@@ -61,6 +68,10 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 }
 
 void RMGEventAction::EndOfEventAction(const G4Event* event) {
+
+  if (RMGManager::ShouldAbortRun()) {
+    return; // the run has been aborted somewhere else, do not persist the event.
+  }
 
   auto oschemes = fRunAction->GetAllOutputDataFields();
 

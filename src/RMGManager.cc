@@ -50,6 +50,8 @@
 
 RMGManager* RMGManager::fRMGManager = nullptr;
 
+std::atomic<bool> RMGManager::fAbortRun = false;
+
 G4ThreadLocal std::map<int, int> RMGManager::fNtupleIDs = {};
 
 RMGManager::RMGManager(std::string app_name, int argc, char** argv)
