@@ -48,10 +48,10 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");
     ana_man->CreateNtupleIColumn(pid, "particle");
-    ana_man->CreateNtupleDColumn(pid, "px_in_MeV");
-    ana_man->CreateNtupleDColumn(pid, "py_in_MeV");
-    ana_man->CreateNtupleDColumn(pid, "pz_in_MeV");
-    ana_man->CreateNtupleDColumn(pid, "ekin_in_MeV");
+    ana_man->CreateNtupleFColumn(pid, "px_in_MeV");
+    ana_man->CreateNtupleFColumn(pid, "py_in_MeV");
+    ana_man->CreateNtupleFColumn(pid, "pz_in_MeV");
+    ana_man->CreateNtupleFColumn(pid, "ekin_in_MeV");
 
     ana_man->FinishNtuple(pid);
   }
@@ -93,10 +93,10 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, event->GetEventID());
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, j);
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, primary->GetPDGcode());
-          ana_man->FillNtupleDColumn(pntupleid, pcol_id++, primary->GetMomentum().getX() / u::MeV);
-          ana_man->FillNtupleDColumn(pntupleid, pcol_id++, primary->GetMomentum().getY() / u::MeV);
-          ana_man->FillNtupleDColumn(pntupleid, pcol_id++, primary->GetMomentum().getZ() / u::MeV);
-          ana_man->FillNtupleDColumn(pntupleid, pcol_id++, primary->GetKineticEnergy() / u::MeV);
+          ana_man->FillNtupleFColumn(pntupleid, pcol_id++, primary->GetMomentum().getX() / u::MeV);
+          ana_man->FillNtupleFColumn(pntupleid, pcol_id++, primary->GetMomentum().getY() / u::MeV);
+          ana_man->FillNtupleFColumn(pntupleid, pcol_id++, primary->GetMomentum().getZ() / u::MeV);
+          ana_man->FillNtupleFColumn(pntupleid, pcol_id++, primary->GetKineticEnergy() / u::MeV);
 
           // NOTE: must be called here for hit-oriented output
           ana_man->AddNtupleRow(pntupleid);
