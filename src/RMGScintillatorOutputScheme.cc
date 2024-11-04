@@ -63,16 +63,16 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
-    ana_man->CreateNtupleFColumn(id, "edep_in_keV");
+    CreateNtupleFOrDColumn(ana_man, id, "edep_in_keV", fStoreSinglePrecisionEnergy);
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
-    ana_man->CreateNtupleFColumn(id, "xloc_pre_in_m");
-    ana_man->CreateNtupleFColumn(id, "yloc_pre_in_m");
-    ana_man->CreateNtupleFColumn(id, "zloc_pre_in_m");
-    ana_man->CreateNtupleFColumn(id, "xloc_post_in_m");
-    ana_man->CreateNtupleFColumn(id, "yloc_post_in_m");
-    ana_man->CreateNtupleFColumn(id, "zloc_post_in_m");
-    ana_man->CreateNtupleFColumn(id, "v_pre_in_m\\ns");
-    ana_man->CreateNtupleFColumn(id, "v_post_in_m\\ns");
+    CreateNtupleFOrDColumn(ana_man, id, "xloc_pre_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "yloc_pre_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "zloc_pre_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "xloc_post_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "yloc_post_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "zloc_post_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "v_pre_in_m\\ns", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "v_post_in_m\\ns", fStoreSinglePrecisionPosition);
 
     ana_man->FinishNtuple(id);
   }
@@ -154,16 +154,25 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
+          fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getX() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getY() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_pre.getZ() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getX() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getY() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position_post.getZ() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->velocity_pre / u::m * u::ns);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->velocity_post / u::m * u::ns);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getX() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getY() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getZ() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getX() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getY() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getZ() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->velocity_pre / u::m * u::ns,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->velocity_post / u::m * u::ns,
+          fStoreSinglePrecisionPosition);
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
@@ -192,6 +201,14 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       ->DeclareMethod("AddDetectorForEdepThreshold", &RMGScintillatorOutputScheme::AddEdepCutDetector)
       .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
       .SetParameterName("det_uid", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
+      .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
+      .SetGuidance("Use float32 (instead of float64) for energy output.")
       .SetStates(G4State_Idle);
 }
 

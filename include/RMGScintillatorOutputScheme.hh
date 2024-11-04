@@ -54,6 +54,9 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     double fEdepCutLow = -1;
     double fEdepCutHigh = -1;
     std::set<int> fEdepCutDetectors;
+
+    bool fStoreSinglePrecisionEnergy = false;
+    bool fStoreSinglePrecisionPosition = false;
 };
 
 #endif

@@ -166,6 +166,8 @@ Commands for controlling output from hits in germanium detectors.
     * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
     * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
     * *DiscardPhotonsIfNoGermaniumEdep*: ``Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.``
+    * *StoreSinglePrecisionPosition*: ``Use float32 (instead of float64) for position output.``
+    * *StoreSinglePrecisionEnergy*: ``Use float32 (instead of float64) for energy output.``
 
 Command /RMG/Output/Germanium/SetEdepCutLow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -217,6 +219,24 @@ Discard optical photons (before simulating them), if no edep in germanium detect
     * **Parameter type**: ``b``
     * **Omittable**: ``False``
 
+Command /RMG/Output/Germanium/StoreSinglePrecisionPosition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Germanium/StoreSinglePrecisionEnergy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
 Command directory path : /RMG/Output/Vertex/
 --------------------------------------------
 
@@ -225,6 +245,8 @@ Commands for controlling output of primary vertices.
 * **Commands**:
     * *StorePrimaryParticleInformation*: ``Store information on primary particle details (not only vertex data).``
     * *SkipPrimaryVertexOutput*: ``Do not store vertex/primary particle data.``
+    * *StoreSinglePrecisionPosition*: ``Use float32 (instead of float64) for position output.``
+    * *StoreSinglePrecisionEnergy*: ``Use float32 (instead of float64) for energy output.``
 
 Command /RMG/Output/Vertex/StorePrimaryParticleInformation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -244,6 +266,24 @@ Do not store vertex/primary particle data.
     * **Parameter type**: ``b``
     * **Omittable**: ``False``
 
+Command /RMG/Output/Vertex/StoreSinglePrecisionPosition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Vertex/StoreSinglePrecisionEnergy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
 Command directory path : /RMG/Output/Scintillator/
 --------------------------------------------------
 
@@ -253,6 +293,8 @@ Commands for controlling output from hits in scintillator detectors.
     * *SetEdepCutLow*: ``Set a lower energy cut that has to be met for this event to be stored.``
     * *SetEdepCutHigh*: ``Set an upper energy cut that has to be met for this event to be stored.``
     * *AddDetectorForEdepThreshold*: ``Take this detector into account for the filtering by /EdepThreshold.``
+    * *StoreSinglePrecisionPosition*: ``Use float32 (instead of float64) for position output.``
+    * *StoreSinglePrecisionEnergy*: ``Use float32 (instead of float64) for energy output.``
 
 Command /RMG/Output/Scintillator/SetEdepCutLow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -289,6 +331,24 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter**: ``det_uid``
     * **Parameter type**: ``i``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Scintillator/StoreSinglePrecisionPosition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
+    * **Omittable**: ``False``
+
+Command /RMG/Output/Scintillator/StoreSinglePrecisionEnergy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter**: ``value``
+    * **Parameter type**: ``b``
     * **Omittable**: ``False``
 
 Command directory path : /RMG/Output/IsotopeFilter/

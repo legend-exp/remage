@@ -62,6 +62,17 @@ class RMGVOutputScheme {
       throw new std::logic_error("GetNtuplenameFlat not implemented");
     }
 
+    inline void CreateNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, std::string name,
+        bool use_float) {
+      if (use_float) ana_man->CreateNtupleFColumn(nt, name);
+      else ana_man->CreateNtupleDColumn(nt, name);
+    }
+    inline void FillNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, int col, double val,
+        bool use_float) {
+      if (use_float) ana_man->FillNtupleFColumn(nt, col, val);
+      else ana_man->FillNtupleDColumn(nt, col, val);
+    }
+
     bool fNtuplePerDetector = true;
 };
 

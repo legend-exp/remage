@@ -64,11 +64,11 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
-    ana_man->CreateNtupleFColumn(id, "edep_in_keV");
+    CreateNtupleFOrDColumn(ana_man, id, "edep_in_keV", fStoreSinglePrecisionEnergy);
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
-    ana_man->CreateNtupleFColumn(id, "xloc_in_m");
-    ana_man->CreateNtupleFColumn(id, "yloc_in_m");
-    ana_man->CreateNtupleFColumn(id, "zloc_in_m");
+    CreateNtupleFOrDColumn(ana_man, id, "xloc_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "yloc_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "zloc_in_m", fStoreSinglePrecisionPosition);
 
     ana_man->FinishNtuple(id);
   }
@@ -150,11 +150,15 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
+          fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position.getX() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position.getY() / u::m);
-      ana_man->FillNtupleFColumn(ntupleid, col_id++, hit->global_position.getZ() / u::m);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getX() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getY() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getZ() / u::m,
+          fStoreSinglePrecisionPosition);
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
@@ -213,6 +217,14 @@ void RMGGermaniumOutputScheme::DefineCommands() {
                    "detectors occurred in the same event.")
       .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
                    "germanium edep filter does not force the photons to be simulated.")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
+      .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
+      .SetGuidance("Use float32 (instead of float64) for energy output.")
       .SetStates(G4State_Idle);
 }
 
