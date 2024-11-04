@@ -48,6 +48,8 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     void DefineCommands();
 
     bool fStorePrimaryParticleInformation = false;
+    bool fStoreSinglePrecisionEnergy = false;
+    bool fStoreSinglePrecisionPosition = false;
     bool fSkipPrimaryVertexOutput = false;
 };
 

@@ -58,6 +58,9 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     std::set<int> fEdepCutDetectors;
 
     bool fDiscardPhotonsIfNoGermaniumEdep = false;
+
+    bool fStoreSinglePrecisionEnergy = false;
+    bool fStoreSinglePrecisionPosition = false;
 };
 
 #endif
