@@ -52,7 +52,7 @@ void RMGScintillatorDetectorHit::Draw() {
     G4Circle circle(this->global_position_pre);
     circle.SetScreenSize(5);
     circle.SetFillStyle(G4Circle::filled);
-    circle.SetVisAttributes(G4VisAttributes(G4Colour(1, 0, 0)));
+    circle.SetVisAttributes(G4VisAttributes(G4Colour(0, 0, 1)));
     vis_man->Draw(circle);
   }
 }
