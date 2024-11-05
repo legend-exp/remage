@@ -8,18 +8,18 @@ Pre-built binaries
 
 The recommended and fastest way of running |remage| is through pre-built
 software containers. Stable releases are regularly made available `on Docker
-Hub <https://hub.docker.com/repository/docker/gipert/remage>`_. To obtain and
+Hub <https://hub.docker.com/repository/docker/legend-exp/remage>`_. To obtain and
 run the latest just do:
 
 .. code-block:: console
 
-   $ docker run gipert/remage --help # just prints a help message
+   $ docker run legend-exp/remage:latest --help # just prints a help message
 
 If you prefer `Apptainer <https://apptainer.org/>`_, you can easily generate an image locally:
 
 .. code-block:: console
 
-  $ apptainer build remage_latest.sif docker://gipert/remage:latest
+  $ apptainer build remage_latest.sif docker://legend-exp/remage:latest
   $ apptainer run remage_latest.sif --help
 
 If containers do not work for you, see the next section to learn how to build
