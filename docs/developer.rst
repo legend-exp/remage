@@ -96,6 +96,18 @@ following:
   other) must be provided as separate pages in ``docs/`` and linked in the
   table of contents.
 
+To generate documentation locally, run
+
+.. code-block:: console
+
+  $ cd remage/build/
+  $ cmake .. -DRMG_BUILD_DOCS=ON
+  $ make sphinx
+
+You'll need a Doxygen installation and Python software dependencies specified
+in ``docs/environment.yml``. The generated documentation can be viewed by
+pointing your browser to ``docs/_build/index.html``.
+
 Writing documentation
 ^^^^^^^^^^^^^^^^^^^^^
 
