@@ -5,17 +5,19 @@ FROM gipert/remage-base:$REMAGE_BASE_FLAVOR
 LABEL maintainer.name="Luigi Pertoldi"
 LABEL maintainer.email="gipert@pm.me"
 
-ARG REMAGE_VERSION="v0.2.0"
+ARG REMAGE_VERSION="dev"
 ARG CMAKE_BUILD_TYPE="Release"
 
 USER root
 WORKDIR /root
 
 RUN mkdir -p src build /opt/remage && \
-    if [ "${REMAGE_VERSION}" = "git" ]; then \
+    if [ "${REMAGE_VERSION}" = "dev" ]; then \
+        rm -rf src && \
         git clone "https://github.com/legend-exp/remage" src; \
     else \
-        wget -q -O- "https://github.com/legend-exp/remage/archive/${REMAGE_VERSION}.tar.gz" | tar --strip-components 1 -C src --strip=1 -x -z; \
+        wget -q -O- "https://github.com/legend-exp/remage/archive/${REMAGE_VERSION}.tar.gz" \
+            | tar --strip-components 1 -C src --strip=1 -x -z; \
     fi && \
     cd build && \
     cmake \
