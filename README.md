@@ -23,10 +23,6 @@ setup (supported specification languages are C++, GDML and more). The user can
 then benefit from a predefined set of tools to perform common actions (physics
 generators, standard output classes, etc).
 
-> [!WARNING]
-> *remage* is still under heavy development. Users are advised to use a tagged
-> release for any workloads unrelated to remage development, if possible.
-
 ### Main features
 
 * Support for modern [Geant4](https://geant4.web.cern.ch), including
