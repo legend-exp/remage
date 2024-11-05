@@ -34,9 +34,13 @@ set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/_build)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
-set(SPHINX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/index.rst)
+file(
+  GLOB SPHINX_SOURCES
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  *.rst *.md)
+
 foreach(_file ${SPHINX_SOURCES})
-  configure_file(${_file} ${SPHINX_SOURCE} COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE} COPYONLY)
 endforeach()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
