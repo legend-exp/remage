@@ -1,11 +1,11 @@
 import sys
 import os
 import subprocess
-import setuptools_scm
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
+    import setuptools_scm
     sys.path.append(os.path.abspath("extensions"))
 else:
     sys.path.append("@PROJECT_SOURCE_DIR@/docs/extensions")
