@@ -15,4 +15,5 @@ dependencies:
   - setuptools-scm
   - sphinx
   - sphinx-copybutton
+  - sphinx-togglebutton
   - sphinx-inline-tabs

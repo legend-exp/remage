@@ -20,6 +20,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.graphviz",
     "sphinx_copybutton",
+    "sphinx_togglebutton",
     "sphinx_inline_tabs",
     "exhale",
     "breathe",
