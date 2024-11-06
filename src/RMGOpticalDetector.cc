@@ -22,6 +22,7 @@
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
+#include "G4VVisManager.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
@@ -37,6 +38,23 @@ G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) con
 void RMGOpticalDetectorHit::Print() {
   RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Wavelength: {} nm", this->detector_uid,
       this->photon_wavelength / CLHEP::nm);
+}
+
+void RMGOpticalDetectorHit::Draw() {
+
+  const auto vis_man = G4VVisManager::GetConcreteInstance();
+  if (!vis_man) return;
+
+  auto lv_va = detector_touchable->GetVolume()->GetLogicalVolume()->GetVisAttributes();
+  G4VisAttributes va;
+  if (lv_va) va = *lv_va;
+  va.SetColour(G4Colour(0, 0, 1));
+  va.SetForceSolid(true);
+
+  auto pos = detector_touchable->GetTranslation(detector_touchable->GetHistoryDepth());
+  auto rot = detector_touchable->GetRotation(detector_touchable->GetHistoryDepth());
+
+  vis_man->Draw(*detector_touchable->GetVolume(), va, G4Transform3D(*rot, pos));
 }
 
 RMGOpticalDetector::RMGOpticalDetector() : G4VSensitiveDetector("Optical") {
@@ -76,8 +94,9 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   // PostStepPoint belongs logically to the next volume. As we write down the
   // hit when the photon reaches the boundary we need to check the
   // PostStepPoint here
-  const auto pv_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-  const auto pv_copynr = step->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber();
+  auto touchable = step->GetPostStepPoint()->GetTouchableHandle();
+  const auto pv_name = touchable->GetVolume()->GetName();
+  const auto pv_copynr = touchable->GetCopyNumber();
 
   // check if physical volume is registered as optical detector
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
@@ -101,6 +120,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 
   // initialize hit object for uid, if not already there
   auto* hit = new RMGOpticalDetectorHit();
+  hit->detector_touchable = touchable;
   hit->detector_uid = det_uid;
   hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
   hit->global_time = step->GetPostStepPoint()->GetGlobalTime();
