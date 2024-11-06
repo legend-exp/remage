@@ -81,7 +81,7 @@ void RMGSteppingAction::DefineCommands() {
       .SetGuidance("Set to -1 to disable this feature.")
       .SetParameterName("max_lifetime", false)
       .SetDefaultValue("-1")
-      .SetStates(G4State_PreInit);
+      .SetStates(G4State_Idle);
 }
 
 
