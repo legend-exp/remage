@@ -41,12 +41,14 @@ leveldiff = 0
 
 for line in inlines:
     if re.match(r"Command directory path : /RMG/", line):
+        line = line.removeprefix("Command directory path : ")
         remove_whitespace_lines_end(outlines)
         outlines.extend(["", line, "-" * len(line), ""])
         in_cmdblock = True
         lastlevel = -1
         leveldiff = 0
     elif re.match(r"Command /RMG/", line):
+        line = line.removeprefix("Command ")
         remove_whitespace_lines_end(outlines)
         outlines.extend(["", line, "^" * len(line), ""])
         in_cmdblock = True
@@ -82,12 +84,12 @@ for line in inlines:
         if m:
             g = list(m.groups())
             sep = g[1].strip()
-            fmt = "**" if sep == ":" else "*"
+            fmt = "**" if sep == ":" else "``"
             if len(g) > 1:
                 g[0] = f"{fmt}{g[0].strip()}{fmt}"
-                g[1] = ":"
+                g[1] = " –"
             if len(g) > 2 and g[2] != "":
-                g[2] = f" ``{g[2].strip()}``"
+                g[2] = f" {g[2].strip()}"
             stripped_line = "".join(g)
         outlines.append("    " * indent + "* " + stripped_line)
         lastlevel = indent
