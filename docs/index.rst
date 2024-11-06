@@ -10,7 +10,7 @@ The installation process is documented in :doc:`install`.
 
 .. warning::
    A proper user guide is not available yet. In the meanwhile, users can have a
-   look at the `examples
+   look at the :doc:`tutorial` or the provided `examples
    <https://github.com/legend-exp/remage/tree/main/examples>`_.
 
 In the simplest application, the user can simulate in an existing GDML geometry
