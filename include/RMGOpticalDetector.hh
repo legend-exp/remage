@@ -21,6 +21,7 @@
 
 #include "G4Allocator.hh"
 #include "G4THitsCollection.hh"
+#include "G4TouchableHandle.hh"
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
@@ -42,9 +43,9 @@ class RMGOpticalDetectorHit : public G4VHit {
     inline void operator delete(void*);
 
     void Print() override;
-    // TODO
-    // void Draw() override;
+    void Draw() override;
 
+    G4TouchableHandle detector_touchable; // for Draw()
     int detector_uid = -1;
     float photon_wavelength = 0.;
     double global_time = -1;
