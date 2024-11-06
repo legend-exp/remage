@@ -109,19 +109,19 @@ viewer.view()
 
 ![Geometry visualization](img/tutorial-pyg4-view.jpg)
 
-By following instructions in the <project:./install.rst> section, you should
+By following instructions in the [installation](./install.rst) section, you should
 have access to the `remage` executable. We are now ready to simulate some
 particle physics with it.
 
 Like any other Geant4-based application, we need to configure the simulation
 with a macro file. Standard Geant4 commands as well as custom commands (see the
-<project:./rmg-commands.rst>) are available.
+[command interface](<./rmg-commands.rst>)) are available.
 
 At the beginning of the file, we have to register the "sensitive detectors" (in
 our simple case, the two HPGes and the LAr). *remage* offers several types of
 predefined detectors, targeting different physical quantities of the particles
 that interact with them. HPGes are of type `Germanium`, while the LAr is of
-type `scintillator`. Their difference in terms of simulation output will be
+type `Scintillator`. Their difference in terms of simulation output will be
 clear later, while inspecting it. As per specification of the
 `/RMG/Geometry/RegisterDetector` command, we need to provide a unique numeric
 identifier that will be used to label the detector data in the simulation
@@ -189,6 +189,7 @@ With Apptainer, additional tweaks are required in order to allow for graphics to
 $ apptainer run \
     --env DISPLAY=$DISPLAY \
     --env XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
+    --env XAUTHORITY=$XAUTHORITY \
     -B $XDG_RUNTIME_DIR \
     path/to/remage_latest.sif --interactive --gdml-file geometry.gdml
 ```
