@@ -47,6 +47,8 @@ class RMGConvertLH5 {
     static int iter_children(long int, const char*, const H5L_info_t*, void*);
     static std::vector<std::string> GetChildren(H5::Group&);
 
+    bool ExistsByType(H5::H5Location&, std::string, H5O_type_t);
+
     void SetStringAttribute(H5::H5Object&, std::string, std::string);
 
     std::pair<std::string, std::vector<std::string>> ReadNullSepDataset(H5::Group&, std::string,
