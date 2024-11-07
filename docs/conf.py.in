@@ -38,6 +38,8 @@ exhale_args = {
 
 breathe_projects = {}
 
+myst_enable_extensions = ["colon_fence"]
+
 if on_rtd:
     # assume build has been prepared in .readthedocs.yml
     breathe_projects["remage"] = "_doxygen/xml"

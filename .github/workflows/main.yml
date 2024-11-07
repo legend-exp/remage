@@ -54,8 +54,8 @@ jobs:
       if: ${{ matrix.container_version != 'slim' }}
       run: |
         cd build
-        cp ../docs/rmg-commands.rst ../docs/rmg-commands.rst.bak
+        cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
         make remage-doc-dump
-        diff ../docs/rmg-commands.rst ../docs/rmg-commands.rst.bak
+        diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
 
 # vim: expandtab tabstop=2 shiftwidth=2
