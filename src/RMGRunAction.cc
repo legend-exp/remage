@@ -68,7 +68,7 @@ void RMGRunAction::SetupAnalysisManager() {
   auto ana_man = G4AnalysisManager::Instance();
 
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
-  ana_man->SetNtupleDirectoryName("hit");
+  ana_man->SetNtupleDirectoryName(rmg_man->GetOutputNtupleDirectory());
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
@@ -265,8 +265,9 @@ void RMGRunAction::PostprocessOutputFile() const {
   }
 
 #if RMG_HAS_HDF5
+  auto nt_dir = RMGManager::Instance()->GetOutputNtupleDirectory();
   // note: do not do a dry-run here, as it takes a lot of memory.
-  if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), false)) {
+  if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), nt_dir, false)) {
     RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(),
         " to LH5 failed. Data is potentially corrupted.");
     return;
