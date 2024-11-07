@@ -152,7 +152,7 @@ endif()
 add_custom_target(
   remage-doc-dump
   COMMAND remage-doc-dump-cli --manual ${CMAKE_BINARY_DIR}/rmg-manual.txt
-  COMMAND ${_root}/docs/g4manual2rst.py ${CMAKE_BINARY_DIR}/rmg-manual.txt
+  COMMAND ${_root}/docs/g4manual2md.py ${CMAKE_BINARY_DIR}/rmg-manual.txt
   WORKING_DIRECTORY ${_root}/docs)
 
 # executable for converting remage output HDF5 with ntuples to LH5 tables
