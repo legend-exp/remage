@@ -228,7 +228,7 @@ $ remage --interactive --gdml-files geometry.gdml -- vis-gammas.mac
   _ __ ___ _ __ ___   __ _  __ _  ___
  | '__/ _ \ '_ ` _ \ / _` |/ _` |/ _ \
  | | |  __/ | | | | | (_| | (_| |  __/
- |_|  \___|_| |_| |_|\__,_|\__, |\___| v0.1.0
+ |_|  \___|_| |_| |_|\__,_|\__, |\___| v0.3.0
                            |___/
 
 [Summary -> Realm set to DoubleBetaDecay
@@ -315,7 +315,7 @@ data layout with the `lh5ls` utility:
 ```console
 $ lh5ls output_t0.lh5
 /
-└── hit · HDF5 group
+└── stp · struct{det001,det002,det003,vertices}
     ├── det001 · table{evtid,particle,edep,time,xloc,yloc,zloc}
     │   ├── edep · array<1>{real} ── {'units': 'keV'}
     │   ├── evtid · array<1>{real}
@@ -376,7 +376,7 @@ plt.rcParams["figure.figsize"] = (10, 3)
 def plot_edep(detid):
     # read the data from detector "detid". pass all 8 files to concatenate them
     # in addition, view it as and Awkward Array
-    data = lh5.read_as(f"hit/{detid}", glob.glob("output_t*.lh5"), "ak")
+    data = lh5.read_as(f"stp/{detid}", glob.glob("output_t*.lh5"), "ak")
 
     # with awkward arrays, we can easily "build events" by grouping by the event identifier
     evt = ak.unflatten(data, ak.run_lengths(data.evtid))
@@ -398,7 +398,7 @@ shoulder. We can also plot the interaction points:
 
 ```python
 def plot_hits(detid):
-    data = lh5.read_as(f"hit/{detid}", glob.glob("output_t*.lh5"), "ak")[:20_000]
+    data = lh5.read_as(f"stp/{detid}", glob.glob("output_t*.lh5"), "ak")[:20_000]
     plt.scatter(data.xloc, data.yloc, marker="o", s=1, label=detid)
 
 plot_hits("det001")
