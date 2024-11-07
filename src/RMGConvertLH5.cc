@@ -256,6 +256,11 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     auto det_group = hit_group.openGroup(ntuple);
     ntuple_success &= ConvertNTupleToTable(det_group);
   }
+  // make the root HDF5 group an LH5 struct.
+  if (!hit_group.attrExists("datatype")) {
+    SetStringAttribute(hit_group, "datatype",
+        "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}");
+  }
 
   if (hit_group.attrExists("type")) hit_group.removeAttr("type");
 
