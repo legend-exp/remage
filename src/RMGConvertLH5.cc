@@ -34,6 +34,10 @@ std::vector<std::string> RMGConvertLH5::GetChildren(H5::Group& group) {
   return children;
 }
 
+bool RMGConvertLH5::ExistsByType(H5::H5Location& loc, std::string name, H5O_type_t type) {
+  return loc.nameExists(name) && loc.childObjType(name) == type;
+}
+
 void RMGConvertLH5::SetStringAttribute(H5::H5Object& obj, std::string attr_name,
     std::string attr_value) {
   H5::StrType att_dtype(0, H5T_VARIABLE);
@@ -96,9 +100,9 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   const std::string ntuple_log_prefix = "ntuple " + ntuple_name + " - ";
   LH5Log(RMGLog::detail, ntuple_log_prefix, "visiting");
 
-  if (!det_group.exists("names") || det_group.childObjType("names") != H5O_TYPE_DATASET ||
-      !det_group.exists("forms") || det_group.childObjType("forms") != H5O_TYPE_DATASET ||
-      !det_group.exists("columns") || det_group.childObjType("columns") != H5O_TYPE_DATASET) {
+  if (!ExistsByType(det_group, "names", H5O_TYPE_DATASET) ||
+      !ExistsByType(det_group, "forms", H5O_TYPE_DATASET) ||
+      !ExistsByType(det_group, "columns", H5O_TYPE_DATASET)) {
     LH5Log(RMGLog::error, ntuple_log_prefix, "missing names, forms or columns dataset");
     return false;
   }
@@ -232,8 +236,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
 
   // check that this file has been written by geant4/remage, and that we did not run this upgrade
   // script before (it will delete the header group below).
-  if (!hfile.exists("header") || hfile.childObjType("header") != H5O_TYPE_GROUP ||
-      !hfile.exists("hit") || hfile.childObjType("hit") != H5O_TYPE_GROUP) {
+  if (!ExistsByType(hfile, "header", H5O_TYPE_GROUP) || !ExistsByType(hfile, "hit", H5O_TYPE_GROUP)) {
     LH5Log(RMGLog::error,
         "not a remage HDF5 output file or already converted (missing header or hit groups)?");
     return false;
@@ -257,8 +260,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   if (hit_group.attrExists("type")) hit_group.removeAttr("type");
 
   // check other things that geant4 might write into the file, and delete them if they are empty.
-  if (hfile.exists("default_histograms") &&
-      hfile.childObjType("default_histograms") == H5O_TYPE_GROUP) {
+  if (ExistsByType(hfile, "default_histograms", H5O_TYPE_GROUP)) {
     auto histo_group = hfile.openGroup("default_histograms");
     auto histograms = GetChildren(histo_group);
     if (histograms.empty()) {
