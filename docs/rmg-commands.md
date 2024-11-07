@@ -55,7 +55,7 @@ How many processed events before progress information is displayed
 Commands for controlling application logging
 
 
-### Sub-directories
+### Commands
 
 * `LogLevel` – Set verbosity level of application log
 
@@ -73,7 +73,7 @@ Set verbosity level of application log
 Commands for controlling randomization settings
 
 
-### Sub-directories
+### Commands
 
 * `RandomEngine` – Select the random engine (CLHEP)
 * `Seed` – Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)
@@ -123,6 +123,9 @@ Commands for controlling the simulation output
 * `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
 * `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
+
+### Commands
+
 * `FileName` – Set output file name for object persistency
 * `NtuplePerDetector` – Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
 * `ActivateOutputScheme` – Activates the output scheme that had been registered under the given name.
@@ -156,7 +159,7 @@ Activates the output scheme that had been registered under the given name.
 Commands for controlling output from hits in germanium detectors.
 
 
-### Sub-directories
+### Commands
 
 * `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
@@ -232,7 +235,7 @@ Use float32 (instead of float64) for energy output.
 Commands for controlling output of primary vertices.
 
 
-### Sub-directories
+### Commands
 
 * `StorePrimaryParticleInformation` – Store information on primary particle details (not only vertex data).
 * `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data.
@@ -276,7 +279,7 @@ Use float32 (instead of float64) for energy output.
 Commands for controlling output from hits in scintillator detectors.
 
 
-### Sub-directories
+### Commands
 
 * `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
@@ -339,7 +342,7 @@ Use float32 (instead of float64) for energy output.
 Commands for filtering event out by created isotopes.
 
 
-### Sub-directories
+### Commands
 
 * `AddIsotope` – Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
 * `DiscardPhotonsIfIsotopeNotProduced` – Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
@@ -375,6 +378,9 @@ Commands for controlling physics processes
 ### Sub-directories
 
 * `/RMG/Processes/Stepping/` – Commands for controlling physics processes
+
+### Commands
+
 * `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
@@ -480,7 +486,7 @@ Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 Commands for controlling physics processes
 
 
-### Sub-directories
+### Commands
 
 * `DaughterNucleusMaxLifetime` – Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
 
@@ -507,7 +513,7 @@ Set to -1 to disable this feature.
 Commands for controlling geometry definitions
 
 
-### Sub-directories
+### Commands
 
 * `GDMLDisableOverlapCheck` – Disable the automatic overlap check after loading a GDML file
 * `GDMLOverlapCheckNumPoints` – Change the number of points sampled for overlap checks
@@ -553,25 +559,25 @@ Print list of defined physical volumes
 register a sensitive detector
 
 * **Parameter** – `type`
-* Detector type
+    – Detector type
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `Germanium Optical Scintillator`
 * **Parameter** – `pv_name`
-* Detector physical volume
+    – Detector physical volume
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Parameter** – `uid`
-* unique detector id
+    – unique detector id
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Parameter** – `copy_nr`
-* copy nr (default 0)
+    – copy nr (default 0)
   * **Parameter type** – `i`
   * **Omittable** – `True`
   * **Default value** – `0`
 * **Parameter** – `allow_id_reuse`
-* append this volume to a previously allocated unique detector id, instead of erroring out.
+    – append this volume to a previously allocated unique detector id, instead of erroring out.
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
@@ -586,6 +592,9 @@ Commands for controlling generators
 * `/RMG/Generator/MUSUNCosmicMuons/` – Commands for controlling the MUSUN µ generator
 * `/RMG/Generator/CosmicMuons/` – Commands for controlling the µ generator
 * `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
+
+### Commands
+
 * `Confine` – Select primary confinement strategy
 * `Select` – Select event generator
 
@@ -612,7 +621,7 @@ Select event generator
 Commands for controlling the MUSUN µ generator
 
 
-### Sub-directories
+### Commands
 
 * `SetMUSUNFile` – Set the MUSUN input file
 
@@ -629,7 +638,7 @@ Set the MUSUN input file
 Commands for controlling the µ generator
 
 
-### Sub-directories
+### Commands
 
 * `SkyShape` – Geometrical shape of the µ generation surface
 * `SkyPlaneSize` – Length of the side of the sky, if it has a planar shape
@@ -831,6 +840,9 @@ Commands for controlling primary confinement
 
 * `/RMG/Generator/Confinement/Physical/` – Commands for setting physical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/` – Commands for setting geometrical volumes up for primary confinement
+
+### Commands
+
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
 * `SamplingMode` – Select sampling mode for volume confinement
@@ -880,7 +892,7 @@ If true (or omitted argument), perform a containment check even after sampling f
 Commands for setting physical volumes up for primary confinement
 
 
-### Sub-directories
+### Commands
 
 * `AddVolume` – Add physical volume(s) to sample primaries from.
 
@@ -905,6 +917,9 @@ Commands for setting geometrical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/Sphere/` – Commands for setting geometrical dimensions of a sampling sphere
 * `/RMG/Generator/Confinement/Geometrical/Cylinder/` – Commands for setting geometrical dimensions of a sampling cylinder
 * `/RMG/Generator/Confinement/Geometrical/Box/` – Commands for setting geometrical dimensions of a sampling box
+
+### Commands
+
 * `AddSolid` – Add geometrical solid to sample primaries from
 * `CenterPositionX` – Set center position (X coordinate)
 * `CenterPositionY` – Set center position (Y coordinate)
@@ -963,7 +978,7 @@ Set center position (Z coordinate)
 Commands for setting geometrical dimensions of a sampling sphere
 
 
-### Sub-directories
+### Commands
 
 * `InnerRadius` – Set inner radius
 * `OuterRadius` – Set outer radius
@@ -1001,7 +1016,7 @@ Set outer radius
 Commands for setting geometrical dimensions of a sampling cylinder
 
 
-### Sub-directories
+### Commands
 
 * `InnerRadius` – Set inner radius
 * `OuterRadius` – Set outer radius
@@ -1082,7 +1097,7 @@ Set spanning angle
 Commands for setting geometrical dimensions of a sampling box
 
 
-### Sub-directories
+### Commands
 
 * `XLength` – Set X length
 * `YLength` – Set Y length
@@ -1135,7 +1150,7 @@ Set Z length
 Control Peters gamma cascade model
 
 
-### Sub-directories
+### Commands
 
 * `SetGammaCascadeRandomStartLocation` – Set the whether the start location in the gamma cascade file is random or not
 * `SetGammaCascadeFile` – Set a gamma cascade file for neutron capture on a specified isotope
@@ -1159,15 +1174,15 @@ Set the whether the start location in the gamma cascade file is random or not
 Set a gamma cascade file for neutron capture on a specified isotope
 
 * **Parameter** – `Z`
-* Z of isotope
+    – Z of isotope
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Parameter** – `A`
-* A of isotope
+    – A of isotope
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Parameter** – `file`
-* /path/to/file of gamma cascade
+    – /path/to/file of gamma cascade
   * **Parameter type** – `s`
   * **Omittable** – `False`
 
@@ -1183,7 +1198,7 @@ Set a gamma cascade file for neutron capture on a specified isotope
 Commands for controlling reading event vertex positions from file
 
 
-### Sub-directories
+### Commands
 
 * `FileName` – Set name of the file containing vertex positions. See the documentation for a specification of the format.
 
