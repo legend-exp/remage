@@ -383,6 +383,12 @@ void RMGManager::DefineCommands() {
       .SetGuidance("Activates the output scheme that had been registered under the given name.")
       .SetParameterName("tree_per_det", false)
       .SetStates(G4State_PreInit, G4State_Idle);
+
+  fOutputMessenger->DeclareMethod("OutputNtupleDirectory", &RMGManager::SetOutputNtupleDirectory)
+      .SetGuidance("Change the default output directory/group for ntuples in output files.")
+      .SetGuidance("note: This setting is not respected by all output formats.")
+      .SetParameterName("ntuple_directory", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

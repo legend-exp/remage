@@ -62,6 +62,7 @@ class RMGManager {
     }
     [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
     inline const std::string& GetOutputFileName() { return fOutputFile; }
+    inline const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
     [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
       return fOutputNtuplePerDetector;
     }
@@ -96,6 +97,7 @@ class RMGManager {
     void SetLogLevel(std::string level);
 
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
+    inline void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
     inline int RegisterNtuple(int det_uid, int ntuple_id) {
       auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
       if (!res.second)
@@ -149,6 +151,7 @@ class RMGManager {
 
     std::string fOutputFile = "detector-hits.root";
     bool fOutputNtuplePerDetector = true;
+    std::string fOutputNtupleDirectory = "stp";
     // track internal id of detector NTuples
     static G4ThreadLocal std::map<int, int> fNtupleIDs;
 

@@ -129,6 +129,7 @@ Commands for controlling the simulation output
 * `FileName` – Set output file name for object persistency
 * `NtuplePerDetector` – Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
 * `ActivateOutputScheme` – Activates the output scheme that had been registered under the given name.
+* `OutputNtupleDirectory` – Change the default output directory/group for ntuples in output files.
 
 ### `/RMG/Output/FileName`
 
@@ -151,6 +152,18 @@ Create a ntuple for each sensitive detector to store hits. Otherwise, store all 
 Activates the output scheme that had been registered under the given name.
 
 * **Parameter** – `tree_per_det`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+
+### `/RMG/Output/OutputNtupleDirectory`
+
+Change the default output directory/group for ntuples in output files.
+
+:::{note}
+This setting is not respected by all output formats.
+:::
+
+* **Parameter** – `ntuple_directory`
   * **Parameter type** – `s`
   * **Omittable** – `False`
 

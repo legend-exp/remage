@@ -30,14 +30,16 @@ class RMGConvertLH5 {
 
   public:
 
-    static bool ConvertToLH5(std::string, bool, bool part_of_batch = false);
+    static bool ConvertToLH5(std::string, std::string, bool, bool part_of_batch = false);
 
     inline static bool fIsStandalone = false;
 
   private:
 
-    inline RMGConvertLH5(std::string filename, bool dry_run, bool part_of_batch)
-        : fHdf5FileName(filename), fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
+    inline RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run,
+        bool part_of_batch)
+        : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fDryRun(dry_run),
+          fIsPartOfBatch(part_of_batch) {};
 
     bool ConvertToLH5Internal();
 
@@ -68,6 +70,7 @@ class RMGConvertLH5 {
     }
 
     std::string fHdf5FileName;
+    std::string fNtupleGroupName;
     bool fDryRun;
     bool fIsPartOfBatch;
 };
