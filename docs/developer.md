@@ -18,7 +18,7 @@ $ git clone git@github.com:yourusername/remage.git
 ## Installing dependencies
 
 ```{eval-rst}
-.. include:: _dependencies.rst
+.. include:: _dependencies.md
 ```
 
 ## Building
