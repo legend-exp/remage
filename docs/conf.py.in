@@ -39,7 +39,7 @@ exhale_args = {
 
 breathe_projects = {}
 
-myst_enable_extensions = ["colon_fence"]
+myst_enable_extensions = ["colon_fence", "substitution"]
 
 if on_rtd:
     # assume build has been prepared in .readthedocs.yml
