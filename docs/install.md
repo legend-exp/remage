@@ -26,8 +26,7 @@ and install from source.
 In preparation for the actual build, users are required to obtain some
 dependencies.
 
-```{eval-rst}
-.. include:: _dependencies.rst
+```{include} _dependencies.md
 ```
 
 ### Building

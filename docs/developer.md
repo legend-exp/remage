@@ -17,8 +17,7 @@ $ git clone git@github.com:yourusername/remage.git
 
 ## Installing dependencies
 
-```{eval-rst}
-.. include:: _dependencies.md
+```{include} _dependencies.md
 ```
 
 ## Building
@@ -53,25 +52,46 @@ $ pre-commit install          # install a Git pre-commit hook (optional, but str
 
 ## Testing
 
-- The *remage* test suite is available below `tests/`. We use
-  [ctest](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html)
-  to run tests and analyze their output.
+The *remage* test suite is available below `tests/`. We use
+[ctest](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html)
+to run tests and analyze their output.
 
-- Tests are automatically run for every push event and pull request to the
-  remote Git repository on a remote server (currently handled by GitHub
-  actions). All pull request typically have to pass all tests before being
-  merged. Running the test suite is simple:
+Tests are automatically run for every push event and pull request to the
+remote Git repository on a remote server (currently handled by GitHub
+actions). All pull request typically have to pass all tests before being
+merged. Running the test suite locally is simple:
 
-  ```console
-  $ cd remage/build/
-  $ make
-  $ ctest
-  ```
+```console
+$ cd remage/build/
+$ make
+$ ctest
+```
 
-  :::{note}
-  Some tests are known to be flaky, especially with older Geant4 version
-  branches.
-  :::
+:::{note}
+Some tests are known to be flaky, especially with older Geant4 version
+branches.
+:::
+
+Cheatsheet:
+```console
+$ ctest --print-labels # see all defined test labels
+$ ctest -L vis # run only tests with label "vis"
+$ ctest -R basics-mt/print-volumes.mac # run only this test
+```
+
+`vis` tests are currently not run in CI, since there is no graphical
+environment available. Moreover, they won't be marked as "failed" (but rather
+"skipped") if they fail due to the same reason. In case you want to run them
+locally, make sure there is support for graphics.
+
+If you want to open a fanci UI to check the output of `vis` tests, you may
+achieve it by:
+
+1. `cd` to `test/confinement`
+1. edit `macros/_vis.mac` to make sure you load an interactive UI (e.g. `/vis/open OI`)
+1. edit the macro you are interested in and swap `_init.mac` with `_vis.mac` at
+   the very beginning (after `/control/execute`)
+1. run the visualization with `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
 
 ## Documentation
 
