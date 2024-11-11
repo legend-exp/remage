@@ -113,13 +113,13 @@ viewer.view()
 
 ## Visualizing a simple simulation
 
-By following instructions in the [installation](./install.rst) section, you should
+By following instructions in the [installation](./install) section, you should
 have access to the `remage` executable. We are now ready to simulate some
 particle physics with it.
 
 Like any other Geant4-based application, we need to configure the simulation
 with a macro file. Standard Geant4 commands as well as custom commands (see the
-[command interface](<./rmg-commands.rst>)) are available.
+[command interface](./rmg-commands)) are available.
 
 At the beginning of the file, we can set some global application options, like
 the verbosity. Let's increase it a bit (compared to the default `summary`) to
@@ -426,5 +426,5 @@ aware that a lot of the simulation and the output can be customized:
 - vertex coordinates can be read from an input file
 - the simulation of optical physics can be optimized
 
-Have a look at the [API reference](./api/index.rst) and the [macro command
-reference](./rmg-commands.rst).
+Have a look at the [API reference](./api/index) and the [macro command
+reference](./rmg-commands).
