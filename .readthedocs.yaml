@@ -24,6 +24,7 @@ build:
       - cp -r docs/_doxygen/html/* docs/extra/doxygen
       - cp docs/conf.py.in docs/conf.py
       - git status
+      - git diff
       - python -m setuptools_scm
 
 conda:
