@@ -6,6 +6,7 @@ channels:
 
 dependencies:
   - python=3.10
+  - pip
   - breathe
   - doxygen
   - exhale
