@@ -13,5 +13,7 @@ DOT_PATH = $(DOXYGEN_DOT_PATH)
 
 # Exclude symbols commonly used by libraries.
 EXCLUDE_SYMBOLS = "CLI::*" "CLI" "FMT_*" "_g4rand" "bxdecay0_g4"
-# Exclude CLI utility.
-EXCLUDE = "@DOXYGEN_INPUT_DIR@/src/remage.cc"
+# Exclude CLI utilities.
+EXCLUDE = "@DOXYGEN_INPUT_DIR@/src/remage.cc" \
+          "@DOXYGEN_INPUT_DIR@/src/remage-to-lh5.cc" \
+          "@DOXYGEN_INPUT_DIR@/src/remage-doc-dump.cc"
