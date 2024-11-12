@@ -43,13 +43,13 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   std::set<int> registered_uids;
   std::map<std::string, int> registered_ntuples;
   for (auto&& det : detectors) {
-    if (det.second.type != RMGHardware::kGermanium) continue;
+    if (det.second.type != RMGDetectorType::kGermanium) continue;
 
     // do not register the ntuple twice if two detectors share their uid.
     auto had_uid = registered_uids.emplace(det.second.uid);
     if (!had_uid.second) continue;
 
-    auto ntuple_name = this->GetNtupleName(det.second.uid);
+    auto ntuple_name = this->GetNtupleName(det.second);
     auto ntuple_reg = registered_ntuples.find(ntuple_name);
     if (ntuple_reg != registered_ntuples.end()) {
       // ntuple already exists, but also store the ntuple id for the other uid(s).

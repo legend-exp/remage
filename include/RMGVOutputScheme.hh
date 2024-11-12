@@ -23,6 +23,8 @@
 #include "G4Track.hh"
 #include "G4UserStackingAction.hh"
 
+#include "RMGDetectorMetadata.hh"
+
 #include "fmt/format.h"
 
 class G4Event;
@@ -55,8 +57,11 @@ class RMGVOutputScheme {
 
   protected:
 
-    [[nodiscard]] virtual inline std::string GetNtupleName(int det_uid) const {
-      return fNtuplePerDetector ? fmt::format("det{:03}", det_uid) : GetNtuplenameFlat();
+    [[nodiscard]] virtual inline std::string GetNtupleName(RMGDetectorMetadata det) const {
+      if (fNtuplePerDetector) {
+        return !det.name.empty() ? det.name : fmt::format("det{:03}", det.uid);
+      }
+      return GetNtuplenameFlat();
     }
     [[nodiscard]] virtual inline std::string GetNtuplenameFlat() const {
       throw new std::logic_error("GetNtuplenameFlat not implemented");

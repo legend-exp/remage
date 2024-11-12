@@ -99,7 +99,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGHardware::kScintillator) {
+    if (d_type != RMGDetectorType::kScintillator) {
       RMGLog::OutFormatDev(RMGLog::debug,
           "Volume '{}' (copy nr. {} not registered as scintillator detector", pv_name, pv_copynr);
       return false;

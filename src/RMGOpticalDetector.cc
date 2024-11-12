@@ -102,7 +102,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGHardware::kOptical) {
+    if (d_type != RMGDetectorType::kOptical) {
       RMGLog::OutFormatDev(RMGLog::debug,
           "Volume '{}' (copy nr. {} not registered as optical detector", pv_name, pv_copynr);
       return false;
