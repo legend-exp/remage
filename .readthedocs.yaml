@@ -13,7 +13,7 @@ build:
   tools:
     python: mambaforge-4.10
   jobs:
-    post_checkout:
+    post_checkout: # for setuptools_scm to work correctly.
       - git fetch --unshallow || true
     pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
       - export DOXYGEN_DOT_PATH=$(which dot)
@@ -23,10 +23,8 @@ build:
       - mkdir -p docs/extra/doxygen
       - cp -r docs/_doxygen/html/* docs/extra/doxygen
       - cp docs/conf.py.in docs/conf.py
+      # this is necessary to preserve versions from git tags. I don't know what writes to this file before building. wtf!!
       - git restore docs/environment.yml
-      - git status
-      - git diff
-      - python -m setuptools_scm
 
 conda:
   environment: docs/environment.yml
