@@ -23,6 +23,7 @@ build:
       - mkdir -p docs/extra/doxygen
       - cp -r docs/_doxygen/html/* docs/extra/doxygen
       - cp docs/conf.py.in docs/conf.py
+      - git restore docs/environment.yml
       - git status
       - git diff
       - python -m setuptools_scm
