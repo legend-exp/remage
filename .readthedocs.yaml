@@ -23,6 +23,8 @@ build:
       - mkdir -p docs/extra/doxygen
       - cp -r docs/_doxygen/html/* docs/extra/doxygen
       - cp docs/conf.py.in docs/conf.py
+      - git status
+      - python -m setuptools_scm
 
 conda:
   environment: docs/environment.yml
