@@ -98,7 +98,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGHardware::kGermanium) {
+    if (d_type != RMGDetectorType::kGermanium) {
       RMGLog::OutFormatDev(RMGLog::debug,
           "Volume '{}' (copy nr. {} not registered as germanium detector", pv_name, pv_copynr);
       return false;

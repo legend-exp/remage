@@ -26,7 +26,7 @@ RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
   fRegisterCmd->SetGuidance("register a sensitive detector");
 
   auto p_type = new G4UIparameter("type", 's', false);
-  p_type->SetParameterCandidates(RMGTools::GetCandidates<RMGHardware::DetectorType>().c_str());
+  p_type->SetParameterCandidates(RMGTools::GetCandidates<RMGDetectorType>().c_str());
   p_type->SetGuidance("Detector type");
   fRegisterCmd->SetParameter(p_type);
 
@@ -62,7 +62,7 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   G4Tokenizer next(parameters);
 
   auto type_str = next();
-  auto type = RMGTools::ToEnum<RMGHardware::DetectorType>(std::string(type_str), "detector type");
+  auto type = RMGTools::ToEnum<RMGDetectorType>(std::string(type_str), "detector type");
   auto pv_name = next();
   const int uid = std::stoi(next());
   int copy_nr = 0;

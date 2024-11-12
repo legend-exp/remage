@@ -115,7 +115,7 @@ void RMGHardware::ConstructSDandField() {
   else sd_man->SetVerboseLevel(0);
 
   // map holding a list of sensitive detectors to activate
-  std::map<DetectorType, G4VSensitiveDetector*> active_dets;
+  std::map<RMGDetectorType, G4VSensitiveDetector*> active_dets;
 
   for (const auto& [k, v] : fDetectorMetadata) {
 
@@ -128,21 +128,21 @@ void RMGHardware::ConstructSDandField() {
       G4VSensitiveDetector* obj = nullptr;
       std::shared_ptr<RMGVOutputScheme> output;
       switch (v.type) {
-        case DetectorType::kOptical:
+        case RMGDetectorType::kOptical:
           obj = new RMGOpticalDetector();
           output = std::make_shared<RMGOpticalOutputScheme>();
           break;
-        case DetectorType::kGermanium:
+        case RMGDetectorType::kGermanium:
           obj = new RMGGermaniumDetector();
           output = std::make_shared<RMGGermaniumOutputScheme>();
           break;
-        case DetectorType::kScintillator:
+        case RMGDetectorType::kScintillator:
           obj = new RMGScintillatorDetector();
           output = std::make_shared<RMGScintillatorOutputScheme>();
           break;
         default:
           RMGLog::OutDev(RMGLog::fatal, "No behaviour for sensitive detector type '",
-              magic_enum::enum_name<DetectorType>(v.type), "' implemented (implement me)");
+              magic_enum::enum_name<RMGDetectorType>(v.type), "' implemented (implement me)");
       }
       sd_man->AddNewDetector(obj);
       active_dets.emplace(v.type, obj);
@@ -198,7 +198,7 @@ void RMGHardware::ConstructSDandField() {
   }
 }
 
-void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name, int uid,
+void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_name, int uid,
     int copy_nr, bool allow_uid_reuse) {
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error,
@@ -220,7 +220,7 @@ void RMGHardware::RegisterDetector(DetectorType type, const std::string& pv_name
   fActiveDetectors.insert(type);
 
   // FIXME: can this be done with emplace?
-  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid}});
+  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name}});
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(RMGLog::warning,
         "Physical volume '{}' (copy number {}) has already been registered as detector", pv_name,

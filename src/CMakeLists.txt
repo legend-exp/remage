@@ -4,6 +4,7 @@
 set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
+    ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh

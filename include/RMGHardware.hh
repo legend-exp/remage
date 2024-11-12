@@ -26,6 +26,7 @@
 #include "G4Region.hh"
 #include "G4VUserDetectorConstruction.hh"
 
+#include "RMGDetectorMetadata.hh"
 #include "RMGHardwareMessenger.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGVOutputScheme.hh"
@@ -46,19 +47,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
     G4VPhysicalVolume* Construct() override;
     void ConstructSDandField() override;
 
-    enum DetectorType {
-      kGermanium,
-      kOptical,
-      kScintillator,
-    };
-
-    struct DetectorMetadata {
-        DetectorType type;
-        int uid;
-    };
-
-    void RegisterDetector(DetectorType type, const std::string& pv_name, int uid, int copy_nr = 0,
-        bool allow_uid_reuse = false);
+    void RegisterDetector(RMGDetectorType type, const std::string& pv_name, int uid,
+        int copy_nr = 0, bool allow_uid_reuse = false);
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
     inline const auto& GetDetectorMetadata(const std::pair<std::string, int>& det) {
       return fDetectorMetadata.at(det);
@@ -84,8 +74,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
     std::map<std::string, double> fPhysVolStepLimits;
 
     // one element for each sensitive detector physical volume
-    std::map<std::pair<std::string, int>, DetectorMetadata> fDetectorMetadata;
-    std::set<DetectorType> fActiveDetectors;
+    std::map<std::pair<std::string, int>, RMGDetectorMetadata> fDetectorMetadata;
+    std::set<RMGDetectorType> fActiveDetectors;
     static G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
     static G4ThreadLocal bool fActiveDetectorsInitialized;
 

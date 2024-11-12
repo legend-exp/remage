@@ -38,7 +38,7 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
 
   protected:
 
-    [[nodiscard]] inline std::string GetNtupleName(int) const override {
+    [[nodiscard]] inline std::string GetNtupleName(RMGDetectorMetadata) const override {
       throw std::logic_error("vertex output scheme has no detectors");
     }
 
