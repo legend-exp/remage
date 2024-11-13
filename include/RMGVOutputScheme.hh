@@ -50,16 +50,19 @@ class RMGVOutputScheme {
     }
     virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
-    // hook into G4TrackingAction
+    // hook into G4TrackingAction.
     virtual inline void TrackingActionPre(const G4Track*) {};
 
+    // only to be called by the manager, before calling AssignOutputNames.
     inline void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
+    inline void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
 
   protected:
 
     [[nodiscard]] virtual inline std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
-        return !det.name.empty() ? det.name : fmt::format("det{:03}", det.uid);
+        if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
+        return fmt::format("det{:03}", det.uid);
       }
       return GetNtuplenameFlat();
     }
@@ -67,6 +70,7 @@ class RMGVOutputScheme {
       throw new std::logic_error("GetNtuplenameFlat not implemented");
     }
 
+    // helper functions for output schemes.
     inline void CreateNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, std::string name,
         bool use_float) {
       if (use_float) ana_man->CreateNtupleFColumn(nt, name);
@@ -78,7 +82,9 @@ class RMGVOutputScheme {
       else ana_man->FillNtupleDColumn(nt, col, val);
     }
 
+    // global options injected by manager.
     bool fNtuplePerDetector = true;
+    bool fNtupleUseVolumeName = false;
 };
 
 #endif

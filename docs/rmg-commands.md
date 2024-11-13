@@ -128,8 +128,9 @@ Commands for controlling the simulation output
 
 * `FileName` – Set output file name for object persistency
 * `NtuplePerDetector` – Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
+* `NtupleUseVolumeName` – Use the sensitive volume name to name output ntuples.
 * `ActivateOutputScheme` – Activates the output scheme that had been registered under the given name.
-* `OutputNtupleDirectory` – Change the default output directory/group for ntuples in output files.
+* `NtupleDirectory` – Change the default output directory/group for ntuples in output files.
 
 ### `/RMG/Output/FileName`
 
@@ -143,7 +144,19 @@ Set output file name for object persistency
 
 Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
 
-* **Parameter** – `tree_per_det`
+* **Parameter** – `nt_per_det`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+
+### `/RMG/Output/NtupleUseVolumeName`
+
+Use the sensitive volume name to name output ntuples.
+
+:::{note}
+this only works if `NtuplePerDetector` is set to true.
+:::
+
+* **Parameter** – `nt_vol_name`
   * **Parameter type** – `b`
   * **Omittable** – `False`
 
@@ -151,11 +164,11 @@ Create a ntuple for each sensitive detector to store hits. Otherwise, store all 
 
 Activates the output scheme that had been registered under the given name.
 
-* **Parameter** – `tree_per_det`
+* **Parameter** – `oscheme`
   * **Parameter type** – `s`
   * **Omittable** – `False`
 
-### `/RMG/Output/OutputNtupleDirectory`
+### `/RMG/Output/NtupleDirectory`
 
 Change the default output directory/group for ntuples in output files.
 
@@ -163,7 +176,7 @@ Change the default output directory/group for ntuples in output files.
 This setting is not respected by all output formats.
 :::
 
-* **Parameter** – `ntuple_directory`
+* **Parameter** – `nt_directory`
   * **Parameter type** – `s`
   * **Omittable** – `False`
 

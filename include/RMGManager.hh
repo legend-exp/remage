@@ -66,6 +66,9 @@ class RMGManager {
     [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
       return fOutputNtuplePerDetector;
     }
+    [[nodiscard]] inline bool GetOutputNtupleUseVolumeName() const {
+      return fOutputNtupleUseVolumeName;
+    }
 
     // setters
     inline void SetUserInit(G4RunManager* g4_manager) {
@@ -151,6 +154,7 @@ class RMGManager {
 
     std::string fOutputFile = "detector-hits.root";
     bool fOutputNtuplePerDetector = true;
+    bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
     // track internal id of detector NTuples
     static G4ThreadLocal std::map<int, int> fNtupleIDs;
