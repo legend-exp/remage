@@ -24,6 +24,12 @@
 #include "RMGLog.hh"
 #include "RMGRunAction.hh"
 
+namespace {
+  template<typename T> constexpr double const_pow(T base, T exp) {
+    return exp == 0 ? 1 : base * const_pow(base, exp - 1);
+  }
+} // namespace
+
 RMGTrackingAction::RMGTrackingAction(RMGRunAction* run_action) : fRunAction(run_action) {
 
   this->DefineCommands();
@@ -36,18 +42,33 @@ void RMGTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 
 void RMGTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 
-  if (fResetInitialDecayTime) ResetInitialDecayTime(aTrack);
+  bool check_global_time = true;
+  if (fResetInitialDecayTime) { check_global_time = !ResetInitialDecayTime(aTrack); }
+
+  // this is just a good "guess" that might not hold true in all cases, i.e. some us values
+  // might still not be unique below this.
+  constexpr double max_representable_time_with_us_prec =
+      const_pow(2, std::numeric_limits<double>::digits) * CLHEP::us;
+
+  if (check_global_time && !fHadLongTimeWarning) {
+    if (aTrack->GetGlobalTime() > max_representable_time_with_us_prec) {
+      RMGLog::Out(RMGLog::warning, "encountered long global time (> ",
+          max_representable_time_with_us_prec / CLHEP::year,
+          " yr). Global time precision might be worse than 1 us.");
+      fHadLongTimeWarning = true;
+    }
+  }
 }
 
-void RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
+bool RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
 
   // only nuclei in the first step are eligible to be reset.
-  if (aTrack->GetTrackID() != 1 || aTrack->GetParentID() != 0) return;
-  if (aTrack->GetDefinition()->GetParticleType() != "nucleus") return;
+  if (aTrack->GetTrackID() != 1 || aTrack->GetParentID() != 0) return false;
+  if (aTrack->GetDefinition()->GetParticleType() != "nucleus") return false;
 
   // only reset the time if the last process is a radioactive decay.
   auto creator_process = aTrack->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
-  if (!dynamic_cast<const G4RadioactiveDecay*>(creator_process)) return;
+  if (!dynamic_cast<const G4RadioactiveDecay*>(creator_process)) return false;
 
   const auto secondaries = fpTrackingManager->GimmeSecondaries();
   auto secondaries_in_current_step = aTrack->GetStep()->GetNumberOfSecondariesInCurrentStep();
@@ -58,6 +79,8 @@ void RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
   }
 
   for (auto sec : *secondaries) { sec->SetGlobalTime(0.); }
+
+  return true;
 }
 
 void RMGTrackingAction::DefineCommands() {
