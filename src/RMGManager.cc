@@ -376,18 +376,24 @@ void RMGManager::DefineCommands() {
   fOutputMessenger->DeclareProperty("NtuplePerDetector", fOutputNtuplePerDetector)
       .SetGuidance("Create a ntuple for each sensitive detector to store hits. Otherwise, store "
                    "all hits of one detector type in one ntuple.")
-      .SetParameterName("tree_per_det", false)
+      .SetParameterName("nt_per_det", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fOutputMessenger->DeclareProperty("NtupleUseVolumeName", fOutputNtupleUseVolumeName)
+      .SetGuidance("Use the sensitive volume name to name output ntuples.")
+      .SetGuidance("note: this only works if `NtuplePerDetector` is set to true.")
+      .SetParameterName("nt_vol_name", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fOutputMessenger->DeclareMethod("ActivateOutputScheme", &RMGManager::ActivateOptionalOutputScheme)
       .SetGuidance("Activates the output scheme that had been registered under the given name.")
-      .SetParameterName("tree_per_det", false)
+      .SetParameterName("oscheme", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  fOutputMessenger->DeclareMethod("OutputNtupleDirectory", &RMGManager::SetOutputNtupleDirectory)
+  fOutputMessenger->DeclareMethod("NtupleDirectory", &RMGManager::SetOutputNtupleDirectory)
       .SetGuidance("Change the default output directory/group for ntuples in output files.")
       .SetGuidance("note: This setting is not respected by all output formats.")
-      .SetParameterName("ntuple_directory", false)
+      .SetParameterName("nt_directory", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 }
 

@@ -24,7 +24,7 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-set(_macros ntuple-per-det.mac ntuple-flat.mac)
+set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-flat.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli>
