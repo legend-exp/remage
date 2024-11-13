@@ -44,8 +44,9 @@ class RMGTrackingAction : public G4UserTrackingAction {
 
     RMGRunAction* fRunAction = nullptr;
     bool fResetInitialDecayTime = false;
+    bool fHadLongTimeWarning = false;
 
-    void ResetInitialDecayTime(const G4Track*);
+    bool ResetInitialDecayTime(const G4Track*);
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
