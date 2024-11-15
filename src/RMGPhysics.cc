@@ -36,6 +36,7 @@
 #include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
 #include "G4HadronPhysicsShielding.hh"
+#include "G4HadronicParameters.hh"
 #include "G4HadronicProcessStore.hh"
 #include "G4IonConstructor.hh"
 #include "G4IonPhysics.hh"
@@ -78,6 +79,8 @@ RMGPhysics::RMGPhysics() {
   this->SetPhysicsRealm(PhysicsRealm::kDoubleBetaDecay);
 
   G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevel() <= RMGLog::debug ? 1 : 0;
+  // need to set this here for it to take effect...?
+  G4HadronicParameters::Instance()->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   this->DefineCommands();
 }
