@@ -39,6 +39,7 @@ jobs:
         cd build
         cmake ..
         make
+        make all  # also build examples
         make install
     - name: Run full test suite
       if: ${{ matrix.container_version != 'slim' }}
