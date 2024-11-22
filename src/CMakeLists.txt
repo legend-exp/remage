@@ -94,6 +94,11 @@ endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
+if(RMG_BUILD_EXAMPLES)
+  # add an alias to support building examples both stand-alone as well as a part of the main project.
+  add_library(RMG::remage ALIAS remage)
+endif()
+
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
