@@ -3,7 +3,10 @@ project(02-hpge)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-find_package(remage)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  # stand-alone build.
+  find_package(remage REQUIRED)
+endif()
 
 add_executable(02-hpge main.cc HPGeTestStand.hh HPGeTestStand.cc)
 target_link_libraries(02-hpge PUBLIC RMG::remage)

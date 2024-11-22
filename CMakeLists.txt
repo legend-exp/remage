@@ -174,6 +174,11 @@ if(RMG_BUILD_DOCS)
   add_subdirectory(docs)
 endif()
 
+option(RMG_BUILD_EXAMPLES "Build all remage examples" OFF)
+if(RMG_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
+
 include(CTest)
 add_subdirectory(tests)
 

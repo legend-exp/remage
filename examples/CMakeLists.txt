@@ -1,2 +1,6 @@
 add_subdirectory(01-gdml)
 add_subdirectory(02-hpge)
+add_subdirectory(03-optics)
+add_subdirectory(04-cosmogenics)
+add_subdirectory(05-MUSUN)
+add_subdirectory(06-NeutronCapture)
