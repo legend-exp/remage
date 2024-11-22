@@ -37,7 +37,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        cmake -DRMG_BUILD_EXAMPLES=1 ..
         make
         make all  # also build examples
         make install
