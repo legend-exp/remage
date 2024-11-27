@@ -18,6 +18,7 @@
 #include "G4GenericMessenger.hh"
 #include "G4Ions.hh"
 #include "G4Step.hh"
+#include "G4Threading.hh"
 
 #include "RMGEventAction.hh"
 #include "RMGLog.hh"
@@ -59,7 +60,7 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 void RMGSteppingAction::SetDaughterKillLifetime(double max_lifetime) {
 
   fDaughterKillLifetime = max_lifetime;
-  if (fDaughterKillLifetime > 0) {
+  if (fDaughterKillLifetime > 0 && G4Threading::IsMasterThread()) {
     RMGLog::OutFormat(RMGLog::summary,
         "Enabled killing of daughter nuclei with a lifetime longer than {} us.",
         fDaughterKillLifetime / CLHEP::us);
