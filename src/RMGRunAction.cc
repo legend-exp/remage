@@ -73,8 +73,6 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  ana_man->SetNtupleMerging(!rmg_man->IsExecSequential());
-
   // do it only for activated detectors (have to ask to the manager)
   for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
 
@@ -99,6 +97,16 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     auto ana_man = G4AnalysisManager::Instance();
     fCurrentOutputFile = BuildOutputFile();
     auto fn = fCurrentOutputFile.first.string();
+
+    // ntuple merging is only supported for some file types. Unfortunately, the function to
+    // check for this capability is private, so we have to replicate this here. Also it can only be
+    // called after opening the file, when setting the flag does not work any more :-(
+    auto file_type = fCurrentOutputFile.first.extension();
+    if (file_type != ".csv" && file_type != ".CSV" && file_type != ".xml" && file_type != ".XML" &&
+        file_type != ".hdf5" && file_type != ".HDF5") {
+      ana_man->SetNtupleMerging(!manager->IsExecSequential());
+    }
+
     if (this->IsMaster()) {
       std::string orig_fn;
       if (fCurrentOutputFile.first != fCurrentOutputFile.second)
