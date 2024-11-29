@@ -14,8 +14,10 @@ WORKDIR /root
 RUN mkdir -p src build /opt/remage && \
     if [ "${REMAGE_VERSION}" = "dev" ]; then \
         rm -rf src && \
-        git clone "https://github.com/legend-exp/remage" src; \
+        git clone "https://github.com/legend-exp/remage" src && \
+        REMAGE_VERSION_SET="$(git -C src describe --tags)"; \
     else \
+        REMAGE_VERSION_SET="${REMAGE_VERSION}" && \
         wget -q -O- "https://github.com/legend-exp/remage/archive/${REMAGE_VERSION}.tar.gz" \
             | tar --strip-components 1 -C src --strip=1 -x -z; \
     fi && \
@@ -23,6 +25,7 @@ RUN mkdir -p src build /opt/remage && \
     cmake \
         -DCMAKE_INSTALL_PREFIX="/opt/remage" \
         -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" \
+        -DCMAKE_PROJECT_VERSION="${REMAGE_VERSION_SET}" \
         ../src && \
     make -j"$(nproc)" install && \
     if [ "${REMAGE_BASE_FLAVOR}" = "slim" ]; then \
