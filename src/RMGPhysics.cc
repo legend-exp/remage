@@ -57,6 +57,7 @@
 #include "G4ParticleHPThermalScattering.hh"
 #include "G4ParticleHPThermalScatteringData.hh"
 #include "G4ProcessManager.hh"
+#include "G4ProcessTable.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4RegionStore.hh"
 #include "G4RunManagerKernel.hh"
@@ -176,6 +177,12 @@ void RMGPhysics::ConstructProcess() {
   em_extra_physics->GammaNuclear(true);
   em_extra_physics->MuonNuclear(true);
   em_extra_physics->ConstructProcess();
+
+  // G4EmExtraPhysics does not propagate the verbose level...
+  auto synch_proc = G4ProcessTable::GetProcessTable()->FindProcesses("SynRad");
+  for (size_t i = 0; i < synch_proc->size(); i++) {
+    (*synch_proc)[i]->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  }
 
   if (fConstructOptical) this->ConstructOptical();
   else RMGLog::Out(RMGLog::detail, "Processes for optical photons are inactivated");
