@@ -24,15 +24,10 @@
 #include "RMGLog.hh"
 #include "RMGRunAction.hh"
 
-namespace {
-  template<typename T> constexpr double const_pow(T base, T exp) {
-    return exp == 0 ? 1 : base * const_pow(base, exp - 1);
-  }
-} // namespace
-
 RMGTrackingAction::RMGTrackingAction(RMGRunAction* run_action) : fRunAction(run_action) {
 
   this->DefineCommands();
+  this->SetLongGlobalTimeUncertaintyWarning(1 * CLHEP::us);
 }
 
 void RMGTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
@@ -45,18 +40,12 @@ void RMGTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
   bool check_global_time = true;
   if (fResetInitialDecayTime) { check_global_time = !ResetInitialDecayTime(aTrack); }
 
-  // this is just a good "guess" that might not hold true in all cases, i.e. some us values
-  // might still not be unique below this.
-  constexpr double max_representable_time_with_us_prec =
-      const_pow(2, std::numeric_limits<double>::digits) * CLHEP::us;
-
-  if (check_global_time && !fHadLongTimeWarning) {
-    if (aTrack->GetGlobalTime() > max_representable_time_with_us_prec) {
-      RMGLog::Out(RMGLog::warning, "encountered long global time (> ",
-          max_representable_time_with_us_prec / CLHEP::year,
-          " yr). Global time precision might be worse than 1 us.");
-      fHadLongTimeWarning = true;
-    }
+  if (check_global_time && !fHadLongTimeWarning &&
+      aTrack->GetGlobalTime() > fMaxRepresentableGlobalTime) {
+    RMGLog::Out(RMGLog::warning, "encountered long global time (> ",
+        fMaxRepresentableGlobalTime / CLHEP::year,
+        " yr). Global time precision might be worse than 1 us.");
+    fHadLongTimeWarning = true;
   }
 }
 
@@ -83,6 +72,13 @@ bool RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
   return true;
 }
 
+void RMGTrackingAction::SetLongGlobalTimeUncertaintyWarning(double uncert) {
+
+  // this is just a good "guess" that might not hold true in all cases, i.e. some us values
+  // might still not be unique below this.
+  fMaxRepresentableGlobalTime = std::pow(2, std::numeric_limits<double>::digits) * uncert;
+}
+
 void RMGTrackingAction::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/Stepping/",
@@ -91,7 +87,15 @@ void RMGTrackingAction::DefineCommands() {
   fMessenger->DeclareProperty("ResetInitialDecayTime", fResetInitialDecayTime)
       .SetGuidance("If the initial step is a radioactive decay, reset the global time of all its "
                    "secondary tracks to 0.")
-      .SetDefaultValue("false")
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit);
+
+  fMessenger
+      ->DeclareMethodWithUnit("LargeGlobalTimeUncertaintyWarning", "us",
+          &RMGTrackingAction::SetLongGlobalTimeUncertaintyWarning)
+      .SetGuidance("Warn if the global times of tracks get too large to provide the requested time "
+                   "uncertainty.")
+      .SetDefaultValue("1")
       .SetStates(G4State_PreInit);
 }
 

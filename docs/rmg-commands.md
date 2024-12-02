@@ -516,6 +516,7 @@ Commands for controlling physics processes
 
 * `DaughterNucleusMaxLifetime` – Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
 * `ResetInitialDecayTime` – If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
+* `LargeGlobalTimeUncertaintyWarning` – Warn if the global times of tracks get too large to provide the requested time uncertainty.
 
 ### `/RMG/Processes/Stepping/DaughterNucleusMaxLifetime`
 
@@ -542,7 +543,21 @@ If the initial step is a radioactive decay, reset the global time of all its sec
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
-  * **Default value** – `false`
+  * **Default value** – `true`
+
+### `/RMG/Processes/Stepping/LargeGlobalTimeUncertaintyWarning`
+
+Warn if the global times of tracks get too large to provide the requested time uncertainty.
+
+* **Parameter** – `value`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `1`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `us`
+  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 
 ## `/RMG/Geometry/`
 
