@@ -17,6 +17,7 @@
 
 #include "G4AnalysisUtilities.hh"
 #include "G4RootAnalysisReader.hh"
+#include "G4Threading.hh"
 #include "G4VAnalysisReader.hh"
 #ifdef TOOLS_USE_HDF5
 #include "G4Hdf5AnalysisReader.hh"
@@ -26,9 +27,22 @@
 
 #include "RMGLog.hh"
 
+namespace {
+  G4Mutex RMGVertexFromFileMutex = G4MUTEX_INITIALIZER;
+} // namespace
+
+G4VAnalysisReader* RMGVertexFromFile::fReader = nullptr;
+
 RMGVertexFromFile::RMGVertexFromFile() : RMGVVertexGenerator("FromFile") { this->DefineCommands(); }
 
 void RMGVertexFromFile::OpenFile(std::string& name) {
+
+  // reader initialization should only happen on the master thread (otherwise it will fail).
+  if (!G4Threading::IsMasterThread()) return;
+
+  G4AutoLock lock(&RMGVertexFromFileMutex);
+  if (fReader) return;
+
   // NOTE: GetExtension() returns a default extension if there is no file extension
   auto ext = G4Analysis::GetExtension(name);
   if (ext == "root") fReader = G4RootAnalysisReader::Instance();
@@ -46,27 +60,42 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
 
   fReader->SetFileName(name);
+
+  fNtupleId = fReader->GetNtuple("vertices");
+  if (fNtupleId >= 0) {
+    // bind the static variables once here, and only use them later.
+    fReader->SetNtupleDColumn("xloc_in_m", fXpos);
+    fReader->SetNtupleDColumn("yloc_in_m", fYpos);
+    fReader->SetNtupleDColumn("zloc_in_m", fZpos);
+  }
 }
 
 bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
-  auto ntupleid = fReader->GetNtuple("vertices");
-  if (ntupleid >= 0) {
-    double xpos, ypos, zpos;
-    fReader->SetNtupleDColumn("xpos", xpos);
-    fReader->SetNtupleDColumn("ypos", ypos);
-    fReader->SetNtupleDColumn("zpos", zpos);
+  G4AutoLock lock(&RMGVertexFromFileMutex);
+
+  if (fReader && fNtupleId >= 0) {
+    fXpos = fYpos = fZpos = NAN;
 
     if (fReader->GetNtupleRow()) {
-      vertex = G4ThreeVector{xpos, ypos, zpos};
+      // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
+      if (std::isnan(fXpos) || std::isnan(fYpos) || std::isnan(fZpos)) {
+        RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
+        vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+        return false;
+      }
+
+      vertex = G4ThreeVector{fXpos, fYpos, fZpos};
       return true;
-    } else RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
-    vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-    return false;
+    }
+
+    RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
   } else {
-    RMGLog::Out(RMGLog::fatal, "Ntuple named 'vertices' could not be found in input file!");
-    return false;
+    RMGLog::Out(RMGLog::error, "Ntuple named 'vertices' could not be found in input file!");
   }
+
+  vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+  return false;
 }
 
 void RMGVertexFromFile::DefineCommands() {

@@ -78,6 +78,8 @@ class RMGConvertLH5 {
 
     bool ConvertFromLH5Internal();
 
+    static inline const std::regex table_dtype_re = std::regex("^table\\{.*\\}$");
+
     std::string HDFDataTypeToForm(H5::DataType);
     bool ConvertTableToNTuple(H5::Group&);
 
