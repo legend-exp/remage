@@ -91,7 +91,7 @@ std::string RMGConvertLH5::DataTypeToLGDO(H5::DataType dtype) {
     case H5T_STRING: return "string";
     case H5T_INTEGER:
     case H5T_FLOAT: return "real";
-    default: throw std::logic_error("not implemented H5T type, LGDO will be invalid");
+    default: throw std::logic_error("not implemented H5T type, ntuple will be invalid");
   }
 }
 
@@ -240,8 +240,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   // script before (it will delete the header group below).
   if (!ExistsByType(hfile, "header", H5O_TYPE_GROUP) ||
       !ExistsByType(hfile, ntuple_group_name, H5O_TYPE_GROUP)) {
-    LH5Log(RMGLog::error,
-        "not a remage HDF5 output file or already converted (missing header or hit groups)?");
+    LH5Log(RMGLog::error, "not a remage HDF5 output file or already converted (missing header or ",
+        ntuple_group_name, " groups)?");
     return false;
   }
   auto header_group = hfile.openGroup("header");
