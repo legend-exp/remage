@@ -87,10 +87,9 @@ if(BxDecay0_FOUND)
 endif()
 
 if(RMG_HAS_HDF5)
-  list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGConvertLH5.hh
-       ${_root}/include/RMGConvertFromLH5.hh)
+  list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGConvertLH5.hh)
 
-  list(APPEND PROJECT_SOURCES ${_root}/src/RMGConvertLH5.cc ${_root}/src/RMGConvertFromLH5.cc)
+  list(APPEND PROJECT_SOURCES ${_root}/src/RMGConvertLH5.cc)
 endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})

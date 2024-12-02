@@ -19,7 +19,7 @@
 #include <vector>
 namespace fs = std::filesystem;
 
-#include "RMGConvertFromLH5.hh"
+#include "RMGConvertLH5.hh"
 #include "RMGLog.hh"
 
 #include "CLI11/CLI11.hpp"
@@ -43,14 +43,14 @@ int main(int argc, char** argv) {
   RMGLog::SetInihibitStartupInfo(true);
   if (verbosity) RMGLog::SetLogLevel(RMGLog::detail);
 
-  RMGConvertFromLH5::fIsStandalone = true;
+  RMGConvertLH5::fIsStandalone = true;
 
   for (auto& file_name : file_names) {
     if (!fs::exists(file_name)) {
       RMGLog::OutFormat(RMGLog::error, "{} does not exist", file_name);
       continue;
     }
-    RMGConvertFromLH5::ConvertFromLH5(file_name, ntuple_group_name, dry_run, !file_names.empty());
+    RMGConvertLH5::ConvertFromLH5(file_name, ntuple_group_name, dry_run, !file_names.empty());
   }
 
   struct rusage usage{};
