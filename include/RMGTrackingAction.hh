@@ -43,10 +43,13 @@ class RMGTrackingAction : public G4UserTrackingAction {
   private:
 
     RMGRunAction* fRunAction = nullptr;
-    bool fResetInitialDecayTime = false;
+    bool fResetInitialDecayTime = true;
     bool fHadLongTimeWarning = false;
+    double fMaxRepresentableGlobalTime = -1;
 
     bool ResetInitialDecayTime(const G4Track*);
+
+    void SetLongGlobalTimeUncertaintyWarning(double);
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
