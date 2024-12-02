@@ -43,7 +43,10 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
 
   private:
 
-    G4VAnalysisReader* fReader = nullptr;
+    static G4VAnalysisReader* fReader;
+    inline static double fXpos = NAN, fYpos = NAN, fZpos = NAN;
+    inline static int fNtupleId = -1;
+
     std::string fFileName;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;

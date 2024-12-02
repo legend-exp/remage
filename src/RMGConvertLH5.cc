@@ -357,7 +357,11 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
   det_group.removeAttr("datatype");
   auto datatype = datatype_opt.value();
 
-  if (datatype.empty()) return false;
+  std::smatch re_match;
+  if (datatype.empty() || !std::regex_match(datatype, re_match, table_dtype_re)) {
+    LH5Log(RMGLog::error, ntuple_log_prefix, "invalid LGDO datatype");
+    return false;
+  }
 
   // iterate over the remaining child groups and update to LH5 format.
   auto columns = GetChildren(det_group);
