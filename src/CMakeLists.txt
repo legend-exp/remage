@@ -87,9 +87,10 @@ if(BxDecay0_FOUND)
 endif()
 
 if(RMG_HAS_HDF5)
-  list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGConvertLH5.hh)
+  list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGConvertLH5.hh
+       ${_root}/include/RMGConvertFromLH5.hh)
 
-  list(APPEND PROJECT_SOURCES ${_root}/src/RMGConvertLH5.cc)
+  list(APPEND PROJECT_SOURCES ${_root}/src/RMGConvertLH5.cc ${_root}/src/RMGConvertFromLH5.cc)
 endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
@@ -166,6 +167,10 @@ if(RMG_HAS_HDF5)
   add_executable(remage-to-lh5 ${_root}/src/remage-to-lh5.cc)
   target_link_libraries(remage-to-lh5 PUBLIC remage)
   set_target_properties(remage-to-lh5 PROPERTIES OUTPUT_NAME remage-to-lh5)
+
+  add_executable(remage-from-lh5 ${_root}/src/remage-from-lh5.cc)
+  target_link_libraries(remage-from-lh5 PUBLIC remage)
+  set_target_properties(remage-from-lh5 PROPERTIES OUTPUT_NAME remage-from-lh5)
 endif()
 
 # install CMake targets
