@@ -173,7 +173,7 @@ void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
 
 void RMGVertexFromFile::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Confinement/FromFile/",
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/FromFile/",
       "Commands for controlling reading event vertex positions from file");
 
   fMessenger->DeclareMethod("FileName", &RMGVertexFromFile::OpenFile)
