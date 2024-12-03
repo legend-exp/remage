@@ -15,15 +15,24 @@
 
 #include "RMGVertexFromFile.hh"
 
+#include <filesystem>
+#include <random>
+namespace fs = std::filesystem;
+
+#include "CLHEP/Units/SystemOfUnits.h"
 #include "G4AnalysisUtilities.hh"
 #include "G4RootAnalysisReader.hh"
 #include "G4Threading.hh"
 #include "G4VAnalysisReader.hh"
-#ifdef TOOLS_USE_HDF5
+#if RMG_HAS_HDF5
 #include "G4Hdf5AnalysisReader.hh"
 #endif
 #include "G4CsvAnalysisReader.hh"
 #include "G4XmlAnalysisReader.hh"
+
+#if RMG_HAS_HDF5
+#include "RMGConvertLH5.hh"
+#endif
 
 #include "RMGLog.hh"
 
@@ -43,12 +52,47 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   G4AutoLock lock(&RMGVertexFromFileMutex);
   if (fReader) return;
 
+  fFileIsTemp = false;
+
+  if (!fs::exists(fs::path(name))) {
+    RMGLog::Out(RMGLog::error, "input file ", name, " does not exist");
+    return;
+  }
+
   // NOTE: GetExtension() returns a default extension if there is no file extension
   auto ext = G4Analysis::GetExtension(name);
   if (ext == "root") fReader = G4RootAnalysisReader::Instance();
   else if (ext == "hdf5") {
-#ifdef TOOLS_USE_HDF5
+#if RMG_HAS_HDF5
     fReader = G4Hdf5AnalysisReader::Instance();
+#else
+    RMGLog::Out(RMGLog::fatal,
+        "HDF5 input not available, please recompile Geant4 with HDF5 support");
+#endif
+  } else if (ext == "lh5") {
+#if RMG_HAS_HDF5
+    std::uniform_int_distribution<int> dist(10000, 99999);
+    std::random_device rd;
+    auto path = fs::path(name);
+    std::string new_fn =
+        ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
+
+    std::error_code ec;
+    if (!fs::copy_file(path, fs::path(new_fn)), ec) {
+      RMGLog::Out(RMGLog::error, "copy of input file ", name, " failed. Does it exist? (",
+          ec.message(), ")");
+      return;
+    }
+
+    if (!RMGConvertLH5::ConvertFromLH5(new_fn, "stp", false)) {
+      RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
+          " to LH5 failed. Data is potentially corrupted.");
+      return;
+    }
+
+    name = new_fn;
+    fReader = G4Hdf5AnalysisReader::Instance();
+    fFileIsTemp = true;
 #else
     RMGLog::Out(RMGLog::fatal,
         "HDF5 input not available, please recompile Geant4 with HDF5 support");
@@ -60,6 +104,7 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
 
   fReader->SetFileName(name);
+  fFileName = name;
 
   fNtupleId = fReader->GetNtuple("vertices");
   if (fNtupleId >= 0) {
@@ -67,6 +112,8 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
     fReader->SetNtupleDColumn("xloc_in_m", fXpos);
     fReader->SetNtupleDColumn("yloc_in_m", fYpos);
     fReader->SetNtupleDColumn("zloc_in_m", fZpos);
+  } else {
+    RMGLog::Out(RMGLog::error, "Ntuple named 'vertices' could not be found in input file!");
   }
 }
 
@@ -85,7 +132,7 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
         return false;
       }
 
-      vertex = G4ThreeVector{fXpos, fYpos, fZpos};
+      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * CLHEP::m;
       return true;
     }
 
@@ -96,6 +143,32 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
   vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
   return false;
+}
+
+void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
+
+  if (!G4Threading::IsMasterThread()) return;
+
+  G4AutoLock lock(&RMGVertexFromFileMutex);
+  if (!fReader) {
+    RMGLog::Out(RMGLog::fatal, "vertex file '", fFileName, "' not found or in wrong format");
+  }
+}
+
+void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
+
+  if (!G4Threading::IsMasterThread()) return;
+
+  G4AutoLock lock(&RMGVertexFromFileMutex);
+  if (!fReader) return;
+
+  fReader = nullptr;
+  if (fFileIsTemp) {
+    std::error_code ec;
+    fs::remove(fs::path(fFileName), ec);
+  }
+  fFileName = "";
+  fFileIsTemp = false;
 }
 
 void RMGVertexFromFile::DefineCommands() {

@@ -30,7 +30,7 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
   public:
 
     RMGVertexFromFile();
-    inline ~RMGVertexFromFile() = default;
+    ~RMGVertexFromFile() = default;
 
     RMGVertexFromFile(RMGVertexFromFile const&) = delete;
     RMGVertexFromFile& operator=(RMGVertexFromFile const&) = delete;
@@ -38,6 +38,9 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
     RMGVertexFromFile& operator=(RMGVertexFromFile&&) = delete;
 
     bool GenerateVertex(G4ThreeVector&) override;
+
+    void BeginOfRunAction(const G4Run*) override;
+    void EndOfRunAction(const G4Run*) override;
 
     void OpenFile(std::string& name);
 
@@ -48,6 +51,7 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
     inline static int fNtupleId = -1;
 
     std::string fFileName;
+    bool fFileIsTemp;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
