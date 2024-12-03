@@ -1203,15 +1203,29 @@ Commands for controlling reading event vertex positions from file
 
 ### Commands
 
-* `FileName` – Set name of the file containing vertex positions. See the documentation for a specification of the format.
+* `FileName` – Set name of the file containing vertex positions for the next run. See the documentation for a specification of the format.
+* `NtupleDirectory` – Change the default input directory/group for ntuples.
 
 ### `/RMG/Generator/Confinement/FromFile/FileName`
 
-Set name of the file containing vertex positions. See the documentation for a specification of the format.
+Set name of the file containing vertex positions for the next run. See the documentation for a specification of the format.
 
 * **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+
+### `/RMG/Generator/Confinement/FromFile/NtupleDirectory`
+
+Change the default input directory/group for ntuples.
+
+:::{note}
+this option only has an effect for LH5 input files.
+:::
+
+* **Parameter** – `nt_directory`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Default value** – `vtx`
 
 ## `/RMG/GrabmayrGammaCascades/`
 

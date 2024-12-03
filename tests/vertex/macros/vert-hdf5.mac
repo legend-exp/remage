@@ -5,7 +5,8 @@
 /RMG/Generator/Confinement/FromFile/FileName macros/vert.hdf5
 
 /RMG/Generator/Select GPS
-/gps/particle     e-
+/gps/particle     ion
+/gps/ion          81 208
 /gps/energy       0 keV
 /gps/ang/type     iso
 

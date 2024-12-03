@@ -9,7 +9,7 @@ zloc = Array(np.array([6, 7, 8] * 10, dtype=np.float64), attrs={"units": "m"})
 
 lh5.write(
     Table({"xloc": xloc, "yloc": yloc, "zloc": zloc}),
-    "stp/vertices",
+    "vtx/pos",
     lh5_file="vert.lh5",
     wo_mode="of",
 )
