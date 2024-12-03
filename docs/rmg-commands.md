@@ -15,7 +15,6 @@ remage macro command reference
 * `/RMG/Geometry/` – Commands for controlling geometry definitions
 * `/RMG/Generator/` – Commands for controlling generators
 * `/RMG/GrabmayrGammaCascades/` – Control Peters gamma cascade model
-* `/RMG/Confinement/` – ...Title not available...
 
 ## `/RMG/Manager/`
 
@@ -891,6 +890,7 @@ Commands for controlling primary confinement
 
 * `/RMG/Generator/Confinement/Physical/` – Commands for setting physical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/` – Commands for setting geometrical volumes up for primary confinement
+* `/RMG/Generator/Confinement/FromFile/` – Commands for controlling reading event vertex positions from file
 
 ### Commands
 
@@ -1196,6 +1196,23 @@ Set Z length
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 
+## `/RMG/Generator/Confinement/FromFile/`
+
+Commands for controlling reading event vertex positions from file
+
+
+### Commands
+
+* `FileName` – Set name of the file containing vertex positions. See the documentation for a specification of the format.
+
+### `/RMG/Generator/Confinement/FromFile/FileName`
+
+Set name of the file containing vertex positions. See the documentation for a specification of the format.
+
+* **Parameter** – `filename`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+
 ## `/RMG/GrabmayrGammaCascades/`
 
 Control Peters gamma cascade model
@@ -1234,29 +1251,5 @@ Set a gamma cascade file for neutron capture on a specified isotope
   * **Omittable** – `False`
 * **Parameter** – `file`
     – /path/to/file of gamma cascade
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-
-## `/RMG/Confinement/`
-
-
-### Sub-directories
-
-* `/RMG/Confinement/FromFile/` – Commands for controlling reading event vertex positions from file
-
-## `/RMG/Confinement/FromFile/`
-
-Commands for controlling reading event vertex positions from file
-
-
-### Commands
-
-* `FileName` – Set name of the file containing vertex positions. See the documentation for a specification of the format.
-
-### `/RMG/Confinement/FromFile/FileName`
-
-Set name of the file containing vertex positions. See the documentation for a specification of the format.
-
-* **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
