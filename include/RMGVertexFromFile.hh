@@ -53,6 +53,8 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
     std::string fFileName;
     bool fFileIsTemp;
 
+    std::string fNtupleDirectoryName = "vtx";
+
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
 };

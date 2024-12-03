@@ -84,7 +84,7 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
       return;
     }
 
-    if (!RMGConvertLH5::ConvertFromLH5(new_fn, "stp", false)) {
+    if (!RMGConvertLH5::ConvertFromLH5(new_fn, fNtupleDirectoryName, false)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
           " to LH5 failed. Data is potentially corrupted.");
       return;
@@ -106,14 +106,14 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   fReader->SetFileName(name);
   fFileName = name;
 
-  fNtupleId = fReader->GetNtuple("vertices");
+  fNtupleId = fReader->GetNtuple("pos");
   if (fNtupleId >= 0) {
     // bind the static variables once here, and only use them later.
     fReader->SetNtupleDColumn("xloc_in_m", fXpos);
     fReader->SetNtupleDColumn("yloc_in_m", fYpos);
     fReader->SetNtupleDColumn("zloc_in_m", fZpos);
   } else {
-    RMGLog::Out(RMGLog::error, "Ntuple named 'vertices' could not be found in input file!");
+    RMGLog::Out(RMGLog::error, "Ntuple named 'pos' could not be found in input file!");
   }
 }
 
@@ -138,7 +138,7 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
     RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
   } else {
-    RMGLog::Out(RMGLog::error, "Ntuple named 'vertices' could not be found in input file!");
+    RMGLog::Out(RMGLog::error, "Ntuple named 'pos' could not be found in input file!");
   }
 
   vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
@@ -177,8 +177,15 @@ void RMGVertexFromFile::DefineCommands() {
       "Commands for controlling reading event vertex positions from file");
 
   fMessenger->DeclareMethod("FileName", &RMGVertexFromFile::OpenFile)
-      .SetGuidance("Set name of the file containing vertex positions. See the documentation for a "
-                   "specification of the format.")
+      .SetGuidance("Set name of the file containing vertex positions for the next run. See the "
+                   "documentation for a specification of the format.")
       .SetParameterName("filename", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareProperty("NtupleDirectory", fNtupleDirectoryName)
+      .SetGuidance("Change the default input directory/group for ntuples.")
+      .SetGuidance("note: this option only has an effect for LH5 input files.")
+      .SetParameterName("nt_directory", false)
+      .SetDefaultValue(fNtupleDirectoryName)
       .SetStates(G4State_PreInit, G4State_Idle);
 }

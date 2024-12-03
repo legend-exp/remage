@@ -13,6 +13,9 @@ install
 # G4 outputs
 *.root
 *.hdf5
+*.lh5
+!/tests/**/*.hdf5
+!/tests/**/*.lh5
 
 # G4 visualization
 bookmarkFile
