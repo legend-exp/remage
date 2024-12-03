@@ -88,7 +88,7 @@ void RMGTrackingAction::DefineCommands() {
       .SetGuidance("If the initial step is a radioactive decay, reset the global time of all its "
                    "secondary tracks to 0.")
       .SetDefaultValue("true")
-      .SetStates(G4State_PreInit);
+      .SetStates(G4State_Idle);
 
   fMessenger
       ->DeclareMethodWithUnit("LargeGlobalTimeUncertaintyWarning", "us",
@@ -96,7 +96,7 @@ void RMGTrackingAction::DefineCommands() {
       .SetGuidance("Warn if the global times of tracks get too large to provide the requested time "
                    "uncertainty.")
       .SetDefaultValue("1")
-      .SetStates(G4State_PreInit);
+      .SetStates(G4State_Idle);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
