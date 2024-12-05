@@ -69,6 +69,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     CreateNtupleFOrDColumn(ana_man, id, "xloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, id, "yloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, id, "zloc_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, id, "SurfaceDist_in_m", fStoreSinglePrecisionPosition);
 
     ana_man->FinishNtuple(id);
   }
@@ -158,6 +159,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getY() / u::m,
           fStoreSinglePrecisionPosition);
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getZ() / u::m,
+          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->distance_to_surface / u::m,
           fStoreSinglePrecisionPosition);
 
       // NOTE: must be called here for hit-oriented output
