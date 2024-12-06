@@ -127,6 +127,7 @@ Commands for controlling the simulation output
 * `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
 * `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
+* `/RMG/Output/Track/` – Commands for controlling output of track vertices.
 
 **Commands:**
 
@@ -395,6 +396,59 @@ Discard optical photons (before simulating them), if the specified isotopes had 
 :::{note}
 If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
 :::
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+
+## `/RMG/Output/Track/`
+
+Commands for controlling output of track vertices.
+
+
+**Commands:**
+
+* `AddProcessFilter` – Only include tracks created by this process.
+* `AddParticleFilter` – Only include tracks with this particle.
+* `SetEnergyFilter` – Only include tracks with kinetic energy above this threshold.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+
+### `/RMG/Output/Track/AddProcessFilter`
+
+Only include tracks created by this process.
+
+* **Parameter** – `process`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+
+### `/RMG/Output/Track/AddParticleFilter`
+
+Only include tracks with this particle.
+
+* **Parameter** – `pdgid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+
+### `/RMG/Output/Track/SetEnergyFilter`
+
+Only include tracks with kinetic energy above this threshold.
+
+* **Parameter** – `energy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+
+### `/RMG/Output/Track/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+
+### `/RMG/Output/Track/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`

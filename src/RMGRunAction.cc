@@ -219,6 +219,9 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     }
   }
 
+  auto oschemes = GetAllOutputDataFields();
+  for (const auto& oscheme : oschemes) { oscheme->EndOfRunAction(fRMGRun); }
+
   if (fIsPersistencyEnabled) {
     G4AnalysisManager::Instance()->Write();
     G4AnalysisManager::Instance()->CloseFile();
