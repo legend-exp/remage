@@ -53,6 +53,7 @@ RMGManager* RMGManager::fRMGManager = nullptr;
 std::atomic<bool> RMGManager::fAbortRun = false;
 
 G4ThreadLocal std::map<int, int> RMGManager::fNtupleIDs = {};
+G4ThreadLocal std::map<std::string, int> RMGManager::fNtupleIDsS = {};
 
 RMGManager::RMGManager(std::string app_name, int argc, char** argv)
     : fApplicationName(app_name), fArgc(argc), fArgv(argv) {
