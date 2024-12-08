@@ -56,7 +56,7 @@ target_link_libraries(myapp PRIVATE RMG::remage)
 
 install
 tutorial
-Geant4 command interface <rmg-commands>
+rmg-commands
 Output structure & LH5 output <output>
 ```
 
