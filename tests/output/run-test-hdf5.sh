@@ -20,7 +20,7 @@ output_exp_lh5="macros/${4/.mac/.hdf5ls-lh5}"
 # -----------------------
 
 # run remage, produce hdf5 output.
-"$rmg" -g gdml/geometry.gdml -o "$output" -- "$macro"
+"$rmg" -g gdml/geometry.gdml -o "$output" -w -- "$macro"
 
 # extract written hdf5 structure.
 "$visit_hdf5" "$output" > "$output_dump"
@@ -49,7 +49,7 @@ diff "$output_dump_lh5" "$output_exp_lh5"
 # -----------------------------
 
 # run remage, produce lh5 output.
-"$rmg" -g gdml/geometry.gdml -o "$output_lh5" -- "$macro"
+"$rmg" -g gdml/geometry.gdml -o "$output_lh5" -w -- "$macro"
 
 # extract written lh5 structure & compare with expectation.
 "$visit_hdf5" "$output_lh5" --dump-attrs > "$output_dump_lh5"
