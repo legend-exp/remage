@@ -1,0 +1,19 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/RMG/Output/ActivateOutputScheme Track
+
+/run/initialize
+
+# /RMG/Output/Track/AddProcessFilter Radioactivation
+# /RMG/Output/Track/SetEnergyFilter 0.01 MeV
+
+/RMG/Generator/Confine UnConfined
+
+/RMG/Generator/Select GPS
+/gps/position     0 0 0
+/gps/particle     ion
+/gps/ion          90 228
+/gps/energy       0 keV
+/gps/ang/type     iso
+
+/run/beamOn 10

@@ -28,6 +28,7 @@
 
 #include "RMGIsotopeFilterOutputScheme.hh"
 #include "RMGLog.hh"
+#include "RMGTrackOutputScheme.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
 
@@ -75,6 +76,7 @@ class RMGUserInit {
     // default output schemes
     inline void RegisterDefaultOptionalOutputSchemes() {
       AddOptionalOutputScheme<RMGIsotopeFilterOutputScheme>("IsotopeFilter");
+      AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
     }
 
     inline void ActivateOptionalOutputScheme(std::string name) {

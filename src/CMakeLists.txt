@@ -33,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGSteppingAction.hh
     ${_root}/include/RMGTools.hh
     ${_root}/include/RMGTrackingAction.hh
+    ${_root}/include/RMGTrackOutputScheme.hh
     ${_root}/include/RMGUserAction.hh
     ${_root}/include/RMGUserInit.hh
     ${_root}/include/RMGVertexConfinement.hh
@@ -70,6 +71,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGStackingAction.cc
     ${_root}/src/RMGSteppingAction.cc
     ${_root}/src/RMGTrackingAction.cc
+    ${_root}/src/RMGTrackOutputScheme.cc
     ${_root}/src/RMGUserAction.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc

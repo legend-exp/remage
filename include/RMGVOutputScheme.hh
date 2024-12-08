@@ -53,6 +53,8 @@ class RMGVOutputScheme {
     // hook into G4TrackingAction.
     virtual inline void TrackingActionPre(const G4Track*) {};
 
+    virtual inline void EndOfRunAction(const G4Run*) {};
+
     // only to be called by the manager, before calling AssignOutputNames.
     inline void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
     inline void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }

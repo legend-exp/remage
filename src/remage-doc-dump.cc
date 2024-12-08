@@ -28,6 +28,7 @@
 #include "RMGManager.hh"
 #include "RMGOpticalOutputScheme.hh"
 #include "RMGScintillatorOutputScheme.hh"
+#include "RMGTrackOutputScheme.hh"
 #include "RMGVOutputScheme.hh"
 #include "RMGVertexConfinement.hh"
 #include "RMGVertexFromFile.hh"
@@ -45,6 +46,7 @@ void init_extra() {
   new RMGVertexOutputScheme();
   new RMGScintillatorOutputScheme();
   new RMGIsotopeFilterOutputScheme();
+  new RMGTrackOutputScheme();
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();

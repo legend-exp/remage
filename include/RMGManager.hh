@@ -110,6 +110,14 @@ class RMGManager {
             det_uid);
       return this->GetNtupleID(det_uid);
     }
+    inline int RegisterNtuple(std::string det_uid, int ntuple_id) {
+      auto res = fNtupleIDsS.emplace(det_uid, ntuple_id);
+      if (!res.second)
+        RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
+            det_uid);
+      return this->GetNtupleID(det_uid);
+    }
+    inline int GetNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
     inline int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
 
     [[nodiscard]] inline bool HadWarning() const {
@@ -161,6 +169,7 @@ class RMGManager {
     std::string fOutputNtupleDirectory = "stp";
     // track internal id of detector NTuples
     static G4ThreadLocal std::map<int, int> fNtupleIDs;
+    static G4ThreadLocal std::map<std::string, int> fNtupleIDsS;
 
 
     static RMGManager* fRMGManager;
