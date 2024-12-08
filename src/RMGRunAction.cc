@@ -236,6 +236,10 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
 
   // TODO: realpath
   auto path = fs::path(manager->GetOutputFileName());
+  if (fs::exists(path) && !manager->GetOutputOverwriteFiles()) {
+    RMGLog::Out(RMGLog::fatal, "Output file ", path.string(), " does already exists.");
+  }
+
   auto ext = path.extension();
   if (ext == ".lh5" || ext == ".LH5") {
 #if !RMG_HAS_HDF5

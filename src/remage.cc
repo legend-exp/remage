@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
   bool quiet = false;
   int nthreads = 1;
   bool interactive = false;
+  bool overwrite_output = false;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
   std::string output;
@@ -64,6 +65,7 @@ int main(int argc, char** argv) {
   app.add_option("-t,--threads", nthreads, "Number of threads");
   app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
+  app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option("macros", macros, "Macro files")->type_name("FILE");
 
   CLI11_PARSE(app, argc, argv);
@@ -89,6 +91,7 @@ int main(int argc, char** argv) {
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);
+  manager.SetOutputOverwriteFiles(overwrite_output);
   manager.SetNumberOfThreads(nthreads);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);

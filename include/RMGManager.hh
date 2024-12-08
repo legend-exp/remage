@@ -62,6 +62,7 @@ class RMGManager {
     }
     [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
     inline const std::string& GetOutputFileName() { return fOutputFile; }
+    [[nodiscard]] inline bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
     inline const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
     [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
       return fOutputNtuplePerDetector;
@@ -100,6 +101,7 @@ class RMGManager {
     void SetLogLevel(std::string level);
 
     inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
+    inline void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
     inline void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
     inline int RegisterNtuple(int det_uid, int ntuple_id) {
       auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
@@ -153,6 +155,7 @@ class RMGManager {
     std::string fRandEngineName;
 
     std::string fOutputFile = "detector-hits.root";
+    bool fOutputOverwriteFiles = false;
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
