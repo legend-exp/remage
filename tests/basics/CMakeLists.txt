@@ -22,11 +22,21 @@ foreach(_mac ${_macros})
   set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS mt)
 endforeach()
 
+# Geant4 11.0 has navigation bugs leading to flaky CI test runs.
+if(Geant4_VERSION VERSION_LESS "11.1.0")
+  set_tests_properties("basics/run-2nbb.mac" PROPERTIES DISABLED True)
+endif()
+
 if(BxDecay0_THREADSAFE)
   foreach(_mac ${_macros_extra})
     add_test(NAME basics-mt/${_mac} COMMAND remage-cli -g gdml/main.gdml -t 2 macros/${_mac})
     set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS "mt extra")
   endforeach()
+
+  # Geant4 11.0 has navigation bugs leading to flaky CI test runs.
+  if(Geant4_VERSION VERSION_LESS "11.1.0")
+    set_tests_properties("basics-mt/run-2nbb.mac" PROPERTIES DISABLED True)
+  endif()
 endif()
 
 list(TRANSFORM _macros_extra PREPEND "basics/")
