@@ -41,7 +41,6 @@ void IsotopeOutputScheme::TrackingActionPre(const G4Track* aTrack) {
   if (z == 0 || a == 0) return; // not an isotope, but any other particle.
 
   G4String CreatorName = aTrack->GetCreatorProcess()->GetProcessName();
-  G4int id = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
 
   // In Theory there should always be only one capture per event. But the more general approach is to be able to store multiple
   if (CreatorName == "RMGnCapture" || CreatorName == "nCapture") {
