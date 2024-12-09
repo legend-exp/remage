@@ -15,7 +15,7 @@ RUN mkdir -p src build /opt/remage && \
     if [ "${REMAGE_VERSION}" = "dev" ]; then \
         rm -rf src && \
         git clone "https://github.com/legend-exp/remage" src && \
-        REMAGE_VERSION_SET="$(git -C src describe --tags)"; \
+        REMAGE_VERSION_SET="$(git -C src describe --tags | sed 's/^v//')"; \
     else \
         REMAGE_VERSION_SET="${REMAGE_VERSION}" && \
         wget -q -O- "https://github.com/legend-exp/remage/archive/${REMAGE_VERSION}.tar.gz" \
