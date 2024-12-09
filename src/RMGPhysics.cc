@@ -249,7 +249,6 @@ void RMGPhysics::ConstructProcess() {
       // Apply RMG custom neutron capture
       // Mostly similar to examples/extended/Hadr04
       auto pManager = G4Neutron::Neutron()->GetProcessManager();
-      auto processVector = pManager->GetProcessList();
       // Find the existing neutron capture process
       auto neutronCaptureProcess =
           dynamic_cast<G4NeutronCaptureProcess*>(pManager->GetProcess("nCapture"));

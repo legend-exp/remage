@@ -374,7 +374,7 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
   }
   std::string names_string, forms_string;
   uint64_t out_column_count = 0;
-  int out_entries_count = -1;
+  uint64_t out_entries_count = 0;
   for (auto& lgdo_name : columns) {
     auto column = lgdo_name;
 
@@ -403,7 +403,7 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
     hsize_t dims[1];
     dset_space.getSimpleExtentDims(dims);
     CreateUIntDataset(det_group, column + "/entries", dims[0]);
-    if (out_entries_count < 0) {
+    if (out_column_count == 0) {
       out_entries_count = dims[0];
     } else if (out_entries_count != dims[0]) {
       LH5Log(RMGLog::error, ntuple_log_prefix, "mismatch for entry count for column ", column, " ",
