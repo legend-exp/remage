@@ -24,6 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         container_version:
+        - G4.11.3
         - G4.11.2
         - G4.11.1
         - G4.11.0
