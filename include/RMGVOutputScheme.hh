@@ -20,6 +20,7 @@
 #include <string>
 
 #include "G4AnalysisManager.hh"
+#include "G4Run.hh"
 #include "G4Track.hh"
 #include "G4UserStackingAction.hh"
 
