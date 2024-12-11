@@ -47,7 +47,7 @@ class RMGScintillatorDetectorHit : public G4VHit {
 
     int detector_uid = -1;
     int particle_type = -1;
-    float energy_deposition = -1;
+    double energy_deposition = -1;
     G4ThreeVector global_position_pre;
     G4ThreeVector global_position_post;
     double global_time = -1;

@@ -47,7 +47,7 @@ class RMGOpticalDetectorHit : public G4VHit {
 
     G4TouchableHandle detector_touchable; // for Draw()
     int detector_uid = -1;
-    float photon_wavelength = 0.;
+    double photon_wavelength = 0.;
     double global_time = -1;
 };
 
