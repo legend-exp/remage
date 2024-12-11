@@ -62,20 +62,20 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     void SetSkyShape(std::string shape);
 
     SkyShape fSkyShape = SkyShape::kSphere;
-    float fSkyPlaneSize = -1;
-    float fSkyPlaneHeight = 50;
+    double fSkyPlaneSize = -1;
+    double fSkyPlaneHeight = 50;
 
-    float fSpherePositionThetaMin = 0 * u::deg;
-    float fSpherePositionThetaMax = 90 * u::deg;
-    float fSpherePositionPhiMin = 0 * u::deg;
-    float fSpherePositionPhiMax = 360 * u::deg;
+    double fSpherePositionThetaMin = 0 * u::deg;
+    double fSpherePositionThetaMax = 90 * u::deg;
+    double fSpherePositionPhiMin = 0 * u::deg;
+    double fSpherePositionPhiMax = 360 * u::deg;
 
-    float fMomentumMin = 0 * u::GeV;
-    float fMomentumMax = 1 * u::TeV;
-    float fThetaMin = 0 * u::deg;
-    float fThetaMax = 90 * u::deg;
-    float fPhiMin = 0 * u::deg;
-    float fPhiMax = 360 * u::deg;
+    double fMomentumMin = 0 * u::GeV;
+    double fMomentumMax = 1 * u::TeV;
+    double fThetaMin = 0 * u::deg;
+    double fThetaMax = 90 * u::deg;
+    double fPhiMin = 0 * u::deg;
+    double fPhiMax = 360 * u::deg;
 };
 
 #endif
