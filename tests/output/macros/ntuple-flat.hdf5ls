@@ -18,6 +18,9 @@ stp/germanium/names
 stp/germanium/particle
 stp/germanium/particle/entries
 stp/germanium/particle/pages
+stp/germanium/surfacedist_in_m
+stp/germanium/surfacedist_in_m/entries
+stp/germanium/surfacedist_in_m/pages
 stp/germanium/time_in_ns
 stp/germanium/time_in_ns/entries
 stp/germanium/time_in_ns/pages

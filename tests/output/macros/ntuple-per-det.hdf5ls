@@ -97,6 +97,9 @@ stp/det011/names
 stp/det011/particle
 stp/det011/particle/entries
 stp/det011/particle/pages
+stp/det011/surfacedist_in_m
+stp/det011/surfacedist_in_m/entries
+stp/det011/surfacedist_in_m/pages
 stp/det011/time_in_ns
 stp/det011/time_in_ns/entries
 stp/det011/time_in_ns/pages
@@ -123,6 +126,9 @@ stp/det012/names
 stp/det012/particle
 stp/det012/particle/entries
 stp/det012/particle/pages
+stp/det012/surfacedist_in_m
+stp/det012/surfacedist_in_m/entries
+stp/det012/surfacedist_in_m/pages
 stp/det012/time_in_ns
 stp/det012/time_in_ns/entries
 stp/det012/time_in_ns/pages

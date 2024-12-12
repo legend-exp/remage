@@ -15,6 +15,9 @@ stp/det1/names
 stp/det1/particle
 stp/det1/particle/entries
 stp/det1/particle/pages
+stp/det1/surfacedist_in_m
+stp/det1/surfacedist_in_m/entries
+stp/det1/surfacedist_in_m/pages
 stp/det1/time_in_ns
 stp/det1/time_in_ns/entries
 stp/det1/time_in_ns/pages
@@ -41,6 +44,9 @@ stp/det2/names
 stp/det2/particle
 stp/det2/particle/entries
 stp/det2/particle/pages
+stp/det2/surfacedist_in_m
+stp/det2/surfacedist_in_m/entries
+stp/det2/surfacedist_in_m/pages
 stp/det2/time_in_ns
 stp/det2/time_in_ns/entries
 stp/det2/time_in_ns/pages
