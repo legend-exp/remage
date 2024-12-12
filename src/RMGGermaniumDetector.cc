@@ -137,16 +137,16 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   float dist = sv->DistanceToOut(Tf.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  int localNoDaughters = lv->GetNoDaughters();
-  // sampleNo has to be signed, so auto typing does not work
-  for (int sampleNo = localNoDaughters - 1; sampleNo >= 0; sampleNo--) {
-    const auto samplePhysical = lv->GetDaughter(sampleNo);
-    G4AffineTransform sampleTf(samplePhysical->GetRotation(), samplePhysical->GetTranslation());
-    sampleTf.Invert();
-    const G4ThreeVector samplePoint = sampleTf.TransformPoint(position);
-    const G4VSolid* sampleSolid = samplePhysical->GetLogicalVolume()->GetSolid();
-    const G4double sampleDist = sampleSolid->DistanceToIn(samplePoint);
-    if (sampleDist < dist) { dist = sampleDist; }
+  int local_no_daughters = lv->GetNoDaughters();
+  // sample_no has to be signed, so auto typing does not work
+  for (int sample_no = local_no_daughters - 1; sample_no >= 0; sample_no--) {
+    const auto sample_physical = lv->GetDaughter(sample_no);
+    G4AffineTransform sample_Tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
+    sample_Tf.Invert();
+    const G4ThreeVector sample_point = sample_Tf.TransformPoint(position);
+    const G4VSolid* sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+    const G4double sample_dist = sample_solid->DistanceToIn(sample_point);
+    if (sample_dist < dist) { dist = sample_dist; }
   }
 
   hit->distance_to_surface = dist;
