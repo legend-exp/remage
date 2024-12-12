@@ -85,6 +85,9 @@ stp/det002/zloc_pre_in_m/entries
 stp/det002/zloc_pre_in_m/pages
 stp/det011
 stp/det011/columns
+stp/det011/dist_to_surf_in_m
+stp/det011/dist_to_surf_in_m/entries
+stp/det011/dist_to_surf_in_m/pages
 stp/det011/edep_in_keV
 stp/det011/edep_in_keV/entries
 stp/det011/edep_in_keV/pages
@@ -111,6 +114,9 @@ stp/det011/zloc_in_m/entries
 stp/det011/zloc_in_m/pages
 stp/det012
 stp/det012/columns
+stp/det012/dist_to_surf_in_m
+stp/det012/dist_to_surf_in_m/entries
+stp/det012/dist_to_surf_in_m/pages
 stp/det012/edep_in_keV
 stp/det012/edep_in_keV/entries
 stp/det012/edep_in_keV/pages

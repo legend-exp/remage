@@ -1,5 +1,6 @@
 stp : struct{det1,det2,scint1,scint2,vertices}
-stp/det1 : table{evtid,particle,edep,time,xloc,yloc,zloc}
+stp/det1 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
+stp/det1/dist_to_surf : array<1>{real}
 stp/det1/edep : array<1>{real}
 stp/det1/evtid : array<1>{real}
 stp/det1/particle : array<1>{real}
@@ -7,7 +8,8 @@ stp/det1/time : array<1>{real}
 stp/det1/xloc : array<1>{real}
 stp/det1/yloc : array<1>{real}
 stp/det1/zloc : array<1>{real}
-stp/det2 : table{evtid,particle,edep,time,xloc,yloc,zloc}
+stp/det2 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
+stp/det2/dist_to_surf : array<1>{real}
 stp/det2/edep : array<1>{real}
 stp/det2/evtid : array<1>{real}
 stp/det2/particle : array<1>{real}

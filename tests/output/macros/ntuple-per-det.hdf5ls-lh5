@@ -25,7 +25,8 @@ stp/det002/yloc_post : array<1>{real}
 stp/det002/yloc_pre : array<1>{real}
 stp/det002/zloc_post : array<1>{real}
 stp/det002/zloc_pre : array<1>{real}
-stp/det011 : table{evtid,particle,edep,time,xloc,yloc,zloc}
+stp/det011 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
+stp/det011/dist_to_surf : array<1>{real}
 stp/det011/edep : array<1>{real}
 stp/det011/evtid : array<1>{real}
 stp/det011/particle : array<1>{real}
@@ -33,7 +34,8 @@ stp/det011/time : array<1>{real}
 stp/det011/xloc : array<1>{real}
 stp/det011/yloc : array<1>{real}
 stp/det011/zloc : array<1>{real}
-stp/det012 : table{evtid,particle,edep,time,xloc,yloc,zloc}
+stp/det012 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
+stp/det012/dist_to_surf : array<1>{real}
 stp/det012/edep : array<1>{real}
 stp/det012/evtid : array<1>{real}
 stp/det012/particle : array<1>{real}
