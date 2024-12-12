@@ -1,10 +1,10 @@
 stp : struct{germanium,scintillator,vertices}
-stp/germanium : table{evtid,det_uid,particle,edep,time,xloc,yloc,zloc,surfacedist}
+stp/germanium : table{evtid,det_uid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
 stp/germanium/det_uid : array<1>{real}
+stp/germanium/dist_to_surf : array<1>{real}
 stp/germanium/edep : array<1>{real}
 stp/germanium/evtid : array<1>{real}
 stp/germanium/particle : array<1>{real}
-stp/germanium/surfacedist : array<1>{real}
 stp/germanium/time : array<1>{real}
 stp/germanium/xloc : array<1>{real}
 stp/germanium/yloc : array<1>{real}
