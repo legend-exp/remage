@@ -134,18 +134,18 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   // First transform coordinates into local system
   G4AffineTransform Tf(pv->GetRotation(), pv->GetTranslation());
   Tf.Invert();
-  float dist = sv->DistanceToOut(Tf.TransformPoint(position));
+  double dist = sv->DistanceToOut(Tf.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
   int local_no_daughters = lv->GetNoDaughters();
   // sample_no has to be signed, so auto typing does not work
   for (int sample_no = local_no_daughters - 1; sample_no >= 0; sample_no--) {
     const auto sample_physical = lv->GetDaughter(sample_no);
-    G4AffineTransform sample_Tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
-    sample_Tf.Invert();
-    const G4ThreeVector sample_point = sample_Tf.TransformPoint(position);
-    const G4VSolid* sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
-    const G4double sample_dist = sample_solid->DistanceToIn(sample_point);
+    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
+    sample_tf.Invert();
+    const auto sample_point = sample_tf.TransformPoint(position);
+    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+    const double sample_dist = sample_solid->DistanceToIn(sample_point);
     if (sample_dist < dist) { dist = sample_dist; }
   }
 
