@@ -132,9 +132,9 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   //
 
   // First transform coordinates into local system
-  G4AffineTransform Tf(pv->GetRotation(), pv->GetTranslation());
-  Tf.Invert();
-  double dist = sv->DistanceToOut(Tf.TransformPoint(position));
+  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
+  tf.Invert();
+  double dist = sv->DistanceToOut(tf.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
   int local_no_daughters = lv->GetNoDaughters();
