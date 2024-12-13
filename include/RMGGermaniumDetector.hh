@@ -48,6 +48,7 @@ class RMGGermaniumDetectorHit : public G4VHit {
     int detector_uid = -1;
     int particle_type = -1;
     double energy_deposition = -1;
+    double distance_to_surface = -1;
     G4ThreeVector global_position;
     double global_time = -1;
 };

@@ -6,6 +6,9 @@ stp/germanium/columns
 stp/germanium/det_uid
 stp/germanium/det_uid/entries
 stp/germanium/det_uid/pages
+stp/germanium/dist_to_surf_in_m
+stp/germanium/dist_to_surf_in_m/entries
+stp/germanium/dist_to_surf_in_m/pages
 stp/germanium/edep_in_keV
 stp/germanium/edep_in_keV/entries
 stp/germanium/edep_in_keV/pages

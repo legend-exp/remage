@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "G4AffineTransform.hh"
 #include "G4Circle.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4OpticalPhoton.hh"
@@ -89,10 +90,14 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   // we're going to use info from the pre-step point
   const auto prestep = step->GetPreStepPoint();
+  const auto position = prestep->GetPosition();
 
   // locate us
-  const auto pv_name = prestep->GetTouchableHandle()->GetVolume()->GetName();
+  const auto pv = prestep->GetTouchableHandle()->GetVolume();
+  const auto pv_name = pv->GetName();
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
+  const auto lv = pv->GetLogicalVolume();
+  const auto sv = lv->GetSolid();
 
   // check if physical volume is registered as germanium detector
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
@@ -119,8 +124,32 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
-  hit->global_position = prestep->GetPosition();
+  hit->global_position = position;
   hit->global_time = prestep->GetGlobalTime();
+
+  // Get distance to surface.
+  // Check distance to surfaces of Mother volume
+  //
+
+  // First transform coordinates into local system
+  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
+  tf.Invert();
+  double dist = sv->DistanceToOut(tf.TransformPoint(position));
+
+  // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
+  int local_no_daughters = lv->GetNoDaughters();
+  // sample_no has to be signed, so auto typing does not work
+  for (int sample_no = local_no_daughters - 1; sample_no >= 0; sample_no--) {
+    const auto sample_physical = lv->GetDaughter(sample_no);
+    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
+    sample_tf.Invert();
+    const auto sample_point = sample_tf.TransformPoint(position);
+    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+    const double sample_dist = sample_solid->DistanceToIn(sample_point);
+    if (sample_dist < dist) { dist = sample_dist; }
+  }
+
+  hit->distance_to_surface = dist;
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
