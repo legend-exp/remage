@@ -242,7 +242,8 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
   auto path_for_overwrite =
       fs::path(G4Analysis::GetTnFileName(path.string(), path.extension().string()));
   if (fs::exists(path_for_overwrite) && !manager->GetOutputOverwriteFiles()) {
-    RMGLog::Out(RMGLog::fatal, "Output file ", path_for_overwrite.string(), " does already exists.");
+    G4RunManager::GetRunManager()->AbortRun(true);
+    RMGLog::Out(RMGLog::error, "Output file ", path_for_overwrite.string(), " does already exists.");
   }
 
   auto ext = path.extension();
