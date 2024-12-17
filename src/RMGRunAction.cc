@@ -243,8 +243,8 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
       fs::path(G4Analysis::GetTnFileName(path.string(), path.extension().string()));
   if (fs::exists(path_for_overwrite) && !manager->GetOutputOverwriteFiles()) {
     RMGLog::Out(RMGLog::error, "Output file ", path_for_overwrite.string(), " does already exists.");
-    // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at this stage.
-    // also, there is no clean way to abort an run before the run started.
+    // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at
+    // this stage. also, there is no clean way to abort an run before the run started.
     std::abort();
   }
 
