@@ -34,6 +34,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: setup and start xvfb
+      run: |
+        apt-get update
+        apt-get install -y xvfb xfonts-75dpi xfonts-100dpi mesa-utils libgl1-mesa-glx libglu1-mesa
+        Xvfb :99 -screen 0 1920x1080x24 &
+
     - name: Install pip dependencies for tests
       # TODO: replace with a better way to manage test dependencies.
       run: |
@@ -47,14 +54,18 @@ jobs:
         make install
     - name: Run full test suite
       if: ${{ matrix.container_version != 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
-        ctest --output-on-failure --label-exclude 'vis'
+        ctest --output-on-failure
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
-        ctest --output-on-failure --label-exclude 'extra|vis'
+        ctest --output-on-failure --label-exclude 'extra'
     - name: Compare checked-in doc dump with current result
       if: ${{ matrix.container_version != 'slim' }}
       run: |
