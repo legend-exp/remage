@@ -2,48 +2,103 @@ ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
 
-exclude: ^include/(fmt|magic_enum|CLI11|EcoMug)/
+exclude: ^include/(fmt|magic_enum|CLI11|EcoMug)/|^docs/rmg-commands.md|^docs/extensions/remage/warnings_filter.py
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-  hooks:
-  - id: check-added-large-files
-    args: ['--maxkb=600']
-  - id: check-case-conflict
-  - id: check-executables-have-shebangs
-  - id: check-merge-conflict
-  - id: check-symlinks
-  - id: check-yaml
-  - id: check-json
-  - id: debug-statements
-  - id: end-of-file-fixer
-  - id: forbid-new-submodules
-  - id: mixed-line-ending
-  - id: trailing-whitespace
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: "1.19.1"
+    hooks:
+      - id: blacken-docs
+        additional_dependencies: [black==24.*]
 
-- repo: https://github.com/cheshirekow/cmake-format-precommit
-  rev: v0.6.13
-  hooks:
-  - id: cmake-format
-    additional_dependencies: [pyyaml]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=600"]
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+      - id: check-json
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: trailing-whitespace
 
-- repo: https://github.com/codespell-project/codespell
-  rev: v2.3.0
-  hooks:
-  - id: codespell
-    args: ["-L", "hist,manuel"]
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: "v1.10.0"
+    hooks:
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
 
-- repo: local
-  hooks:
-   - id: clang-tidy
-     name: clang-tidy
-     entry: bash -c 'command -V run-clang-tidy >&- 2>&-; if [[ $? == 0 && -d build ]]; then run-clang-tidy -fix -quiet -p=build; fi'
-     language: system
-     pass_filenames: false
-     types_or: [c++]
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: "v3.3.3"
+    hooks:
+      - id: prettier
+        types_or: [yaml, markdown, html, css, scss, javascript, json]
+        args: [--prose-wrap=always]
 
-- repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v19.1.5
-  hooks:
-   - id: clang-format
-     types_or: [c++]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.7.4"
+    hooks:
+      - id: ruff
+        args: ["--fix", "--show-fixes"]
+      - id: ruff-format
+
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        additional_dependencies: [pyyaml]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        args: ["-L", "hist,manuel"]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: "v0.10.0.1"
+    hooks:
+      - id: shellcheck
+
+  - repo: local
+    hooks:
+      - id: disallow-caps
+        name: Disallow improper capitalization
+        language: pygrep
+        entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
+        exclude: .pre-commit-config.yaml
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: "v0.23"
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies: ["validate-pyproject-schema-store[all]"]
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: "0.29.4"
+    hooks:
+      - id: check-dependabot
+      - id: check-github-workflows
+      - id: check-readthedocs
+
+  - repo: local
+    hooks:
+      - id: clang-tidy
+        name: clang-tidy
+        entry:
+          bash -c 'command -V run-clang-tidy >&- 2>&-; if [[ $? == 0 && -d build
+          ]]; then run-clang-tidy -fix -quiet -p=build; fi'
+        language: system
+        pass_filenames: false
+        types_or: [c++]
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.5
+    hooks:
+      - id: clang-format
+        types_or: [c++]

@@ -2,10 +2,12 @@
 
 """Convert an output file of remage-doc-dump to a rst file."""
 
+from __future__ import annotations
+
 import math
-import os
 import re
 import sys
+from pathlib import Path
 
 if len(sys.argv) < 2:
     msg = "need to pass an original file"
@@ -26,8 +28,8 @@ outlines = [
     '[//]: # "All guidance strings and command info are taken from C++ source files and can be changed there."',
     "",
 ]
-infile = open(path, "rt")
-inlines = [line.strip("\n") for line in infile]
+with Path(path).open() as infile:
+    inlines = [line.strip("\n") for line in infile]
 
 
 def remove_whitespace_lines_end(lines: list):
@@ -46,14 +48,14 @@ last_param = -1  # line number of last parameter start (i.e. "Parameter : ...")
 
 for line in inlines:
     if re.match(r"Command directory path : /RMG/", line):
-        line = "## `" + line.removeprefix("Command directory path : ") + "`"
+        line = "## `" + line.removeprefix("Command directory path : ") + "`"  # noqa: PLW2901
         remove_whitespace_lines_end(outlines)
         outlines.extend(["", line, ""])
         in_cmdblock = True
         lastlevel = -1
         leveldiff = 0
     elif re.match(r"Command /RMG/", line):
-        line = "### `" + line.removeprefix("Command ") + "`"
+        line = "### `" + line.removeprefix("Command ") + "`"  # noqa: PLW2901
         remove_whitespace_lines_end(outlines)
         outlines.extend(["", line, ""])
         in_cmdblock = True
@@ -68,10 +70,15 @@ for line in inlines:
             in_guidance = False
         elif line != "":
             outlines.extend([line, ""])
-    elif in_cmdblock and line == " Commands : " and not inlines[idx + 1].startswith(" " * 3):
-        # ignore directories with no commands.
-        pass
-    elif in_cmdblock and line == " Sub-directories : " and inlines[idx + 1] == " Commands : ":
+    elif (
+        in_cmdblock
+        and line == " Commands : "
+        and not inlines[idx + 1].startswith(" " * 3)
+    ) or (
+        in_cmdblock
+        and line == " Sub-directories : "
+        and inlines[idx + 1] == " Commands : "
+    ):
         # ignore directories with no commands.
         pass
     elif in_cmdblock and line != "":
@@ -100,7 +107,9 @@ for line in inlines:
             monospaced = True
 
         stripped_line = stripped_line.rstrip()
-        if lastlevel == -1 and indent > lastlevel + 1:  # parts of the output have the wrong indentation.
+        if (
+            lastlevel == -1 and indent > lastlevel + 1
+        ):  # parts of the output have the wrong indentation.
             leveldiff = indent
         indent -= leveldiff
         no_star_prefix = False
@@ -115,23 +124,16 @@ for line in inlines:
             fmt = "**" if sep == ":" else "`"
             if len(g) > 1:
                 g[0] = f"{fmt}{g[0].strip()}{fmt}"
-                g[1] = " –"
+                g[1] = " –"  # noqa: RUF001
             if len(g) > 2 and g[2] != "":
                 fmt2 = "`" if monospaced or fmt == "**" else ""
                 g[2] = f" {fmt2}{g[2].strip()}{fmt2}"
             stripped_line = "".join(g)
 
-        star_prefix = "* " if not no_star_prefix else "  – "
+        star_prefix = "* " if not no_star_prefix else "  – "  # noqa: RUF001
         outlines.append("  " * indent + star_prefix + stripped_line)
         lastlevel = indent
     idx += 1
 
-outfile = open("rmg-commands.md", "wt")
-outfile.writelines([l + "\n" for l in outlines])
-
-print(
-    "converted G4 manual",
-    os.path.realpath(path),
-    "to MarkDown file",
-    os.path.realpath("rmg-commands.md"),
-)
+with Path("rmg-commands.md").open("w") as outfile:
+    outfile.writelines([line + "\n" for line in outlines])

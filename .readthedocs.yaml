@@ -17,7 +17,8 @@ build:
       - git fetch --unshallow || true
     pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
       - export DOXYGEN_DOT_PATH=$(which dot)
-      - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g docs/Doxyfile.in > docs/Doxyfile
+      - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g
+        docs/Doxyfile.in > docs/Doxyfile
       - cat docs/Doxyfile
       - cd docs && doxygen
       - mkdir -p docs/extra/doxygen

@@ -4,12 +4,14 @@ The following rules and conventions have been established for the package
 development and are enforced throughout the entire code base. Merge requests
 that do not comply to the following directives will be rejected.
 
-To start developing *remage*, fork the remote repository to your personal
-GitHub account (see [About Forks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks)).
+To start developing _remage_, fork the remote repository to your personal GitHub
+account (see
+[About Forks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks)).
 If you have not set up your ssh keys on the computer you will be working on,
-please follow [GitHub's instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
-Once you have your own fork, you can clone it via
-(replace "yourusername" with your GitHub username):
+please follow
+[GitHub's instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+Once you have your own fork, you can clone it via (replace "yourusername" with
+your GitHub username):
 
 ```console
 $ git clone git@github.com:yourusername/remage.git
@@ -18,11 +20,12 @@ $ git clone git@github.com:yourusername/remage.git
 ## Installing dependencies
 
 ```{include} _dependencies.md
+
 ```
 
 ## Building
 
-*remage* currently only supports an out-of-tree build using CMake. To build and
+_remage_ currently only supports an out-of-tree build using CMake. To build and
 install remage from a source checkout, run:
 
 ```console
@@ -34,14 +37,13 @@ $ make install
 
 ## Code style
 
-A set of [pre-commit](https://pre-commit.com) hooks is configured to make
-sure that *remage* coherently follows standard coding style conventions.
-The pre-commit tool is able to identify common style problems and automatically
-fix them, wherever possible. Configured hooks are listed in the
-`.pre-commit-config.yaml` file at the project root folder. They are run
-remotely on the GitHub repository through the [pre-commit
-bot](https://pre-commit.ci), but should also be run locally before submitting a
-pull request:
+A set of [pre-commit](https://pre-commit.com) hooks is configured to make sure
+that _remage_ coherently follows standard coding style conventions. The
+pre-commit tool is able to identify common style problems and automatically fix
+them, wherever possible. Configured hooks are listed in the
+`.pre-commit-config.yaml` file at the project root folder. They are run remotely
+on the GitHub repository through the [pre-commit bot](https://pre-commit.ci),
+but should also be run locally before submitting a pull request:
 
 ```console
 $ cd remage
@@ -52,14 +54,14 @@ $ pre-commit install          # install a Git pre-commit hook (optional, but str
 
 ## Testing
 
-The *remage* test suite is available below `tests/`. We use
+The _remage_ test suite is available below `tests/`. We use
 [ctest](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html)
 to run tests and analyze their output.
 
-Tests are automatically run for every push event and pull request to the
-remote Git repository on a remote server (currently handled by GitHub
-actions). All pull request typically have to pass all tests before being
-merged. Running the test suite locally is simple:
+Tests are automatically run for every push event and pull request to the remote
+Git repository on a remote server (currently handled by GitHub actions). All
+pull request typically have to pass all tests before being merged. Running the
+test suite locally is simple:
 
 ```console
 $ cd remage/build/
@@ -74,6 +76,7 @@ navigate to "Actions", select the CI run of interest, scroll to the bottom of
 the page.
 
 Cheatsheet:
+
 ```console
 $ ctest --print-labels # see all defined test labels
 $ ctest -L vis # run only tests with label "vis"
@@ -84,16 +87,17 @@ If you want to open a fanci UI to check the output of `vis` tests, you may
 achieve it by:
 
 1. `cd` to `test/confinement`
-1. edit `macros/_vis.mac` to make sure you load an interactive UI (e.g. `/vis/open OI`)
+1. edit `macros/_vis.mac` to make sure you load an interactive UI (e.g.
+   `/vis/open OI`)
 1. edit the macro you are interested in and swap `_init.mac` with `_vis.mac` at
    the very beginning (after `/control/execute`)
-1. run the visualization with `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
+1. run the visualization with
+   `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
 
 ## Documentation
 
-We adopt best practices in writing and maintaining *remage*'s
-documentation. When contributing to the project, make sure to implement the
-following:
+We adopt best practices in writing and maintaining _remage_'s documentation.
+When contributing to the project, make sure to implement the following:
 
 - Documentation should be exclusively available on the Project website
   [remage.readthedocs.io](https://remage.readthedocs.io). No READMEs,
@@ -101,14 +105,14 @@ following:
 - Pull request authors are required to provide sufficient documentation for
   every proposed change or addition.
 - Documentation for classes/methods etc. should be provided in the same source
-  file, as Doxygen-formatted comments (see e.g. [this
-  guide](https://www.doxygen.nl/manual/docblocks.html)). They will be
+  file, as Doxygen-formatted comments (see e.g.
+  [this guide](https://www.doxygen.nl/manual/docblocks.html)). They will be
   automatically added to the API documentation section on ReadTheDocs.
 - General guides, comprehensive tutorials or other high-level documentation
-  (e.g. referring to how separate parts of the code interact between each
-  other) must be provided as separate pages in `docs/` and linked in the
-  table of contents. These documentation source files must formatted in
-  reStructuredText (reST). A reference format specification is available on the
+  (e.g. referring to how separate parts of the code interact between each other)
+  must be provided as separate pages in `docs/` and linked in the table of
+  contents. These documentation source files must formatted in reStructuredText
+  (reST). A reference format specification is available on the
   [Sphinx reST usage guide](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html).
 
 To generate documentation locally, run
@@ -119,9 +123,9 @@ $ cmake .. -DRMG_BUILD_DOCS=ON
 $ make sphinx
 ```
 
-You'll need a Doxygen installation and Python software dependencies specified
-in `docs/environment.yml`. The generated documentation can be viewed by
-pointing your browser to `docs/_build/index.html`.
+You'll need a Doxygen installation and Python software dependencies specified in
+`docs/environment.yml`. The generated documentation can be viewed by pointing
+your browser to `docs/_build/index.html`.
 
 ### Automatic command reference generation
 
@@ -134,12 +138,12 @@ $ cd remage/build/
 $ make remage-doc-dump
 ```
 
-The generated documentation file is also tracked using git, and not automatically
-rebuilt when the documentation is built, i.e. for ReadTheDocs.
+The generated documentation file is also tracked using git, and not
+automatically rebuilt when the documentation is built, i.e. for ReadTheDocs.
 
 Manually changing the checked-in file `rmg-commands.md` is neither required nor
 possible, all changes will be overwritten by the next automatic update.
 
 The GitHub CI jobs will only check if the command-reference file is up-to-date
-with the actual source code for each pull reuquest or push, but it will *not*
+with the actual source code for each pull reuquest or push, but it will _not_
 update the documentation automatically.

@@ -17,13 +17,14 @@ Configuration options
   the warning is converted to an information message and displayed.
 """
 
+from __future__ import annotations
+
 import logging
 import re
-from typing import Dict, Any, List
+from typing import Any
 
 from sphinx.application import Sphinx
 from sphinx.util.logging import NAMESPACE
-
 
 __version__ = "0.1.0"
 
@@ -35,7 +36,8 @@ class WarningsFilter(logging.Filter):
         silent: If true, warning is hidden, otherwise it is shown as INFO.
         name: Filter name.
     """
-    def __init__(self, expressions: List[str], silent: bool, name: str = "") -> None:
+
+    def __init__(self, expressions: list[str], silent: bool, name: str = "") -> None:
         super().__init__(name)
 
         self._expressions = expressions
@@ -49,10 +51,9 @@ class WarningsFilter(logging.Filter):
             if re.match(expression, str(record.msg)):
                 if self._silent:
                     return False
-                else:
-                    record.levelno = logging.INFO
-                    record.msg = f"Filtered warning: {record.msg}"
-                    return True
+                record.levelno = logging.INFO
+                record.msg = f"Filtered warning: {record.msg}"
+                return True
 
         return True
 
@@ -65,7 +66,7 @@ def configure(app: Sphinx) -> None:
 
     # load expressions from configuration file
     with open(app.config.warnings_filter_config) as f:
-        expressions = list()
+        expressions = []
         for line in f.readlines():
             if not line.startswith("#"):
                 expressions.append(line.rstrip())
@@ -77,7 +78,7 @@ def configure(app: Sphinx) -> None:
         handler.filters.insert(0, filter)
 
 
-def setup(app: Sphinx) -> Dict[str, Any]:
+def setup(app: Sphinx) -> dict[str, Any]:
     app.add_config_value("warnings_filter_config", "", "")
     app.add_config_value("warnings_filter_silent", True, "")
 

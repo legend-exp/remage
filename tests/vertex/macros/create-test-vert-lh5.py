@@ -1,7 +1,8 @@
 #!/bin/env python3
+from __future__ import annotations
 
-from lgdo import Array, Table, lh5
 import numpy as np
+from lgdo import Array, Table, lh5
 
 xloc = Array(np.array([0, 1, 2] * 10, dtype=np.float64), attrs={"units": "m"})
 yloc = Array(np.array([3, 4, 5] * 10, dtype=np.float64), attrs={"units": "m"})
