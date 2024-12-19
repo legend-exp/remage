@@ -41,16 +41,26 @@ jobs:
         cmake -DRMG_BUILD_EXAMPLES=1 ..
         make
         make install
+
+    - name: Setup and start xvfb (enables Geant4 visualization)
+      run: |
+        Xvfb :99 -screen 0 1920x1080x24 &
+
     - name: Run full test suite
       if: ${{ matrix.container_version != 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
         ctest --output-on-failure --label-exclude 'vis'
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
         ctest --output-on-failure --label-exclude 'extra|vis'
+
     - name: Compare checked-in doc dump with current result
       if: ${{ matrix.container_version != 'slim' }}
       run: |
