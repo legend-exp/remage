@@ -17,7 +17,7 @@ concurrency:
 jobs:
 
   test_on_linux:
-    name: Test on Linux containers (Ubuntu LTS)
+    name: Test on remage image
     runs-on: ubuntu-latest
 
     strategy:
@@ -59,8 +59,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-output
-        # artifacts must have a ".output" extension
-        path: build/tests/**/*.output.*
+        # artifacts must have a ".output*" extension
+        path: build/tests/**/*.output*.*
 
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
