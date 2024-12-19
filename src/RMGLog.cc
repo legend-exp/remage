@@ -13,8 +13,9 @@
 
 #include "RMGLog.hh"
 
-#include "RMGConfig.hh"
+#include "G4Version.hh"
 
+#include "RMGConfig.hh"
 #if RMG_HAS_ROOT
 #include <TError.h>
 #include <TROOT.h>
@@ -26,6 +27,7 @@
 #include <cstring>
 #include <iomanip>
 #include <memory>
+#include <regex>
 #include <unistd.h> // for isatty()
 
 RMGLog::LogLevel RMGLog::fMinimumLogLevel = RMGLog::summary;
@@ -57,12 +59,14 @@ RMGLog::RMGLog() {
 
 void RMGLog::StartupInfo() {
 
+  auto g4_version = std::regex_replace(G4Version, std::regex("\\$|Name:"), "");
+
   std::string message;
   // clang-format off
   message += R"(  _ __ ___ _ __ ___   __ _  __ _  ___ )" "\n";
   message += R"( | '__/ _ \ '_ ` _ \ / _` |/ _` |/ _ \)" "\n";
-  message += R"( | | |  __/ | | | | | (_| | (_| |  __/)" "\n";
-  message += R"( |_|  \___|_| |_| |_|\__,_|\__, |\___| v)" + RMGLog::fVersion + "\n";
+  message += R"( | | |  __/ | | | | | (_| | (_| |  __/ v)" + RMGLog::fVersion + "\n";
+  message += R"( |_|  \___|_| |_| |_|\__,_|\__, |\___| using)" + g4_version + "\n";
   message += R"(                           |___/      )" "\n";
   // clang-format on
 
