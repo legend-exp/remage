@@ -26,8 +26,6 @@ jobs:
         container_version:
         - G4.11.3
         - G4.11.2
-        - G4.11.1
-        - G4.11.0
         - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
@@ -38,7 +36,7 @@ jobs:
     - name: setup and start xvfb
       run: |
         apt-get update
-        apt-get install -y xvfb xfonts-75dpi xfonts-100dpi mesa-utils libgl1-mesa-glx libglu1-mesa
+        apt-get install -y xvfb xfonts-75dpi xfonts-100dpi
         Xvfb :99 -screen 0 1920x1080x24 &
 
     - name: Install pip dependencies for tests
