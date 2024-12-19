@@ -58,7 +58,7 @@ jobs:
       if: ${{ matrix.container_version != 'slim' }}
       uses: actions/upload-artifact@v4
       with:
-        name: test-output
+        name: test-output-${{ matrix.container_version }}
         # artifacts must have a ".output*" extension
         path: build/tests/**/*.output*.*
 
