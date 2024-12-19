@@ -35,7 +35,7 @@ BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakStringLiterals: true
 ColumnLimit: 100
-CommentPragmas: '^ IWYU pragma:'
+CommentPragmas: "^ IWYU pragma:"
 CompactNamespaces: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
@@ -49,20 +49,20 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '<[[:alnum:]._/]+>'
-    Priority:        1
-    CaseSensitive:   false
-  - Regex:           '^"(G4|globals\.hh|Randomize\.hh|CLHEP)'
-    Priority:        2
-    CaseSensitive:   false
-  - Regex:           '^"RMG'
-    Priority:        3
-    CaseSensitive:   false
-  - Regex:           '.*'
-    Priority:        4
-    CaseSensitive:   false
-IncludeIsMainRegex: '(Test)?$'
-IncludeIsMainSourceRegex: ''
+  - Regex: "<[[:alnum:]._/]+>"
+    Priority: 1
+    CaseSensitive: false
+  - Regex: '^"(G4|globals\.hh|Randomize\.hh|CLHEP)'
+    Priority: 2
+    CaseSensitive: false
+  - Regex: '^"RMG'
+    Priority: 3
+    CaseSensitive: false
+  - Regex: ".*"
+    Priority: 4
+    CaseSensitive: false
+IncludeIsMainRegex: "(Test)?$"
+IncludeIsMainSourceRegex: ""
 IndentAccessModifiers: true
 IndentCaseLabels: true
 IndentCaseBlocks: false
@@ -75,8 +75,8 @@ IndentWrappedFunctionNames: false
 InsertTrailingCommas: None
 KeepEmptyLinesAtTheStartOfBlocks: true
 LambdaBodyIndentation: Signature
-MacroBlockBegin: ''
-MacroBlockEnd: ''
+MacroBlockBegin: ""
+MacroBlockEnd: ""
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
 PenaltyBreakAssignment: 2

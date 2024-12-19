@@ -14,8 +14,9 @@ Before opening a PR:
 After the CI has run:
 
 - fix all reported problems, if any
-- navigate to the ReadTheDocs documentation build (linked in the GitHub
-  actions report for the PR) and check that the docs are properly rendered
+- navigate to the ReadTheDocs documentation build (linked in the GitHub actions
+  report for the PR) and check that the docs are properly rendered
 - download and check the test outputs from the GitHub actions interface
 
-For more details, refer to the [developer's guide](https://remage.readthedocs.io/en/stable/developer.html).
+For more details, refer to the
+[developer's guide](https://remage.readthedocs.io/en/stable/developer.html).

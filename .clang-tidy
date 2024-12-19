@@ -21,8 +21,8 @@ Checks: "-*, \
   -readability-function-cognitive-complexity"
 
 CheckOptions:
-- key: modernize-use-override.IgnoreDestructors
-  value: true
+  - key: modernize-use-override.IgnoreDestructors
+    value: true
 
 FormatStyle: file
 HeaderFilterRegex: 'include/.*\.(hh|icc)'

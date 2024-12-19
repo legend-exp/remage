@@ -1,16 +1,14 @@
 # remage
 
-*remage* is a modern C++ simulation framework for germanium experiments.
+_remage_ is a modern C++ simulation framework for germanium experiments.
 
 ## Quick start
 
 The installation process is documented in {doc}`install`.
 
-:::{warning}
-A proper user guide is not available yet. In the meanwhile, users can have a
-look at the {doc}`tutorial` or the provided
-[examples](https://github.com/legend-exp/remage/tree/main/examples).
-:::
+:::{warning} A proper user guide is not available yet. In the meanwhile, users
+can have a look at the {doc}`tutorial` or the provided
+[examples](https://github.com/legend-exp/remage/tree/main/examples). :::
 
 In the simplest application, the user can simulate in an existing GDML geometry
 through the `remage` executable:
@@ -38,7 +36,7 @@ Options:
 Macro files can use all available upstream Geant4 macro commands, as well as the
 [remage macro interface](./rmg-commands)
 
-Advanced applications can extend *remage* and link against `libremage` with the
+Advanced applications can extend _remage_ and link against `libremage` with the
 usual CMake syntax:
 
 ```cmake

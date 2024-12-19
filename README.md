@@ -16,37 +16,37 @@ Simulation framework for germanium detector experiments
 
 <br/>
 
-The *remage* project aims to deliver a modern Geant4-based C++ library designed
+The _remage_ project aims to deliver a modern Geant4-based C++ library designed
 for efficient simulation of particle physics processes in typical germanium
 detector experiments. The library is setup-agnostic, requiring users only to
 define the experimental setup's geometry. Supported specification languages
-include C++, GDML, and others. Once the geometry is provided, users can access
-a comprehensive suite of tools for common tasks, such as physics generation and
+include C++, GDML, and others. Once the geometry is provided, users can access a
+comprehensive suite of tools for common tasks, such as physics generation and
 standard output handling.
 
 Get started with our [documentation pages](https://remage.readthedocs.io)!
 
 ### Main features
 
-* Low entry barrier: Most simulations can be executed directly using the
-  `remage` executable and a macro file, eliminating the need to write or
-  compile C++ code.
-* Various pre-compiled *remage* versions available on
+- Low entry barrier: Most simulations can be executed directly using the
+  `remage` executable and a macro file, eliminating the need to write or compile
+  C++ code.
+- Various pre-compiled _remage_ versions available on
   [Docker Hub](https://hub.docker.com/repository/docker/legendexp/remage)
-* Support for modern [Geant4](https://geant4.web.cern.ch), including:
-  * Multithreading
-  * [GDML](https://gdml.web.cern.ch/GDML) support
-  * Multiple output file formats ([ROOT](https://root.cern.ch),
+- Support for modern [Geant4](https://geant4.web.cern.ch), including:
+  - Multithreading
+  - [GDML](https://gdml.web.cern.ch/GDML) support
+  - Multiple output file formats ([ROOT](https://root.cern.ch),
     [HDF5](https://www.hdfgroup.org/solutions/hdf5)...)
-* [LEGEND HDF5 (LH5)](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/)
+- [LEGEND HDF5 (LH5)](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/)
   output format
-* Fast third-party cosmic muon generator (through
+- Fast third-party cosmic muon generator (through
   [EcoMug](https://doi.org/10.1016/j.nima.2021.165732))
-* Support for external generators:
-  * [MUSUN](https://doi.org/10.1016/j.cpc.2008.10.013)
-  * [MAURINA](https://doi.org/10.1140/epja/s10050-024-01336-0)
-* Third-party double-beta decay generator (through
+- Support for external generators:
+  - [MUSUN](https://doi.org/10.1016/j.cpc.2008.10.013)
+  - [MAURINA](https://doi.org/10.1140/epja/s10050-024-01336-0)
+- Third-party double-beta decay generator (through
   [bxdecay0](https://github.com/BxCppDev/bxdecay0))
-* Advanced vertex confinement on physical volumes, geometrical solids, surfaces
+- Advanced vertex confinement on physical volumes, geometrical solids, surfaces
   and intersections
-* Sensible output schemes for HPGe and optical detectors
+- Sensible output schemes for HPGe and optical detectors

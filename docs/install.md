@@ -2,16 +2,17 @@
 
 ## Pre-built binaries
 
-The recommended and fastest way of running *remage* is through pre-built
-software containers. Stable releases are regularly made available [on Docker
-Hub](https://hub.docker.com/repository/docker/legendexp/remage). To obtain and
-run the latest just do:
+The recommended and fastest way of running _remage_ is through pre-built
+software containers. Stable releases are regularly made available
+[on Docker Hub](https://hub.docker.com/repository/docker/legendexp/remage). To
+obtain and run the latest just do:
 
 ```console
 $ docker run legendexp/remage:latest --help # just prints a help message
 ```
 
-If you prefer [Apptainer](https://apptainer.org/), you can easily generate an image locally:
+If you prefer [Apptainer](https://apptainer.org/), you can easily generate an
+image locally:
 
 ```console
 $ apptainer build remage_latest.sif docker://legendexp/remage:latest
@@ -27,6 +28,7 @@ In preparation for the actual build, users are required to obtain some
 dependencies.
 
 ```{include} _dependencies.md
+
 ```
 
 ### Building

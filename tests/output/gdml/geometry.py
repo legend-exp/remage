@@ -7,7 +7,9 @@ from pyg4ometry import geant4 as g4
 
 registry = g4.Registry()
 world = g4.solid.Box("world", 2, 2, 2, registry, "m")
-world_lv = g4.LogicalVolume(world, g4.MaterialPredefined("G4_Galactic"), "world", registry)
+world_lv = g4.LogicalVolume(
+    world, g4.MaterialPredefined("G4_Galactic"), "world", registry
+)
 registry.setWorld(world_lv)
 
 scint = g4.solid.Box("scint", 0.5, 1, 1, registry, "m")
