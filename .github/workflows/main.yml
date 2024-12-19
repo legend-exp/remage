@@ -23,21 +23,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
         - G4.11.3
         - G4.11.2
-        - G4.11.1
-        - G4.11.0
         - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: setup and start xvfb
+      # FIXME: remove install once container is updated
+      run: |
+        apt-get update
+        apt-get install -y xvfb xfonts-75dpi xfonts-100dpi
+        Xvfb :99 -screen 0 1920x1080x24 &
+
     - name: Install pip dependencies for tests
-      # TODO: replace with a better way to manage test dependencies.
+      # FIXME: remove this once container is updated with test dependencies
       run: |
         pip3 install --user --upgrade legend-pydataobj scipy
+
     - name: Build project
       run: |
         mkdir build
@@ -45,16 +53,29 @@ jobs:
         cmake -DRMG_BUILD_EXAMPLES=1 ..
         make
         make install
+
     - name: Run full test suite
       if: ${{ matrix.container_version != 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
-        ctest --output-on-failure --label-exclude 'vis'
+        ctest --output-on-failure
+
+    - name: Upload test suite outputs to GitHub
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-output
+        path: build/tests/**/*.pdf
+
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
         ctest --output-on-failure --label-exclude 'extra|vis'
+
     - name: Compare checked-in doc dump with current result
       if: ${{ matrix.container_version != 'slim' }}
       run: |
