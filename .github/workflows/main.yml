@@ -17,27 +17,23 @@ concurrency:
 jobs:
 
   test_on_linux:
-    name: Test on Linux containers (Ubuntu LTS)
+    name: Test on remage image
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
+        # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
         - G4.11.3
         - G4.11.2
-        - G4.11.1
-        - G4.11.0
         - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Install pip dependencies for tests
-      # TODO: replace with a better way to manage test dependencies.
-      run: |
-        pip3 install --user --upgrade legend-pydataobj scipy
+
     - name: Build project
       run: |
         mkdir build
@@ -45,16 +41,35 @@ jobs:
         cmake -DRMG_BUILD_EXAMPLES=1 ..
         make
         make install
+
+    - name: Setup and start xvfb (enables Geant4 visualization)
+      run: |
+        Xvfb :99 -screen 0 1920x1080x24 &
+
     - name: Run full test suite
       if: ${{ matrix.container_version != 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
-        ctest --output-on-failure --label-exclude 'vis'
+        ctest --output-on-failure
+
+    - name: Upload test suite outputs to GitHub
+      if: ${{ matrix.container_version != 'slim' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-output-${{ matrix.container_version }}
+        # artifacts must have a ".output*" extension
+        path: build/tests/**/*.output*.*
+
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
+      env:
+        DISPLAY: :99
       run: |
         cd build
         ctest --output-on-failure --label-exclude 'extra|vis'
+
     - name: Compare checked-in doc dump with current result
       if: ${{ matrix.container_version != 'slim' }}
       run: |
