@@ -23,11 +23,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
         - G4.11.3
         - G4.11.2
-        - G4.11.1
-        - G4.11.0
         - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
