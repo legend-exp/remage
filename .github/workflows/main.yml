@@ -33,10 +33,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Install pip dependencies for tests
-      # TODO: replace with a better way to manage test dependencies.
-      run: |
-        pip3 install --user --upgrade legend-pydataobj scipy
+
     - name: Build project
       run: |
         mkdir build
