@@ -15,4 +15,4 @@
 
 /run/beamOn 5000
 
-/control/alias export-fn complex-volume.pdf
+/control/alias export-fn complex-volume.output.pdf

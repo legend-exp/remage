@@ -8,4 +8,4 @@
 
 /run/beamOn 100
 
-/vis/ogl/export vis-2nbb.pdf
+/vis/ogl/export vis-2nbb.output.pdf

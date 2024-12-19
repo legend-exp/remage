@@ -1,6 +1,6 @@
 /run/initialize
 
-/RMG/Manager/Logging/LogLevel debug
+/RMG/Manager/Logging/LogLevel summary
 
 /vis/open OGL
 /vis/drawVolume

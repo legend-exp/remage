@@ -13,4 +13,4 @@
 
 /run/beamOn 100
 
-/vis/ogl/export vis-co60.pdf
+/vis/ogl/export vis-co60.output.pdf

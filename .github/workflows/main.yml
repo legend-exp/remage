@@ -52,7 +52,16 @@ jobs:
         DISPLAY: :99
       run: |
         cd build
-        ctest --output-on-failure --label-exclude 'vis'
+        ctest --output-on-failure
+
+    - name: Upload test suite outputs to GitHub
+      if: ${{ matrix.container_version != 'slim' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-output
+        # artifacts must have a ".output" extension
+        path: build/tests/**/*.output.*
+
     - name: Run minimal test suite
       if: ${{ matrix.container_version == 'slim' }}
       env:
