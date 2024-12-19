@@ -67,10 +67,11 @@ $ make
 $ ctest
 ```
 
-:::{note}
-Some tests are known to be flaky, especially with older Geant4 version
-branches.
-:::
+If tests produce output files with an extension that contains an `.output`
+sub-extension, they will be automatically uploaded to GitHub as part of a
+tarball. This can be downloaded and inspected from the GitHub actions run page:
+navigate to "Actions", select the CI run of interest, scroll to the bottom of
+the page.
 
 Cheatsheet:
 ```console
@@ -78,11 +79,6 @@ $ ctest --print-labels # see all defined test labels
 $ ctest -L vis # run only tests with label "vis"
 $ ctest -R basics-mt/print-volumes.mac # run only this test
 ```
-
-`vis` tests are currently not run in CI, since there is no graphical
-environment available. Moreover, they won't be marked as "failed" (but rather
-"skipped") if they fail due to the same reason. In case you want to run them
-locally, make sure there is support for graphics.
 
 If you want to open a fanci UI to check the output of `vis` tests, you may
 achieve it by:
@@ -104,10 +100,16 @@ following:
   GitHub/LEGEND wiki pages should be written.
 - Pull request authors are required to provide sufficient documentation for
   every proposed change or addition.
+- Documentation for classes/methods etc. should be provided in the same source
+  file, as Doxygen-formatted comments (see e.g. [this
+  guide](https://www.doxygen.nl/manual/docblocks.html)). They will be
+  automatically added to the API documentation section on ReadTheDocs.
 - General guides, comprehensive tutorials or other high-level documentation
   (e.g. referring to how separate parts of the code interact between each
   other) must be provided as separate pages in `docs/` and linked in the
-  table of contents.
+  table of contents. These documentation source files must formatted in
+  reStructuredText (reST). A reference format specification is available on the
+  [Sphinx reST usage guide](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html).
 
 To generate documentation locally, run
 
@@ -120,12 +122,6 @@ $ make sphinx
 You'll need a Doxygen installation and Python software dependencies specified
 in `docs/environment.yml`. The generated documentation can be viewed by
 pointing your browser to `docs/_build/index.html`.
-
-### Writing documentation
-
-Documentation source files must formatted in reStructuredText (reST). A
-reference format specification is available on the [Sphinx reST usage
-guide](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html).
 
 ### Automatic command reference generation
 
