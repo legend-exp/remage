@@ -32,7 +32,7 @@ jobs:
       image: docker://gipert/remage-base:${{ matrix.container_version }}
       # make git work inside container. reference:
       # https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: "--user 1001"
+      # options: "--user 1001"
 
     steps:
       - uses: actions/checkout@v4
@@ -42,8 +42,6 @@ jobs:
 
       - name: Build project
         run: |
-          echo $HOME
-          cat -v $HOME/.gitconfig
           git config --global --add safe.directory $(pwd)
           mkdir build
           cd build
