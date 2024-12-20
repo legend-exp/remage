@@ -28,11 +28,7 @@ jobs:
           - G4.11.2
           - slim
 
-    container:
-      image: docker://gipert/remage-base:${{ matrix.container_version }}
-      # make git work inside container. reference:
-      # https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      # options: "--user 1001"
+    container: docker://gipert/remage-base:${{ matrix.container_version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +38,7 @@ jobs:
 
       - name: Build project
         run: |
-          git config --global --add safe.directory $(pwd)
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 ..
