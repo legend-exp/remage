@@ -32,9 +32,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Build project
         run: |
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 ..
