@@ -43,7 +43,7 @@ void RMGOpticalDetectorHit::Print() {
 void RMGOpticalDetectorHit::Draw() {
 
   const auto vis_man = G4VVisManager::GetConcreteInstance();
-  if (!vis_man) return;
+  if (!vis_man || !detector_touchable) return;
 
   auto lv_va = detector_touchable->GetVolume()->GetLogicalVolume()->GetVisAttributes();
   G4VisAttributes va;
@@ -120,7 +120,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 
   // initialize hit object for uid, if not already there
   auto* hit = new RMGOpticalDetectorHit();
-  hit->detector_touchable = touchable;
+  if (G4VVisManager::GetConcreteInstance()) { hit->detector_touchable = touchable; }
   hit->detector_uid = det_uid;
   hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
   hit->global_time = step->GetPostStepPoint()->GetGlobalTime();
