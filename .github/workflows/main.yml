@@ -43,7 +43,8 @@ jobs:
       - name: Build project
         run: |
           echo $HOME
-          git config get safe.directory
+          cat -v $HOME/.gitconfig
+          git config --global --add safe.directory $(pwd)
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 ..
