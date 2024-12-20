@@ -32,9 +32,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # we need a fully checked-out repo to get version from setuptools-scm.
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
       - name: Build project
         run: |
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
@@ -86,6 +92,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # we need a fully checked-out repo to get version from setuptools-scm.
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
