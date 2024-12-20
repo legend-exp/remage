@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/RMGGitVersion.cmake)
+
 project(
   remage
-  VERSION 0.5.0
+  VERSION ${RMG_GIT_VERSION}
   DESCRIPTION "Simulation framework for HPGe-based experiments"
   LANGUAGES C CXX) # C is needed for Geant4's HDF5 support
 

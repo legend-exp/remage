@@ -28,10 +28,17 @@ jobs:
           - G4.11.2
           - slim
 
-    container: docker://gipert/remage-base:${{ matrix.container_version }}
+    container:
+      image: docker://gipert/remage-base:${{ matrix.container_version }}
+      # make git work inside container. reference:
+      # https://github.com/actions/runner/issues/2033#issuecomment-1598547465
+      options: "--user 1001"
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Build project
         run: |
