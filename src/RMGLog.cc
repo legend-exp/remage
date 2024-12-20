@@ -39,7 +39,7 @@ bool RMGLog::fHadError = false;
 
 bool RMGLog::fUsePrefix = true;
 
-std::string RMGLog::fVersion = RMG_PROJECT_VERSION;
+std::string RMGLog::fVersion = RMG_PROJECT_VERSION_FULL;
 
 // initialize them at start of program - mandatory
 // so that even if user redirects, we've got a copy
