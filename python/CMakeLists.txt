@@ -10,7 +10,7 @@ set(PYTHON_SOURCES ${_r}/cmake/cpp_config.py.in ${_r}/python/remage/__init__.py
 get_target_property(REMAGE_CPP_OUTPUT_NAME remage-cli-cpp OUTPUT_NAME)
 
 # 1) construct the full path to the built executable
-set(REMAGE_CPP_EXE_PATH ${CMAKE_BINARY_DIR}/${REMAGE_CPP_OUTPUT_NAME})
+set(REMAGE_CPP_EXE_PATH ${CMAKE_BINARY_DIR}/src/${REMAGE_CPP_OUTPUT_NAME})
 
 # configure cpp_config.py.in for the build area with the dynamically derived path
 configure_file(
