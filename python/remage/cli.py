@@ -4,11 +4,7 @@ import argparse
 import subprocess
 import sys
 
-from .cpp_utils import REMAGE_CPP_EXE_PATH
-
-# NOTE: when uv/pip installs the package and creates the executable for the cli,
-# it hardcodes the path to the current python executable (e.g. the one of the
-# virtualenv) in the script's shebang
+from .cpp_config import REMAGE_CPP_EXE_PATH
 
 
 def remage_cli():
@@ -16,7 +12,6 @@ def remage_cli():
         prog="remage", description="remage's command-line interface"
     )
 
-    # global options
     parser.add_argument(
         "--version", action="store_true", help="""Print remage version and exit"""
     )
