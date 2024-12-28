@@ -14,11 +14,11 @@ set(_macros_extra run-2nbb.mac)
 set(_macros_vis vis-co60.mac vis-2nbb.mac)
 
 foreach(_mac ${_macros} ${_macros_extra} ${_macros_vis})
-  add_test(NAME basics/${_mac} COMMAND remage-cli -g gdml/main.gdml -- macros/${_mac})
+  add_test(NAME basics/${_mac} COMMAND remage-cli-cpp -g gdml/main.gdml -- macros/${_mac})
 endforeach()
 
 foreach(_mac ${_macros})
-  add_test(NAME basics-mt/${_mac} COMMAND remage-cli -g gdml/main.gdml -t 2 macros/${_mac})
+  add_test(NAME basics-mt/${_mac} COMMAND remage-cli-cpp -g gdml/main.gdml -t 2 macros/${_mac})
   set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS mt)
 endforeach()
 
@@ -29,7 +29,7 @@ endif()
 
 if(BxDecay0_THREADSAFE)
   foreach(_mac ${_macros_extra})
-    add_test(NAME basics-mt/${_mac} COMMAND remage-cli -g gdml/main.gdml -t 2 macros/${_mac})
+    add_test(NAME basics-mt/${_mac} COMMAND remage-cli-cpp -g gdml/main.gdml -t 2 macros/${_mac})
     set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS "mt extra")
   endforeach()
 
@@ -49,6 +49,6 @@ set_tests_properties(${_macros_vis} PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't
 # further specific tests.
 
 # expect two overlaps from this prepared geometry.
-add_test(NAME basics/overlaps.mac COMMAND remage-cli -- macros/overlaps.mac)
+add_test(NAME basics/overlaps.mac COMMAND remage-cli-cpp -- macros/overlaps.mac)
 set_tests_properties(basics/overlaps.mac PROPERTIES PASS_REGULAR_EXPRESSION
                                                     "GeomVol1002.*GeomVol1002")

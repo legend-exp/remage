@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyremage"
+name = "remage"
 authors = [
   { name = "Luigi Pertoldi", email = "gipert@pm.me" },
 ]
@@ -45,6 +45,9 @@ dev = [
   "pytest-cov >=3",
 ]
 
+[project.scripts]
+remage = "remage.cli:remage_cli"
+
 [project.urls]
 Homepage = "https://github.com/legend-exp/remage"
 "Bug Tracker" = "https://github.com/legend-exp/remage/issues"
@@ -53,8 +56,10 @@ Changelog = "https://github.com/legend-exp/remage/releases"
 
 [tool.hatch]
 version.source = "vcs"
-build.hooks.vcs.version-file = "python/_version.py"
-metadata.path = "python/"
+build.hooks.vcs.version-file = "python/remage/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["python/remage"]
 
 [tool.hatch.envs.default]
 features = ["test"]
@@ -106,8 +111,6 @@ ignore = [
   "ISC001",   # Conflicts with formatter
 ]
 isort.required-imports = ["from __future__ import annotations"]
-# Uncomment if using a _compat.typing backport
-# typing-modules = ["pyremage._compat.typing"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["T20"]

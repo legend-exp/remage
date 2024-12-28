@@ -21,8 +21,7 @@ add_custom_command(
   OUTPUT ${DOXYGEN_INDEX_FILE}
   COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
   DEPENDS ${DOXYFILE_IN} ${REMAGE_PUBLIC_HEADERS}
-  MAIN_DEPENDENCY ${DOXYFILE_OUT}
-  COMMENT "Running Doxygen")
+  MAIN_DEPENDENCY ${DOXYFILE_OUT})
 
 add_custom_target(
   doxygen ALL
@@ -65,11 +64,13 @@ add_custom_command(
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in
-  COMMENT "Generating Sphinx docs")
+  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
 
 # Nice named target so we can run the job easily
-add_custom_target(sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_custom_target(
+  sphinx ALL
+  DEPENDS ${SPHINX_INDEX_FILE}
+  COMMENT "Generating Sphinx docs")
 
 # Add an install target to install the docs
 include(GNUInstallDirs)
