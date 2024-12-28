@@ -12,8 +12,9 @@ endforeach()
 set(_macros vert-hdf5.mac vert-lh5.mac)
 
 foreach(_mac ${_macros})
-  add_test(NAME vertex/${_mac} COMMAND remage-cli-cpp -g gdml/geometry.gdml -- macros/${_mac})
+  add_test(NAME vertex/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -- macros/${_mac})
   set_tests_properties(vertex/${_mac} PROPERTIES LABELS extra)
-  add_test(NAME vertex-mt/${_mac} COMMAND remage-cli-cpp -g gdml/geometry.gdml -t 2 macros/${_mac})
+  add_test(NAME vertex-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t 2
+                                          macros/${_mac})
   set_tests_properties(vertex-mt/${_mac} PROPERTIES LABELS "mt extra")
 endforeach()
