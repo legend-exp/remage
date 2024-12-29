@@ -48,7 +48,16 @@ test = [
   "mplhep",
   "numpy",
   "pandas",
-  "pyg4ometry"
+  "pyg4ometry",
+  "numba", # without this, uv somehow fails to pick a good numba version
+]
+docs = [
+  "sphinx-copybutton",
+  "sphinx-togglebutton",
+  "sphinx-inline-tabs",
+  "exhale",
+  "breathe",
+  "myst-parser",
 ]
 
 [project.scripts]
