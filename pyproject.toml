@@ -8,7 +8,7 @@ authors = [
   { name = "Luigi Pertoldi", email = "gipert@pm.me" },
 ]
 maintainers = [
-    { name = "The LEGEND Collaboration" },
+  { name = "The LEGEND Collaboration" },
 ]
 description = "A python wrapper for remage"
 readme = "README.md"
@@ -32,17 +32,23 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "legend-pydataobj",
+  "legend-pydataobj",
 ]
 
 [project.optional-dependencies]
 test = [
   "pytest >=6",
   "pytest-cov >=3",
-]
-dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
+  "awkward",
+  "hist[plot]",
+  "legend-pygeom-optics",
+  "legend-pygeom-hpges",
+  "legend-pygeom-tools",
+  "matplotlib",
+  "mplhep",
+  "numpy",
+  "pandas",
+  "pyg4ometry"
 ]
 
 [project.scripts]

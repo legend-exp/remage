@@ -40,6 +40,11 @@ This setup is replicated during installation, targeting the install prefix. A
 key advantage of this approach is enabling the use of the _remage_ executable in
 unit tests, which run on _remage_ from the build area.
 
+```{important}
+Python dependencies for tests must be listed in `pyproject.toml`, in
+`project.optional-dependencies.test`.
+```
+
 Information about the C++ part of _remage_ is forwarded to the Python wrapper
 via the `cmake/cpp_config.py.in` file, which is configured by CMake at build
 time and moved into the package source folder.
