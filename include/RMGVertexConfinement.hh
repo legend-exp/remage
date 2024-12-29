@@ -92,6 +92,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
             bool cc = true);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
+        [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
