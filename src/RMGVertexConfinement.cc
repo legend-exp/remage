@@ -539,13 +539,17 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       RMGLog::OutDev(RMGLog::debug,
           "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
 
+      RMGVertexConfinement::SampleableObjectCollection selected_sources = {};
+      selected_sources.emplace_back(choice);
+
       while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
         fTrials++;
+
 
         if (choice.containment_check) {
           vertex = choice.translation +
                    choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-          while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
+          while (!selected_sources.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
             fTrials++;
             vertex = choice.translation +
                      choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
@@ -564,7 +568,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           vertex = choice.translation +
                    choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
           RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
-          if (fForceContainmentCheck && !all_volumes.IsInside(vertex)) {
+          if (fForceContainmentCheck && !selected_sources.IsInside(vertex)) {
             RMGLog::OutDev(RMGLog::error,
                 "Generated vertex not inside sampling volumes (forced containment check): ",
                 vertex / CLHEP::cm, " cm");
