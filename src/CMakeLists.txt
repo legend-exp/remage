@@ -146,9 +146,9 @@ set_property(
   PROPERTY COMPATIBLE_INTERFACE_STRING remage_MAJOR_VERSION)
 
 # executable for CLI
-add_executable(remage-cli ${_root}/src/remage.cc)
-target_link_libraries(remage-cli PUBLIC remage)
-set_target_properties(remage-cli PROPERTIES OUTPUT_NAME remage)
+add_executable(remage-cli-cpp ${_root}/src/remage.cc)
+target_link_libraries(remage-cli-cpp PUBLIC remage)
+set_target_properties(remage-cli-cpp PROPERTIES OUTPUT_NAME remage-cpp)
 
 # executable for dumping all docs
 add_executable(remage-doc-dump-cli EXCLUDE_FROM_ALL ${_root}/src/remage-doc-dump.cc)
@@ -188,11 +188,11 @@ install(
 install(
   DIRECTORY ../include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/remage
-  PATTERN "CLI11" EXCLUDE
-  PATTERN "EcoMug" EXCLUDE)
+  PATTERN CLI11 EXCLUDE
+  PATTERN EcoMug EXCLUDE)
 
 # install CLI binaries
-install(TARGETS remage-cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS remage-cli-cpp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(RMG_HAS_HDF5)
   install(TARGETS remage-to-lh5 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

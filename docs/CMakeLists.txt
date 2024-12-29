@@ -19,10 +19,9 @@ file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
 # configure target that runs Doxygen
 add_custom_command(
   OUTPUT ${DOXYGEN_INDEX_FILE}
-  COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
+  COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT} > /dev/null
   DEPENDS ${DOXYFILE_IN} ${REMAGE_PUBLIC_HEADERS}
-  MAIN_DEPENDENCY ${DOXYFILE_OUT}
-  COMMENT "Running Doxygen")
+  MAIN_DEPENDENCY ${DOXYFILE_OUT})
 
 add_custom_target(
   doxygen ALL
@@ -60,16 +59,18 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @
 
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} -b html -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml
+  COMMAND ${SPHINX_EXECUTABLE} -q -b html -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml
           ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in
-  COMMENT "Generating Sphinx docs")
+  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
 
 # Nice named target so we can run the job easily
-add_custom_target(sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_custom_target(
+  sphinx ALL
+  DEPENDS ${SPHINX_INDEX_FILE}
+  COMMENT "Generating Sphinx docs")
 
 # Add an install target to install the docs
 include(GNUInstallDirs)

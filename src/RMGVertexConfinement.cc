@@ -107,14 +107,23 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return this->data.back();
 }
 
+bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& vertex) const {
+  auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+
+  if (this->physical_volume) {
+    if (navigator->LocateGlobalPointAndSetup(vertex) == this->physical_volume) return true;
+  } else {
+    if (this->sampling_solid->Inside(this->rotation.inverse() * vertex - this->translation))
+      return true;
+  }
+
+  return false;
+}
+
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   for (const auto& o : data) {
-    if (o.physical_volume) {
-      if (navigator->LocateGlobalPointAndSetup(vertex) == o.physical_volume) return true;
-    } else {
-      if (o.sampling_solid->Inside(o.rotation.inverse() * vertex - o.translation)) return true;
-    }
+    if (o.IsInside(vertex)) return true;
   }
   return false;
 }
