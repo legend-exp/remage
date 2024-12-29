@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
   remage
-  VERSION 0.6.2
+  VERSION 0.6.2 # TODO: get this dynamically
   DESCRIPTION "Simulation framework for HPGe-based experiments"
   LANGUAGES C CXX) # C is needed for Geant4's HDF5 support
 
@@ -174,6 +174,20 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
 add_subdirectory(src)
+
+# let's now look for python, needed for the remage python wrapper and tests
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" -m venv --help
+  RESULT_VARIABLE VENV_AVAILABLE
+  OUTPUT_QUIET ERROR_QUIET)
+
+if(NOT VENV_AVAILABLE EQUAL 0)
+  message(FATAL_ERROR "Python3 is installed, but the 'venv' module is missing.")
+endif()
+
+add_subdirectory(python)
 
 option(RMG_BUILD_DOCS "Build remage documentation" OFF)
 if(RMG_BUILD_DOCS)

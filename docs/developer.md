@@ -17,6 +17,33 @@ your GitHub username):
 $ git clone git@github.com:yourusername/remage.git
 ```
 
+## That `remage` executable...
+
+To enhance _remage_'s capabilities without requiring complex C++ code, we
+implemented a Python wrapper. This wrapper handles input preprocessing, invokes
+the `remage-cpp` executable, and performs output postprocessing. While this
+approach slightly complicates the build system, it significantly reduces the
+amount of code to write and maintain.
+
+The C++ code resides in the `src` directory, with the `remage-cpp` executable
+built from `src/remage.cc`. The Python code is organized as a package under the
+`python` directory, where the `cli.py` module provides the _remage_ command-line
+interface.
+
+At build time, CMake compiles `remage-cpp` and installs the Python package in
+the build area. The Python package and its dependencies (see `pyproject.toml`)
+are installed into a virtual environment, ensuring an isolated environment with
+all required dependencies. The Python wrapper is configured to use the
+`remage-cpp` executable from the build area.
+
+This setup is replicated during installation, targeting the install prefix. A
+key advantage of this approach is enabling the use of the _remage_ executable in
+unit tests, which run on _remage_ from the build area.
+
+Information about the C++ part of _remage_ is forwarded to the Python wrapper
+via the `cmake/cpp_config.py.in` file, which is configured by CMake at build
+time and moved into the package source folder.
+
 ## Installing dependencies
 
 ```{include} _dependencies.md
@@ -33,6 +60,10 @@ $ cd remage
 $ mkdir build && cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=<optional prefix> ..
 $ make install
+```
+
+```{tip}
+A list of available Make targets can be printed by running `make help`.
 ```
 
 ## Code style
