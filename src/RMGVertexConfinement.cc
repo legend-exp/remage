@@ -128,6 +128,7 @@ bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVec
   return false;
 }
 
+
 template<typename... Args>
 void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... args) {
 
