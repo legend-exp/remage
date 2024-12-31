@@ -6,9 +6,11 @@ _remage_ is a modern C++ simulation framework for germanium experiments.
 
 The installation process is documented in {doc}`install`.
 
-:::{warning} A proper user guide is not available yet. In the meanwhile, users
-can have a look at the {doc}`tutorial` or the provided
-[examples](https://github.com/legend-exp/remage/tree/main/examples). :::
+:::{warning}
+A proper user guide is not available yet. In the meanwhile, users can have a
+look at the {doc}`tutorial` or the provided
+[examples](https://github.com/legend-exp/remage/tree/main/examples).
+:::
 
 In the simplest application, the user can simulate in an existing GDML geometry
 through the `remage` executable:
