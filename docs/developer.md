@@ -116,8 +116,9 @@ $ ctest -R basics-mt/print-volumes.mac # run only this test
 
 :::
 
-:::{tip} If you want to open a fancy UI to check the output of `vis` tests, you
-may achieve it by:
+:::{tip}
+If you want to open a fancy UI to check the output of `vis` tests, you may
+achieve it by:
 
 1. `cd` to `test/confinement`
 1. edit `macros/_vis.mac` to make sure you load an interactive UI (e.g.
@@ -125,7 +126,8 @@ may achieve it by:
 1. edit the macro you are interested in and swap `_init.mac` with `_vis.mac` at
    the very beginning (after `/control/execute`)
 1. run the visualization with
-   `remage -i -g gdml/geometry.gdml -- macros/themacro.mac` :::
+   `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
+   :::
 
 ### Configuring CMake
 
