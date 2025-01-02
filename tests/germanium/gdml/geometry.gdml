@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<isotope name="Ge70" Z="32" N="70">
+			<atom value="69.924"/>
+		</isotope>
+		<isotope name="Ge72" Z="32" N="72">
+			<atom value="71.922"/>
+		</isotope>
+		<isotope name="Ge73" Z="32" N="73">
+			<atom value="72.923"/>
+		</isotope>
+		<isotope name="Ge74" Z="32" N="74">
+			<atom value="73.921"/>
+		</isotope>
+		<isotope name="Ge76" Z="32" N="76">
+			<atom value="75.921"/>
+		</isotope>
+		<element name="ElementNaturalGermanium" formula="NatGe">
+			<fraction ref="Ge70" n="0.2057"/>
+			<fraction ref="Ge72" n="0.2745"/>
+			<fraction ref="Ge73" n="0.0775"/>
+			<fraction ref="Ge74" n="0.365"/>
+			<fraction ref="Ge76" n="0.0773"/>
+		</element>
+		<material name="NaturalGermanium">
+			<D value="5.3234"/>
+			<fraction ref="ElementNaturalGermanium" n="1"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="world" r="20" lunit="cm"/>
+		<orb name="germanium" r="15" lunit="cm"/>
+	</solids>
+	<structure>
+		<volume name="germanium">
+			<materialref ref="NaturalGermanium"/>
+			<solidref ref="germanium"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="germanium">
+				<volumeref ref="germanium"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>

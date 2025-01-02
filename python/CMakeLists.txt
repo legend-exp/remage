@@ -40,17 +40,29 @@ add_custom_command(
 
 add_custom_target(python-virtualenv DEPENDS ${VENV_DIR}/bin/uv)
 
-# install the remage wrapper package into the virtual environment with uv (build area)
+# store the path to the python executable, needed later in tests
+set_target_properties(python-virtualenv PROPERTIES PYTHONPATH ${VENV_DIR}/bin/python)
+
+# install the remage wrapper package into the virtual environment with uv
+# (build area), including dependencies for running tests
 # NOTE: when uv/pip installs the package and creates the executable for the cli,
 # it hardcodes the path to the current python executable (e.g. the one of the
 # virtualenv) in the script's shebang
+
+# need more packages if we also want to use this venv later for tests
+if(BUILD_TESTING)
+  set(_pkg_install "${CMAKE_SOURCE_DIR}[test]")
+else()
+  set(_pkg_install ${CMAKE_SOURCE_DIR})
+endif()
+
 add_custom_command(
   OUTPUT ${VENV_DIR}/bin/remage
   COMMAND
     cp
     ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py # now we want to use the cpp_config for the build area
     ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
+  COMMAND ${VENV_DIR}/bin/python -m uv -q pip install --reinstall ${_pkg_install}
   DEPENDS python-virtualenv ${PYTHON_SOURCES}
   COMMENT "Installing remage Python wrapper into the virtual environment")
 
