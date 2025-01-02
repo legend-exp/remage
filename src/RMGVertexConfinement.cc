@@ -128,18 +128,6 @@ bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVec
   return false;
 }
 
-bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& vertex) const {
-  auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-
-  if (this->physical_volume) {
-    if (navigator->LocateGlobalPointAndSetup(vertex) == this->physical_volume) return true;
-  } else {
-    if (this->sampling_solid->Inside(this->rotation.inverse() * vertex - this->translation))
-      return true;
-  }
-
-  return false;
-}
 
 template<typename... Args>
 void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... args) {
