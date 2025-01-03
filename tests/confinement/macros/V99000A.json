@@ -1,0 +1,44 @@
+{
+  "name": "V99000A",
+  "type": "icpc",
+  "production": {
+    "manufacturer": "Test",
+    "enrichment": {
+      "val": 0.75,
+      "unc": 0.05
+    }
+  },
+  "geometry": {
+    "height_in_mm": 70,
+    "radius_in_mm": 35,
+    "borehole": {
+      "radius_in_mm": 5,
+      "depth_in_mm": 55
+    },
+    "groove": {
+      "depth_in_mm": 1,
+      "radius_in_mm": {
+        "outer": 10,
+        "inner": 9
+      }
+    },
+    "pp_contact": {
+      "radius_in_mm": 3,
+      "depth_in_mm": 2
+    },
+    "taper": {
+      "top": {
+        "angle_in_deg": 10,
+        "height_in_mm": 10
+      },
+      "bottom": {
+        "angle_in_deg": 0,
+        "height_in_mm": 0
+      },
+      "borehole": {
+        "angle_in_deg": 0,
+        "height_in_mm": 0
+      }
+    }
+  }
+}
