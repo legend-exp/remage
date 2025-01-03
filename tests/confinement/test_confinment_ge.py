@@ -9,15 +9,14 @@ import numpy as np
 import pyg4ometry as pg4
 from lgdo import lh5
 from matplotlib import pyplot as plt
-from pygeomtools.detectors import get_sensvol_metadata
+from pygeomtools import get_sensvol_metadata
 from scipy import stats
-from tqdm import tqdm
 
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12
 
-gdml = "cfg/l200-public.gdml"
-outfile = "output/l200-beta.lh5"
+gdml = "gdml/ge-array.gdml"
+outfile = "test-confine.lh5"
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()
@@ -28,9 +27,11 @@ detectors = [det for det in detectors if det[0] in ["V", "P", "B", "C"]]
 
 det_map = {
     det: {
-        "uint": get_sensvol_metadata(reg, det)["daq"]["rawid"],
+        "uint": int(det[1:]),
         "pos": reg.physicalVolumeDict[det].position.eval(),
-        "hpge": hpges.make_hpge(get_sensvol_metadata(reg, det), registry=reg_tmp),
+        "hpge": hpges.make_hpge(
+            get_sensvol_metadata(reg, det), name=det, registry=reg_tmp
+        ),
     }
     for idx, det in enumerate(detectors)
 }
@@ -48,7 +49,7 @@ positions = np.array(
         np.vstack([vertices.xloc * 1000, vertices.yloc * 1000, vertices.zloc * 1000])
     )
 )
-for det in tqdm(det_map.keys()):
+for det in det_map:
     local_positions = copy.copy(positions)
     local_positions -= det_map[det]["pos"]
 
@@ -117,7 +118,6 @@ def make_plot(vert, hit):
 
     # should follow a chi2 distribution with N -1 dof
 
-    test_stat = 140
     p = stats.chi2.sf(test_stat, N - 1)
     sigma = stats.norm.ppf(1 - p)
 
@@ -134,7 +134,6 @@ def make_plot(vert, hit):
 
     ax[0].errorbar(np.arange(len(names)), expected_fraction, fmt=".", label="Expected")
     ax[0].set_ylabel("Fraction of vertices [%]")
-    ax[0].set_ylim(0, 3)
     ax[0].set_xticks(np.arange(len(names)), names, rotation=90, fontsize=10)
     ax[0].legend()
     ax[0].grid()
@@ -165,7 +164,7 @@ def make_plot(vert, hit):
 
 
 p, sigma = make_plot(vertices, hits)
-plt.savefig("plots/check.pdf")
+plt.savefig("confinement-ge.output.pdf")
 
 if sigma < 5:
     sys.exit(0)
