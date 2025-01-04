@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 ..
+          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
           make
           make install
 
