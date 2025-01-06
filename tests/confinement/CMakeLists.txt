@@ -59,3 +59,38 @@ add_test(NAME confinment-lar/intersection COMMAND ${PYTHONPATH} ./test_lar_inter
 
 set_tests_properties(confinment-lar/intersection PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                             confine-lar-in-output-fixture)
+
+# generate subtraction output
+add_test(NAME confinment-lar/subtraction-gen-output
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-out.lh5 --
+                 macros/lar-out.mac)
+
+set_tests_properties(
+  confinment-lar/subtraction-gen-output
+  PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-out-output-fixture FIXTURES_REQUIRED
+             confine-gdml-fixture)
+
+# analyse subtraction
+add_test(NAME confinment-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
+                                                 test-confine-lar-out.lh5 lar-sub-check.output.pdf)
+
+set_tests_properties(confinment-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                           confine-lar-out-output-fixture)
+
+# generate intersection and subtraction output
+add_test(NAME confinment-lar/intersection-and-subtraction-gen-output
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in-out.lh5 --
+                 macros/lar-in-and-out.mac)
+
+set_tests_properties(
+  confinment-lar/intersection-and-subtraction-gen-output
+  PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-out-output-fixture FIXTURES_REQUIRED
+             confine-gdml-fixture)
+
+# analyse intersection and subtraction
+add_test(NAME confinment-lar/intersection-and-subtraction
+         COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-in-out.lh5
+                 lar-int-and-sub-check.output.pdf)
+
+set_tests_properties(confinment-lar/intersection-and-subtraction
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)

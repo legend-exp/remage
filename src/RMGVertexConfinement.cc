@@ -42,7 +42,9 @@
 G4Mutex RMGVertexConfinement::fGeometryMutex = G4MUTEX_INITIALIZER;
 // state shared between threads and protected by fGeometryMutex. See .hh file for details!
 RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fGeomVolumeSolids = {};
+RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fExcludedGeomVolumeSolids = {};
 RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fPhysicalVolumes = {};
+
 bool RMGVertexConfinement::fVolumesInitialized = false;
 
 // This structure must contain at least a non-null pointer, between the first
@@ -119,6 +121,54 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 
   return false;
 }
+bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int max_attempts,
+    bool sample_on_surface, bool force_containment_check, long int& n_trials) const {
+
+  if (this->physical_volume) {
+    RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
+        this->physical_volume->GetName(), this->physical_volume->GetCopyNo());
+  } else {
+    RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}'",
+        this->sampling_solid->GetName());
+  }
+  RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", max_attempts);
+
+  int calls = 0;
+
+
+  if (this->containment_check) {
+    vertex = this->translation +
+             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
+
+    while (!this->IsInside(vertex) and calls++ < max_attempts) {
+      n_trials++;
+      vertex = this->translation +
+               this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
+      RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm, " cm");
+    }
+    if (calls >= max_attempts) {
+      RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (", max_attempts,
+          "), check that your volumes are efficiently ",
+          "sampleable and try, eventually, to increase the threshold through the dedicated ",
+          "macro command. Returning dummy vertex");
+      return false;
+    }
+  } else {
+    vertex = this->translation +
+             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
+    RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
+    if (force_containment_check && !this->IsInside(vertex)) {
+      RMGLog::OutDev(RMGLog::error,
+          "Generated vertex not inside sampling volumes (forced containment check): ",
+          vertex / CLHEP::cm, " cm");
+    }
+  }
+
+  RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ", calls,
+      " iterations, returning");
+  return true;
+}
+
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
@@ -154,6 +204,7 @@ void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... ar
 
 RMGVertexConfinement::RMGVertexConfinement() : RMGVVertexGenerator("VolumeConfinement") {
 
+  RMGLog::OutFormat(RMGLog::detail, "Create RMGVertexConfinment object");
   this->DefineCommands();
 }
 
@@ -362,42 +413,45 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       fPhysicalVolumes.size(), std::string(G4BestUnit(fPhysicalVolumes.total_volume, "Volume")));
 }
 
-void RMGVertexConfinement::InitializeGeometricalVolumes() {
+void RMGVertexConfinement::InitializeGeometricalVolumes(bool useExcludedVolumes) {
 
-  // if collections are not empty, assume initialization to be already done and skip
-  if (!fGeomVolumeSolids.empty() or fGeomVolumeData.empty()) return;
+  // Select the appropriate containers based on the option
 
-  // no physical volume is specified nor at initialization or later
-  for (const auto& d : fGeomVolumeData) {
+  auto& volumeSolids = useExcludedVolumes ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
+  const auto& volumeData = useExcludedVolumes ? fExcludedGeomVolumeData : fGeomVolumeData;
+
+  // If collections are not empty, assume initialization to be already done and skip
+  if (!volumeSolids.empty() || volumeData.empty()) return;
+
+  // Initialize volumes based on the data
+  for (const auto& d : volumeData) {
     if (d.solid_type == GeometricalSolidType::kSphere) {
-      fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Sphere("RMGVertexConfinement::fGeomSamplingShape::Sphere/" +
-                           std::to_string(fGeomVolumeSolids.size() + 1),
+      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+          new G4Sphere("RMGVertexConfinement::SamplingShape::Sphere/" +
+                           std::to_string(volumeSolids.size() + 1),
               d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
     } else if (d.solid_type == GeometricalSolidType::kCylinder) {
-      fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Tubs("RMGVertexConfinement::fGeomSamplingShape::Cylinder/" +
-                         std::to_string(fGeomVolumeSolids.size() + 1),
+      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+          new G4Tubs("RMGVertexConfinement::SamplingShape::Cylinder/" +
+                         std::to_string(volumeSolids.size() + 1),
               d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
               d.cylinder_starting_angle, d.cylinder_spanning_angle));
     } else if (d.solid_type == GeometricalSolidType::kBox) {
-      fGeomVolumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
-          new G4Box("RMGVertexConfinement::fGeomSamplingShape::Box/" +
-                        std::to_string(fGeomVolumeSolids.size() + 1),
+      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+          new G4Box("RMGVertexConfinement::SamplingShape::Box/" +
+                        std::to_string(volumeSolids.size() + 1),
               0.5 * d.box_x_length, 0.5 * d.box_y_length, 0.5 * d.box_z_length));
-    }
-    // else if (...)
-    else {
+    } else {
       RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
           d.solid_type);
     }
 
-    fGeomVolumeSolids.back().containment_check = false;
+    volumeSolids.back().containment_check = false;
 
-    RMGLog::Out(RMGLog::detail, "Added geometrical solid of type '",
-        fGeomVolumeSolids.back().sampling_solid->GetEntityType(), "' with volume ",
-        G4BestUnit(fGeomVolumeSolids.back().volume, "Volume"), "and surface ",
-        G4BestUnit(fGeomVolumeSolids.back().surface, "Surface"));
+    RMGLog::Out(RMGLog::detail, "Added geometrical solid ", useExcludedVolumes ? "(excluded) " : " ",
+        "of type '", volumeSolids.back().sampling_solid->GetEntityType(), "' with volume ",
+        G4BestUnit(volumeSolids.back().volume, "Volume"), "and surface ",
+        G4BestUnit(volumeSolids.back().surface, "Surface"));
   }
 
   RMGLog::Out(RMGLog::detail, "Will sample points in the ", fOnSurface ? "surface" : "bulk",
@@ -406,14 +460,19 @@ void RMGVertexConfinement::InitializeGeometricalVolumes() {
 
 void RMGVertexConfinement::Reset() {
   // take lock, just not to race with the fVolumesInitialized flag elsewhere.
+
+
   G4AutoLock lock(&fGeometryMutex);
   fVolumesInitialized = true;
   fPhysicalVolumes.clear();
   fGeomVolumeSolids.clear();
+  fExcludedGeomVolumeSolids.clear();
 
   fPhysicalVolumeNameRegexes.clear();
   fPhysicalVolumeCopyNrRegexes.clear();
   fGeomVolumeData.clear();
+  fExcludedGeomVolumeData.clear();
+
   fSamplingMode = SamplingMode::kUnionAll;
   fOnSurface = false;
   fForceContainmentCheck = false;
@@ -438,7 +497,9 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
     G4AutoLock lock(&fGeometryMutex);
     if (!fVolumesInitialized) {
       this->InitializePhysicalVolumes();
-      this->InitializeGeometricalVolumes();
+      this->InitializeGeometricalVolumes(true);
+      this->InitializeGeometricalVolumes(false);
+
       fVolumesInitialized = true;
     }
   }
@@ -447,7 +508,6 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
 
   int calls = 0;
-
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
       // strategy: sample a point in the geometrical user volume or the
@@ -459,49 +519,34 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
             "either no physical or no geometrical volumes have been added");
       }
 
-      // choose a volume component randomly
-      SampleableObject choice_nonconst;
-      bool physical_first;
-      if (fOnSurface) {
-        physical_first = fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface;
-        choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
-                                         : fGeomVolumeSolids.SurfaceWeightedRand();
-      } else {
-        physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
-        choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
-                                         : fGeomVolumeSolids.VolumeWeightedRand();
-      }
-      const auto& choice = choice_nonconst;
+      int calls = 0;
 
-      // shoot in the first region
-      while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
-        fTrials++;
+      while (calls <= RMGVVertexGenerator::fMaxAttempts) {
+        calls++;
 
-        if (choice.containment_check) { // this can effectively happen only with physical volumes, at the moment
-          while (!fPhysicalVolumes.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
-            fTrials++;
-            vertex = choice.translation +
-                     choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-          }
-          if (calls >= RMGVVertexGenerator::fMaxAttempts) {
-            RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
-                "sampleable and try, eventually, to increase the threshold through the dedicated ",
-                "macro command. Returning dummy vertex");
-            vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-            return false;
-          }
+        // chose a volume
+        SampleableObject choice_nonconst;
+        bool physical_first;
+        if (fOnSurface) {
+          physical_first = fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface;
+          choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
+                                           : fGeomVolumeSolids.SurfaceWeightedRand();
         } else {
-          vertex = choice.translation +
-                   choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-          if (fForceContainmentCheck) {
-            auto is_inside = physical_first ? fPhysicalVolumes.IsInside(vertex)
-                                            : fGeomVolumeSolids.IsInside(vertex);
-            if (!is_inside)
-              RMGLog::OutDev(RMGLog::error,
-                  "Generated vertex not inside sampling volumes (forced containment check): ",
-                  vertex / CLHEP::cm, " cm");
-          }
+          physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
+          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
+                                           : fGeomVolumeSolids.VolumeWeightedRand();
+        }
+
+        const auto& choice = choice_nonconst;
+
+        // generate a candidate vertex
+        bool success =
+            choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+
+        if (!success) {
+          RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
+          vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+          return false;
         }
 
         // is it also in the other volume class (geometrical/physical)?
@@ -523,7 +568,87 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
       return false;
     }
+    case SamplingMode::kSubtractGeometrical: {
+      // strategy: sample a point in the geometrical user volume or the
+      // physical user volume depending on the smallest surface/volume. Then
+      // check if it is inside the other volume
 
+      if (fGeomVolumeSolids.empty() and fPhysicalVolumes.empty()) {
+        RMGLog::Out(RMGLog::fatal, "'SubtractGeometrical' mode is set but ",
+            " no physical and no geometrical volumes have been added");
+      }
+      bool has_physical = not fPhysicalVolumes.empty();
+      bool has_geometrical = not fGeomVolumeSolids.empty();
+
+      int calls = 0;
+
+      while (calls <= RMGVVertexGenerator::fMaxAttempts) {
+        calls++;
+
+        // chose a volume
+        SampleableObject choice_nonconst;
+        bool physical_first;
+
+        if (fOnSurface) {
+          physical_first =
+              ((fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface) && has_physical) ||
+              (not has_geometrical);
+          choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
+                                           : fGeomVolumeSolids.SurfaceWeightedRand();
+        } else {
+
+          physical_first =
+              ((fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume) && has_physical) ||
+              (not has_geometrical);
+
+
+          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
+                                           : fGeomVolumeSolids.VolumeWeightedRand();
+        }
+
+        const auto& choice = choice_nonconst;
+
+        // generate a candidate vertex
+        bool success =
+            choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+
+        if (!success) {
+          RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
+          vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+          return false;
+        }
+
+        // check for intersections
+        bool accept = false;
+
+        if (physical_first && has_geometrical) {
+          if (fGeomVolumeSolids.IsInside(vertex)) accept = true;
+        } else if (not physical_first && has_physical) {
+          if (fPhysicalVolumes.IsInside(vertex)) accept = true;
+        } else {
+          accept = true;
+        }
+        RMGLog::Out(RMGLog::debug, accept ? "Chosen vertex passes intersection criteria "
+                                          : "Chosen vertex fails intersection criteria. ");
+
+        // now check for subtractions
+
+        if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) return true;
+
+        RMGLog::Out(RMGLog::debug, "Chosen vertex fails intersection criteria.");
+      }
+
+      if (calls >= RMGVVertexGenerator::fMaxAttempts) {
+        RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
+            RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
+            "sampleable and try, eventually, to increase the threshold through the dedicated ",
+            "macro command. Returning dummy vertex");
+      }
+
+      // everything has failed so return the dummy vertex
+      vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+      return false;
+    }
     case SamplingMode::kUnionAll: {
       // strategy: just sample uniformly in/on all geometrical and physical volumes
 
@@ -536,68 +661,19 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
             "no physical or no geometrical volumes have been added");
       }
 
+      // chose a volume to sample from
       const auto choice =
           fOnSurface ? all_volumes.SurfaceWeightedRand() : all_volumes.VolumeWeightedRand();
 
-      if (choice.physical_volume) {
-        RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
-            choice.physical_volume->GetName(), choice.physical_volume->GetCopyNo());
-      } else {
-        RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}'",
-            choice.sampling_solid->GetName());
+      // do the sampling
+      bool success = choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+
+      if (!success) {
+        RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
+        vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+        return false;
       }
-      RMGLog::OutDev(RMGLog::debug,
-          "Maximum attempts to find a good vertex: ", RMGVVertexGenerator::fMaxAttempts);
-
-      while (calls++ < RMGVVertexGenerator::fMaxAttempts) {
-        fTrials++;
-
-
-        if (choice.containment_check) {
-          vertex = choice.translation +
-                   choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-          while (!choice.IsInside(vertex) and calls++ < RMGVVertexGenerator::fMaxAttempts) {
-            fTrials++;
-            vertex = choice.translation +
-                     choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-            RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm,
-                " cm");
-          }
-          if (calls >= RMGVVertexGenerator::fMaxAttempts) {
-            RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-                RMGVVertexGenerator::fMaxAttempts, "), check that your volumes are efficiently ",
-                "sampleable and try, eventually, to increase the threshold through the dedicated ",
-                "macro command. Returning dummy vertex");
-            vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-            return false;
-          }
-        } else {
-          vertex = choice.translation +
-                   choice.rotation * RMGGeneratorUtil::rand(choice.sampling_solid, fOnSurface);
-          RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
-          if (fForceContainmentCheck && !choice.IsInside(vertex)) {
-            RMGLog::OutDev(RMGLog::error,
-                "Generated vertex not inside sampling volumes (forced containment check): ",
-                vertex / CLHEP::cm, " cm");
-          }
-        }
-
-        RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ",
-            calls, " iterations, returning");
-        return true;
-      }
-
-      if (calls >= RMGVVertexGenerator::fMaxAttempts) {
-        RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (",
-            RMGVVertexGenerator::fMaxAttempts,
-            "), check that your volumes are efficiently sampleable and ",
-            "try, eventually, to increase the threshold through the dedicated macro command. "
-            "Returning dummy vertex");
-      }
-
-      // everything has failed so return the dummy vertex
-      vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-      return false;
+      return true;
     }
 
     default: {
@@ -628,22 +704,46 @@ void RMGVertexConfinement::AddGeometricalVolumeString(std::string solid) {
   GenericGeometricalSolidData data;
   data.solid_type = RMGTools::ToEnum<GeometricalSolidType>(solid, "solid type");
   fGeomVolumeData.push_back(data);
+  fLastSolidExcluded = false;
+}
+
+void RMGVertexConfinement::AddExcludedGeometricalVolumeString(std::string solid) {
+  GenericGeometricalSolidData data;
+  data.solid_type = RMGTools::ToEnum<GeometricalSolidType>(solid, "solid type");
+  fExcludedGeomVolumeData.push_back(data);
+  fLastSolidExcluded = true;
+
+  if (fSamplingMode != SamplingMode::kSubtractGeometrical) {
+    RMGLog::Out(RMGLog::fatal, "Cannot set excluded geometrical regions in any other sampling mode",
+        "' than kSubtractGeometrical");
+  }
 }
 
 RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBack(
     std::optional<GeometricalSolidType> solid_type) {
-  if (fGeomVolumeData.empty()) {
-    RMGLog::Out(RMGLog::fatal, "Must call /RMG/Generator/Confinement/Geometrical/AddSolid",
+
+
+  // checks - need to be performed both for GeomVolume and ExcludedGeomVolume
+  auto& volumeSolids = fLastSolidExcluded ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
+  auto& volumeData = fLastSolidExcluded ? fExcludedGeomVolumeData : fGeomVolumeData;
+  auto command_name = fLastSolidExcluded ? "AddExcludedSolid" : "AddSolid";
+
+  if (volumeData.empty()) {
+    RMGLog::Out(RMGLog::fatal, "Must call /RMG/Generator/Confinement/Geometrical/", command_name,
         "' before setting any geometrical parameter value");
   }
-  if (!fGeomVolumeSolids.empty()) {
+
+  if (!volumeSolids.empty()) {
     RMGLog::Out(RMGLog::fatal,
         "Solids for vertex confinement have already been initialized, no change possible!");
   }
-  if (solid_type.has_value() && fGeomVolumeData.back().solid_type != solid_type) {
+
+
+  if (solid_type.has_value() && volumeData.back().solid_type != solid_type) {
     RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
   }
-  return fGeomVolumeData.back();
+
+  return volumeData.back();
 }
 
 void RMGVertexConfinement::BeginOfRunAction(const G4Run*) {
@@ -663,6 +763,7 @@ void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
 }
 
 void RMGVertexConfinement::DefineCommands() {
+
 
   fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/",
       "Commands for controlling primary confinement"));
@@ -728,6 +829,15 @@ void RMGVertexConfinement::DefineCommands() {
       .SetCandidates(RMGTools::GetCandidates<GeometricalSolidType>())
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethod("AddExcludedSolid", &RMGVertexConfinement::AddExcludedGeometricalVolumeString)
+      .SetGuidance("Add geometrical solid to exclude samples from")
+      .SetParameterName("solid", false)
+      .SetCandidates(RMGTools::GetCandidates<GeometricalSolidType>())
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
 
   // FIXME: see comment in .hh
   fMessengers.back()

@@ -115,9 +115,15 @@ for string in det_info:
     lines.append("/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 44 mm ")
     lines.append("/RMG/Generator/Confinement/Geometrical/Cylinder/Height 400 mm \n")
 
+lines_exclude = [line.replace("AddSolid", "AddExcludedSolid") for line in lines]
+
 # write the coordinates of the lar volumes
 with Path("macros/lar-in-coordinates.mac").open("w") as f:
     for line in lines:
+        f.write(line + "\n")
+
+with Path("macros/lar-out-coordinates.mac").open("w") as f:
+    for line in lines_exclude:
         f.write(line + "\n")
 
 pytools.detectors.write_detector_auxvals(reg)

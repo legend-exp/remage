@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import sys
 
 import awkward as ak
 import legendhpges as hpges
@@ -158,7 +157,11 @@ def make_plot(vert, hit):
     ax[1].axhline(y=0, color="red")
     ax[1].grid()
     fig.suptitle(f"confinment check for HPGes, p = {100*p:.1e} %")
-    plt.tight_layout()
+    caption = "The fraction of the vertices found inside each HPGe. This is compared to the expectation which is that the number "
+    caption += "should be proportional to the volume of the HPGe. The top panel shows the fraction in each detector "
+    caption += r"while the lower panel shows the relative difference in % from the expectation."
+    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
 
     return p, sigma
 
@@ -166,7 +169,4 @@ def make_plot(vert, hit):
 p, sigma = make_plot(vertices, hits)
 plt.savefig("confinement-ge.output.pdf")
 
-if sigma < 5:
-    sys.exit(0)
-else:
-    sys.exit(-1)
+assert sigma < 5

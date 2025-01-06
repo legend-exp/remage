@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-
 import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
@@ -113,7 +111,7 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
     hist = plt.hist2d(
         np.array(1000 * vertices.xloc),
         np.array(1000 * vertices.yloc),
-        bins=[150, 150],
+        bins=[100, 100],
         range=[[-150, 150], [-150, 150]],
         vmin=0.5,
         cmap=cmap,
@@ -121,6 +119,14 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
     ax.set_xlabel("x position [mm]")
     ax.set_ylabel("y position [mm]")
     ax.axis("equal")
+
+    # set the caption
+    caption = "The x-y positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
+    caption += "The vertices should be arranged in cylinders of radius 44 mm around each string. A higher density of points should be found near the edges."
+
+    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
+
     pdf.savefig()
 
     # x-z
@@ -131,7 +137,7 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
             np.array(1000 * vertices.xloc[vertices.strings == s]),
             np.array(1000 * vertices.zloc[vertices.strings == s]),
             bins=[100, 100],
-            range=[[min_x, min_x + 50], [-160, 260]],
+            range=[[-150, 150], [-160, 260]],
             vmin=0.5,
             cmap=cmap,
         )
@@ -139,6 +145,14 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
         if s == 0:
             ax[s].set_ylabel("z position [mm]")
     plt.tight_layout()
+
+    # set the caption
+    caption = "The x-z positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
+    caption += "The vertices should be arranged in cylinders (center 50mm and height 400mm) and the regions with HPGe should be visible."
+
+    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
+
     pdf.savefig()
 
     # now plot the fraction in each detector
@@ -205,7 +219,7 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
         fmt=".",
     )
 
-    ax[1].set_ylabel("Fraction of vertices [%]")
+    ax[1].set_ylabel("Relative Difference [%]")
 
     ax[0].set_xticks(
         np.arange(5), [f"string {i}" for i in range(5)], rotation=90, fontsize=13
@@ -213,11 +227,15 @@ with PdfPages("lar-in-check.output.pdf") as pdf:
     ax[1].axhline(y=0, color="red")
     ax[1].grid()
     fig.suptitle(f"Intersection check ({sigma:.1f} $\sigma$)")
-    plt.tight_layout()
+
+    caption = "The fraction of the vertices found inside each cylinder. This is compared to the expectation which is that the number "
+    caption += "should be proportional to the volume of the cylinder minus the total HPGe volume. The top panel shows the fraction in each string "
+    caption += (
+        r"while the lower panel shows the relative difference in % from the expectation"
+    )
+    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
+
     pdf.savefig()
 
-
-if sigma < 5:
-    sys.exit(0)
-else:
-    sys.exit(-1)
+assert sigma < 5

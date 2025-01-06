@@ -1,0 +1,25 @@
+
+/RMG/Geometry/RegisterDetector Scintillator LAr 0
+/RMG/Output/NtuplePerDetector false
+/run/initialize
+
+/RMG/Generator/Confine Volume
+
+/RMG/Generator/Confinement/SamplingMode SubtractGeometrical
+/RMG/Generator/Confinement/Physical/AddVolume LAr
+
+/RMG/Generator/Confinement/Geometrical/AddSolid Cylinder
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 50 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 170 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/Height 400 mm
+
+# add lar volumes
+/control/execute macros/lar-out-coordinates.mac
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 500000

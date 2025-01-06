@@ -978,7 +978,7 @@ Select sampling mode for volume confinement
 * **Parameter** – `mode`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `IntersectPhysicalWithGeometrical UnionAll`
+  * **Candidates** – `IntersectPhysicalWithGeometrical UnionAll SubtractGeometrical`
 
 ### `/RMG/Generator/Confinement/MaxSamplingTrials`
 
@@ -1031,6 +1031,7 @@ Commands for setting geometrical volumes up for primary confinement
 **Commands:**
 
 * `AddSolid` – Add geometrical solid to sample primaries from
+* `AddExcludedSolid` – Add geometrical solid to exclude samples from
 * `CenterPositionX` – Set center position (X coordinate)
 * `CenterPositionY` – Set center position (Y coordinate)
 * `CenterPositionZ` – Set center position (Z coordinate)
@@ -1038,6 +1039,15 @@ Commands for setting geometrical volumes up for primary confinement
 ### `/RMG/Generator/Confinement/Geometrical/AddSolid`
 
 Add geometrical solid to sample primaries from
+
+* **Parameter** – `solid`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Sphere Cylinder Box`
+
+### `/RMG/Generator/Confinement/Geometrical/AddExcludedSolid`
+
+Add geometrical solid to exclude samples from
 
 * **Parameter** – `solid`
   * **Parameter type** – `s`
