@@ -413,45 +413,46 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       fPhysicalVolumes.size(), std::string(G4BestUnit(fPhysicalVolumes.total_volume, "Volume")));
 }
 
-void RMGVertexConfinement::InitializeGeometricalVolumes(bool useExcludedVolumes) {
+void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volumes) {
 
   // Select the appropriate containers based on the option
 
-  auto& volumeSolids = useExcludedVolumes ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
-  const auto& volumeData = useExcludedVolumes ? fExcludedGeomVolumeData : fGeomVolumeData;
+  auto& volume_solids = use_excluded_volumes ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
+  const auto& volume_data = use_excluded_volumes ? fExcludedGeomVolumeData : fGeomVolumeData;
 
   // If collections are not empty, assume initialization to be already done and skip
-  if (!volumeSolids.empty() || volumeData.empty()) return;
+  if (!volume_solids.empty() || volume_data.empty()) return;
 
   // Initialize volumes based on the data
-  for (const auto& d : volumeData) {
+  for (const auto& d : volume_data) {
     if (d.solid_type == GeometricalSolidType::kSphere) {
-      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+      volume_solids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Sphere("RMGVertexConfinement::SamplingShape::Sphere/" +
-                           std::to_string(volumeSolids.size() + 1),
+                           std::to_string(volume_solids.size() + 1),
               d.sphere_inner_radius, d.sphere_outer_radius, 0, CLHEP::twopi, 0, CLHEP::pi));
     } else if (d.solid_type == GeometricalSolidType::kCylinder) {
-      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+      volume_solids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Tubs("RMGVertexConfinement::SamplingShape::Cylinder/" +
-                         std::to_string(volumeSolids.size() + 1),
+                         std::to_string(volume_solids.size() + 1),
               d.cylinder_inner_radius, d.cylinder_outer_radius, 0.5 * d.cylinder_height,
               d.cylinder_starting_angle, d.cylinder_spanning_angle));
     } else if (d.solid_type == GeometricalSolidType::kBox) {
-      volumeSolids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
+      volume_solids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center,
           new G4Box("RMGVertexConfinement::SamplingShape::Box/" +
-                        std::to_string(volumeSolids.size() + 1),
+                        std::to_string(volume_solids.size() + 1),
               0.5 * d.box_x_length, 0.5 * d.box_y_length, 0.5 * d.box_z_length));
     } else {
       RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
           d.solid_type);
     }
 
-    volumeSolids.back().containment_check = false;
+    volume_solids.back().containment_check = false;
 
-    RMGLog::Out(RMGLog::detail, "Added geometrical solid ", useExcludedVolumes ? "(excluded) " : " ",
-        "of type '", volumeSolids.back().sampling_solid->GetEntityType(), "' with volume ",
-        G4BestUnit(volumeSolids.back().volume, "Volume"), "and surface ",
-        G4BestUnit(volumeSolids.back().surface, "Surface"));
+    RMGLog::Out(RMGLog::detail, "Added geometrical solid ",
+        use_excluded_volumes ? "(excluded) " : " ", "of type '",
+        volume_solids.back().sampling_solid->GetEntityType(), "' with volume ",
+        G4BestUnit(volume_solids.back().volume, "Volume"), "and surface ",
+        G4BestUnit(volume_solids.back().surface, "Surface"));
   }
 
   RMGLog::Out(RMGLog::detail, "Will sample points in the ", fOnSurface ? "surface" : "bulk",
@@ -474,6 +475,8 @@ void RMGVertexConfinement::Reset() {
   fExcludedGeomVolumeData.clear();
 
   fSamplingMode = SamplingMode::kUnionAll;
+  fFirstSamplingVolumeType = VolumeType::kUnset;
+
   fOnSurface = false;
   fForceContainmentCheck = false;
 }
@@ -508,6 +511,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
 
   int calls = 0;
+
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
       // strategy: sample a point in the geometrical user volume or the
@@ -527,12 +531,25 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         // chose a volume
         SampleableObject choice_nonconst;
         bool physical_first;
+
+        // for surface events the user has to chose which volume type to sample first
         if (fOnSurface) {
-          physical_first = fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface;
+
+          if (fFirstSamplingVolumeType == VolumeType::kUnset)
+            RMGLog::Out(RMGLog::fatal, "For surface sampling vertex confinment mode it is required ",
+                "to set the type of volume to sample first (geometrical or physical).");
+
+
+          physical_first = fFirstSamplingVolumeType == VolumeType::kPhysical;
           choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
                                            : fGeomVolumeSolids.SurfaceWeightedRand();
+
         } else {
-          physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
+          // for volume sampling the user can specify the volume to sample first else the set with smaller total volume is used
+          physical_first = fFirstSamplingVolumeType == VolumeType::kUnset
+                               ? fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume
+                               : fFirstSamplingVolumeType == VolumeType::kPhysical;
+
           choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
                                            : fGeomVolumeSolids.VolumeWeightedRand();
         }
@@ -568,6 +585,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
       return false;
     }
+
     case SamplingMode::kSubtractGeometrical: {
       // strategy: sample a point in the geometrical user volume or the
       // physical user volume depending on the smallest surface/volume. Then
@@ -577,8 +595,16 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         RMGLog::Out(RMGLog::fatal, "'SubtractGeometrical' mode is set but ",
             " no physical and no geometrical volumes have been added");
       }
+
       bool has_physical = not fPhysicalVolumes.empty();
       bool has_geometrical = not fGeomVolumeSolids.empty();
+
+      if (fFirstSamplingVolumeType == VolumeType::kPhysical and not has_physical)
+        RMGLog::Out(RMGLog::fatal, "Cannot sample first from physical volumes when none are set.");
+
+      if (fFirstSamplingVolumeType == VolumeType::kGeometrical and not has_geometrical)
+        RMGLog::Out(RMGLog::fatal,
+            "Cannot sample first from geometrical volumes when none are set.");
 
       int calls = 0;
 
@@ -590,17 +616,26 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         bool physical_first;
 
         if (fOnSurface) {
-          physical_first =
-              ((fGeomVolumeSolids.total_surface > fPhysicalVolumes.total_surface) && has_physical) ||
-              (not has_geometrical);
+
+          // check the user has set which volume to samplg first from
+          if (fFirstSamplingVolumeType == VolumeType::kUnset)
+            RMGLog::Out(RMGLog::fatal, "For surface sampling vertex confinment mode it is required ",
+                "to set the type of volume to sample first (geometrical or physical).");
+
+          physical_first = fFirstSamplingVolumeType == VolumeType::kPhysical;
+
+
           choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
                                            : fGeomVolumeSolids.SurfaceWeightedRand();
         } else {
 
-          physical_first =
-              ((fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume) && has_physical) ||
-              (not has_geometrical);
 
+          // if both physical and geometrical volumes are present and order is not set chose based on the total volume
+          if (fFirstSamplingVolumeType == VolumeType::kUnset && has_geometrical && has_physical)
+            physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
+          else if (has_physical && not has_geometrical) physical_first = true;
+          else if (has_geometrical && not has_physical) physical_first = false;
+          else fFirstSamplingVolumeType == VolumeType::kPhysical;
 
           choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
                                            : fGeomVolumeSolids.VolumeWeightedRand();
@@ -690,6 +725,12 @@ void RMGVertexConfinement::SetSamplingModeString(std::string mode) {
   } catch (const std::bad_cast&) { return; }
 }
 
+void RMGVertexConfinement::SetFirstSamplingVolumeTypeString(std::string type) {
+  try {
+    this->SetFirstSamplingVolumeType(RMGTools::ToEnum<VolumeType>(type, "volume type"));
+  } catch (const std::bad_cast&) { return; }
+}
+
 void RMGVertexConfinement::AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr) {
   if (copy_nr.empty()) copy_nr = ".*"; // for default arg from messenger.
   if (!fPhysicalVolumes.empty()) {
@@ -724,26 +765,26 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
 
 
   // checks - need to be performed both for GeomVolume and ExcludedGeomVolume
-  auto& volumeSolids = fLastSolidExcluded ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
-  auto& volumeData = fLastSolidExcluded ? fExcludedGeomVolumeData : fGeomVolumeData;
+  auto& volume_solids = fLastSolidExcluded ? fExcludedGeomVolumeSolids : fGeomVolumeSolids;
+  auto& volume_data = fLastSolidExcluded ? fExcludedGeomVolumeData : fGeomVolumeData;
   auto command_name = fLastSolidExcluded ? "AddExcludedSolid" : "AddSolid";
 
-  if (volumeData.empty()) {
+  if (volume_data.empty()) {
     RMGLog::Out(RMGLog::fatal, "Must call /RMG/Generator/Confinement/Geometrical/", command_name,
         "' before setting any geometrical parameter value");
   }
 
-  if (!volumeSolids.empty()) {
+  if (!volume_solids.empty()) {
     RMGLog::Out(RMGLog::fatal,
         "Solids for vertex confinement have already been initialized, no change possible!");
   }
 
 
-  if (solid_type.has_value() && volumeData.back().solid_type != solid_type) {
+  if (solid_type.has_value() && volume_data.back().solid_type != solid_type) {
     RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
   }
 
-  return volumeData.back();
+  return volume_data.back();
 }
 
 void RMGVertexConfinement::BeginOfRunAction(const G4Run*) {
@@ -788,6 +829,15 @@ void RMGVertexConfinement::DefineCommands() {
       .SetCandidates(RMGTools::GetCandidates<SamplingMode>())
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethod("FirstSamplingVolume", &RMGVertexConfinement::SetFirstSamplingVolumeTypeString)
+      .SetGuidance("Select the type of volume which will be sampled first for intersections")
+      .SetParameterName("type", false)
+      .SetCandidates(RMGTools::GetCandidates<VolumeType>())
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
 
   fMessengers.back()
       ->DeclareProperty("MaxSamplingTrials", fMaxAttempts)

@@ -61,9 +61,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     enum class SamplingMode {
       kIntersectPhysicalWithGeometrical,
       kUnionAll,
-      kSubtractGeometrical
+      kSubtractGeometrical,
     };
 
+    enum class VolumeType {
+      kPhysical,
+      kGeometrical,
+      kUnset,
+    };
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
@@ -80,6 +85,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void Reset();
 
     inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
+    inline void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
 
     inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -168,6 +174,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     static bool fVolumesInitialized;
 
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
+    VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
+
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
     bool fLastSolidExcluded = false;
@@ -177,6 +185,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);
+    void SetFirstSamplingVolumeTypeString(std::string type);
+
     void AddGeometricalVolumeString(std::string solid);
     void AddExcludedGeometricalVolumeString(std::string solid);
 
