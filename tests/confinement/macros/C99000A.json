@@ -1,0 +1,44 @@
+{
+  "name": "C99000A",
+  "type": "coax",
+  "production": {
+    "manufacturer": "Test",
+    "enrichment": {
+      "val": 0.75,
+      "unc": 0.05
+    }
+  },
+  "geometry": {
+    "height_in_mm": 80,
+    "radius_in_mm": 40,
+    "borehole": {
+      "radius_in_mm": 7,
+      "depth_in_mm": 70
+    },
+    "groove": {
+      "depth_in_mm": 2,
+      "radius_in_mm": {
+        "outer": 20,
+        "inner": 17
+      }
+    },
+    "pp_contact": {
+      "radius_in_mm": 17,
+      "depth_in_mm": 0
+    },
+    "taper": {
+      "top": {
+        "angle_in_deg": 45,
+        "height_in_mm": 5
+      },
+      "bottom": {
+        "angle_in_deg": 45,
+        "height_in_mm": 2
+      },
+      "borehole": {
+        "angle_in_deg": 0,
+        "height_in_mm": 0
+      }
+    }
+  }
+}

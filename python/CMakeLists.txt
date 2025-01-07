@@ -62,7 +62,7 @@ add_custom_command(
     cp
     ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py # now we want to use the cpp_config for the build area
     ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${VENV_DIR}/bin/python -m uv -q pip install --reinstall ${_pkg_install}
+  COMMAND ${VENV_DIR}/bin/python -m uv pip -q install --reinstall ${_pkg_install}
   DEPENDS python-virtualenv ${PYTHON_SOURCES}
   COMMENT "Installing remage Python wrapper into the virtual environment")
 

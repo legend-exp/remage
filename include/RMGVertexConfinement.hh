@@ -60,9 +60,15 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     enum class SamplingMode {
       kIntersectPhysicalWithGeometrical,
-      kUnionAll
+      kUnionAll,
+      kSubtractGeometrical,
     };
 
+    enum class VolumeType {
+      kPhysical,
+      kGeometrical,
+      kUnset,
+    };
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
@@ -79,6 +85,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void Reset();
 
     inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
+    inline void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
 
     inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -93,6 +100,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
+        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts, bool sample_on_surface,
+            bool force_containment_check, long int& n_trials) const;
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
@@ -123,7 +132,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
         }
 
-        std::vector<SampleableObject> data;
+        std::vector<SampleableObject> data = {};
         double total_volume = 0;
         double total_surface = 0;
     };
@@ -144,13 +153,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     };
 
     void InitializePhysicalVolumes();
-    void InitializeGeometricalVolumes();
+    void InitializeGeometricalVolumes(bool useExcludedVolumes);
     bool ActualGenerateVertex(G4ThreeVector& v);
 
     std::vector<std::string> fPhysicalVolumeNameRegexes;
     std::vector<std::string> fPhysicalVolumeCopyNrRegexes;
 
     std::vector<GenericGeometricalSolidData> fGeomVolumeData;
+    std::vector<GenericGeometricalSolidData> fExcludedGeomVolumeData;
 
     static G4Mutex fGeometryMutex;
     // the final geometry data is shared between all threads and protected by fGeometryMutex.
@@ -159,19 +169,27 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     // mutate the G4SolidStore temporarily, e.g. G4SubstractionSolid::GetCubicVolume()
     static SampleableObjectCollection fPhysicalVolumes;
     static SampleableObjectCollection fGeomVolumeSolids;
+    static SampleableObjectCollection fExcludedGeomVolumeSolids;
+
     static bool fVolumesInitialized;
 
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
+    VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
+
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
-
+    bool fLastSolidExcluded = false;
     // counters used for the current run.
     long fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);
+    void SetFirstSamplingVolumeTypeString(std::string type);
+
     void AddGeometricalVolumeString(std::string solid);
+    void AddExcludedGeometricalVolumeString(std::string solid);
+
     GenericGeometricalSolidData& SafeBack(
         std::optional<GeometricalSolidType> solid_type = std::nullopt);
 

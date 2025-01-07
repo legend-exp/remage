@@ -199,6 +199,7 @@ if(RMG_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+message(STATUS "Test/validation suite support: BUILD_TESTING=${BUILD_TESTING}")
 include(CTest)
 add_subdirectory(tests)
 

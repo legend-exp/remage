@@ -1,0 +1,18 @@
+
+/RMG/Geometry/RegisterDetector Scintillator LAr 0
+/RMG/Output/NtuplePerDetector false
+/run/initialize
+
+/RMG/Generator/Confine Volume
+
+/RMG/Generator/Confinement/SamplingMode IntersectPhysicalWithGeometrical
+/RMG/Generator/Confinement/Physical/AddVolume LAr
+
+# add lar volumes
+/control/execute macros/lar-in-coordinates.mac
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 500000
