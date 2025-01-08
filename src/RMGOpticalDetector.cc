@@ -120,7 +120,9 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
 
   // initialize hit object for uid, if not already there
   auto* hit = new RMGOpticalDetectorHit();
-  if (G4VVisManager::GetConcreteInstance()) { hit->detector_touchable = touchable; }
+  if (RMGManager::Instance()->GetG4VisManager()->GetCurrentSceneHandler()) {
+    hit->detector_touchable = touchable;
+  }
   hit->detector_uid = det_uid;
   hit->photon_wavelength = CLHEP::c_light * CLHEP::h_Planck / step->GetTotalEnergyDeposit();
   hit->global_time = step->GetPostStepPoint()->GetGlobalTime();
