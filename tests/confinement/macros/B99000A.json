@@ -1,0 +1,36 @@
+{
+  "name": "B99000A",
+  "type": "bege",
+  "production": {
+    "manufacturer": "Test",
+    "enrichment": {
+      "val": 0.75,
+      "unc": 0.05
+    }
+  },
+  "geometry": {
+    "height_in_mm": 40.0,
+    "radius_in_mm": 35.0,
+    "groove": {
+      "depth_in_mm": 2.0,
+      "radius_in_mm": {
+        "outer": 12.0,
+        "inner": 10.0
+      }
+    },
+    "pp_contact": {
+      "radius_in_mm": 7.5,
+      "depth_in_mm": 0
+    },
+    "taper": {
+      "top": {
+        "angle_in_deg": 0.0,
+        "height_in_mm": 0.0
+      },
+      "bottom": {
+        "angle_in_deg": 0.0,
+        "height_in_mm": 0.0
+      }
+    }
+  }
+}

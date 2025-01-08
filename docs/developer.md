@@ -17,6 +17,33 @@ your GitHub username):
 $ git clone git@github.com:yourusername/remage.git
 ```
 
+## That `remage` executable...
+
+To enhance _remage_'s capabilities without requiring complex C++ code, we
+implemented a Python wrapper. This wrapper handles input preprocessing, invokes
+the `remage-cpp` executable, and performs output postprocessing. While this
+approach slightly complicates the build system, it significantly reduces the
+amount of code to write and maintain.
+
+The C++ code resides in the `src` directory, with the `remage-cpp` executable
+built from `src/remage.cc`. The Python code is organized as a package under the
+`python` directory, where the `cli.py` module provides the _remage_ command-line
+interface.
+
+At build time, CMake compiles `remage-cpp` and installs the Python package in
+the build area. The Python package and its dependencies (see `pyproject.toml`)
+are installed into a virtual environment, ensuring an isolated environment with
+all required dependencies. The Python wrapper is configured to use the
+`remage-cpp` executable from the build area.
+
+This setup is replicated during installation, targeting the install prefix. A
+key advantage of this approach is enabling the use of the _remage_ executable in
+unit tests, which run on _remage_ from the build area.
+
+Information about the C++ part of _remage_ is forwarded to the Python wrapper
+via the `cmake/cpp_config.py.in` file, which is configured by CMake at build
+time and moved into the package source folder.
+
 ## Installing dependencies
 
 ```{include} _dependencies.md
@@ -33,6 +60,10 @@ $ cd remage
 $ mkdir build && cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=<optional prefix> ..
 $ make install
+```
+
+```{tip}
+A list of available Make targets can be printed by running `make help`.
 ```
 
 ## Code style
@@ -75,7 +106,7 @@ tarball. This can be downloaded and inspected from the GitHub actions run page:
 navigate to "Actions", select the CI run of interest, scroll to the bottom of
 the page.
 
-Cheatsheet:
+:::{tip} Cheatsheet:
 
 ```console
 $ ctest --print-labels # see all defined test labels
@@ -83,7 +114,10 @@ $ ctest -L vis # run only tests with label "vis"
 $ ctest -R basics-mt/print-volumes.mac # run only this test
 ```
 
-If you want to open a fanci UI to check the output of `vis` tests, you may
+:::
+
+:::{tip}
+If you want to open a fancy UI to check the output of `vis` tests, you may
 achieve it by:
 
 1. `cd` to `test/confinement`
@@ -93,6 +127,54 @@ achieve it by:
    the very beginning (after `/control/execute`)
 1. run the visualization with
    `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
+   :::
+
+### Configuring CMake
+
+You may add a new test with the
+[`add_test()`](https://cmake.org/cmake/help/latest/command/add_test.html) CMake
+command. Use the `category/test-name` convention to name tests. Here are few
+examples:
+
+If the test is supposed to run the `remage` executable, you can use the
+`REMAGE_PYEXE`, which stores its path:
+
+```cmake
+add_test(NAME basics/test COMMAND ${REMAGE_PYEXE} [<arg>...])
+```
+
+If you want to use the low-level `remage-cpp` executable, you can directly use
+the `remage-cli-cpp` target:
+
+```cmake
+add_test(NAME basics/test COMMAND remage-cli-cpp [<arg>...])
+```
+
+If you want to run a Python script, the recommended interpreted to use is the
+one from the virtual environment set up in the build area by CMake. Its path is
+stored in the `PYTHONPATH` variable:
+
+```cmake
+add_test(NAME basics/test COMMAND ${PYTHONPATH} script.py)
+```
+
+In case a simulation output file needs to be generated with _remage_, before a
+series of tests is ran with Python scripts, one can do so with a fixture:
+
+```cmake
+add_test(
+  NAME germanium/gen-output
+  COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -w -o output.lh5 -- macros/run.mac)
+set_tests_properties(germanium/gen-output PROPERTIES FIXTURES_SETUP output-fixture)
+
+add_test(NAME germanium/bremsstrahlung COMMAND ${PYTHONPATH} ./test_brem.py)
+set_tests_properties(germanium/bremsstrahlung PROPERTIES FIXTURES_REQUIRED output-fixture)
+
+add_test(NAME germanium/e-range COMMAND ${PYTHONPATH} ./test_e_range.py)
+set_tests_properties(germanium/e-range PROPERTIES FIXTURES_REQUIRED output-fixture)
+```
+
+For more complete examples, have a look at the existing tests.
 
 ## Documentation
 

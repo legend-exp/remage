@@ -956,6 +956,7 @@ Commands for controlling primary confinement
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
 * `SamplingMode` – Select sampling mode for volume confinement
+* `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
 * `ForceContainmentCheck` – If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.
 
@@ -978,7 +979,16 @@ Select sampling mode for volume confinement
 * **Parameter** – `mode`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `IntersectPhysicalWithGeometrical UnionAll`
+  * **Candidates** – `IntersectPhysicalWithGeometrical UnionAll SubtractGeometrical`
+
+### `/RMG/Generator/Confinement/FirstSamplingVolume`
+
+Select the type of volume which will be sampled first for intersections
+
+* **Parameter** – `type`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Physical Geometrical Unset`
 
 ### `/RMG/Generator/Confinement/MaxSamplingTrials`
 
@@ -1031,6 +1041,7 @@ Commands for setting geometrical volumes up for primary confinement
 **Commands:**
 
 * `AddSolid` – Add geometrical solid to sample primaries from
+* `AddExcludedSolid` – Add geometrical solid to exclude samples from
 * `CenterPositionX` – Set center position (X coordinate)
 * `CenterPositionY` – Set center position (Y coordinate)
 * `CenterPositionZ` – Set center position (Z coordinate)
@@ -1038,6 +1049,15 @@ Commands for setting geometrical volumes up for primary confinement
 ### `/RMG/Generator/Confinement/Geometrical/AddSolid`
 
 Add geometrical solid to sample primaries from
+
+* **Parameter** – `solid`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Sphere Cylinder Box`
+
+### `/RMG/Generator/Confinement/Geometrical/AddExcludedSolid`
+
+Add geometrical solid to exclude samples from
 
 * **Parameter** – `solid`
   * **Parameter type** – `s`

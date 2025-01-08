@@ -28,16 +28,17 @@ endforeach()
 set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-flat.mac)
 
 foreach(_mac ${_macros})
-  add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli>
+  add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli-cpp>
                                             ${_visit_hdf5} ${_remage_to_lh5} ${_mac})
-  add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh $<TARGET_FILE:remage-cli> ${_mac})
+  add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh $<TARGET_FILE:remage-cli-cpp>
+                                            ${_mac})
 endforeach()
 
 list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra DEPENDS output/build-test-visit-hdf5)
 
 # SPECIAL TESTS
-add_test(NAME output/th228-chain COMMAND ./run-test-th228-chain.py $<TARGET_FILE:remage-cli>)
+add_test(NAME output/th228-chain COMMAND ./run-test-th228-chain.py $<TARGET_FILE:remage-cli-cpp>)
 
 # Geant4 <= 11.0.3 is deleting non-empty HDF5 files after a successful run, so disable the tests.
 if(Geant4_VERSION VERSION_LESS "11.0.4" OR NOT RMG_HAS_HDF5)

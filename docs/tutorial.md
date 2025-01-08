@@ -191,7 +191,8 @@ radioactive source:
 /run/beamOn 50
 ```
 
-:::{admonition} Complete macro file (`vis-gammas.mac`) :class: dropdown
+:::{admonition} Complete macro file (`vis-gammas.mac`)
+:class: dropdown
 
 ```text
 /RMG/Manager/Logging/LogLevel detail
@@ -245,15 +246,18 @@ $ remage --interactive --gdml-files geometry.gdml -- vis-gammas.mac
 ...
 ```
 
-:::{note} Interactive visualization requires passing `--interactive` to the
-`remage` executable. :::
+:::{note}
+Interactive visualization requires passing `--interactive` to the
+`remage` executable.
+:::
 
 Interactions in HPGes and in LAr are marked in red and blue, respectively.
 
 ![Simulation visualization](img/tutorial-g4-view.jpg)
 
-:::{tip} With Apptainer, additional tweaks are required in order to allow for
-graphics to be displayed, e.g.
+:::{tip}
+With Apptainer, additional tweaks are required in order to allow for graphics
+to be displayed, e.g.
 
 ```console
 $ apptainer run \
@@ -264,11 +268,14 @@ $ apptainer run \
     path/to/remage_latest.sif --interactive [...]
 ```
 
-and similarly with Docker. :::
+and similarly with Docker.
+:::
 
-:::{tip} If `remage` from the Apptainer image refuses to run simulations, this
-might be due to some of your environment variables from outside the container.
-Give `--cleanenv` a try. :::
+:::{tip}
+If `remage` from the Apptainer image refuses to run simulations, this might be
+due to some of your environment variables from outside the container. Give
+`--cleanenv` a try.
+:::
 
 ## Storing simulated data on disk
 

@@ -14,9 +14,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <csignal>
+#include <iostream>
+#include <regex>
 #include <string>
 #include <vector>
 
+#include "G4Version.hh"
+
+#include "RMGConfig.hh"
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
@@ -47,6 +52,8 @@ int main(int argc, char** argv) {
 
   int verbosity;
   bool quiet = false;
+  bool version = false;
+  bool version_rich = false;
   int nthreads = 1;
   bool interactive = false;
   bool overwrite_output = false;
@@ -59,6 +66,8 @@ int main(int argc, char** argv) {
 
   app.add_flag("-q", quiet, "Print only warnings and errors");
   app.add_flag("-v", verbosity, "Increase verbosity");
+  app.add_flag("--version", version, "Print remage version");
+  app.add_flag("--version-rich", version_rich, "Print remage build configuration");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
@@ -71,6 +80,24 @@ int main(int argc, char** argv) {
   CLI11_PARSE(app, argc, argv);
 
   RMGLog::SetLogLevel(loglevel);
+
+  if (version) {
+    std::cout << RMG_PROJECT_VERSION << std::endl;
+    return 0;
+  }
+
+  if (version_rich) {
+    auto g4_version = std::regex_replace(G4Version, std::regex("\\$|Name:"), "");
+    RMGLog::StartupInfo();
+    std::cout << "version: " << RMG_PROJECT_VERSION << "\n\n"
+              << "· Geant4 version: " << g4_version << "\n"
+              << "· ROOT CERN support: " << (RMG_HAS_ROOT ? "yes" : "no") << "\n"
+              << "· BxDecay0 support: "
+              << (RMG_HAS_BXDECAY0 or RMG_HAS_BXDECAY0_THREADSAFE ? "yes" : "no") << "\n"
+              << "· GDML support: " << (RMG_HAS_GDML ? "yes" : "no") << "\n"
+              << "· HDF5 support: " << (RMG_HAS_HDF5 ? "yes" : "no") << std::endl;
+    return 0;
+  }
 
   switch (verbosity) {
     case 1: RMGLog::SetLogLevel(RMGLog::detail); break;
