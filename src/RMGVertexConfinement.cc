@@ -52,8 +52,8 @@ bool RMGVertexConfinement::fVolumesInitialized = false;
 //  - physical volumes get always a bounding box assigned, but at later time
 //  - purely geometrical volumes only have the sampling_solid member defined
 RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r,
-    G4ThreeVector t, G4VSolid* s, bool cc)
-    : rotation(r), translation(t), containment_check(cc) {
+    G4ThreeVector t, G4VSolid* s, bool ns, bool ss)
+    : rotation(r), translation(t), native_sample(ns), surface_sample(ss) {
 
   // at least one volume must be specified
   if (!v and !s) RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
@@ -121,8 +121,125 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 
   return false;
 }
+
+
+// get the intersections between the solid and an arbitrary line, defined by start and dir
+std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
+    G4ThreeVector dir) const {
+
+
+  // check if the physical volume exists
+  if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
+    RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject where the physical volume is not set",
+        "this probably means you are trying to generically sample a geometrical volume which "
+        "instead",
+        "should be natively sampled");
+
+  auto solid = this->physical_volume->GetLogicalVolume()->GetSolid();
+
+
+  G4double dist = 0;
+  std::vector<G4ThreeVector> intersections = {};
+  G4ThreeVector int_point;
+
+  int_point = start;
+  int counter = 0;
+
+  dist = 0;
+
+  while (dist < kInfinity) {
+
+    dist = (counter % 2) == 0 ? solid->DistanceToIn(int_point, dir)
+                              : solid->DistanceToOut(int_point, dir);
+
+    int_point = int_point + dist * dir;
+
+    if (dist < kInfinity) intersections.push_back(int_point);
+    counter++;
+  }
+
+  if (intersections.size() % 2) throw;
+
+  return intersections;
+}
+
+
+// generate a random position and direction for the surface sampling
+void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
+    G4ThreeVector& pos) const {
+
+
+  if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
+    RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject where the physical volume is not set",
+        "this probably means you are trying to generically sample a geometrical volume which "
+        "instead",
+        "should be natively sampled");
+
+  // get the bounding radius
+  G4double bounding_radius =
+      physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
+
+
+  // start on z-axis, pointing down.
+  pos = G4ThreeVector(0.0, 0.0, bounding_radius);
+  dir = G4ThreeVector(0.0, 0.0, -1.0);
+
+  // push in rho direction by some impact parameter
+  G4double diskPhi = 2.0 * CLHEP::pi * G4UniformRand();
+  G4double diskR = sqrt(G4UniformRand()) * bounding_radius;
+
+  pos += G4ThreeVector(cos(diskPhi) * diskR, sin(diskPhi) * diskR, 0);
+
+  // now rotate pos and dir by some random direction
+  G4double theta = acos(2.0 * G4UniformRand() - 1.0);
+  G4double phi = 2.0 * CLHEP::pi * G4UniformRand();
+
+  pos.rotateY(theta);
+  pos.rotateZ(phi);
+  dir.rotateY(theta);
+  dir.rotateZ(phi);
+}
+
+
+// generate with the generic sampler the actual surface point
+bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector& vertex,
+    int max_attempts, int n_max) const {
+
+  int calls = 0;
+  G4ThreeVector dir;
+  G4ThreeVector pos;
+
+  while (calls < max_attempts) {
+
+    // chose a random line
+    this->GetDirection(dir, pos);
+
+    // find the intersections
+    std::vector<G4ThreeVector> intersections = this->GetIntersections(pos, dir);
+
+    if (intersections.size() == 0) continue;
+
+    // pick one weighting by n_max and return it
+    int random_int = static_cast<int>(n_max * G4UniformRand());
+
+    if (random_int <= intersections.size() - 1) {
+      vertex = intersections[random_int];
+      return true;
+    }
+    calls++;
+  }
+
+  RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (", max_attempts,
+      "), check that your surfaces are efficiently ",
+      "sampleable and try, eventually, to increase the threshold through the dedicated ",
+      "macro command. Returning dummy vertex");
+
+  return false;
+}
+
+
 bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int max_attempts,
-    bool sample_on_surface, bool force_containment_check, long int& n_trials) const {
+    bool force_containment_check, long int& n_trials) const {
 
   if (this->physical_volume) {
     RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
@@ -135,15 +252,33 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
 
   int calls = 0;
 
+  // possible sampling strategies
+  // 1) native sampling
+  // 2) volume sampling with containment check
+  // 3) general surface sampling
 
-  if (this->containment_check) {
+
+  if (this->native_sample) {
     vertex = this->translation +
-             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
+             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, this->surface_sample);
+    RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
+    if (force_containment_check && !this->IsInside(vertex)) {
+      RMGLog::OutDev(RMGLog::error,
+          "Generated vertex not inside sampling volumes (forced containment check): ",
+          vertex / CLHEP::cm, " cm");
+    }
+  } else if (this->surface_sample) {
+    bool success = this->GenerateSurfacePoint(vertex, this->max_num_intersections, max_attempts);
+
+    if (not success) return false;
+
+  } else {
+    vertex = this->translation + this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);
 
     while (!this->IsInside(vertex) and calls++ < max_attempts) {
       n_trials++;
-      vertex = this->translation +
-               this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
+      vertex =
+          this->translation + this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);
       RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm, " cm");
     }
     if (calls >= max_attempts) {
@@ -153,22 +288,13 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
           "macro command. Returning dummy vertex");
       return false;
     }
-  } else {
-    vertex = this->translation +
-             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, sample_on_surface);
-    RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
-    if (force_containment_check && !this->IsInside(vertex)) {
-      RMGLog::OutDev(RMGLog::error,
-          "Generated vertex not inside sampling volumes (forced containment check): ",
-          vertex / CLHEP::cm, " cm");
-    }
   }
+
 
   RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ", calls,
       " iterations, returning");
   return true;
 }
-
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
@@ -282,16 +408,39 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       // if there are no daughters one can avoid doing containment checks
       if (log_vol->GetNoDaughters() > 0) {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
-        el.containment_check = true;
+        el.native_sample = false;
+        if (fOnSurface)
+          RMGLog::OutDev(RMGLog::error,
+              "Surface sampling is not implemented for volumes with daughters");
+
       } else {
         RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
-        el.containment_check = false;
+        el.native_sample = true;
       }
+      el.surface_sample = fOnSurface;
     }
     // if it's not sampleable, cannot perform native surface sampling
     else if (fOnSurface) {
-      RMGLog::Out(RMGLog::fatal, "Physical volume '", el.physical_volume->GetName(),
-          "' does not satisfy requirements for native surface sampling");
+
+      if (log_vol->GetNoDaughters() > 0)
+        RMGLog::OutDev(RMGLog::error,
+            "Surface sampling is not implemented for volumes with daughters");
+
+      RMGLog::Out(RMGLog::debug, "Physical volume '", el.physical_volume->GetName(),
+          "' does not satisfy requirements for native surface sampling so resort to general "
+          "surface sampler");
+
+      el.native_sample = false;
+      el.surface_sample = true;
+      el.max_num_intersections = fMaxNumIntersections;
+
+      if (fMaxNumIntersections < 2)
+        RMGLog::Out(RMGLog::fatal,
+            " for generic surface sampling MaxNumIntersections, the maximum number of lines a ",
+            "line can intersect with the surface must be set with "
+            "/RMG/Generator/Confinement/MaxNumberOfIntersections",
+            "Note: this can be an overestimate.");
+
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
@@ -300,14 +449,15 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       RMGLog::OutDev(RMGLog::debug,
           "Is a subtraction solid, sampling from constituent solid with containment check");
       el.sampling_solid = solid->GetConstituentSolid(0);
-      el.containment_check = true;
+      el.native_sample = false;
+      el.surface_sample = false;
     }
     // use bounding solid for all other cases
     else {
       RMGLog::OutDev(RMGLog::debug, "Is not sampleable natively, need a bounding box with ",
           "containment check");
-      el.containment_check = true;
-
+      el.native_sample = false;
+      el.surface_sample = false;
       // to get a guaranteed bounding solid we rely on G4VSolid::BoundingLimits()
       // the function, implemented for each G4 solid, calculates the dimensions
       // of a bounding box. NOTE: it's possible to obtain a radius through
@@ -331,7 +481,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       el.sampling_solid =
           new G4Box(el.physical_volume->GetName() + "/RMGVertexConfinement::fBoundingBox", bb_x,
               bb_y, bb_z);
-    } // sampling_solid and containment_check must hold a valid value at this point
+    } // sampling_solid and native_sample and surface_sample must hold a valid value at this point
 
 
     // determine solid transformation w.r.t. world volume reference
@@ -401,7 +551,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     for (size_t i = 1; i < trees.size(); ++i) {
       const auto& v = trees.at(i);
       new_obj_from_inspection.emplace_back(el.physical_volume, v.vol_global_rotation,
-          v.vol_global_translation, el.sampling_solid, el.containment_check);
+          v.vol_global_translation, el.sampling_solid, el.native_sample, el.surface_sample);
     }
   }
 
@@ -446,7 +596,8 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
           d.solid_type);
     }
 
-    volume_solids.back().containment_check = false;
+    volume_solids.back().native_sample = true;
+    volume_solids.back().surface_sample = fOnSurface;
 
     RMGLog::Out(RMGLog::detail, "Added geometrical solid ",
         use_excluded_volumes ? "(excluded) " : " ", "of type '",
@@ -557,8 +708,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         const auto& choice = choice_nonconst;
 
         // generate a candidate vertex
-        bool success =
-            choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
 
         if (!success) {
           RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
@@ -644,8 +794,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         const auto& choice = choice_nonconst;
 
         // generate a candidate vertex
-        bool success =
-            choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
 
         if (!success) {
           RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
@@ -701,7 +850,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           fOnSurface ? all_volumes.SurfaceWeightedRand() : all_volumes.VolumeWeightedRand();
 
       // do the sampling
-      bool success = choice.Sample(vertex, fMaxAttempts, fOnSurface, fForceContainmentCheck, fTrials);
+      bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
 
       if (!success) {
         RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
@@ -844,6 +993,16 @@ void RMGVertexConfinement::DefineCommands() {
       .SetGuidance("Set maximum number of attempts for sampling primary positions in a volume")
       .SetParameterName("N", false)
       .SetRange("N > 0")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+
+  fMessengers.back()
+      ->DeclareProperty("MaxNumberOfIntersections", fMaxNumIntersections)
+      .SetGuidance("Set maximum number of intersections of a line with the surface. Note: can be "
+                   "set to an overestimate. ")
+      .SetParameterName("N", false)
+      .SetRange("N > 1")
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 

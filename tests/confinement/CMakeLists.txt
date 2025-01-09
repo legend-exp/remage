@@ -5,7 +5,6 @@ file(
   macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py)
 
 # copy them to the build area
-
 foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
@@ -94,3 +93,7 @@ add_test(NAME confinment-lar/intersection-and-subtraction
 
 set_tests_properties(confinment-lar/intersection-and-subtraction
                      PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)
+
+# test generic surface sampling methods
+add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
+target_link_libraries(test-surface-sampler-methods PUBLIC remage Geant4)

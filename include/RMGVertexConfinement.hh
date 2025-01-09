@@ -69,6 +69,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       kGeometrical,
       kUnset,
     };
+
+
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
@@ -96,12 +98,20 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         SampleableObject() = default;
         SampleableObject(const SampleableObject&) = default;
         SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s,
-            bool cc = true);
+            bool ns = false, bool ss = false);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
-        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts, bool sample_on_surface,
+        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts,
             bool force_containment_check, long int& n_trials) const;
+        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_samples,
+            int n_max) const;
+
+        // methods for the generic surface sampling
+        std::vector<G4ThreeVector> GetIntersections(const G4ThreeVector start,
+            const G4ThreeVector dir) const;
+        void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
+
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
@@ -109,7 +119,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         G4ThreeVector translation;
         double volume = -1;
         double surface = -1;
-        bool containment_check = true;
+        bool surface_sample = false;
+        bool native_sample = false;
+        int max_num_intersections = -1;
     };
 
     struct SampleableObjectCollection {
@@ -179,6 +191,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
     bool fLastSolidExcluded = false;
+    int fMaxNumIntersections = -1;
     // counters used for the current run.
     long fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime;
