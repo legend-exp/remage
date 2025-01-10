@@ -36,33 +36,22 @@ def add_hpge(lar, reg, angle, radius, z, idx, dtype):
 
 # construct geometry
 reg = pg4.geant4.Registry()
-ws = pg4.geant4.solid.Box("ws", 500, 500, 500, reg, lunit="mm")
+ws = pg4.geant4.solid.Box("ws", 300, 300, 300, reg, lunit="mm")
 wl = pg4.geant4.LogicalVolume(ws, "G4_Galactic", "wl", reg)
 wl.pygeom_color_rgba = (0.1, 1, 0.1, 0.5)
 
 reg.setWorld(wl)
 
 
-# lar
-lar_s = pg4.geant4.solid.Tubs(
-    "LAr_s", 0, 200, 250, 0, 2 * np.pi, registry=reg, lunit="mm"
-)
-lar_l = pg4.geant4.LogicalVolume(lar_s, "G4_lAr", "LAr_l", registry=reg)
-lar_l.pygeom_color_rgba = (1, 0.1, 0, 0.2)
-pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], lar_l, "LAr", wl, registry=reg)
-
-
 # hpge strings
 string_radius = 85
 string_angles = [0, 90, 180, 270]
-detectors = ["V", "P", "B", "C"]
-
 
 n = 0
 lines = []
-for i, det in enumerate(detectors):
+for i, det in enumerate(["V", "P", "B", "C"]):
     angle = string_angles[i]
-    n = add_hpge(lar_l, reg, angle, string_radius, -20, n, det)
+    n = add_hpge(wl, reg, angle, string_radius, -20, n, det)
 
     x = string_radius * np.sin(np.deg2rad(angle))
     y = string_radius * np.cos(np.deg2rad(angle))
