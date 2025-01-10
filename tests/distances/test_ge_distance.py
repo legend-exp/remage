@@ -11,6 +11,7 @@ import awkward as ak
 import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
+from legendhpges import draw
 from lgdo import lh5
 from matplotlib import pyplot as plt
 from pygeomtools import get_sensvol_metadata
@@ -89,7 +90,7 @@ def make_plot(hit, tolerance=1e-6):
             good_distance = False
 
         # Now draw the plots
-        hpges.draw.plot_profile(det_map[det]["hpge"], axes=axs[idx])
+        draw.plot_profile(det_map[det]["hpge"], axes=axs[idx])
 
         rpos_loc = np.sqrt(sel_hit.xloc**2 + sel_hit.yloc**2)
         rng = np.random.default_rng()
