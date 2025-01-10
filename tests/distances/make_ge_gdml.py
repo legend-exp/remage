@@ -48,23 +48,9 @@ string_radius = 85
 string_angles = [0, 90, 180, 270]
 
 n = 0
-lines = []
 for i, det in enumerate(["V", "P", "B", "C"]):
     angle = string_angles[i]
     n = add_hpge(wl, reg, angle, string_radius, -20, n, det)
-
-    x = string_radius * np.sin(np.deg2rad(angle))
-    y = string_radius * np.cos(np.deg2rad(angle))
-
-    lines.append("/RMG/Generator/Confinement/Geometrical/AddSolid Cylinder ")
-    lines.append(f"/RMG/Generator/Confinement/Geometrical/CenterPositionX {x} mm")
-    lines.append(f"/RMG/Generator/Confinement/Geometrical/CenterPositionY {y} mm ")
-    lines.append("/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0 mm ")
-    lines.append("/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 44 mm ")
-    lines.append("/RMG/Generator/Confinement/Geometrical/Cylinder/Height 100 mm \n")
-
-lines_exclude = [line.replace("AddSolid", "AddExcludedSolid") for line in lines]
-
 
 pytools.detectors.write_detector_auxvals(reg)
 pytools.geometry.check_registry_sanity(reg, reg)
