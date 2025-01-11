@@ -268,9 +268,15 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
           vertex / CLHEP::cm, " cm");
     }
   } else if (this->surface_sample) {
-    bool success = this->GenerateSurfacePoint(vertex, this->max_num_intersections, max_attempts);
-
+    bool success = this->GenerateSurfacePoint(vertex, max_attempts, this->max_num_intersections);
+    vertex = this->translation + this->rotation * vertex;
     if (not success) return false;
+
+    if (force_containment_check && !this->IsInside(vertex)) {
+      RMGLog::OutDev(RMGLog::error,
+          "Generated vertex not inside sampling volumes (forced containment check): ",
+          vertex / CLHEP::cm, " cm");
+    }
 
   } else {
     vertex = this->translation + this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);

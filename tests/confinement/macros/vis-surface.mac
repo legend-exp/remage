@@ -1,0 +1,60 @@
+/RMG/Output/NtuplePerDetector false
+/RMG/Geometry/RegisterDetector Germanium ${det} 001
+
+/run/initialize
+
+/vis/open OGL
+/vis/viewer/reset
+/vis/viewer/set/globalLineWidthScale 1.5
+/vis/viewer/set/style wireframe
+
+# draw the detector
+/vis/drawVolume
+
+
+# set colors
+
+/vis/geometry/set/colour tubby 0 1 0.2 1 .6
+/vis/geometry/set/colour box 0 0.7 1 0.5 .6
+/vis/geometry/set/colour trd 0 0.2 0.2 0.5 .6
+/vis/geometry/set/colour con 0 0.0 0.2 0.8 .6
+/vis/geometry/set/colour sub 0 1 0.2 0.5 .6
+/vis/geometry/set/colour uni 0 1 0.2 0.1 .6
+
+/vis/scene/add/text 10 0 30 cm 30 0 0 "This shows the primary position of events generated on the surface of ${det}."
+
+# set the viewpoint
+/vis/scene/add/axes 0 0 0 0.1 m
+/vis/viewer/set/viewpointVector 0.9 0.9 1
+/vis/viewer/set/upVector 0 0 1
+
+# add trajectories and control the coloring
+/vis/scene/add/trajectories smooth
+/vis/scene/endOfEventAction accumulate
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 10
+
+# set the background to white
+/vis/viewer/set/background white
+/vis/geometry/set/forceSolid
+/vis/geometry/set/forceWireframe
+
+
+# now generate the primaries
+/RMG/Generator/Select GPS
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/ForceContainmentCheck true
+
+
+/RMG/Generator/Confinement/Physical/AddVolume ${det}
+/RMG/Generator/Confinement/MaxNumberOfIntersections 6
+
+/gps/particle e-
+/gps/ang/type iso
+
+/gps/energy 1 eV
+/run/beamOn 1000
+
+/control/alias export-fn vis-surface-${det}.output.pdf
