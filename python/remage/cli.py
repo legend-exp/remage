@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import shutil
 import signal
 import subprocess
 import sys
+from pathlib import Path
 
 from .cpp_config import REMAGE_CPP_EXE_PATH
 
@@ -10,7 +12,12 @@ from .cpp_config import REMAGE_CPP_EXE_PATH
 def _run_remage_cpp() -> int:
     """run the remage-cpp executable and return the exit code as seen in bash."""
     # reuse our own argv[0] to have helpful help messages.
-    proc = subprocess.Popen(sys.argv, executable=REMAGE_CPP_EXE_PATH)
+    # but is is expanded (by the kernel?), so find out if we are in $PATH.
+    argv = list(sys.argv)
+    exe_name = Path(argv[0]).name
+    if shutil.which(exe_name) == sys.argv[0]:
+        argv[0] = exe_name
+    proc = subprocess.Popen(argv, executable=REMAGE_CPP_EXE_PATH)
 
     # propagate signals to the C++ executable.
     def new_signal_handler(sig: int, _):
