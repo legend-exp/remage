@@ -158,7 +158,9 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
     counter++;
   }
 
-  if (intersections.size() % 2) throw;
+  if (intersections.size() % 2)
+    RMGLog::OutDev(RMGLog::fatal, "Found ", intersections.size(), " intersections. However,",
+        "the number should always be divisible by two.");
 
   return intersections;
 }
@@ -170,10 +172,9 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
 
 
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
-    RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject where the physical volume is not set",
-        "this probably means you are trying to generically sample a geometrical volume which "
-        "instead",
-        "should be natively sampled");
+    RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
+        "where the physical volume is not set this probably means you are trying to generically",
+        "sample a geometrical volume which instead should be natively sampled");
 
   // get the bounding radius
   G4double bounding_radius =
@@ -185,10 +186,10 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   dir = G4ThreeVector(0.0, 0.0, -1.0);
 
   // push in rho direction by some impact parameter
-  G4double diskPhi = 2.0 * CLHEP::pi * G4UniformRand();
-  G4double diskR = sqrt(G4UniformRand()) * bounding_radius;
+  G4double disk_phi = 2.0 * CLHEP::pi * G4UniformRand();
+  G4double disk_r = sqrt(G4UniformRand()) * bounding_radius;
 
-  pos += G4ThreeVector(cos(diskPhi) * diskR, sin(diskPhi) * diskR, 0);
+  pos += G4ThreeVector(cos(disk_phi) * disk_r, sin(disk_phi) * disk_r, 0);
 
   // now rotate pos and dir by some random direction
   G4double theta = acos(2.0 * G4UniformRand() - 1.0);
