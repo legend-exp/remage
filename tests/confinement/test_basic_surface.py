@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+import argparse
 import copy
 
 import numpy as np
-import argparse
-
 import pyg4ometry as pg4
 from lgdo import lh5
 from matplotlib import pyplot as plt
@@ -180,11 +179,10 @@ select_sides = {
         "nice_name": "G4Trapezoid",
     },
 }
-dtype =  args.det
+dtype = args.det
 
 
 with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
-   
     # get positions
     pos = reg.physicalVolumeDict[dtype].position.eval()
 
@@ -213,8 +211,9 @@ with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
         indices[is_close] = idx
 
     if len(indices[indices == -1]) > 0:
-        print(f"{dtype} has primaries not close to any side")
-        assert False
+        msg = f"{dtype} has primaries not close to any side"
+        raise ValueError(msg)
+
     vertices["idx"] = indices
     vertices["rlocal"] = np.sqrt(vertices.xlocal**2 + vertices.ylocal**2)
     n = 5000
@@ -248,7 +247,9 @@ with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
     ax.set_zlabel("z position [mm]")
 
     caption = f"The position of primary vertices for {nice_name} in 3D space. \n"
-    caption += "Primaries are grouped by the surface with each shown in a different color. "
+    caption += (
+        "Primaries are grouped by the surface with each shown in a different color. "
+    )
 
     plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
     plt.tight_layout(rect=[0, 0.12, 1, 1])
@@ -272,7 +273,9 @@ with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
         plt.tight_layout()
 
     caption = f"The position of primary vertices for {nice_name} in 2D space for different projections. \n"
-    caption += "Primaries are grouped by the surface with each shown in a different color. "
+    caption += (
+        "Primaries are grouped by the surface with each shown in a different color. "
+    )
 
     plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
     plt.tight_layout(rect=[0, 0.12, 1, 1])
@@ -355,7 +358,11 @@ with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
 
     caption = "The fraction of the vertices found on each face of the shapes."
     caption += "This should be proportional to the surface area. The top panel shows the fraction in each face "
-    caption += r"while the lower panel shows the relative difference in % from the expectation"
+    caption += (
+        r"while the lower panel shows the relative difference in % from the expectation"
+    )
     plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
     plt.tight_layout(rect=[0, 0.12, 1, 1])
     pdf.savefig()
+
+    assert sigma < 5

@@ -179,7 +179,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   G4double bounding_radius =
       physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
 
-  G4ThreeVector barycenter  =
+  G4ThreeVector barycenter =
       physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentCenter();
 
   // start on z-axis, pointing down.
@@ -191,7 +191,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   G4double disk_r = sqrt(G4UniformRand()) * bounding_radius;
 
   pos += G4ThreeVector(cos(disk_phi) * disk_r, sin(disk_phi) * disk_r, 0);
-  
+
   // now rotate pos and dir by some random direction
   G4double theta = acos(2.0 * G4UniformRand() - 1.0);
   G4double phi = 2.0 * CLHEP::pi * G4UniformRand();
@@ -200,9 +200,8 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   pos.rotateZ(phi);
   dir.rotateY(theta);
   dir.rotateZ(phi);
-  std::cout<<"barycenter "<<barycenter<<std::endl;
-  pos += barycenter;
 
+  pos += barycenter;
 }
 
 

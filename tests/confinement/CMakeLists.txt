@@ -108,7 +108,8 @@ set_tests_properties(confinement/test-surface-sampler-methods-build
                      PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
-set(_surface_tests test-points-union test-intersections-basic test-intersections-subtraction test-intersections-union test-containment-subtraction test-containment-union)
+set(_surface_tests test-points-union test-intersections-basic test-intersections-subtraction
+                   test-intersections-union test-containment-subtraction test-containment-union)
 
 foreach(_test ${_surface_tests})
 
@@ -174,10 +175,10 @@ foreach(det ${_solids})
     PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
                confine-surface-macro-${det}-fixture)
 
-
-  add_test(NAME confinment-surface/relative-fractions-${det} COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
+  add_test(NAME confinment-surface/relative-fractions-${det}
+           COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
 
   set_tests_properties(confinment-surface/relative-fractions-${det}
-                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
+                       PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
 
 endforeach()
