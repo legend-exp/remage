@@ -95,6 +95,8 @@ set_tests_properties(confinment-lar/intersection-and-subtraction
                      PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)
 
 # test generic surface sampling methods
+find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} REQUIRED COMPONENTS Geant4)
+
 add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
 target_link_libraries(test-surface-sampler-methods PUBLIC remage BxDecay0::BxDecay0)
 
