@@ -1,0 +1,21 @@
+/RMG/Output/NtuplePerDetector false
+/RMG/Geometry/RegisterDetector Germanium ${det} 001
+
+/run/initialize
+
+
+# now generate the primaries
+/RMG/Generator/Select GPS
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/ForceContainmentCheck true
+
+
+/RMG/Generator/Confinement/Physical/AddVolume ${det}
+/RMG/Generator/Confinement/MaxNumberOfIntersections 6
+
+/gps/particle e-
+/gps/ang/type iso
+
+/gps/energy 1 eV
+/run/beamOn 500000

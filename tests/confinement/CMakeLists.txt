@@ -101,6 +101,7 @@ target_link_libraries(test-surface-sampler-methods PUBLIC remage BxDecay0::BxDec
 add_test(NAME confinement/test-surface-sampler-methods-build
          COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
                  test-surface-sampler-methods)
+
 set_tests_properties(confinement/test-surface-sampler-methods-build
                      PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
@@ -130,14 +131,14 @@ set(_solids tubby box con uni sub trd)
 foreach(det ${_solids})
 
   add_test(
-    NAME confinement-surface/gen-macro-${det}
+    NAME confinement-surface/gen-vis-macro-${det}
     COMMAND /bin/sh -c
             "sed 's/\${det}/${det}/g' macros/vis-surface.mac > macros/vis-surface-${det}.mac")
 
   set_tests_properties(
-    confinement-surface/gen-macro-${det}
-    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-macro-${det}-fixture FIXTURES_REQUIRED
-               confine-surface-gdml-fixture)
+    confinement-surface/gen-vis-macro-${det}
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
+               FIXTURES_REQUIRED confine-surface-gdml-fixture)
 
   add_test(NAME confinment-surface/${det}-vis
            COMMAND ${REMAGE_PYEXE} macros/vis-surface-${det}.mac macros/_vis-export.mac -g
@@ -145,5 +146,43 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinment-surface/${det}-vis PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                             confine-surface-macro-${det}-fixture)
+                                             confine-surface-vis-macro-${det}-fixture)
 endforeach()
+
+# run simulations and check
+
+foreach(det ${_solids})
+
+  add_test(
+    NAME confinement-surface/gen-macro-${det}
+    COMMAND /bin/sh -c
+            "sed 's/\${det}/${det}/g' macros/gen-surface.mac > macros/gen-surface-${det}.mac")
+
+  set_tests_properties(
+    confinement-surface/gen-macro-${det}
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-macro-${det}-fixture FIXTURES_REQUIRED
+               confine-surface-gdml-fixture)
+
+  add_test(NAME confinment-surface/${det}-gen
+           COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
+                   detail -o test-confine-surface-${det}-out.lh5)
+
+  set_tests_properties(
+    confinment-surface/${det}-gen
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
+               confine-surface-macro-${det}-fixture)
+endforeach()
+
+# required fixtures
+set(required_fixtures "")
+foreach(det ${_solids})
+  list(APPEND required_fixtures "confine-surface-${det}")
+endforeach()
+
+# Join the fixtures into a semicolon-separated string
+string(JOIN ";" required_fixtures_str ${required_fixtures})
+
+add_test(NAME confinment-surface/relative-fractions COMMAND ${PYTHONPATH} ./test_basic_surface.py)
+
+set_tests_properties(confinment-surface/relative-fractions
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED required_fixtures)
