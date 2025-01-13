@@ -88,7 +88,7 @@ small_box = pg4.geant4.solid.Box(
     "small_box", pX=20, pY=20, pZ=50, registry=reg, lunit="mm"
 )
 uni = pg4.geant4.solid.Union(
-    "uni", box, small_box, tra2=[[0, 0, 0], [0, 0, 60]], registry=reg
+    "uni", box, small_box, tra2=[[0, 0, 0], [0, 0, 75]], registry=reg
 )
 uni_l = pg4.geant4.LogicalVolume(uni, "G4_BLOOD_ICRP", "uni", reg)
 uni_l.pygeom_color_rgba = (1, 0.2, 0.1, 1)

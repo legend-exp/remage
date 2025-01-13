@@ -37,7 +37,6 @@
 
 # set the background to white
 #/vis/viewer/set/background white
-/vis/geometry/set/forceSolid
 /vis/geometry/set/forceWireframe
 
 

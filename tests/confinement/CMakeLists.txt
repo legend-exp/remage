@@ -108,7 +108,7 @@ set_tests_properties(confinement/test-surface-sampler-methods-build
                      PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
-set(_surface_tests test-intersections-basic test-intersections-subtraction test-containment)
+set(_surface_tests test-points-union test-intersections-basic test-intersections-subtraction test-intersections-union test-containment-subtraction test-containment-union)
 
 foreach(_test ${_surface_tests})
 
@@ -173,18 +173,11 @@ foreach(det ${_solids})
     confinment-surface/${det}-gen
     PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
                confine-surface-macro-${det}-fixture)
+
+
+  add_test(NAME confinment-surface/relative-fractions-${det} COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
+
+  set_tests_properties(confinment-surface/relative-fractions-${det}
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
+
 endforeach()
-
-# required fixtures
-set(required_fixtures "")
-foreach(det ${_solids})
-  list(APPEND required_fixtures "confine-surface-${det}")
-endforeach()
-
-# Join the fixtures into a semicolon-separated string
-string(JOIN ";" required_fixtures_str ${required_fixtures})
-
-add_test(NAME confinment-surface/relative-fractions COMMAND ${PYTHONPATH} ./test_basic_surface.py)
-
-set_tests_properties(confinment-surface/relative-fractions
-                     PROPERTIES LABELS extra FIXTURES_REQUIRED required_fixtures)
