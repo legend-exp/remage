@@ -958,6 +958,7 @@ Commands for controlling primary confinement
 * `SamplingMode` – Select sampling mode for volume confinement
 * `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
+* `MaxNumberOfIntersections` – Set maximum number of intersections of a line with the surface. Note: can be set to an overestimate.
 * `ForceContainmentCheck` – If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.
 
 ### `/RMG/Generator/Confinement/Reset`
@@ -995,6 +996,15 @@ Select the type of volume which will be sampled first for intersections
 Set maximum number of attempts for sampling primary positions in a volume
 
 * **Range of parameters** – `N > 0`
+* **Parameter** – `N`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+
+### `/RMG/Generator/Confinement/MaxNumberOfIntersections`
+
+Set maximum number of intersections of a line with the surface. Note: can be set to an overestimate. 
+
+* **Range of parameters** – `N > 1`
 * **Parameter** – `N`
   * **Parameter type** – `i`
   * **Omittable** – `False`

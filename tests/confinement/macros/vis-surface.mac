@@ -36,7 +36,7 @@
 /vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 10
 
 # set the background to white
-/vis/viewer/set/background white
+#/vis/viewer/set/background white
 /vis/geometry/set/forceSolid
 /vis/geometry/set/forceWireframe
 
