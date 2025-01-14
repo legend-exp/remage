@@ -33,16 +33,21 @@
 
 class G4VPhysicalVolume;
 class G4VSolid;
+
+/** @brief Class for generating vertices in physical or geometrical volumes.
+ */
 class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
 
+    /** @brief Different types of geometrical (user) defined solids. */
     enum class GeometricalSolidType {
       kSphere,
       kCylinder,
       kBox,
     };
 
+    /** @brief Information about the geometrical (user) defined solids. */
     struct GenericGeometricalSolidData {
         GeometricalSolidType solid_type;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
@@ -58,24 +63,37 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         double box_z_length = -1;
     };
 
+    /**
+     * @brief Strategy for sampling physical and geometrical volumes.
+     *
+     * @details Can be either:
+     * - @c kIntersectPhysicalWithGeometrical : In which case vertices are generated in the
+     * intersection of the set of physical and geometrical volumes.
+     * - @c kUnionAll Generate in the union of all volumes, weighted by surface area / volume.
+     * - @c kSubtractGeometrical : Similar to @c kIntersectPhysicalWithGeometrical but specified
+     * regions can also be excluded.
+     */
     enum class SamplingMode {
       kIntersectPhysicalWithGeometrical,
       kUnionAll,
       kSubtractGeometrical,
     };
 
+    /** @brief Types of volume to sample, either physical (a volume in the geometry), geometrical
+     * (defined by the user) or unset. */
     enum class VolumeType {
       kPhysical,
       kGeometrical,
       kUnset,
     };
 
-
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
     void EndOfRunAction(const G4Run* run) override;
 
+    /** @brief Generate the actual vertex, according to the sampling mode (see \ref
+     * RMGVertexConfinement::SamplingMode). */
     bool GenerateVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
@@ -93,14 +111,38 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       return fGeomVolumeData;
     }
 
+    /**
+     * An object which we can generate position samples in. Based on either a
+     * @c G4VPhysicalVolume or geometrical volume defined by a @c G4VSolid . The
+     * sampling can be performed either on the surface or in the volume of the solid.
+     */
     struct SampleableObject {
+
 
         SampleableObject() = default;
         SampleableObject(const SampleableObject&) = default;
+
+        /**
+         * @brief SampleableObject constructor.
+         *
+         * @param v The physical volume.
+         * @param r A rotation matrix for the sampling solid.
+         * @param t A translation vector for the sampling solid.
+         * @param s A solid for geometrical volume sampling or for generating candidate points for
+         * rejection sampling.
+         * @param ns A flag of whether the solid is natively sampeable.
+         * @param ss A flag of whether the solid should be sampled on the surface.
+         */
         SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s,
             bool ns = false, bool ss = false);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
+
+        /**
+         * @brief Check if the vertex is inside the solid.
+         * @param vertex The sampled vertex.
+         * @returns Boolean flag of whether the vertexx is inside the solid.
+         */
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         /**
@@ -109,6 +151,10 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @details Depending on if the solid is a basic one either sample natively,
          * or using rejection sampling. Either samples the volume or the surface depending
          * on the @c surface_sample member.
+         * - For surface sampling mode the solid is either natively sampled (if this is
+         * implemented), or is sampled with \ref SampleableObject::GenerateSurfacePoint
+         * - For volume sampling, if the solid is not natively sampleable, points are generated in a
+         * bounding box and then rejection sampling is used using \ref SampleableObject::IsInside.
          *
          * @param vertex The sampled vertex.
          * @param max_attempts The maximum number of candidate vertices for rejection sampling.
@@ -119,7 +165,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts,
             bool force_containment_check, long int& n_trials) const;
-
 
         /**
          * @brief Generate a point on the surface of the solid.
@@ -170,24 +215,36 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
-
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
         G4RotationMatrix rotation;
         G4ThreeVector translation;
+
         double volume = -1;
         double surface = -1;
+
         bool surface_sample = false;
         bool native_sample = false;
         int max_num_intersections = -1;
     };
 
+    /** A collection of @c SampleableObjects . Can be used
+     * to sample from by selecting a volume weighted by surface area
+     * or volume.
+     */
     struct SampleableObjectCollection {
 
         SampleableObjectCollection() = default;
         inline ~SampleableObjectCollection() { data.clear(); }
 
+        /** @brief Select a @c SampleableObject from the collection, weighted by surface area.
+         *  @returns a reference to the chosen @c SampleableObject .
+         */
         [[nodiscard]] const SampleableObject& SurfaceWeightedRand() const;
+
+        /** @brief Select a @c SampleableObject from the collection, weighted by volume.
+         *  @returns a reference to the chosen @c SampleableObject .
+         */
         [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
