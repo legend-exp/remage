@@ -28,7 +28,6 @@
 
 #include "QBBC.hh"
 
-
 // class for some basic vis
 class MyDetectorConstruction : public G4VUserDetectorConstruction {
   public:
@@ -56,7 +55,7 @@ class MyDetectorConstruction : public G4VUserDetectorConstruction {
 
       // turn off vis
       auto worldVisAttr = new G4VisAttributes();
-      worldVisAttr->SetVisibility(true);
+      worldVisAttr->SetVisibility(false);
       worldLog->SetVisAttributes(worldVisAttr);
 
       G4VPhysicalVolume* worldPhys =
@@ -100,6 +99,73 @@ class MyDetectorConstruction : public G4VUserDetectorConstruction {
     }
 };
 
+
+int RunVis(RMGVertexConfinement::SampleableObject obj,std::string name)
+{
+ G4double radius =
+        obj.physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
+    G4ThreeVector center =
+        obj.physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentCenter();
+
+    G4LogicalVolume* log = obj.physical_volume->GetLogicalVolume();
+
+    std::vector<G4ThreeVector> points;
+    int i = 0;
+    while (i < 100) {
+      G4ThreeVector pos;
+      G4ThreeVector dir;
+      obj.GetDirection(dir, pos);
+
+      points.push_back(pos);
+      if ((pos - center).mag() < radius) {
+        std::cout << "the initial point must be less than the bounding radius" << std::endl;
+        return 1;
+      }
+      i++;
+    }
+    G4RunManager* runManager = new G4RunManager();
+
+    // Set mandatory initialization classes
+    runManager->SetUserInitialization(new MyDetectorConstruction(center, radius, points, log));
+
+    auto physicsList = new QBBC;
+    physicsList->SetVerboseLevel(1);
+    runManager->SetUserInitialization(physicsList);
+    runManager->Initialize();
+    // Initialize visualization
+    G4VisManager* visManager = new G4VisExecutive();
+    visManager->Initialize();
+
+    // User interface
+
+    // Set up visualization commands
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
+    UImanager->ApplyCommand("/run/initialize ");
+
+    UImanager->ApplyCommand("/vis/open OGL ");
+    UImanager->ApplyCommand("/vis/verbose warnings");
+
+    UImanager->ApplyCommand("/vis/drawVolume");
+    UImanager->ApplyCommand("/vis/geometry/set/forceWireframe");
+    UImanager->ApplyCommand("/vis/viewer/set/viewpointVector 0.7 0.9 0.7");
+    UImanager->ApplyCommand("/vis/viewer/zoom 1.5");
+
+    UImanager->ApplyCommand("/vis/scene/list ");
+    UImanager->ApplyCommand("/vis/scene/endOfEventAction accumulate");
+    UImanager->ApplyCommand("/vis/viewer/set/globalLineWidthScale 1.5");
+    UImanager->ApplyCommand("/vis/viewer/set/upVector 0 0 1");
+
+    UImanager->ApplyCommand("/vis/ogl/export test-points-"+name+".output.pdf");
+
+
+    delete visManager;
+    delete runManager;
+
+
+    return 0;
+
+
+}
 
 G4VPhysicalVolume* get_phy_volume(G4VSolid* solid, std::string Material_string) {
   G4NistManager* nist = G4NistManager::Instance();
@@ -323,73 +389,25 @@ int main(int argc, char* argv[]) {
 
     // get some points to plot
     auto obj = sampleables["uni"];
-    G4double radius =
-        obj.physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
-    G4ThreeVector center =
-        obj.physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentCenter();
+    RunVis(obj,"union");
 
-    G4LogicalVolume* log = obj.physical_volume->GetLogicalVolume();
+  }
+  else if (test_type == "test-points-subtraction") {
 
-    std::vector<G4ThreeVector> points;
-    int i = 0;
-    while (i < 1000) {
-      G4ThreeVector pos;
-      G4ThreeVector dir;
-      obj.GetDirection(dir, pos);
+    // get some points to plot
+    auto obj = sampleables["sub"];
+    return RunVis(obj,"subtraction");
 
-      points.push_back(pos);
-      if ((pos - center).mag() < radius) {
-        std::cout << "the initial point must be less than the bounding radius" << std::endl;
-        return 1;
-      }
-      i++;
-    }
-    G4RunManager* runManager = new G4RunManager();
+  } 
+  else if (test_type == "test-points-basic") {
 
-    // Set mandatory initialization classes
-    runManager->SetUserInitialization(new MyDetectorConstruction(center, radius, points, log));
+    // get some points to plot
+    auto obj = sampleables["tubs"];
+    return RunVis(obj,"simple");
 
-    auto physicsList = new QBBC;
-    physicsList->SetVerboseLevel(1);
-    runManager->SetUserInitialization(physicsList);
-
-    // Initialize visualization
-    G4VisManager* visManager = new G4VisExecutive();
-    visManager->Initialize();
-
-    // User interface
-    G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-
-    // Set up visualization commands
-    G4UImanager* UImanager = G4UImanager::GetUIpointer();
-    UImanager->ApplyCommand("/run/initialize ");
-
-    UImanager->ApplyCommand("/vis/open OGL ");
-    UImanager->ApplyCommand("/vis/verbose warnings");
-
-    UImanager->ApplyCommand("/vis/drawVolume");
-    UImanager->ApplyCommand("/vis/geometry/set/forceWireframe");
-    UImanager->ApplyCommand("/vis/viewer/set/viewpointVector 0.7 0.9 0.7");
-    UImanager->ApplyCommand("/vis/viewer/zoom 1.5");
-
-    UImanager->ApplyCommand("/vis/scene/list ");
-    UImanager->ApplyCommand("/vis/scene/add/axes 0 0 0 0.1 m");
-    UImanager->ApplyCommand("/vis/scene/endOfEventAction accumulate");
-    UImanager->ApplyCommand("/vis/viewer/set/globalLineWidthScale 1.5");
-    UImanager->ApplyCommand("/vis/viewer/set/upVector 0 0 1");
-
-    // UImanager->ApplyCommand("/vis/viewer/set/background white");
-    UImanager->ApplyCommand("/vis/ogl/export test-points-union.output.pdf");
-
-
-    delete ui;
-    delete visManager;
-    delete runManager;
-
-    return 0;
-
-
-  } else {
+  } 
+  
+   else {
     return 0;
   }
 
