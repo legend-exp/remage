@@ -126,7 +126,7 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 // get the intersections between the solid and an arbitrary line, defined by start and dir
 std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
     G4ThreeVector dir) const {
-  
+
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
@@ -226,7 +226,7 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
     // The surface sampling algorithm returns N intersections.
     // We have to select one, to keep independence of the sampled points
     // and weight by the number of intersections.
-    
+
     int random_int = static_cast<int>(n_max * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
