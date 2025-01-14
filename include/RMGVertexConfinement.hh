@@ -102,14 +102,72 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
+
+        /**
+         * @brief Generate a sample from the solid.
+         *
+         * @details Depending on if the solid is a basic one either sample natively,
+         * or using rejection sampling. Either samples the volume or the surface depending
+         * on the @c surface_sample member.
+         *
+         * @param vertex The sampled vertex.
+         * @param max_attempts The maximum number of candidate vertices for rejection sampling.
+         * @param force_containment_check Whether to force a check on where the point is
+         * inside the solid.
+         * @param n_trials The total number of trials performed.
+         *
+         */
         [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts,
             bool force_containment_check, long int& n_trials) const;
+
+
+        /**
+         * @brief Generate a point on the surface of the solid.
+         *
+         * @details This follows the algorithm from https://arxiv.org/abs/0802.2960.
+         * - Produce a direction vector corresponding to a uniform flux in a bounding sphere.
+         * - Find the intersections of this line with the solid.
+         * - Pick one intersection, or repeat.
+         *
+         * @param vertex The sampled vertex,
+         * @param max_samples The maximum number of attempts to find a valid vertex.
+         * @param n_max The maximum number of intersections possible for the solid,
+         * can be an overestimate.
+         *
+         */
         [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_samples,
             int n_max) const;
 
         // methods for the generic surface sampling
+        /**
+         * @brief Get the number of intersections between the solid and the line starting at @c
+         * start with direction @c dir.
+         *
+         * @details This is used in the generic surface sampling algorithm. This function makes use
+         * of the methods @c GetDistanceToIn(p,v) and @c GetDistanceToOut(p,v) of @c G4VSolid .
+         * It continually looks for the distance to the next boundary (along the line)
+         * until this becomes zero indicating there are no more intersections.
+         *
+         * @param start The starting vector of the line, note this should be outside the solid.
+         * @param dir   The direction vector.
+         *
+         * @returns A vector of the points of intersection.
+         */
         std::vector<G4ThreeVector> GetIntersections(const G4ThreeVector start,
             const G4ThreeVector dir) const;
+
+
+        /**
+         * @brief Get a position and direction for the generic surface sampling algorithm.
+         *
+         * @details This generates a point on a bounding sphere, then shifts by some impact
+         * parameter, following the algorithm from https://arxiv.org/abs/0802.2960. This produces a
+         * uniform and isotropic flux inside the bounding sphere.
+         *
+         * @param dir The direction vector for the point.
+         * @param pos The initial position for the point.
+         *
+         */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
 
