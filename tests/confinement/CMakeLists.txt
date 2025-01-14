@@ -95,24 +95,18 @@ set_tests_properties(confinment-lar/intersection-and-subtraction
                      PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)
 
 # test generic surface sampling methods
-find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} QUIET COMPONENTS Geant4)
-
 add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
-
 target_link_libraries(test-surface-sampler-methods PUBLIC remage)
-
 if(BxDecay0_FOUND)
-  target_link_libraries(test-surface-sampler-methods PRIVATE BxDecay0::BxDecay0)
-
-  add_test(NAME confinement/test-surface-sampler-methods-build
-           COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
-                   test-surface-sampler-methods)
-
-  set_tests_properties(confinement/test-surface-sampler-methods-build
-                       PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
-else()
-  message(WARNING "BxDecay0 not found - skipping tests depending on it.")
+  target_link_libraries(test-surface-sampler-methods PRIVATE BxDecay0::BxDecay0_Geant4)
 endif()
+
+add_test(NAME confinement/test-surface-sampler-methods-build
+         COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
+                 test-surface-sampler-methods)
+
+set_tests_properties(confinement/test-surface-sampler-methods-build
+                     PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
 set(_surface_tests
