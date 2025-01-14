@@ -126,8 +126,7 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 // get the intersections between the solid and an arbitrary line, defined by start and dir
 std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
     G4ThreeVector dir) const {
-
-
+  
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
@@ -136,14 +135,12 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
 
   auto solid = this->physical_volume->GetLogicalVolume()->GetSolid();
 
-
   G4double dist = 0;
   std::vector<G4ThreeVector> intersections = {};
   G4ThreeVector int_point;
 
   int_point = start;
   int counter = 0;
-
   dist = 0;
 
   while (dist < kInfinity) {
@@ -168,7 +165,6 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
 // generate a random position and direction for the surface sampling
 void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
     G4ThreeVector& pos) const {
-
 
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot generate directions for a SampleableObject ",
@@ -299,7 +295,6 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
       return false;
     }
   }
-
 
   RMGLog::OutDev(RMGLog::debug, "Found good vertex ", vertex / CLHEP::cm, " cm", " after ", calls,
       " iterations, returning");
