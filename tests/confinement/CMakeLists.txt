@@ -70,8 +70,9 @@ set_tests_properties(
              confine-gdml-fixture)
 
 # analyse subtraction
-add_test(NAME confinment-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
-                                                 test-confine-lar-out.lh5 lar-sub-check.output.pdf)
+add_test(NAME confinment-lar/subtraction
+         COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-out.lh5
+                 lar-sub-check.output.pdf)
 
 set_tests_properties(confinment-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                            confine-lar-out-output-fixture)
@@ -92,7 +93,7 @@ add_test(NAME confinment-lar/intersection-and-subtraction
                  lar-int-and-sub-check.output.pdf)
 
 set_tests_properties(confinment-lar/intersection-and-subtraction
-                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture)
 
 # test generic surface sampling methods
 add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)

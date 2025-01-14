@@ -182,7 +182,7 @@ select_sides = {
 dtype = args.det
 
 
-with PdfPages(f"simple-solids-surface-{dtype}.output.pdf") as pdf:
+with PdfPages(f"confinement.simple-solids-surface-{dtype}.output.pdf") as pdf:
     # get positions
     pos = reg.physicalVolumeDict[dtype].position.eval()
 

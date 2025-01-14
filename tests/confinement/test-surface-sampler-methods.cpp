@@ -154,7 +154,8 @@ int RunVis(RMGVertexConfinement::SampleableObject obj, std::string name) {
   UImanager->ApplyCommand("/vis/viewer/set/globalLineWidthScale 1.5");
   UImanager->ApplyCommand("/vis/viewer/set/upVector 0 0 1");
 
-  UImanager->ApplyCommand("/vis/ogl/export surface-sample-bounding-box-" + name + ".output.pdf");
+  UImanager->ApplyCommand(
+      "/vis/ogl/export surface-sample-bounding-box-" + name + ".output.pdf");
 
 
   delete visManager;
