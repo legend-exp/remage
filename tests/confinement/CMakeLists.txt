@@ -102,19 +102,22 @@ target_link_libraries(test-surface-sampler-methods PUBLIC remage)
 
 if(BxDecay0_FOUND)
   target_link_libraries(test-surface-sampler-methods PRIVATE BxDecay0::BxDecay0)
+
+  add_test(NAME confinement/test-surface-sampler-methods-build
+           COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
+                   test-surface-sampler-methods)
+
+  set_tests_properties(confinement/test-surface-sampler-methods-build
+                       PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
+else()
+  message(WARNING "BxDecay0 not found - skipping tests depending on it.")
 endif()
-
-add_test(NAME confinement/test-surface-sampler-methods-build
-         COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
-                 test-surface-sampler-methods)
-
-set_tests_properties(confinement/test-surface-sampler-methods-build
-                     PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
 set(_surface_tests
     test-points-subtraction
     test-points-basic
+    test-points-union
     test-intersections-basic
     test-intersections-subtraction
     test-intersections-union
@@ -123,34 +126,10 @@ set(_surface_tests
 
 foreach(_test ${_surface_tests})
 
-  add_test(NAME confinement/test-surface-sampler-methods-build
-           COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
-                   test-surface-sampler-methods)
-
-  set_tests_properties(confinement/test-surface-sampler-methods-build
-                       PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
-
-  # add the tests
-  set(_surface_tests
-      test-points-subtraction
-      test-points-basic
-      test-points-union
-      test-intersections-basic
-      test-intersections-subtraction
-      test-intersections-union
-      test-containment-subtraction
-      test-containment-union)
-
-  foreach(_test ${_surface_tests})
-
-    add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
-    set_tests_properties(
-      confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                             test-surface-sampler-methods-fixture)
-  endforeach()
-else()
-  message(WARNING "BxDecay0 not found - skipping tests depending on it.")
-endif()
+  add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
+  set_tests_properties(confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                              test-surface-sampler-methods-fixture)
+endforeach()
 
 # now run some simulations and test the outputs
 
