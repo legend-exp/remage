@@ -114,6 +114,7 @@ if(BxDecay0_FOUND)
   set(_surface_tests
       test-points-subtraction
       test-points-basic
+      test-points-union
       test-intersections-basic
       test-intersections-subtraction
       test-intersections-union
@@ -138,7 +139,6 @@ set_tests_properties(confinment-surface/gen-gdml PROPERTIES LABELS extra FIXTURE
                                                             confine-surface-gdml-fixture)
 
 # visualise
-
 set(_solids tubby box con uni sub trd)
 
 foreach(det ${_solids})
@@ -163,7 +163,6 @@ foreach(det ${_solids})
 endforeach()
 
 # run simulations and check
-
 foreach(det ${_solids})
 
   add_test(

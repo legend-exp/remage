@@ -143,6 +143,11 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
   int counter = 0;
   dist = 0;
 
+  // Find the number of intersections between the shape and a line.
+  // Uses the DistanceToIn and DistanceToOut methods to find the next intersection,
+  // continually call these (depending on if we are inside or outside) until the distance
+  // becomes kInfinity.
+
   while (dist < kInfinity) {
 
     dist = (counter % 2) == 0 ? solid->DistanceToIn(int_point, dir)
@@ -171,7 +176,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
         "where the physical volume is not set this probably means you are trying to generically ",
         "sample a geometrical volume which instead should be natively sampled");
 
-  // get the bounding radius
+  // Get the center and radius of a bounding sphere around the shape
   G4double bounding_radius =
       physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
 
@@ -185,7 +190,6 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   // push in rho direction by some impact parameter
   G4double disk_phi = 2.0 * CLHEP::pi * G4UniformRand();
   G4double disk_r = sqrt(G4UniformRand()) * bounding_radius;
-
   pos += G4ThreeVector(cos(disk_phi) * disk_r, sin(disk_phi) * disk_r, 0);
 
   // now rotate pos and dir by some random direction
@@ -197,11 +201,11 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
   dir.rotateY(theta);
   dir.rotateZ(phi);
 
+  // shift by the barycenter of the bounding sphere.
   pos += barycenter;
 }
 
 
-// generate with the generic sampler the actual surface point
 bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector& vertex,
     int max_attempts, int n_max) const {
 
@@ -219,7 +223,10 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
 
     if (intersections.size() == 0) continue;
 
-    // pick one weighting by n_max and return it
+    // The surface sampling algorithm returns N intersections.
+    // We have to select one, to keep independence of the sampled points
+    // and weight by the number of intersections.
+    
     int random_int = static_cast<int>(n_max * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
