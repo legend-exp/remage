@@ -112,8 +112,14 @@ set_tests_properties(confinement/test-surface-sampler-methods-build
                      PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
-set(_surface_tests test-points-subtraction test-points-basic test-intersections-basic test-intersections-subtraction
-                   test-intersections-union test-containment-subtraction test-containment-union)
+set(_surface_tests
+    test-points-subtraction
+    test-points-basic
+    test-intersections-basic
+    test-intersections-subtraction
+    test-intersections-union
+    test-containment-subtraction
+    test-containment-union)
 
 foreach(_test ${_surface_tests})
 
