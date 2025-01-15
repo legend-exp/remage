@@ -58,8 +58,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-output-${{ matrix.container_version }}
-          # artifacts must have a ".output*" extension
-          path: build/tests/**/*.output*.*
+          # artifacts must have a ".output*" extension or .tex
+          path: |
+            build/tests/tex/*.output*.*
+            build/tests/tex/*.tex
 
       - name: Run minimal test suite
         if: ${{ matrix.container_version == 'slim' }}
