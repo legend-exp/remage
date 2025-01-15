@@ -77,7 +77,7 @@ hits = ak.Array(
 )
 
 
-def make_plot(hit, tolerance=1e-6):
+def make_plot(hit, tolerance=1e-9):
     good_distance = True
     for idx, det in enumerate(det_map):
         temp = det_map[det]["uint"]
