@@ -9,6 +9,7 @@ get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
 
 add_subdirectory(basics)
 add_subdirectory(confinement)
+add_subdirectory(distances)
 add_subdirectory(germanium)
 add_subdirectory(internals)
 add_subdirectory(output)

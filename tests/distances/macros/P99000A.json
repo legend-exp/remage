@@ -1,0 +1,29 @@
+{
+  "name": "P99000A",
+  "type": "ppc",
+  "production": {
+    "manufacturer": "Test",
+    "enrichment": {
+      "val": 0.75,
+      "unc": 0.05
+    }
+  },
+  "geometry": {
+    "height_in_mm": 45.0,
+    "radius_in_mm": 35.0,
+    "pp_contact": {
+      "radius_in_mm": 2,
+      "depth_in_mm": 2
+    },
+    "taper": {
+      "top": {
+        "angle_in_deg": 0,
+        "height_in_mm": 0
+      },
+      "bottom": {
+        "angle_in_deg": 30,
+        "height_in_mm": 10
+      }
+    }
+  }
+}
