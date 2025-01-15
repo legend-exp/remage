@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac gdml/*.gdml gdml/*.xml)
+  macros/*.mac gdml/*.gdml gdml/*.xml *.tex)
 
 # copy them to the build area
 foreach(_file ${_aux})

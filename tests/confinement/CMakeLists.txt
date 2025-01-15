@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py)
+  macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py *.tex)
 
 # copy them to the build area
 foreach(_file ${_aux})
@@ -70,9 +70,8 @@ set_tests_properties(
              confine-gdml-fixture)
 
 # analyse subtraction
-add_test(NAME confinment-lar/subtraction
-         COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-out.lh5
-                 lar-sub-check.output.pdf)
+add_test(NAME confinment-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
+                                                 test-confine-lar-out.lh5 lar-sub-check.output.pdf)
 
 set_tests_properties(confinment-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                            confine-lar-out-output-fixture)

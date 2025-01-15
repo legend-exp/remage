@@ -1,0 +1,171 @@
+
+These tests check the generation of primary vertices by remage.
+\subsection{Native sampling}
+The first checks plot the positions for natively sampleable objects.
+
+
+\IfFileExists{native-surface.output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{native-surface.output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for the surface of
+        some natively sampled shapes. Primaries should be present on the G4Box (bottom row second from right),
+        G4Orb (full sphere - above the box) and G4Tubs (left). The primaries should be on the detector surface, although this
+        is hard to appreciate with Geant4 visualisation.
+        }
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating natively sampled surface primaries either failed or did not run.
+    }}
+}
+
+
+\IfFileExists{native-surface.output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{native-volume.output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for the volume of
+        some natively sampled shapes. Primaries should be present on the G4Box (bottom row second from right),
+        G4Orb (full sphere - above the box), G4Tubs and G4Sphere (sector of a sphere - bottom center). The primaries should be on the detector surface, although this
+       be in the detector volume although this is hard to appreciate with Geant4 visualisation.
+        }
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating natively sampled volume primaries either failed or did not run.
+    }}
+}
+
+Finally, we check the generation of points on complex objects.
+
+
+\IfFileExists{complex-volume.output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{complex-volume.output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for the volume of
+        some complex shapes. A polycone (top center), a box with a hole (center), the union of an orb and box (upper right)
+        and an orb (right).
+        }
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating complex sampled volume primaries either failed or did not run.
+    }}
+}
+
+
+
+\subsection{Geometrical volumes and intersections}
+The next tests check the generation of points in geometrical (user defined) volumes and intersections / unions of
+geometrical and physical volumes.
+
+\IfFileExists{geometrical-output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{geometrical-output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for some geometrical (user defined ) volumes.
+        The primaries should be located in a sphere of center $(0,2,2)$ m and radius $0.7$ m (center overlapping box), a partially filled cylinder with center
+        $(-2,-2,-2)$ m and outer radius $0.7$ m and height 1 m (far right) and a box of center $(0,2,-2)$ m and sides of length 0.7, 0.5 and 1.2 m (top).
+        }
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating geometrically volume primaries either failed or did not run.
+    }}
+}
+
+\IfFileExists{geometrical-and-physical-output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{geometrical-and-physical-output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for the Union of physical volumes defined
+        by the union of the box and orb (upper left) and the partially filled sphere (lower center) and a geometric volume defined by
+        sphere of center $(0,2,2)$ m and radius $0.7$ m near the center overlapping the box.
+        The primaries should be in these three locations.}
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating geometric or physical volume primaries either failed or did not run.
+    }}
+}
+\IfFileExists{geometrical-and-physical-output_0000.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\textwidth]{geometrical-and-physical-output_0000.pdf}
+        \caption{Geant4 visualisation of a simulation of the primary positions for the intersection of
+        physical volumes defined by a user defined sphere of center $(1.5,2,2)$ m and radius $0.4$ m and the orb in the lower right.
+        The primaries should be located in a subset of this orb.}
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{The test of generating geometric and physical volume primaries either failed or did not run.
+    }}
+}
+
+\subsection{Union and intersection tests}
+The next test simulates $2\nu\beta\beta$ decay in a hypothetical HPGe array and makes a
+statistical comparison of the number of primaries in each volume.
+\IfFileExists{relative-ge.output.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth]{relative-ge.output.pdf}
+
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{Relative HPGe sampling test either failed or did not run
+    }}
+}
+
+To check the intersection we generate events inside a cylinder around the HPGe detectors and again check the
+positions and relative fractions.
+
+\IfFileExists{lar-in-check.output.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth,page=1]{lar-in-check.output.pdf}
+        \includegraphics[width=0.9\textwidth,page=2]{lar-in-check.output.pdf}
+        \includegraphics[width=0.9\textwidth,page=3]{lar-in-check.output.pdf}
+
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{Intersection of physical and geometrical volume test (LAr cylinder) either failed or did not run
+    }}
+}
+
+Finally check subtraction by generating events excluding these regions.
+
+\IfFileExists{lar-sub-check.output.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth,page=1]{lar-sub-check.output.pdf}
+        \includegraphics[width=0.9\textwidth,page=2]{lar-sub-check.output.pdf}
+
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{Subtraction of physical and geometrical volume test (LAr cylinder) either failed or did not run
+    }}
+
+}
+Finally, both an intersection and a subtraction.
+
+\IfFileExists{lar-int-and-sub-check.output.pdf}{
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.9\textwidth,page=1]{lar-int-and-sub-check.output.pdf}
+        \includegraphics[width=0.9\textwidth,page=2]{lar-int-and-sub-check.output.pdf}
+
+    \end{figure}
+}{
+    \noindent \fbox{\textbf{Subtraction of physical and geometrical volume test (LAr cylinder) either failed or did not run
+    }}
+
+}
+
+\subsection{Generic surface sampling}
+The final part of this report describes checks on the generic surface sampler algorithm.
