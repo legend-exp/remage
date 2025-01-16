@@ -47,19 +47,18 @@ RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fPhysical
 
 bool RMGVertexConfinement::fVolumesInitialized = false;
 
-// This structure must contain at least a non-null pointer, between the first
-// and the last argument. The idea is that:
-//  - physical volumes get always a bounding box assigned, but at later time
-//  - purely geometrical volumes only have the sampling_solid member defined
-RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r,
-    G4ThreeVector t, G4VSolid* s, bool ns, bool ss)
-    : rotation(r), translation(t), native_sample(ns), surface_sample(ss) {
+RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* physical_volume,
+    G4RotationMatrix rotation, G4ThreeVector translation, G4VSolid* sampling_solid,
+    bool is_native_sampleable, bool surface_sample)
+    : rotation(rotation), translation(translation), native_sample(is_native_sampleable),
+      surface_sample(surface_sample) {
 
   // at least one volume must be specified
-  if (!v and !s) RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
+  if (!physical_volume and !sampling_solid)
+    RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
 
-  this->physical_volume = v;
-  this->sampling_solid = s;
+  this->physical_volume = physical_volume;
+  this->sampling_solid = sampling_solid;
 
   // should use the physical volume properties, if available
   const auto& solid =
@@ -130,7 +129,8 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
-        "where the physical volume is not set this probably means you are trying to generically ",
+        "where the physical volume is not set this probably means you are trying to "
+        "generically ",
         "sample a geometrical volume which instead should be natively sampled");
 
   auto solid = this->physical_volume->GetLogicalVolume()->GetSolid();
@@ -173,7 +173,8 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
 
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot generate directions for a SampleableObject ",
-        "where the physical volume is not set this probably means you are trying to generically ",
+        "where the physical volume is not set this probably means you are trying to "
+        "generically ",
         "sample a geometrical volume which instead should be natively sampled");
 
   // Get the center and radius of a bounding sphere around the shape
@@ -444,13 +445,12 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
       el.native_sample = false;
       el.surface_sample = true;
-      el.max_num_intersections = fMaxNumIntersections;
+      el.max_num_intersections = fSurfaceSampleMaxIntersections;
 
-      if (fMaxNumIntersections < 2)
-        RMGLog::Out(RMGLog::fatal,
-            " for generic surface sampling MaxNumIntersections, the maximum number of lines a ",
+      if (fSurfaceSampleMaxIntersections < 2)
+        RMGLog::Out(RMGLog::fatal, " for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of lines a ",
             "line can intersect with the surface must be set with "
-            "/RMG/Generator/Confinement/MaxNumberOfIntersections",
+            "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
             "Note: this can be an overestimate.");
 
     }
@@ -484,8 +484,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
       RMGLog::OutDev(RMGLog::debug, "Bounding box coordinates: min = ", lim_min, ", max = ", lim_max);
 
-      // the origin of the local coordinates of the non-sampleable solid is not necessarily at its
-      // barycenter. However, the coordinate origin of a G4Box is always its barycenter.
+      // the origin of the local coordinates of the non-sampleable solid is not necessarily at
+      // its barycenter. However, the coordinate origin of a G4Box is always its barycenter.
       double bb_x = std::max(std::abs(lim_max.getX()), std::abs(lim_min.getX()));
       double bb_y = std::max(std::abs(lim_max.getY()), std::abs(lim_min.getY()));
       double bb_z = std::max(std::abs(lim_max.getZ()), std::abs(lim_min.getZ()));
@@ -708,7 +708,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
                                            : fGeomVolumeSolids.SurfaceWeightedRand();
 
         } else {
-          // for volume sampling the user can specify the volume to sample first else the set with smaller total volume is used
+          // for volume sampling the user can specify the volume to sample first else the set
+          // with smaller total volume is used
           physical_first = fFirstSamplingVolumeType == VolumeType::kUnset
                                ? fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume
                                : fFirstSamplingVolumeType == VolumeType::kPhysical;
@@ -1010,7 +1011,7 @@ void RMGVertexConfinement::DefineCommands() {
 
 
   fMessengers.back()
-      ->DeclareProperty("MaxNumberOfIntersections", fMaxNumIntersections)
+      ->DeclareProperty("SurfaceSampleMaxIntersections", fSurfaceSampleMaxIntersections)
       .SetGuidance("Set maximum number of intersections of a line with the surface. Note: can be "
                    "set to an overestimate. ")
       .SetParameterName("N", false)

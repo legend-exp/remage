@@ -9,8 +9,14 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-set(_macros complex-volume.mac complex-surface.mac geometrical.mac native-surface.mac geometrical-and-physical.mac
-            geometrical-or-physical.mac native-volume.mac)
+set(_macros
+    complex-volume.mac
+    complex-surface.mac
+    geometrical.mac
+    native-surface.mac
+    geometrical-and-physical.mac
+    geometrical-or-physical.mac
+    native-volume.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME confinement/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root

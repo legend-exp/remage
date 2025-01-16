@@ -115,9 +115,13 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * An object which we can generate position samples in. Based on either a
      * @c G4VPhysicalVolume or geometrical volume defined by a @c G4VSolid . The
      * sampling can be performed either on the surface or in the volume of the solid.
+     *
+     *  This structure must contain at least a non-null pointer, between the @c physical_volume and
+     * @c sampling_solid arguments. The idea is that:
+     *  - physical volumes get always a bounding box assigned, but at later time
+     *  - purely geometrical volumes only have the sampling_solid member defined
      */
     struct SampleableObject {
-
 
         SampleableObject() = default;
         SampleableObject(const SampleableObject&) = default;
@@ -125,16 +129,17 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         /**
          * @brief SampleableObject constructor.
          *
-         * @param v The physical volume.
-         * @param r A rotation matrix for the sampling solid.
-         * @param t A translation vector for the sampling solid.
-         * @param s A solid for geometrical volume sampling or for generating candidate points for
-         * rejection sampling.
-         * @param ns A flag of whether the solid is natively sampeable.
-         * @param ss A flag of whether the solid should be sampled on the surface.
+         * @param physical_volume The physical volume.
+         * @param rotation A rotation matrix for the sampling solid.
+         * @param translation A translation vector for the sampling solid.
+         * @param sampling_solid A solid for geometrical volume sampling or for generating candidate
+         * points for rejection sampling.
+         * @param is_native_sampleable A flag of whether the solid is natively sampeable.
+         * @param surface_sample A flag of whether the solid should be sampled on the surface.
          */
-        SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s,
-            bool ns = false, bool ss = false);
+        SampleableObject(G4VPhysicalVolume* physical_volume, G4RotationMatrix rotation,
+            G4ThreeVector translation, G4VSolid* sampling_solid, bool is_native_sampleable = false,
+            bool surface_sample = false);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
 
@@ -200,7 +205,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         std::vector<G4ThreeVector> GetIntersections(const G4ThreeVector start,
             const G4ThreeVector dir) const;
-
 
         /**
          * @brief Get a position and direction for the generic surface sampling algorithm.
@@ -306,7 +310,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
     bool fLastSolidExcluded = false;
-    int fMaxNumIntersections = -1;
+    int fSurfaceSampleMaxIntersections = -1;
+
     // counters used for the current run.
     long fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime;
