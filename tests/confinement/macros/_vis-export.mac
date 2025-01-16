@@ -1,1 +1,2 @@
-/vis/ogl/export {export-fn}
+/vis/ogl/set/printSize 300 300
+/vis/ogl/export {export-fn}.pdf

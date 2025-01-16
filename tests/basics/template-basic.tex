@@ -1,28 +1,12 @@
 The first set of checks shown below test that remage is running and has reasonable seeming results.
-\IfFileExists{vis-2nbb.output_0000.pdf}{
 
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.6\textwidth]{vis-2nbb.output_0000.pdf}
-        \caption{Geant4 visualisation of a simulation of $2\nu\beta\beta$ decay in a HPGe detector for a typical screeing \
-        setup. You should see the trajectories focused around the HPGe detector and mainly electrons (red), with a \
-        few gamma (green) being produced. \
-        }
-    \end{figure}
-}{
-    \noindent \fbox{\textbf{The test of visualising $2\nu\beta\beta$ either failed or was not run.
-    }}
-}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{vis-2nbb.output_0000.pdf}
+    \includegraphics[width=0.45\textwidth]{vis-co60.output_0000.pdf}
 
-
-\IfFileExists{vis-co60.output_0000.pdf}{
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.6\textwidth]{vis-co60.output_0000.pdf}
-        \caption{Geant4 visualisation of a simulation of $^{60}Co$ decay in a source close to a HPGe
-        detector for a typical screening station setup. You should see $\gamma$ particles (in green) throughout
-        the experimental setup starting from a source above the detector.}
-    \end{figure}
-}{
-    \noindent \fbox{\textbf{The test of visualising $^{60}Co$ either failed or was not run.}}
-}
+    \caption{Geant4 visualisation of a simulation of $2\nu\beta\beta$ decay in a HPGe detector (left) and $^{60}$Co in a source above the detector (right( for a typical screeing \
+    setup. For the left figure you should see the trajectories focused around the HPGe detector and mainly electrons (red), with a \
+    few gamma (green) being produced. For the right you should see $\gamma$ particles (in green) throughout  the experimental setup starting from a source above the detector
+    }
+\end{figure}

@@ -56,4 +56,4 @@
 /gps/energy 1 eV
 /run/beamOn 1000
 
-/control/alias export-fn vis-surface-${det}.output.pdf
+/control/alias export-fn vis-surface-${det}.output.png
