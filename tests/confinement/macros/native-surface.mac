@@ -13,4 +13,4 @@
 
 /run/beamOn 2000
 
-/control/alias export-fn native-surface.output.pdf
+/control/alias export-fn native-surface.output

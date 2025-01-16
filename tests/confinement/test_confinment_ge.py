@@ -167,6 +167,6 @@ def make_plot(vert, hit):
 
 
 p, sigma = make_plot(vertices, hits)
-plt.savefig("confinement-ge.output.pdf")
+plt.savefig("relative-ge.output.pdf")
 
 assert sigma < 5

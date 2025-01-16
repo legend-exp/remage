@@ -33,16 +33,21 @@
 
 class G4VPhysicalVolume;
 class G4VSolid;
+
+/** @brief Class for generating vertices in physical or geometrical volumes.
+ */
 class RMGVertexConfinement : public RMGVVertexGenerator {
 
   public:
 
+    /** @brief Different types of geometrical (user) defined solids. */
     enum class GeometricalSolidType {
       kSphere,
       kCylinder,
       kBox,
     };
 
+    /** @brief Information about the geometrical (user) defined solids. */
     struct GenericGeometricalSolidData {
         GeometricalSolidType solid_type;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
@@ -58,22 +63,37 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         double box_z_length = -1;
     };
 
+    /**
+     * @brief Strategy for sampling physical and geometrical volumes.
+     *
+     * @details Can be either:
+     * - @c kIntersectPhysicalWithGeometrical : In which case vertices are generated in the
+     * intersection of the set of physical and geometrical volumes.
+     * - @c kUnionAll Generate in the union of all volumes, weighted by surface area / volume.
+     * - @c kSubtractGeometrical : Similar to @c kIntersectPhysicalWithGeometrical but specified
+     * regions can also be excluded.
+     */
     enum class SamplingMode {
       kIntersectPhysicalWithGeometrical,
       kUnionAll,
       kSubtractGeometrical,
     };
 
+    /** @brief Types of volume to sample, either physical (a volume in the geometry), geometrical
+     * (defined by the user) or unset. */
     enum class VolumeType {
       kPhysical,
       kGeometrical,
       kUnset,
     };
+
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
     void EndOfRunAction(const G4Run* run) override;
 
+    /** @brief Generate the actual vertex, according to the sampling mode (see \ref
+     * RMGVertexConfinement::SamplingMode). */
     bool GenerateVertex(G4ThreeVector& v) override;
 
     // to be used in the messenger class
@@ -91,33 +111,144 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       return fGeomVolumeData;
     }
 
+    /**
+     * An object which we can generate position samples in. Based on either a
+     * @c G4VPhysicalVolume or geometrical volume defined by a @c G4VSolid . The
+     * sampling can be performed either on the surface or in the volume of the solid.
+     *
+     *  This structure must contain at least a non-null pointer, between the @c physical_volume and
+     * @c sampling_solid arguments. The idea is that:
+     *  - physical volumes get always a bounding box assigned, but at later time
+     *  - purely geometrical volumes only have the sampling_solid member defined
+     */
     struct SampleableObject {
 
         SampleableObject() = default;
         SampleableObject(const SampleableObject&) = default;
-        SampleableObject(G4VPhysicalVolume* v, G4RotationMatrix r, G4ThreeVector t, G4VSolid* s,
-            bool cc = true);
+
+        /**
+         * @brief SampleableObject constructor.
+         *
+         * @param physical_volume The physical volume.
+         * @param rotation A rotation matrix for the sampling solid.
+         * @param translation A translation vector for the sampling solid.
+         * @param sampling_solid A solid for geometrical volume sampling or for generating candidate
+         * points for rejection sampling.
+         * @param is_native_sampleable A flag of whether the solid is natively sampeable.
+         * @param surface_sample A flag of whether the solid should be sampled on the surface.
+         */
+        SampleableObject(G4VPhysicalVolume* physical_volume, G4RotationMatrix rotation,
+            G4ThreeVector translation, G4VSolid* sampling_solid, bool is_native_sampleable = false,
+            bool surface_sample = false);
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
+
+        /**
+         * @brief Check if the vertex is inside the solid.
+         * @param vertex The sampled vertex.
+         * @returns Boolean flag of whether the vertexx is inside the solid.
+         */
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
-        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts, bool sample_on_surface,
+
+        /**
+         * @brief Generate a sample from the solid.
+         *
+         * @details Depending on if the solid is a basic one either sample natively,
+         * or using rejection sampling. Either samples the volume or the surface depending
+         * on the @c surface_sample member.
+         * - For surface sampling mode the solid is either natively sampled (if this is
+         * implemented), or is sampled with \ref SampleableObject::GenerateSurfacePoint
+         * - For volume sampling, if the solid is not natively sampleable, points are generated in a
+         * bounding box and then rejection sampling is used using \ref SampleableObject::IsInside.
+         *
+         * @param vertex The sampled vertex.
+         * @param max_attempts The maximum number of candidate vertices for rejection sampling.
+         * @param force_containment_check Whether to force a check on where the point is
+         * inside the solid.
+         * @param n_trials The total number of trials performed.
+         *
+         */
+        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts,
             bool force_containment_check, long int& n_trials) const;
+
+        /**
+         * @brief Generate a point on the surface of the solid.
+         *
+         * @details This follows the algorithm from https://arxiv.org/abs/0802.2960.
+         * - Produce a direction vector corresponding to a uniform flux in a bounding sphere.
+         * - Find the intersections of this line with the solid.
+         * - Pick one intersection, or repeat.
+         *
+         * @param vertex The sampled vertex,
+         * @param max_samples The maximum number of attempts to find a valid vertex.
+         * @param n_max The maximum number of intersections possible for the solid,
+         * can be an overestimate.
+         *
+         */
+        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_samples,
+            int n_max) const;
+
+        // methods for the generic surface sampling
+        /**
+         * @brief Get the number of intersections between the solid and the line starting at @c
+         * start with direction @c dir.
+         *
+         * @details This is used in the generic surface sampling algorithm. This function makes use
+         * of the methods @c GetDistanceToIn(p,v) and @c GetDistanceToOut(p,v) of @c G4VSolid .
+         * It continually looks for the distance to the next boundary (along the line)
+         * until this becomes zero indicating there are no more intersections.
+         *
+         * @param start The starting vector of the line, note this should be outside the solid.
+         * @param dir   The direction vector.
+         *
+         * @returns A vector of the points of intersection.
+         */
+        std::vector<G4ThreeVector> GetIntersections(const G4ThreeVector start,
+            const G4ThreeVector dir) const;
+
+        /**
+         * @brief Get a position and direction for the generic surface sampling algorithm.
+         *
+         * @details This generates a point on a bounding sphere, then shifts by some impact
+         * parameter, following the algorithm from https://arxiv.org/abs/0802.2960. This produces a
+         * uniform and isotropic flux inside the bounding sphere.
+         *
+         * @param dir The direction vector for the point.
+         * @param pos The initial position for the point.
+         *
+         */
+        void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
         G4RotationMatrix rotation;
         G4ThreeVector translation;
+
         double volume = -1;
         double surface = -1;
-        bool containment_check = true;
+
+        bool surface_sample = false;
+        bool native_sample = false;
+        int max_num_intersections = -1;
     };
 
+    /** A collection of @c SampleableObjects . Can be used
+     * to sample from by selecting a volume weighted by surface area
+     * or volume.
+     */
     struct SampleableObjectCollection {
 
         SampleableObjectCollection() = default;
         inline ~SampleableObjectCollection() { data.clear(); }
 
+        /** @brief Select a @c SampleableObject from the collection, weighted by surface area.
+         *  @returns a reference to the chosen @c SampleableObject .
+         */
         [[nodiscard]] const SampleableObject& SurfaceWeightedRand() const;
+
+        /** @brief Select a @c SampleableObject from the collection, weighted by volume.
+         *  @returns a reference to the chosen @c SampleableObject .
+         */
         [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
@@ -179,6 +310,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
     bool fLastSolidExcluded = false;
+    int fSurfaceSampleMaxIntersections = -1;
+
     // counters used for the current run.
     long fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime;

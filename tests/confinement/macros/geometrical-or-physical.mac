@@ -21,4 +21,4 @@
 
 /run/beamOn 2000
 
-/control/alias export-fn geometrical-or-physical.output.pdf
+/control/alias export-fn geometrical-or-physical.output

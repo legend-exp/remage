@@ -2,16 +2,21 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py)
+  macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py *.tex)
 
 # copy them to the build area
-
 foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-set(_macros complex-volume.mac geometrical.mac native-surface.mac geometrical-and-physical.mac
-            geometrical-or-physical.mac native-volume.mac)
+set(_macros
+    complex-volume.mac
+    complex-surface.mac
+    geometrical.mac
+    native-surface.mac
+    geometrical-and-physical.mac
+    geometrical-or-physical.mac
+    native-volume.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME confinement/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root
@@ -93,4 +98,97 @@ add_test(NAME confinment-lar/intersection-and-subtraction
                  lar-int-and-sub-check.output.pdf)
 
 set_tests_properties(confinment-lar/intersection-and-subtraction
-                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-ibn-out-output-fixture)
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture)
+
+# test generic surface sampling methods
+add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
+target_link_libraries(test-surface-sampler-methods PUBLIC remage)
+if(BxDecay0_FOUND)
+  target_link_libraries(test-surface-sampler-methods PRIVATE BxDecay0::BxDecay0_Geant4)
+endif()
+
+add_test(NAME confinement/test-surface-sampler-methods-build
+         COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
+                 test-surface-sampler-methods)
+
+set_tests_properties(confinement/test-surface-sampler-methods-build
+                     PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
+
+# add the tests
+set(_surface_tests
+    test-points-subtraction
+    test-points-basic
+    test-points-union
+    test-intersections-basic
+    test-intersections-subtraction
+    test-intersections-union
+    test-containment-subtraction
+    test-containment-union)
+
+foreach(_test ${_surface_tests})
+
+  add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
+  set_tests_properties(confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                              test-surface-sampler-methods-fixture)
+endforeach()
+
+# now run some simulations and test the outputs
+
+# generate the GDML file
+add_test(NAME confinment-surface/gen-gdml COMMAND ${PYTHONPATH} make_basic_solids.py)
+set_tests_properties(confinment-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
+                                                            confine-surface-gdml-fixture)
+
+# visualise
+set(_solids tubby box con uni sub trd)
+
+foreach(det ${_solids})
+
+  add_test(
+    NAME confinement-surface/gen-vis-macro-${det}
+    COMMAND /bin/sh -c
+            "sed 's/\${det}/${det}/g' macros/vis-surface.mac > macros/vis-surface-${det}.mac")
+
+  set_tests_properties(
+    confinement-surface/gen-vis-macro-${det}
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
+               FIXTURES_REQUIRED confine-surface-gdml-fixture)
+
+  add_test(NAME confinment-surface/${det}-vis
+           COMMAND ${REMAGE_PYEXE} macros/vis-surface-${det}.mac macros/_vis-export.mac -g
+                   gdml/simple-solids.gdml -w -l detail)
+
+  set_tests_properties(
+    confinment-surface/${det}-vis PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                             confine-surface-vis-macro-${det}-fixture)
+endforeach()
+
+# run simulations and check
+foreach(det ${_solids})
+
+  add_test(
+    NAME confinement-surface/gen-macro-${det}
+    COMMAND /bin/sh -c
+            "sed 's/\${det}/${det}/g' macros/gen-surface.mac > macros/gen-surface-${det}.mac")
+
+  set_tests_properties(
+    confinement-surface/gen-macro-${det}
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-macro-${det}-fixture FIXTURES_REQUIRED
+               confine-surface-gdml-fixture)
+
+  add_test(NAME confinment-surface/${det}-gen
+           COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
+                   detail -o test-confine-surface-${det}-out.lh5)
+
+  set_tests_properties(
+    confinment-surface/${det}-gen
+    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
+               confine-surface-macro-${det}-fixture)
+
+  add_test(NAME confinment-surface/relative-fractions-${det}
+           COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
+
+  set_tests_properties(confinment-surface/relative-fractions-${det}
+                       PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
+
+endforeach()

@@ -36,4 +36,4 @@
 
 /run/beamOn 5000
 
-/control/alias export-fn geometrical.output.pdf
+/control/alias export-fn geometrical.output

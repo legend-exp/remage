@@ -62,9 +62,13 @@ $ cmake -DCMAKE_INSTALL_PREFIX=<optional prefix> ..
 $ make install
 ```
 
-```{tip}
+:::{warning}
+If you want to run the _remage_ tests the cmake flag `-DBUILD_TESTING=ON` is required.
+:::
+
+:::{note}
 A list of available Make targets can be printed by running `make help`.
-```
+:::
 
 ## Code style
 
