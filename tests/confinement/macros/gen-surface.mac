@@ -12,7 +12,7 @@
 
 
 /RMG/Generator/Confinement/Physical/AddVolume ${det}
-/RMG/Generator/Confinement/MaxNumberOfIntersections 6
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
 
 /gps/particle e-
 /gps/ang/type iso

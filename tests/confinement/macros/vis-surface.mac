@@ -48,7 +48,7 @@
 
 
 /RMG/Generator/Confinement/Physical/AddVolume ${det}
-/RMG/Generator/Confinement/MaxNumberOfIntersections 6
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
 
 /gps/particle e-
 /gps/ang/type iso
@@ -56,4 +56,4 @@
 /gps/energy 1 eV
 /run/beamOn 1000
 
-/control/alias export-fn vis-surface-${det}.output.png
+/control/alias export-fn vis-surface-${det}.output

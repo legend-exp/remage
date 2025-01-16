@@ -140,21 +140,18 @@ int RunVis(RMGVertexConfinement::SampleableObject obj, std::string name) {
   // Set up visualization commands
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   UImanager->ApplyCommand("/run/initialize ");
-
   UImanager->ApplyCommand("/vis/open OGL ");
   UImanager->ApplyCommand("/vis/verbose warnings");
-
   UImanager->ApplyCommand("/vis/drawVolume");
   UImanager->ApplyCommand("/vis/geometry/set/forceWireframe");
   UImanager->ApplyCommand("/vis/viewer/set/viewpointVector 0.7 0.9 0.7");
   UImanager->ApplyCommand("/vis/viewer/zoom 1.5");
-
   UImanager->ApplyCommand("/vis/scene/list ");
   UImanager->ApplyCommand("/vis/scene/endOfEventAction accumulate");
   UImanager->ApplyCommand("/vis/viewer/set/globalLineWidthScale 1.5");
   UImanager->ApplyCommand("/vis/viewer/set/upVector 0 0 1");
-
-  UImanager->ApplyCommand("/vis/ogl/export surface-sample-bounding-box-" + name + ".output.png");
+  UImanager->ApplyCommand("/vis/ogl/set/printMode pixmap");
+  UImanager->ApplyCommand("/vis/ogl/export surface-sample-bounding-box-" + name + ".output.pdf");
 
 
   delete visManager;

@@ -3,7 +3,7 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/ForceContainmentCheck true
 /RMG/Generator/Confinement/SampleOnSurface true
-/RMG/Generator/Confinement/MaxNumberOfIntersections 6
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
 
 /RMG/Generator/Confinement/Physical/AddVolume BoxWithHole
 /RMG/Generator/Confinement/Physical/AddVolume BoxAndOrb

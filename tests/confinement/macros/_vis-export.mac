@@ -1,2 +1,2 @@
-/vis/ogl/set/printSize 300 300
+/vis/ogl/set/printMode pixmap
 /vis/ogl/export {export-fn}.pdf
