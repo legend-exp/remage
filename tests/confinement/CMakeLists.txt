@@ -129,15 +129,15 @@ foreach(_test ${_surface_tests})
 
   add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
 
+  set_tests_properties(confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                              test-surface-sampler-methods-fixture)
+
   if(_test MATCHES "test-points-.*")
     set_tests_properties(
-      confinment-surface/${_test} PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
-                                             test-surface-sampler-methods-fixture)
-  else()
-    set_tests_properties(
-      confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                             test-surface-sampler-methods-fixture)
+      confinment-surface/${_test} PROPERTIES LABELS "extra;vis" SKIP_REGULAR_EXPRESSION
+                                             "couldn't open display")
   endif()
+
 endforeach()
 
 # now run some simulations and test the outputs
@@ -169,6 +169,8 @@ foreach(det ${_solids})
   set_tests_properties(
     confinment-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                              confine-surface-vis-macro-${det}-fixture)
+  set_tests_properties(confinment-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
+                                                                "couldn't open display")
 endforeach()
 
 # run simulations and check
