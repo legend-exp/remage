@@ -128,8 +128,16 @@ set(_surface_tests
 foreach(_test ${_surface_tests})
 
   add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
-  set_tests_properties(confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                              test-surface-sampler-methods-fixture)
+
+  if(_test MATCHES "test-points-.*")
+    set_tests_properties(
+      confinment-surface/${_test} PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
+                                             test-surface-sampler-methods-fixture)
+  else()
+    set_tests_properties(
+      confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                             test-surface-sampler-methods-fixture)
+  endif()
 endforeach()
 
 # now run some simulations and test the outputs
@@ -159,7 +167,7 @@ foreach(det ${_solids})
                    gdml/simple-solids.gdml -w -l detail)
 
   set_tests_properties(
-    confinment-surface/${det}-vis PROPERTIES LABELS extra FIXTURES_REQUIRED
+    confinment-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                              confine-surface-vis-macro-${det}-fixture)
 endforeach()
 
