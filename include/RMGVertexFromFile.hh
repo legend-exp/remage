@@ -22,6 +22,7 @@
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
 
+#include "RMGAnalysisReader.hh"
 #include "RMGVVertexGenerator.hh"
 
 class G4VAnalysisReader;
@@ -46,17 +47,15 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
 
   private:
 
-    static G4VAnalysisReader* fReader;
+    static G4Mutex fMutex;
+    static RMGAnalysisReader* fReader;
+
     inline static double fXpos = NAN, fYpos = NAN, fZpos = NAN;
-    inline static int fNtupleId = -1;
-
-    std::string fFileName;
-    bool fFileIsTemp;
-
-    std::string fNtupleDirectoryName = "vtx";
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
+
+    std::string fNtupleDirectoryName = "vtx";
 };
 
 #endif

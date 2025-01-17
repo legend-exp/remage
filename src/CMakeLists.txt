@@ -4,6 +4,7 @@
 set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
+    ${_root}/include/RMGAnalysisReader.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
@@ -45,6 +46,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGWorkerInitialization.hh)
 
 set(PROJECT_SOURCES
+    ${_root}/src/RMGAnalysisReader.cc
     ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
