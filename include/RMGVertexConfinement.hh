@@ -49,7 +49,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     /** @brief Information about the geometrical (user) defined solids. */
     struct GenericGeometricalSolidData {
-        GeometricalSolidType solid_type;
+        GeometricalSolidType solid_type = GeometricalSolidType::kBox;
         G4ThreeVector volume_center = G4ThreeVector(0, 0, 0);
         double sphere_inner_radius = 0;
         double sphere_outer_radius = -1;
@@ -180,12 +180,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * - Pick one intersection, or repeat.
          *
          * @param vertex The sampled vertex,
-         * @param max_samples The maximum number of attempts to find a valid vertex.
+         * @param max_attempts The maximum number of attempts to find a valid vertex.
          * @param n_max The maximum number of intersections possible for the solid,
          * can be an overestimate.
          *
          */
-        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_samples,
+        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_attempts,
             int n_max) const;
 
         // methods for the generic surface sampling
@@ -203,8 +203,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          *
          * @returns A vector of the points of intersection.
          */
-        std::vector<G4ThreeVector> GetIntersections(const G4ThreeVector start,
-            const G4ThreeVector dir) const;
+        [[nodiscard]] std::vector<G4ThreeVector> GetIntersections(G4ThreeVector start,
+            G4ThreeVector dir) const;
 
         /**
          * @brief Get a position and direction for the generic surface sampling algorithm.
@@ -284,7 +284,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     };
 
     void InitializePhysicalVolumes();
-    void InitializeGeometricalVolumes(bool useExcludedVolumes);
+    void InitializeGeometricalVolumes(bool use_excluded_volumes);
     bool ActualGenerateVertex(G4ThreeVector& v);
 
     std::vector<std::string> fPhysicalVolumeNameRegexes;
