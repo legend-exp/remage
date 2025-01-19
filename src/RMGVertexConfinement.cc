@@ -222,7 +222,7 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
     // find the intersections
     std::vector<G4ThreeVector> intersections = this->GetIntersections(pos, dir);
 
-    if (intersections.size() == 0) continue;
+    if (intersections.empty()) continue;
 
     // The surface sampling algorithm returns N intersections.
     // We have to select one, to keep independence of the sampled points
@@ -310,11 +310,8 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
 }
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
-  auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-  for (const auto& o : data) {
-    if (o.IsInside(vertex)) return true;
-  }
-  return false;
+  return std::any_of(data.begin(), data.end(),
+      [&vertex](const auto& o) { return o.IsInside(vertex); });
 }
 
 
