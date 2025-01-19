@@ -107,11 +107,11 @@ if(BxDecay0_FOUND)
   target_link_libraries(test-surface-sampler-methods PRIVATE BxDecay0::BxDecay0_Geant4)
 endif()
 
-add_test(NAME confinement/test-surface-sampler-methods-build
+add_test(NAME confinement-surface/test-surface-sampler-methods-build
          COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
                  test-surface-sampler-methods)
 
-set_tests_properties(confinement/test-surface-sampler-methods-build
+set_tests_properties(confinement-surface/test-surface-sampler-methods-build
                      PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
@@ -186,19 +186,19 @@ foreach(det ${_solids})
     PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-macro-${det}-fixture FIXTURES_REQUIRED
                confine-surface-gdml-fixture)
 
-  add_test(NAME confinment-surface/${det}-gen
+  add_test(NAME confinement-surface/${det}-gen
            COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
                    detail -o test-confine-surface-${det}-out.lh5)
 
   set_tests_properties(
-    confinment-surface/${det}-gen
+    confinement-surface/${det}-gen
     PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
                confine-surface-macro-${det}-fixture)
 
-  add_test(NAME confinment-surface/relative-fractions-${det}
+  add_test(NAME confinement-surface/relative-fractions-${det}
            COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
 
-  set_tests_properties(confinment-surface/relative-fractions-${det}
+  set_tests_properties(confinement-surface/relative-fractions-${det}
                        PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
 
 endforeach()
