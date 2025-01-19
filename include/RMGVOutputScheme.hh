@@ -34,6 +34,7 @@ class RMGVOutputScheme {
   public:
 
     RMGVOutputScheme() = default;
+    virtual ~RMGVOutputScheme() = default;
 
     // initialization.
     virtual inline void AssignOutputNames(G4AnalysisManager*) {}
