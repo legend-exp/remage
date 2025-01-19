@@ -310,7 +310,8 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
 }
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
-  return std::any_of(data.begin(), data.end(), [&vertex](const auto& o) { return o.IsInside(vertex); });
+  return std::any_of(data.begin(), data.end(),
+      [&vertex](const auto& o) { return o.IsInside(vertex); });
 }
 
 
