@@ -2,7 +2,7 @@
 
 /RMG/Generator/Confine FromFile
 
-/RMG/Generator/Confinement/FromFile/FileName macros/vert.lh5
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-pos.lh5
 
 /RMG/Generator/Select GPS
 /gps/particle     ion

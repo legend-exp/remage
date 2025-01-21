@@ -2,7 +2,7 @@
 
 /RMG/Generator/Confine FromFile
 
-/RMG/Generator/Confinement/FromFile/FileName macros/vert.hdf5
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-pos.hdf5
 
 /RMG/Generator/Select GPS
 /gps/particle     ion
