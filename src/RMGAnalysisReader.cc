@@ -35,7 +35,7 @@ namespace fs = std::filesystem;
 
 #include "RMGLog.hh"
 
-bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
+bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_name,
     std::string ntuple_name) {
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
@@ -45,13 +45,13 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
 
   fFileIsTemp = false;
 
-  if (!fs::exists(fs::path(name))) {
-    RMGLog::Out(RMGLog::error, "input file ", name, " does not exist");
+  if (!fs::exists(fs::path(file_name))) {
+    RMGLog::Out(RMGLog::error, "input file ", file_name, " does not exist");
     return false;
   }
 
   // NOTE: GetExtension() returns a default extension if there is no file extension
-  auto ext = G4Analysis::GetExtension(name);
+  auto ext = G4Analysis::GetExtension(file_name);
   if (ext == "root") {
     fReader = G4RootAnalysisReader::Instance();
   } else if (ext == "hdf5") {
@@ -65,13 +65,13 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
 #if RMG_HAS_HDF5
     std::uniform_int_distribution<int> dist(10000, 99999);
     std::random_device rd;
-    auto path = fs::path(name);
+    auto path = fs::path(file_name);
     std::string new_fn =
         ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
 
     std::error_code ec;
     if (!fs::copy_file(path, fs::path(new_fn)), ec) {
-      RMGLog::Out(RMGLog::error, "copy of input file ", name, " failed. Does it exist? (",
+      RMGLog::Out(RMGLog::error, "copy of input file ", file_name, " failed. Does it exist? (",
           ec.message(), ")");
       return false;
     }
@@ -82,7 +82,7 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
       return false;
     }
 
-    name = new_fn;
+    file_name = new_fn;
     fReader = G4Hdf5AnalysisReader::Instance();
     fFileIsTemp = true;
 #else
@@ -99,10 +99,9 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
 
-  fReader->SetFileName(name);
-  fFileName = name;
+  fFileName = file_name;
 
-  fNtupleId = fReader->GetNtuple(ntuple_name);
+  fNtupleId = fReader->GetNtuple(ntuple_name, file_name);
   if (fNtupleId < 0) {
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
     return false;
@@ -115,6 +114,8 @@ void RMGAnalysisReader::CloseFile() {
 
   if (!fReader) return;
 
+  // fReader is a thread-local singleton. Do not delete it here, otherwise geant4 will to delete it
+  // again. also do not close files, as there is no way to close a specific file only.
   fReader = nullptr;
   if (fFileIsTemp) {
     std::error_code ec;
@@ -122,4 +123,5 @@ void RMGAnalysisReader::CloseFile() {
   }
   fFileName = "";
   fFileIsTemp = false;
+  fNtupleId = -1;
 }

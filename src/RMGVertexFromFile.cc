@@ -35,11 +35,12 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
 
   if (!fReader->OpenFile(name, fNtupleDirectoryName, "pos")) return;
 
-  if (fReader->GetNtupleId() >= 0) {
+  auto nt = fReader->GetNtupleId();
+  if (nt >= 0) {
     // bind the static variables once here, and only use them later.
-    fReader->GetReader()->SetNtupleDColumn("xloc_in_m", fXpos);
-    fReader->GetReader()->SetNtupleDColumn("yloc_in_m", fYpos);
-    fReader->GetReader()->SetNtupleDColumn("zloc_in_m", fZpos);
+    fReader->GetReader()->SetNtupleDColumn(nt, "xloc_in_m", fXpos);
+    fReader->GetReader()->SetNtupleDColumn(nt, "yloc_in_m", fYpos);
+    fReader->GetReader()->SetNtupleDColumn(nt, "zloc_in_m", fZpos);
   }
 }
 
@@ -48,9 +49,10 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
   G4AutoLock lock(&fMutex);
 
   if (fReader->GetReader() && fReader->GetNtupleId() >= 0) {
-    fXpos = fYpos = fZpos = NAN;
+    fXpos = fYpos = fZpos = NAN; // initialize sentinel values.
 
-    if (fReader->GetReader()->GetNtupleRow()) {
+    auto nt = fReader->GetNtupleId();
+    if (fReader->GetReader()->GetNtupleRow(nt)) {
       // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
       if (std::isnan(fXpos) || std::isnan(fYpos) || std::isnan(fZpos)) {
         RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");

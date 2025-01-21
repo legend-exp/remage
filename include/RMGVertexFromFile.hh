@@ -25,7 +25,6 @@
 #include "RMGAnalysisReader.hh"
 #include "RMGVVertexGenerator.hh"
 
-class G4VAnalysisReader;
 class RMGVertexFromFile : public RMGVVertexGenerator {
 
   public:
