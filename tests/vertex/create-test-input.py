@@ -20,17 +20,20 @@ def _convert_lh5_to_hdf5(lh5_fn):
     new_path = orig_path.with_suffix(".hdf5")
     shutil.copy(orig_path, new_path)
     ret = subprocess.run(
-        [rmg_from_lh5, "--ntuple-group", "vtx", "--", new_path], check=False
+        [rmg_from_lh5, "--ntuple-group", "vtx", "--", str(new_path)], check=False
     )
     assert ret.returncode == 0
 
 
+INPUT_FILE_ROWS = int(1e6)
+rng = np.random.default_rng(123456)
+
 # ==================================================
 # position input
 
-xloc = Array(np.array([0, 1, 2] * 100, dtype=np.float64), attrs={"units": "m"})
-yloc = Array(np.array([3, 4, 5] * 100, dtype=np.float64), attrs={"units": "m"})
-zloc = Array(np.array([6, 7, 8] * 100, dtype=np.float64), attrs={"units": "m"})
+xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS), attrs={"units": "m"})
+yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS), attrs={"units": "m"})
+zloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS), attrs={"units": "m"})
 
 vtx_pos_file = "macros/vtx-pos.lh5"
 lh5.write(
@@ -40,3 +43,26 @@ lh5.write(
     wo_mode="of",
 )
 _convert_lh5_to_hdf5(vtx_pos_file)
+
+
+# ==================================================
+# kinetcis input.
+
+p_theta = np.acos(rng.uniform(-1, 1, INPUT_FILE_ROWS))
+p_phi = rng.uniform(0, 2 * np.pi, INPUT_FILE_ROWS)
+
+px = Array(np.cos(p_phi) * np.sin(p_theta))
+py = Array(np.sin(p_phi) * np.sin(p_theta))
+pz = Array(np.cos(p_theta))
+
+pdg = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64) * 11)
+ekin = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "MeV"})
+
+vtx_kin_file = "macros/vtx-kin.lh5"
+lh5.write(
+    Table({"g4_pid": pdg, "ekin": ekin, "px": px, "py": py, "pz": pz}),
+    "vtx/kin",
+    lh5_file=vtx_kin_file,
+    wo_mode="of",
+)
+_convert_lh5_to_hdf5(vtx_kin_file)

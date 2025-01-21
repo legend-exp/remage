@@ -30,7 +30,7 @@ endif()
 if(BxDecay0_THREADSAFE)
   foreach(_mac ${_macros_extra})
     add_test(NAME basics-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t 2 macros/${_mac})
-    set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS "mt extra")
+    set_tests_properties(basics-mt/${_mac} PROPERTIES LABELS "mt;extra")
   endforeach()
 
   # Geant4 11.0 has navigation bugs leading to flaky CI test runs.

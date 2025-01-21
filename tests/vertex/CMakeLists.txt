@@ -17,13 +17,14 @@ endforeach()
 add_test(NAME vertex/gen-input COMMAND ${PYTHONPATH} create-test-input.py ${_remage_from_lh5})
 set_tests_properties(vertex/gen-input PROPERTIES LABELS extra FIXTURES_SETUP vertex-input-fixture)
 
-set(_macros vert-hdf5.mac vert-lh5.mac)
+set(_macros pos-hdf5 pos-lh5 kin-lh5 kin-hdf5 pos-kin-lh5)
 
 foreach(_mac ${_macros})
-  add_test(NAME vertex/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -- macros/${_mac})
-  set_tests_properties(vertex/${_mac} PROPERTIES LABELS extra FIXTURES_SETUP vertex-input-fixture)
-  add_test(NAME vertex-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t 2
-                                          macros/${_mac})
-  set_tests_properties(vertex-mt/${_mac} PROPERTIES LABELS "mt extra" FIXTURES_SETUP
+  add_test(NAME vertex/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${REMAGE_PYEXE} ${_mac} 1)
+  set_tests_properties(vertex/${_mac} PROPERTIES LABELS extra FIXTURES_REQUIRED vertex-input-fixture)
+
+  # note: only 4 threads available on GitHub actions.
+  add_test(NAME vertex-mt/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${REMAGE_PYEXE} ${_mac} 4)
+  set_tests_properties(vertex-mt/${_mac} PROPERTIES LABELS "mt;extra" FIXTURES_REQUIRED
                                                     vertex-input-fixture)
 endforeach()
