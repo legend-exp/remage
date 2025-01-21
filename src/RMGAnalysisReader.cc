@@ -101,7 +101,7 @@ bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_
 
   fFileName = file_name;
 
-  fNtupleId = fReader->GetNtuple(ntuple_name, file_name);
+  fNtupleId = fReader->GetNtuple(ntuple_name, file_name, ntuple_dir_name);
   if (fNtupleId < 0) {
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
     return false;

@@ -1308,7 +1308,7 @@ Set name of the file containing vertex positions for the next run. See the docum
 Change the default input directory/group for ntuples.
 
 :::{note}
-this option only has an effect for LH5 input files.
+this option only has an effect for LH5 or HDF5 input files.
 :::
 
 * **Parameter** – `nt_directory`

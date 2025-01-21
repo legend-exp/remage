@@ -454,10 +454,6 @@ bool RMGConvertLH5::ConvertFromLH5Internal() {
 
   if (ntuples_group.attrExists("datatype")) ntuples_group.removeAttr("datatype");
 
-  if (ntuple_group_name != "default_ntuples") {
-    hfile.moveLink(ntuple_group_name, "default_ntuples");
-  }
-
   hfile.close();
 
   LH5Log(RMGLog::summary, "Done updating HDF5 file ", fHdf5FileName, " to LH5");
