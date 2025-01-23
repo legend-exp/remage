@@ -106,11 +106,11 @@ std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDatas
   return {s, vec}; // strip the first NUL byte.
 }
 
-H5::DataType RMGConvertLH5::FormToHDFDataType(std::string form_type) {
-  if (form_type == "string") return H5::StrType(0, H5T_VARIABLE);
-  if (form_type == "int") return H5::PredType::STD_I32LE;
-  if (form_type == "float") return H5::PredType::IEEE_F32LE;
-  if (form_type == "double") return H5::AtomType(H5::PredType::IEEE_F64LE);
+std::unique_ptr<H5::DataType> RMGConvertLH5::FormToHDFDataType(std::string form_type) {
+  if (form_type == "string") return std::make_unique<H5::StrType>(0, H5T_VARIABLE);
+  if (form_type == "int") return std::make_unique<H5::DataType>(H5::PredType::STD_I32LE);
+  if (form_type == "float") return std::make_unique<H5::DataType>(H5::PredType::IEEE_F32LE);
+  if (form_type == "double") return std::make_unique<H5::DataType>(H5::PredType::IEEE_F64LE);
   throw std::logic_error("not implemented form_type, LGDO will be invalid");
 }
 
@@ -214,7 +214,8 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
 
       hsize_t dset_dataspace_dim[1] = {0};
       H5::DataSpace dset_dataspace(1, dset_dataspace_dim);
-      det_group.createDataSet(lgdo_name, FormToHDFDataType(forms_parts[col_idx]), dset_dataspace);
+      auto dset_dtype = FormToHDFDataType(forms_parts[col_idx]);
+      det_group.createDataSet(lgdo_name, *dset_dtype, dset_dataspace);
     }
     det_group.unlink(column_tmp);
 

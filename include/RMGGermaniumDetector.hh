@@ -88,7 +88,7 @@ inline void* RMGGermaniumDetectorHit::operator new(size_t) {
 }
 
 inline void RMGGermaniumDetectorHit::operator delete(void* hit) {
-  RMGGermaniumDetectorHitAllocator->FreeSingle((RMGGermaniumDetectorHit*)hit);
+  RMGGermaniumDetectorHitAllocator->FreeSingle(static_cast<RMGGermaniumDetectorHit*>(hit));
 }
 
 #endif

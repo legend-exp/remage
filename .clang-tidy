@@ -18,11 +18,27 @@ Checks: "-*, \
   -readability-named-parameter, \
   -readability-identifier-length, \
   -readability-qualified-auto, \
-  -readability-function-cognitive-complexity"
+  -readability-function-cognitive-complexity, \
+  cppcoreguidelines-*, \
+  -cppcoreguidelines-avoid-magic-numbers, \
+  -cppcoreguidelines-macro-usage, \
+  -cppcoreguidelines-owning-memory, \
+  -cppcoreguidelines-non-private-member-variables-in-classes, \
+  -cppcoreguidelines-avoid-non-const-global-variables, \
+  -cppcoreguidelines-prefer-member-initializer, \
+  -cppcoreguidelines-special-member-functions, \
+  -cppcoreguidelines-pro-type-union-access, \
+  -cppcoreguidelines-explicit-virtual-functions, \
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay, \
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic, \
+  -cppcoreguidelines-avoid-c-arrays, \
+  -cppcoreguidelines-pro-bounds-constant-array-index"
 
 CheckOptions:
   - key: modernize-use-override.IgnoreDestructors
     value: true
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion
+    value: false
 
 FormatStyle: file
 HeaderFilterRegex: 'include/.*\.(hh|icc)'

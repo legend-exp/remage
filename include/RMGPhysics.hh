@@ -73,7 +73,6 @@ class RMGPhysics : public G4VModularPhysicsList {
         double positron;
         double proton;
         double alpha;
-        double muon;
         double generic_ion;
     };
 

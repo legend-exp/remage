@@ -95,12 +95,12 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(G4VPhysicalVo
 
 void RMGNavigationTools::PrintListOfLogicalVolumes() {
 
-  int max_length = 0;
+  size_t max_length = 0;
   // use std::set to have volumes automatically sorted by name
   std::set<std::pair<std::string, std::string>> volumes;
   for (const auto& v : *G4LogicalVolumeStore::GetInstance()) {
 
-    if (v->GetName().size() > std::size_t(max_length)) max_length = v->GetName().size();
+    if (v->GetName().size() > max_length) max_length = v->GetName().size();
 
     volumes.insert({v->GetName(),
         fmt::format("{} daugh. // {} // {} // {} // {} // {}", v->GetNoDaughters(),

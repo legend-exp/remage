@@ -18,6 +18,7 @@
 #define _RMG_CONVERT_LH5_HH
 
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <regex>
 #include <string>
@@ -67,7 +68,7 @@ class RMGConvertLH5 {
     static inline const std::regex names_split_re = std::regex("(_in_.+?)?\\0");
     static inline const std::regex names_split_re_end = std::regex("(_in_.+?)$");
 
-    H5::DataType FormToHDFDataType(std::string);
+    std::unique_ptr<H5::DataType> FormToHDFDataType(std::string);
     std::string DataTypeToLGDO(H5::DataType);
     bool ConvertNTupleToTable(H5::Group&);
 
