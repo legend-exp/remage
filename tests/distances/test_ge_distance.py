@@ -42,13 +42,21 @@ det_map = {
 
 steps = lh5.read_as("stp/germanium", outfile, "ak")
 # Transform the coordinates to the local detector frame
-uint = np.array(np.full_like(steps.time, -1), dtype=int)
-xlocal = np.array(1000 * steps.xloc)
-ylocal = np.array(1000 * steps.yloc)
-zlocal = np.array(1000 * steps.zloc)
+uint = np.array(np.full_like(steps.time.to_numpy(), -1), dtype=int)
+xlocal = 1000 * steps.xloc.to_numpy()
+ylocal = 1000 * steps.yloc.to_numpy()
+zlocal = 1000 * steps.zloc.to_numpy()
 
 positions = np.array(
-    np.transpose(np.vstack([steps.xloc * 1000, steps.yloc * 1000, steps.zloc * 1000]))
+    np.transpose(
+        np.vstack(
+            [
+                steps.xloc.to_numpy() * 1000,
+                steps.yloc.to_numpy() * 1000,
+                steps.zloc.to_numpy() * 1000,
+            ]
+        )
+    )
 )
 for det in det_map:
     local_positions = copy.copy(positions)
