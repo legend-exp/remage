@@ -90,7 +90,7 @@ inline void* RMGScintillatorDetectorHit::operator new(size_t) {
 }
 
 inline void RMGScintillatorDetectorHit::operator delete(void* hit) {
-  RMGScintillatorDetectorHitAllocator->FreeSingle((RMGScintillatorDetectorHit*)hit);
+  RMGScintillatorDetectorHitAllocator->FreeSingle(static_cast<RMGScintillatorDetectorHit*>(hit));
 }
 
 #endif

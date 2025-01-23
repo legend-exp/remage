@@ -86,7 +86,7 @@ inline void* RMGOpticalDetectorHit::operator new(size_t) {
 }
 
 inline void RMGOpticalDetectorHit::operator delete(void* hit) {
-  RMGOpticalDetectorHitAllocator->FreeSingle((RMGOpticalDetectorHit*)hit);
+  RMGOpticalDetectorHitAllocator->FreeSingle(static_cast<RMGOpticalDetectorHit*>(hit));
 }
 
 #endif

@@ -137,10 +137,10 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   double dist = sv->DistanceToOut(tf.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  int local_no_daughters = lv->GetNoDaughters();
-  // sample_no has to be signed, so auto typing does not work
-  for (int sample_no = local_no_daughters - 1; sample_no >= 0; sample_no--) {
-    const auto sample_physical = lv->GetDaughter(sample_no);
+  auto local_no_daughters = lv->GetNoDaughters();
+  // increase by one to keep positive in reverse loop.
+  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
+    const auto sample_physical = lv->GetDaughter(sample_no - 1);
     G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
     sample_tf.Invert();
     const auto sample_point = sample_tf.TransformPoint(position);
