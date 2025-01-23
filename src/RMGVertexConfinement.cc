@@ -690,7 +690,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
         // chose a volume
         SampleableObject choice_nonconst;
-        bool physical_first;
+        bool physical_first = true;
 
         // for surface events the user has to chose which volume type to sample first
         if (fOnSurface) {
@@ -773,7 +773,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
         // chose a volume
         SampleableObject choice_nonconst;
-        bool physical_first;
+        bool physical_first = true;
 
         if (fOnSurface) {
 
@@ -795,7 +795,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
             physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
           else if (has_physical && not has_geometrical) physical_first = true;
           else if (has_geometrical && not has_physical) physical_first = false;
-          else fFirstSamplingVolumeType == VolumeType::kPhysical;
+          else physical_first = (fFirstSamplingVolumeType == VolumeType::kPhysical);
 
           choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
                                            : fGeomVolumeSolids.VolumeWeightedRand();
