@@ -54,7 +54,7 @@ jobs:
           ctest --output-on-failure
 
       - name: Upload test suite outputs to GitHub
-        if: ${{ matrix.container_version != 'slim' }}
+        if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
           name: test-output-${{ matrix.container_version }}
