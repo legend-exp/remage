@@ -82,7 +82,8 @@ class RMGVOutputScheme {
     }
     inline void FillNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, int col, double val,
         bool use_float) {
-      if (use_float) ana_man->FillNtupleFColumn(nt, col, val);
+      if (use_float)
+        ana_man->FillNtupleFColumn(nt, col, val); // NOLINT(cppcoreguidelines-narrowing-conversions)
       else ana_man->FillNtupleDColumn(nt, col, val);
     }
 

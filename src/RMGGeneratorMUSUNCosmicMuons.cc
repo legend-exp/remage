@@ -66,7 +66,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(G4String pathToFile) {
   std::istringstream iss(firstLine);
   std::vector<std::string> tokens(std::istream_iterator<std::string>{iss},
       std::istream_iterator<std::string>());
-  int numColumns = tokens.size();
+  size_t numColumns = tokens.size();
 
   // Define header template
   std::string header_template = "#class tools::wcsv::ntuple\n"

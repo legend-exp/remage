@@ -39,7 +39,7 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
     if (particle_type == "nucleus" && track->GetParentID() > 0 &&
         track->GetKineticEnergy() < 0.1 * CLHEP::keV) {
-      auto ion = static_cast<G4Ions*>(track->GetDefinition());
+      auto ion = dynamic_cast<G4Ions*>(track->GetDefinition());
       double lifetime = ion->GetPDGLifeTime();
       double excitation = ion->GetExcitationEnergy();
 

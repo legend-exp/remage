@@ -314,7 +314,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     // counters used for the current run.
     long fTrials = 0;
-    std::chrono::nanoseconds fVertexGenerationTime;
+    std::chrono::nanoseconds fVertexGenerationTime{};
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);

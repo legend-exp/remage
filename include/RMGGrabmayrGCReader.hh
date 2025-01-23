@@ -27,6 +27,7 @@
 
 // Modified from WLGDPetersGammaCascadeReader originally contributed by Moritz Neuberger
 struct GammaCascadeLine {
+    GammaCascadeLine() = delete;
     G4int en;              // neutron energy [keV]
     G4int ex;              // excitation energy [keV]
     G4int m;               // multiplicity of gamma cascade

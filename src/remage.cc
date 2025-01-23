@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 
   CLI::App app{"remage: simulation framework for germanium experiments"};
 
-  int verbosity;
+  int verbosity = 0;
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
   // handle signal to abort the current run.
-  struct sigaction sig;
+  struct sigaction sig{};
   sig.sa_handler = &signal_handler;
   sigemptyset(&sig.sa_mask);
   sig.sa_flags = 0;

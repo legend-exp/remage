@@ -147,7 +147,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
     LH5Log(RMGLog::error, ntuple_log_prefix, "invalid columns dataset");
     return false;
   }
-  uint32_t expected_column_count;
+  uint32_t expected_column_count = 0;
   dset_columns.read(&expected_column_count, dset_columns.getDataType());
 
   // read the column names into a buffer. This contains the full data with null bytes.
@@ -242,7 +242,7 @@ bool RMGConvertLH5::CheckGeantHeader(H5::Group& header_group) {
   if (!header_group.attrExists("data_schema_version")) return false;
   auto att_schema_version = header_group.openAttribute("data_schema_version");
   if (att_schema_version.getDataType() != H5::PredType::STD_I32LE) return false;
-  int32_t schema_version;
+  int32_t schema_version = 0;
   att_schema_version.read(att_schema_version.getDataType(), &schema_version);
   if (schema_version != 1) return false;
 

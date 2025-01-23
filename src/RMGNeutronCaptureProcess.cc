@@ -52,8 +52,8 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   auto CascadeReader = RMGGrabmayrGCReader::GetInstance();
 
   G4int nSec = ProposedResult->GetNumberOfSecondaries();
-  G4int z;
-  G4int a;
+  G4int z = -1;
+  G4int a = -1;
   G4bool IsApplicable = false;
   // Search through the proposed secondaries for our Isotopes of interest
   if (nSec > 0) {

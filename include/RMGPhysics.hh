@@ -98,9 +98,9 @@ class RMGPhysics : public G4VModularPhysicsList {
 
   private:
 
-    PhysicsRealm fPhysicsRealm;
-    StepCutStore fStepCuts;
-    StepCutStore fStepCutsSensitive;
+    PhysicsRealm fPhysicsRealm = PhysicsRealm::kDoubleBetaDecay;
+    StepCutStore fStepCuts = {};
+    StepCutStore fStepCutsSensitive = {};
     bool fConstructOptical = false;
     bool fUseOpticalCustomWLS = false;
     bool fUseThermalScattering = false;

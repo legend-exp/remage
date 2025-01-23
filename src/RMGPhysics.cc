@@ -182,7 +182,7 @@ void RMGPhysics::ConstructProcess() {
   // G4EmExtraPhysics does not propagate the verbose level...
   auto synch_proc = G4ProcessTable::GetProcessTable()->FindProcesses("SynRad");
   for (size_t i = 0; i < synch_proc->size(); i++) {
-    (*synch_proc)[i]->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+    (*synch_proc)[(int)i]->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   }
 
   if (fConstructOptical) this->ConstructOptical();
