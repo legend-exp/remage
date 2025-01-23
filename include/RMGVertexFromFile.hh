@@ -46,7 +46,6 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
 
   private:
 
-    static G4Mutex fMutex;
     static RMGAnalysisReader* fReader;
 
     inline static double fXpos = NAN, fYpos = NAN, fZpos = NAN;

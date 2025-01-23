@@ -21,7 +21,8 @@ set(_macros pos-hdf5 pos-lh5 kin-lh5 kin-hdf5 pos-kin-lh5)
 
 foreach(_mac ${_macros})
   add_test(NAME vertex/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${REMAGE_PYEXE} ${_mac} 1)
-  set_tests_properties(vertex/${_mac} PROPERTIES LABELS extra FIXTURES_REQUIRED vertex-input-fixture)
+  set_tests_properties(vertex/${_mac} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                 vertex-input-fixture)
 
   # note: only 4 threads available on GitHub actions.
   add_test(NAME vertex-mt/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${REMAGE_PYEXE} ${_mac} 4)

@@ -16,12 +16,9 @@
 #include "RMGVertexFromFile.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "G4AutoLock.hh"
 #include "G4Threading.hh"
 
 #include "RMGLog.hh"
-
-G4Mutex RMGVertexFromFile::fMutex = G4MUTEX_INITIALIZER;
 
 RMGAnalysisReader* RMGVertexFromFile::fReader = new RMGAnalysisReader();
 
@@ -31,28 +28,24 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->OpenFile(name, fNtupleDirectoryName, "pos")) return;
+  auto reader = fReader->OpenFile(name, fNtupleDirectoryName, "pos");
+  if (!reader) return;
 
-  auto nt = fReader->GetNtupleId();
-  if (nt >= 0) {
-    // bind the static variables once here, and only use them later.
-    fReader->GetReader()->SetNtupleDColumn(nt, "xloc_in_m", fXpos);
-    fReader->GetReader()->SetNtupleDColumn(nt, "yloc_in_m", fYpos);
-    fReader->GetReader()->SetNtupleDColumn(nt, "zloc_in_m", fZpos);
-  }
+  // bind the static variables once here, and only use them later.
+  reader.SetNtupleDColumn("xloc_in_m", fXpos);
+  reader.SetNtupleDColumn("yloc_in_m", fYpos);
+  reader.SetNtupleDColumn("zloc_in_m", fZpos);
 }
 
 bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
-  G4AutoLock lock(&fMutex);
+  auto reader = fReader->GetLockedReader();
 
-  if (fReader->GetReader() && fReader->GetNtupleId() >= 0) {
+  if (reader) {
     fXpos = fYpos = fZpos = NAN; // initialize sentinel values.
 
-    auto nt = fReader->GetNtupleId();
-    if (fReader->GetReader()->GetNtupleRow(nt)) {
+    if (reader.GetNtupleRow()) {
       // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
       if (std::isnan(fXpos) || std::isnan(fYpos) || std::isnan(fZpos)) {
         RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
@@ -76,9 +69,8 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->GetReader()) {
+  if (!fReader->GetLockedReader()) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(),
         "' not found or in wrong format");
   }
@@ -87,7 +79,6 @@ void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
 void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
   fReader->CloseFile();
 }

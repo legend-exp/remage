@@ -64,7 +64,6 @@ class RMGGeneratorFromFile : public RMGVGenerator {
         }
     };
 
-    static G4Mutex fMutex;
     static RMGAnalysisReader* fReader;
     inline static RowData fRowData{};
 

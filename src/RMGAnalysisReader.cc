@@ -35,19 +35,31 @@ namespace fs = std::filesystem;
 
 #include "RMGLog.hh"
 
-bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_name,
-    std::string ntuple_name) {
+G4Mutex RMGAnalysisReader::fMutex = G4MUTEX_INITIALIZER;
+
+RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(std::string& file_name,
+    std::string ntuple_dir_name, std::string ntuple_name) {
+
+  // create an invalid lock to return on error.
+  G4AutoLock invalid_lock(&fMutex, std::defer_lock);
+  invalid_lock.release();
+  auto invalid_access = RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1);
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
-  if (!G4Threading::IsMasterThread()) return false;
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    std::abort();
+  }
 
-  if (fReader) return false;
+  G4AutoLock lock(&fMutex);
+
+  if (fReader) return std::move(invalid_access);
 
   fFileIsTemp = false;
 
   if (!fs::exists(fs::path(file_name))) {
     RMGLog::Out(RMGLog::error, "input file ", file_name, " does not exist");
-    return false;
+    return std::move(invalid_access);
   }
 
   // NOTE: GetExtension() returns a default extension if there is no file extension
@@ -73,13 +85,13 @@ bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_
     if (!fs::copy_file(path, fs::path(new_fn)), ec) {
       RMGLog::Out(RMGLog::error, "copy of input file ", file_name, " failed. Does it exist? (",
           ec.message(), ")");
-      return false;
+      return std::move(invalid_access);
     }
 
     if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
           " to LH5 failed. Data is potentially corrupted.");
-      return false;
+      return std::move(invalid_access);
     }
 
     file_name = new_fn;
@@ -94,7 +106,7 @@ bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_
   } else if (ext == "xml") {
     fReader = G4XmlAnalysisReader::Instance();
   } else {
-    RMGLog::OutFormat(RMGLog::fatal, "File Extension '.{}' not recognized!");
+    RMGLog::OutFormat(RMGLog::fatal, "File Extension '.{}' not recognized!", ext);
   }
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
@@ -104,13 +116,18 @@ bool RMGAnalysisReader::OpenFile(std::string& file_name, std::string ntuple_dir_
   fNtupleId = fReader->GetNtuple(ntuple_name, file_name, ntuple_dir_name);
   if (fNtupleId < 0) {
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
-    return false;
+    return std::move(invalid_access);
   }
-  return true;
+  return {std::move(lock), fReader, fNtupleId};
 }
 
 void RMGAnalysisReader::CloseFile() {
-  if (!G4Threading::IsMasterThread()) return;
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    return;
+  }
+
+  G4AutoLock lock(&fMutex);
 
   if (!fReader) return;
 
@@ -124,4 +141,11 @@ void RMGAnalysisReader::CloseFile() {
   fFileName = "";
   fFileIsTemp = false;
   fNtupleId = -1;
+}
+
+RMGAnalysisReader::Access RMGAnalysisReader::GetLockedReader() const {
+
+  G4AutoLock lock(&fMutex);
+
+  return {std::move(lock), fReader, fNtupleId};
 }

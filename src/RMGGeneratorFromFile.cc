@@ -18,20 +18,12 @@
 #include <cmath>
 
 #include "G4ParticleGun.hh"
-#include "G4ParticleMomentum.hh"
-#include "G4ParticleTypes.hh"
+#include "G4ParticleTable.hh"
 #include "G4ThreeVector.hh"
-#include "Randomize.hh"
 
-#include "RMGHardware.hh"
 #include "RMGLog.hh"
-#include "RMGManager.hh"
-#include "RMGTools.hh"
-#include "RMGVGenerator.hh"
 
 namespace u = CLHEP;
-
-G4Mutex RMGGeneratorFromFile::fMutex = G4MUTEX_INITIALIZER;
 
 RMGAnalysisReader* RMGGeneratorFromFile::fReader = new RMGAnalysisReader();
 
@@ -44,27 +36,23 @@ void RMGGeneratorFromFile::OpenFile(std::string& name) {
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->OpenFile(name, fNtupleDirectoryName, "kin")) return;
+  auto reader = fReader->OpenFile(name, fNtupleDirectoryName, "kin");
+  if (!reader) return;
 
-  auto nt = fReader->GetNtupleId();
-  if (nt >= 0) {
-    // bind the static variables once here, and only use them later.
-    fReader->GetReader()->SetNtupleIColumn(nt, "g4_pid", fRowData.fG4Pid);
-    fReader->GetReader()->SetNtupleDColumn(nt, "ekin_in_MeV", fRowData.fEkin);
-    fReader->GetReader()->SetNtupleDColumn(nt, "px_in_MeV", fRowData.fPx);
-    fReader->GetReader()->SetNtupleDColumn(nt, "py_in_MeV", fRowData.fPy);
-    fReader->GetReader()->SetNtupleDColumn(nt, "pz_in_MeV", fRowData.fPz);
-  }
+  // bind the static variables once here, and only use them later.
+  reader.SetNtupleIColumn("g4_pid", fRowData.fG4Pid);
+  reader.SetNtupleDColumn("ekin_in_MeV", fRowData.fEkin);
+  reader.SetNtupleDColumn("px", fRowData.fPx);
+  reader.SetNtupleDColumn("py", fRowData.fPy);
+  reader.SetNtupleDColumn("pz", fRowData.fPz);
 }
 
 void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->GetReader()) {
+  if (!fReader->GetLockedReader()) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(),
         "' not found or in wrong format");
   }
@@ -73,7 +61,6 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
 void RMGGeneratorFromFile::EndOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
   fReader->CloseFile();
 }
@@ -81,43 +68,46 @@ void RMGGeneratorFromFile::EndOfRunAction(const G4Run*) {
 
 void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
 
-  G4AutoLock lock(&fMutex);
+  auto locked_reader = fReader->GetLockedReader();
 
-  if (!fReader->GetReader() || fReader->GetNtupleId() < 0) {
+  if (!locked_reader) {
     RMGLog::Out(RMGLog::error, "Ntuple named 'pos' could not be found in input file!");
     return;
   }
 
   fRowData = RowData(); // initialize sentinel values.
 
-  auto nt = fReader->GetNtupleId();
-  if (!fReader->GetReader()->GetNtupleRow(nt)) {
+  if (!locked_reader.GetNtupleRow()) {
     RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
     return;
   }
 
+  // make copy of data and exit critical section.
+  auto row_data = fRowData;
+  locked_reader.unlock();
+
   // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
-  if (!fRowData.IsValid()) {
+  if (!row_data.IsValid()) {
     RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
     return;
   }
 
-  auto particle = G4ParticleTable::GetParticleTable()->FindParticle(fRowData.fG4Pid);
+  auto particle = G4ParticleTable::GetParticleTable()->FindParticle(row_data.fG4Pid);
   if (!particle) {
-    RMGLog::Out(RMGLog::error, "invalid particle PDG id ", fRowData.fG4Pid);
+    RMGLog::Out(RMGLog::error, "invalid particle PDG id ", row_data.fG4Pid);
     return;
   }
 
   RMGLog::OutFormat(RMGLog::debug,
-      "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) MeV ; Ekin = {:.4g} MeV",
-      fRowData.fG4Pid, fRowData.fPx, fRowData.fPy, fRowData.fPz, fRowData.fEkin);
+      "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV", row_data.fG4Pid,
+      row_data.fPx, row_data.fPy, row_data.fPz, row_data.fEkin);
 
-  G4ThreeVector momentum{fRowData.fPx, fRowData.fPy, fRowData.fPz};
+  G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
 
   fGun->SetParticleDefinition(particle);
   fGun->SetParticlePosition(fParticlePosition);
-  fGun->SetParticleMomentumDirection(momentum * u::MeV);
-  fGun->SetParticleEnergy(fRowData.fEkin * u::MeV);
+  fGun->SetParticleMomentumDirection(momentum);
+  fGun->SetParticleEnergy(row_data.fEkin * u::MeV);
 
   fGun->GeneratePrimaryVertex(event);
 }
