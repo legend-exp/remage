@@ -795,10 +795,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
             physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
           else if (has_physical && not has_geometrical) physical_first = true;
           else if (has_geometrical && not has_physical) physical_first = false;
-          else {
-            fFirstSamplingVolumeType == VolumeType::kPhysical;
-            physical_first = true;
-          }
+          else physical_first = (fFirstSamplingVolumeType == VolumeType::kPhysical);
 
           choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
                                            : fGeomVolumeSolids.VolumeWeightedRand();
