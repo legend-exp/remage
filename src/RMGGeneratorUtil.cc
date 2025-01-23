@@ -59,9 +59,8 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
     std::array<double, 3> A = {4 * dx * dy, 4 * dx * dz, 4 * dy * dz};
 
     auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
-    ;
     auto face_sign = _g4rand() <= 0.5 ? -1 : 1;
-    double x, y, z;
+    double x = NAN, y = NAN, z = NAN;
 
     if (face <= A[0]) {
       x = dx * (2 * _g4rand() - 1);

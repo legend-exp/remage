@@ -25,8 +25,8 @@ namespace fs = std::filesystem;
 #include "CLI11/CLI11.hpp"
 
 int main(int argc, char** argv) {
-  bool verbosity;
-  bool dry_run;
+  bool verbosity = false;
+  bool dry_run = false;
   std::vector<std::string> file_names;
   std::string ntuple_group_name = "stp";
 
