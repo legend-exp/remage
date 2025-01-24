@@ -38,18 +38,24 @@ class RMGGeneratorGPS : public RMGVGenerator {
     inline void GeneratePrimaries(G4Event* event) override {
       G4AutoLock lock(&fMutex);
 
-      // the GPS is inherently thread-unsafe. only one source can be manipoulated/used at a time.
+      // the GPS is inherently thread-unsafe. only one source can be manipulated/used at a time.
       // all threads share the same internal global state.
-      fParticleSource->GetCurrentSource()->GetPosDist()->SetCentreCoords(fVertexPosition);
+      if (fVertexPositionSet) {
+        fParticleSource->GetCurrentSource()->GetPosDist()->SetCentreCoords(fVertexPosition);
+      }
       fParticleSource->GeneratePrimaryVertex(event);
     }
 
-    void SetParticlePosition(G4ThreeVector vec) override { fVertexPosition = vec; }
+    void SetParticlePosition(G4ThreeVector vec) override {
+      fVertexPosition = vec;
+      fVertexPositionSet = true;
+    }
 
   private:
 
     inline static G4Mutex fMutex = G4MUTEX_INITIALIZER;
 
+    bool fVertexPositionSet = false;
     G4ThreeVector fVertexPosition;
 
     std::unique_ptr<G4GeneralParticleSource> fParticleSource = nullptr;
