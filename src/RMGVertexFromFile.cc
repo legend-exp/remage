@@ -33,9 +33,16 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   if (!reader) return;
 
   // bind the static variables once here, and only use them later.
-  reader.SetNtupleDColumn("xloc_in_m", fXpos);
-  reader.SetNtupleDColumn("yloc_in_m", fYpos);
-  reader.SetNtupleDColumn("zloc_in_m", fZpos);
+  reader.SetNtupleDColumn("xloc", fXpos, {"nm", "um", "mm", "cm", "m"});
+  reader.SetNtupleDColumn("yloc", fYpos, {"nm", "um", "mm", "cm", "m"});
+  reader.SetNtupleDColumn("zloc", fZpos, {"nm", "um", "mm", "cm", "m"});
+
+  const auto xunit = reader.GetUnit("xloc");
+  const auto yunit = reader.GetUnit("yloc");
+  const auto zunit = reader.GetUnit("zloc");
+  if (xunit != yunit || xunit != zunit) {
+    RMGLog::OutFormat(RMGLog::fatal, " ('{}', '{}', '{}')", xunit, yunit, zunit);
+  }
 }
 
 bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
@@ -53,7 +60,11 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
         return false;
       }
 
-      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * CLHEP::m;
+      const auto unit_name = reader.GetUnit("xloc");
+      const std::map<std::string, double> units = {{"", CLHEP::m}, {"nm", CLHEP::nm},
+          {"um", CLHEP::um}, {"mm", CLHEP::mm}, {"cm", CLHEP::cm}, {"m", CLHEP::m}};
+
+      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * units.at(unit_name);
       return true;
     }
 

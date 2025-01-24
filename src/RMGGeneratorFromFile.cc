@@ -41,11 +41,11 @@ void RMGGeneratorFromFile::OpenFile(std::string& name) {
   if (!reader) return;
 
   // bind the static variables once here, and only use them later.
-  reader.SetNtupleIColumn("g4_pid", fRowData.fG4Pid);
-  reader.SetNtupleDColumn("ekin_in_MeV", fRowData.fEkin);
-  reader.SetNtupleDColumn("px", fRowData.fPx);
-  reader.SetNtupleDColumn("py", fRowData.fPy);
-  reader.SetNtupleDColumn("pz", fRowData.fPz);
+  reader.SetNtupleIColumn("g4_pid", fRowData.fG4Pid, {""});
+  reader.SetNtupleDColumn("ekin", fRowData.fEkin, {"eV", "keV", "MeV", "GeV"});
+  reader.SetNtupleDColumn("px", fRowData.fPx, {""});
+  reader.SetNtupleDColumn("py", fRowData.fPy, {""});
+  reader.SetNtupleDColumn("pz", fRowData.fPz, {""});
 }
 
 void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
@@ -84,6 +84,7 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
 
   // make copy of data and exit critical section.
   auto row_data = fRowData;
+  auto unit_name = locked_reader.GetUnit("ekin");
   locked_reader.unlock();
 
   // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
@@ -104,10 +105,13 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
 
   G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
 
+  const std::map<std::string, double> units = {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV},
+      {"MeV", u::MeV}, {"GeV", u::GeV}};
+
   fGun->SetParticleDefinition(particle);
   fGun->SetParticlePosition(fParticlePosition);
   fGun->SetParticleMomentumDirection(momentum);
-  fGun->SetParticleEnergy(row_data.fEkin * u::MeV);
+  fGun->SetParticleEnergy(row_data.fEkin * units.at(unit_name));
 
   fGun->GeneratePrimaryVertex(event);
 }

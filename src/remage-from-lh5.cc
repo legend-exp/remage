@@ -50,7 +50,9 @@ int main(int argc, char** argv) {
       RMGLog::OutFormat(RMGLog::error, "{} does not exist", file_name);
       continue;
     }
-    RMGConvertLH5::ConvertFromLH5(file_name, ntuple_group_name, dry_run, !file_names.empty());
+    std::map<std::string, std::map<std::string, std::string>> units_map{};
+    RMGConvertLH5::ConvertFromLH5(file_name, ntuple_group_name, dry_run, !file_names.empty(),
+        units_map);
   }
 
   struct rusage usage{};

@@ -18,6 +18,7 @@
 #define _RMG_CONVERT_LH5_HH
 
 #include <filesystem>
+#include <map>
 #include <memory>
 #include <optional>
 #include <regex>
@@ -33,7 +34,8 @@ class RMGConvertLH5 {
   public:
 
     static bool ConvertToLH5(std::string, std::string, bool, bool part_of_batch = false);
-    static bool ConvertFromLH5(std::string, std::string, bool, bool part_of_batch = false);
+    static bool ConvertFromLH5(std::string, std::string, bool, bool part_of_batch,
+        std::map<std::string, std::map<std::string, std::string>>&);
 
     inline static bool fIsStandalone = false;
 
@@ -77,12 +79,12 @@ class RMGConvertLH5 {
     ////////////////////////////////////////////////////////////////////////////////////////////
     // LH5 -> HDF5 (input files):
 
-    bool ConvertFromLH5Internal();
+    bool ConvertFromLH5Internal(std::map<std::string, std::map<std::string, std::string>>&);
 
     static inline const std::regex table_dtype_re = std::regex("^table\\{.*\\}$");
 
     std::string HDFDataTypeToForm(H5::DataType);
-    bool ConvertTableToNTuple(H5::Group&);
+    bool ConvertTableToNTuple(H5::Group&, std::map<std::string, std::string>&);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -16,6 +16,7 @@
 #ifndef _RMG_ANALYSIS_READER_HH_
 #define _RMG_ANALYSIS_READER_HH_
 
+#include <map>
 #include <string>
 
 #include "G4AutoLock.hh"
@@ -60,6 +61,7 @@ class RMGAnalysisReader final {
         void unlock() {
           fReader = nullptr;
           fNtupleId = -1;
+          fUnits = nullptr;
           if (fLock) { fLock.unlock(); }
         }
 
@@ -68,19 +70,30 @@ class RMGAnalysisReader final {
         [[nodiscard]] auto GetNtupleRow() { return fReader->GetNtupleRow(fNtupleId); }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleDColumn. */
-        auto SetNtupleDColumn(const std::string& name, G4double& value) {
+        auto SetNtupleDColumn(const std::string& name, G4double& value,
+            const std::vector<std::string>& allowed_units = {}) {
+          AssertUnit(name, allowed_units);
           return fReader->SetNtupleDColumn(fNtupleId, name, value);
         }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleFColumn. */
-        auto SetNtupleFColumn(const std::string& name, G4float& value) {
+        auto SetNtupleFColumn(const std::string& name, G4float& value,
+            const std::vector<std::string>& allowed_units = {}) {
+          AssertUnit(name, allowed_units);
           return fReader->SetNtupleFColumn(fNtupleId, name, value);
         }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleIColumn. */
-        auto SetNtupleIColumn(const std::string& name, G4int& value) {
+        auto SetNtupleIColumn(const std::string& name, G4int& value,
+            const std::vector<std::string>& allowed_units = {}) {
+          AssertUnit(name, allowed_units);
           return fReader->SetNtupleIColumn(fNtupleId, name, value);
         }
+
+        /**
+         * @brief get unit information for the column. an empty string means either no unit
+         * attached or no support by the file format. */
+        [[nodiscard]] std::string GetUnit(const std::string& name) const;
 
         /**
          * @brief check whether this access handle is still valid. */
@@ -89,12 +102,16 @@ class RMGAnalysisReader final {
       private:
 
         // only allow creation or moving in parent.
-        inline Access(G4AutoLock lock, G4VAnalysisReader* reader, int nt)
-            : fLock(std::move(lock)), fReader(reader), fNtupleId(nt) {};
+        inline Access(G4AutoLock lock, G4VAnalysisReader* reader, int nt,
+            const std::map<std::string, std::string>* u)
+            : fLock(std::move(lock)), fReader(reader), fNtupleId(nt), fUnits(u) {};
         Access(Access&&) = default;
+
+        void AssertUnit(const std::string& name, const std::vector<std::string>& allowed_units) const;
 
         G4VAnalysisReader* fReader = nullptr;
         int fNtupleId = -1;
+        const std::map<std::string, std::string>* fUnits;
         G4AutoLock fLock;
     };
 
@@ -145,6 +162,9 @@ class RMGAnalysisReader final {
 
     G4VAnalysisReader* fReader = nullptr;
     int fNtupleId = -1;
+
+    std::map<std::string, std::string> fUnits{};
+    bool fHasUnits = false;
 
     std::string fFileName;
     bool fFileIsTemp = false;

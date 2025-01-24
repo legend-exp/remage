@@ -25,25 +25,31 @@ def _convert_lh5_to_hdf5(lh5_fn):
     assert ret.returncode == 0
 
 
-INPUT_FILE_ROWS = int(1e6)
+INPUT_FILE_ROWS = int(1e5)
 rng = np.random.default_rng(123456)
 
 # ==================================================
 # position input
 
-xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS), attrs={"units": "m"})
-yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS), attrs={"units": "m"})
-zloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS), attrs={"units": "m"})
 
-vtx_pos_file = "macros/vtx-pos.lh5"
-lh5.write(
-    Table({"xloc": xloc, "yloc": yloc, "zloc": zloc}),
-    "vtx/pos",
-    lh5_file=vtx_pos_file,
-    wo_mode="of",
-)
-_convert_lh5_to_hdf5(vtx_pos_file)
+def _create_pos_input(dtype, vtx_pos_file, units):
+    attrs = {"units": units}
+    xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
+    yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
+    zloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
 
+    lh5.write(
+        Table({"xloc": xloc, "yloc": yloc, "zloc": zloc}),
+        "vtx/pos",
+        lh5_file=vtx_pos_file,
+        wo_mode="of",
+    )
+    _convert_lh5_to_hdf5(vtx_pos_file)
+
+
+_create_pos_input(np.float64, "macros/vtx-pos.lh5", "m")
+# _create_pos_input(np.float32, "macros/vtx-pos-float32.lh5", "m")
+_create_pos_input(np.float64, "macros/vtx-pos-mm.lh5", "mm")
 
 # ==================================================
 # kinetcis input.

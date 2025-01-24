@@ -13,26 +13,24 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "RMGAnalysisReader.hh"
+
 #include <filesystem>
 #include <random>
-
-#include "RMGVertexFromFile.hh"
 namespace fs = std::filesystem;
 
 #include "G4AnalysisUtilities.hh"
-#include "G4RootAnalysisReader.hh"
-#include "G4Threading.hh"
-#include "G4VAnalysisReader.hh"
+#include "G4CsvAnalysisReader.hh"
 #if RMG_HAS_HDF5
 #include "G4Hdf5AnalysisReader.hh"
 #endif
-#include "G4CsvAnalysisReader.hh"
+#include "G4RootAnalysisReader.hh"
+#include "G4Threading.hh"
 #include "G4XmlAnalysisReader.hh"
 
 #if RMG_HAS_HDF5
 #include "RMGConvertLH5.hh"
 #endif
-
 #include "RMGLog.hh"
 
 G4Mutex RMGAnalysisReader::fMutex = G4MUTEX_INITIALIZER;
@@ -43,7 +41,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(std::string& file_name,
   // create an invalid lock to return on error.
   G4AutoLock invalid_lock(&fMutex, std::defer_lock);
   invalid_lock.release();
-  auto invalid_access = RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1);
+  auto invalid_access = RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1, nullptr);
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
   if (!G4Threading::IsMasterThread()) {
@@ -61,6 +59,8 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(std::string& file_name,
     RMGLog::Out(RMGLog::error, "input file ", file_name, " does not exist");
     return std::move(invalid_access);
   }
+
+  std::map<std::string, std::map<std::string, std::string>> units_map{};
 
   // NOTE: GetExtension() returns a default extension if there is no file extension
   auto ext = G4Analysis::GetExtension(file_name);
@@ -88,12 +88,13 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(std::string& file_name,
       return std::move(invalid_access);
     }
 
-    if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false)) {
+    if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
           " to LH5 failed. Data is potentially corrupted.");
       return std::move(invalid_access);
     }
 
+    fHasUnits = true;
     file_name = new_fn;
     fReader = G4Hdf5AnalysisReader::Instance();
     fFileIsTemp = true;
@@ -118,7 +119,8 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(std::string& file_name,
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
     return std::move(invalid_access);
   }
-  return {std::move(lock), fReader, fNtupleId};
+  fUnits = units_map[ntuple_name];
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr};
 }
 
 void RMGAnalysisReader::CloseFile() {
@@ -141,11 +143,41 @@ void RMGAnalysisReader::CloseFile() {
   fFileName = "";
   fFileIsTemp = false;
   fNtupleId = -1;
+  fHasUnits = false;
+  fHasUnits = {};
 }
 
 RMGAnalysisReader::Access RMGAnalysisReader::GetLockedReader() const {
 
   G4AutoLock lock(&fMutex);
 
-  return {std::move(lock), fReader, fNtupleId};
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr};
+}
+
+G4AutoLock RMGAnalysisReader::GetLock() const {
+
+  // reader initialization should only happen on the master thread (otherwise it will fail).
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    std::abort();
+  }
+
+  G4AutoLock lock(&fMutex);
+
+  return std::move(lock);
+}
+
+/* ========================================================================================== */
+
+std::string RMGAnalysisReader::Access::GetUnit(const std::string& name) const {
+  if (!fUnits) return "";
+  return fUnits->at(name);
+}
+
+void RMGAnalysisReader::Access::AssertUnit(const std::string& name,
+    const std::vector<std::string>& allowed_units) const {
+  if (!fUnits) return;
+  if (std::find(allowed_units.begin(), allowed_units.end(), GetUnit(name)) == allowed_units.end()) {
+    RMGLog::Out(RMGLog::fatal, "invalid unit '", GetUnit(name), "' for column ", name);
+  }
 }
