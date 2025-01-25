@@ -126,10 +126,11 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->energy_deposition = step->GetTotalEnergyDeposit();
   hit->global_position = position;
   hit->global_time = prestep->GetGlobalTime();
+  hit->track_id = step->GetTrack()->GetTrackID();
+  hit->parent_track_id = step->GetTrack()->GetParentID();
 
   // Get distance to surface.
   // Check distance to surfaces of Mother volume
-  //
 
   // First transform coordinates into local system
   G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());

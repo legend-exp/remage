@@ -26,7 +26,23 @@
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
-/** @brief Output scheme for Germanium detectors.*/
+/** @brief Output scheme for Germanium detectors.
+ *
+ *  @details This output scheme records the hits in the Germanium detectors.
+ *  The properties of each @c RMGGermaniumDetectorHit are recorded:
+ *  - event index,
+ *  - particle type,
+ *  - time,
+ *  - position,
+ *  - energy deposition, 
+ *  - distance to detector surface.
+ * 
+ * Optionally, the track ID and parent track ID can be stored as well as the 
+ * detector ID for the single table output mode.
+ *
+ * In addition, this class is used for stacking tracks associated with optical
+ * photons when no energy was deposited in Germanium.
+ */
 class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
@@ -86,6 +102,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+
+    bool fStoreTrackID = false;
 };
 
 #endif
