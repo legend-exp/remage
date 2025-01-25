@@ -4,10 +4,10 @@ stp/germanium/det_uid : array<1>{real}
 stp/germanium/dist_to_surf : array<1>{real}
 stp/germanium/edep : array<1>{real}
 stp/germanium/evtid : array<1>{real}
-stp/germanium/particle : array<1>{real}
-stp/germanium/trackid : array<1>{real}
 stp/germanium/parent_trackid : array<1>{real}
+stp/germanium/particle : array<1>{real}
 stp/germanium/time : array<1>{real}
+stp/germanium/trackid : array<1>{real}
 stp/germanium/xloc : array<1>{real}
 stp/germanium/yloc : array<1>{real}
 stp/germanium/zloc : array<1>{real}

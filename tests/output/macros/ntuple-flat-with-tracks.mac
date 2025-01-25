@@ -5,9 +5,9 @@
 /RMG/Geometry/RegisterDetector Germanium det1 11
 /RMG/Geometry/RegisterDetector Germanium det2 12
 
+/control/execute macros/_init.mac
 /RMG/Output/Germanium/StoreTrackID true
 
-/control/execute macros/_init.mac
 
 /RMG/Generator/Confine UnConfined
 
