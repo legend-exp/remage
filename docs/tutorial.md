@@ -119,6 +119,15 @@ viewer.view()
 
 ![Geometry visualization](img/tutorial-pyg4-view.jpg)
 
+We can also easily save the geometry as a geometry description markup language (GDML) file. This format
+allows us to input the geometry to `remage`.
+
+```python
+w = pg4.gdml.Writer()
+w.addDetector(reg)
+w.write("geometry.gdml")
+```
+
 ## Visualizing a simple simulation
 
 By following instructions in the [installation](./install) section, you should
@@ -190,6 +199,10 @@ radioactive source:
 
 /run/beamOn 50
 ```
+
+The macro commands should be placed in a plain text file
+(conventionally ended with the `.mac` suffix). For example the
+complete macro file is shown below.
 
 :::{admonition} Complete macro file (`vis-gammas.mac`)
 :class: dropdown
