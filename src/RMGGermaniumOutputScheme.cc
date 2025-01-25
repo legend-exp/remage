@@ -67,7 +67,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(id, "particle");
 
     // also store track IDs if instructed
-    if (fStoreTrackID){
+    if (fStoreTrackID) {
       ana_man->CreateNtupleIColumn(id, "trackid");
       ana_man->CreateNtupleIColumn(id, "parent_trackid");
     }
@@ -78,7 +78,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     CreateNtupleFOrDColumn(ana_man, id, "yloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, id, "zloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_in_m", fStoreSinglePrecisionPosition);
-  
+
     ana_man->FinishNtuple(id);
   }
 }
@@ -160,9 +160,9 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
 
       // store track IDs if instructed
-      if (fStoreTrackID){
-      ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->track_id);
-      ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
+      if (fStoreTrackID) {
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->track_id);
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
       }
 
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,

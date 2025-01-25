@@ -34,10 +34,10 @@ class G4Event;
  *  - particle type,
  *  - time,
  *  - position,
- *  - energy deposition, 
+ *  - energy deposition,
  *  - distance to detector surface.
- * 
- * Optionally, the track ID and parent track ID can be stored as well as the 
+ *
+ * Optionally, the track ID and parent track ID can be stored as well as the
  * detector ID for the single table output mode.
  *
  * In addition, this class is used for stacking tracks associated with optical
