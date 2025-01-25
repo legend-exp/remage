@@ -200,8 +200,8 @@ radioactive source:
 /run/beamOn 50
 ```
 
-The macro commands should be placed in a plain text file 
-(conventionally ended with the `.mac` suffix). For example the 
+The macro commands should be placed in a plain text file
+(conventionally ended with the `.mac` suffix). For example the
 complete macro file is shown below.
 
 :::{admonition} Complete macro file (`vis-gammas.mac`)
