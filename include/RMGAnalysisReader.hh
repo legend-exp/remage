@@ -134,9 +134,16 @@ class RMGAnalysisReader final {
      * "dir/table" this is "dir".
      * @param ntuple_name the first part of the input table name. For the table addressed by
      * "dir/table" this is "table".
+     * @param lock a lock instance obtained by @ref RMGAnalysisReader::GetLock - optional.
+     * @param force_ext force a file extension/reader type. should be a lowercase file extension
+     * like @c lh5, @c hdf5, @c csv, @c root.
      */
-    [[nodiscard]] Access OpenFile(std::string& file_name, std::string ntuple_dir_name,
-        std::string ntuple_name);
+    [[nodiscard]] Access OpenFile(const std::string& file_name, std::string ntuple_dir_name,
+        std::string ntuple_name, G4AutoLock lock, std::string force_ext = "");
+    /**
+     * @overload */
+    [[nodiscard]] Access OpenFile(const std::string& file_name, std::string ntuple_dir_name,
+        std::string ntuple_name, std::string force_ext = "");
 
     /**
      * @brief if any file is open for reading, close the reader.
@@ -151,6 +158,10 @@ class RMGAnalysisReader final {
      *
      * @details this acquires a global lock to avoid problems. The lock is held until the access handle is discarded. */
     [[nodiscard]] Access GetLockedReader() const;
+
+    /**
+     * @brief acquires a global lock to the analysis reader mutex. */
+    [[nodiscard]] G4AutoLock GetLock() const;
 
     /**
      * @brief get the file name of the current open file, or an empty string. */
