@@ -33,7 +33,7 @@ namespace u = CLHEP;
 
 RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() { this->DefineCommands(); }
 
-// invoked in RMGRunAction::SetupAnalysisManager()
+
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto rmg_man = RMGManager::Instance();
@@ -95,7 +95,6 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G
   return hit_coll;
 }
 
-// invoked in RMGEventAction::EndOfEventAction()
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   // exit fast if no threshold is configured.
   if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
@@ -122,7 +121,6 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   return false;
 }
 
-// invoked in RMGEventAction::EndOfEventAction()
 void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   auto hit_coll = GetHitColl(event);
   if (!hit_coll) return;

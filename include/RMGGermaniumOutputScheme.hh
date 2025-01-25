@@ -26,20 +26,45 @@
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
+/** @brief Output scheme for Germanium detectors.*/
 class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGGermaniumOutputScheme();
 
+    /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
-    void StoreEvent(const G4Event*) override;
-    bool ShouldDiscardEvent(const G4Event*) override;
+
+    /** @brief Store the information from the event, invoked in @c RMGEventAction::EndOfEventAction
+     */
+    void StoreEvent(const G4Event* event) override;
+
+    /** @brief Decide where to store the event, invoked in @c RMGEventAction::EndOfEventAction
+     *  @details @c true if the event should be discarded, else @c false .
+     *  The event is discard if there is not hit in Germanium of the energy range
+     *  condition is not met.
+     */
+    bool ShouldDiscardEvent(const G4Event* event) override;
+
+    /** @brief Wraps @c G4UserStackingAction::StackingActionNewStage
+     *  @details discard all waiting events, if @c ShouldDiscardEvent() is true.
+     */
     std::optional<bool> StackingActionNewStage(int) override;
+
+    /** @brief Wraps @c G4UserStackingAction::StackingActionClassify
+     *  @details This is used to classify all optical photon tracks as @c fWaiting if
+     * @c fDiscardPhotonsIfNoGermaniumEdep is true.
+     */
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
+    /** @brief Set a lower cut on the energy deposited in the event to store it. */
     inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
+
+    /** @brief Set a lower cut on the energy deposited in the event to store it. */
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
+
+    /** @brief Add a detector uid to the list of detectors to apply the energy cut for. */
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
   protected:
