@@ -25,7 +25,7 @@
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
-/** @brief Class to store hits in the Germanium detectors, wraps @c G4VHit */
+/** @brief Class to store hits in the Germanium detectors, extends @c G4VHit */
 class RMGGermaniumDetectorHit : public G4VHit {
 
   public:

@@ -40,7 +40,7 @@ class G4Event;
  * Optionally, the track ID and parent track ID can be stored as well as the
  * detector ID for the single table output mode.
  *
- * In addition, this class is used for stacking tracks associated with optical
+ * In addition, this class can be used for stacking tracks associated with optical
  * photons when no energy was deposited in Germanium.
  */
 class RMGGermaniumOutputScheme : public RMGVOutputScheme {
@@ -56,9 +56,9 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
      */
     void StoreEvent(const G4Event* event) override;
 
-    /** @brief Decide where to store the event, invoked in @c RMGEventAction::EndOfEventAction
+    /** @brief Decide whether to store the event, invoked in @c RMGEventAction::EndOfEventAction
      *  @details @c true if the event should be discarded, else @c false .
-     *  The event is discard if there is not hit in Germanium of the energy range
+     *  The event is discarded if there is no hit in Germanium or the energy range
      *  condition is not met.
      */
     bool ShouldDiscardEvent(const G4Event* event) override;
