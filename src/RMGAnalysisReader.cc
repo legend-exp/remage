@@ -66,7 +66,8 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
   // create an invalid lock to return on error.
   G4AutoLock invalid_lock(&fMutex, std::defer_lock);
   invalid_lock.release();
-  auto invalid_access = RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1, nullptr);
+  auto invalid_access =
+      RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1, nullptr, false);
 
   if (fReader) return std::move(invalid_access);
 
@@ -135,7 +136,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
     return std::move(invalid_access);
   }
   fUnits = units_map[ntuple_name];
-  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr};
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr, true};
 }
 
 void RMGAnalysisReader::CloseFile() {
@@ -166,7 +167,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::GetLockedReader() const {
 
   G4AutoLock lock(&fMutex);
 
-  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr};
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr, false};
 }
 
 G4AutoLock RMGAnalysisReader::GetLock() const {
@@ -194,5 +195,11 @@ void RMGAnalysisReader::Access::AssertUnit(const std::string& name,
   if (!fUnits) return;
   if (std::find(allowed_units.begin(), allowed_units.end(), GetUnit(name)) == allowed_units.end()) {
     RMGLog::Out(RMGLog::fatal, "invalid unit '", GetUnit(name), "' for column ", name);
+  }
+}
+
+void RMGAnalysisReader::Access::AssertSetup(bool setup) const {
+  if (setup != fCanSetup) {
+    RMGLog::Out(RMGLog::fatal, "invalid operation in mode fCanSetup=", fCanSetup);
   }
 }

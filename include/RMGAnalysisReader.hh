@@ -43,7 +43,8 @@ class RMGAnalysisReader final {
   public:
 
     /**
-     * @brief thread-safe access handle to the underlying reader. */
+     * @brief thread-safe access handle to the underlying reader. This handle can be used to set-up
+     * ntuple reading (in setup mode) or to read rows from the ntuple. */
     class Access final {
         friend class RMGAnalysisReader;
 
@@ -67,11 +68,15 @@ class RMGAnalysisReader final {
 
         /**
          * @brief wraps @ref G4VAnalysisReader::GetNtupleRow. */
-        [[nodiscard]] auto GetNtupleRow() { return fReader->GetNtupleRow(fNtupleId); }
+        [[nodiscard]] auto GetNtupleRow() {
+          AssertSetup(false);
+          return fReader->GetNtupleRow(fNtupleId);
+        }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleDColumn. */
         auto SetNtupleDColumn(const std::string& name, G4double& value,
             const std::vector<std::string>& allowed_units = {}) {
+          AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleDColumn(fNtupleId, name, value);
         }
@@ -79,6 +84,7 @@ class RMGAnalysisReader final {
          * @brief wraps @ref G4VAnalysisReader::SetNtupleFColumn. */
         auto SetNtupleFColumn(const std::string& name, G4float& value,
             const std::vector<std::string>& allowed_units = {}) {
+          AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleFColumn(fNtupleId, name, value);
         }
@@ -86,6 +92,7 @@ class RMGAnalysisReader final {
          * @brief wraps @ref G4VAnalysisReader::SetNtupleIColumn. */
         auto SetNtupleIColumn(const std::string& name, G4int& value,
             const std::vector<std::string>& allowed_units = {}) {
+          AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleIColumn(fNtupleId, name, value);
         }
@@ -103,16 +110,18 @@ class RMGAnalysisReader final {
 
         // only allow creation or moving in parent.
         inline Access(G4AutoLock lock, G4VAnalysisReader* reader, int nt,
-            const std::map<std::string, std::string>* u)
-            : fLock(std::move(lock)), fReader(reader), fNtupleId(nt), fUnits(u) {};
+            const std::map<std::string, std::string>* u, bool setup)
+            : fLock(std::move(lock)), fReader(reader), fNtupleId(nt), fUnits(u), fCanSetup(setup) {};
         Access(Access&&) = default;
 
         void AssertUnit(const std::string& name, const std::vector<std::string>& allowed_units) const;
+        void AssertSetup(bool setup) const;
 
         G4VAnalysisReader* fReader = nullptr;
         int fNtupleId = -1;
         const std::map<std::string, std::string>* fUnits;
         G4AutoLock fLock;
+        bool fCanSetup = false;
     };
 
     RMGAnalysisReader() = default;
@@ -124,10 +133,11 @@ class RMGAnalysisReader final {
     RMGAnalysisReader& operator=(RMGAnalysisReader&&) = delete;
 
     /**
-     * @brief open an input file for reading of one specific ntuple.
+     * @brief open an input file for reading of one specific ntuple. The return access handle can be
+     * used to connect to-be-read column to variables.
      *
      * @details This function can only be used on the master thread. This operation acquires a
-     * global lock to avoid problems.
+     * global lock across all readers that will be held until the access handle is discarded.
      *
      * @param file_name the input file name. the file format is determined from the file extension.
      * @param ntuple_dir_name the first part of the input table name. For the table addressed by
@@ -146,17 +156,17 @@ class RMGAnalysisReader final {
         std::string ntuple_name, std::string force_ext = "");
 
     /**
-     * @brief if any file is open for reading, close the reader.
+     * @brief if any file is open for reading, close the reader. Also clean-up temporary files.
      *
-     * @details this invalidates all readers obtained via @ref RMGAnalysisReader::GetLockedReader.
-     * This function can only be used on the master thread. This operation acquires a global lock to
-     * avoid problems. */
+     * @details This function can only be used on the master thread. This operation acquires a global
+     * across all readers. This function will not actually free resources allocated for the reader by Geant4. */
     void CloseFile();
 
     /**
      * @brief get an access handle to the current underlying G4VAnalysisReader.
      *
-     * @details this acquires a global lock to avoid problems. The lock is held until the access handle is discarded. */
+     * @details The return access handle can be used to read row(s) from the ntuple. This function
+     * acquires a global across all readers that will be held until the access handle is discarded. */
     [[nodiscard]] Access GetLockedReader() const;
 
     /**
