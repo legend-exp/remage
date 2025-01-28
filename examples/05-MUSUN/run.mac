@@ -6,11 +6,9 @@
 
 /RMG/Output/FileName output.root
 
-
-
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select MUSUNCosmicMuons
 
-/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_10k_events.csv
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_100_events.csv
 
-/run/beamOn 1000
+/run/beamOn 100
