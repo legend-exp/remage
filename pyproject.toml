@@ -33,6 +33,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "legend-pydataobj",
+  "colorlog",
 ]
 
 [project.optional-dependencies]

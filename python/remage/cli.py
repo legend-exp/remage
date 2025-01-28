@@ -9,6 +9,8 @@ import sys
 import threading
 from pathlib import Path
 
+import colorlog
+
 from .cpp_config import REMAGE_CPP_EXE_PATH
 from .ipc import ipc_thread_fn
 
@@ -83,17 +85,47 @@ def _run_remage_cpp() -> int:
     return ec, unhandled_ipc_messages
 
 
+def _setup_log() -> None:
+    """Setup a colored logger for this package."""
+
+    logger = logging.getLogger("remage")
+
+    if sys.stderr.isatty():
+        fmt = "%(log_color)s[%(levelname)s %(name)s%(reset)s %(message)s"
+
+        handler = colorlog.StreamHandler()
+        handler.setFormatter(colorlog.ColoredFormatter(fmt))
+        logger.addHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    return logger
+
+
 def remage_cli() -> None:
+    logger = _setup_log()
+
     ec, ipc_info = _run_remage_cpp()
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
         # ec==2 is just a warning, continue in the execution flow.
         sys.exit(ec)
 
-    _log_level = next(
-        msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "loglevel"
+    # setup logging based on log level from C++.
+    log_level = next(
+        (msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "loglevel"),
+        "summary",
     )
-    # TODO: setup logging based on _log_level
+    levels_rmg_to_py = {
+        "debug": logging.DEBUG,
+        "detail": logging.INFO,
+        "summary": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+        "fatal": logging.CRITICAL,
+        "nothing": logging.CRITICAL,
+    }
+    logger.setLevel(levels_rmg_to_py[log_level])
 
     # TODO: further post-processing
     output_files = [msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "output"]
