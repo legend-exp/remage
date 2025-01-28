@@ -23,6 +23,7 @@
 
 #include "RMGConfig.hh"
 #include "RMGHardware.hh"
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
   int nthreads = 1;
   bool interactive = false;
   bool overwrite_output = false;
+  int pipe_fd = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
   std::string output;
@@ -75,6 +77,7 @@ int main(int argc, char** argv) {
   app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
+  app.add_option("--pipe-fd", pipe_fd, "")->group(""); // group() hides this "internal" option.
   app.add_option("macros", macros, "Macro files")->type_name("FILE");
 
   CLI11_PARSE(app, argc, argv);
@@ -115,6 +118,10 @@ int main(int argc, char** argv) {
   if (sigaction(SIGUSR1, &sig, nullptr) != 0) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
+
+  RMGIpc::Setup(pipe_fd);
+  RMGIpc::SendIpcNonBlocking(
+      RMGIpc::CreateMessage("loglevel", std::string(magic_enum::enum_name(RMGLog::GetLogLevel()))));
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);

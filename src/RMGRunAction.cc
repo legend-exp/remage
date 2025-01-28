@@ -32,6 +32,7 @@
 #endif
 #include "RMGEventAction.hh"
 #include "RMGGermaniumOutputScheme.hh"
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGMasterGenerator.hh"
@@ -269,13 +270,19 @@ namespace {
 }
 
 void RMGRunAction::PostprocessOutputFile() const {
-  if (fCurrentOutputFile.first == fCurrentOutputFile.second) return;
+
+  if (fCurrentOutputFile.first == fCurrentOutputFile.second) {
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", fCurrentOutputFile.first));
+    return;
+  }
 
   // HDF5 C++ might not be thread-safe?
   G4AutoLock l(&RMGConvertLH5Mutex);
 
   auto worker_tmp = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
   auto worker_lh5 = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.second.string(), "lh5"));
+
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", worker_lh5));
 
   if (!fs::exists(worker_tmp)) {
     if (!this->IsMaster() || RMGManager::Instance()->IsExecSequential()) {
