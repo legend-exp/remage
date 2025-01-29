@@ -33,7 +33,7 @@ namespace u = CLHEP;
 
 RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() { this->DefineCommands(); }
 
-// invoked in RMGRunAction::SetupAnalysisManager()
+
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto rmg_man = RMGManager::Instance();
@@ -61,9 +61,17 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
         rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
     registered_ntuples.emplace(ntuple_name, id);
 
+    // store the indices
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
+
+    // also store track IDs if instructed
+    if (fStoreTrackID) {
+      ana_man->CreateNtupleIColumn(id, "trackid");
+      ana_man->CreateNtupleIColumn(id, "parent_trackid");
+    }
+    // store the floating points values
     CreateNtupleFOrDColumn(ana_man, id, "edep_in_keV", fStoreSinglePrecisionEnergy);
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
     CreateNtupleFOrDColumn(ana_man, id, "xloc_in_m", fStoreSinglePrecisionPosition);
@@ -95,7 +103,6 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G
   return hit_coll;
 }
 
-// invoked in RMGEventAction::EndOfEventAction()
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   // exit fast if no threshold is configured.
   if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
@@ -122,7 +129,6 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   return false;
 }
 
-// invoked in RMGEventAction::EndOfEventAction()
 void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   auto hit_coll = GetHitColl(event);
   if (!hit_coll) return;
@@ -146,11 +152,19 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
+      // store the indices
       ana_man->FillNtupleIColumn(ntupleid, col_id++, event->GetEventID());
       if (!fNtuplePerDetector) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
+
+      // store track IDs if instructed
+      if (fStoreTrackID) {
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->track_id);
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
+      }
+
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
           fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
@@ -228,6 +242,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
+      .SetGuidance("Store Track IDs for hits in the output file.")
       .SetStates(G4State_Idle);
 }
 

@@ -25,6 +25,7 @@
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
+/** @brief Class to store hits in the Germanium detectors, extends @c G4VHit */
 class RMGGermaniumDetectorHit : public G4VHit {
 
   public:
@@ -47,10 +48,13 @@ class RMGGermaniumDetectorHit : public G4VHit {
 
     int detector_uid = -1;
     int particle_type = -1;
+
     double energy_deposition = -1;
     double distance_to_surface = -1;
     G4ThreeVector global_position;
     double global_time = -1;
+    int track_id = -1;
+    int parent_track_id = -1;
 };
 
 using RMGGermaniumDetectorHitsCollection = G4THitsCollection<RMGGermaniumDetectorHit>;
