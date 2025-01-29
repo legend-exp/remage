@@ -10,8 +10,6 @@
 
 namespace u = CLHEP;
 
-IsotopeOutputScheme::IsotopeOutputScheme() {}
-
 void IsotopeOutputScheme::ClearBeforeEvent() {
   zOfEvent.clear();
   aOfEvent.clear();

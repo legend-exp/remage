@@ -13,17 +13,18 @@ namespace u = CLHEP;
 
 G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
-  G4State state;
+  // just used for "named arguments" further down.
+  G4State state = G4State::kStateSolid;
   std::string name, symbol;
   std::vector<std::string> elements;
   std::vector<double> mass_fraction;
-  double density;
-  double temperature;
-  double pressure;
-  double abundance;
-  int n_isotopes;
-  int n_components;
-  int n_atoms;
+  double density = 0;
+  double temperature = 0;
+  double pressure = 0;
+  double abundance = 0;
+  int n_isotopes = 0;
+  int n_components = 0;
+  int n_atoms = 0;
 
   auto man = G4NistManager::Instance();
 
@@ -46,16 +47,16 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
   density = 3.01 * u::g / u::cm3;
 
-  G4Element* elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * u::g / u::mole);
-  G4Element* elS = new G4Element("Sulfur", "S", 16., 32.066 * u::g / u::mole);
-  G4Element* O = new G4Element("Oxygen", "O", 8., 16.00 * u::g / u::mole);
+  auto elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * u::g / u::mole);
+  auto elS = new G4Element("Sulfur", "S", 16., 32.066 * u::g / u::mole);
+  auto O = new G4Element("Oxygen", "O", 8., 16.00 * u::g / u::mole);
 
-  G4Material* gadoliniumSulfate = new G4Material("GadoliniumSulfate", density, 3); // Gd2(SO4)3
+  auto gadoliniumSulfate = new G4Material("GadoliniumSulfate", density, 3); // Gd2(SO4)3
   gadoliniumSulfate->AddElement(elGd, 2);
   gadoliniumSulfate->AddElement(elS, 3);
   gadoliniumSulfate->AddElement(O, 12);
 
-  G4Material* Gdwater = new G4Material("GdLoadedWater", 1.000000 * u::g / u::cm3, 2);
+  auto Gdwater = new G4Material("GdLoadedWater", 1.000000 * u::g / u::cm3, 2);
   Gdwater->AddMaterial(water, 1. - 0.002);
   Gdwater->AddMaterial(gadoliniumSulfate, 0.002);
 
