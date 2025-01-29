@@ -39,6 +39,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
       kG4gun,
       kGPS,
       kBxDecay0,
+      kFromFile,
       kCosmicMuons,
       kMUSUNCosmicMuons,
       kUserDefined,

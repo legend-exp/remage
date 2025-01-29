@@ -9,6 +9,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh
+    ${_root}/include/RMGGeneratorFromFile.hh
     ${_root}/include/RMGGeneratorMUSUNCosmicMuons.hh
     ${_root}/include/RMGGeneratorG4Gun.hh
     ${_root}/include/RMGGeneratorGPS.hh
@@ -52,6 +53,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
+    ${_root}/src/RMGGeneratorFromFile.cc
     ${_root}/src/RMGGeneratorMUSUNCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc
     ${_root}/src/RMGGermaniumDetector.cc

@@ -1,0 +1,13 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine FromFile
+
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-pos.hdf5
+
+/RMG/Generator/Select GPS
+/gps/particle     ion
+/gps/ion          81 208
+/gps/energy       0 keV
+/gps/ang/type     iso
+
+/run/beamOn 100000

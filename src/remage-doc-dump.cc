@@ -21,6 +21,7 @@
 #include "G4UImanager.hh"
 
 #include "RMGGeneratorCosmicMuons.hh"
+#include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGIsotopeFilterOutputScheme.hh"
@@ -50,6 +51,7 @@ void init_extra() {
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
+  new RMGGeneratorFromFile();
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();

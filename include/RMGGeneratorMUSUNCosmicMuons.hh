@@ -4,10 +4,10 @@
 #include <filesystem>
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "G4CsvAnalysisReader.hh"
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
 
+#include "RMGAnalysisReader.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
 
@@ -51,17 +51,17 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
 
     void DefineCommands();
     void SetMUSUNFile(G4String pathToFile);
-    void PrepareCopy(G4String pathToFile);
+    void PrepareCopy(std::string pathToFile);
 
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     G4String fPathToFile = "";
     std::filesystem::path fPathToTmpFolder;
-    G4String fPathToTmpFile = "";
+    std::filesystem::path fPathToTmpFile;
 
-    static G4CsvAnalysisReader* fAnalysisReader;
+    static RMGAnalysisReader* fAnalysisReader;
 
-    static RMGGeneratorMUSUNCosmicMuons_Data* input_data;
+    static RMGGeneratorMUSUNCosmicMuons_Data* fInputData;
 };
 
 #endif

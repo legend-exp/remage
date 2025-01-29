@@ -4,6 +4,11 @@
 
 /RMG/Geometry/GDMLDisableOverlapCheck true
 
+/RMG/Geometry/RegisterDetector Germanium det1 11
+/RMG/Geometry/RegisterDetector Germanium det2 12
+
 /run/initialize
 
 /RMG/Manager/Logging/LogLevel detail
+
+/RMG/Output/Vertex/StorePrimaryParticleInformation true

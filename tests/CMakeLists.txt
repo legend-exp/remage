@@ -15,3 +15,7 @@ add_subdirectory(internals)
 add_subdirectory(output)
 add_subdirectory(python)
 add_subdirectory(vertex)
+
+if(RMG_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()

@@ -16,12 +16,9 @@
 #include "RMGVertexFromFile.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "G4AutoLock.hh"
 #include "G4Threading.hh"
 
 #include "RMGLog.hh"
-
-G4Mutex RMGVertexFromFile::fMutex = G4MUTEX_INITIALIZER;
 
 RMGAnalysisReader* RMGVertexFromFile::fReader = new RMGAnalysisReader();
 
@@ -31,26 +28,31 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->OpenFile(name, fNtupleDirectoryName, "pos")) return;
+  auto reader = fReader->OpenFile(name, fNtupleDirectoryName, "pos");
+  if (!reader) return;
 
-  if (fReader->GetNtupleId() >= 0) {
-    // bind the static variables once here, and only use them later.
-    fReader->GetReader()->SetNtupleDColumn("xloc_in_m", fXpos);
-    fReader->GetReader()->SetNtupleDColumn("yloc_in_m", fYpos);
-    fReader->GetReader()->SetNtupleDColumn("zloc_in_m", fZpos);
+  // bind the static variables once here, and only use them later.
+  reader.SetNtupleDColumn("xloc", fXpos, {"nm", "um", "mm", "cm", "m"});
+  reader.SetNtupleDColumn("yloc", fYpos, {"nm", "um", "mm", "cm", "m"});
+  reader.SetNtupleDColumn("zloc", fZpos, {"nm", "um", "mm", "cm", "m"});
+
+  const auto xunit = reader.GetUnit("xloc");
+  const auto yunit = reader.GetUnit("yloc");
+  const auto zunit = reader.GetUnit("zloc");
+  if (xunit != yunit || xunit != zunit) {
+    RMGLog::OutFormat(RMGLog::fatal, " ('{}', '{}', '{}')", xunit, yunit, zunit);
   }
 }
 
 bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
-  G4AutoLock lock(&fMutex);
+  auto reader = fReader->GetLockedReader();
 
-  if (fReader->GetReader() && fReader->GetNtupleId() >= 0) {
-    fXpos = fYpos = fZpos = NAN;
+  if (reader) {
+    fXpos = fYpos = fZpos = NAN; // initialize sentinel values.
 
-    if (fReader->GetReader()->GetNtupleRow()) {
+    if (reader.GetNtupleRow()) {
       // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
       if (std::isnan(fXpos) || std::isnan(fYpos) || std::isnan(fZpos)) {
         RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
@@ -58,7 +60,11 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
         return false;
       }
 
-      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * CLHEP::m;
+      const auto unit_name = reader.GetUnit("xloc");
+      const std::map<std::string, double> units = {{"", CLHEP::m}, {"nm", CLHEP::nm},
+          {"um", CLHEP::um}, {"mm", CLHEP::mm}, {"cm", CLHEP::cm}, {"m", CLHEP::m}};
+
+      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * units.at(unit_name);
       return true;
     }
 
@@ -74,9 +80,8 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
-  if (!fReader->GetReader()) {
+  if (!fReader->GetLockedReader()) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(),
         "' not found or in wrong format");
   }
@@ -85,7 +90,6 @@ void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
 void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
-  G4AutoLock lock(&fMutex);
 
   fReader->CloseFile();
 }
@@ -103,7 +107,7 @@ void RMGVertexFromFile::DefineCommands() {
 
   fMessenger->DeclareProperty("NtupleDirectory", fNtupleDirectoryName)
       .SetGuidance("Change the default input directory/group for ntuples.")
-      .SetGuidance("note: this option only has an effect for LH5 input files.")
+      .SetGuidance("note: this option only has an effect for LH5 or HDF5 input files.")
       .SetParameterName("nt_directory", false)
       .SetDefaultValue(fNtupleDirectoryName)
       .SetStates(G4State_PreInit, G4State_Idle);

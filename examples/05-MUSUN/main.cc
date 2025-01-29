@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
   manager.SetUserInit(new HPGeTestStand());
   manager.SetNumberOfThreads(2);
   manager.EnablePersistency();
+  manager.SetOutputOverwriteFiles(true);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe1", 0);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe2", 1);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe3", 2);
@@ -22,5 +23,6 @@ int main(int argc, char** argv) {
   manager.Initialize();
   manager.Run();
 
-  return 0;
+  if (manager.HadError()) return 1;
+  return manager.HadWarning() ? 2 : 0;
 }

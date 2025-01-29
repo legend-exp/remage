@@ -10,3 +10,14 @@ endif()
 
 add_executable(05-MUSUN main.cc HPGeTestStand.hh HPGeTestStand.cc)
 target_link_libraries(05-MUSUN PUBLIC RMG::remage)
+
+# collect auxiliary files
+file(
+  GLOB _aux
+  RELATIVE ${PROJECT_SOURCE_DIR}
+  *.csv *.mac)
+
+# copy them to the build area
+foreach(_file ${_aux})
+  configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
+endforeach()

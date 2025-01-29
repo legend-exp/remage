@@ -13,45 +13,76 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "RMGAnalysisReader.hh"
+
 #include <filesystem>
 #include <random>
-
-#include "RMGVertexFromFile.hh"
 namespace fs = std::filesystem;
 
 #include "G4AnalysisUtilities.hh"
-#include "G4RootAnalysisReader.hh"
-#include "G4Threading.hh"
-#include "G4VAnalysisReader.hh"
+#include "G4CsvAnalysisReader.hh"
 #if RMG_HAS_HDF5
 #include "G4Hdf5AnalysisReader.hh"
 #endif
-#include "G4CsvAnalysisReader.hh"
+#include "G4RootAnalysisReader.hh"
+#include "G4Threading.hh"
 #include "G4XmlAnalysisReader.hh"
 
 #if RMG_HAS_HDF5
 #include "RMGConvertLH5.hh"
 #endif
-
 #include "RMGLog.hh"
 
-bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
-    std::string ntuple_name) {
+G4Mutex RMGAnalysisReader::fMutex = G4MUTEX_INITIALIZER;
+
+RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_name,
+    std::string ntuple_dir_name, std::string ntuple_name, std::string force_ext) {
 
   // reader initialization should only happen on the master thread (otherwise it will fail).
-  if (!G4Threading::IsMasterThread()) return false;
-
-  if (fReader) return false;
-
-  fFileIsTemp = false;
-
-  if (!fs::exists(fs::path(name))) {
-    RMGLog::Out(RMGLog::error, "input file ", name, " does not exist");
-    return false;
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    std::abort();
   }
 
-  // NOTE: GetExtension() returns a default extension if there is no file extension
-  auto ext = G4Analysis::GetExtension(name);
+  G4AutoLock lock(&fMutex);
+
+  return OpenFile(file_name, ntuple_dir_name, ntuple_name, std::move(lock), force_ext);
+}
+
+RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_name,
+    std::string ntuple_dir_name, std::string ntuple_name, G4AutoLock lock, std::string force_ext) {
+
+  if (lock.mutex() != &fMutex || !lock) {
+    RMGLog::OutDev(RMGLog::fatal, "used lock protecting the wrong mutex or unheld lock");
+    std::abort();
+  }
+
+  // reader initialization should only happen on the master thread (otherwise it will fail).
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    std::abort();
+  }
+
+  // create an invalid lock to return on error.
+  G4AutoLock invalid_lock(&fMutex, std::defer_lock);
+  invalid_lock.release();
+  auto invalid_access =
+      RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1, nullptr, false);
+
+  if (fReader) return std::move(invalid_access);
+
+  fFileIsTemp = false;
+  fFileName = file_name;
+  auto path = fs::path(file_name);
+
+  if (!fs::exists(path)) {
+    RMGLog::Out(RMGLog::error, "input file ", file_name, " does not exist");
+    return std::move(invalid_access);
+  }
+
+  std::map<std::string, std::map<std::string, std::string>> units_map{};
+
+  auto ext = !force_ext.empty() ? force_ext : G4Analysis::GetExtension(file_name);
   if (ext == "root") {
     fReader = G4RootAnalysisReader::Instance();
   } else if (ext == "hdf5") {
@@ -65,24 +96,24 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
 #if RMG_HAS_HDF5
     std::uniform_int_distribution<int> dist(10000, 99999);
     std::random_device rd;
-    auto path = fs::path(name);
     std::string new_fn =
         ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
 
     std::error_code ec;
     if (!fs::copy_file(path, fs::path(new_fn)), ec) {
-      RMGLog::Out(RMGLog::error, "copy of input file ", name, " failed. Does it exist? (",
+      RMGLog::Out(RMGLog::error, "copy of input file ", file_name, " failed. Does it exist? (",
           ec.message(), ")");
-      return false;
+      return std::move(invalid_access);
     }
 
-    if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false)) {
+    if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
           " to LH5 failed. Data is potentially corrupted.");
-      return false;
+      return std::move(invalid_access);
     }
 
-    name = new_fn;
+    fHasUnits = true;
+    fFileName = new_fn;
     fReader = G4Hdf5AnalysisReader::Instance();
     fFileIsTemp = true;
 #else
@@ -94,27 +125,32 @@ bool RMGAnalysisReader::OpenFile(std::string& name, std::string ntuple_dir_name,
   } else if (ext == "xml") {
     fReader = G4XmlAnalysisReader::Instance();
   } else {
-    RMGLog::OutFormat(RMGLog::fatal, "File Extension '.{}' not recognized!");
+    RMGLog::OutFormat(RMGLog::fatal, "File Extension '.{}' not recognized!", ext);
   }
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) fReader->SetVerboseLevel(10);
 
-  fReader->SetFileName(name);
-  fFileName = name;
-
-  fNtupleId = fReader->GetNtuple(ntuple_name);
+  fNtupleId = fReader->GetNtuple(ntuple_name, fFileName, ntuple_dir_name);
   if (fNtupleId < 0) {
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
-    return false;
+    return std::move(invalid_access);
   }
-  return true;
+  fUnits = units_map[ntuple_name];
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr, true};
 }
 
 void RMGAnalysisReader::CloseFile() {
-  if (!G4Threading::IsMasterThread()) return;
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    return;
+  }
+
+  G4AutoLock lock(&fMutex);
 
   if (!fReader) return;
 
+  // fReader is a thread-local singleton. Do not delete it here, otherwise geant4 will to delete it
+  // again. also do not close files, as there is no way to close a specific file only.
   fReader = nullptr;
   if (fFileIsTemp) {
     std::error_code ec;
@@ -122,4 +158,48 @@ void RMGAnalysisReader::CloseFile() {
   }
   fFileName = "";
   fFileIsTemp = false;
+  fNtupleId = -1;
+  fHasUnits = false;
+  fHasUnits = {};
+}
+
+RMGAnalysisReader::Access RMGAnalysisReader::GetLockedReader() const {
+
+  G4AutoLock lock(&fMutex);
+
+  return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr, false};
+}
+
+G4AutoLock RMGAnalysisReader::GetLock() const {
+
+  // reader initialization should only happen on the master thread (otherwise it will fail).
+  if (!G4Threading::IsMasterThread()) {
+    RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
+    std::abort();
+  }
+
+  G4AutoLock lock(&fMutex);
+
+  return std::move(lock);
+}
+
+/* ========================================================================================== */
+
+std::string RMGAnalysisReader::Access::GetUnit(const std::string& name) const {
+  if (!fUnits) return "";
+  return fUnits->at(name);
+}
+
+void RMGAnalysisReader::Access::AssertUnit(const std::string& name,
+    const std::vector<std::string>& allowed_units) const {
+  if (!fUnits) return;
+  if (std::find(allowed_units.begin(), allowed_units.end(), GetUnit(name)) == allowed_units.end()) {
+    RMGLog::Out(RMGLog::fatal, "invalid unit '", GetUnit(name), "' for column ", name);
+  }
+}
+
+void RMGAnalysisReader::Access::AssertSetup(bool setup) const {
+  if (setup != fCanSetup) {
+    RMGLog::Out(RMGLog::fatal, "invalid operation in mode fCanSetup=", fCanSetup);
+  }
 }

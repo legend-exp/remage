@@ -709,6 +709,7 @@ Commands for controlling generators
 
 * `/RMG/Generator/MUSUNCosmicMuons/` – Commands for controlling the MUSUN µ generator
 * `/RMG/Generator/CosmicMuons/` – Commands for controlling the µ generator
+* `/RMG/Generator/FromFile/` – Commands for controlling reading event data from file
 * `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
 
 **Commands:**
@@ -732,7 +733,7 @@ Select event generator
 * **Parameter** – `generator`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `G4gun GPS BxDecay0 CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
+  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
 
 ## `/RMG/Generator/MUSUNCosmicMuons/`
 
@@ -948,6 +949,37 @@ Maximum zenith angle of the generated muon position on the sphere
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+
+## `/RMG/Generator/FromFile/`
+
+Commands for controlling reading event data from file
+
+
+**Commands:**
+
+* `FileName` – Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
+* `NtupleDirectory` – Change the default input directory/group for ntuples.
+
+### `/RMG/Generator/FromFile/FileName`
+
+Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
+
+* **Parameter** – `filename`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+
+### `/RMG/Generator/FromFile/NtupleDirectory`
+
+Change the default input directory/group for ntuples.
+
+:::{note}
+this option only has an effect for LH5 or HDF5 input files.
+:::
+
+* **Parameter** – `nt_directory`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Default value** – `vtx`
 
 ## `/RMG/Generator/Confinement/`
 
@@ -1317,7 +1349,7 @@ Set name of the file containing vertex positions for the next run. See the docum
 Change the default input directory/group for ntuples.
 
 :::{note}
-this option only has an effect for LH5 input files.
+this option only has an effect for LH5 or HDF5 input files.
 :::
 
 * **Parameter** – `nt_directory`

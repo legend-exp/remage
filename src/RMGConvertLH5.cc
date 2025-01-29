@@ -345,7 +345,8 @@ std::string RMGConvertLH5::HDFDataTypeToForm(H5::DataType dtype) {
   }
 }
 
-bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
+bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group,
+    std::map<std::string, std::string>& units_map) {
   const std::string ntuple_name = det_group.getObjName();
   const std::string ntuple_log_prefix = "ntuple " + ntuple_name + " - ";
   LH5Log(RMGLog::detail, ntuple_log_prefix, "visiting");
@@ -381,7 +382,9 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
 
     auto dset_column = det_group.openDataSet(lgdo_name);
     if (dset_column.attrExists("units")) {
-      column += "_in_" + GetStringAttribute(dset_column, "units").value();
+      units_map[lgdo_name] = GetStringAttribute(dset_column, "units").value();
+    } else {
+      units_map[lgdo_name] = "";
     }
     names_string += column + std::string("\0", 1);
     forms_string += HDFDataTypeToForm(dset_column.getDataType()) + std::string("\0", 1);
@@ -426,7 +429,8 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group) {
   return true;
 }
 
-bool RMGConvertLH5::ConvertFromLH5Internal() {
+bool RMGConvertLH5::ConvertFromLH5Internal(
+    std::map<std::string, std::map<std::string, std::string>>& units_map) {
   // using the core driver with no backing storage will allow to change the file purely in-memory.
   // warning: this will internally allocate approx. the full file size!
   H5::FileAccPropList fapl;
@@ -449,14 +453,11 @@ bool RMGConvertLH5::ConvertFromLH5Internal() {
   bool ntuple_success = true;
   for (auto& ntuple : ntuples) {
     auto det_group = ntuples_group.openGroup(ntuple);
-    ntuple_success &= ConvertTableToNTuple(det_group);
+    units_map[ntuple] = {};
+    ntuple_success &= ConvertTableToNTuple(det_group, units_map[ntuple]);
   }
 
   if (ntuples_group.attrExists("datatype")) ntuples_group.removeAttr("datatype");
-
-  if (ntuple_group_name != "default_ntuples") {
-    hfile.moveLink(ntuple_group_name, "default_ntuples");
-  }
 
   hfile.close();
 
@@ -466,10 +467,11 @@ bool RMGConvertLH5::ConvertFromLH5Internal() {
 }
 
 bool RMGConvertLH5::ConvertFromLH5(std::string lh5_file_name, std::string ntuple_group_name,
-    bool dry_run, bool part_of_batch) {
+    bool dry_run, bool part_of_batch,
+    std::map<std::string, std::map<std::string, std::string>>& units_map) {
   auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, dry_run, part_of_batch);
   try {
-    return conv.ConvertFromLH5Internal();
+    return conv.ConvertFromLH5Internal(units_map);
   } catch (const H5::Exception& e) {
     conv.LH5Log(RMGLog::error, e.getDetailMsg());
     return false;
