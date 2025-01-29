@@ -11,17 +11,18 @@ namespace u = CLHEP;
 
 G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
 
-  G4State state;
+  // just used for "named arguments" further down.
+  G4State state = G4State::kStateSolid;
   std::string name, symbol;
   std::vector<std::string> elements;
   std::vector<double> mass_fraction;
-  double density;
-  double temperature;
-  double pressure;
-  double abundance;
-  int n_isotopes;
-  int n_components;
-  int n_atoms;
+  double density = 0;
+  double temperature = 0;
+  double pressure = 0;
+  double abundance = 0;
+  int n_isotopes = 0;
+  int n_components = 0;
+  int n_atoms = 0;
 
   auto man = G4NistManager::Instance();
 

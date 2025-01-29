@@ -14,7 +14,7 @@ class IsotopeOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    IsotopeOutputScheme();
+    IsotopeOutputScheme() = default;
 
     void ClearBeforeEvent() override;
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
