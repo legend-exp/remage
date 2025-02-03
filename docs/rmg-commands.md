@@ -44,6 +44,7 @@ Enable interactive mode
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Manager/PrintProgressModulo`
 
@@ -53,6 +54,7 @@ How many processed events before progress information is displayed
 * **Parameter** – `n`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Manager/Logging/`
 
@@ -71,6 +73,7 @@ Set verbosity level of application log
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `debug detail summary warning error fatal nothing`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Manager/Randomization/`
 
@@ -92,6 +95,7 @@ Select the random engine (CLHEP)
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `JamesRandom RanLux MTwist MixMaxRng`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Manager/Randomization/Seed`
 
@@ -102,6 +106,7 @@ Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)
   * **Parameter type** – `i`
   * **Omittable** – `False`
   * **Default value** – `1`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Manager/Randomization/InternalSeed`
 
@@ -111,10 +116,13 @@ Select the initial seed for randomization by using the internal CLHEP table
 * **Parameter** – `index`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Manager/Randomization/UseSystemEntropy`
 
 Select a random initial seed from system entropy
+
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Output/`
 
@@ -144,6 +152,7 @@ Set output file name for object persistency
 * **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Output/NtuplePerDetector`
 
@@ -152,6 +161,7 @@ Create a ntuple for each sensitive detector to store hits. Otherwise, store all 
 * **Parameter** – `nt_per_det`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Output/NtupleUseVolumeName`
 
@@ -164,6 +174,7 @@ this only works if `NtuplePerDetector` is set to true.
 * **Parameter** – `nt_vol_name`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Output/ActivateOutputScheme`
 
@@ -172,6 +183,7 @@ Activates the output scheme that had been registered under the given name.
 * **Parameter** – `oscheme`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Output/NtupleDirectory`
 
@@ -184,6 +196,7 @@ This setting is not respected by all output formats.
 * **Parameter** – `nt_directory`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Output/Germanium/`
 
@@ -212,6 +225,7 @@ Set a lower energy cut that has to be met for this event to be stored.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/SetEdepCutHigh`
 
@@ -225,6 +239,7 @@ Set an upper energy cut that has to be met for this event to be stored.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
 
@@ -233,6 +248,7 @@ Take this detector into account for the filtering by /EdepThreshold.
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
 
@@ -245,6 +261,7 @@ If another output scheme also requests the photons to be discarded, the germaniu
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
 
@@ -253,6 +270,7 @@ Use float32 (instead of float64) for position output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
 
@@ -261,6 +279,7 @@ Use float32 (instead of float64) for energy output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreTrackID`
 
@@ -269,6 +288,7 @@ Store Track IDs for hits in the output file.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Output/Vertex/`
 
@@ -289,6 +309,7 @@ Store information on primary particle details (not only vertex data).
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
 
@@ -297,6 +318,7 @@ Do not store vertex/primary particle data.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/StoreSinglePrecisionPosition`
 
@@ -305,6 +327,7 @@ Use float32 (instead of float64) for position output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
 
@@ -313,6 +336,7 @@ Use float32 (instead of float64) for energy output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Output/Scintillator/`
 
@@ -339,6 +363,7 @@ Set a lower energy cut that has to be met for this event to be stored.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/SetEdepCutHigh`
 
@@ -352,6 +377,7 @@ Set an upper energy cut that has to be met for this event to be stored.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
 
@@ -360,6 +386,7 @@ Take this detector into account for the filtering by /EdepThreshold.
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
 
@@ -368,6 +395,7 @@ Use float32 (instead of float64) for position output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
 
@@ -376,6 +404,7 @@ Use float32 (instead of float64) for energy output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Output/IsotopeFilter/`
 
@@ -397,6 +426,7 @@ Add an isotope to the list. Only events that have a track with this isotope at a
 * **Parameter** – `Z`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced`
 
@@ -409,6 +439,7 @@ If another output scheme also requests the photons to be discarded, the isotope 
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Output/Track/`
 
@@ -430,6 +461,7 @@ Only include tracks created by this process.
 * **Parameter** – `process`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Track/AddParticleFilter`
 
@@ -438,6 +470,7 @@ Only include tracks with this particle.
 * **Parameter** – `pdgid`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Track/SetEnergyFilter`
 
@@ -446,6 +479,7 @@ Only include tracks with kinetic energy above this threshold.
 * **Parameter** – `energy`
   * **Parameter type** – `d`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Track/StoreSinglePrecisionPosition`
 
@@ -454,6 +488,7 @@ Use float32 (instead of float64) for position output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Output/Track/StoreSinglePrecisionEnergy`
 
@@ -462,6 +497,7 @@ Use float32 (instead of float64) for energy output.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Processes/`
 
@@ -493,6 +529,7 @@ Set simulation realm (cut values for particles in (sensitive) detector
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Processes/OpticalPhysics`
 
@@ -501,6 +538,7 @@ Add optical processes to the physics list
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/OpticalPhysicsMaxOneWLSPhoton`
 
@@ -509,6 +547,7 @@ Use a custom wavelegth shifting process that produces at maximum one secondary p
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/LowEnergyEMPhysics`
 
@@ -519,6 +558,7 @@ Add low energy electromagnetic processes to the physics list
   * **Omittable** – `False`
   * **Default value** – `Livermore`
   * **Candidates** – `Option1 Option2 Option3 Option4 Penelope Livermore LivermorePolarized None`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/HadronicPhysics`
 
@@ -529,6 +569,7 @@ Add hadronic processes to the physics list
   * **Omittable** – `False`
   * **Default value** – `Shielding`
   * **Candidates** – `QGSP_BIC_HP QGSP_BERT_HP FTFP_BERT_HP Shielding None`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/ThermalScattering`
 
@@ -538,6 +579,7 @@ Use thermal scattering cross sections for neutrons
   * **Parameter type** – `b`
   * **Omittable** – `False`
   * **Candidates** – `0 1`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/EnableGammaAngularCorrelation`
 
@@ -547,6 +589,7 @@ Set correlated gamma emission flag
   * **Parameter type** – `b`
   * **Omittable** – `False`
   * **Candidates** – `0 1`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/GammaTwoJMAX`
 
@@ -556,6 +599,7 @@ Set max 2J for sampling of angular correlations
 * **Parameter** – `x`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/StoreICLevelData`
 
@@ -565,6 +609,7 @@ Store e- internal conversion data
   * **Parameter type** – `b`
   * **Omittable** – `False`
   * **Candidates** – `0 1`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/UseGrabmayrsGammaCascades`
 
@@ -573,6 +618,7 @@ Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ## `/RMG/Processes/Stepping/`
 
@@ -602,6 +648,7 @@ Set to -1 to disable this feature.
   * **Omittable** – `True`
   * **Default value** – `us`
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Processes/Stepping/ResetInitialDecayTime`
 
@@ -611,6 +658,7 @@ If the initial step is a radioactive decay, reset the global time of all its sec
   * **Parameter type** – `b`
   * **Omittable** – `False`
   * **Default value** – `true`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Processes/Stepping/LargeGlobalTimeUncertaintyWarning`
 
@@ -625,6 +673,7 @@ Warn if the global times of tracks get too large to provide the requested time u
   * **Omittable** – `True`
   * **Default value** – `us`
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Geometry/`
 
@@ -647,6 +696,7 @@ Disable the automatic overlap check after loading a GDML file
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/GDMLOverlapCheckNumPoints`
 
@@ -655,6 +705,7 @@ Change the number of points sampled for overlap checks
 * **Parameter** – `value`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/IncludeGDMLFile`
 
@@ -663,14 +714,19 @@ Use GDML file for geometry definition
 * **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/PrintListOfLogicalVolumes`
 
 Print list of defined logical volumes
 
+* **Allowed states** – `Idle`
+
 ### `/RMG/Geometry/PrintListOfPhysicalVolumes`
 
 Print list of defined physical volumes
+
+* **Allowed states** – `Idle`
 
 ### `/RMG/Geometry/RegisterDetector`
 
@@ -699,6 +755,7 @@ register a sensitive detector
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Allowed states** – `PreInit`
 
 ## `/RMG/Generator/`
 
@@ -725,6 +782,7 @@ Select primary confinement strategy
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `UnConfined Volume FromFile`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Select`
 
@@ -734,6 +792,7 @@ Select event generator
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/MUSUNCosmicMuons/`
 
@@ -751,6 +810,7 @@ Set the MUSUN input file
 * **Parameter** – `MUSUNFileName`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/CosmicMuons/`
 
@@ -781,6 +841,7 @@ Geometrical shape of the µ generation surface
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `Plane Sphere`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SkyPlaneSize`
 
@@ -795,6 +856,7 @@ Length of the side of the sky, if it has a planar shape
   * **Omittable** – `True`
   * **Default value** – `m`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SkyPlaneHeight`
 
@@ -809,6 +871,7 @@ Height of the sky, if it has a planar shape
   * **Omittable** – `True`
   * **Default value** – `m`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/MomentumMin`
 
@@ -823,6 +886,7 @@ Minimum momentum of the generated muon
   * **Omittable** – `True`
   * **Default value** – `GeV/c`
   * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/MomentumMax`
 
@@ -837,6 +901,7 @@ Maximum momentum of the generated muon
   * **Omittable** – `True`
   * **Default value** – `GeV/c`
   * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/ThetaMin`
 
@@ -851,6 +916,7 @@ Minimum azimutal angle of the generated muon momentum
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/ThetaMax`
 
@@ -865,6 +931,7 @@ Maximum azimutal angle of the generated muon momentum
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/PhiMin`
 
@@ -879,6 +946,7 @@ Minimum zenith angle of the generated muon momentum
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/PhiMax`
 
@@ -893,6 +961,7 @@ Maximum zenith angle of the generated muon momentum
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SpherePositionThetaMin`
 
@@ -907,6 +976,7 @@ Minimum azimutal angle of the generated muon position on the sphere
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SpherePositionThetaMax`
 
@@ -921,6 +991,7 @@ Maximum azimutal angle of the generated muon position on the sphere
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SpherePositionPhiMin`
 
@@ -935,6 +1006,7 @@ Minimum zenith angle of the generated muon position on the sphere
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/SpherePositionPhiMax`
 
@@ -949,6 +1021,7 @@ Maximum zenith angle of the generated muon position on the sphere
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/FromFile/`
 
@@ -967,6 +1040,7 @@ Set name of the file containing vertex kinetics for the next run. See the docume
 * **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/FromFile/NtupleDirectory`
 
@@ -980,6 +1054,7 @@ this option only has an effect for LH5 or HDF5 input files.
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/`
 
@@ -1006,6 +1081,8 @@ Commands for controlling primary confinement
 
 Reset all parameters of vertex confinement, so that it can be reconfigured.
 
+* **Allowed states** – `PreInit Idle`
+
 ### `/RMG/Generator/Confinement/SampleOnSurface`
 
 If true (or omitted argument), sample on the surface of solids
@@ -1013,6 +1090,7 @@ If true (or omitted argument), sample on the surface of solids
 * **Parameter** – `flag`
   * **Parameter type** – `b`
   * **Omittable** – `True`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/SamplingMode`
 
@@ -1022,6 +1100,7 @@ Select sampling mode for volume confinement
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `IntersectPhysicalWithGeometrical UnionAll SubtractGeometrical`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/FirstSamplingVolume`
 
@@ -1031,6 +1110,7 @@ Select the type of volume which will be sampled first for intersections
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `Physical Geometrical Unset`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/MaxSamplingTrials`
 
@@ -1040,6 +1120,7 @@ Set maximum number of attempts for sampling primary positions in a volume
 * **Parameter** – `N`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/SurfaceSampleMaxIntersections`
 
@@ -1049,6 +1130,7 @@ Set maximum number of intersections of a line with the surface. Note: can be set
 * **Parameter** – `N`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/ForceContainmentCheck`
 
@@ -1057,6 +1139,7 @@ If true (or omitted argument), perform a containment check even after sampling f
 * **Parameter** – `flag`
   * **Parameter type** – `b`
   * **Omittable** – `True`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Physical/`
 
@@ -1077,6 +1160,7 @@ Add physical volume(s) to sample primaries from.
 * **Parameter** – `copy_nr_regex`
   * **Parameter type** – `s`
   * **Omittable** – `True`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Geometrical/`
 
@@ -1105,6 +1189,7 @@ Add geometrical solid to sample primaries from
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `Sphere Cylinder Box`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/AddExcludedSolid`
 
@@ -1114,6 +1199,7 @@ Add geometrical solid to exclude samples from
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `Sphere Cylinder Box`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/CenterPositionX`
 
@@ -1127,6 +1213,7 @@ Set center position (X coordinate)
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/CenterPositionY`
 
@@ -1140,6 +1227,7 @@ Set center position (Y coordinate)
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/CenterPositionZ`
 
@@ -1153,6 +1241,7 @@ Set center position (Z coordinate)
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Geometrical/Sphere/`
 
@@ -1177,6 +1266,7 @@ Set inner radius
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius`
 
@@ -1191,6 +1281,7 @@ Set outer radius
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Geometrical/Cylinder/`
 
@@ -1218,6 +1309,7 @@ Set inner radius
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius`
 
@@ -1232,6 +1324,7 @@ Set outer radius
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Cylinder/Height`
 
@@ -1246,6 +1339,7 @@ Set height
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Cylinder/StartingAngle`
 
@@ -1259,6 +1353,7 @@ Set starting angle
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Cylinder/SpanningAngle`
 
@@ -1272,6 +1367,7 @@ Set spanning angle
   * **Omittable** – `True`
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Geometrical/Box/`
 
@@ -1297,6 +1393,7 @@ Set X length
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Box/YLength`
 
@@ -1311,6 +1408,7 @@ Set Y length
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/Geometrical/Box/ZLength`
 
@@ -1325,6 +1423,7 @@ Set Z length
   * **Omittable** – `True`
   * **Default value** – `cm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/FromFile/`
 
@@ -1343,6 +1442,7 @@ Set name of the file containing vertex positions for the next run. See the docum
 * **Parameter** – `filename`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/FromFile/NtupleDirectory`
 
@@ -1356,6 +1456,7 @@ this option only has an effect for LH5 or HDF5 input files.
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/GrabmayrGammaCascades/`
 
@@ -1380,6 +1481,7 @@ Set the whether the start location in the gamma cascade file is random or not
   * **Omittable** – `False`
   * **Default value** – `0`
   * **Candidates** – `0 1`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/GrabmayrGammaCascades/SetGammaCascadeFile`
 
@@ -1397,3 +1499,4 @@ Set a gamma cascade file for neutron capture on a specified isotope
     – /path/to/file of gamma cascade
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
