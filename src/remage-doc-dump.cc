@@ -16,8 +16,11 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <string>
 
+#include "G4ApplicationState.hh"
+#include "G4UIcommandTree.hh"
 #include "G4UImanager.hh"
 
 #include "RMGGeneratorCosmicMuons.hh"
@@ -36,6 +39,7 @@
 #include "RMGVertexOutputScheme.hh"
 
 #include "CLI11/CLI11.hpp"
+#include "magic_enum/magic_enum.hpp"
 
 void init_extra() {
   // initialize non-default things that have messengers.
@@ -57,6 +61,8 @@ void init_extra() {
   new RMGVertexFromFile();
 }
 
+void list_tree(G4UIcommandTree* tree);
+
 int main(int argc, char** argv) {
   CLI::App app{"remage-doc-dump"};
   std::string html_dir, manual_file;
@@ -71,7 +77,9 @@ int main(int argc, char** argv) {
 
   init_extra();
 
-  auto UI = G4UImanager::GetUIpointer();
+  auto ui = G4UImanager::GetUIpointer();
+  auto rmg_tree = ui->GetTree()->FindCommandTree("/RMG/");
+  if (!rmg_tree) {}
 
   if (!html_dir.empty()) {
     RMGLog::Out(RMGLog::summary, "Export HTML to ", html_dir);
@@ -79,7 +87,7 @@ int main(int argc, char** argv) {
     std::filesystem::create_directories(path);
     std::filesystem::current_path(path);
 
-    UI->ApplyCommand("/control/createHTML /RMG/");
+    rmg_tree->CreateHTML();
   }
 
   if (!manual_file.empty()) {
@@ -87,9 +95,37 @@ int main(int argc, char** argv) {
     std::ofstream out(manual_file);
     std::streambuf* coutbuf = std::cout.rdbuf();
     std::cout.rdbuf(out.rdbuf());
-    UI->ApplyCommand("/control/manual /RMG/");
+    list_tree(rmg_tree);
     std::cout.rdbuf(coutbuf);
   }
+}
+
+void list_tree(G4UIcommandTree* tree) {
+  // List summary.
+  tree->ListCurrent();
+
+  // List commands.
+  auto command_count = tree->GetCommandEntry();
+  for (auto i = 1; i <= command_count; i++) {
+    auto cmd = tree->GetCommand(i);
+    cmd->List();
+
+    // add an additional line about allowed application states.
+    std::string states;
+    auto state_regex = std::regex("^G4State_");
+    for (const auto& state : (*cmd->GetStateList())) {
+      auto name = std::string(magic_enum::enum_name<G4ApplicationState>(state));
+      name = std::regex_replace(name, state_regex, "");
+      states += name + " ";
+    }
+    states = states.substr(0, states.size() - 1);
+
+    G4cout << "Allowed states : " << states << G4endl;
+  }
+
+  // (Recursively) list subdirectories.
+  auto tree_count = tree->GetTreeEntry();
+  for (auto i = 1; i <= tree_count; i++) { list_tree(tree->GetTree(i)); }
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
