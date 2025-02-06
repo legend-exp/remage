@@ -363,17 +363,15 @@ void RMGPhysics::SetCuts() {
   this->SetCutsWithDefault();
 
   // special for low energy physics
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(250 * u::eV, 100. * u::GeV);
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(fLowEnergyRange,fHighEnergyRange);
 
   // set cut values for the default region (world volume)
-  this->SetCutValue(fStepCuts.gamma, "gamma");
-  this->SetCutValue(fStepCuts.electron, "e-");
-  this->SetCutValue(fStepCuts.positron, "e+");
-  this->SetCutValue(fStepCuts.proton, "proton");
+  this->SetCutValue(fProdCuts.gamma, "gamma");
+  this->SetCutValue(fProdCuts.electron, "e-");
+  this->SetCutValue(fProdCuts.positron, "e+");
+  this->SetCutValue(fProdCuts.proton, "proton");
 
   // set different cuts for the sensitive region
-  // the G4Region "SensitiveRegion" is created in RMGHardware, but this
-  // behavior might be changed in a derived class, so careful here!
   // second argument is verbosity, setting to false to avoid warning printout
   // if region is not found. we are going to check ourselves
   auto region = G4RegionStore::GetInstance()->GetRegion("SensitiveRegion", false);
@@ -381,10 +379,10 @@ void RMGPhysics::SetCuts() {
     RMGLog::Out(RMGLog::detail, "Register cuts for G4Region 'SensitiveRegion'");
     auto cuts = region->GetProductionCuts();
     if (!cuts) cuts = new G4ProductionCuts;
-    cuts->SetProductionCut(fStepCutsSensitive.gamma, "gamma");
-    cuts->SetProductionCut(fStepCutsSensitive.electron, "e-");
-    cuts->SetProductionCut(fStepCutsSensitive.positron, "e+");
-    cuts->SetProductionCut(fStepCutsSensitive.proton, "proton");
+    cuts->SetProductionCut(fProdCutsSensitive.gamma, "gamma");
+    cuts->SetProductionCut(fProdCutsSensitive.electron, "e-");
+    cuts->SetProductionCut(fProdCutsSensitive.positron, "e+");
+    cuts->SetProductionCut(fProdCutsSensitive.proton, "proton");
     region->SetProductionCuts(cuts);
   } else {
     RMGLog::Out(RMGLog::warning, "Could not find G4Region 'SensitiveRegion' in the store. ",
@@ -398,46 +396,44 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
   switch (realm) {
     case PhysicsRealm::kDoubleBetaDecay:
       RMGLog::Out(RMGLog::summary, "Realm set to DoubleBetaDecay");
-      // The default values for the energy thresholds are tuned to 100 keV
-      // in natural germanium (i.e., the BBdecay realm)
-      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma = 0.1 * u::mm;
-      fStepCuts.electron = 0.1 * u::mm;
-      fStepCuts.positron = 0.1 * u::mm;
 
-      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma = 0.1 * u::mm;
-      fStepCutsSensitive.electron = 0.1 * u::mm;
-      fStepCutsSensitive.positron = 0.1 * u::mm;
+      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCuts.gamma = 0.1 * u::mm;
+      fProdCuts.electron = 0.1 * u::mm;
+      fProdCuts.positron = 0.1 * u::mm;
+
+      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCutsSensitive.gamma = 0.1 * u::mm;
+      fProdCutsSensitive.electron = 0.1 * u::mm;
+      fProdCutsSensitive.positron = 0.1 * u::mm;
       break;
 
     case PhysicsRealm::kDarkMatter:
       RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
-      // These values are tuned to ~1 keV for gamma, e+, e- in
-      // natural germanium.
-      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma = 5 * u::um;
-      fStepCuts.electron = 0.5 * u::um;
-      fStepCuts.positron = 0.5 * u::um;
+  
+      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCuts.gamma = 5 * u::um;
+      fProdCuts.electron = 0.5 * u::um;
+      fProdCuts.positron = 0.5 * u::um;
 
-      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma = 5 * u::um;
-      fStepCutsSensitive.electron = 0.5 * u::um;
-      fStepCutsSensitive.positron = 0.5 * u::um;
+      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCutsSensitive.gamma = 5 * u::um;
+      fProdCutsSensitive.electron = 0.5 * u::um;
+      fProdCutsSensitive.positron = 0.5 * u::um;
       break;
 
     case PhysicsRealm::kCosmicRays:
       RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
-      fStepCuts = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCuts.gamma = 5 * u::cm;
-      fStepCuts.electron = 1 * u::cm;
-      fStepCuts.positron = 1 * u::cm;
-      fStepCuts.proton = 5 * u::mm;
+      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCuts.gamma = 5 * u::cm;
+      fProdCuts.electron = 1 * u::cm;
+      fProdCuts.positron = 1 * u::cm;
+      fProdCuts.proton = 5 * u::mm;
 
-      fStepCutsSensitive = StepCutStore(G4VUserPhysicsList::defaultCutValue);
-      fStepCutsSensitive.gamma = 30 * u::mm;
-      fStepCutsSensitive.electron = 40 * u::um;
-      fStepCutsSensitive.positron = 40 * u::um;
+      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+      fProdCutsSensitive.gamma = 30 * u::mm;
+      fProdCutsSensitive.electron = 40 * u::um;
+      fProdCutsSensitive.positron = 40 * u::um;
       break;
 
     case PhysicsRealm::kLArScintillation:
@@ -448,7 +444,52 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
   fPhysicsRealm = realm;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGPhysics::SetSensitiveProductionCut(double cut) {
+
+  if (this->fPhysicsRealmSet)
+  {
+    RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
+    " while the realm has already been explicity set, this will overide the production cuts");
+  }
+
+  RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for sensitive region to ", cut);
+
+  fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+  fProdCutsSensitive.gamma = cut;
+  fProdCutsSensitive.electron = cut;
+  fProdCutsSensitive.positron = cut;
+
+  this->SetCuts();
+  fPhysicsRealm = PhysicsRealm::kUserDefined;
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+
+void RMGPhysics::SetDefaultProductionCut(double cut) {
+
+  if (this->fPhysicsRealmSet)
+  {
+    RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
+    " while the realm has already been explicity set, this will overide the production cuts");
+  }
+
+  RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for default region to ", cut);
+
+  fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
+  fProdCuts.gamma = cut;
+  fProdCuts.electron = cut;
+  fProdCuts.positron = cut;
+
+  this->SetCuts();
+  fPhysicsRealm = PhysicsRealm::kUserDefined;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 
 void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
   try {
@@ -464,6 +505,8 @@ void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
 }
 
 void RMGPhysics::SetPhysicsRealmString(std::string realm) {
+
+  fPhysicsRealmSet = true;
   try {
     this->SetPhysicsRealm(RMGTools::ToEnum<PhysicsRealm>(realm, "physics realm"));
   } catch (const std::bad_cast&) { return; }
@@ -480,6 +523,17 @@ void RMGPhysics::DefineCommands() {
       .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
       .SetParameterName("realm", false)
       .SetCandidates(RMGTools::GetCandidates<PhysicsRealm>())
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+
+  fMessenger->DeclareMethodWithUnit("DefaultProductionCut","mm", &RMGPhysics::SetDefaultProductionCut)
+      .SetGuidance("Set simulation production cuts, for default region. Note: this overides the physics realm")
+      .SetParameterName("cut", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareMethodWithUnit("SensitiveProductionCut","mm", &RMGPhysics::SetSensitiveProductionCut)
+      .SetGuidance("Set simulation production cuts, for default region. Note: this overides the physics realm")
+      .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
