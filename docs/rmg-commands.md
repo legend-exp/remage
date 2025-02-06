@@ -511,6 +511,8 @@ Commands for controlling physics processes
 **Commands:**
 
 * `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
+* `DefaultProductionCut` – Set simulation production cuts, for default region. Note: this overides the physics realm
+* `SensitiveProductionCut` – Set simulation production cuts, for default region. Note: this overides the physics realm
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -528,7 +530,35 @@ Set simulation realm (cut values for particles in (sensitive) detector
 * **Parameter** – `realm`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation`
+  * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation UserDefined`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Processes/DefaultProductionCut`
+
+Set simulation production cuts, for default region. Note: this overides the physics realm
+
+* **Parameter** – `cut`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Processes/SensitiveProductionCut`
+
+Set simulation production cuts, for default region. Note: this overides the physics realm
+
+* **Parameter** – `cut`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Processes/OpticalPhysics`

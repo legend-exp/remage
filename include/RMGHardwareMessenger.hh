@@ -18,22 +18,37 @@
 
 #include "G4UImessenger.hh"
 
+/** @brief Class for handling custom messenger commands. */
 class RMGHardware;
 class RMGHardwareMessenger : public G4UImessenger {
 
   public:
 
+    /** @brief Constructor based on a @c RMGHardware pointer. */
     RMGHardwareMessenger(RMGHardware* hw);
     ~RMGHardwareMessenger();
 
+    /** @brief Set the values for command 
+     *  @param command the command to set parameters
+     *  @param newValues the parameter values.
+     */
     void SetNewValue(G4UIcommand* command, G4String newValues) override;
+    
+    /** @brief Define the commands to set the sensitive detector */
+    void DefineRegisterDetector();
+
+    /** @brief Define the commands to set the step limits */
+    void DefineStepLimits();
 
   private:
 
     RMGHardware* fHardware;
     G4UIcommand* fRegisterCmd;
+    G4UIcommand* fStepLimitsCmd;
 
     void RegisterDetectorCmd(const std::string& parameters);
+    void StepLimitsCmd(const std::string& parameters);
+
 };
 
 #endif
