@@ -89,8 +89,8 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          miniconda-version: "latest"
-          activate-environment: ""
+          miniforge-version: latest
+          activate-environment: "geant4-env"
           auto-activate-base: "false"
           channels: conda-forge
           channel-priority: "strict"
@@ -101,16 +101,17 @@ jobs:
           # native dependencies for pyg4ometry
           brew install opencascade cgal gmp mpfr boost
 
-          conda create --override-channels -c conda-forge --name geant4-env
-          conda activate geant4-env
-          conda install geant4
+          # conda create --override-channels -c conda-forge --name geant4-env
+          # conda activate geant4-env
+          conda install conda-forge::geant4
 
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
       - name: Build project
         run: |
-          conda activate geant4-env
+          # conda activate geant4-env
 
+          python --version
           mkdir build .local
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
@@ -119,7 +120,7 @@ jobs:
 
       - name: Run minimal test suite
         run: |
-          conda activate geant4-env
+          # conda activate geant4-env
 
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
