@@ -95,10 +95,10 @@ jobs:
       - name: Install Geant4
         shell: bash -l {0}
         run: |
-          conda create --name conda-forge::geant4-env
+          conda create --name geant4-env
           conda activate geant4-env
           conda config --remove channels defaults
-          conda install geant4
+          conda install conda-forge::geant4
 
           export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
 
