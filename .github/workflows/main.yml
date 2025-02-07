@@ -96,11 +96,11 @@ jobs:
       - name: Build project
         run: |
           export CMAKE_PREFIX_PATH="${PWD}/geant4:/opt/homebrew/opt/expat:${CMAKE_PREFIX_PATH}"
+          export PKG_CONFIG_PATH=/opt/homebrew/opt/expat/lib/pkgconfig:$PKG_CONFIG_PATH
           source geant4/bin/geant4.sh
 
           mkdir build
           cd build
-          ls ../geant4
           cmake ..
           make
           make install
