@@ -86,6 +86,7 @@ jobs:
 
       - name: Install Geant4
         run: |
+          brew install expat
           mkdir geant4
           cd geant4
           wget -O geant4.tar.gz https://cern.ch/geant4-data/releases/lib4.11.3/Darwin-clang16.0.0-Sequoia.tar.gz
