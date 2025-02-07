@@ -240,31 +240,62 @@ void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_n
   }
 }
 
+void RMGHardware::SetMaxStepLimit(double max_step) {
+  if (this->fVolumeForStepLimit == "")
+    RMGLog::OutFormat(RMGLog::error, "cannot set step limits if 'fVolumeForStepLimit' is not set");
+
+  fPhysVolStepLimits.insert_or_assign(this->fVolumeForStepLimit, max_step);
+
+  RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", fVolumeForStepLimit,
+      max_step);
+}
+
 void RMGHardware::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
-      "Commands for controlling geometry definitions");
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
+      "Commands for controlling geometry definitions"));
 
-  fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
+  fMessengers.back()
+      ->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
       .SetGuidance("Disable the automatic overlap check after loading a GDML file")
       .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
+  fMessengers.back()
+      ->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
       .SetGuidance("Change the number of points sampled for overlap checks")
       .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
+  fMessengers.back()
+      ->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
       .SetGuidance("Use GDML file for geometry definition")
       .SetParameterName("filename", false)
       .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
+  fMessengers.back()
+      ->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
       .SetGuidance("Print list of defined logical volumes")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
+  fMessengers.back()
+      ->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
+
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/StepLimits/",
+      "Commands for setting step limits for volumes"));
+
+  fMessengers.back()
+      ->DeclareMethod("AddVolume", &RMGHardware::AddVolumeForStepLimits)
+      .SetGuidance("Add physical volume to apply step limits to")
+      .SetParameterName("pv_name", false)
+      .SetStates(G4State_PreInit);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("MaxStepSize", "mm", &RMGHardware::SetMaxStepLimit)
+      .SetGuidance("Set center position (X coordinate)")
+      .SetParameterName("value", false)
+      .SetStates(G4State_PreInit);
+
 
   // RegisterDetector cannot be defined with the G4GenericMessenger (it has to many parameters).
   fHwMessenger = std::make_unique<RMGHardwareMessenger>(this);

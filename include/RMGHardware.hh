@@ -28,6 +28,7 @@
 
 #include "RMGDetectorMetadata.hh"
 #include "RMGHardwareMessenger.hh"
+#include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGVOutputScheme.hh"
 
@@ -101,17 +102,16 @@ class RMGHardware : public G4VUserDetectorConstruction {
     /** @brief Method to define geometry directly, the user must reimplement the base class method. */
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
 
-    /** @brief Set the maximum step size for a certain physical volume.
+    /** @brief Set the maximum step size.
      *
      * @details This is used as a @c G4UserLimit to limit step sizes to being no larger than the
      * chosen value. This requires the @c G4StepLimiter process to be activated in the physics list.
+     * This requires that @c fVolumeForStepLimit has been set.
      *
-     * @param name The name of the physical volume to add step limits to.
      * @param max_step The maximum step size.
      */
-    inline void SetMaxStepLimit(std::string name, double max_step) {
-      fPhysVolStepLimits.insert_or_assign(name, max_step);
-    }
+    inline void SetMaxStepLimit(double max_step);
+    inline void AddVolumeForStepLimits(std::string name) { fVolumeForStepLimit = name; };
 
     inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
@@ -131,12 +131,13 @@ class RMGHardware : public G4VUserDetectorConstruction {
     static G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
     static G4ThreadLocal bool fActiveDetectorsInitialized;
 
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     std::unique_ptr<RMGHardwareMessenger> fHwMessenger;
     void DefineCommands();
 
     /// The world volume
     G4VPhysicalVolume* fWorld = nullptr;
+    std::string fVolumeForStepLimit = "";
 
     /** Region used to assign special production cuts
      *  for sensitive volumes. Logical volumes of sensitive volumes should be

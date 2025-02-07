@@ -294,9 +294,8 @@ void RMGPhysics::ConstructProcess() {
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
 
   // add step limits
-  auto step_limits  = new G4StepLimiterPhysics();
+  auto step_limits = new G4StepLimiterPhysics();
   step_limits->ConstructProcess();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

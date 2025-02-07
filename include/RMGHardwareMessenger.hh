@@ -25,9 +25,8 @@ class RMGHardwareMessenger : public G4UImessenger {
   public:
 
     /** @brief Constructor based on a @c RMGHardware pointer.
-     *  @details This currently initialises both the @c "/RMG/Geometry/RegisterDetector" and
-     * @c "/RMG/Geometry/SetStepLimits" macro commands.
-     * @param hw Pointer to the @c RMGHardware instance.
+     *  @details This currently initialises the @c "/RMG/Geometry/RegisterDetector" command.
+     *  @param hw Pointer to the @c RMGHardware instance.
      */
     RMGHardwareMessenger(RMGHardware* hw);
     ~RMGHardwareMessenger();
@@ -38,20 +37,15 @@ class RMGHardwareMessenger : public G4UImessenger {
      */
     void SetNewValue(G4UIcommand* command, G4String newValues) override;
 
-    /** @brief Define the commands to set the sensitive detector */
+    /** @brief Define the commands to set the sensitive detectors. */
     void DefineRegisterDetector();
-
-    /** @brief Define the commands to set the step limits */
-    void DefineStepLimits();
 
   private:
 
     RMGHardware* fHardware;
     G4UIcommand* fRegisterCmd;
-    G4UIcommand* fStepLimitsCmd;
 
     void RegisterDetectorCmd(const std::string& parameters);
-    void StepLimitsCmd(const std::string& parameters);
 };
 
 #endif

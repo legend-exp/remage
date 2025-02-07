@@ -511,8 +511,8 @@ Commands for controlling physics processes
 **Commands:**
 
 * `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
-* `DefaultProductionCut` – Set simulation production cuts, for default region. Note: this overides the physics realm
-* `SensitiveProductionCut` – Set simulation production cuts, for default region. Note: this overides the physics realm
+* `DefaultProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
+* `SensitiveProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -535,7 +535,7 @@ Set simulation realm (cut values for particles in (sensitive) detector
 
 ### `/RMG/Processes/DefaultProductionCut`
 
-Set simulation production cuts, for default region. Note: this overides the physics realm
+Set simulation production cuts, for default region. Note: this overrides the physics realm
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
@@ -549,7 +549,7 @@ Set simulation production cuts, for default region. Note: this overides the phys
 
 ### `/RMG/Processes/SensitiveProductionCut`
 
-Set simulation production cuts, for default region. Note: this overides the physics realm
+Set simulation production cuts, for default region. Note: this overrides the physics realm
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
@@ -718,6 +718,7 @@ Commands for controlling geometry definitions
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
+* `SetStepLimits` – set step limits for a sensitive detector
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -785,6 +786,21 @@ register a sensitive detector
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/SetStepLimits`
+
+set step limits for a sensitive detector
+
+* **Parameter** – `pv_name`
+    – Detector physical volume
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Parameter** – `step limit`
+    – The maximum step limit
+  * **Parameter type** – `d`
+  * **Omittable** – `True`
+  * **Default value** – `1`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Generator/`
