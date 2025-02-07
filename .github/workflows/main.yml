@@ -96,6 +96,7 @@ jobs:
 
       - name: Build project
         run: |
+          ls ../geant4
           mkdir build
           cd build
           cmake -DCMAKE_PREFIX_PATH=../geant4 ..
