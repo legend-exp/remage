@@ -96,7 +96,6 @@ jobs:
           # brew install expat
 
           conda init
-          conda config --remove channels defaults
           conda config --add channels conda-forge
           conda config --set channel_priority strict
           conda create --name geant4-env
