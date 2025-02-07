@@ -130,8 +130,6 @@ void RMGPhysics::ConstructProcess() {
 
   G4VUserPhysicsList::AddTransportation();
 
-  // add step limiter physics
-  this->RegisterPhysics(new G4StepLimiterPhysics());
 
   // EM Physics
   G4VPhysicsConstructor* em_constructor = nullptr;
@@ -294,6 +292,11 @@ void RMGPhysics::ConstructProcess() {
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
+
+  // add step limits
+  auto step_limits  = new G4StepLimiterPhysics();
+  step_limits->ConstructProcess();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
