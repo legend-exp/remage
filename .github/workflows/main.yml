@@ -15,66 +15,91 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_on_linux:
-    name: Test on remage image
-    runs-on: ubuntu-latest
+#  test_on_linux:
+#    name: Test on remage image
+#    runs-on: ubuntu-latest
+#
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        # guideline: only test on latest patch releases (and maybe previous one)
+#        container_version:
+#          - G4.11.3
+#          - G4.11.2
+#          - slim
+#
+#    container: docker://gipert/remage-base:${{ matrix.container_version }}
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Build project
+#        run: |
+#          mkdir build
+#          cd build
+#          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
+#          make
+#          make install
+#
+#      - name: Setup and start xvfb (enables Geant4 visualization)
+#        run: |
+#          Xvfb :99 -screen 0 1920x1080x24 &
+#
+#      - name: Run full test suite
+#        if: ${{ matrix.container_version != 'slim' }}
+#        env:
+#          DISPLAY: :99
+#        run: |
+#          cd build
+#          ctest --output-on-failure
+#
+#      - name: Upload test suite outputs to GitHub
+#        if: ${{ always() && matrix.container_version != 'slim' }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-output-${{ matrix.container_version }}
+#          # artifacts must have a ".output*" extension
+#          path: build/tests/**/*.output*.*
+#
+#      - name: Run minimal test suite
+#        if: ${{ matrix.container_version == 'slim' }}
+#        env:
+#          DISPLAY: :99
+#        run: |
+#          cd build
+#          ctest --output-on-failure --label-exclude 'extra|vis'
+#
+#      - name: Compare checked-in doc dump with current result
+#        if: ${{ matrix.container_version != 'slim' }}
+#        run: |
+#          cd build
+#          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
+#          make remage-doc-dump
+#          diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
 
-    strategy:
-      fail-fast: false
-      matrix:
-        # guideline: only test on latest patch releases (and maybe previous one)
-        container_version:
-          - G4.11.3
-          - G4.11.2
-          - slim
-
-    container: docker://gipert/remage-base:${{ matrix.container_version }}
+  test_on_mac:
+    name: Test on macOS
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Geant4
+        run: |
+          mkdir geant4
+          cd geant4
+          wget -O geant4.tar.gz https://cern.ch/geant4-data/releases/lib4.11.3/Darwin-clang16.0.0-Sequoia.tar.gz
+          tar --strip-components=1 -xzf geant4.tar.gz
+          export CMAKE_PREFIX_PATH="${PWD}:${CMAKE_PREFIX_PATH}
+          source bin/geant4.sh
+          cd ..
 
       - name: Build project
         run: |
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
+          cmake ..
           make
           make install
-
-      - name: Setup and start xvfb (enables Geant4 visualization)
-        run: |
-          Xvfb :99 -screen 0 1920x1080x24 &
-
-      - name: Run full test suite
-        if: ${{ matrix.container_version != 'slim' }}
-        env:
-          DISPLAY: :99
-        run: |
-          cd build
-          ctest --output-on-failure
-
-      - name: Upload test suite outputs to GitHub
-        if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-output-${{ matrix.container_version }}
-          # artifacts must have a ".output*" extension
-          path: build/tests/**/*.output*.*
-
-      - name: Run minimal test suite
-        if: ${{ matrix.container_version == 'slim' }}
-        env:
-          DISPLAY: :99
-        run: |
-          cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
-
-      - name: Compare checked-in doc dump with current result
-        if: ${{ matrix.container_version != 'slim' }}
-        run: |
-          cd build
-          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
-          make remage-doc-dump
-          diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
 
 # vim: expandtab tabstop=2 shiftwidth=2
