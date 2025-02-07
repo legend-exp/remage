@@ -14,9 +14,6 @@ else()
   message(STATUS "Setting build type to '${CMAKE_BUILD_TYPE}'")
 endif()
 
-# prevent us assuming double when we actually only have float.
-add_compile_options(-Wdouble-promotion)
-
 # build flags for special ASAN build.
 set(CMAKE_C_FLAGS_ASAN
     "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer")
