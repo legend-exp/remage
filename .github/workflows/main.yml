@@ -88,9 +88,10 @@ jobs:
         with:
           miniconda-version: "latest"
           activate-environment: ""
+          auto-activate-base: "false"
           channels: conda-forge
           channel-priority: "strict"
-          conda-remove-defaults: true
+          conda-remove-defaults: "true"
 
       - name: Install Geant4
         shell: bash -l {0}
@@ -99,12 +100,19 @@ jobs:
           conda activate geant4-env
           conda install geant4
 
-          export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
+          echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
-          mkdir build
+      - name: Install Geant4
+        shell: bash -l {0}
+        run: |
+          conda activate geant4-env
+
+          mkdir build .local
           cd build
-          cmake ..
+          cmake -DCMAKE_INSTALL_PREFIX=../local ..
           make
           make install
+
+          export 
 
 # vim: expandtab tabstop=2 shiftwidth=2
