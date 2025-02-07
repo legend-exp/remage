@@ -96,8 +96,11 @@ jobs:
           channel-priority: "strict"
           conda-remove-defaults: "true"
 
-      - name: Install Geant4
+      - name: Install Geant4 and native dependencies
         run: |
+          # native dependencies for pyg4ometry
+          brew install opencascade cgal gmp mpfr boost
+
           conda create --override-channels -c conda-forge --name geant4-env
           conda activate geant4-env
           conda install geant4
