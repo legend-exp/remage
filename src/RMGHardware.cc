@@ -265,7 +265,7 @@ void RMGHardware::DefineCommands() {
   fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
-      
+
   // RegisterDetector cannot be defined with the G4GenericMessenger (it has to many parameters).
   fHwMessenger = std::make_unique<RMGHardwareMessenger>(this);
 }

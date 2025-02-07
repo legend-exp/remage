@@ -64,6 +64,7 @@
 #include "G4Scintillation.hh"
 #include "G4ShortLivedConstructor.hh"
 #include "G4StepLimiter.hh"
+#include "G4StepLimiterPhysics.hh"
 #include "G4StoppingPhysics.hh"
 #include "G4ThermalNeutrons.hh"
 
@@ -129,6 +130,9 @@ void RMGPhysics::ConstructProcess() {
 
   G4VUserPhysicsList::AddTransportation();
 
+  // add step limiter physics
+  this->RegisterPhysics(new G4StepLimiterPhysics());
+
   // EM Physics
   G4VPhysicsConstructor* em_constructor = nullptr;
   RMGLog::Out(RMGLog::detail, "Adding electromagnetic physics");
@@ -178,6 +182,7 @@ void RMGPhysics::ConstructProcess() {
   em_extra_physics->GammaNuclear(true);
   em_extra_physics->MuonNuclear(true);
   em_extra_physics->ConstructProcess();
+
 
   // G4EmExtraPhysics does not propagate the verbose level...
   auto synch_proc = G4ProcessTable::GetProcessTable()->FindProcesses("SynRad");
@@ -363,7 +368,7 @@ void RMGPhysics::SetCuts() {
   this->SetCutsWithDefault();
 
   // special for low energy physics
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(fLowEnergyRange,fHighEnergyRange);
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(fLowEnergyRange, fHighEnergyRange);
 
   // set cut values for the default region (world volume)
   this->SetCutValue(fProdCuts.gamma, "gamma");
@@ -410,7 +415,7 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 
     case PhysicsRealm::kDarkMatter:
       RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
-  
+
       fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
       fProdCuts.gamma = 5 * u::um;
       fProdCuts.electron = 0.5 * u::um;
@@ -449,10 +454,9 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 
 void RMGPhysics::SetSensitiveProductionCut(double cut) {
 
-  if (this->fPhysicsRealmSet)
-  {
+  if (this->fPhysicsRealmSet) {
     RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
-    " while the realm has already been explicity set, this will overide the production cuts");
+        " while the realm has already been explicitly set, this will override the production cuts");
   }
 
   RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for sensitive region to ", cut);
@@ -464,16 +468,14 @@ void RMGPhysics::SetSensitiveProductionCut(double cut) {
 
   this->SetCuts();
   fPhysicsRealm = PhysicsRealm::kUserDefined;
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::SetDefaultProductionCut(double cut) {
 
-  if (this->fPhysicsRealmSet)
-  {
+  if (this->fPhysicsRealmSet) {
     RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
-    " while the realm has already been explicity set, this will overide the production cuts");
+        " while the realm has already been explicitly set, this will override the production cuts");
   }
 
   RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for default region to ", cut);
@@ -485,7 +487,6 @@ void RMGPhysics::SetDefaultProductionCut(double cut) {
 
   this->SetCuts();
   fPhysicsRealm = PhysicsRealm::kUserDefined;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,13 +527,17 @@ void RMGPhysics::DefineCommands() {
       .SetStates(G4State_PreInit, G4State_Idle);
 
 
-  fMessenger->DeclareMethodWithUnit("DefaultProductionCut","mm", &RMGPhysics::SetDefaultProductionCut)
-      .SetGuidance("Set simulation production cuts, for default region. Note: this overides the physics realm")
+  fMessenger
+      ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
+      .SetGuidance("Set simulation production cuts, for default region. Note: this overrides the "
+                   "physics realm")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  fMessenger->DeclareMethodWithUnit("SensitiveProductionCut","mm", &RMGPhysics::SetSensitiveProductionCut)
-      .SetGuidance("Set simulation production cuts, for default region. Note: this overides the physics realm")
+  fMessenger
+      ->DeclareMethodWithUnit("SensitiveProductionCut", "mm", &RMGPhysics::SetSensitiveProductionCut)
+      .SetGuidance("Set simulation production cuts, for default region. Note: this overrides the "
+                   "physics realm")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 

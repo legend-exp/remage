@@ -22,10 +22,9 @@
 #include "RMGTools.hh"
 
 RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
-  
+
   this->DefineRegisterDetector();
   this->DefineStepLimits();
-
 }
 
 RMGHardwareMessenger::~RMGHardwareMessenger() { delete fRegisterCmd; }
@@ -33,11 +32,10 @@ RMGHardwareMessenger::~RMGHardwareMessenger() { delete fRegisterCmd; }
 void RMGHardwareMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   if (command == fRegisterCmd) RegisterDetectorCmd(newValues);
   else if (command == fStepLimitsCmd) StepLimitsCmd(newValues);
-
 }
 
 void RMGHardwareMessenger::DefineRegisterDetector() {
-  
+
   fRegisterCmd = new G4UIcommand("/RMG/Geometry/RegisterDetector", this);
   fRegisterCmd->SetGuidance("register a sensitive detector");
 
@@ -70,18 +68,17 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
 
 
 void RMGHardwareMessenger::DefineStepLimits() {
-  
+
   fStepLimitsCmd = new G4UIcommand("/RMG/Geometry/SetStepLimits", this);
   fStepLimitsCmd->SetGuidance("set step limits for a sensitive detector");
-
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
   p_pv->SetGuidance("Detector physical volume");
   fStepLimitsCmd->SetParameter(p_pv);
 
-  auto step_limit= new G4UIparameter("step limit", 'd', true);
+  auto step_limit = new G4UIparameter("step limit", 'd', true);
   step_limit->SetGuidance("The maximum step limit");
-  step_limit->SetDefaultValue(1*CLHEP::mm);
+  step_limit->SetDefaultValue(1 * CLHEP::mm);
   fStepLimitsCmd->SetParameter(step_limit);
 
   fStepLimitsCmd->AvailableForStates(G4State_PreInit);
@@ -108,8 +105,8 @@ void RMGHardwareMessenger::StepLimitsCmd(const std::string& parameters) {
   G4Tokenizer next(parameters);
 
   auto pv_name = next();
-  auto step_limit = StoD(next())*CLHEP::mm;
- 
+  auto step_limit = StoD(next()) * CLHEP::mm;
+
   fHardware->SetMaxStepLimit(pv_name, step_limit);
 }
 // vim: tabstop=2 shiftwidth=2 expandtab
