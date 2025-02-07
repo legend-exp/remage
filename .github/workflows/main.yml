@@ -84,22 +84,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/@v3
         with:
           miniconda-version: "latest"
           activate-environment: ""
           conda-remove-defaults: true
 
       - name: Install Geant4
-        shell: bash
+        shell: bash -l {0}
         run: |
           # brew install expat
 
           conda init
+          conda config --remove channels defaults
           conda config --add channels conda-forge
           conda config --set channel_priority strict
-          conda create -c conda-forge --name geant4-env geant4
+          conda create --name geant4-env
           conda activate geant4-env
+          conda config --remove channels defaults
+          conda install geant4
 
           export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
 
