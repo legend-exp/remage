@@ -84,27 +84,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Geant4
-        run: |
-          brew install expat
-          mkdir geant4
-          cd geant4
-          wget -O geant4.tar.gz https://cern.ch/geant4-data/releases/lib4.11.3/Darwin-clang16.0.0-Sequoia.tar.gz
-          tar --strip-components=1 -xzf geant4.tar.gz
-          cd ..
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          activate-environment: ""
 
-      - name: Build project
+      - name: Install Geant4
+        shell: bash -l {0}
         run: |
-          export CMAKE_PREFIX_PATH="${PWD}/geant4:/opt/homebrew/opt/expat:${CMAKE_PREFIX_PATH}"
-          export PKG_CONFIG_PATH=/opt/homebrew/opt/expat/lib/pkgconfig:$PKG_CONFIG_PATH
-          source geant4/bin/geant4.sh
+          # brew install expat
+
+          conda create -c conda-forge --name geant4-env geant4
+          conda activate geant4-env
 
           mkdir build
           cd build
-          cmake \
-            -DEXPAT_LIBRARY=/opt/homebrew/opt/expat/lib/libexpat.dylib \
-            -DEXPAT_INCLUDE_DIR=/opt/homebrew/opt/expat/include \
-            ..
+          cmake ..
           make
           make install
 
