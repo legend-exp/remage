@@ -95,7 +95,7 @@ jobs:
 
       - name: Build project
         run: |
-          export CMAKE_PREFIX_PATH="${PWD}/geant4:${CMAKE_PREFIX_PATH}"
+          export CMAKE_PREFIX_PATH="${PWD}/geant4:/opt/homebrew:${CMAKE_PREFIX_PATH}"
           source geant4/bin/geant4.sh
 
           mkdir build
