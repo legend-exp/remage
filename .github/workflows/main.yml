@@ -101,7 +101,7 @@ jobs:
           mkdir build
           cd build
           ls ../geant4
-          cmake -DCMAKE_PREFIX_PATH=../geant4 ..
+          cmake ..
           make
           make install
 
