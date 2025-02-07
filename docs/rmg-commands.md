@@ -710,6 +710,10 @@ Warn if the global times of tracks get too large to provide the requested time u
 Commands for controlling geometry definitions
 
 
+**Sub-directories:**
+
+* `/RMG/Geometry/StepLimits/` – Commands for setting step limits for volumes
+
 **Commands:**
 
 * `GDMLDisableOverlapCheck` – Disable the automatic overlap check after loading a GDML file
@@ -718,7 +722,6 @@ Commands for controlling geometry definitions
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
-* `SetStepLimits` – set step limits for a sensitive detector
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -788,19 +791,37 @@ register a sensitive detector
   * **Default value** – `false`
 * **Allowed states** – `PreInit`
 
-### `/RMG/Geometry/SetStepLimits`
+## `/RMG/Geometry/StepLimits/`
 
-set step limits for a sensitive detector
+Commands for setting step limits for volumes
+
+
+**Commands:**
+
+* `AddVolume` – Add physical volume to apply step limits to
+* `MaxStepSize` – Set center position (X coordinate)
+
+### `/RMG/Geometry/StepLimits/AddVolume`
+
+Add physical volume to apply step limits to
 
 * **Parameter** – `pv_name`
-    – Detector physical volume
   * **Parameter type** – `s`
   * **Omittable** – `False`
-* **Parameter** – `step limit`
-    – The maximum step limit
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/StepLimits/MaxStepSize`
+
+Set center position (X coordinate)
+
+* **Parameter** – `value`
   * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
   * **Omittable** – `True`
-  * **Default value** – `1`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Generator/`

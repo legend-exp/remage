@@ -461,7 +461,8 @@ void RMGPhysics::SetSensitiveProductionCut(double cut) {
         " while the realm has already been explicitly set, this will override the production cuts");
   }
 
-  RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for sensitive region to ", cut);
+  RMGLog::OutFormat(RMGLog::summary,
+      "Setting user defined production cuts for sensitive region to {} mm", cut / u::mm);
 
   fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
   fProdCutsSensitive.gamma = cut;
@@ -480,7 +481,8 @@ void RMGPhysics::SetDefaultProductionCut(double cut) {
         " while the realm has already been explicitly set, this will override the production cuts");
   }
 
-  RMGLog::Out(RMGLog::summary, "Setting user defined production cuts for default region to ", cut);
+  RMGLog::OutFormat(RMGLog::summary,
+      "Setting user defined production cuts for default region to {} mm", cut / u::mm);
 
   fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
   fProdCuts.gamma = cut;
