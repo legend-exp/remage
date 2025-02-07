@@ -90,15 +90,16 @@ jobs:
           cd geant4
           wget -O geant4.tar.gz https://cern.ch/geant4-data/releases/lib4.11.3/Darwin-clang16.0.0-Sequoia.tar.gz
           tar --strip-components=1 -xzf geant4.tar.gz
-          export CMAKE_PREFIX_PATH="${PWD}:${CMAKE_PREFIX_PATH}"
-          source bin/geant4.sh
           cd ..
 
       - name: Build project
         run: |
-          ls ../geant4
+          export CMAKE_PREFIX_PATH="${PWD}/geant4:${CMAKE_PREFIX_PATH}"
+          source geant4/bin/geant4.sh
+
           mkdir build
           cd build
+          ls ../geant4
           cmake -DCMAKE_PREFIX_PATH=../geant4 ..
           make
           make install
