@@ -101,7 +101,10 @@ jobs:
 
           mkdir build
           cd build
-          cmake ..
+          cmake \
+            -DEXPAT_LIBRARY=/opt/homebrew/opt/expat/lib/libexpat.dylib \
+            -DEXPAT_INCLUDE_DIR=/opt/homebrew/opt/expat/include \
+            ..
           make
           make install
 
