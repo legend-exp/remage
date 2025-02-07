@@ -80,6 +80,9 @@ jobs:
   test_on_mac:
     name: Test on macOS
     runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash -el {0}
 
     steps:
       - uses: actions/checkout@v4
@@ -94,7 +97,6 @@ jobs:
           conda-remove-defaults: "true"
 
       - name: Install Geant4
-        shell: bash -l {0}
         run: |
           conda create --override-channels -c conda-forge --name geant4-env
           conda activate geant4-env
@@ -102,15 +104,21 @@ jobs:
 
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
-      - name: Install Geant4
-        shell: bash -l {0}
+      - name: Build project
         run: |
           conda activate geant4-env
 
           mkdir build .local
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=../local ..
+          cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
           make
           make install
+
+      - name: Run minimal test suite
+        run: |
+          conda activate geant4-env
+
+          cd build
+          ctest --output-on-failure --label-exclude 'extra|vis'
 
 # vim: expandtab tabstop=2 shiftwidth=2
