@@ -113,6 +113,4 @@ jobs:
           make
           make install
 
-          export
-
 # vim: expandtab tabstop=2 shiftwidth=2
