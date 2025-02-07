@@ -90,12 +90,17 @@ jobs:
           activate-environment: ""
 
       - name: Install Geant4
-        shell: bash -l {0}
+        shell: bash
         run: |
           # brew install expat
 
+          conda config --remove channels defaults
+          conda config --add channels conda-forge
+          conda config --set channel_priority strict
           conda create -c conda-forge --name geant4-env geant4
           conda activate geant4-env
+
+          export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
 
           mkdir build
           cd build
