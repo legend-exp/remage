@@ -88,17 +88,14 @@ jobs:
         with:
           miniconda-version: "latest"
           activate-environment: ""
+          channels: conda-forge
+          channel-priority: "strict"
           conda-remove-defaults: true
 
       - name: Install Geant4
         shell: bash -l {0}
         run: |
-          # brew install expat
-
-          conda init
-          conda config --add channels conda-forge
-          conda config --set channel_priority strict
-          conda create --name geant4-env
+          conda create --name conda-forge::geant4-env
           conda activate geant4-env
           conda config --remove channels defaults
           conda install geant4
