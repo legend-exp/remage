@@ -211,6 +211,7 @@ Commands for controlling output from hits in germanium detectors.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 
 ### `/RMG/Output/Germanium/SetEdepCutLow`
@@ -275,6 +276,15 @@ Use float32 (instead of float64) for position output.
 ### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`
