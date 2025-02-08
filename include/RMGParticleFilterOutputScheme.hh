@@ -19,13 +19,10 @@
 #include <optional>
 #include <set>
 
-#include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
-#include "G4VUserEventInformation.hh"
 
 #include "RMGVOutputScheme.hh"
 
-class G4Event;
 class RMGParticleFilterOutputScheme : public RMGVOutputScheme {
 
   public:
