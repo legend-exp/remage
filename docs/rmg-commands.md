@@ -133,6 +133,7 @@ Commands for controlling the simulation output
 * `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
 * `/RMG/Output/Track/` – Commands for controlling output of track vertices.
+* `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
 
 **Commands:**
 
@@ -503,6 +504,24 @@ Use float32 (instead of float64) for energy output.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/ParticleFilter/`
+
+Commands for filtering particles out by PDG encoding.
+
+
+**Commands:**
+
+* `AddParticle` – Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
+
+### `/RMG/Output/ParticleFilter/AddParticle`
+
+Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
+
+* **Parameter** – `PDGcode`
+  * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 

@@ -19,7 +19,6 @@
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
-#include "G4OpticalPhoton.hh"
 
 #include "RMGLog.hh"
 
