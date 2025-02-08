@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
   remage
-  VERSION 0.6.2 # TODO: get this dynamically
+  VERSION 0.7.1 # TODO: get this dynamically
   DESCRIPTION "Simulation framework for HPGe-based experiments"
   LANGUAGES C CXX) # C is needed for Geant4's HDF5 support
 
