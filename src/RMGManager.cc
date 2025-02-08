@@ -389,7 +389,7 @@ void RMGManager::DefineCommands() {
   fOutputMessenger->DeclareMethod("ActivateOutputScheme", &RMGManager::ActivateOptionalOutputScheme)
       .SetGuidance("Activates the output scheme that had been registered under the given name.")
       .SetParameterName("oscheme", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetStates(G4State_PreInit);
 
   fOutputMessenger->DeclareMethod("NtupleDirectory", &RMGManager::SetOutputNtupleDirectory)
       .SetGuidance("Change the default output directory/group for ntuples in output files.")
