@@ -183,7 +183,7 @@ Activates the output scheme that had been registered under the given name.
 * **Parameter** – `oscheme`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Output/NtupleDirectory`
 
