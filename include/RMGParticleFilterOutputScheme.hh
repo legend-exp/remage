@@ -32,6 +32,8 @@ class RMGParticleFilterOutputScheme : public RMGVOutputScheme {
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
     inline void AddParticle(int pdg) { fParticles.insert(pdg); }
+    void AddKeepVolume(std::string name);
+    void AddKillVolume(std::string name);
 
   private:
 
@@ -39,6 +41,8 @@ class RMGParticleFilterOutputScheme : public RMGVOutputScheme {
     void DefineCommands();
 
     std::set<int> fParticles;
+    std::set<std::string> fKeepVolumes;
+    std::set<std::string> fKillVolumes;
 };
 
 #endif
