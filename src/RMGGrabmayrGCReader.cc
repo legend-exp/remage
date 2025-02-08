@@ -110,7 +110,7 @@ void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, cons
 
   SetStartLocation(*file);
 
-  fCascadeFiles.insert({{z, a}, std::move(file)});
+  fCascadeFiles.insert(std::make_pair(std::make_pair(z, a), std::move(file)));
 }
 
 void RMGGrabmayrGCReader::RandomizeFiles() {

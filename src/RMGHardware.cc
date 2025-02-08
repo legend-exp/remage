@@ -18,7 +18,6 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "G4GDMLParser.hh"
 #include "G4GenericMessenger.hh"
 #include "G4GeomTestVolume.hh"
 #include "G4LogicalVolume.hh"
@@ -27,6 +26,7 @@ namespace fs = std::filesystem;
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
 
+#include "RMGConfig.hh"
 #include "RMGGermaniumDetector.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGHardwareMessenger.hh"
@@ -38,6 +38,10 @@ namespace fs = std::filesystem;
 #include "RMGScintillatorDetector.hh"
 #include "RMGScintillatorOutputScheme.hh"
 #include "RMGVertexOutputScheme.hh"
+
+#if RMG_HAS_GDML
+#include "G4GDMLParser.hh"
+#endif
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -52,6 +56,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   RMGLog::Out(RMGLog::debug, "Constructing detector");
 
   if (!fGDMLFiles.empty()) {
+#if RMG_HAS_GDML
     RMGLog::Out(RMGLog::debug, "Setting up G4GDMLParser");
     G4GDMLParser parser;
     parser.SetOverlapCheck(false); // overlap check is performed below.
@@ -70,6 +75,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
           new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
       test_vol->TestOverlapInTree();
     }
+#else
+    RMGLog::OutDev(RMGLog::fatal, "GDML support is not available!");
+#endif
   } else {
     fWorld = this->DefineGeometry();
     if (!fWorld)
