@@ -445,6 +445,12 @@ void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
 
     case PhysicsRealm::kLArScintillation:
       RMGLog::Out(RMGLog::warning, "LAr scintillation realm unimplemented");
+      break;
+    case PhysicsRealm::kUserDefined:
+      RMGLog::Out(RMGLog::summary,
+          "User requested custom physics realm, based on directly setting production cuts.");
+
+      break;
   }
 
   this->SetCuts();
