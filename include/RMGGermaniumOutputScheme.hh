@@ -53,6 +53,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
 
     /** @brief Store the information from the event, invoked in @c RMGEventAction::EndOfEventAction
+     * @details Only steps with non-zero energy are stored, unless @c fDiscardZeroEnergyHits is false.
      */
     void StoreEvent(const G4Event* event) override;
 
@@ -99,6 +100,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     std::set<int> fEdepCutDetectors;
 
     bool fDiscardPhotonsIfNoGermaniumEdep = false;
+    bool fDiscardZeroEnergyHits = true;
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;

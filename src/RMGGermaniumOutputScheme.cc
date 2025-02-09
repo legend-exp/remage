@@ -146,7 +146,9 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
     const auto ana_man = G4AnalysisManager::Instance();
 
     for (auto hit : *hit_coll->GetVector()) {
-      if (!hit) continue;
+
+      if (!hit or (hit->energy_deposition == 0 and this->fDiscardZeroEnergyHits)) continue;
+
       hit->Print();
 
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
@@ -242,6 +244,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
+      .SetGuidance("Discard hits with zero energy.")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)

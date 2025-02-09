@@ -240,6 +240,13 @@ void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_n
   }
 }
 
+void RMGHardware::SetMaxStepLimit(double max_step, std::string name) {
+
+  fPhysVolStepLimits.insert_or_assign(name, max_step);
+
+  RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", name, max_step);
+}
+
 void RMGHardware::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",

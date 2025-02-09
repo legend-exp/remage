@@ -28,14 +28,17 @@
 
 #include "RMGDetectorMetadata.hh"
 #include "RMGHardwareMessenger.hh"
+#include "RMGLog.hh"
 #include "RMGNavigationTools.hh"
 #include "RMGVOutputScheme.hh"
 
+/** @brief Class to handle the detector geometry hardware, extends @c G4VUserDetectorConstruction . */
 class G4VPhysicalVolume;
 class RMGHardware : public G4VUserDetectorConstruction {
 
   public:
 
+    /** @brief Constructor based on calling the macro commands (with @c DefineCommands ). */
     RMGHardware();
     ~RMGHardware() = default;
 
@@ -44,23 +47,71 @@ class RMGHardware : public G4VUserDetectorConstruction {
     RMGHardware(RMGHardware&&) = delete;
     RMGHardware& operator=(RMGHardware&&) = delete;
 
+    /** @brief Construct the detector
+     *
+     *  @details Detector geometry can be based on GDML files, parsed with @c G4GDMLParser .
+     *  Alternatively geometry can be defined directly by overriding the @c DefineGeometry() method.
+     *
+     *  This function defines the geometry and checks for overlaps, if using GDML defined geometry and check
+     *  are not disabled. It also assigns physical volumes to Geant4 regions and sets user step limits.
+     *  This must not modify thread-local state, because it is only called once globally.
+     *
+     * @returns The physical volume of the world.
+     */
     G4VPhysicalVolume* Construct() override;
+
+    /** @brief Setup thread-local geometry data.
+     *
+     * @details This is called once for the master thread and once for each worker thread. Can be
+     * used to setup sensitive detectors, which have to be constructed per thread.
+     */
     void ConstructSDandField() override;
 
+    /** @brief Register a detector as being a remage sensitive detector.
+     *
+     * @param type The type of detector.
+     * @param pv_name The name of the physical volume.
+     * @param uid A unique integer identifier for the sensitive volume.
+     * @param copy_nr The copy number for the physical volume.
+     * @param allow_uid_reuse Flag to allow a uid to be reused
+     */
     void RegisterDetector(RMGDetectorType type, const std::string& pv_name, int uid,
         int copy_nr = 0, bool allow_uid_reuse = false);
+
+    /** @brief Extract a map of the detector metadata, one element for each sensitive detector physical volume and copy_nr. */
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
+
+    /** @brief Extract the detector metadata for a given detector.
+     *
+     * @param det the detector identifier, a pair of the physical volume name and the copy number.
+     */
     inline const auto& GetDetectorMetadata(const std::pair<std::string, int>& det) {
       return fDetectorMetadata.at(det);
     }
+
+
     inline const auto& GetActiveDetectorList() { return fActiveDetectors; }
     [[nodiscard]] inline const auto& GetAllActiveOutputSchemes() { return fActiveOutputSchemes; }
 
+    /** @brief Add a GDML file to the geometry.
+     *
+     * @param filename file name to add.
+     */
     inline void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
+
+    /** @brief Method to define geometry directly, the user must reimplement the base class method. */
     inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
-    inline void SetMaxStepLimit(std::string name, double max_step) {
-      fPhysVolStepLimits.insert_or_assign(name, max_step);
-    }
+
+    /** @brief Set the maximum step size.
+     *
+     * @details This is used as a @c G4UserLimit to limit step sizes to being no larger than the
+     * chosen value. This requires the @c G4StepLimiter process to be activated in the physics list.
+     *
+     * @param max_step The maximum step size.
+     * @param name Name of the physical volume.
+     */
+    void SetMaxStepLimit(double max_step, std::string name);
+
     inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
 

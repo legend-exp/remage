@@ -22,6 +22,21 @@
 #include "RMGTools.hh"
 
 RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
+
+  this->DefineRegisterDetector();
+  this->DefineStepLimits();
+}
+
+RMGHardwareMessenger::~RMGHardwareMessenger() { delete fRegisterCmd; }
+
+void RMGHardwareMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
+
+  if (command == fRegisterCmd) RegisterDetectorCmd(newValues);
+  else if (command == fStepLimitsCmd) StepLimitsCmd(newValues);
+}
+
+void RMGHardwareMessenger::DefineRegisterDetector() {
+
   fRegisterCmd = new G4UIcommand("/RMG/Geometry/RegisterDetector", this);
   fRegisterCmd->SetGuidance("register a sensitive detector");
 
@@ -52,10 +67,20 @@ RMGHardwareMessenger::RMGHardwareMessenger(RMGHardware* hw) : fHardware(hw) {
   fRegisterCmd->AvailableForStates(G4State_PreInit);
 }
 
-RMGHardwareMessenger::~RMGHardwareMessenger() { delete fRegisterCmd; }
+void RMGHardwareMessenger::DefineStepLimits() {
 
-void RMGHardwareMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
-  if (command == fRegisterCmd) RegisterDetectorCmd(newValues);
+  fStepLimitsCmd = new G4UIcmdWithADoubleAndUnit("/RMG/Geometry/SetMaxStepSize", this);
+  fStepLimitsCmd->SetGuidance("Sets maximum step size for a certain detector");
+
+  fStepLimitsCmd->SetParameterName("step_size", false);
+  fStepLimitsCmd->SetDefaultValue(1);
+  fStepLimitsCmd->SetUnitCategory("Length");
+
+  auto p_pv = new G4UIparameter("pv_name", 's', false);
+  p_pv->SetGuidance("Detector physical volume");
+  fStepLimitsCmd->SetParameter(p_pv);
+
+  fStepLimitsCmd->AvailableForStates(G4State_PreInit);
 }
 
 void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
@@ -73,6 +98,17 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
 
   fHardware->RegisterDetector(type, pv_name, uid, copy_nr, allow_reuse);
+}
+
+void RMGHardwareMessenger::StepLimitsCmd(const std::string& parameters) {
+  G4Tokenizer next(parameters);
+
+  auto x = next();
+  auto y = next();
+  auto num = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue((x + " " + y).c_str());
+  auto pv_name = next();
+
+  fHardware->SetMaxStepLimit(num, pv_name);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

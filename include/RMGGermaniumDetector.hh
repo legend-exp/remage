@@ -59,6 +59,9 @@ class RMGGermaniumDetectorHit : public G4VHit {
 
 using RMGGermaniumDetectorHitsCollection = G4THitsCollection<RMGGermaniumDetectorHit>;
 
+
+/** @brief Class to describe the germanium detector, mainly handles processing of the detected hits.
+ * Extends @c G4VSensitiveDetector */
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
@@ -75,6 +78,9 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
     RMGGermaniumDetector& operator=(RMGGermaniumDetector&&) = delete;
 
     void Initialize(G4HCofThisEvent* hit_coll) override;
+
+    /** @brief Process the detected hits computing the various parameters of a @c
+     * RMGGermaniumDetectorHit and then adding this to the hit collection.*/
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
 

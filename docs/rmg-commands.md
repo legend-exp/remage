@@ -183,7 +183,7 @@ Activates the output scheme that had been registered under the given name.
 * **Parameter** – `oscheme`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-* **Allowed states** – `PreInit`
+* **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Output/NtupleDirectory`
 
@@ -211,6 +211,7 @@ Commands for controlling output from hits in germanium detectors.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 
 ### `/RMG/Output/Germanium/SetEdepCutLow`
@@ -275,6 +276,15 @@ Use float32 (instead of float64) for position output.
 ### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`
@@ -511,6 +521,8 @@ Commands for controlling physics processes
 **Commands:**
 
 * `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
+* `DefaultProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
+* `SensitiveProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -528,7 +540,35 @@ Set simulation realm (cut values for particles in (sensitive) detector
 * **Parameter** – `realm`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation`
+  * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation UserDefined`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Processes/DefaultProductionCut`
+
+Set simulation production cuts, for default region. Note: this overrides the physics realm
+
+* **Parameter** – `cut`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Processes/SensitiveProductionCut`
+
+Set simulation production cuts, for default region. Note: this overrides the physics realm
+
+* **Parameter** – `cut`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Processes/OpticalPhysics`
@@ -688,6 +728,7 @@ Commands for controlling geometry definitions
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
+* `SetMaxStepSize` – Sets maximum step size for a certain detector
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -755,6 +796,24 @@ register a sensitive detector
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/SetMaxStepSize`
+
+Sets maximum step size for a certain detector
+
+* **Parameter** – `step_size`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `1`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Parameter** – `pv_name`
+    – Detector physical volume
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Generator/`

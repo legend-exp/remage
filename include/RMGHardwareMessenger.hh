@@ -16,24 +16,43 @@
 #ifndef _RMG_HARDWARE_MESSENGER_HH_
 #define _RMG_HARDWARE_MESSENGER_HH_
 
+#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UImessenger.hh"
 
+/** @brief Class for handling custom messenger commands relating to @c RMGHardware. */
 class RMGHardware;
 class RMGHardwareMessenger : public G4UImessenger {
 
   public:
 
+    /** @brief Constructor based on a @c RMGHardware pointer.
+     *  @details This currently initialises the @c "/RMG/Geometry/RegisterDetector" and
+     *  the @c "/RMG/Geometry/SetMaxStepSize" commands.
+     *  @param hw Pointer to the @c RMGHardware instance.
+     */
     RMGHardwareMessenger(RMGHardware* hw);
     ~RMGHardwareMessenger();
 
+    /** @brief Set the values for command
+     *  @param command the command to set parameters
+     *  @param newValues the parameter values.
+     */
     void SetNewValue(G4UIcommand* command, G4String newValues) override;
+
+    /** @brief Define the commands to set the sensitive detectors. */
+    void DefineRegisterDetector();
+
+    /** @brief Define the commands to set the step limits. */
+    void DefineStepLimits();
 
   private:
 
     RMGHardware* fHardware;
     G4UIcommand* fRegisterCmd;
+    G4UIcmdWithADoubleAndUnit* fStepLimitsCmd;
 
     void RegisterDetectorCmd(const std::string& parameters);
+    void StepLimitsCmd(const std::string& parameters);
 };
 
 #endif
