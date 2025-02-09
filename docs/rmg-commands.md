@@ -183,7 +183,7 @@ Activates the output scheme that had been registered under the given name.
 * **Parameter** – `oscheme`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
+* **Allowed states** – `PreInit`
 
 ### `/RMG/Output/NtupleDirectory`
 
@@ -521,8 +521,8 @@ Commands for controlling physics processes
 **Commands:**
 
 * `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
-* `DefaultProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
-* `SensitiveProductionCut` – Set simulation production cuts, for default region. Note: this overrides the physics realm
+* `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
+* `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -545,7 +545,7 @@ Set simulation realm (cut values for particles in (sensitive) detector
 
 ### `/RMG/Processes/DefaultProductionCut`
 
-Set simulation production cuts, for default region. Note: this overrides the physics realm
+Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
@@ -559,7 +559,7 @@ Set simulation production cuts, for default region. Note: this overrides the phy
 
 ### `/RMG/Processes/SensitiveProductionCut`
 
-Set simulation production cuts, for default region. Note: this overrides the physics realm
+Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
