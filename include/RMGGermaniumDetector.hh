@@ -87,7 +87,6 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
   private:
 
     RMGGermaniumDetectorHitsCollection* fHitsCollection = nullptr;
-    bool ffDiscardZeroEnergyHits = true;
 };
 
 extern G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator;
