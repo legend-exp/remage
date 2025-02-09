@@ -63,6 +63,7 @@ jobs:
           else
             echo "::notice:: is up-to-date with remage source"
           fi
+          exit $docs_differ
 
       - name: Setup and start xvfb (enables Geant4 visualization)
         if: ${{ always() }}
