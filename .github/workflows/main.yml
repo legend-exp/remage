@@ -43,6 +43,8 @@ jobs:
 
       - name: Compare checked-in doc dump with current result
         if: ${{ matrix.container_version != 'slim' }}
+        id: rmg_doc_dump
+        continue-on-error: true
         run: |
           cd build
           cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
@@ -58,15 +60,13 @@ jobs:
           docs_differ=0
           docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
           if [ $docs_differ -ne 0 ]; then
-            echo "::error file=docs/rmg-commands.md:: docs/rmg-commands.md is not up-to-date with remage source. please run `make remage-doc-dump` and commit changes."
+            echo "::error file=docs/rmg-commands.md:: docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
             echo "$docs_diff"
           else
             echo "::notice:: is up-to-date with remage source"
           fi
-          exit $docs_differ
 
       - name: Setup and start xvfb (enables Geant4 visualization)
-        if: ${{ always() }}
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
 
@@ -95,5 +95,14 @@ jobs:
           exit 0
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
+
+      - name: Compare checked-in doc dump with current result (2)
+        if: ${{ matrix.container_version != 'slim' }}
+        env:
+          RESULT: ${{ steps.rmg_doc_dump.outcome }}
+        run: |
+          if [ "$RESULT" == "failure"" ]; then
+            exit 1
+          fi
 
 # vim: expandtab tabstop=2 shiftwidth=2
