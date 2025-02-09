@@ -533,15 +533,17 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger
       ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
-      .SetGuidance("Set simulation production cuts, for default region. Note: this overrides the "
-                   "physics realm")
+      .SetGuidance("Set simulation production cuts, for default region for proton, position, "
+                   "electron and gamma. Notes: this overrides the "
+                   "values from the physics realm. This does not apply to proton or generic ions.")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger
       ->DeclareMethodWithUnit("SensitiveProductionCut", "mm", &RMGPhysics::SetSensitiveProductionCut)
-      .SetGuidance("Set simulation production cuts, for default region. Note: this overrides the "
-                   "physics realm")
+      .SetGuidance("Set simulation production cuts, for default region for proton, position, "
+                   "electron and gamma. Notes: this overrides the "
+                   "values from the physics realm. This does not apply to proton or generic ions.")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 

@@ -130,15 +130,19 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetPhysicsRealmString(std::string realm);
 
     /** @brief Set the production cut for the default region.
-     *  @details The same cut is used for electrons, positrons and gammas. Note: This overrides the
-     * choices from the Physics Realm.
+     *  @details The same cut is used for electrons, positrons and gammas.
+     *  Notes:
+     *   - This overrides the choices from the Physics Realm.
+     *   - No production cut alpha or generic ion is set.
      *  @param cut the production cut value for the default region.
      */
     void SetDefaultProductionCut(double cut);
 
     /** @brief Set the production cut for the sensitive region.
-     *  @details The same cut is used for electrons, positrons and gammas. Note: This overrides the
-     * choices from the Physics Realm.
+     *  @details The same cut is used for electrons, positrons and gammas.
+     *  Notes:
+     *   - This overrides the choices from the Physics Realm.
+     *   - No production cut alpha or generic ion is set.
      *  @param cut the production cut value for the sensitive region.
      */
     void SetSensitiveProductionCut(double cut);

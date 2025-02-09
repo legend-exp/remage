@@ -249,32 +249,27 @@ void RMGHardware::SetMaxStepLimit(double max_step, std::string name) {
 
 void RMGHardware::DefineCommands() {
 
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
-      "Commands for controlling geometry definitions"));
+  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
+      "Commands for controlling geometry definitions");
 
-  fMessengers.back()
-      ->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
+  fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
       .SetGuidance("Disable the automatic overlap check after loading a GDML file")
       .SetStates(G4State_PreInit);
 
-  fMessengers.back()
-      ->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
+  fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
       .SetGuidance("Change the number of points sampled for overlap checks")
       .SetStates(G4State_PreInit);
 
-  fMessengers.back()
-      ->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
+  fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
       .SetGuidance("Use GDML file for geometry definition")
       .SetParameterName("filename", false)
       .SetStates(G4State_PreInit);
 
-  fMessengers.back()
-      ->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfLogicalVolumes", &RMGHardware::PrintListOfLogicalVolumes)
       .SetGuidance("Print list of defined logical volumes")
       .SetStates(G4State_Idle);
 
-  fMessengers.back()
-      ->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
+  fMessenger->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
 
