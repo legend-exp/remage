@@ -720,10 +720,6 @@ Warn if the global times of tracks get too large to provide the requested time u
 Commands for controlling geometry definitions
 
 
-**Sub-directories:**
-
-* `/RMG/Geometry/StepLimits/` – Commands for setting step limits for volumes
-
 **Commands:**
 
 * `GDMLDisableOverlapCheck` – Disable the automatic overlap check after loading a GDML file
@@ -732,6 +728,7 @@ Commands for controlling geometry definitions
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
+* `SetMaxStepSize` – Sets maximum step size for a certain detector
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -801,37 +798,22 @@ register a sensitive detector
   * **Default value** – `false`
 * **Allowed states** – `PreInit`
 
-## `/RMG/Geometry/StepLimits/`
+### `/RMG/Geometry/SetMaxStepSize`
 
-Commands for setting step limits for volumes
+Sets maximum step size for a certain detector
 
-
-**Commands:**
-
-* `AddVolume` – Add physical volume to apply step limits to
-* `MaxStepSize` – Set center position (X coordinate)
-
-### `/RMG/Geometry/StepLimits/AddVolume`
-
-Add physical volume to apply step limits to
-
-* **Parameter** – `pv_name`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit`
-
-### `/RMG/Geometry/StepLimits/MaxStepSize`
-
-Set center position (X coordinate)
-
-* **Parameter** – `value`
+* **Parameter** – `step_size`
   * **Parameter type** – `d`
   * **Omittable** – `False`
+  * **Default value** – `1`
 * **Parameter** – `Unit`
   * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `mm`
+  * **Omittable** – `False`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Parameter** – `pv_name`
+    – Detector physical volume
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Generator/`

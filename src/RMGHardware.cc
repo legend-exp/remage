@@ -240,14 +240,11 @@ void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_n
   }
 }
 
-void RMGHardware::SetMaxStepLimit(double max_step) {
-  if (this->fVolumeForStepLimit == "")
-    RMGLog::OutFormat(RMGLog::error, "cannot set step limits if 'fVolumeForStepLimit' is not set");
+void RMGHardware::SetMaxStepLimit(double max_step, std::string name) {
 
-  fPhysVolStepLimits.insert_or_assign(this->fVolumeForStepLimit, max_step);
+  fPhysVolStepLimits.insert_or_assign(name, max_step);
 
-  RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", fVolumeForStepLimit,
-      max_step);
+  RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", name, max_step);
 }
 
 void RMGHardware::DefineCommands() {
@@ -280,22 +277,6 @@ void RMGHardware::DefineCommands() {
       ->DeclareMethod("PrintListOfPhysicalVolumes", &RMGHardware::PrintListOfPhysicalVolumes)
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
-
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/StepLimits/",
-      "Commands for setting step limits for volumes"));
-
-  fMessengers.back()
-      ->DeclareMethod("AddVolume", &RMGHardware::AddVolumeForStepLimits)
-      .SetGuidance("Add physical volume to apply step limits to")
-      .SetParameterName("pv_name", false)
-      .SetStates(G4State_PreInit);
-
-  fMessengers.back()
-      ->DeclareMethodWithUnit("MaxStepSize", "mm", &RMGHardware::SetMaxStepLimit)
-      .SetGuidance("Set center position (X coordinate)")
-      .SetParameterName("value", false)
-      .SetStates(G4State_PreInit);
-
 
   // RegisterDetector cannot be defined with the G4GenericMessenger (it has to many parameters).
   fHwMessenger = std::make_unique<RMGHardwareMessenger>(this);

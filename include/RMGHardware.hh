@@ -106,12 +106,11 @@ class RMGHardware : public G4VUserDetectorConstruction {
      *
      * @details This is used as a @c G4UserLimit to limit step sizes to being no larger than the
      * chosen value. This requires the @c G4StepLimiter process to be activated in the physics list.
-     * This requires that @c fVolumeForStepLimit has been set.
      *
      * @param max_step The maximum step size.
+     * @param name Name of the physical volume.
      */
-    inline void SetMaxStepLimit(double max_step);
-    inline void AddVolumeForStepLimits(std::string name) { fVolumeForStepLimit = name; };
+    void SetMaxStepLimit(double max_step, std::string name);
 
     inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
@@ -131,13 +130,12 @@ class RMGHardware : public G4VUserDetectorConstruction {
     static G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
     static G4ThreadLocal bool fActiveDetectorsInitialized;
 
-    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
+    std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<RMGHardwareMessenger> fHwMessenger;
     void DefineCommands();
 
     /// The world volume
     G4VPhysicalVolume* fWorld = nullptr;
-    std::string fVolumeForStepLimit = "";
 
     /** Region used to assign special production cuts
      *  for sensitive volumes. Logical volumes of sensitive volumes should be
