@@ -43,7 +43,6 @@ jobs:
 
       - name: Compare checked-in doc dump with current result
         if: ${{ matrix.container_version != 'slim' }}
-        continue-on-error: true
         run: |
           cd build
           cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
@@ -52,17 +51,21 @@ jobs:
           make remage-doc-dump
           echo "::endgroup::"
 
+          echo "::group::full generated command docs"
+          cat -v ../docs/rmg-commands.md
+          echo "::endgroup::"
+
           docs_differ=0
           docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
-          if [ docs_differ -ne 0 ]; then
-            echo "::error file=docs/rmg-commands.md:: is not up-to-date with remage source"
+          if [ $docs_differ -ne 0 ]; then
+            echo "::error file=docs/rmg-commands.md:: docs/rmg-commands.md is not up-to-date with remage source. please run `make remage-doc-dump` and commit changes."
             echo "$docs_diff"
           else
-            echo "::error file=docs/rmg-commands.md:: is not up-to-date with remage source"
+            echo "::notice:: is up-to-date with remage source"
           fi
-          exit 1
 
       - name: Setup and start xvfb (enables Geant4 visualization)
+        if: ${{ always() }}
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
 
