@@ -141,7 +141,6 @@ def remage_cli() -> None:
     logger.setLevel(levels_rmg_to_py[log_level])
 
     # TODO: further post-processing
-    output_files = [msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "output"]
-    print("output files to merge:", *output_files)  # noqa: T201
+    _output_files = [msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "output"]
 
     sys.exit(ec)
