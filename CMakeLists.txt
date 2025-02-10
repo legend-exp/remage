@@ -1,6 +1,23 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/RMGGitVersion.cmake)
+if(WIN32)
+  message(FATAL_ERROR "remage is not supported on Windows")
+endif()
+
+# let's now look for python, needed for build preparation, the python wrapper and tests
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" -m venv --help
+  RESULT_VARIABLE VENV_AVAILABLE
+  OUTPUT_QUIET ERROR_QUIET)
+
+if(NOT VENV_AVAILABLE EQUAL 0)
+  message(FATAL_ERROR "Python3 is installed, but the 'venv' module is missing.")
+endif()
+
+# get the version using setuptools-scm (that's why we just searched python).
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/RMGSetuptoolsVersion.cmake)
 
 project(
   remage
@@ -9,10 +26,6 @@ project(
   LANGUAGES C CXX) # C is needed for Geant4's HDF5 support
 
 message(STATUS "remage version ${CMAKE_PROJECT_VERSION} (${RMG_GIT_VERSION_FULL})")
-
-if(WIN32)
-  message(FATAL_ERROR "remage is not supported on Windows")
-endif()
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(STATUS "remage requires an out-of-source build.")
@@ -177,19 +190,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "CMAKE_CXX_STANDARD is c++" ${CMAKE_CXX_STANDARD})
 
 add_subdirectory(src)
-
-# let's now look for python, needed for the remage python wrapper and tests
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-
-execute_process(
-  COMMAND "${Python3_EXECUTABLE}" -m venv --help
-  RESULT_VARIABLE VENV_AVAILABLE
-  OUTPUT_QUIET ERROR_QUIET)
-
-if(NOT VENV_AVAILABLE EQUAL 0)
-  message(FATAL_ERROR "Python3 is installed, but the 'venv' module is missing.")
-endif()
-
 add_subdirectory(python)
 
 option(RMG_BUILD_DOCS "Build remage documentation" OFF)
