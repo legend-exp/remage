@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import shutil
@@ -102,10 +103,22 @@ def _setup_log() -> None:
     return logger
 
 
+def _cleanup_tmp_files(ipc_info):
+    """Remove temporary files created by the C++ application, that might not have been cleaned up."""
+    tmp_files = [msg[1] for msg in ipc_info if len(msg) == 2 and msg[0] == "tmpfile"]
+    for tmp_file in tmp_files:
+        p = Path(tmp_file)
+        with contextlib.suppress(Exception):
+            p.unlink(missing_ok=True)
+
+
 def remage_cli() -> None:
     logger = _setup_log()
 
     ec, ipc_info = _run_remage_cpp()
+    # clean-up should run always, irrespective of exit code.
+    _cleanup_tmp_files(ipc_info)
+
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
         # ec==2 is just a warning, continue in the execution flow.

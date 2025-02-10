@@ -117,6 +117,16 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     if (fCurrentOutputFile.first != fCurrentOutputFile.second && std::filesystem::exists(fn)) {
       RMGLog::Out(RMGLog::fatal, "Temporary file ", fn, " already exists?");
     }
+
+    // notify wrapper about temp files created on master or worker threads.
+    auto orig_file_type = fCurrentOutputFile.second.extension();
+    if (fCurrentOutputFile.first != fCurrentOutputFile.second &&
+        (orig_file_type == ".lh5" || orig_file_type == ".LH5")) {
+      auto worker_tmp =
+          fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
+      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", worker_tmp));
+    }
+
     auto success = ana_man->OpenFile(fn);
 
     // If opening failed, disable persistency.
