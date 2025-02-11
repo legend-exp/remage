@@ -92,5 +92,5 @@ add_custom_target(
 
 # hack the install process to also install the remage wrapper
 install(
-  CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install-remage-cli)"
+  CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install-remage-cli -- --no-print-directory)"
 )
