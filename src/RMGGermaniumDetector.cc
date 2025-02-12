@@ -45,14 +45,14 @@ void RMGGermaniumDetectorHit::Print() {
   RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
       " / Particle: ", this->particle_type,
       " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
-      " / Position: ", this->global_position / CLHEP::m, " m",
+      " / Position (prestep): ", this->global_position_prestep / CLHEP::m, " m",
       " / Time: ", this->global_time / CLHEP::ns, " ns");
 }
 
 void RMGGermaniumDetectorHit::Draw() {
   const auto vis_man = G4VVisManager::GetConcreteInstance();
   if (vis_man and this->energy_deposition > 0) {
-    G4Circle circle(this->global_position);
+    G4Circle circle(this->global_position_prestep);
     circle.SetScreenSize(5);
     circle.SetFillStyle(G4Circle::filled);
     circle.SetVisAttributes(G4VisAttributes(G4Colour(1, 0, 0)));
@@ -81,6 +81,28 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
+double RMGGermaniumDetector::DistanceToSurface(const G4VSolid *sv,const G4LogicalVolume * lv,const G4AffineTransform tf, const G4ThreeVector & position){
+
+  // Get distance to surface.
+  // First transform coordinates into local system
+
+  double dist = sv->DistanceToOut(tf.TransformPoint(position));
+
+  // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
+  auto local_no_daughters = lv->GetNoDaughters();
+  // increase by one to keep positive in reverse loop.
+  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
+    const auto sample_physical = lv->GetDaughter(sample_no - 1);
+    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
+    sample_tf.Invert();
+    const auto sample_point = sample_tf.TransformPoint(position);
+    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+    const double sample_dist = sample_solid->DistanceToIn(sample_point);
+    if (sample_dist < dist) { dist = sample_dist; }
+  }
+  return dist;
+}
+
 bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
   RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
@@ -91,7 +113,11 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   // we're going to use info from the pre-step point
   const auto prestep = step->GetPreStepPoint();
-  const auto position = prestep->GetPosition();
+  const auto position_prestep = prestep->GetPosition();
+  
+  const auto poststep = step->GetPostStepPoint();
+  const auto position_poststep = poststep->GetPosition();
+  const auto position_average  = (position_prestep+position_poststep)/2;
 
   // locate us
   const auto pv = prestep->GetTouchableHandle()->GetVolume();
@@ -125,33 +151,23 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
-  hit->global_position = position;
+  
+  // positions
+  hit->global_position_prestep = position_prestep;
+  hit->global_position_poststep =  position_poststep;
+  hit->global_position_average =  position_average;
+
   hit->global_time = prestep->GetGlobalTime();
   hit->track_id = step->GetTrack()->GetTrackID();
   hit->parent_track_id = step->GetTrack()->GetParentID();
-
-  // Get distance to surface.
-  // Check distance to surfaces of Mother volume
-
-  // First transform coordinates into local system
+  
   G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
   tf.Invert();
-  double dist = sv->DistanceToOut(tf.TransformPoint(position));
 
-  // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  auto local_no_daughters = lv->GetNoDaughters();
-  // increase by one to keep positive in reverse loop.
-  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
-    const auto sample_physical = lv->GetDaughter(sample_no - 1);
-    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
-    sample_tf.Invert();
-    const auto sample_point = sample_tf.TransformPoint(position);
-    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
-    const double sample_dist = sample_solid->DistanceToIn(sample_point);
-    if (sample_dist < dist) { dist = sample_dist; }
-  }
-
-  hit->distance_to_surface = dist;
+  // get various distances
+  hit->distance_to_surface_prestep = DistanceToSurface(sv,lv,tf,position_prestep);
+  hit->distance_to_surface_poststep = DistanceToSurface(sv,lv,tf,position_poststep);
+  hit->distance_to_surface_average = DistanceToSurface(sv,lv,tf,position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
