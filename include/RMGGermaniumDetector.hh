@@ -50,8 +50,14 @@ class RMGGermaniumDetectorHit : public G4VHit {
     int particle_type = -1;
 
     double energy_deposition = -1;
-    double distance_to_surface = -1;
-    G4ThreeVector global_position;
+    double distance_to_surface_prestep = -1;
+    double distance_to_surface_average = -1;
+    double distance_to_surface_poststep = -1;
+
+    G4ThreeVector global_position_poststep;
+    G4ThreeVector global_position_prestep;
+    G4ThreeVector global_position_average;
+
     double global_time = -1;
     int track_id = -1;
     int parent_track_id = -1;
@@ -83,6 +89,15 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
      * RMGGermaniumDetectorHit and then adding this to the hit collection.*/
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
+    
+    /** @brief Compute the distance from the point to the surface of the physical volume.
+     * @details Checks distance to surfaces of mother volume.
+     * @param sv The solid to find the distance to.
+     * @param lv The logical volume instance, used to check for mother volume.
+     * @param tf The transformation to global coordinates
+     * @param position The position to evaluate the distance for.
+     */
+  double DistanceToSurface(const G4VSolid *sv,const G4LogicalVolume * lv,const G4AffineTransform tf, const G4ThreeVector & position);
 
   private:
 

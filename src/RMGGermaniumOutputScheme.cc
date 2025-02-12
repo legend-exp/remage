@@ -27,6 +27,8 @@
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGTools.hh"
+
 #include "RMGManager.hh"
 
 namespace u = CLHEP;
@@ -170,13 +172,25 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
           fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getX() / u::m,
+
+
+      // extract position and distance
+      G4ThreeVector position  = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) ? hit->global_position_prestep : 
+                                (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) ? hit->global_position_poststep :
+                                hit->global_position_average;
+  
+      double distance = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) ? hit->distance_to_surface_prestep : 
+                                (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) ? hit->distance_to_surface_poststep :
+                                hit->distance_to_surface_average;
+
+
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getY() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position.getZ() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++,position.getZ() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->distance_to_surface / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
           fStoreSinglePrecisionPosition);
 
       // NOTE: must be called here for hit-oriented output
@@ -209,6 +223,12 @@ std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int s
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
+void RMGGermaniumOutputScheme::SetPositionModeString(std::string mode) {
+
+  try {
+    this->SetPositionMode(RMGTools::ToEnum<PositionMode>(mode, "position mode"));
+  } catch (const std::bad_cast&) { return; }
+}
 void RMGGermaniumOutputScheme::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/",
@@ -253,6 +273,15 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
       .SetStates(G4State_Idle);
+
+
+  fMessenger->DeclareMethod("StepPositionMode", &RMGGermaniumOutputScheme::SetPositionModeString)
+      .SetGuidance("Select which position of the step to store")
+      .SetParameterName("mode", false)
+      .SetCandidates(RMGTools::GetCandidates<PositionMode>())
+      .SetStates( G4State_Idle)
+      .SetToBeBroadcasted(true);
+
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
