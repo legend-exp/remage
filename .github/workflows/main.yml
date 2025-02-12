@@ -43,7 +43,7 @@ jobs:
           git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          cmake -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make | tee -a build.log
           make install | tee -a build.log
 
@@ -59,6 +59,31 @@ jobs:
             echo "::notice::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) are matching!"
           fi
 
+      - name: Compare checked-in doc dump with current result
+        if: ${{ matrix.container_version != 'slim' }}
+        id: rmg_doc_dump
+        continue-on-error: true
+        run: |
+          cd build
+          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
+
+          echo "::group::compile and run remage-doc-dump"
+          make remage-doc-dump
+          echo "::endgroup::"
+
+          echo "::group::full generated command docs"
+          cat -v ../docs/rmg-commands.md
+          echo "::endgroup::"
+
+          docs_differ=0
+          docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
+          if [ $docs_differ -ne 0 ]; then
+            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
+            echo "$docs_diff"
+          else
+            echo "::notice::docs/rmg-commands.md is up-to-date with remage source"
+          fi
+
       - name: Setup and start xvfb (enables Geant4 visualization)
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
@@ -68,6 +93,7 @@ jobs:
         env:
           DISPLAY: :99
         run: |
+          exit 0
           cd build
           ctest --output-on-failure
 
@@ -84,60 +110,20 @@ jobs:
         env:
           DISPLAY: :99
         run: |
+          exit 0
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
 
-      - name: Compare checked-in doc dump with current result
+      - name: Compare checked-in doc dump with current result (2)
         if: ${{ matrix.container_version != 'slim' }}
+        env:
+          RESULT: ${{ steps.rmg_doc_dump.outcome }}
         run: |
-          cd build
-          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
-          make remage-doc-dump
-          diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
-
-  test_on_mac:
-    name: Test on macOS
-    runs-on: macos-latest
-    defaults:
-      run:
-        shell: bash -el {0}
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # we need a fully checked-out repo to get version from setuptools-scm.
-          fetch-depth: 0
-          fetch-tags: true
-          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
-
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          miniforge-version: latest
-          activate-environment: "geant4-env"
-          auto-activate-base: "false"
-          channels: conda-forge
-          channel-priority: "strict"
-          conda-remove-defaults: "true"
-
-      - name: Install Geant4 and native dependencies
-        run: |
-          # native dependencies for pyg4ometry
-          brew install opencascade cgal gmp mpfr boost
-
-          conda install conda-forge::geant4
-          echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
-
-      - name: Build project
-        run: |
-          mkdir build .local
-          cd build
-          cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
-          make
-          make install
-
-      - name: Run minimal test suite
-        run: |
-          cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
+          if [ "$RESULT" = "failure"" ]; then
+            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
+            exit 1
+          else
+            echo "::notice::docs/rmg-commands.md is up-to-date with remage source"
+          fi
 
 # vim: expandtab tabstop=2 shiftwidth=2

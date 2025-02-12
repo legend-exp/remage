@@ -11,6 +11,8 @@ Macro commands
 
 ## `/RMG/`
 
+make test fail
+
 
 **Sub-directories:**
 
