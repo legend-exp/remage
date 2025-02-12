@@ -89,7 +89,7 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
      * RMGGermaniumDetectorHit and then adding this to the hit collection.*/
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
-    
+
     /** @brief Compute the distance from the point to the surface of the physical volume.
      * @details Checks distance to surfaces of mother volume.
      * @param sv The solid to find the distance to.
@@ -97,7 +97,8 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
      * @param tf The transformation to global coordinates
      * @param position The position to evaluate the distance for.
      */
-  double DistanceToSurface(const G4VSolid *sv,const G4LogicalVolume * lv,const G4AffineTransform tf, const G4ThreeVector & position);
+    double DistanceToSurface(const G4VSolid* sv, const G4LogicalVolume* lv,
+        const G4AffineTransform tf, const G4ThreeVector& position);
 
   private:
 

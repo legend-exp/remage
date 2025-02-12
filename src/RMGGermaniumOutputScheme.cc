@@ -27,9 +27,8 @@
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
-#include "RMGTools.hh"
-
 #include "RMGManager.hh"
+#include "RMGTools.hh"
 
 namespace u = CLHEP;
 
@@ -175,20 +174,24 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
 
       // extract position and distance
-      G4ThreeVector position  = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) ? hit->global_position_prestep : 
-                                (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) ? hit->global_position_poststep :
-                                hit->global_position_average;
-  
-      double distance = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) ? hit->distance_to_surface_prestep : 
-                                (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) ? hit->distance_to_surface_poststep :
-                                hit->distance_to_surface_average;
+      G4ThreeVector position = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep)
+                                   ? hit->global_position_prestep
+                               : (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep)
+                                   ? hit->global_position_poststep
+                                   : hit->global_position_average;
+
+      double distance = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep)
+                            ? hit->distance_to_surface_prestep
+                        : (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep)
+                            ? hit->distance_to_surface_poststep
+                            : hit->distance_to_surface_average;
 
 
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
           fStoreSinglePrecisionPosition);
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++,position.getZ() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
           fStoreSinglePrecisionPosition);
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
           fStoreSinglePrecisionPosition);
@@ -279,9 +282,8 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance("Select which position of the step to store")
       .SetParameterName("mode", false)
       .SetCandidates(RMGTools::GetCandidates<PositionMode>())
-      .SetStates( G4State_Idle)
+      .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
-
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
