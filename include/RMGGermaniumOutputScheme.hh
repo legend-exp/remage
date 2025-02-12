@@ -49,9 +49,9 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     /** @brief Enum of which position of the hit to store. */
     enum class PositionMode {
-      kPreStep, /**Store the prestep point. */
-      kPostStep,/**Store the poststep point. */
-      kAverage,/**Store the average. */
+      kPreStep,  /**Store the prestep point. */
+      kPostStep, /**Store the poststep point. */
+      kAverage,  /**Store the average. */
     };
 
     RMGGermaniumOutputScheme();
@@ -92,8 +92,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
     /** @brief Set which position is used for the steps */
-    inline void SetPositionMode(PositionMode mode){fPositionMode = mode;}
-    
+    inline void SetPositionMode(PositionMode mode) { fPositionMode = mode; }
+
   protected:
 
     [[nodiscard]] inline std::string GetNtuplenameFlat() const override { return "germanium"; }
@@ -101,7 +101,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
   private:
 
     RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);
-  void SetPositionModeString(std::string mode);
+    void SetPositionModeString(std::string mode);
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
@@ -119,7 +119,6 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fStoreTrackID = false;
 
     PositionMode fPositionMode = PositionMode::kPreStep;
-
 };
 
 #endif

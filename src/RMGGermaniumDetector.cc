@@ -81,7 +81,8 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
-double RMGGermaniumDetector::DistanceToSurface(const G4VSolid *sv,const G4LogicalVolume * lv,const G4AffineTransform tf, const G4ThreeVector & position){
+double RMGGermaniumDetector::DistanceToSurface(const G4VSolid* sv, const G4LogicalVolume* lv,
+    const G4AffineTransform tf, const G4ThreeVector& position) {
 
   // Get distance to surface.
   // First transform coordinates into local system
@@ -114,10 +115,10 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   // we're going to use info from the pre-step point
   const auto prestep = step->GetPreStepPoint();
   const auto position_prestep = prestep->GetPosition();
-  
+
   const auto poststep = step->GetPostStepPoint();
   const auto position_poststep = poststep->GetPosition();
-  const auto position_average  = (position_prestep+position_poststep)/2;
+  const auto position_average = (position_prestep + position_poststep) / 2;
 
   // locate us
   const auto pv = prestep->GetTouchableHandle()->GetVolume();
@@ -151,23 +152,23 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
-  
+
   // positions
   hit->global_position_prestep = position_prestep;
-  hit->global_position_poststep =  position_poststep;
-  hit->global_position_average =  position_average;
+  hit->global_position_poststep = position_poststep;
+  hit->global_position_average = position_average;
 
   hit->global_time = prestep->GetGlobalTime();
   hit->track_id = step->GetTrack()->GetTrackID();
   hit->parent_track_id = step->GetTrack()->GetParentID();
-  
+
   G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
   tf.Invert();
 
   // get various distances
-  hit->distance_to_surface_prestep = DistanceToSurface(sv,lv,tf,position_prestep);
-  hit->distance_to_surface_poststep = DistanceToSurface(sv,lv,tf,position_poststep);
-  hit->distance_to_surface_average = DistanceToSurface(sv,lv,tf,position_average);
+  hit->distance_to_surface_prestep = DistanceToSurface(sv, lv, tf, position_prestep);
+  hit->distance_to_surface_poststep = DistanceToSurface(sv, lv, tf, position_poststep);
+  hit->distance_to_surface_average = DistanceToSurface(sv, lv, tf, position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
