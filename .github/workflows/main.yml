@@ -49,6 +49,7 @@ jobs:
 
       - name: check version equality
         run: |
+          cd build
           cpp_version=$(sed -En "s/-- remage version [0-9.]+ \(([0-9a-z.+_-]+)\)/\\1/p" build.log)
           py_version=$(sed -En "s/-- Installed python wrapper Version: ([0-9a-z.+_-]+)/\\1/p" build.log)
           if [ "$cpp_version" == "$py_version" ]; then
