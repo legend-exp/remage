@@ -52,10 +52,11 @@ jobs:
           cd build
           cpp_version=$(sed -En "s/-- remage version [0-9.]+ \(([0-9a-z.+_-]+)\)/\\1/p" build.log)
           py_version=$(sed -En "s/-- Installed python wrapper Version: ([0-9a-z.+_-]+)/\\1/p" build.log)
-          if [ "$cpp_version" == "$py_version" ]; then
+          if [ "$cpp_version" != "$py_version" ]; then
             echo "::error:: version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
             exit 1
           fi
+          echo "::error:: version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
 
       - name: Setup and start xvfb (enables Geant4 visualization)
         run: |
