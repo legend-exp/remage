@@ -32,14 +32,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # we need a fully checked-out repo to get version from setuptools-scm.
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
       - name: Build project
         run: |
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
-          cmake -DRMG_BUILD_DOCS=OFF ..
-          make
-          make install
+          cmake -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          make | tee -a build.log
+          make install | tee -a build.log
+
+      - name: check version equality
+        run: |
+          cd build
+          cpp_version=$(sed -En "s/-- remage version [0-9.]+ \(([0-9a-z.+_-]+)\)/\\1/p" build.log)
+          py_version=$(sed -En "s/-- Installed python wrapper Version: ([0-9a-z.+_-]+)/\\1/p" build.log)
+          if [ "$cpp_version" != "$py_version" ]; then
+            echo "::error::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
+            exit 1
+          else
+            echo "::notice::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) are matching!"
+          fi
 
       - name: Compare checked-in doc dump with current result
         if: ${{ matrix.container_version != 'slim' }}
@@ -60,10 +78,10 @@ jobs:
           docs_differ=0
           docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
           if [ $docs_differ -ne 0 ]; then
-            echo "::error file=docs/rmg-commands.md:: docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
+            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
             echo "$docs_diff"
           else
-            echo "::notice:: is up-to-date with remage source"
+            echo "::notice::docs/rmg-commands.md is up-to-date with remage source"
           fi
 
       - name: Setup and start xvfb (enables Geant4 visualization)
@@ -101,8 +119,11 @@ jobs:
         env:
           RESULT: ${{ steps.rmg_doc_dump.outcome }}
         run: |
-          if [ "$RESULT" == "failure"" ]; then
+          if [ "$RESULT" = "failure"" ]; then
+            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
             exit 1
+          else
+            echo "::notice::docs/rmg-commands.md is up-to-date with remage source"
           fi
 
 # vim: expandtab tabstop=2 shiftwidth=2

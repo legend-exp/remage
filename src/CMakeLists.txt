@@ -18,6 +18,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGGrabmayrGCReader.hh
     ${_root}/include/RMGIsotopeFilterOutputScheme.hh
+    ${_root}/include/RMGIpc.hh
     ${_root}/include/RMGLog.hh
     ${_root}/include/RMGManager.hh
     ${_root}/include/RMGMasterGenerator.hh
@@ -59,6 +60,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
+    ${_root}/src/RMGIpc.cc
     ${_root}/src/RMGIsotopeFilterOutputScheme.cc
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGManager.cc

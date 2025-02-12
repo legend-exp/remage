@@ -31,6 +31,7 @@ namespace fs = std::filesystem;
 #if RMG_HAS_HDF5
 #include "RMGConvertLH5.hh"
 #endif
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 
 G4Mutex RMGAnalysisReader::fMutex = G4MUTEX_INITIALIZER;
@@ -105,6 +106,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
           ec.message(), ")");
       return std::move(invalid_access);
     }
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", new_fn));
 
     if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,

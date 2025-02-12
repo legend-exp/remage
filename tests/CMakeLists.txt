@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 project(remage-tests)
 
 # this can be used as the path to the remage executable in the tests
