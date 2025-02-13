@@ -6,7 +6,6 @@ endif()
 
 # let's now look for python, needed for build preparation, the python wrapper and tests
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
-message(STATUS "Found Python interpreter: ${Python3_EXECUTABLE}")
 
 execute_process(
   COMMAND "${Python3_EXECUTABLE}" -m venv --help
