@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -16,6 +17,9 @@ nthread = int(sys.argv[3])
 
 output_stem = macro + ("-mt" if nthread > 1 else "")
 output_lh5 = f"{output_stem}.lh5"
+
+# geant4 only uses as many CPUs as available.
+nthread = min([nthread, os.cpu_count()])
 
 # clean up files from last run(s).
 for old_f in Path().glob(f"{output_stem}*.lh5"):
