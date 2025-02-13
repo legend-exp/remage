@@ -33,6 +33,7 @@ RUN mkdir -p src build /opt/remage && \
     else \
         ctest --output-on-failure --label-exclude 'vis'; \
     fi && \
+    cd .. && \
     rm -rf build src
 
 ENV PATH="/opt/remage/bin:$PATH" \
