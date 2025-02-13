@@ -136,7 +136,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
+          cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
           make
           make install
 
@@ -148,6 +148,6 @@ jobs:
       - name: Minimally test installed executable
         run: |
           rm -rf build
-          PATH="/usr/local/bin:$PATH" LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH" remage --version
+          PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$DYLD_LIBRARY_PATH" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
