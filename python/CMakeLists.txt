@@ -41,7 +41,8 @@ add_custom_command(
 add_custom_target(python-virtualenv DEPENDS ${VENV_DIR}/bin/uv)
 
 # store the path to the python executable, needed later in tests
-set_target_properties(python-virtualenv PROPERTIES PYTHONPATH ${VENV_DIR}/bin/python)
+set_target_properties(python-virtualenv PROPERTIES PYTHONPATH ${VENV_DIR}/bin/python
+                                                   ADDITIONAL_CLEAN_FILES ${VENV_DIR})
 
 # install the remage wrapper package into the virtual environment with uv
 # (build area), including dependencies for running tests
@@ -70,7 +71,12 @@ add_custom_command(
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)
 
 # store the path to the remage executable, needed later in tests (that must work in the build area)
-set_target_properties(remage-cli PROPERTIES PYEXE_PATH ${VENV_DIR}/bin/remage)
+set_target_properties(
+  remage-cli
+  PROPERTIES
+    ADDITIONAL_CLEAN_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py;${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py"
+    PYEXE_PATH ${VENV_DIR}/bin/remage)
 
 # install section
 
@@ -90,6 +96,13 @@ add_custom_command(
   COMMENT "Installing remage Python wrapper")
 
 add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
+
+set_target_properties(
+  install-remage-cli
+  PROPERTIES
+    ADDITIONAL_CLEAN_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py;${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py"
+)
 
 # hack the install process to also install the remage wrapper
 install(
