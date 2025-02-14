@@ -135,14 +135,17 @@ jobs:
 
       - name: Build project
         run: |
-          ls $CMAKE_PREFIX_PATH
-          find $CMAKE_PREFIX_PATH -type f
           exit 1
           mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
           make
           make install
+
+      - name: Minimally test installed executable
+        run: |
+          rm -rf build
+          PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
 
       - name: Run minimal test suite
         run: |
