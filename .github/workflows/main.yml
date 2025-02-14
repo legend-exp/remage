@@ -135,7 +135,6 @@ jobs:
 
       - name: Build project
         run: |
-          exit 1
           mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
