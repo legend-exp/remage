@@ -145,4 +145,9 @@ jobs:
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
 
+      - name: Minimally test installed executable
+        run: |
+          rm -rf build
+          PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
+
 # vim: expandtab tabstop=2 shiftwidth=2
