@@ -23,10 +23,10 @@ jobs:
       fail-fast: false
       matrix:
         # guideline: only test on latest patch releases (and maybe previous one)
-        container_version:
-          - G4.11.3
-          - G4.11.2
-          - slim
+        container_version: []
+          #- G4.11.3
+          #- G4.11.2
+          #- slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
 
@@ -135,7 +135,8 @@ jobs:
 
       - name: Build project
         run: |
-          tree $CMAKE_PREFIX_PATH
+          ls $CMAKE_PREFIX_PATH
+          find $CMAKE_PREFIX_PATH -type f
           exit 1
           mkdir build
           cd build
