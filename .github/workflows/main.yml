@@ -23,7 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         # guideline: only test on latest patch releases (and maybe previous one)
-        container_version: []
+        container_version:
+          []
           #- G4.11.3
           #- G4.11.2
           #- slim
