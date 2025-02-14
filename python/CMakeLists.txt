@@ -35,7 +35,7 @@ add_custom_command(
   OUTPUT ${VENV_DIR}/bin/uv
   COMMAND ${Python3_EXECUTABLE} -m venv ${VENV_DIR}
   COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade pip
-  COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location uv
+  COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade uv
   COMMENT "Configuring Python virtual environment")
 
 add_custom_target(python-virtualenv DEPENDS ${VENV_DIR}/bin/uv)
@@ -56,12 +56,11 @@ else()
   set(_pkg_install ${CMAKE_SOURCE_DIR})
 endif()
 
+# now we want to use the cpp_config for the build area
 add_custom_command(
   OUTPUT ${VENV_DIR}/bin/remage
-  COMMAND
-    cp
-    ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py # now we want to use the cpp_config for the build area
-    ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
+  COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
+          ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND ${VENV_DIR}/bin/python -m uv pip -q install --reinstall ${_pkg_install}
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND bash -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
@@ -75,20 +74,22 @@ set_target_properties(remage-cli PROPERTIES PYEXE_PATH ${VENV_DIR}/bin/remage)
 
 # install section
 
-# install the package into the install prefix with the existing uv installation
+# install the package into the install prefix together with a virtualenv
+# in this way remage should always run isolated in its environment.
+# we want to use the cpp_config for the install area
 add_custom_command(
   OUTPUT ${CMAKE_INSTALL_PREFIX}/bin/remage
-  COMMAND
-    cp
-    ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py # now we want to use the cpp_config for the install area
-    ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${VENV_DIR}/bin/python -m uv -q pip install --reinstall --prefix ${CMAKE_INSTALL_PREFIX}
-          ${CMAKE_SOURCE_DIR})
-
-add_custom_target(
-  install-remage-cli
-  DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage
+  COMMAND ${Python3_EXECUTABLE} -m venv ${CMAKE_INSTALL_PREFIX}
+  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m pip -q install --no-warn-script-location --upgrade
+          pip
+  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m pip -q install --no-warn-script-location --upgrade
+          uv
+  COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
+          ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
+  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
   COMMENT "Installing remage Python wrapper")
+
+add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
 
 # hack the install process to also install the remage wrapper
 install(

@@ -95,6 +95,11 @@ jobs:
           make remage-doc-dump
           diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
 
+      - name: Minimally test installed executable
+        run: |
+          rm -rf build
+          PATH="/usr/local/bin:$PATH" LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH" remage --version
+
   test_on_mac:
     name: Test on macOS
     runs-on: macos-latest
@@ -129,7 +134,7 @@ jobs:
 
       - name: Build project
         run: |
-          mkdir build .local
+          mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
           make
