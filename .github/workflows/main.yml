@@ -24,8 +24,8 @@ jobs:
       matrix:
         # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
-          #- G4.11.3
-          #- G4.11.2
+          - G4.11.3
+          - G4.11.2
           - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
@@ -40,7 +40,6 @@ jobs:
 
       - name: Build project
         run: |
-          exit 1  # TODO: remove
           git config --global --add safe.directory $(pwd)  # make git work inside container.
           mkdir build
           cd build
@@ -141,14 +140,14 @@ jobs:
           make
           make install
 
-      - name: Minimally test installed executable
-        run: |
-          rm -rf build
-          PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
-
       - name: Run minimal test suite
         run: |
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
+
+      - name: Minimally test installed executable
+        run: |
+          rm -rf build
+          PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
