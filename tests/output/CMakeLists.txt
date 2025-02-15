@@ -1,15 +1,6 @@
 # executable for converting remage output HDF5 with ntuples to LH5 tables
-set(_visit_hdf5 "false")
 set(_remage_to_lh5 "false")
 if(RMG_HAS_HDF5)
-  add_executable(test-visit-hdf5 EXCLUDE_FROM_ALL test-visit-hdf5.cc)
-  target_include_directories(test-visit-hdf5 PRIVATE ${HDF5_INCLUDE_DIRS})
-  target_link_libraries(test-visit-hdf5 PUBLIC ${HDF5_CXX_LIBRARIES})
-  set(_visit_hdf5 $<TARGET_FILE:test-visit-hdf5>)
-  add_test(NAME output/build-test-visit-hdf5
-           COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
-                   test-visit-hdf5)
-
   set(_remage_to_lh5 $<TARGET_FILE:remage-to-lh5>)
 endif()
 
@@ -17,7 +8,7 @@ endif()
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh run-test-*.py)
+  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh *.py)
 
 # copy them to the build area
 foreach(_file ${_aux})
@@ -29,7 +20,7 @@ set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-flat.mac ntuple-fla
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli-cpp>
-                                            ${_visit_hdf5} ${_remage_to_lh5} ${_mac})
+                                            ${PYTHONPATH} ${_remage_to_lh5} ${_mac})
   add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh $<TARGET_FILE:remage-cli-cpp>
                                             ${_mac})
 endforeach()
