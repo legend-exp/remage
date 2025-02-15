@@ -29,7 +29,8 @@ list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra DEPENDS output/build-test-visit-hdf5)
 
 # SPECIAL TESTS
-add_test(NAME output/th228-chain COMMAND ./run-test-th228-chain.py $<TARGET_FILE:remage-cli-cpp>)
+add_test(NAME output/th228-chain COMMAND ${PYTHONPATH} run-test-th228-chain.py
+                                         $<TARGET_FILE:remage-cli-cpp>)
 set_tests_properties(output/th228-chain PROPERTIES LABELS extra)
 
 # Geant4 <= 11.0.3 is deleting non-empty HDF5 files after a successful run, so disable the tests.
