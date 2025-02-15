@@ -281,7 +281,7 @@ namespace {
 
 void RMGRunAction::PostprocessOutputFile() const {
 
-  if (fCurrentOutputFile.first == fCurrentOutputFile.second) {
+  if (fCurrentOutputFile.first == fCurrentOutputFile.second && fs::exists(fCurrentOutputFile.first)) {
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", fCurrentOutputFile.first));
     return;
   }
@@ -292,7 +292,9 @@ void RMGRunAction::PostprocessOutputFile() const {
   auto worker_tmp = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
   auto worker_lh5 = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.second.string(), "lh5"));
 
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", worker_lh5));
+  if (fs::exists(worker_tmp)) {
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", worker_lh5));
+  }
 
   if (!fs::exists(worker_tmp)) {
     if (!this->IsMaster() || RMGManager::Instance()->IsExecSequential()) {
