@@ -3,7 +3,7 @@
 set -euo pipefail
 
 rmg="$1"
-visit_hdf5="$2"
+python_path="$2"
 remage_to_lh5="$3"
 macro="macros/$4"
 
@@ -23,7 +23,7 @@ output_exp_lh5="macros/${4/.mac/.hdf5ls-lh5}"
 "$rmg" -g gdml/geometry.gdml -o "$output" -w -- "$macro"
 
 # extract written hdf5 structure.
-"$visit_hdf5" "$output" > "$output_dump"
+"$python_path" ./visit-hdf5.py "$output" > "$output_dump"
 
 # compare structure with expectation.
 # this verifies that we have
@@ -40,7 +40,7 @@ diff "$output_dump" "$output_exp"
 # ------------------------------
 
 # extract written lh5 structure & compare with expectation.
-"$visit_hdf5" "$output" --dump-attrs > "$output_dump_lh5"
+"$python_path" ./visit-hdf5.py "$output" --dump-attrs > "$output_dump_lh5"
 diff "$output_dump_lh5" "$output_exp_lh5"
 
 
@@ -52,5 +52,5 @@ diff "$output_dump_lh5" "$output_exp_lh5"
 "$rmg" -g gdml/geometry.gdml -o "$output_lh5" -w -- "$macro"
 
 # extract written lh5 structure & compare with expectation.
-"$visit_hdf5" "$output_lh5" --dump-attrs > "$output_dump_lh5"
+"$python_path" ./visit-hdf5.py "$output_lh5" --dump-attrs > "$output_dump_lh5"
 diff "$output_dump_lh5" "$output_exp_lh5"
