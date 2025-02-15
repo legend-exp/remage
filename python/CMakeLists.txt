@@ -4,7 +4,7 @@
 set(_r ${PROJECT_SOURCE_DIR})
 
 set(PYTHON_SOURCES ${_r}/cmake/cpp_config.py.in ${_r}/python/remage/__init__.py
-                   ${_r}/python/remage/cli.py ${_r}/pyproject.toml)
+                   ${_r}/python/remage/cli.py ${_r}/python/remage/ipc.py ${_r}/pyproject.toml)
 
 # get the output name of the remage-cli target (set in src/CMakeLists.txt)
 get_target_property(REMAGE_CPP_OUTPUT_NAME remage-cli-cpp OUTPUT_NAME)
