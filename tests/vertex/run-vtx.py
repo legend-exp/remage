@@ -2,24 +2,19 @@
 
 from __future__ import annotations
 
-import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 import numpy as np
 from lgdo import lh5
+from remage import remage_run
 
-rmg = sys.argv[1]
-macro = sys.argv[2]
-nthread = int(sys.argv[3])
+macro = sys.argv[1]
+nthread = int(sys.argv[2])
 
 output_stem = macro + ("-mt" if nthread > 1 else "")
 output_lh5 = f"{output_stem}.lh5"
-
-# geant4 only uses as many CPUs as available.
-nthread = min([nthread, os.cpu_count()])
 
 # clean up files from last run(s).
 for old_f in Path().glob(f"{output_stem}*.lh5"):
@@ -39,7 +34,6 @@ with Path(f"macros/{macro}.mac").open("r") as macro_file:
 
 # run remage, produce lh5 output.
 cmd = [
-    rmg,
     "-g",
     "gdml/geometry.gdml",
     "-o",
@@ -51,16 +45,9 @@ cmd = [
     "--",
     f"macros/{macro}.mac",
 ]
-proc = subprocess.run(cmd, check=False)
-
-if proc.returncode not in [0, 2]:
-    print("remage subprocess failed")
-    sys.exit(proc.returncode)
-
-# list of output files.
-files = output_lh5
-if nthread > 1:
-    files = [f"{output_stem}_t{i}.lh5" for i in range(nthread)]
+files = remage_run(cmd)[1].get("output")  # list of output files.
+if len(files) == 1:
+    files = files[0]
 
 # validate output against input files.
 if "pos" in macro:
