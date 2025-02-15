@@ -14,6 +14,7 @@ add_subdirectory(germanium)
 add_subdirectory(hades)
 add_subdirectory(internals)
 add_subdirectory(output)
+add_subdirectory(particlefilter)
 add_subdirectory(python)
 add_subdirectory(vertex)
 

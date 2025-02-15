@@ -1,0 +1,20 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme ParticleFilter
+
+/run/initialize
+
+/RMG/Output/ParticleFilter/AddParticle 22
+
+/RMG/Generator/Confine UnConfined
+
+/RMG/Generator/Select GPS
+/gps/pos/type Volume
+/gps/pos/shape Sphere
+/gps/pos/radius 0.5 m
+/gps/particle e-
+/gps/energy       2 MeV
+/gps/ang/type     iso
+
+/run/beamOn 10000

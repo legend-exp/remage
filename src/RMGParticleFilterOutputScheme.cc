@@ -59,10 +59,19 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterOutputScheme::
   // If a keep volume is specified only keep particle if in that volume.
   if (fKeepVolumes.find(pv_name) != fKeepVolumes.end()) return std::nullopt;
 
+  // If this is the primary particle we can not kill it without crashing the simulation
+  if (aTrack->GetTrackID() == 0) {
+    RMGLog::OutDev(RMGLog::warning,
+        "ParticleFilter: The primary particle was specified to kill. "
+        "This would cause the simulation to crash... so simulating it anyways. ");
+    return std::nullopt;
+  }
+
   // We land here if
   // i) Particle is marked to kill.
   // ii) No Kill volume specified or the particle is in the kill volume.
   // iii) Particle is not in the keep volume.
+  // iiii) Particle is not the primary particle.
   RMGLog::OutDev(RMGLog::debug, "Filtering out particle with PDG code ", pdg,
       " in RMGParticleFilterOutputScheme");
   return fKill;
