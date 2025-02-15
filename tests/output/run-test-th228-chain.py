@@ -2,20 +2,14 @@
 
 from __future__ import annotations
 
-import subprocess
-import sys
-
 from lgdo import lh5
+from remage import remage_run
 
-rmg = sys.argv[1]
 macro = "macros/th228-chain.mac"
 output_lh5 = "th228-chain.lh5"
 
 # run remage, produce lh5 output.
-subprocess.run(
-    [rmg, "-g", "gdml/geometry-box.gdml", "-o", output_lh5, "-w", "--", macro],
-    check=False,
-)
+remage_run(["-g", "gdml/geometry-box.gdml", "-o", output_lh5, "-w", "--", macro])
 
 # check that we get to stable isotopes.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")

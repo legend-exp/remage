@@ -63,3 +63,18 @@ def ipc_thread_fn(
         if e.errno == 9:  # bad file descriptor.
             return
         raise e
+
+
+class IpcResult:
+    def __init__(self, ipc_info):
+        self.ipc_info = ipc_info
+
+    def get(self, name: str) -> list[str]:
+        return [msg[1] for msg in self.ipc_info if len(msg) == 2 and msg[0] == name]
+
+    def get_single(self, name: str, default: str) -> str:
+        gen = self.get(name)
+        if len(gen) > 1:
+            msg = f"ipc returned key {name} more than once"
+            raise RuntimeError(msg)
+        return gen[0] if len(gen) == 1 else default
