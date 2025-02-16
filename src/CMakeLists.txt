@@ -87,6 +87,8 @@ set(PROJECT_SOURCES
 # no need to install, it is included in the header list above
 configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGConfig.hh.in
                ${PROJECT_SOURCE_DIR}/include/RMGConfig.hh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGVersion.hh.in
+               ${PROJECT_SOURCE_DIR}/include/RMGVersion.hh @ONLY)
 
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
