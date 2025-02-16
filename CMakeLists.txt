@@ -246,3 +246,13 @@ message(STATUS "WWW:   export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LI
 message(
   STATUS "WWW:   export CMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}/lib/cmake:$CMAKE_PREFIX_PATH")
 message(STATUS "")
+
+# TODO: can be removed after remage venv is not installed into the global python installation any more.
+if(CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+  message(FATAL_ERROR "WWW: cannot use ${CMAKE_INSTALL_PREFIX} as an install prefix, "
+                      "as it might conflict with the system python installation.")
+endif()
+if(CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
+  message(WARNING "WWW: it is not advised to use ${CMAKE_INSTALL_PREFIX} as an install prefix. "
+                  "Please consider using a path specific to remage.")
+endif()
