@@ -48,8 +48,8 @@ class RMGHardwareMessenger : public G4UImessenger {
   private:
 
     RMGHardware* fHardware;
-    G4UIcommand* fRegisterCmd;
-    G4UIcmdWithADoubleAndUnit* fStepLimitsCmd;
+    G4UIcommand* fRegisterCmd = nullptr;
+    G4UIcmdWithADoubleAndUnit* fStepLimitsCmd = nullptr;
 
     void RegisterDetectorCmd(const std::string& parameters);
     void StepLimitsCmd(const std::string& parameters);
