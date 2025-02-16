@@ -1,5 +1,6 @@
 # CMake generated
 /include/RMGConfig.hh
+/include/RMGVersion.hh
 /python/remage/cpp_config.py
 /docs/Doxyfile
 /docs/conf.py

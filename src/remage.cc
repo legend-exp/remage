@@ -27,6 +27,7 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
+#include "RMGVersion.hh"
 
 #include "magic_enum/magic_enum.hpp"
 

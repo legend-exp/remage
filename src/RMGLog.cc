@@ -16,6 +16,8 @@
 #include "G4Version.hh"
 
 #include "RMGConfig.hh"
+#include "RMGVersion.hh"
+
 #if RMG_HAS_ROOT
 #include <TError.h>
 #include <TROOT.h>
