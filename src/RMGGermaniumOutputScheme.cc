@@ -174,17 +174,23 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
 
       // extract position and distance
-      G4ThreeVector position = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep)
-                                   ? hit->global_position_prestep
-                               : (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep)
-                                   ? hit->global_position_poststep
-                                   : hit->global_position_average;
+      G4ThreeVector position;
+      double distance;
 
-      double distance = (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep)
-                            ? hit->distance_to_surface_prestep
-                        : (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep)
-                            ? hit->distance_to_surface_poststep
-                            : hit->distance_to_surface_average;
+      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
+        position = hit->global_position_prestep;
+        distance = hit->distance_to_surface_prestep;
+      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) {
+        position = hit->global_position_poststep;
+        distance = hit->distance_to_surface_poststep;
+      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kAverage) {
+
+        position = hit->global_position_average;
+        distance = hit->distance_to_surface_average;
+      } else
+        RMGLog::Out(RMGLog::fatal,
+            "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
+            magic_enum::enum_name<PositionMode>(fPositionMode));
 
 
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,

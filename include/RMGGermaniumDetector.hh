@@ -92,13 +92,16 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
 
     /** @brief Compute the distance from the point to the surface of the physical volume.
      * @details Checks distance to surfaces of mother volume.
-     * @param sv The solid to find the distance to.
-     * @param lv The logical volume instance, used to check for mother volume.
-     * @param tf The transformation to global coordinates
+     * @param pv The physical volume to find the distance to.
      * @param position The position to evaluate the distance for.
      */
-    double DistanceToSurface(const G4VSolid* sv, const G4LogicalVolume* lv,
-        const G4AffineTransform tf, const G4ThreeVector& position);
+    double DistanceToSurface(const G4VPhysicalVolume* pv, const G4ThreeVector& position);
+
+    /** @brief Check if the step point is contained in a physical volume registered as a Germanium detector.
+     *
+     * @param step_point The step point (either post or pre step) to check.
+     */
+    bool CheckStepPointContainment(const G4StepPoint* step_point);
 
   private:
 
