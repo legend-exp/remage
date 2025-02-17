@@ -9,6 +9,11 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-add_test(NAME particlefilter/test-particlefilter
-         COMMAND ${PYTHONPATH} ./run-test-particlefilter.py $<TARGET_FILE:remage-cli-cpp>)
-set_tests_properties(particlefilter/test-particlefilter PROPERTIES LABELS extra)
+add_test(NAME particlefilter/basicfilter COMMAND ${PYTHONPATH} run-test-basicfilter.py)
+set_tests_properties(particlefilter/basicfilter PROPERTIES LABELS extra)
+
+add_test(NAME particlefilter/killvolume COMMAND ${PYTHONPATH} run-test-killvolume.py)
+set_tests_properties(particlefilter/killvolume PROPERTIES LABELS extra)
+
+add_test(NAME particlefilter/keepvolume COMMAND ${PYTHONPATH} run-test-keepvolume.py)
+set_tests_properties(particlefilter/keepvolume PROPERTIES LABELS extra)

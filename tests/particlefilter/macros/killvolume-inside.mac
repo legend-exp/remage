@@ -1,0 +1,23 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme ParticleFilter
+
+/run/initialize
+
+/RMG/Output/ParticleFilter/AddParticle 1000020040
+/RMG/Output/ParticleFilter/AddParticle 1000882240
+/RMG/Output/ParticleFilter/AddParticle 1000882241
+/RMG/Output/ParticleFilter/AddKillVolume scint2
+
+/RMG/Generator/Confine Volume
+
+/RMG/Generator/Confinement/Physical/AddVolume scint2
+
+/RMG/Generator/Select GPS
+/gps/particle     ion
+/gps/ion          90 228
+/gps/energy       0 keV
+/gps/ang/type     iso
+
+/run/beamOn 10
