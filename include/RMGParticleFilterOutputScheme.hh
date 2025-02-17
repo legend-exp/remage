@@ -23,16 +23,49 @@
 
 #include "RMGVOutputScheme.hh"
 
+/** @brief Filter-output scheme for particles.
+ *
+ *  @details This optional output scheme filters out all particles specified via
+ *  their PDG code. Optionally, it can apply this filter to a specified volume
+ *  or ignore a specified volume. Properties need to be specified per macro.
+ *
+ *  Does nothing if the output scheme is not enabled per macro before run initialization.
+ *  Also does nothing if no particle is specified. If no volume is specified the filter
+ *  is applied to all volumes.
+ */
 class RMGParticleFilterOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGParticleFilterOutputScheme();
 
+    /** @brief Wraps @c G4UserStackingAction::StackingActionClassify
+     *  @details This is used to classify all specified particles as @c fKill if
+     *  they are in the specified volumes (or no volume is specified).
+     *
+     *  If the primary particle is filtered out here, the simulation crashes. To
+     *  avoid the crash, the particle will be simulated anyways and a warning message will
+     *  be shown.
+     */
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
+    /** @brief Add a particle, identified by its PDG code, to the list of particles to kill. */
     inline void AddParticle(int pdg) { fParticles.insert(pdg); }
+
+    /** @brief Add a physical volume, by name, to the volumes in which the filter will
+     *  not be applied.
+     *  @details This means that specified particles outside of the specified
+     *  keep-volumes will be filtered. It is therefore not possible to specify keep-volumes
+     *  and kill-volumes in the same geometry.
+     */
     void AddKeepVolume(std::string name);
+
+    /** @brief Add a physical volume, by name, to the volumes in which the filter will
+     *  be applied.
+     *  @details This means that specified particles outside of the specified
+     *  kill-volumes will not be affected by the filter. It is therefore not possible to
+     *  specify keep-volumes and kill-volumes in the same geometry.
+     */
     void AddKillVolume(std::string name);
 
   private:
