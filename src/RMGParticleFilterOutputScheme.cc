@@ -26,7 +26,7 @@ RMGParticleFilterOutputScheme::RMGParticleFilterOutputScheme() { this->DefineCom
 
 void RMGParticleFilterOutputScheme::AddKeepVolume(std::string name) {
   if (!fKillVolumes.empty()) {
-    RMGLog::OutDev(RMGLog::error, "Conflicting requests for kill/keep volume in ParticleFilter. "
+    RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
                                   "Trying to assign keep-volume but a kill-volume already exists.");
   }
 
@@ -35,7 +35,7 @@ void RMGParticleFilterOutputScheme::AddKeepVolume(std::string name) {
 
 void RMGParticleFilterOutputScheme::AddKillVolume(std::string name) {
   if (!fKeepVolumes.empty()) {
-    RMGLog::OutDev(RMGLog::error, "Conflicting requests for kill/keep volume in ParticleFilter. "
+    RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
                                   "Trying to assign kill-volume but a keep-volume already exists.");
   }
 
