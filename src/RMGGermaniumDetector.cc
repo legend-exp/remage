@@ -156,9 +156,9 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   // check containment of pre and post-step point
   auto prestep_inside = this->CheckStepPointContainment(prestep);
-  auto poststep_inside = this->CheckStepPointContainment(poststep);
+  // auto poststep_inside = this->CheckStepPointContainment(poststep);
 
-  if (not prestep_inside or not poststep_inside) return false;
+  if (not prestep_inside) return false;
 
   // retrieve unique id for persistency, take from the prestep
   const auto pv = prestep->GetTouchableHandle()->GetVolume();

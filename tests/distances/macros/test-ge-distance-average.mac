@@ -1,0 +1,18 @@
+/control/execute macros/detectors-fake.mac
+/RMG/Output/NtuplePerDetector false
+
+/run/initialize
+/RMG/Output/Germanium/StepPositionMode Average
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume B.*
+/RMG/Generator/Confinement/Physical/AddVolume C.*
+/RMG/Generator/Confinement/Physical/AddVolume P.*
+/RMG/Generator/Confinement/Physical/AddVolume V.*
+
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 100000

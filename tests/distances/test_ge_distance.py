@@ -11,6 +11,7 @@ import awkward as ak
 import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
+import sys
 from legendhpges import draw
 from lgdo import lh5
 from matplotlib import pyplot as plt
@@ -20,7 +21,7 @@ plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12
 
 gdml = "gdml/ge-array.gdml"
-outfile = "test-distance.lh5"
+outfile =sys.argv[1]
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()

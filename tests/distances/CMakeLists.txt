@@ -16,13 +16,15 @@ set_tests_properties(distances-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETU
                                                       distance-gdml-fixture)
 
 # test on HPGe containment
-add_test(NAME distances-ge/gen-output COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o
-                                              test-distance.lh5 -- macros/test-ge-distance.mac)
-set_tests_properties(
-  distances-ge/gen-output PROPERTIES LABELS extra FIXTURES_SETUP distance-output-fixture
-                                     FIXTURES_REQUIRED distance-gdml-fixture)
+foreach(value prestep poststep average)
+  add_test(NAME distances-ge/gen-output-${value} COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o
+                                                test-distance-${value}.lh5 -- macros/test-ge-distance-${value}.mac)
+  set_tests_properties(
+    distances-ge/gen-output-${value} PROPERTIES LABELS extra FIXTURES_SETUP distance-output-fixture-${value}
+                                      FIXTURES_REQUIRED distance-gdml-fixture-${value})
 
-add_test(NAME distances-ge/distance COMMAND ${PYTHONPATH} ./test_ge_distance.py)
+  add_test(NAME distances-ge/distance-${value} COMMAND ${PYTHONPATH} ./test_ge_distance.py test-distance-${value}.lh5)
 
-set_tests_properties(distances-ge/distance PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                      distance-output-fixture)
+  set_tests_properties(distances-ge/distance-${value} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                        distance-output-fixture-${value})
+endforeach()
