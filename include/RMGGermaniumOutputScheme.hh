@@ -52,6 +52,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
       kPreStep,  /**Store the prestep point. */
       kPostStep, /**Store the poststep point. */
       kAverage,  /**Store the average. */
+      kBoth,     /**Store both post and prestep */
     };
 
     RMGGermaniumOutputScheme();

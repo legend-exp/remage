@@ -2,6 +2,7 @@
 /RMG/Output/NtuplePerDetector false
 
 /run/initialize
+/RMG/Output/Germanium/StepPositionMode PostStep
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume B.*

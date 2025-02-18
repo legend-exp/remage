@@ -80,6 +80,14 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     CreateNtupleFOrDColumn(ana_man, id, "zloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_in_m", fStoreSinglePrecisionPosition);
 
+    // save also a second position if requested
+    if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+
+      CreateNtupleFOrDColumn(ana_man, id, "xloc_post_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "yloc_post_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "zloc_post_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_post_in_m", fStoreSinglePrecisionPosition);
+    }
     ana_man->FinishNtuple(id);
   }
 }
@@ -177,7 +185,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       G4ThreeVector position;
       double distance;
 
-      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
+      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep or
+          fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
         position = hit->global_position_prestep;
         distance = hit->distance_to_surface_prestep;
       } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) {
@@ -201,6 +210,20 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
           fStoreSinglePrecisionPosition);
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
           fStoreSinglePrecisionPosition);
+
+      // save also post-step if requested
+      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+        position = hit->global_position_poststep;
+        distance = hit->distance_to_surface_poststep;
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
+            fStoreSinglePrecisionPosition);
+      }
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
