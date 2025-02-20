@@ -80,19 +80,21 @@ set_target_properties(
 
 # install section
 
+set(INSTALL_VENV_DIR ${CMAKE_INSTALL_PREFIX}/share/remage_venv)
+
 # install the package into the install prefix together with a virtualenv
 # in this way remage should always run isolated in its environment.
 # we want to use the cpp_config for the install area
 add_custom_command(
   OUTPUT ${CMAKE_INSTALL_PREFIX}/bin/remage
-  COMMAND ${Python3_EXECUTABLE} -m venv ${CMAKE_INSTALL_PREFIX}
-  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m pip -q install --no-warn-script-location --upgrade
-          pip
-  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m pip -q install --no-warn-script-location --upgrade
-          uv
+  COMMAND ${Python3_EXECUTABLE} -m venv ${INSTALL_VENV_DIR}
+  COMMAND ${INSTALL_VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade pip
+  COMMAND ${INSTALL_VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade uv
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
+  COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
+  COMMAND ln -s ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
   COMMENT "Installing remage Python wrapper")
 
 add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
