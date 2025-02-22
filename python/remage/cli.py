@@ -18,7 +18,9 @@ from .ipc import IpcResult, ipc_thread_fn
 log = logging.getLogger(__name__)
 
 
-def _run_remage_cpp(args: list[str] | None = None) -> tuple[int, IpcResult]:
+def _run_remage_cpp(
+    args: list[str] | None = None,
+) -> tuple[int, signal.Signals, IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
 
     # open pipe for IPC C++ -> python.
@@ -86,7 +88,8 @@ def _run_remage_cpp(args: list[str] | None = None) -> tuple[int, IpcResult]:
     ipc_thread.join()
 
     ec = 128 - proc.returncode if proc.returncode < 0 else proc.returncode
-    return ec, IpcResult(unhandled_ipc_messages)
+    termsig = signal.Signals(-proc.returncode) if proc.returncode < 0 else None
+    return ec, termsig, IpcResult(unhandled_ipc_messages)
 
 
 def _setup_log() -> logging.Logger:
@@ -120,7 +123,11 @@ def remage_run(
 ) -> tuple[int, IpcResult]:
     logger = _setup_log()
 
-    ec, ipc_info = _run_remage_cpp(args)
+    ec, termsig, ipc_info = _run_remage_cpp(args)
+    # print an error message for the termination signal, similar to what bash does.
+    if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
+        print(signal.strsignal(termsig), file=sys.stderr)  # noqa: T201
+
     # clean-up should run always, irrespective of exit code.
     _cleanup_tmp_files(ipc_info)
 
