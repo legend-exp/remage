@@ -65,7 +65,7 @@ add_custom_command(
   COMMAND ${VENV_DIR}/bin/python -m uv pip -q install --reinstall ${_pkg_install}
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND bash -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
-  DEPENDS python-virtualenv ${PYTHON_SOURCES}
+  DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
   COMMENT "Installing remage Python wrapper into the virtual environment")
 
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)
@@ -93,8 +93,9 @@ add_custom_command(
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
-  COMMAND ln -s ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
+  COMMAND ln -fs ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
   WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+  DEPENDS ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
   COMMENT "Installing remage Python wrapper")
 
 add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
