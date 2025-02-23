@@ -6,12 +6,12 @@
 from __future__ import annotations
 
 import copy
+import sys
 
 import awkward as ak
 import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
-import sys
 from legendhpges import draw
 from lgdo import lh5
 from matplotlib import pyplot as plt
@@ -100,9 +100,9 @@ def make_plot(hit, tolerance=1e-9):
             good_distance = False
 
             bad = np.where(np.abs(sel_hit.dist_G4 - dist_py) > tolerance)
-            msg = f"The following distances are difference\n"
-            msg +=f"Geant4 {sel_hit.dist_G4[bad]} \n"
-            msg +=f"Python {dist_py[bad]}"
+            msg = "The following distances are difference\n"
+            msg += f"Geant4 {sel_hit.dist_G4[bad]} \n"
+            msg += f"Python {dist_py[bad]}"
             print(msg)
 
         # Now draw the plots
