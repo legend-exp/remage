@@ -21,7 +21,7 @@ foreach(value prestep poststep average)
                                                 test-distance-${value}.lh5 -- macros/test-ge-distance-${value}.mac)
   set_tests_properties(
     distances-ge/gen-output-${value} PROPERTIES LABELS extra FIXTURES_SETUP distance-output-fixture-${value}
-                                      FIXTURES_REQUIRED distance-gdml-fixture-${value})
+                                      FIXTURES_REQUIRED distance-gdml-fixture)
 
   add_test(NAME distances-ge/distance-${value} COMMAND ${PYTHONPATH} ./test_ge_distance.py test-distance-${value}.lh5)
 
