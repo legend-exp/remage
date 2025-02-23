@@ -13,6 +13,6 @@
 
 /RMG/Generator/Select GPS
 /gps/particle e-
-/gps/energy 1 eV
+/gps/energy 1000 keV
 
 /run/beamOn 100000
