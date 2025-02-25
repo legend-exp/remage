@@ -1,3 +1,4 @@
+// Copyright (C) 2024 Manuel Huber
 // Copyright (C) 2022 Luigi Pertoldi <gipert@pm.me>
 //
 // This program is free software: you can redistribute it and/or modify it under
