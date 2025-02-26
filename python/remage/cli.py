@@ -126,7 +126,11 @@ def remage_run(
     ec, termsig, ipc_info = _run_remage_cpp(args)
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
-        print(signal.strsignal(termsig), file=sys.stderr)  # noqa: T201
+        log.error(
+            "remage-cpp exited with signal %s (%s)",
+            termsig.name,
+            signal.strsignal(termsig),
+        )
 
     # clean-up should run always, irrespective of exit code.
     _cleanup_tmp_files(ipc_info)
@@ -138,6 +142,8 @@ def remage_run(
             msg = "error while running remage-cpp"
             raise RuntimeError(msg)
         return ec, ipc_info
+
+    assert termsig is None  # now we should only have had a graceful exit.
 
     # setup logging based on log level from C++.
     log_level = ipc_info.get_single("loglevel", "summary")
