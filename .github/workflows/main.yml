@@ -127,6 +127,7 @@ jobs:
       - name: Install Geant4 and native dependencies
         run: |
           # native dependencies for pyg4ometry
+          brew update
           brew install opencascade cgal gmp mpfr boost
 
           conda install conda-forge::geant4
