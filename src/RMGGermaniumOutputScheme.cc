@@ -242,7 +242,6 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
             fStoreSinglePrecisionPosition);
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
             fStoreSinglePrecisionPosition);
-
       }
 
       // NOTE: must be called here for hit-oriented output
