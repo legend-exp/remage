@@ -87,6 +87,11 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       CreateNtupleFOrDColumn(ana_man, id, "yloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "zloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_post_in_m", fStoreSinglePrecisionPosition);
+
+      CreateNtupleFOrDColumn(ana_man, id, "xloc_avg_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "yloc_avg_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "zloc_avg_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_avg_in_m", fStoreSinglePrecisionPosition);
     }
     ana_man->FinishNtuple(id);
   }
@@ -213,8 +218,22 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
       // save also post-step if requested
       if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+
+        // save post-step
         position = hit->global_position_poststep;
         distance = hit->distance_to_surface_poststep;
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
+            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
+            fStoreSinglePrecisionPosition);
+
+        // save avg
+        position = hit->global_position_average;
+        distance = hit->distance_to_surface_average;
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
             fStoreSinglePrecisionPosition);
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
