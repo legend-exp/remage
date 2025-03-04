@@ -264,7 +264,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
 
   H5::H5File hfile(fHdf5FileName, H5F_ACC_RDWR, H5::FileCreatPropList::DEFAULT, fapl);
 
-  auto ntuple_group_name = fNtupleGroupName;
+  const auto ntuple_group_name = fNtupleGroupName;
 
   // check that this file has been written by geant4/remage, and that we did not run this upgrade
   // script before (it will delete the header group below).
@@ -284,18 +284,24 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   // rework the ntuples to LGDO tables.
   auto ntuples_group = hfile.openGroup(ntuple_group_name);
   auto ntuples = GetChildren(ntuples_group);
+  for (const auto& ntuple : ntuples) {
+    if (hfile.nameExists(ntuple)) {
+      LH5Log(RMGLog::error, "top-level object already exists: ", ntuple);
+      return false;
+    }
+  }
   bool ntuple_success = true;
-  for (auto& ntuple : ntuples) {
+  for (const auto& ntuple : ntuples) {
     auto det_group = ntuples_group.openGroup(ntuple);
     ntuple_success &= ConvertNTupleToTable(det_group);
-  }
-  // make the root HDF5 group an LH5 struct.
-  if (!ntuples_group.attrExists("datatype")) {
-    SetStringAttribute(ntuples_group, "datatype",
-        "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}");
+    det_group.close();
+    // move ntuple one level up.
+    hfile.createGroup(ntuple);
+    hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple + "/" + ntuple_group_name);
   }
 
-  if (ntuples_group.attrExists("type")) ntuples_group.removeAttr("type");
+  ntuples_group.close();
+  hfile.unlink(ntuple_group_name);
 
   // check other things that geant4 might write into the file, and delete them if they are empty.
   if (ExistsByType(hfile, "default_histograms", H5O_TYPE_GROUP)) {
