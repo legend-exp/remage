@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <filesystem>
+#include <iterator>
 #include <vector>
 
 #include "G4GenericMessenger.hh"
