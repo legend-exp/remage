@@ -602,7 +602,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
               0.5 * d.box_x_length, 0.5 * d.box_y_length, 0.5 * d.box_z_length));
     } else {
       RMGLog::OutFormat(RMGLog::error, "Geometrical solid '{}' not known! (Implement me?)",
-          d.solid_type);
+          magic_enum::enum_name<GeometricalSolidType>(d.solid_type));
     }
 
     volume_solids.back().native_sample = true;
@@ -940,7 +940,8 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
 
 
   if (solid_type.has_value() && volume_data.back().solid_type != solid_type) {
-    RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}", solid_type.value());
+    RMGLog::OutFormat(RMGLog::fatal, "Trying to modify non-{0} as {0}",
+        magic_enum::enum_name<GeometricalSolidType>(solid_type.value()));
   }
 
   return volume_data.back();

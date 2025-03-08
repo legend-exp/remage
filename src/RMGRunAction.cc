@@ -158,7 +158,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   fRMGRun->SetStartTime(std::chrono::system_clock::now());
 
   if (this->IsMaster()) {
-    auto tt = fmt::localtime(fRMGRun->GetStartTime());
+    auto tt = fmt::localtime(std::chrono::system_clock::to_time_t(fRMGRun->GetStartTime()));
 
     RMGLog::OutFormat(RMGLog::summary,
         "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}", fRMGRun->GetRunID(), tt);
@@ -187,7 +187,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
     RMGLog::OutFormat(RMGLog::summary,
         "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
-        fRMGRun->GetRunID(), n_ev, fmt::localtime(time_now));
+        fRMGRun->GetRunID(), n_ev, fmt::localtime(std::chrono::system_clock::to_time_t(time_now)));
     if (n_ev != n_ev_requested) {
       RMGLog::OutFormat(RMGLog::warning,
           "Run nr. {:d} only simulated {:d} events, out of {:d} events requested!",

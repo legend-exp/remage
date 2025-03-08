@@ -16,6 +16,7 @@
 #include "RMGConvertLH5.hh"
 
 #include <cstdint>
+#include <fmt/ranges.h>
 #include <regex>
 #include <string>
 #include <vector>

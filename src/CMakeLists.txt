@@ -115,12 +115,8 @@ target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/remage>"
                                          $<INSTALL_INTERFACE:include/remage>)
 
-# Must use FMT_HEADER_ONLY absolutely everywhere or will get undefined symbols at link time
-# TODO: Use imported target so we can make this transparent and also allow use of external fmt
-target_compile_definitions(remage PUBLIC FMT_HEADER_ONLY)
-
 # link against dependent libraries
-target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES})
+target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES} fmt::fmt)
 
 if(BxDecay0_FOUND)
   target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)

@@ -21,6 +21,8 @@
 
 #include "RMGLog.hh"
 
+#include "magic_enum/magic_enum.hpp"
+
 RMGOpWLSProcess::RMGOpWLSProcess(const G4String& aNamePrefix, G4ProcessType aType)
     : G4WrapperProcess(aNamePrefix, aType) {}
 
@@ -42,7 +44,7 @@ G4VParticleChange* RMGOpWLSProcess::PostStepDoIt(const G4Track& aTrack, const G4
       particleChange->GetTrackStatus() != fStopAndKill) {
     RMGLog::OutFormat(RMGLog::error,
         "{}: Got unexpected particleChange with status={} numOfSecondaries={} (in material {})",
-        GetProcessName(), particleChange->GetTrackStatus(),
+        GetProcessName(), magic_enum::enum_name<G4TrackStatus>(particleChange->GetTrackStatus()),
         particleChange->GetNumberOfSecondaries(), mat->GetName());
     return particleChange;
   }
