@@ -71,10 +71,11 @@ include(BuildType)
 
 # enable some more pedantic warnings
 add_compile_options(
-  -Wall # Enable most warnings
-  -Wextra # Enable extra warnings
-  -Wpedantic # Enforce stricter standards compliance
-  -Wshadow # Warn if a variable declaration shadows another
+  -Wall # enable most warnings
+  -Wextra # enable extra warnings
+  -Wpedantic # enforce stricter standards compliance
+  -Wshadow # warn if a variable declaration shadows another
+  -Werror # turn warnings into errors
 )
 
 # Copy .clang-tidy file to build dir to ensure clang-tidy always picks up the correct one
