@@ -16,6 +16,8 @@
 #ifndef _RMG_STEPPING_ACTION_HH_
 #define _RMG_STEPPING_ACTION_HH_
 
+#include <memory>
+
 #include "G4GenericMessenger.hh"
 #include "G4UserSteppingAction.hh"
 
