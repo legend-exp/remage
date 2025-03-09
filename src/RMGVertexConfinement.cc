@@ -47,22 +47,21 @@ RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fPhysical
 
 bool RMGVertexConfinement::fVolumesInitialized = false;
 
-RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* physical_volume,
-    G4RotationMatrix rotation, G4ThreeVector translation, G4VSolid* sampling_solid,
-    bool is_native_sampleable, bool surface_sample)
-    : rotation(rotation), translation(translation), native_sample(is_native_sampleable),
-      surface_sample(surface_sample) {
+RMGVertexConfinement::SampleableObject::SampleableObject(G4VPhysicalVolume* physvol,
+    G4RotationMatrix rot, G4ThreeVector trans, G4VSolid* sample_solid, bool is_native_sampleable,
+    bool on_surface)
+    : rotation(rot), translation(trans), surface_sample(on_surface),
+      native_sample(is_native_sampleable) {
 
   // at least one volume must be specified
-  if (!physical_volume and !sampling_solid)
+  if (!physvol and !sample_solid)
     RMGLog::Out(RMGLog::error, "Invalid pointers given to constructor");
 
-  this->physical_volume = physical_volume;
-  this->sampling_solid = sampling_solid;
+  this->physical_volume = physvol;
+  this->sampling_solid = sample_solid;
 
   // should use the physical volume properties, if available
-  const auto& solid =
-      physical_volume ? physical_volume->GetLogicalVolume()->GetSolid() : sampling_solid;
+  const auto& solid = physvol ? physvol->GetLogicalVolume()->GetSolid() : sample_solid;
 
   // NOTE: these functions use Monte Carlo methods when the solid is complex. Also note, that
   // they are not thread-safe in all cases!
@@ -208,9 +207,9 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
 
 
 bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector& vertex,
-    int max_attempts, int n_max) const {
+    size_t max_attempts, size_t n_max) const {
 
-  int calls = 0;
+  size_t calls = 0;
   G4ThreeVector dir;
   G4ThreeVector pos;
 
@@ -228,7 +227,7 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
     // We have to select one, to keep independence of the sampled points
     // and weight by the number of intersections.
 
-    int random_int = static_cast<int>(n_max * G4UniformRand());
+    auto random_int = static_cast<size_t>(n_max * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
       vertex = intersections[random_int];
@@ -246,8 +245,8 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
 }
 
 
-bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int max_attempts,
-    bool force_containment_check, long int& n_trials) const {
+bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, size_t max_attempts,
+    bool force_containment_check, size_t& n_trials) const {
 
   if (this->physical_volume) {
     RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}[{}]'",
@@ -258,7 +257,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, int m
   }
   RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", max_attempts);
 
-  int calls = 0;
+  size_t calls = 0;
 
   // possible sampling strategies
   // 1) native sampling
@@ -669,8 +668,6 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
   RMGLog::OutDev(RMGLog::debug,
       "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
-
-  int calls = 0;
 
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
