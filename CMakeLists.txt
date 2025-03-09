@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 if(WIN32)
   message(FATAL_ERROR "remage is not supported on Windows")
@@ -183,11 +183,13 @@ endif()
 
 include(FetchContent)
 
+# obtain the fmt library
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
   GIT_TAG 11.1.4)
 FetchContent_MakeAvailable(fmt)
+set_target_properties(fmt PROPERTIES SYSTEM TRUE) # skip clang-tidy checks.
 
 # set minimum C++ standard
 if(NOT CMAKE_CXX_STANDARD)
