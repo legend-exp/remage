@@ -119,7 +119,7 @@ target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR
 target_link_libraries(
   remage
   PUBLIC ${Geant4_LIBRARIES} fmt::fmt
-  PRIVATE CLI11::CLI11)
+  PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 
 if(BxDecay0_FOUND)
   target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
