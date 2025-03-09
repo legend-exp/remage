@@ -112,7 +112,7 @@ endif()
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/remage>"
+target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
                                          $<INSTALL_INTERFACE:include/remage>)
 
 # link against dependent libraries
@@ -133,12 +133,6 @@ if(RMG_HAS_HDF5)
   target_include_directories(remage PRIVATE ${HDF5_INCLUDE_DIRS})
   target_link_libraries(remage PUBLIC ${HDF5_CXX_LIBRARIES})
 endif()
-
-# Ensure clients are aware of the minimum C++ standard we were compiled with
-target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
-
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>"
-                                         $<INSTALL_INTERFACE:include>)
 
 # attach project version to shared library
 set_target_properties(
