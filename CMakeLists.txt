@@ -205,6 +205,13 @@ FetchContent_Declare(
   GIT_TAG 4160d25) # 2.5.0
 FetchContent_MakeAvailable(cli11)
 
+# obtain magic_enum
+FetchContent_Declare(
+  magic_enum
+  GIT_REPOSITORY https://github.com/Neargye/magic_enum
+  GIT_TAG e046b69) # 0.9.7
+FetchContent_MakeAvailable(magic_enum)
+
 # skip clang-tidy checks. Content downloaded via FetchContent is automatically included
 # in clang-tidy checks and there is no easy way to disable it. unfortunately, there is
 # also no way to disable all checks in a directory, so we still have to enable at least
