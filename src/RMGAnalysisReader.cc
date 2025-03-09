@@ -70,7 +70,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
   auto invalid_access =
       RMGAnalysisReader::Access(std::move(invalid_lock), nullptr, -1, nullptr, false);
 
-  if (fReader) return std::move(invalid_access);
+  if (fReader) return invalid_access;
 
   fFileIsTemp = false;
   fFileName = file_name;
@@ -78,7 +78,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
 
   if (!fs::exists(path)) {
     RMGLog::Out(RMGLog::error, "input file ", file_name, " does not exist");
-    return std::move(invalid_access);
+    return invalid_access;
   }
 
   std::map<std::string, std::map<std::string, std::string>> units_map{};
@@ -104,14 +104,14 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
     if (!fs::copy_file(path, fs::path(new_fn)), ec) {
       RMGLog::Out(RMGLog::error, "copy of input file ", file_name, " failed. Does it exist? (",
           ec.message(), ")");
-      return std::move(invalid_access);
+      return invalid_access;
     }
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", new_fn));
 
     if (!RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map)) {
       RMGLog::Out(RMGLog::error, "Conversion of input file ", new_fn,
           " to LH5 failed. Data is potentially corrupted.");
-      return std::move(invalid_access);
+      return invalid_access;
     }
 
     fHasUnits = true;
@@ -135,7 +135,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
   fNtupleId = fReader->GetNtuple(ntuple_name, fFileName, ntuple_dir_name);
   if (fNtupleId < 0) {
     RMGLog::Out(RMGLog::error, "Ntuple named '", ntuple_name, "' could not be found in input file!");
-    return std::move(invalid_access);
+    return invalid_access;
   }
   fUnits = units_map[ntuple_name];
   return {std::move(lock), fReader, fNtupleId, fHasUnits ? &fUnits : nullptr, true};
@@ -182,7 +182,7 @@ G4AutoLock RMGAnalysisReader::GetLock() const {
 
   G4AutoLock lock(&fMutex);
 
-  return std::move(lock);
+  return lock;
 }
 
 /* ========================================================================================== */
