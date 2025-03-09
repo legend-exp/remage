@@ -129,17 +129,17 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         /**
          * @brief SampleableObject constructor.
          *
-         * @param physical_volume The physical volume.
-         * @param rotation A rotation matrix for the sampling solid.
-         * @param translation A translation vector for the sampling solid.
-         * @param sampling_solid A solid for geometrical volume sampling or for generating candidate
-         * points for rejection sampling.
+         * @param physvol The physical volume.
+         * @param rot A rotation matrix for the sampling solid.
+         * @param trans A translation vector for the sampling solid.
+         * @param solid A solid for geometrical volume sampling or for generating candidate points
+         * or rejection sampling.
          * @param is_native_sampleable A flag of whether the solid is natively sampeable.
-         * @param surface_sample A flag of whether the solid should be sampled on the surface.
+         * @param on_surface A flag of whether the solid should be sampled on the surface.
          */
-        SampleableObject(G4VPhysicalVolume* physical_volume, G4RotationMatrix rotation,
-            G4ThreeVector translation, G4VSolid* sampling_solid, bool is_native_sampleable = false,
-            bool surface_sample = false);
+        SampleableObject(G4VPhysicalVolume* physvol, G4RotationMatrix rot, G4ThreeVector trans,
+            G4VSolid* solid, bool is_native_sampleable = false, bool on_surface = false);
+
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
 
