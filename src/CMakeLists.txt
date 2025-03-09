@@ -119,7 +119,7 @@ target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR
 target_link_libraries(
   remage
   PUBLIC ${Geant4_LIBRARIES} fmt::fmt
-  PRIVATE CLI11::CLI11 magic_enum::magic_enum)
+  PRIVATE magic_enum::magic_enum)
 
 if(BxDecay0_FOUND)
   target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
@@ -154,12 +154,18 @@ set_property(
 
 # executable for CLI
 add_executable(remage-cli-cpp ${_root}/src/remage.cc)
-target_link_libraries(remage-cli-cpp PUBLIC remage)
+target_link_libraries(
+  remage-cli-cpp
+  PUBLIC remage
+  PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 set_target_properties(remage-cli-cpp PROPERTIES OUTPUT_NAME remage-cpp)
 
 # executable for dumping all docs
 add_executable(remage-doc-dump-cli EXCLUDE_FROM_ALL ${_root}/src/remage-doc-dump.cc)
-target_link_libraries(remage-doc-dump-cli PUBLIC remage)
+target_link_libraries(
+  remage-doc-dump-cli
+  PUBLIC remage
+  PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 set_target_properties(remage-doc-dump-cli PROPERTIES OUTPUT_NAME remage-doc-dump)
 if(BxDecay0_FOUND)
   target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4)
@@ -173,11 +179,17 @@ add_custom_target(
 # executable for converting remage output HDF5 with ntuples to LH5 tables
 if(RMG_HAS_HDF5)
   add_executable(remage-to-lh5 ${_root}/src/remage-to-lh5.cc)
-  target_link_libraries(remage-to-lh5 PUBLIC remage)
+  target_link_libraries(
+    remage-to-lh5
+    PUBLIC remage
+    PRIVATE CLI11::CLI11 magic_enum::magic_enum)
   set_target_properties(remage-to-lh5 PROPERTIES OUTPUT_NAME remage-to-lh5)
 
   add_executable(remage-from-lh5 ${_root}/src/remage-from-lh5.cc)
-  target_link_libraries(remage-from-lh5 PUBLIC remage)
+  target_link_libraries(
+    remage-from-lh5
+    PUBLIC remage
+    PRIVATE CLI11::CLI11 magic_enum::magic_enum)
   set_target_properties(remage-from-lh5 PROPERTIES OUTPUT_NAME remage-from-lh5)
 endif()
 
