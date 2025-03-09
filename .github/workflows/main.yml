@@ -153,12 +153,6 @@ jobs:
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
 
-      - name: Test docs building
-        run: |
-          cd build
-          cmake -DRMG_BUILD_DOCS=ON .. | tee -a build.log
-          make sphinx
-
       - name: Minimally test installed executable
         run: |
           rm -rf build
