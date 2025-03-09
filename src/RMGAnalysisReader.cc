@@ -101,7 +101,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(const std::string& file_na
         ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
 
     std::error_code ec;
-    if (!fs::copy_file(path, fs::path(new_fn)), ec) {
+    if (!fs::copy_file(path, fs::path(new_fn), ec)) {
       RMGLog::Out(RMGLog::error, "copy of input file ", file_name, " failed. Does it exist? (",
           ec.message(), ")");
       return invalid_access;
