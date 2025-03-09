@@ -38,7 +38,7 @@
 #include "RMGVertexFromFile.hh"
 #include "RMGVertexOutputScheme.hh"
 
-#include "CLI11/CLI11.hpp"
+#include "CLI/CLI.hpp"
 #include "magic_enum/magic_enum.hpp"
 
 void init_extra() {

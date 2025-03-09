@@ -195,8 +195,16 @@ include(FetchContent)
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG 11.1.4)
+  GIT_TAG 1239137) # 11.1.4
 FetchContent_MakeAvailable(fmt)
+
+# obtain CLI11
+FetchContent_Declare(
+  cli11
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_TAG 4160d25) # 2.5.0
+FetchContent_MakeAvailable(cli11)
+
 # skip clang-tidy checks. Content downloaded via FetchContent is automatically included
 # in clang-tidy checks and there is no easy way to disable it. unfortunately, there is
 # also no way to disable all checks in a directory, so we still have to enable at least

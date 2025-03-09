@@ -116,7 +116,10 @@ target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR
                                          $<INSTALL_INTERFACE:include/remage>)
 
 # link against dependent libraries
-target_link_libraries(remage PUBLIC ${Geant4_LIBRARIES} fmt::fmt)
+target_link_libraries(
+  remage
+  PUBLIC ${Geant4_LIBRARIES} fmt::fmt
+  PRIVATE CLI11::CLI11)
 
 if(BxDecay0_FOUND)
   target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
@@ -192,7 +195,6 @@ install(
 install(
   DIRECTORY ../include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/remage
-  PATTERN CLI11 EXCLUDE
   PATTERN EcoMug EXCLUDE)
 
 # install CLI binaries

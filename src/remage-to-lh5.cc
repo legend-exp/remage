@@ -22,7 +22,7 @@ namespace fs = std::filesystem;
 #include "RMGConvertLH5.hh"
 #include "RMGLog.hh"
 
-#include "CLI11/CLI11.hpp"
+#include "CLI/CLI.hpp"
 
 int main(int argc, char** argv) {
   bool verbosity = false;
