@@ -44,7 +44,7 @@ namespace CLI::detail {
   }
 } // namespace CLI::detail
 
-#include "CLI11/CLI11.hpp"
+#include "CLI/CLI.hpp"
 
 void signal_handler(int) { RMGManager::AbortRunGracefully(); }
 
