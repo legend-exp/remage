@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 import re
+from pathlib import Path
 from typing import Any
 
 from sphinx.application import Sphinx
@@ -65,7 +66,7 @@ def configure(app: Sphinx) -> None:
     """
 
     # load expressions from configuration file
-    with open(app.config.warnings_filter_config) as f:
+    with Path(app.config.warnings_filter_config).open() as f:
         expressions = []
         for line in f.readlines():
             if not line.startswith("#"):

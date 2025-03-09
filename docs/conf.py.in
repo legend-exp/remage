@@ -6,10 +6,8 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
     import setuptools_scm
-    sys.path.append(os.path.abspath("extensions"))
-else:
-    sys.path.append("@PROJECT_SOURCE_DIR@/docs/extensions")
 
+sys.path.append(os.path.abspath("extensions"))
 
 project = "remage"
 copyright = "2020, the LEGEND Collaboration"
@@ -25,7 +23,7 @@ extensions = [
     "exhale",
     "breathe",
     "myst_parser",
-    "remage.warnings_filter",
+    "warnings_filter",
 ]
 
 exhale_args = {
