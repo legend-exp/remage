@@ -27,6 +27,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalDetector.hh
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
+    ${_root}/include/RMGParticleFilterOutputScheme.hh
     ${_root}/include/RMGPhysics.hh
     ${_root}/include/RMGRunAction.hh
     ${_root}/include/RMGRun.hh
@@ -70,6 +71,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGOpticalDetector.cc
     ${_root}/src/RMGOpticalOutputScheme.cc
     ${_root}/src/RMGOpWLSProcess.cc
+    ${_root}/src/RMGParticleFilterOutputScheme.cc
     ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGScintillatorDetector.cc
