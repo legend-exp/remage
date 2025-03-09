@@ -69,6 +69,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Set default build type
 include(BuildType)
 
+# enable some more pedantic warnings
+add_compile_options(
+  -Wall # enable most warnings
+  -Wextra # enable extra warnings
+  -Wpedantic # enforce stricter standards compliance
+  -Wshadow # warn if a variable declaration shadows another
+  -Werror # turn warnings into errors
+)
+
 # Copy .clang-tidy file to build dir to ensure clang-tidy always picks up the correct one
 # no matter where out build dir is relative to the source dir
 if(EXISTS "${PROJECT_SOURCE_DIR}/.clang-tidy")
@@ -181,9 +190,8 @@ else()
   endif()
 endif()
 
-include(FetchContent)
-
 # obtain the fmt library
+include(FetchContent)
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt

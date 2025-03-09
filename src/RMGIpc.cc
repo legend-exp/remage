@@ -23,7 +23,7 @@
 #include "RMGLog.hh"
 
 namespace {
-  void ipc_signal_handler(int signal) {
+  void ipc_signal_handler(int) {
     if (!RMGIpc::fWaitForIpc.is_lock_free()) return;
     RMGIpc::fWaitForIpc = true;
   }
@@ -86,6 +86,11 @@ bool RMGIpc::SendIpcNonBlocking(std::string msg) {
   if (fIpcFd < 0) return false;
 
   msg += "\x1d"; // ASCII GS group separator = end of message.
+  if (msg.size() > SSIZE_MAX) {
+    RMGLog::Out(RMGLog::error, "IPC message transmit failed for too-large message");
+    return false;
+  }
+
   auto len = write(fIpcFd, msg.c_str(), msg.size());
 
   if (len < 0) {
@@ -93,7 +98,7 @@ bool RMGIpc::SendIpcNonBlocking(std::string msg) {
     return false;
   }
 
-  if (len != msg.size()) {
+  if ((size_t)len != msg.size()) {
     // TODO: better handle this case.
     RMGLog::Out(RMGLog::error, "IPC message not fully transmitted. missing=", msg.size() - len);
     return false;

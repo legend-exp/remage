@@ -159,6 +159,10 @@ G4VPhysicalVolume* get_phy_volume(G4VSolid* solid, std::string material_string) 
 
 int main(int argc, char* argv[]) {
   // Check if exactly one argument is provided
+  if (argc < 2) {
+    std::cerr << "missing parameter test_type" << std::endl;
+    return 1;
+  }
   std::string test_type = argv[1];
 
   // define the solids we need
@@ -225,10 +229,10 @@ int main(int argc, char* argv[]) {
       G4ThreeVector pos;
       obj.GetDirection(dir, pos);
 
-      size_t ints = obj.GetIntersections(pos, dir).size();
+      size_t ints_rnd = obj.GetIntersections(pos, dir).size();
 
-      if (ints != 0 and ints != 2) {
-        std::cout << "The number of intersections can only be 0 or 2 not " << ints << std::endl;
+      if (ints_rnd != 0 and ints_rnd != 2) {
+        std::cout << "The number of intersections can only be 0 or 2 not " << ints_rnd << std::endl;
         return 1;
       }
     }
@@ -311,6 +315,10 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 10000; i++) {
       G4ThreeVector pos;
       bool success = obj.GenerateSurfacePoint(pos, 200, 4);
+      if (!success) {
+        std::cout << "generation of point failed" << std::endl;
+        return 1;
+      }
 
       if (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) != EInside::kSurface) {
 
@@ -330,6 +338,10 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 10000; i++) {
       G4ThreeVector pos;
       bool success = obj.GenerateSurfacePoint(pos, 200, 4);
+      if (!success) {
+        std::cout << "generation of point failed" << std::endl;
+        return 1;
+      }
 
       if (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) != EInside::kSurface) {
 

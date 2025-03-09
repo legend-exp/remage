@@ -35,10 +35,10 @@
 #endif
 #include "fmt/core.h"
 
-#define OutDev(loglevel, args...) RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", args)
+#define OutDev(loglevel, ...) RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", __VA_ARGS__)
 
-#define OutFormatDev(loglevel, fmt, args...)                                                       \
-  RMGLog::OutFormat(loglevel, "[" + std::string(__PRETTY_FUNCTION__) + "] " + fmt, args)
+#define OutFormatDev(loglevel, fmt, ...)                                                           \
+  RMGLog::OutFormat(loglevel, "[" + std::string(__PRETTY_FUNCTION__) + "] " + fmt, __VA_ARGS__)
 
 // ---------------------------------------------------------
 

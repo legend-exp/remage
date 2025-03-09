@@ -23,10 +23,7 @@
 #include "RMGEventAction.hh"
 #include "RMGLog.hh"
 
-RMGSteppingAction::RMGSteppingAction(RMGEventAction* eventaction) : fEventAction(eventaction) {
-
-  this->DefineCommands();
-}
+RMGSteppingAction::RMGSteppingAction(RMGEventAction*) { this->DefineCommands(); }
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
