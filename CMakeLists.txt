@@ -189,7 +189,12 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/fmtlib/fmt
   GIT_TAG 11.1.4)
 FetchContent_MakeAvailable(fmt)
-set_target_properties(fmt PROPERTIES SYSTEM TRUE) # skip clang-tidy checks.
+# skip clang-tidy checks. Content downloaded via FetchContent is automatically included
+# in clang-tidy checks and there is no easy way to disable it. unfortunately, there is
+# also no way to disable all checks in a directory, so we still have to enable at least
+# one hopefully benign check.
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/_deps/.clang-tidy
+     "---\nChecks: \"-*,cppcoreguidelines-avoid-goto\"")
 
 # set minimum C++ standard
 if(NOT CMAKE_CXX_STANDARD)
