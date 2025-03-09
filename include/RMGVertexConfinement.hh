@@ -168,8 +168,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param n_trials The total number of trials performed.
          *
          */
-        [[nodiscard]] bool Sample(G4ThreeVector& vertex, int max_attempts,
-            bool force_containment_check, long int& n_trials) const;
+        [[nodiscard]] bool Sample(G4ThreeVector& vertex, size_t max_attempts,
+            bool force_containment_check, size_t& n_trials) const;
 
         /**
          * @brief Generate a point on the surface of the solid.
@@ -185,8 +185,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * can be an overestimate.
          *
          */
-        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, int max_attempts,
-            int n_max) const;
+        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, size_t max_attempts,
+            size_t n_max) const;
 
         // methods for the generic surface sampling
         /**
@@ -313,7 +313,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     int fSurfaceSampleMaxIntersections = -1;
 
     // counters used for the current run.
-    long fTrials = 0;
+    size_t fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime{};
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
