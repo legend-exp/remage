@@ -111,7 +111,7 @@ class RMGAnalysisReader final {
         // only allow creation or moving in parent.
         inline Access(G4AutoLock lock, G4VAnalysisReader* reader, int nt,
             const std::map<std::string, std::string>* u, bool setup)
-            : fLock(std::move(lock)), fReader(reader), fNtupleId(nt), fUnits(u), fCanSetup(setup) {};
+            : fReader(reader), fLock(std::move(lock)), fNtupleId(nt), fUnits(u), fCanSetup(setup) {};
         Access(Access&&) = default;
 
         void AssertUnit(const std::string& name, const std::vector<std::string>& allowed_units) const;
