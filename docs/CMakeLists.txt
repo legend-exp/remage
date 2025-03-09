@@ -50,17 +50,17 @@ endforeach()
 file(
   GLOB SPHINX_IMAGES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  img/*)
+  _img/*)
 
-file(MAKE_DIRECTORY ${SPHINX_SOURCE}/img)
+file(MAKE_DIRECTORY ${SPHINX_SOURCE}/_img)
 foreach(_file ${SPHINX_IMAGES})
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/img COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/_img COPYONLY)
 endforeach()
 
 file(
   GLOB_RECURSE SPHINX_EXTENSIONS
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  extensions/*.py)
+  _extensions/*.py)
 
 foreach(_file ${SPHINX_EXTENSIONS})
   get_filename_component(_dir ${_file} DIRECTORY)
