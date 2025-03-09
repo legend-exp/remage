@@ -283,7 +283,6 @@ class EcoMug {
     double mCylinderRadius;
     std::array<double, 3> mCylinderCenterPosition;
     double mHSphereRadius;
-    double mMaxFuncSkyCylinder;
     std::array<double, 3> mHSphereCenterPosition;
     EMRandom mRandom;
     std::default_random_engine mEngineC;
@@ -306,7 +305,7 @@ class EcoMug {
           mHSphereCosMaxPositionTheta(0.), mJPrime(0.), mN(0.), mRandAccRej(0.), mPhi0(0.),
           mTheta0(0.), mAccepted(false), mSkySize({{0., 0.}}), mSkyCenterPosition({{0., 0., 0.}}),
           mCylinderHeight(0.), mCylinderRadius(0.), mCylinderCenterPosition({{0., 0., 0.}}),
-          mHSphereRadius(0.), mMaxFuncSkyCylinder(5.3176), mHSphereCenterPosition({{0., 0., 0.}}),
+          mHSphereRadius(0.), mHSphereCenterPosition({{0., 0., 0.}}),
           mEngineC(std::random_device{}()) {
       mDiscDistC = std::discrete_distribution<int>({128, 100});
       mMaxJ = {-1., -1., -1.};
