@@ -37,12 +37,14 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 # serious thought! one important requirement is CMake being able to copy the
 # sources again if they change
 file(
-  GLOB SPHINX_SOURCES
+  GLOB_RECURSE SPHINX_SOURCES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  *.rst *.md)
+  *.rst **/*.rst *.md **/*.md)
 
 foreach(_file ${SPHINX_SOURCES})
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE} COPYONLY)
+  get_filename_component(_dir ${_file} DIRECTORY)
+  file(MAKE_DIRECTORY ${SPHINX_SOURCE}/${_dir})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
 file(
@@ -53,6 +55,17 @@ file(
 file(MAKE_DIRECTORY ${SPHINX_SOURCE}/img)
 foreach(_file ${SPHINX_IMAGES})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/img COPYONLY)
+endforeach()
+
+file(
+  GLOB_RECURSE SPHINX_EXTENSIONS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  extensions/*.py)
+
+foreach(_file ${SPHINX_EXTENSIONS})
+  get_filename_component(_dir ${_file} DIRECTORY)
+  file(MAKE_DIRECTORY ${SPHINX_SOURCE}/${_dir})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
