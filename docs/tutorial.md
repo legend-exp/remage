@@ -117,7 +117,7 @@ viewer.addLogicalVolume(reg.getWorldVolume())
 viewer.view()
 ```
 
-![Geometry visualization](img/tutorial-pyg4-view.jpg)
+![Geometry visualization](_img/tutorial-pyg4-view.jpg)
 
 We can also easily save the geometry as a geometry description markup language (GDML) file. This format
 allows us to input the geometry to `remage`.
@@ -266,7 +266,7 @@ Interactive visualization requires passing `--interactive` to the
 
 Interactions in HPGes and in LAr are marked in red and blue, respectively.
 
-![Simulation visualization](img/tutorial-g4-view.jpg)
+![Simulation visualization](_img/tutorial-g4-view.jpg)
 
 :::{tip}
 With Apptainer, additional tweaks are required in order to allow for graphics
@@ -422,7 +422,7 @@ plt.yscale("log")
 plt.legend()
 ```
 
-![plot](./img/hpge-edep.jpg)
+![plot](./_img/hpge-edep.jpg)
 
 The expected spectrum, composed by full-energy peak at 1 MeV and Compton
 shoulder. We can also plot the interaction points:
@@ -441,7 +441,7 @@ plt.legend()
 plt.axis("equal")
 ```
 
-![plot](./img/hpge-hits.jpg)
+![plot](./_img/hpge-hits.jpg)
 
 ## Advanced usage
 
