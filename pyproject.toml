@@ -59,6 +59,7 @@ docs = [
   "exhale",
   "breathe",
   "myst-parser",
+  "furo",
 ]
 
 [project.scripts]
