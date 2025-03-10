@@ -75,7 +75,7 @@ jobs:
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-output-${{ matrix.container_version }}
+          name: remage-test-output-${{ matrix.container_version }}
           # artifacts must have a ".output*" extension
           path: build/tests/**/*.output*.*
 
@@ -107,7 +107,7 @@ jobs:
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
-          name: validation-report-${{ matrix.container_version }}
+          name: remage-validation-report-${{ matrix.container_version }}
           path: build/docs/validation/_build/
 
       - name: Minimally test installed executable
