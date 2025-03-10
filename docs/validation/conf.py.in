@@ -1,0 +1,28 @@
+project = "remage's validation suite"
+copyright = "2020, the LEGEND Collaboration"
+author = "Luigi Pertoldi"
+
+extensions = [
+    "sphinx.ext.mathjax",
+    "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinx_togglebutton",
+    "sphinx_inline_tabs",
+    "myst_parser",
+]
+
+myst_enable_extensions = ["colon_fence", "substitution", "dollarmath"]
+
+version = "@PROJECT_VERSION@"
+html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
+
+breathe_default_project = "remage"
+
+# Furo theme
+html_theme = "furo"
+html_theme_options = {
+    "source_repository": "https://github.com/legend-exp/remage",
+    "source_branch": "main",
+    "source_directory": "docs/validation",
+}
+html_title = f"{project} {version}"

@@ -233,6 +233,7 @@ add_subdirectory(python)
 option(RMG_BUILD_DOCS "Build remage documentation" OFF)
 if(RMG_BUILD_DOCS)
   add_subdirectory(docs)
+  add_subdirectory(docs/validation)
 endif()
 
 option(RMG_BUILD_EXAMPLES "Build all remage examples" OFF)
