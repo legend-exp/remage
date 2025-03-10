@@ -15,5 +15,8 @@ DOT_PATH = $(DOXYGEN_DOT_PATH)
 EXCLUDE_SYMBOLS = "CLI::*" "CLI" "FMT_*" "_g4rand" "bxdecay0_g4"
 # Exclude CLI utilities.
 EXCLUDE = "@DOXYGEN_INPUT_DIR@/src/remage.cc" \
+          "@DOXYGEN_INPUT_DIR@/src/remage-from-lh5.cc" \
           "@DOXYGEN_INPUT_DIR@/src/remage-to-lh5.cc" \
           "@DOXYGEN_INPUT_DIR@/src/remage-doc-dump.cc"
+
+TAGFILES = "geant4.tag=https://geant4.kek.jp/Reference/11.3.0"

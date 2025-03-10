@@ -5,7 +5,18 @@ find_package(Sphinx REQUIRED)
 get_target_property(REMAGE_PUBLIC_HEADER_DIR remage INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB REMAGE_PUBLIC_HEADERS ${REMAGE_PUBLIC_HEADER_DIR}/*.hh)
 
-# configure Doxyfile in build directory
+set(GEANT4_TAG_URL "https://geant4.kek.jp/Reference/11.3.0/geant4.tag")
+message(STATUS "Downloading Geant4 tag file from: ${GEANT4_TAG_URL}")
+file(
+  DOWNLOAD "${GEANT4_TAG_URL}" "${CMAKE_CURRENT_BINARY_DIR}/geant4.tag"
+  STATUS download_status
+  LOG download_log)
+
+if(NOT download_status EQUAL 0)
+  message(
+    WARNING "Download of Geant4 tag file failed with status ${download_status}:\n${download_log}")
+endif()
+
 set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
 set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR})
