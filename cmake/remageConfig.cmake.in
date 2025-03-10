@@ -1,7 +1,5 @@
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")
-
 # custom code to check for remage components
 # the 'remage_components' list is configure in the main CMakeLists.txt
 set(_supported_components @remage_components@)
@@ -25,3 +23,8 @@ endif()
 if(@BxDecay0_FOUND@)
     find_dependency(BxDecay0 @RMG_BXDECAY0_MINIMUM_VERSION@ REQUIRED COMPONENTS Geant4)
 endif()
+
+find_dependency(fmt REQUIRED)
+
+# finally import targets.
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")
