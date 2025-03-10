@@ -44,9 +44,6 @@ set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/_build)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
-# FIXME: the logic here to handle sources is not really clean, needs some more
-# serious thought! one important requirement is CMake being able to copy the
-# sources again if they change
 file(
   GLOB_RECURSE SPHINX_SOURCES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -71,7 +68,7 @@ endforeach()
 file(
   GLOB_RECURSE SPHINX_EXTENSIONS
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  _extensions/*.py)
+  _extensions/*.py known-warnings.txt)
 
 foreach(_file ${SPHINX_EXTENSIONS})
   get_filename_component(_dir ${_file} DIRECTORY)
@@ -86,7 +83,7 @@ add_custom_command(
   COMMAND ${SPHINX_EXECUTABLE} -q -b html -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml
           ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
-  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE}
+  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${SPHINX_EXTENSIONS} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
   ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
 
