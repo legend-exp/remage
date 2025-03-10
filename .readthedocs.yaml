@@ -13,10 +13,6 @@ build:
   tools:
     python: mambaforge-23.11
   jobs:
-    pre_create_environment:
-      # update mamba just in case
-      - mamba update --yes --quiet --name=base mamba
-      - mamba --version
     post_checkout: # for setuptools_scm to work correctly.
       - git fetch --unshallow || true
     pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
