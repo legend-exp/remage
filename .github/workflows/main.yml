@@ -99,7 +99,7 @@ jobs:
         if: ${{ matrix.container_version == 'G.11.3' }}
         run: |
           cd build
-          cmake -DRMG_BUILD_DOCS=ON .. | tee -a build.log
+          cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
 
       - name: Minimally test installed executable
