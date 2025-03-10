@@ -77,7 +77,9 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
     RMGOpticalDetectorHitsCollection* fHitsCollection = nullptr;
 };
 
+/// \cond this triggers a sphinx error
 extern G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator;
+/// \endcond
 
 inline void* RMGOpticalDetectorHit::operator new(size_t) {
   if (!RMGOpticalDetectorHitAllocator)

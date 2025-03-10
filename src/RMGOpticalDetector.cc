@@ -28,7 +28,9 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
+/// \cond this triggers a sphinx error
 G4ThreadLocal G4Allocator<RMGOpticalDetectorHit>* RMGOpticalDetectorHitAllocator = nullptr;
+/// \endcond
 
 // NOTE: does this make sense?
 G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) const {

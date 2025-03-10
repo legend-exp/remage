@@ -81,7 +81,9 @@ class RMGScintillatorDetector : public G4VSensitiveDetector {
     RMGScintillatorDetectorHitsCollection* fHitsCollection = nullptr;
 };
 
+/// \cond this triggers a sphinx error
 extern G4ThreadLocal G4Allocator<RMGScintillatorDetectorHit>* RMGScintillatorDetectorHitAllocator;
+/// \endcond
 
 inline void* RMGScintillatorDetectorHit::operator new(size_t) {
   if (!RMGScintillatorDetectorHitAllocator)

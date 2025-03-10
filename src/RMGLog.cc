@@ -45,8 +45,10 @@ std::string RMGLog::fVersion = RMG_PROJECT_VERSION_FULL;
 
 // initialize them at start of program - mandatory
 // so that even if user redirects, we've got a copy
+/// \cond this triggers a sphinx error
 std::streambuf const* coutbuf = G4cout.rdbuf();
 std::streambuf const* cerrbuf = G4cerr.rdbuf();
+/// \endcond
 
 // ---------------------------------------------------------
 

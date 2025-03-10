@@ -32,7 +32,9 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
+/// \cond this triggers a sphinx error
 G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator = nullptr;
+/// \endcond
 
 // NOTE: does this make sense?
 G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right) const {

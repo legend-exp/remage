@@ -156,8 +156,7 @@ class RMGLog {
         bool do_flush = true);
 
     /**
-     * Converts a log level to a string
-     * @param force_no_colors forcibly disable usage of ANSI escape sequences (e.g. if printing to file) */
+     * Converts a log level to a string */
     static std::string GetPrefix(RMGLog::LogLevel, std::ostream& os);
 
     /**
