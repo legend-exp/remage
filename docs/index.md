@@ -61,6 +61,13 @@ Output structure & LH5 output <output>
 ```
 
 ```{toctree}
+:caption: Links
+:maxdepth: 1
+
+remage validation report <https://legend-exp.github.io/remage/validation/{REMAGE_VERSION}>
+```
+
+```{toctree}
 :caption: Development
 :maxdepth: 1
 

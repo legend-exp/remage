@@ -1,3 +1,4 @@
+import re
 import sys
 import os
 import subprocess
@@ -51,7 +52,9 @@ else:
     breathe_projects["remage"] = f"{doxyout}/xml"
 
     # also deploy Doxygen docs
-    subprocess.call(f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True)
+    subprocess.call(
+        f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True
+    )
 
     version = "@RMG_GIT_VERSION_FULL@"
     html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
@@ -69,7 +72,41 @@ html_theme_options = {
 }
 html_title = f"{project} {version}"
 
-exclude_patterns = ["validation", "_static/collapsible-lists/LICENSE.md"]
+exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md"]
 
 # warnings filtering
 warnings_filter_silent = False
+
+
+# now determine version for link to validation repor
+def is_semver(version: str) -> bool:
+    # Regex explanation:
+    # ^v?               -> start of string, optional "v"
+    # (0|[1-9]\d*)      -> major version (no leading zeros unless the number is 0)
+    # \.                -> literal dot
+    # (0|[1-9]\d*)      -> minor version
+    # \.                -> literal dot
+    # (0|[1-9]\d*)      -> patch version
+    # (?:(a|alpha|b|beta|rc)\d+)? -> optional pre-release tag followed by one or more digits
+    # $                 -> end of string
+    pattern = r"^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:(a|alpha|b|beta|rc)\d+)?$"
+    semver_regex = re.compile(pattern)
+    return bool(semver_regex.fullmatch(version))
+
+
+# https://stackoverflow.com/a/56328457/4279748
+ultimate_replacements = {
+    "{REMAGE_VERSION}": version if is_semver(version) else "latest"
+}
+
+
+def _replace(app, docname, source):
+    result = source[0]
+    for key in app.config.ultimate_replacements:
+        result = result.replace(key, app.config.ultimate_replacements[key])
+    source[0] = result
+
+
+def setup(app):
+    app.add_config_value("ultimate_replacements", {}, True)
+    app.connect("source-read", _replace)
