@@ -53,7 +53,7 @@ else:
     # also deploy Doxygen docs
     subprocess.call(f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True)
 
-    version = "@PROJECT_VERSION@"
+    version = "@RMG_GIT_VERSION_FULL@"
     html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
     warnings_filter_config = "@PROJECT_SOURCE_DIR@/docs/known-warnings.txt"
 

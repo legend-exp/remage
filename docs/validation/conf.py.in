@@ -13,7 +13,7 @@ extensions = [
 
 myst_enable_extensions = ["colon_fence", "substitution", "dollarmath"]
 
-version = "@PROJECT_VERSION@"
+version = "@RMG_GIT_VERSION_FULL"
 html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
 
 breathe_default_project = "remage"
