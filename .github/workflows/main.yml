@@ -24,8 +24,8 @@ jobs:
       matrix:
         # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
-          - G4.11.3
-          - G4.11.2
+          - latest
+          - stable
           - slim
 
     container: docker://gipert/remage-base:${{ matrix.container_version }}
@@ -75,7 +75,7 @@ jobs:
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
-          name: remage-test-output-${{ matrix.container_version }}
+          name: remage-test-output-g4flavor${{ matrix.container_version }}
           # artifacts must have a ".output*" extension
           path: build/tests/**/*.output*.*
 
@@ -107,7 +107,7 @@ jobs:
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
-          name: remage-validation-report-${{ matrix.container_version }}
+          name: remage-validation-report-g4flavor-${{ matrix.container_version }}
           path: build/docs/validation/_build/
 
       - name: Minimally test installed executable
@@ -166,4 +166,35 @@ jobs:
           rm -rf build
           PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
 
+  deploy_validation_report:
+    # if: github.event_name != 'pull_request'
+    needs: test_on_linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: remage-validation-report-g4flavor-stable
+          path: output/
+
+      - name: Determine target directory
+        id: target
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "dir=$(echo '${{ github.event.release.tag_name }}')" >> $GITHUB_ENV
+          else
+            echo "dir=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.PUSH_ACCESS_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: output
+          destination_dir: ${{ env.dir }}
 # vim: expandtab tabstop=2 shiftwidth=2
