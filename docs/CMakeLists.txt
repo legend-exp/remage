@@ -9,6 +9,7 @@ set(GEANT4_TAG_URL "https://geant4.kek.jp/Reference/11.3.0/geant4.tag")
 message(STATUS "Downloading Geant4 tag file from: ${GEANT4_TAG_URL}")
 file(
   DOWNLOAD "${GEANT4_TAG_URL}" "${CMAKE_CURRENT_BINARY_DIR}/geant4.tag"
+  EXPECTED_HASH SHA256=79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c
   STATUS download_status
   LOG download_log)
 
