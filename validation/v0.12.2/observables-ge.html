@@ -1,0 +1,748 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Comparison with NIST" href="nist.html" />
+        <link rel="prefetch" href="_static/remage-logo.png" as="image" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
+        <title>HPGe tracking and observables - remage 0.12.2 validation suite</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     <em>Work in progress:</em> we are currently populating the validation report, come back at a later point! 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">remage 0.12.2 validation suite</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">remage 0.12.2 validation suite</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="versioninfo.html">About this validation report</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">HPGe tracking and observables</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://remage.readthedocs.io">remage documentation</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/observables-ge.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/observables-ge.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<style>
+  .ss-layout-default-ABC_DEF { grid-template-areas: 'A B C' 'D E F'; }
+  .ss-layout-default-AB { grid-template-areas: 'A B'; }
+</style>
+<section class="tex2jax_ignore mathjax_ignore" id="hpge-tracking-and-observables">
+<h1>HPGe tracking and observables<a class="headerlink" href="#hpge-tracking-and-observables" title="Link to this heading">¶</a></h1>
+<p>This section of the validation report involves basic simulations of particles in
+Germanium relevant for HPGe detectors. We focus on computing observables of
+interest for HPGe detectors. The dependence of these observables on user inputs,
+for example:</p>
+<ul class="simple">
+<li><p>step limits,</p></li>
+<li><p>production cuts,</p></li>
+<li><p>physics lists,</p></li>
+</ul>
+<p>is computed, allowing for a user to determine appropriate choices for their
+simulation.</p>
+<p>The geometry is based on a cylinder of natural Germanium (height and radius both
+4 cm), emersed in a liquid argon sphere, with a small Fe calibration source
+above the detector.</p>
+<p>This geometry is shown below, for gamma particles generated in the source.</p>
+<p> </p>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="_images/vis-observables-ge-gdml.output.jpeg"><img alt="_images/vis-observables-ge-gdml.output.jpeg" src="_images/vis-observables-ge-gdml.output.jpeg" style="width: 600px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Geometry for the tests on Ge observables, gamma primaries are generated in the
+source (shown in white).</em></span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<section id="electron-tracking-plots">
+<h2>Electron tracking plots<a class="headerlink" href="#electron-tracking-plots" title="Link to this heading">¶</a></h2>
+<p>We generate electrons uniformly in the bulk of the Germanium. This is performed
+both for a variety of step limits and production cuts.</p>
+<ul class="simple">
+<li><p>Step limits are a user defined limitation on the maximum step length for
+tracking charged particles, for more details see
+<a class="reference external" href="https://geant4.web.cern.ch/documentation/pipelines/master/bfad_html/ForApplicationDevelopers/TrackingAndPhysics/userLimits.html">[geant4-docs]</a>.</p></li>
+<li><p>Production cuts are a limit on the range of secondary particles to be
+produced, particles with a range below this will not be produced (and the
+energy will be dumped into the current volume), for more details see
+<a class="reference external" href="https://geant4.web.cern.ch/documentation/dev/prm_html/PhysicsReferenceManual/electromagnetic/energy_loss/setcuts.html">[geant4-docs]</a>.</p></li>
+</ul>
+<p>We generate 1 MeV electrons and plot the steps for geant4, both without step
+limits and with 10 um step limitations.</p>
+<figure class="sphinx-subfigure align-default" id="id4">
+<div class="sphinx-subfigure-grid ss-layout-default-ABC_DEF" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.tracks.out0.png"><img alt="_images/tracks-bulk-no-limit.tracks.out0.png" src="_images/tracks-bulk-no-limit.tracks.out0.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.tracks.out1.png"><img alt="_images/tracks-bulk-no-limit.tracks.out1.png" src="_images/tracks-bulk-no-limit.tracks.out1.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: C;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.tracks.out2.png"><img alt="_images/tracks-bulk-no-limit.tracks.out2.png" src="_images/tracks-bulk-no-limit.tracks.out2.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: D;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.tracks.out0.png"><img alt="_images/tracks-bulk-10um-limit.tracks.out0.png" src="_images/tracks-bulk-10um-limit.tracks.out0.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: E;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.tracks.out1.png"><img alt="_images/tracks-bulk-10um-limit.tracks.out1.png" src="_images/tracks-bulk-10um-limit.tracks.out1.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: F;">
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.tracks.out2.png"><img alt="_images/tracks-bulk-10um-limit.tracks.out2.png" src="_images/tracks-bulk-10um-limit.tracks.out2.png" style="width: 300px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Plots of the x and z position of 1 MeV electrons in the bulk volume of
+Germanium, the first row gives tracks without step limits (the default in
+Geant4) while the second row uses 10 um step limits. You should see constrained
+electron tracks (with fine stepping in the second case). There is also the
+possibility to see some isolated steps / tracks due to Bremsstralhung.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>Next we plot the distribution of step lengths, and the joint distribution with
+the distance of the steps to the detector surface. This is shown for a large
+range of distances and also zooming into events close to the surface.</p>
+<figure class="sphinx-subfigure align-default" id="id5">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Without step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.step-hist.png"><img alt="Without step limits." src="_images/tracks-bulk-no-limit.step-hist.png" style="width: 400px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">With 10um step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.step-hist.png"><img alt="With 10um step limits." src="_images/tracks-bulk-10um-limit.step-hist.png" style="width: 400px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Step length distributions for 1 MeV electrons in Germanium. You should see the
+step lengths be limited to 10 um in the second case.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<figure class="sphinx-subfigure align-default" id="id6">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Without step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.step-vs-dist.png"><img alt="Without step limits." src="_images/tracks-bulk-no-limit.step-vs-dist.png" style="width: 400px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">With 10um step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.step-vs-dist.png"><img alt="With 10um step limits." src="_images/tracks-bulk-10um-limit.step-vs-dist.png" style="width: 400px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Joint distribution of step length and distance to detector surface for 1 MeV
+electrons in Germanium. Without step limits you should see step limits smaller
+close to the detector surface, due to the safety mechanism in Geant4. Two
+populations of events are expected to be present due to the multiple column
+scatter (MSC) and Ionisation processes in Geant4. With step limits the step
+lengths should be limited to 10 um.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<figure class="sphinx-subfigure align-default" id="id7">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Without step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-no-limit.step-vs-dist-zoom.png"><img alt="Without step limits." src="_images/tracks-bulk-no-limit.step-vs-dist-zoom.png" style="width: 400px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">With 10um step limits.</span>
+<a class="reference internal image-reference" href="_images/tracks-bulk-10um-limit.step-vs-dist-zoom.png"><img alt="With 10um step limits." src="_images/tracks-bulk-10um-limit.step-vs-dist-zoom.png" style="width: 400px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Joint distribution of step length and distance to detector surface for 1 MeV
+electrons in Germanium zooming into small distances. Similar trends as in the
+previous plot should be present.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+</section>
+<section id="step-limits-effect-on-observables">
+<h2>Step limits effect on observables<a class="headerlink" href="#step-limits-effect-on-observables" title="Link to this heading">¶</a></h2>
+<p>The next section of the validation report describes the calculation of
+observables of interest relevant for Germanium detectors, this consists of:</p>
+<ul class="simple">
+<li><p>the energy deposited in the Germanium, both with and without active volume
+correction.</p></li>
+<li><p>pulse shape heuristics, or parameters describing the topology of the event,
+(not really observables but relating to pulse shape parameters).</p></li>
+<li><p>attenuation of external gammas.</p></li>
+</ul>
+<p>We compare the simulated observables with the step limits used in the
+simulation.</p>
+<section id="bulk-electrons">
+<h3>Bulk electrons<a class="headerlink" href="#bulk-electrons" title="Link to this heading">¶</a></h3>
+<p>We generate 1 MeV electrons in the bulk of the Germanium detector varying the
+step limits and production cuts. This is relevant both for the simulation of
+neutrinoless double beta decay but also any gamma’s depositing energy in the
+HPGe. This is since a change in the fraction of electrons with fully
+reconstructed energy will change the peak-to-continuum ratio for the gamma
+simulation.</p>
+<section id="total-energy">
+<h4>Total energy<a class="headerlink" href="#total-energy" title="Link to this heading">¶</a></h4>
+<p>We extract the total energy deposited in the Germanium detector, the energy
+spectra are plotted below:</p>
+<figure class="align-default" id="id8">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-total-energy.spec.output.png"><img alt="_images/beta-observables.bulk-total-energy.spec.output.png" src="_images/beta-observables.bulk-total-energy.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Spectrum of total energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>To quantify this we count the fraction of events within 1 keV of the full energy
+peak.</p>
+<figure class="align-default" id="id9">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-total-energy.eff.output.png"><img alt="_images/beta-observables.bulk-total-energy.eff.output.png" src="_images/beta-observables.bulk-total-energy.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>We do not expect differences based on the step limits, since the safety
+mechanism in Geant4 should ensure the correct amount of energy is deposited in
+each sensitive detector (essentially very small steps will be taken near the
+surface).</p>
+</section>
+<section id="active-volume-corrected-energy">
+<h4>Active volume corrected energy<a class="headerlink" href="#active-volume-corrected-energy" title="Link to this heading">¶</a></h4>
+<p>Next, we compute the energy after active volume correction (see
+<a class="reference external" href="https://www.mpi-hd.mpg.de/gerda/public/2016/phd2016_bjoernLehnert.pdf">[Bjoern Lehnert’s thesis]</a>
+chapter 7). We employ a linear transition layer model with a 1 mm full-charge
+collection depth and a 0.5 mm linear component. The next plots show the spectrum
+and fraction of full energy peak events after this active volume correction.</p>
+<figure class="align-default" id="id10">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.spec.output.png"><img alt="_images/beta-observables.bulk-active-energy.spec.output.png" src="_images/beta-observables.bulk-active-energy.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<figure class="align-default" id="id11">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.eff.output.png"><img alt="_images/beta-observables.bulk-active-energy.eff.output.png" src="_images/beta-observables.bulk-active-energy.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>It is possible we may see differences due to the introduction of the inactive
+region of the HPGe detector meaning the Geant4 default stepping is not
+necessarily high enough in this region.</p>
+<p>However, the overall trends are driven by the fraction of events with vertices
+sampled in the partially active region. To decouple this effect from the
+variations due to step limitations we select the energies corresponding to
+vertices in the partially active region (distance to surface less than 1 mm) and
+in the bulk (distance greater than one mm).</p>
+<figure class="sphinx-subfigure align-default" id="id12">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Vertices sampled inside the transition layer (distance less than 1 mm).</span>
+<a class="reference internal image-reference" href="_images/beta-observables.tl-active-energy.spec.output.png"><img alt="Vertices sampled inside the transition layer (distance less than 1 mm)." src="_images/beta-observables.tl-active-energy.spec.output.png" style="width: 400px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">Vertices sampled inside the transition layer (distance greater than 1 mm).</span>
+<a class="reference internal image-reference" href="_images/beta-observables.not-tl-active-energy.spec.output.png"><img alt="Vertices sampled inside the transition layer (distance greater than 1 mm)." src="_images/beta-observables.not-tl-active-energy.spec.output.png" style="width: 400px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Energy spectra for 1 MeV electrons in Germanium, selecting vertices in the
+transition region and the detector bulk.</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>  </p>
+<p>Similar to the previous tests we also plot the fraction of events with energy
+within 1 keV of the full energy peak.</p>
+<figure class="sphinx-subfigure align-default" id="id13">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<a class="reference internal image-reference" href="_images/beta-observables.tl-active-energy.eff.output.png"><img alt="Vertices sampled inside the transition layer (distance less than 1 mm)." src="_images/beta-observables.tl-active-energy.eff.output.png" style="width: 400px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<a class="reference internal image-reference" href="_images/beta-observables.not-tl-active-energy.eff.output.png"><img alt="Vertices sampled inside the transition layer (distance greater than 1 mm)." src="_images/beta-observables.not-tl-active-energy.eff.output.png" style="width: 400px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Fraction of generated electrons with fully reconstructed active energy (within 1
+keV), as a function of the step limits.</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>You should observe that very few of the events from the transition layer deposit
+their full energy in the Germanium. You may also be able to observe some
+dependence on the efficiency for the vertices sampled inside the bulk of the
+detector</p>
+</section>
+<section id="pulse-shape-heuristics">
+<h4>Pulse-shape heuristics<a class="headerlink" href="#pulse-shape-heuristics" title="Link to this heading">¶</a></h4>
+<p>It is currently not possible to simulate the pulse-shape of a Germanium detector
+with Geant4. Work is ongoing to simulate the detector response with dedicated
+packages. Alternatively “pulse-shape-heuristics” are parameters that can be used
+to estimate if an event would have passed or failed a PSD cut. Whilst these are
+not technically observable it is still important to simulate them accuractely.</p>
+<p>We focus on “r90” defined as the smallest radius (centered on the energy
+weighted center) or the event containing at-least 90% of the deposited energy.
+The spectrum of r90 for 1 MeV electrons in bulk is shown below:</p>
+<figure class="align-default" id="id14">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.spec.output.png"><img alt="_images/beta-observables.bulk-r90.spec.output.png" src="_images/beta-observables.bulk-r90.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Spectrum of r90 in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id14" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>To quantify the effect of the step limits on our observable of interest (the
+fraction of multisite events), we compute the fraction of events with &gt; 1 mm
+r90.</p>
+<figure class="align-default" id="id15">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.eff.output.png"><img alt="_images/beta-observables.bulk-r90.eff.output.png" src="_images/beta-observables.bulk-r90.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of generated electrons with r90 greater than 1 mm, as a function of the step limits.</em></span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+</section>
+</section>
+<section id="surface-electrons">
+<h3>Surface electrons<a class="headerlink" href="#surface-electrons" title="Link to this heading">¶</a></h3>
+<section id="id1">
+<h4>Total energy<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<p>Next we generate events on the surface of the HPGe detector. This is relevant
+for beta decays on the surface of the detector (eg. from Potassium-42) but also
+gives us a way to study more generally the surface effects.</p>
+<p>We generated 1 MeV electrons on the center of the bottom surface of the
+detector, all pointing upwards. As before we extract the total deposited energy:</p>
+<figure class="align-default" id="id16">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.spec.output.png"><img alt="_images/beta-observables.surf-total-energy.spec.output.png" src="_images/beta-observables.surf-total-energy.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Spectrum of total energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<figure class="align-default" id="id17">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.eff.output.png"><img alt="_images/beta-observables.surf-total-energy.eff.output.png" src="_images/beta-observables.surf-total-energy.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+</section>
+<section id="id2">
+<h4>Active volume corrected energy<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<p>Next we plot the spectrum after the active volume correction:</p>
+<figure class="align-default" id="id18">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.spec.output.png"><img alt="_images/beta-observables.surf-active-energy.spec.output.png" src="_images/beta-observables.surf-active-energy.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>It is not expected to observe many events with 1 MeV deposited in the active
+volume. So as an observable we count the fraction of events with more than 300
+keV deposited. This is relevant for the background induced by surface events.</p>
+<figure class="align-default" id="id19">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.eff.output.png"><img alt="_images/beta-observables.surf-active-energy.eff.output.png" src="_images/beta-observables.surf-active-energy.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of generated electrons with more than 300 keV active energy, as a function of the step limits.</em></span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>Again it is possible you may see differences relating to the step limits.
+However, it should be kept in mind that for simulations of beta’s, which is a
+continuous spectrum this detector response function will be conolved with the
+spectrum shape minimising the effect.</p>
+</section>
+<section id="range">
+<h4>Range<a class="headerlink" href="#range" title="Link to this heading">¶</a></h4>
+<p>Finally, we can extract the maximum z position of the electron, this gives a
+measurement of the range of the electrons. The spectrum of this parameter (not
+really an observable) is shown below:</p>
+<figure class="align-default" id="id20">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.spec.output.png"><img alt="_images/beta-observables.surf-max-z.spec.output.png" src="_images/beta-observables.surf-max-z.spec.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Distribution of the range of the electrons in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+<p>To quantify this we extract the fraction of events with a range &gt; 1 mm.</p>
+<figure class="align-default" id="id21">
+<a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.eff.output.png"><img alt="_images/beta-observables.surf-max-z.eff.output.png" src="_images/beta-observables.surf-max-z.eff.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Fraction of 1 MeV electrons travelling more than 1 mm as a function of the step limits.</em></span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>   </p>
+</section>
+</section>
+</section>
+<section id="production-cuts-effect-on-observables">
+<h2>Production cuts effect on observables<a class="headerlink" href="#production-cuts-effect-on-observables" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="nist.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Comparison with NIST</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2020, the LEGEND Collaboration
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">HPGe tracking and observables</a><ul>
+<li><a class="reference internal" href="#electron-tracking-plots">Electron tracking plots</a></li>
+<li><a class="reference internal" href="#step-limits-effect-on-observables">Step limits effect on observables</a><ul>
+<li><a class="reference internal" href="#bulk-electrons">Bulk electrons</a><ul>
+<li><a class="reference internal" href="#total-energy">Total energy</a></li>
+<li><a class="reference internal" href="#active-volume-corrected-energy">Active volume corrected energy</a></li>
+<li><a class="reference internal" href="#pulse-shape-heuristics">Pulse-shape heuristics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#surface-electrons">Surface electrons</a><ul>
+<li><a class="reference internal" href="#id1">Total energy</a></li>
+<li><a class="reference internal" href="#id2">Active volume corrected energy</a></li>
+<li><a class="reference internal" href="#range">Range</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#production-cuts-effect-on-observables">Production cuts effect on observables</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/tabs.js?v=3ee01567"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    </body>
+</html>
