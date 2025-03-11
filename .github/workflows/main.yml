@@ -196,5 +196,5 @@ jobs:
           github_token: ${{ secrets.PUSH_ACCESS_TOKEN }}
           publish_branch: gh-pages
           publish_dir: output
-          destination_dir: ${{ env.dir }}
+          destination_dir: validation/${{ env.dir }}
 # vim: expandtab tabstop=2 shiftwidth=2
