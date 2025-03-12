@@ -167,7 +167,8 @@ jobs:
           PATH="$PWD/local/bin:$PATH" DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH" remage --version
 
   deploy_validation_report:
-    # if: github.event_name != 'pull_request'
+    name: Deploy validation report to legend-exp.github.io/remage/validation
+    if: github.event_name != 'pull_request'
     needs: test_on_linux
     runs-on: ubuntu-latest
     permissions:
