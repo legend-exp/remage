@@ -1,6 +1,6 @@
 /run/initialize
 
-/vis/open OGL
+/vis/open TOOLSSG_OFFSCREEN 1500x1500
 /vis/sceneHandler/attach
 
 /vis/drawVolume

@@ -3,7 +3,7 @@
 
 /run/initialize
 
-/vis/open OGL
+/vis/open TOOLSSG_OFFSCREEN 1500x1500
 /vis/viewer/reset
 /vis/viewer/set/globalLineWidthScale 1.5
 /vis/viewer/set/style wireframe
