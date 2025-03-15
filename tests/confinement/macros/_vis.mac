@@ -19,10 +19,10 @@
 /vis/modeling/trajectories/vertices/set e- yellow
 /vis/modeling/trajectories/vertices/default/setStepPtsVisible true
 /vis/modeling/trajectories/vertices/default/setDrawStepPts true
-/vis/modeling/trajectories/vertices/default/setStepPtsSize 10
+/vis/modeling/trajectories/vertices/default/setStepPtsSize 5
 
 /vis/geometry/set/forceSolid
-/vis/geometry/set/colour all 10 1 1 1 0.3
+/vis/geometry/set/colour all 10 1 1 1 0.5
 
 /vis/scene/add/hits
-/vis/scene/endOfEventAction accumulate
+/vis/scene/endOfEventAction accumulate 99999999
