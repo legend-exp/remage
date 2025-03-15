@@ -3,3 +3,4 @@
 .*Duplicate C\+\+ declaration, also defined at.*
 .*Document headings start at H3, not H1.*
 .*"api/file_view_hierarchy.rst.include": line 11 exceeds the line-length-limit..*
+.*unknown mimetype for.*
