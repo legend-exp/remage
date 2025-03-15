@@ -29,11 +29,11 @@ endforeach()
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
 # TODO: add new images here
-set(IMAGES confinement/geometrical-and-physical.output.jpeg)
+set(TESTS_IMAGES confinement/geometrical-and-physical.output.jpeg)
 
 # copy them over, but at build time!
 set(COPIED_IMGS)
-foreach(_file ${IMAGES})
+foreach(_file ${TESTS_IMAGES})
   set(_src ${CMAKE_BINARY_DIR}/tests/${_file})
   set(_dest ${CMAKE_CURRENT_BINARY_DIR}/_img/${_file})
   add_custom_command(

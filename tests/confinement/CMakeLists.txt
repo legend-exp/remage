@@ -35,69 +35,70 @@ foreach(_mac ${_macros})
 endforeach()
 
 # generate the GDML file
-add_test(NAME confinment-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
-set_tests_properties(confinment-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
-                                                       confine-gdml-fixture)
+add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
+set_tests_properties(confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
+                                                        confine-gdml-fixture)
 
 # test on HPGe containment
-add_test(NAME confinment-ge/gen-output COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o
-                                               test-confine.lh5 -- macros/test-ge-confine.mac)
+add_test(NAME confinement-ge/gen-output COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o
+                                                test-confine.lh5 -- macros/test-ge-confine.mac)
 set_tests_properties(
-  confinment-ge/gen-output PROPERTIES LABELS extra FIXTURES_SETUP confine-output-fixture
-                                      FIXTURES_REQUIRED confine-gdml-fixture)
+  confinement-ge/gen-output PROPERTIES LABELS extra FIXTURES_SETUP confine-output-fixture
+                                       FIXTURES_REQUIRED confine-gdml-fixture)
 
-add_test(NAME confinment-ge/relative-fraction COMMAND ${PYTHONPATH} ./test_confinment_ge.py)
+add_test(NAME confinement-ge/relative-fraction COMMAND ${PYTHONPATH} ./test_confinement_ge.py)
 
-set_tests_properties(confinment-ge/relative-fraction PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                                confine-output-fixture)
+set_tests_properties(confinement-ge/relative-fraction PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                                 confine-output-fixture)
 
 # test on lar intersection
-add_test(NAME confinment-lar/intersection-gen-output
+add_test(NAME confinement-lar/intersection-gen-output
          COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in.lh5 --
                  macros/lar-in.mac)
 set_tests_properties(
-  confinment-lar/intersection-gen-output
+  confinement-lar/intersection-gen-output
   PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
-add_test(NAME confinment-lar/intersection COMMAND ${PYTHONPATH} ./test_lar_intersection.py)
+add_test(NAME confinement-lar/intersection COMMAND ${PYTHONPATH} ./test_lar_intersection.py)
 
-set_tests_properties(confinment-lar/intersection PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                            confine-lar-in-output-fixture)
+set_tests_properties(confinement-lar/intersection PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                             confine-lar-in-output-fixture)
 
 # generate subtraction output
-add_test(NAME confinment-lar/subtraction-gen-output
+add_test(NAME confinement-lar/subtraction-gen-output
          COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-out.lh5 --
                  macros/lar-out.mac)
 
 set_tests_properties(
-  confinment-lar/subtraction-gen-output
+  confinement-lar/subtraction-gen-output
   PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-out-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
 # analyse subtraction
-add_test(NAME confinment-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
-                                                 test-confine-lar-out.lh5 lar-sub-check.output.pdf)
+add_test(NAME confinement-lar/subtraction
+         COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-out.lh5
+                 lar-sub-check.output.pdf)
 
-set_tests_properties(confinment-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                           confine-lar-out-output-fixture)
+set_tests_properties(confinement-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                            confine-lar-out-output-fixture)
 
 # generate intersection and subtraction output
-add_test(NAME confinment-lar/intersection-and-subtraction-gen-output
+add_test(NAME confinement-lar/intersection-and-subtraction-gen-output
          COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in-out.lh5 --
                  macros/lar-in-and-out.mac)
 
 set_tests_properties(
-  confinment-lar/intersection-and-subtraction-gen-output
+  confinement-lar/intersection-and-subtraction-gen-output
   PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-out-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
 # analyse intersection and subtraction
-add_test(NAME confinment-lar/intersection-and-subtraction
+add_test(NAME confinement-lar/intersection-and-subtraction
          COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-in-out.lh5
                  lar-int-and-sub-check.output.pdf)
 
-set_tests_properties(confinment-lar/intersection-and-subtraction
+set_tests_properties(confinement-lar/intersection-and-subtraction
                      PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture)
 
 # test generic surface sampling methods
@@ -127,15 +128,16 @@ set(_surface_tests
 
 foreach(_test ${_surface_tests})
 
-  add_test(NAME confinment-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
+  add_test(NAME confinement-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
 
-  set_tests_properties(confinment-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                              test-surface-sampler-methods-fixture)
+  set_tests_properties(
+    confinement-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                            test-surface-sampler-methods-fixture)
 
   if(_test MATCHES "test-points-.*")
     set_tests_properties(
-      confinment-surface/${_test} PROPERTIES LABELS "extra;vis" SKIP_REGULAR_EXPRESSION
-                                             "couldn't open display")
+      confinement-surface/${_test} PROPERTIES LABELS "extra;vis" SKIP_REGULAR_EXPRESSION
+                                              "couldn't open display")
   endif()
 
 endforeach()
@@ -143,9 +145,9 @@ endforeach()
 # now run some simulations and test the outputs
 
 # generate the GDML file
-add_test(NAME confinment-surface/gen-gdml COMMAND ${PYTHONPATH} make_basic_solids.py)
-set_tests_properties(confinment-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
-                                                            confine-surface-gdml-fixture)
+add_test(NAME confinement-surface/gen-gdml COMMAND ${PYTHONPATH} make_basic_solids.py)
+set_tests_properties(confinement-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
+                                                             confine-surface-gdml-fixture)
 
 # visualise
 set(_solids tubby box con uni sub trd)
@@ -162,15 +164,15 @@ foreach(det ${_solids})
     PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
                FIXTURES_REQUIRED confine-surface-gdml-fixture)
 
-  add_test(NAME confinment-surface/${det}-vis
+  add_test(NAME confinement-surface/${det}-vis
            COMMAND ${REMAGE_PYEXE} macros/vis-surface-${det}.mac macros/_vis-export.mac -g
                    gdml/simple-solids.gdml -w -l detail)
 
   set_tests_properties(
-    confinment-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
-                                             confine-surface-vis-macro-${det}-fixture)
-  set_tests_properties(confinment-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                "couldn't open display")
+    confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
+                                              confine-surface-vis-macro-${det}-fixture)
+  set_tests_properties(confinement-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
+                                                                 "couldn't open display")
 endforeach()
 
 # run simulations and check
