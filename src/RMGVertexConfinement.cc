@@ -239,7 +239,7 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
   RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (", max_attempts,
       "), check that your surfaces are efficiently ",
       "sampleable and try, eventually, to increase the threshold through the dedicated ",
-      "macro command. Returning dummy vertex");
+      "macro command /RMG/Generator/Confinement/MaxSamplingTrials. Returning dummy vertex");
 
   return false;
 }

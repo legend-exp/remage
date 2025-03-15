@@ -29,7 +29,8 @@ endforeach()
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
 # TODO: add new images here
-set(TESTS_IMAGES confinement/geometrical-and-physical.output.jpeg)
+set(TESTS_IMAGES basics/vis-co60.output.jpeg confinement/native-surface.output.jpeg
+                 confinement/native-volume.output.jpeg)
 
 # copy them over, but at build time!
 set(COPIED_IMGS)
@@ -53,7 +54,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @
 
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
+  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE} ${COPIED_IMGS}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
