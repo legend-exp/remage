@@ -81,8 +81,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @
 
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} -q -b html -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml
-          ${SPHINX_SOURCE} ${SPHINX_BUILD}
+  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b html
+          -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${SPHINX_EXTENSIONS} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
