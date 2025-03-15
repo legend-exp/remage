@@ -66,9 +66,13 @@ geant4.PhysicalVolume(
 )
 
 # above box with hole inside a mother orb
+boxnorb2_s = geant4.solid.Union(
+    "BoxAndOrb2", box2_s, hole_s, [[0, 0, 0], [0, 0, 0]], reg
+)
+boxnorb2_l = geant4.LogicalVolume(boxnorb2_s, "G4_Pb", "BoxAndOrb2", reg)
 orb_s = geant4.solid.Orb("MotherOrb", 1, reg, lunit="m")
 orb_l = geant4.LogicalVolume(orb_s, "G4_Pb", "MotherOrb", reg)
-geant4.PhysicalVolume([0, 0, 0], [0, 0, 0, "m"], boxnorb_l, "BoxAndOrb2", orb_l, reg)
+geant4.PhysicalVolume([0, 0, 0], [0, 0, 0, "m"], boxnorb2_l, "BoxAndOrb2", orb_l, reg)
 geant4.PhysicalVolume([0, 0, 0], [2, 2, 2, "m"], orb_l, "MotherOrb", world_l, reg)
 
 # polycone
