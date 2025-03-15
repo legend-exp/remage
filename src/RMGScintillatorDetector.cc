@@ -31,7 +31,9 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
+/// \cond this triggers a sphinx error
 G4ThreadLocal G4Allocator<RMGScintillatorDetectorHit>* RMGScintillatorDetectorHitAllocator = nullptr;
+/// \endcond
 
 // NOTE: does this make sense?
 G4bool RMGScintillatorDetectorHit::operator==(const RMGScintillatorDetectorHit& right) const {

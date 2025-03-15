@@ -2,25 +2,31 @@
 
 /RMG/Manager/Logging/LogLevel summary
 
-/vis/open OGL
+/vis/open TOOLSSG_OFFSCREEN 1500x1500
 /vis/drawVolume
 /vis/sceneHandler/attach
 
-/vis/viewer/set/lineSegmentsPerCircle 10
+/vis/viewer/set/lineSegmentsPerCircle 15
 # /vis/viewer/set/defaultColour black
 # /vis/viewer/set/background white
-/vis/scene/add/axes 0 0 0 3 m
+# /vis/scene/add/axes 0 0 0 3 m
 
 /vis/viewer/set/upVector 0 0 -1
 /vis/viewer/set/viewpointVector -1 1 1
 
 /vis/scene/add/trajectories smooth
-/vis/modeling/trajectories/create/drawByCharge
-/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
-/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+/vis/modeling/trajectories/create/drawByParticleID vertices
+/vis/modeling/trajectories/vertices/set e- yellow
+/vis/modeling/trajectories/vertices/default/setStepPtsVisible true
+/vis/modeling/trajectories/vertices/default/setDrawStepPts true
+/vis/modeling/trajectories/vertices/default/setStepPtsSize 5
 
 /vis/geometry/set/forceSolid
-/vis/geometry/set/colour all 10 1 1 1 0.3
+# /vis/geometry/set/forceWireframe MotherOrb 0 true
+
+/vis/geometry/set/colour all 10 1 1 1 0.5
+/vis/geometry/set/colour MotherOrb 0 1 1 1 0.3
+/vis/geometry/set/colour BoxAndOrb2 0 1 0 0 1
 
 /vis/scene/add/hits
-/vis/scene/endOfEventAction accumulate
+/vis/scene/endOfEventAction accumulate 99999999

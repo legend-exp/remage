@@ -2,7 +2,7 @@ version: 2
 
 sphinx:
   configuration: docs/conf.py
-  fail_on_warning: false
+  fail_on_warning: true
 
 formats:
   - epub
@@ -11,11 +11,12 @@ formats:
 build:
   os: ubuntu-22.04
   tools:
-    python: mambaforge-4.10
+    python: mambaforge-23.11
   jobs:
     post_checkout: # for setuptools_scm to work correctly.
       - git fetch --unshallow || true
     pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
+      - cd docs && wget --quiet https://geant4.kek.jp/Reference/11.3.0/geant4.tag
       - export DOXYGEN_DOT_PATH=$(which dot)
       - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g
         docs/Doxyfile.in > docs/Doxyfile

@@ -89,7 +89,9 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
     RMGGermaniumDetectorHitsCollection* fHitsCollection = nullptr;
 };
 
+/// \cond this triggers a sphinx error
 extern G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator;
+/// \endcond
 
 inline void* RMGGermaniumDetectorHit::operator new(size_t) {
   if (!RMGGermaniumDetectorHitAllocator)

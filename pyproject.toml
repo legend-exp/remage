@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "remage"
 authors = [
-  { name = "Luigi Pertoldi", email = "gipert@pm.me" },
+  { name = "The remage developers" },
 ]
 maintainers = [
   { name = "The LEGEND Collaboration" },
@@ -59,6 +59,7 @@ docs = [
   "exhale",
   "breathe",
   "myst-parser",
+  "furo",
 ]
 
 [project.scripts]

@@ -5,7 +5,19 @@ find_package(Sphinx REQUIRED)
 get_target_property(REMAGE_PUBLIC_HEADER_DIR remage INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB REMAGE_PUBLIC_HEADERS ${REMAGE_PUBLIC_HEADER_DIR}/*.hh)
 
-# configure Doxyfile in build directory
+set(GEANT4_TAG_URL "https://geant4.kek.jp/Reference/11.3.0/geant4.tag")
+message(STATUS "Downloading Geant4 tag file from: ${GEANT4_TAG_URL}")
+file(
+  DOWNLOAD "${GEANT4_TAG_URL}" "${CMAKE_CURRENT_BINARY_DIR}/geant4.tag"
+  EXPECTED_HASH SHA256=79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c
+  STATUS download_status
+  LOG download_log)
+
+if(NOT download_status EQUAL 0)
+  message(
+    WARNING "Download of Geant4 tag file failed with status ${download_status}:\n${download_log}")
+endif()
+
 set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
 set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR})
@@ -33,36 +45,46 @@ set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/_build)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
-# FIXME: the logic here to handle sources is not really clean, needs some more
-# serious thought! one important requirement is CMake being able to copy the
-# sources again if they change
 file(
-  GLOB SPHINX_SOURCES
+  GLOB_RECURSE SPHINX_SOURCES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  *.rst *.md)
+  *.rst **/*.rst *.md **/*.md)
 
 foreach(_file ${SPHINX_SOURCES})
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE} COPYONLY)
+  get_filename_component(_dir ${_file} DIRECTORY)
+  file(MAKE_DIRECTORY ${SPHINX_SOURCE}/${_dir})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
 file(
   GLOB SPHINX_IMAGES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  img/*)
+  _img/*)
 
-file(MAKE_DIRECTORY ${SPHINX_SOURCE}/img)
+file(MAKE_DIRECTORY ${SPHINX_SOURCE}/_img)
 foreach(_file ${SPHINX_IMAGES})
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/img COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/_img COPYONLY)
+endforeach()
+
+file(
+  GLOB_RECURSE SPHINX_EXTENSIONS
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  _extensions/*.py known-warnings.txt)
+
+foreach(_file ${SPHINX_EXTENSIONS})
+  get_filename_component(_dir ${_file} DIRECTORY)
+  file(MAKE_DIRECTORY ${SPHINX_SOURCE}/${_dir})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
 
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} -q -b html -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml
-          ${SPHINX_SOURCE} ${SPHINX_BUILD}
+  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b html
+          -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
-  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE}
+  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${SPHINX_EXTENSIONS} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
   ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
 

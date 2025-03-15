@@ -156,7 +156,7 @@ def make_plot(vert, hit):
     ax[1].set_xticks(np.arange(len(names)), names, rotation=90, fontsize=10)
     ax[1].axhline(y=0, color="red")
     ax[1].grid()
-    fig.suptitle(f"confinment check for HPGes, p = {100 * p:.1e} %")
+    fig.suptitle(f"confinement check for HPGes, p = {100 * p:.1e} %")
     caption = "The fraction of the vertices found inside each HPGe. This is compared to the expectation which is that the number "
     caption += "should be proportional to the volume of the HPGe. The top panel shows the fraction in each detector "
     caption += r"while the lower panel shows the relative difference in % from the expectation."

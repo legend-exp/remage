@@ -1,3 +1,4 @@
+import re
 import sys
 import os
 import subprocess
@@ -6,14 +7,12 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
     import setuptools_scm
-    sys.path.append(os.path.abspath("extensions"))
-else:
-    sys.path.append("@PROJECT_SOURCE_DIR@/docs/extensions")
 
+sys.path.append(os.path.abspath("_extensions"))
 
 project = "remage"
 copyright = "2020, the LEGEND Collaboration"
-author = "Luigi Pertoldi"
+author = "The remage developers"
 
 extensions = [
     "sphinx.ext.mathjax",
@@ -25,15 +24,15 @@ extensions = [
     "exhale",
     "breathe",
     "myst_parser",
-    "remage.warnings_filter",
+    "warnings_filter",
 ]
 
 exhale_args = {
-    "containmentFolder":     "./api",
-    "rootFileName":          "index.rst",
-    "doxygenStripFromPath":  "..",
-    "rootFileTitle":         "API reference",
-    "createTreeView":        True,
+    "containmentFolder": "./api",
+    "rootFileName": "index.rst",
+    "doxygenStripFromPath": "..",
+    "rootFileTitle": "API reference",
+    "createTreeView": True,
     "exhaleExecutesDoxygen": False,
 }
 
@@ -53,9 +52,11 @@ else:
     breathe_projects["remage"] = f"{doxyout}/xml"
 
     # also deploy Doxygen docs
-    subprocess.call(f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True)
+    subprocess.call(
+        f"mkdir -p extra/doxygen && cp -r {doxyout}/html/* extra/doxygen", shell=True
+    )
 
-    version = "@PROJECT_VERSION@"
+    version = "@RMG_GIT_VERSION_FULL@"
     html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
     warnings_filter_config = "@PROJECT_SOURCE_DIR@/docs/known-warnings.txt"
 
@@ -67,9 +68,45 @@ html_theme = "furo"
 html_theme_options = {
     "source_repository": "https://github.com/legend-exp/remage",
     "source_branch": "main",
-    "source_directory": "docs/source",
+    "source_directory": "docs",
 }
 html_title = f"{project} {version}"
 
+exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md"]
+
 # warnings filtering
-warnings_filter_silent = False
+warnings_filter_silent = True
+
+
+# now determine version for link to validation repor
+def is_semver(version: str) -> bool:
+    # Regex explanation:
+    # ^v?               -> start of string, optional "v"
+    # (0|[1-9]\d*)      -> major version (no leading zeros unless the number is 0)
+    # \.                -> literal dot
+    # (0|[1-9]\d*)      -> minor version
+    # \.                -> literal dot
+    # (0|[1-9]\d*)      -> patch version
+    # (?:(a|alpha|b|beta|rc)\d+)? -> optional pre-release tag followed by one or more digits
+    # $                 -> end of string
+    pattern = r"^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:(a|alpha|b|beta|rc)\d+)?$"
+    semver_regex = re.compile(pattern)
+    return bool(semver_regex.fullmatch(version))
+
+
+# https://stackoverflow.com/a/56328457/4279748
+ultimate_replacements = {
+    "{REMAGE_VERSION}": version if is_semver(version) else "latest"
+}
+
+
+def _replace(app, docname, source):
+    result = source[0]
+    for key in app.config.ultimate_replacements:
+        result = result.replace(key, app.config.ultimate_replacements[key])
+    source[0] = result
+
+
+def setup(app):
+    app.add_config_value("ultimate_replacements", {}, True)
+    app.connect("source-read", _replace)

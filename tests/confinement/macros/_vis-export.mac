@@ -1,2 +1,3 @@
-/vis/ogl/set/printMode pixmap
-/vis/ogl/export {export-fn}.pdf
+/vis/tsg/offscreen/set/file {export-fn}.jpeg
+
+/vis/viewer/rebuild

@@ -13,6 +13,6 @@
 /gps/particle e-
 /gps/energy 1 eV
 
-/run/beamOn 5000
+/run/beamOn 20000
 
 /control/alias export-fn complex-volume.output

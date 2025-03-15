@@ -233,11 +233,17 @@ add_subdirectory(python)
 option(RMG_BUILD_DOCS "Build remage documentation" OFF)
 if(RMG_BUILD_DOCS)
   add_subdirectory(docs)
+  add_subdirectory(docs/validation)
 endif()
 
 option(RMG_BUILD_EXAMPLES "Build all remage examples" OFF)
 if(RMG_BUILD_EXAMPLES)
   add_subdirectory(examples)
+endif()
+
+if(Geant4_VERSION VERSION_LESS_EQUAL "11.1.0" AND BUILD_TESTING)
+  message(WARNING "full support for the test suite is available with Geant4 >= 11.1 , "
+                  "set BUILD_TESTING=OFF to suppress this warning")
 endif()
 
 message(STATUS "Test/validation suite support: BUILD_TESTING=${BUILD_TESTING}")

@@ -19,6 +19,6 @@
 /gps/particle e-
 /gps/energy 1 eV
 
-/run/beamOn 2000
+/run/beamOn 10000
 
 /control/alias export-fn geometrical-or-physical.output

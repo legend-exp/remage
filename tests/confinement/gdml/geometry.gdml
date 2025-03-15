@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
 	<define/>
 	<materials/>
 	<solids>
@@ -15,6 +15,10 @@
 			<second ref="Hole"/>
 		</subtraction>
 		<union name="BoxAndOrb">
+			<first ref="Box2"/>
+			<second ref="Hole"/>
+		</union>
+		<union name="BoxAndOrb2">
 			<first ref="Box2"/>
 			<second ref="Hole"/>
 		</union>
@@ -49,11 +53,15 @@
 			<materialref ref="G4_Pb"/>
 			<solidref ref="BoxAndOrb"/>
 		</volume>
+		<volume name="BoxAndOrb2">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="BoxAndOrb2"/>
+		</volume>
 		<volume name="MotherOrb">
 			<materialref ref="G4_Pb"/>
 			<solidref ref="MotherOrb"/>
 			<physvol name="BoxAndOrb2">
-				<volumeref ref="BoxAndOrb"/>
+				<volumeref ref="BoxAndOrb2"/>
 			</physvol>
 		</volume>
 		<volume name="Polycone">

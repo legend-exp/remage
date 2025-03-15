@@ -13,4 +13,5 @@
 
 /run/beamOn 100
 
-/vis/ogl/export vis-co60.output.pdf
+/vis/tsg/offscreen/set/file vis-co60.output.jpeg
+/vis/viewer/rebuild

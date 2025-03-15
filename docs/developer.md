@@ -116,6 +116,8 @@ the page.
 $ ctest --print-labels # see all defined test labels
 $ ctest -L vis # run only tests with label "vis"
 $ ctest -R basics-mt/print-volumes.mac # run only this test
+$ ctest -V # show test output
+$ ctest --output-on-failure # show test output only if test fails
 ```
 
 :::
@@ -233,3 +235,43 @@ possible, all changes will be overwritten by the next automatic update.
 The GitHub CI jobs will only check if the command-reference file is up-to-date
 with the actual source code for each pull reuquest or push, but it will _not_
 update the documentation automatically.
+
+### Validation report
+
+Validation reports are automatically generated and uploaded as web pages to
+https://legend-exp.github.io/remage/validation for each remage version and for
+the `stable` tag of the `remage-base` container image. The source files are
+stored in the remage repository below `docs/validation` and can be built
+locally through the `sphinx-validation` target:
+
+```console
+$ cd remage/build/
+$ make sphinx-validation
+```
+
+CMake will copy images from the `build/tests` folder at build time and make
+them available for the report pages. To include new images to the report, you
+need to explicitly list them in the `TESTS_IMAGES` variable defined in
+`docs/validation/CMakeLists.txt`:
+
+```cmake
+set(TESTS_IMAGES
+    confinement/geometrical-and-physical.output.jpeg
+    basics/vis-co60.output.jpeg
+    ...)
+```
+
+:::{note}
+PDF images cannot be displayed in the validation report, convert them to bitmap.
+:::
+
+:::{warning}
+`make sphinx-validation` assumes that the images from the test suite have
+already been generated. Make sure to manually run `ctest` before building the
+validation report.
+:::
+
+:::{note}
+The validation report is not deployed for pull requests. Instead, the HTML
+pages can be downloaded as GitHub action artifact.
+:::
