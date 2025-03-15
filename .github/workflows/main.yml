@@ -75,7 +75,7 @@ jobs:
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
         with:
-          name: remage-test-output-g4flavor${{ matrix.container_version }}
+          name: remage-test-output-g4flavor-${{ matrix.container_version }}
           # artifacts must have a ".output*" extension
           path: build/tests/**/*.output*.*
 
