@@ -75,7 +75,7 @@ html_title = f"{project} {version}"
 exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md"]
 
 # warnings filtering
-warnings_filter_silent = False
+warnings_filter_silent = True
 
 
 # now determine version for link to validation repor
