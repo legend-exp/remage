@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 project = "remage's validation suite"
 copyright = "2020, the LEGEND Collaboration"
-author = "Luigi Pertoldi"
+author = "The remage developers"
 
 extensions = [
     "sphinx.ext.mathjax",
