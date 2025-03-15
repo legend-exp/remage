@@ -270,3 +270,8 @@ PDF images cannot be displayed in the validation report, convert them to bitmap.
 already been generated. Make sure to manually run `ctest` before building the
 validation report.
 :::
+
+:::{note}
+The validation report is not deployed for pull requests. Instead, the HTML
+pages can be downloaded as GitHub action artifact.
+:::
