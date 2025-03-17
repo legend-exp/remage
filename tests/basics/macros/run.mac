@@ -1,0 +1,18 @@
+/RMG/Geometry/RegisterDetector Germanium germanium 001
+
+/run/initialize
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Geometrical/AddSolid Sphere
+/RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius 1
+
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0
+
+/RMG/Generator/Select {GENERATOR}
+/gps/particle e-
+/gps/ang/type iso
+/gps/energy {ENERGY} keV
+
+/run/beamOn 1000

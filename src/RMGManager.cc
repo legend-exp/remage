@@ -149,9 +149,15 @@ void RMGManager::Run() {
   // configure UI
   std::unique_ptr<G4UIExecutive> session = nullptr;
   if (fInteractive) { session = StartInteractiveSession(); }
+  auto UI = G4UImanager::GetUIpointer();
+
+  // register aliases
+  for (const auto& kv : fG4Aliases) {
+    RMGLog::Out(RMGLog::summary, "Setting G4 alias: ", kv.first, "=", kv.second);
+    UI->ApplyCommand("/control/alias " + kv.first + " " + kv.second);
+  }
 
   // eventually execute macros
-  auto UI = G4UImanager::GetUIpointer();
   for (const auto& macro : fMacroFileNames) {
     RMGLog::Out(RMGLog::summary, "Loading macro file: ", macro);
     UI->ApplyCommand("/control/execute " + macro);

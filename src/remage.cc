@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
   CLI::App app{"remage: simulation framework for germanium experiments"};
 
-  int verbosity = 0;
+  int verbose = false;
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
@@ -62,24 +62,32 @@ int main(int argc, char** argv) {
   int pipe_fd = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
+  std::vector<std::string> macro_substitutions;
   std::string output;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
-  app.add_flag("-q", quiet, "Print only warnings and errors");
-  app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_flag("--version", version, "Print remage version");
-  app.add_flag("--version-rich", version_rich, "Print remage build configuration");
+  app.add_flag("-q", quiet, "Print only warnings and errors (same as --log-level=warning)");
+  app.add_flag("-v", verbose, "Increase program verbosity to maximum (same as --log-level=debug)");
+  app.add_flag("--version", version, "Print remage's version and exit");
+  app.add_flag("--version-rich", version_rich,
+      "Print versions of remage and its dependencies and exit");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
-  app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
-  app.add_option("-t,--threads", nthreads, "Number of threads");
-  app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
+  app.add_option("-s,--macro-substitutions", macro_substitutions,
+      "key=value pairs of variables to substitute in macros (syntax as for Geant4 aliases)");
+  app.add_flag("-i,--interactive", interactive, "Open an interactive macro command prompt");
+  app.add_option("-t,--threads", nthreads, "Set the number of threads used by remage");
+  app.add_option("-g,--gdml-files", gdmls,
+         "Supply one or more GDML files describing the experimental geometry")
+      ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
-  app.add_option("--pipe-fd", pipe_fd, "")->group(""); // group() hides this "internal" option.
-  app.add_option("macros", macros, "Macro files")->type_name("FILE");
+  app.add_option("--pipe-fd", pipe_fd,
+      "Pipe file descriptor for inter-process communication (internal)");
+  app.add_option("macros", macros, "One or more remage/Geant4 macro command listings to execute")
+      ->type_name("FILE");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -103,12 +111,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  switch (verbosity) {
-    case 1: RMGLog::SetLogLevel(RMGLog::detail); break;
-    case 2: RMGLog::SetLogLevel(RMGLog::debug); break;
-    default: break;
-  }
-
+  if (verbose) RMGLog::SetLogLevel(RMGLog::debug);
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
   // handle signal to abort the current run.
@@ -130,6 +133,12 @@ int main(int argc, char** argv) {
   manager.SetNumberOfThreads(nthreads);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
+
+  for (const auto& s : macro_substitutions) {
+    size_t pos = s.find('=');
+    if (pos != std::string::npos) { manager.RegisterG4Alias(s.substr(0, pos), s.substr(pos + 1)); }
+  }
+
   for (const auto& m : macros) manager.IncludeMacroFile(m);
   if (!output.empty()) manager.SetOutputFileName(output);
 

@@ -87,6 +87,9 @@ class RMGManager {
 
     inline void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
     inline void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
+    inline void RegisterG4Alias(std::string alias, std::string value) {
+      fG4Aliases.emplace(alias, value);
+    }
     void Initialize();
     void Run();
 
@@ -152,6 +155,7 @@ class RMGManager {
     std::string fApplicationName;
     int fArgc;
     char** fArgv;
+    std::map<std::string, std::string> fG4Aliases;
     std::vector<std::string> fMacroFileNames;
     bool fInteractive = false;
     bool fIsPersistencyEnabled = true;
