@@ -68,9 +68,8 @@ int main(int argc, char** argv) {
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
-  app.add_flag("-q", "--quiet", quiet,
-      "Print only warnings and errors (same as --log-level=warning)");
-  app.add_flag("-v", "--verbose", verbose,
+  app.add_flag("-q,--quiet", quiet, "Print only warnings and errors (same as --log-level=warning)");
+  app.add_flag("-v,--verbose", verbose,
       "Increase program verbosity to maximum (same as --log-level=debug)");
   app.add_flag("--version", version, "Print remage's version and exit");
   app.add_flag("--version-rich", version_rich,
