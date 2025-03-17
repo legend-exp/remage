@@ -4,7 +4,7 @@
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Geometrical/AddSolid Sphere
-/RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius 10
+/RMG/Generator/Confinement/Geometrical/Sphere/OuterRadius 1
 
 /RMG/Generator/Confinement/Geometrical/CenterPositionX 0
 /RMG/Generator/Confinement/Geometrical/CenterPositionY 0
@@ -13,6 +13,6 @@
 /RMG/Generator/Select GPS
 /gps/particle e-
 /gps/ang/type iso
-/gps/energy 1000 keV
+/gps/energy {ENERGY} keV
 
-/run/beamOn 10000
+/run/beamOn 1000
