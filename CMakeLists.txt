@@ -291,11 +291,13 @@ if(NOT APPLE)
 else()
   message(STATUS "WWW:   export DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
 endif()
+# cmake-lint: disable=W0106
 message(
   STATUS "WWW:   export CMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}/lib/cmake:$CMAKE_PREFIX_PATH")
 message(STATUS "")
 
-# TODO: can be removed after remage venv is not installed into the global python installation any more.
+# TODO: can be removed after remage venv is not installed into the global python installation
+# any more.
 if(CMAKE_INSTALL_PREFIX STREQUAL "/usr")
   message(FATAL_ERROR "WWW: cannot use ${CMAKE_INSTALL_PREFIX} as an install prefix, "
                       "as it might conflict with the system python installation.")
