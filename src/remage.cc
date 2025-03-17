@@ -68,20 +68,26 @@ int main(int argc, char** argv) {
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
-  app.add_flag("-q", quiet, "Print only warnings and errors");
-  app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_flag("--version", version, "Print remage version");
-  app.add_flag("--version-rich", version_rich, "Print remage build configuration");
+  app.add_flag("-q", quiet, "Print only warnings and errors (same as --log-level=warning)");
+  app.add_flag("-v", verbosity, "Increase program verbosity to maximum (same as --log-level=debug)");
+  app.add_flag("--version", version, "Print remage's version and exit");
+  app.add_flag("--version-rich", version_rich,
+      "Print versions of remage and its dependencies and exit");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
-  app.add_option("-s,--macro-substitutions", macro_substitutions, "key=value pairs");
-  app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
-  app.add_option("-t,--threads", nthreads, "Number of threads");
-  app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
+  app.add_option("-s,--macro-substitutions", macro_substitutions,
+      "key=value pairs of variables to substitute in macros (syntax as for Geant4 aliases)");
+  app.add_flag("-i,--interactive", interactive, "Open an interactive macro command prompt");
+  app.add_option("-t,--threads", nthreads, "Set the number of threads used by remage");
+  app.add_option("-g,--gdml-files", gdmls,
+         "Supply one or more GDML files describing the experimental geometry")
+      ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
-  app.add_option("--pipe-fd", pipe_fd, "")->group(""); // group() hides this "internal" option.
-  app.add_option("macros", macros, "Macro files")->type_name("FILE");
+  app.add_option("--pipe-fd", pipe_fd,
+      "Pipe file descriptor for inter-process communication (internal)");
+  app.add_option("macros", macros, "One or more remage/Geant4 macro command listings to execute")
+      ->type_name("FILE");
 
   CLI11_PARSE(app, argc, argv);
 
