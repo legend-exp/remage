@@ -62,6 +62,7 @@ int main(int argc, char** argv) {
   int pipe_fd = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
+  std::vector<std::string> macro_substitutions;
   std::string output;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
@@ -73,6 +74,7 @@ int main(int argc, char** argv) {
   app.add_flag("--version-rich", version_rich, "Print remage build configuration");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
+  app.add_option("-s,--macro-substitutions", macro_substitutions, "key=value pairs");
   app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
   app.add_option("-t,--threads", nthreads, "Number of threads");
   app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
@@ -130,6 +132,12 @@ int main(int argc, char** argv) {
   manager.SetNumberOfThreads(nthreads);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
+
+  for (const auto& s : macro_substitutions) {
+    size_t pos = s.find('=');
+    if (pos != std::string::npos) { manager.RegisterG4Alias(s.substr(0, pos), s.substr(pos + 1)); }
+  }
+
   for (const auto& m : macros) manager.IncludeMacroFile(m);
   if (!output.empty()) manager.SetOutputFileName(output);
 
