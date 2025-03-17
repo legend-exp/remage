@@ -276,7 +276,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/remageConfig.cmake
 
 # write useful post-install setup scripts
 include(Toolchain)
-create_mage_toolchain()
+create_remage_toolchain()
 
 include(DependencyGraph)
 gen_dep_graph(pdf)
