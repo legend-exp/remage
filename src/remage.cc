@@ -50,9 +50,11 @@ void signal_handler(int) { RMGManager::AbortRunGracefully(); }
 
 int main(int argc, char** argv) {
 
-  CLI::App app{"remage: simulation framework for germanium experiments"};
+  CLI::App app{std::string("remage: simulation framework for germanium experiments\n\n"
+                           "NOTE: see help section of the Python wrapper for a detailed "
+                           "description of the command line options.")};
 
-  int verbosity = 0;
+  bool verbose = false;
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
@@ -67,23 +69,26 @@ int main(int argc, char** argv) {
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
-  app.add_flag("-q", quiet, "Print only warnings and errors");
-  app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_flag("--version", version, "Print remage version");
-  app.add_flag("--version-rich", version_rich, "Print remage build configuration");
+  // NOTE: option help should be added to the python wrapper arg parser (python/remage/cli.py)
+  app.add_flag("-q,--quiet", quiet);
+  app.add_flag("-v,--verbose", verbose);
+  app.add_flag("--version", version);
+  app.add_flag("--version-rich", version_rich);
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
 
-  app.add_flag("-i,--interactive", interactive, "Run in interactive mode");
-  app.add_option("-t,--threads", nthreads, "Number of threads");
-  app.add_option("-g,--gdml-files", gdmls, "GDML files")->type_name("FILE");
-  app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
-  app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
-  app.add_option("--pipe-fd", pipe_fd, "")->group(""); // group() hides this "internal" option.
-  app.add_option("macros", macros, "Macro files")->type_name("FILE");
+  app.add_flag("-i,--interactive", interactive);
+  app.add_option("-t,--threads", nthreads);
+  app.add_option("-g,--gdml-files", gdmls)->type_name("FILE");
+  app.add_option("-o,--output-file", output)->type_name("FILE");
+  app.add_flag("-w,--overwrite", overwrite_output);
+  app.add_option("--pipe-fd", pipe_fd);
+  app.add_option("macros", macros)->type_name("FILE");
+
+  // dummy arguments only used in the python wrapper
+  std::vector<std::string> _substitutions;
+  app.add_option("-s,--substitute-in-macro", _substitutions)->group("");
 
   CLI11_PARSE(app, argc, argv);
-
-  RMGLog::SetLogLevel(loglevel);
 
   if (version) {
     std::cout << RMG_PROJECT_VERSION << std::endl;
@@ -103,12 +108,9 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  switch (verbosity) {
-    case 1: RMGLog::SetLogLevel(RMGLog::detail); break;
-    case 2: RMGLog::SetLogLevel(RMGLog::debug); break;
-    default: break;
-  }
-
+  // priority of logging flags is defined here!
+  RMGLog::SetLogLevel(loglevel);
+  if (verbose) RMGLog::SetLogLevel(RMGLog::debug);
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
   // handle signal to abort the current run.
