@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
   CLI::App app{"remage: simulation framework for germanium experiments"};
 
-  int verbosity = 0;
+  int verbose = false;
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
 
   app.add_flag("-q", quiet, "Print only warnings and errors (same as --log-level=warning)");
-  app.add_flag("-v", verbosity, "Increase program verbosity to maximum (same as --log-level=debug)");
+  app.add_flag("-v", verbose, "Increase program verbosity to maximum (same as --log-level=debug)");
   app.add_flag("--version", version, "Print remage's version and exit");
   app.add_flag("--version-rich", version_rich,
       "Print versions of remage and its dependencies and exit");
@@ -111,12 +111,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  switch (verbosity) {
-    case 1: RMGLog::SetLogLevel(RMGLog::detail); break;
-    case 2: RMGLog::SetLogLevel(RMGLog::debug); break;
-    default: break;
-  }
-
+  if (verbose) RMGLog::SetLogLevel(RMGLog::debug);
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
   // handle signal to abort the current run.
