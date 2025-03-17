@@ -28,8 +28,11 @@ endforeach()
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
 # TODO: add new images here
-set(TESTS_IMAGES basics/vis-co60.output.jpeg confinement/native-surface.output.jpeg
-                 confinement/native-volume.output.jpeg)
+# cmake-format: off
+set(TESTS_IMAGES
+    confinement/native-surface.output.jpeg
+    confinement/native-volume.output.jpeg)
+# cmake-format: on
 
 # copy them over, but at build time!
 set(COPIED_IMGS)
