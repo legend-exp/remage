@@ -7,6 +7,7 @@ project(remage-tests)
 get_target_property(REMAGE_PYEXE remage-cli PYEXE_PATH)
 get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
 
+add_subdirectory(basics)
 add_subdirectory(confinement)
 add_subdirectory(distances)
 add_subdirectory(germanium)

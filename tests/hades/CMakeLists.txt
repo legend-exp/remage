@@ -51,4 +51,4 @@ set_tests_properties(${_macros_vis} PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't
 # expect two overlaps from this prepared geometry.
 add_test(NAME hades/overlaps.mac COMMAND ${REMAGE_PYEXE} -- macros/overlaps.mac)
 set_tests_properties(hades/overlaps.mac PROPERTIES PASS_REGULAR_EXPRESSION
-                                                    "GeomVol1002.*GeomVol1002")
+                                                   "GeomVol1002.*GeomVol1002")
