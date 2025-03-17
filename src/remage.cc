@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option("--pipe-fd", pipe_fd,
-      "Pipe file descriptor for inter-process communication (internal)")
+         "Pipe file descriptor for inter-process communication (internal)")
       ->group(""); // group("") hides the option from help output.
   app.add_option("macros", macros, "One or more remage/Geant4 macro command listings to execute")
       ->type_name("FILE");
@@ -138,8 +138,11 @@ int main(int argc, char** argv) {
 
   for (const auto& s : macro_substitutions) {
     size_t pos = s.find('=');
-    if (pos != std::string::npos) { manager.RegisterG4Alias(s.substr(0, pos), s.substr(pos + 1)); }
-    else { RMGLog::Out(RMGLog::error, "invalid substitution pair ", s); }
+    if (pos != std::string::npos) {
+      manager.RegisterG4Alias(s.substr(0, pos), s.substr(pos + 1));
+    } else {
+      RMGLog::Out(RMGLog::error, "invalid substitution pair ", s);
+    }
   }
 
   for (const auto& m : macros) manager.IncludeMacroFile(m);
