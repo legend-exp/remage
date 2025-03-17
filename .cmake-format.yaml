@@ -4,3 +4,8 @@ format:
 # Causes a few issues - can be solved later, possibly.
 markup:
   enable_markup: false
+
+lint:
+  disabled_codes: ["C0111", "C0113"]
+  argument_var_pattern: "[a-z_][a-z0-9_]+"
+  public_var_pattern: "[A-Z][A-Za-z0-9_]+"
