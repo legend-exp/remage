@@ -30,9 +30,6 @@
 
 #include "globals.hh"
 
-#ifndef FMT_HEADER_ONLY
-#define FMT_HEADER_ONLY
-#endif
 #include "fmt/core.h"
 
 #define OutDev(loglevel, ...) RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", __VA_ARGS__)
