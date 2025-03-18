@@ -211,6 +211,30 @@ $ cmake .. -DRMG_BUILD_DOCS=ON
 $ make sphinx
 ```
 
+:::{tip}
+Implicit cross-references are automatically generated for all headers until
+level 3 (i.e. `###` headers in markdown). The level can be adjusted through the
+`myst_heading_anchors = DEPTH` setting in `conf.py`.
+
+To reference a remage macro command auto-generated documentation section type
+`<project:./rmg-commands.md#rmgmanagerinteractive>`, which will render as
+<project:./rmg-commands.md#rmgmanagerinteractive>.
+
+Further reading on the [myst-parser
+documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors).
+:::
+
+:::{tip}
+To reference the C++ API docs, use the `{cpp}` domain. For example:
+
+- `` {cpp:class}`RMGHardware` `` becomes {cpp:class}`RMGHardware`
+- `` {cpp:func}`RMGHardware::RegisterDetector` `` becomes {cpp:func}`RMGHardware::RegisterDetector`
+- `` {cpp:func}`RMGGeneratorUtil::IsSampleable` `` becomes {cpp:func}`RMGGeneratorUtil::IsSampleable`
+
+A full list of domain roles can be found
+[here](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html).
+:::
+
 You'll need a Doxygen installation and Python software dependencies specified in
 `docs/environment.yml`. The generated documentation can be viewed by pointing
 your browser to `docs/_build/index.html`.

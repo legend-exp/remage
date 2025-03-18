@@ -4,7 +4,7 @@ _remage_ is a modern C++ simulation framework for germanium experiments.
 
 ## Quick start
 
-The installation process is documented in {doc}`install`.
+The installation process is documented in {doc}`manual/install`.
 
 ```{warning}
  A proper user guide is not available yet. In the meanwhile, users can have a
@@ -54,10 +54,9 @@ target_link_libraries(myapp PRIVATE RMG::remage)
 ```{toctree}
 :maxdepth: 2
 
-install
 tutorial
+manual/index
 rmg-commands
-Output structure & LH5 output <output>
 ```
 
 ```{toctree}
