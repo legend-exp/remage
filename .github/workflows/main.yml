@@ -74,6 +74,7 @@ jobs:
           if [ $docs_differ -ne 0 ]; then
             echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
             echo "$docs_diff"
+            exit 1
           fi
 
       - name: Setup and start xvfb (enables Geant4 visualization)
