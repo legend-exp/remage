@@ -57,8 +57,24 @@ jobs:
           if [ "$cpp_version" != "$py_version" ]; then
             echo "::error::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
             exit 1
-          else
-            echo "::notice::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) are matching!"
+          fi
+
+      - name: Compare checked-in doc dump with current result
+        if: ${{ matrix.container_version != 'slim' }}
+        run: |
+          cd build
+          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
+
+          echo "::group::compile and run remage-doc-dump"
+          make remage-doc-dump
+          echo "::endgroup::"
+
+          docs_differ=0
+          docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
+          if [ $docs_differ -ne 0 ]; then
+            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
+            echo "$docs_diff"
+            exit 1
           fi
 
       - name: Setup and start xvfb (enables Geant4 visualization)
@@ -88,14 +104,6 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
-
-      - name: Compare checked-in doc dump with current result
-        if: ${{ matrix.container_version != 'slim' }}
-        run: |
-          cd build
-          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
-          make remage-doc-dump
-          diff ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
 
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
