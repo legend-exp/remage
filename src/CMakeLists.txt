@@ -105,7 +105,8 @@ endif()
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
 
 if(RMG_BUILD_EXAMPLES)
-  # add an alias to support building examples both stand-alone as well as a part of the main project.
+  # add an alias to support building examples both stand-alone as well as a part of the
+  # main project.
   add_library(RMG::remage ALIAS remage)
 endif()
 
