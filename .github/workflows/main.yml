@@ -39,8 +39,10 @@ jobs:
           ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
       - name: Build project
+        shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
           git config --global --add safe.directory $(pwd)  # make git work inside container.
+
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
