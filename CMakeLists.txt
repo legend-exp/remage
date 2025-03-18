@@ -4,6 +4,9 @@ if(WIN32)
   message(FATAL_ERROR "remage is not supported on Windows")
 endif()
 
+# include path for custom modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
 # let's now look for python, needed for build preparation, the python wrapper and tests
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -17,7 +20,7 @@ if(NOT VENV_AVAILABLE EQUAL 0)
 endif()
 
 # get the version using setuptools-scm (that's why we just searched python).
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/RMGSetuptoolsVersion.cmake)
+include(RMGSetuptoolsVersion)
 
 project(
   remage
@@ -37,8 +40,6 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "in-source build detected")
 endif()
 
-# include path for custom modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules/)
 include(Colors)
 
 # get install directories names
