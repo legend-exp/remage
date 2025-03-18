@@ -8,7 +8,6 @@ Macro commands
 
 ## `/RMG/`
 
-bug
 
 
 **Sub-directories:**
