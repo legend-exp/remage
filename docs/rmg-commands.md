@@ -9,7 +9,6 @@ Macro commands
 ## `/RMG/`
 
 
-
 **Sub-directories:**
 
 * `/RMG/Manager/` – General commands for controlling the application
