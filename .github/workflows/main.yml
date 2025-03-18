@@ -154,6 +154,7 @@ jobs:
           # native dependencies for pyg4ometry
           brew update
           brew install opencascade cgal gmp mpfr boost
+
           conda install conda-forge::geant4
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
