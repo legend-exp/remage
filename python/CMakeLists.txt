@@ -71,12 +71,11 @@ add_custom_command(
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)
 
 # store the path to the remage executable, needed later in tests (that must work in the build area)
-set_target_properties(
-  remage-cli
-  PROPERTIES
-    ADDITIONAL_CLEAN_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py;${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py"
-    PYEXE_PATH ${VENV_DIR}/bin/remage)
+set_property(TARGET remage-cli PROPERTY PYEXE_PATH ${VENV_DIR}/bin/remage)
+set_property(
+  TARGET remage-cli
+  PROPERTY ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py"
+           "${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py")
 
 # install section
 
@@ -100,14 +99,11 @@ add_custom_command(
 
 add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
 
-set_target_properties(
-  install-remage-cli
-  PROPERTIES
-    ADDITIONAL_CLEAN_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py;${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py"
-)
+set_property(
+  TARGET install-remage-cli
+  PROPERTY ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py"
+           "${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py")
 
 # hack the install process to also install the remage wrapper
-install(
-  CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install-remage-cli -- --no-print-directory)"
-)
+install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target\
+                                      install-remage-cli -- --no-print-directory)")
