@@ -43,7 +43,7 @@ void RMGParticleFilterOutputScheme::AddKillVolume(std::string name) {
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGParticleFilterOutputScheme::
-    StackingActionClassify(const G4Track* aTrack, int stage) {
+    StackingActionClassify(const G4Track* aTrack, int) {
 
   const int pdg = aTrack->GetDefinition()->GetPDGEncoding();
   // If the particle is not marked to kill, let it go
