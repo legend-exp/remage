@@ -52,11 +52,11 @@ endif()
 #   The directory to place the generated output
 # ~~~
 function(gen_dep_graph OUTPUT_TYPE)
-  set(OPTIONS ADD_TO_DEP_GRAPH)
-  set(SINGLE_VALUE_KEYWORDS TARGET_NAME OUTPUT_DIR)
-  set(MULTI_VALUE_KEYWORDS)
-  cmake_parse_arguments(gen_dep_graph "${OPTIONS}" "${SINGLE_VALUE_KEYWORDS}"
-                        "${MULTI_VALUE_KEYWORDS}" ${ARGN})
+  set(options ADD_TO_DEP_GRAPH)
+  set(single_value_keywords TARGET_NAME OUTPUT_DIR)
+  set(multi_value_keywords)
+  cmake_parse_arguments(gen_dep_graph "${options}" "${single_value_keywords}"
+                        "${multi_value_keywords}" ${ARGN})
 
   if(BUILD_DEP_GRAPH)
     if(NOT DOT_EXE)
@@ -64,38 +64,38 @@ function(gen_dep_graph OUTPUT_TYPE)
     endif()
 
     if(gen_dep_graph_TARGET_NAME)
-      set(TARGET_NAME ${gen_dep_graph_TARGET_NAME})
+      set(target_name ${gen_dep_graph_TARGET_NAME})
     else()
-      set(TARGET_NAME dep-graph-${PROJECT_NAME})
+      set(target_name dep-graph-${PROJECT_NAME})
     endif()
 
     if(gen_dep_graph_OUTPUT_DIR)
-      set(OUT_DIR ${gen_dep_graph_OUTPUT_DIR})
+      set(out_dir ${gen_dep_graph_OUTPUT_DIR})
     else()
-      set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+      set(out_dir ${CMAKE_CURRENT_BINARY_DIR})
     endif()
 
+    set(out_file "${out_dir}/${target_name}.${OUTPUT_TYPE}")
+
     add_custom_target(
-      ${TARGET_NAME}
+      ${target_name}
       COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
-              --graphviz=${CMAKE_CURRENT_BINARY_DIR}/graphviz/${TARGET_NAME}.dot
-      COMMAND ${DOT_EXE} -T${OUTPUT_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/graphviz/${TARGET_NAME}.dot
-              -o ${OUT_DIR}/${TARGET_NAME}.${OUTPUT_TYPE})
+              --graphviz=${CMAKE_CURRENT_BINARY_DIR}/graphviz/${target_name}.dot
+      COMMAND ${DOT_EXE} -T${OUTPUT_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/graphviz/${target_name}.dot
+              -o $ {out_file})
 
     add_custom_command(
-      TARGET ${TARGET_NAME}
+      TARGET ${target_name}
       POST_BUILD
       COMMAND ;
-      COMMENT
-        "Dependency graph for ${TARGET_NAME} generated and located at ${OUT_DIR}/${TARGET_NAME}.${OUTPUT_TYPE}"
-    )
+      COMMENT "Dependency graph for ${target_name} generated and located at ${out_file}")
 
     if(gen_dep_graph_ADD_TO_DEP_GRAPH)
       if(NOT TARGET dep-graph)
         add_custom_target(dep-graph)
       endif()
 
-      add_dependencies(dep-graph ${TARGET_NAME})
+      add_dependencies(dep-graph ${target_name})
     endif()
   endif()
 endfunction()
