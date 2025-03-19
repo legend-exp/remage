@@ -118,8 +118,6 @@ bool RMGGermaniumDetector::CheckStepPointContainment(const G4StepPoint* step_poi
   const auto pv = step_point->GetTouchableHandle()->GetVolume();
   auto pv_name = pv->GetName();
   const auto pv_copynr = step_point->GetTouchableHandle()->GetCopyNumber();
-  const auto lv = pv->GetLogicalVolume();
-  const auto sv = lv->GetSolid();
 
   // check if physical volume is registered as germanium detector
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
