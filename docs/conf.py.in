@@ -18,6 +18,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
     "sphinx.ext.graphviz",
+    "sphinx.ext.todo",
     "sphinx_copybutton",
     "sphinx_togglebutton",
     "sphinx_inline_tabs",
@@ -39,6 +40,7 @@ exhale_args = {
 breathe_projects = {}
 
 myst_enable_extensions = ["colon_fence", "substitution"]
+myst_heading_anchors = 3
 
 if on_rtd:
     # assume build has been prepared in .readthedocs.yml
@@ -76,6 +78,9 @@ exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md"]
 
 # warnings filtering
 warnings_filter_silent = True
+
+# actually show ToDo admonitions
+todo_include_todos = True
 
 
 # now determine version for link to validation repor
