@@ -8,13 +8,14 @@ dependencies:
   - python=3.12
   - pip
   - breathe
+  - docutils>=0.21
   - doxygen
-  - exhale
+  - exhale>=0.3.7
   - furo
   - graphviz
   - myst-parser
   - setuptools-scm
-  - sphinx
+  - sphinx>=8.2
   - sphinx-copybutton
   - sphinx-togglebutton
   - sphinx-inline-tabs
