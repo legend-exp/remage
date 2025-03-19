@@ -306,7 +306,7 @@ Select which position of the step to store
 * **Parameter** – `mode`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `PreStep PostStep Average`
+  * **Candidates** – `PreStep PostStep Average Both`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/Vertex/`
