@@ -9,7 +9,6 @@ dependencies:
   - breathe
   - docutils>=0.21
   - doxygen
-  - exhale>=0.3.7
   - furo
   - graphviz
   - myst-parser
