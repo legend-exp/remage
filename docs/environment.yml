@@ -17,6 +17,4 @@ dependencies:
   - sphinx-copybutton
   - sphinx-togglebutton
   - sphinx-inline-tabs
-  - pip:
-    dependencies:
-      - exhale>=0.3.7
+  - pip: ["exhale>=0.3.7"]
