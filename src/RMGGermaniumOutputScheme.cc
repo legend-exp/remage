@@ -83,15 +83,15 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     // save also a second position if requested
     if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
 
+      CreateNtupleFOrDColumn(ana_man, id, "xloc_pre_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "yloc_pre_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "zloc_pre_in_m", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_pre_in_m", fStoreSinglePrecisionPosition);
+
       CreateNtupleFOrDColumn(ana_man, id, "xloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "yloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "zloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_post_in_m", fStoreSinglePrecisionPosition);
-
-      CreateNtupleFOrDColumn(ana_man, id, "xloc_avg_in_m", fStoreSinglePrecisionPosition);
-      CreateNtupleFOrDColumn(ana_man, id, "yloc_avg_in_m", fStoreSinglePrecisionPosition);
-      CreateNtupleFOrDColumn(ana_man, id, "zloc_avg_in_m", fStoreSinglePrecisionPosition);
-      CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_avg_in_m", fStoreSinglePrecisionPosition);
     }
     ana_man->FinishNtuple(id);
   }
@@ -190,14 +190,14 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       G4ThreeVector position;
       double distance;
 
-      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep or
-          fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
         position = hit->global_position_prestep;
         distance = hit->distance_to_surface_prestep;
       } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) {
         position = hit->global_position_poststep;
         distance = hit->distance_to_surface_poststep;
-      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kAverage) {
+      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kAverage or
+                 fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
 
         position = hit->global_position_average;
         distance = hit->distance_to_surface_average;

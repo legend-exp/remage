@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-import copy
 import sys
 
 import awkward as ak
@@ -48,33 +47,15 @@ xlocal = 1000 * steps.xloc.to_numpy()
 ylocal = 1000 * steps.yloc.to_numpy()
 zlocal = 1000 * steps.zloc.to_numpy()
 
-positions = np.array(
-    np.transpose(
-        np.vstack(
-            [
-                steps.xloc.to_numpy() * 1000,
-                steps.yloc.to_numpy() * 1000,
-                steps.zloc.to_numpy() * 1000,
-            ]
-        )
-    )
-)
 for det in det_map:
-    local_positions = copy.copy(positions)
-    local_positions -= det_map[det]["pos"]
-
-    is_inside = np.full(len(uint), False)
-    is_inside[uint == -1] = det_map[det]["hpge"].is_inside(local_positions[uint == -1])
-
-    uint[is_inside] = det_map[det]["uint"]
-    xlocal[is_inside] -= det_map[det]["pos"][0]
-    ylocal[is_inside] -= det_map[det]["pos"][1]
-    zlocal[is_inside] -= det_map[det]["pos"][2]
-
+    xlocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][0]
+    ylocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][1]
+    zlocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][2]
 
 steps["xlocal"] = xlocal
 steps["ylocal"] = ylocal
 steps["zlocal"] = zlocal
+
 steps = ak.unflatten(steps, ak.run_lengths(steps.evtid))
 uid = ak.fill_none(ak.firsts(steps.det_uid, axis=-1), -1)
 dist_G4 = ak.fill_none(ak.firsts(steps.dist_to_surf * 1000, axis=-1), -1)

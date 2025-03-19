@@ -119,7 +119,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     bool fStoreTrackID = false;
 
-    PositionMode fPositionMode = PositionMode::kPreStep;
+    PositionMode fPositionMode = PositionMode::kAverage;
 };
 
 #endif
