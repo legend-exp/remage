@@ -188,7 +188,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
       // extract position and distance
       G4ThreeVector position;
-      double distance;
+      double distance = 0;
 
       if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
         position = hit->global_position_prestep;
