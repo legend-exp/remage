@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-import copy
+import sys
 
 import awkward as ak
 import legendhpges as hpges
@@ -20,7 +20,7 @@ plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12
 
 gdml = "gdml/ge-array.gdml"
-outfile = "test-distance.lh5"
+outfile = sys.argv[1]
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()
@@ -47,33 +47,15 @@ xlocal = 1000 * steps.xloc.to_numpy()
 ylocal = 1000 * steps.yloc.to_numpy()
 zlocal = 1000 * steps.zloc.to_numpy()
 
-positions = np.array(
-    np.transpose(
-        np.vstack(
-            [
-                steps.xloc.to_numpy() * 1000,
-                steps.yloc.to_numpy() * 1000,
-                steps.zloc.to_numpy() * 1000,
-            ]
-        )
-    )
-)
 for det in det_map:
-    local_positions = copy.copy(positions)
-    local_positions -= det_map[det]["pos"]
-
-    is_inside = np.full(len(uint), False)
-    is_inside[uint == -1] = det_map[det]["hpge"].is_inside(local_positions[uint == -1])
-
-    uint[is_inside] = det_map[det]["uint"]
-    xlocal[is_inside] -= det_map[det]["pos"][0]
-    ylocal[is_inside] -= det_map[det]["pos"][1]
-    zlocal[is_inside] -= det_map[det]["pos"][2]
-
+    xlocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][0]
+    ylocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][1]
+    zlocal[steps.det_uid == int(det[1:])] -= det_map[det]["pos"][2]
 
 steps["xlocal"] = xlocal
 steps["ylocal"] = ylocal
 steps["zlocal"] = zlocal
+
 steps = ak.unflatten(steps, ak.run_lengths(steps.evtid))
 uid = ak.fill_none(ak.firsts(steps.det_uid, axis=-1), -1)
 dist_G4 = ak.fill_none(ak.firsts(steps.dist_to_surf * 1000, axis=-1), -1)
@@ -94,8 +76,15 @@ def make_plot(hit, tolerance=1e-9):
         coords = np.column_stack((sel_hit.xloc, sel_hit.yloc, sel_hit.zloc))
         dist_py = det_map[det]["hpge"].distance_to_surface(coords)
         # Check if all distances are within tolerance
+
         if np.sum(np.abs(sel_hit.dist_G4 - dist_py) > tolerance):
             good_distance = False
+
+            bad = np.where(np.abs(sel_hit.dist_G4 - dist_py) > tolerance)
+            msg = "The following distances are difference\n"
+            msg += f"Geant4 {sel_hit.dist_G4[bad]} \n"
+            msg += f"Python {dist_py[bad]}"
+            print(msg)
 
         # Now draw the plots
         draw.plot_profile(det_map[det]["hpge"], axes=axs[idx])
@@ -146,5 +135,6 @@ plt.figtext(0.02, 0.04, caption, wrap=True, ha="left", fontsize=11)
 plt.tight_layout(rect=[0, 0.12, 1, 1])
 # plt.tight_layout()
 plt.savefig("distance-ge.output.pdf")
+
 
 assert are_distances_good

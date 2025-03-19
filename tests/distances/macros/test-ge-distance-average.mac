@@ -2,6 +2,7 @@
 /RMG/Output/NtuplePerDetector false
 
 /run/initialize
+/RMG/Output/Germanium/StepPositionMode Average
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume B.*
@@ -12,6 +13,6 @@
 
 /RMG/Generator/Select GPS
 /gps/particle e-
-/gps/energy 1 eV
+/gps/energy 1000 keV
 
-/run/beamOn 100000
+/run/beamOn 1000000
