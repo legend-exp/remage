@@ -4,7 +4,7 @@ _remage_ is a modern C++ simulation framework for germanium experiments.
 
 ## Quick start
 
-The installation process is documented in {doc}`install`.
+The installation process is documented in {doc}`manual/install`.
 
 ```{warning}
  A proper user guide is not available yet. In the meanwhile, users can have a
@@ -18,21 +18,31 @@ through the `remage` executable:
 ```console
 $ remage --help
 remage: simulation framework for germanium experiments
-Usage: ./src/remage [OPTIONS] [macros...]
 
-Positionals:
-  macros FILE ...             Macro files
+remage [OPTIONS] [macros...]
 
-Options:
-  -h,--help                   Print this help message and exit
-  -q                          Print only warnings and errors
-  -v [0]                      Increase verbosity
-  -l,--log-level LEVEL [summary]
+POSITIONALS:
+  macros FILE ...             One or more remage/Geant4 macro command listings to execute
+
+OPTIONS:
+  -h,     --help              Print this help message and exit
+  -q,     --quiet             Print only warnings and errors (same as --log-level=warning)
+  -v,     --verbose [0]       Increase program verbosity to maximum (same as --log-level=debug)
+          --version           Print remage's version and exit
+          --version-rich      Print versions of remage and its dependencies and exit
+  -l,     --log-level LEVEL [summary]
                               Logging level debug|detail|summary|warning|error|fatal|nothing
-  -i,--interactive            Run in interactive mode
-  -t,--threads INT            Number of threads
-  -g,--gdml-files FILE ...    GDML files
-  -o,--output-file FILE       Output file for detector hits
+  -s,     --macro-substitutions TEXT ...
+                              key=value pairs of variables to substitute in macros (syntax as
+                              for Geant4 aliases)
+  -i,     --interactive       Open an interactive macro command prompt
+  -t,     --threads INT       Set the number of threads used by remage
+  -g,     --gdml-files FILE ...
+                              Supply one or more GDML files describing the experimental
+                              geometry
+  -o,     --output-file FILE  Output file for detector hits
+  -w,     --overwrite         Overwrite existing output files
+
 ```
 
 Macro files can use all available upstream Geant4 macro commands, as well as the
@@ -54,10 +64,9 @@ target_link_libraries(myapp PRIVATE RMG::remage)
 ```{toctree}
 :maxdepth: 2
 
-install
 tutorial
+manual/index
 rmg-commands
-Output structure & LH5 output <output>
 ```
 
 ```{toctree}

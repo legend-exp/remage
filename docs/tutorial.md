@@ -130,7 +130,7 @@ w.write("geometry.gdml")
 
 ## Visualizing a simple simulation
 
-By following instructions in the [installation](./install) section, you should
+By following instructions in the [installation](./manual/install) section, you should
 have access to the `remage` executable. We are now ready to simulate some
 particle physics with it.
 

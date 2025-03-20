@@ -27,7 +27,7 @@ and install from source.
 In preparation for the actual build, users are required to obtain some
 dependencies.
 
-```{include} _dependencies.md
+```{include} ../_dependencies.md
 
 ```
 
