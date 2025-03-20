@@ -16,4 +16,4 @@
 /gps/particle e-
 /gps/energy 1000 keV
 
-/run/beamOn 1000000
+/run/beamOn 10000

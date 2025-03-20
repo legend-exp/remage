@@ -20,9 +20,6 @@
 /vis/geometry/set/colour sub 0 1 0.2 0.5 .6
 /vis/geometry/set/colour uni 0 1 0.2 0.1 .6
 
-/vis/scene/add/text 10 0 30 cm 30 0 0 "This shows the primary position of events"
-/vis/scene/add/text 10 0 27 cm 30 0 0 "generated on the surface of ${det}."
-
 # set the viewpoint
 # /vis/scene/add/axes 0 0 0 0.1 m
 /vis/viewer/set/viewpointVector 0.9 0.9 1

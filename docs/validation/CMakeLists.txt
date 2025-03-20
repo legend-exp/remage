@@ -31,7 +31,23 @@ endforeach()
 # cmake-format: off
 set(TESTS_IMAGES
     confinement/native-surface.output.jpeg
-    confinement/native-volume.output.jpeg)
+    confinement/native-volume.output.jpeg
+    confinement/complex-surface.output.jpeg
+    confinement/complex-volume.output.jpeg
+    confinement/geometrical.output.jpeg
+    confinement/geometrical-or-physical.output.jpeg
+    confinement/geometrical-and-physical.output.jpeg
+    confinement/surface-sample-bounding-box-simple.output.jpeg
+    confinement/surface-sample-bounding-box-subtraction.output.jpeg
+    confinement/surface-sample-bounding-box-union.output.jpeg
+    confinement/vis-surface-box.output.jpeg
+    confinement/vis-surface-con.output.jpeg
+    confinement/vis-surface-sub.output.jpeg
+    confinement/vis-surface-tubby.output.jpeg
+    confinement/vis-surface-uni.output.jpeg
+    confinement/vis-surface-trd.output.jpeg
+
+    )
 # cmake-format: on
 
 # copy them over, but at build time!
