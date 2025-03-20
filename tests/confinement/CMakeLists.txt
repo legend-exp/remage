@@ -76,9 +76,8 @@ set_tests_properties(
              confine-gdml-fixture)
 
 # analyse subtraction
-add_test(NAME confinement-lar/subtraction
-         COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-out.lh5
-                 lar-sub-check.output.pdf)
+add_test(NAME confinement-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
+                                                  test-confine-lar-out.lh5 lar-sub-check)
 
 set_tests_properties(confinement-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                             confine-lar-out-output-fixture)
@@ -96,7 +95,7 @@ set_tests_properties(
 # analyse intersection and subtraction
 add_test(NAME confinement-lar/intersection-and-subtraction
          COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-in-out.lh5
-                 lar-int-and-sub-check.output.pdf)
+                 lar-int-and-sub-check)
 
 set_tests_properties(confinement-lar/intersection-and-subtraction
                      PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture)

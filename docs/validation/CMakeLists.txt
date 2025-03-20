@@ -45,7 +45,33 @@ set(TESTS_IMAGES
     confinement/vis-surface-sub.output.jpeg
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
-    confinement/vis-surface-trd.output.jpeg)
+    confinement/vis-surface-trd.output.jpeg
+    confinement/confinement.simple-solids-surface-box-3d.output.png
+    confinement/confinement.simple-solids-surface-con-3d.output.png
+    confinement/confinement.simple-solids-surface-sub-3d.output.png
+    confinement/confinement.simple-solids-surface-tubby-3d.output.png
+    confinement/confinement.simple-solids-surface-uni-3d.output.png
+    confinement/confinement.simple-solids-surface-trd-3d.output.png
+    confinement/confinement.simple-solids-surface-box-projections.output.png
+    confinement/confinement.simple-solids-surface-con-projections.output.png
+    confinement/confinement.simple-solids-surface-sub-projections.output.png
+    confinement/confinement.simple-solids-surface-tubby-projections.output.png
+    confinement/confinement.simple-solids-surface-uni-projections.output.png
+    confinement/confinement.simple-solids-surface-trd-projections.output.png
+    confinement/confinement.simple-solids-surface-box-ratios.output.png
+    confinement/confinement.simple-solids-surface-con-ratios.output.png
+    confinement/confinement.simple-solids-surface-sub-ratios.output.png
+    confinement/confinement.simple-solids-surface-tubby-ratios.output.png
+    confinement/confinement.simple-solids-surface-uni-ratios.output.png
+    confinement/confinement.simple-solids-surface-trd-ratios.output.png
+    confinement/relative-ge.output.png
+    confinement/lar-in-check-ratios.output.png
+    confinement/lar-in-check-xy.output.png
+    confinement/lar-in-check-xz.output.png
+    confinement/lar-sub-check-xy.output.png
+    confinement/lar-sub-check-xz.output.png
+    confinement/lar-int-and-sub-check-xy.output.png
+    confinement/lar-int-and-sub-check-xz.output.png)
 
 # cmake-format: on
 

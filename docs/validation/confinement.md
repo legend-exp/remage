@@ -128,7 +128,7 @@ Sampled vertices for surface generation on a cylinder (shown in light pink).
 
 &nbsp;
 
-```{figure} ./_img/confinement/vis-surface-tubby.output.jpeg
+```{figure} ./_img/confinement/vis-surface-box.output.jpeg
 :width: 500px
 Sampled vertices for surface generation on a box (shown in green).
 ```
@@ -163,6 +163,147 @@ Sampled vertices for surface generation on the subtraction of a cone (shown in d
 
 &nbsp;
 
-## Statistical tests of uniformity
+### Statistical tests of uniformity
+
+The final part of the test for the generic surface sampler is a series of statistical tests on the uniformity of the points on
+the surface of the shapes. This is based on counting the number of primaries on each face of the solids and comparing the ratio
+to that of the surface areas. The tests are based on the same simulation as in the previous section.
+
+First we plot the 3D position of the vertices labelling which side the vertex is closest too by color. If a vertex is not
+close to any side the test will fail.
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-3d.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-box-3d.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-3d.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-3d.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-3d.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-con-3d.output.png
+:width: 700px
+```
+
+You should be able to verify that the primaries close to each surface are correctly identified
+and that the primaries are indeed distributed on a surface.
+
+Next the projections onto various axes are shown.
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-projections.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-box-projections.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-projections.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-projections.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-projections.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-con-projections.output.png
+:width: 700px
+```
+
+These projections should make it clear that the primaries are really generated on the surface.
+
+Finally, we perform the statistical tests comparing the ratio of primaries on each surface
+to the ratio of surface area. You should see only statistical fluctuations.
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-ratios.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-box-ratios.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-ratios.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-ratios.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-ratios.output.png
+:width: 700px
+```
+
+```{figure} ./_img/confinement/confinement.simple-solids-surface-con-ratios.output.png
+:width: 700px
+```
 
 ## Dedicated simulations for Ge in LAr
+
+The last sub-section of this part of the validation report contains a more specific test with an array
+of HPGe detectors emersed in LAr.
+
+### Relative fraction of events per HPGe volume
+
+The first test consists of generating events uniformly across all the HPGe detectors and checking
+that the fraction of primaries in each volume matches the ratio of the volumes.
+
+```{figure} ./_img/ confinement/relative-ge.output.png
+:width: 700px
+```
+
+### Generation in parts of the LAr volume
+
+We generate events in intersection of the LAr volume surrounding the detectors and a cylinder
+around each detector string. We plot a histogram of the positions of the primaries
+which should show gaps due to the HPGe detectors. And we compute the ratio of primaries
+in each cylinder, which should be proportional to the volume of the cylinder minus that
+of the Germanium.
+
+```{figure} ./_img/ confinement/lar-in-check-xy.output.png
+:width: 700px
+```
+
+```{figure} ./_img/ confinement/lar-in-check-xz.output.png
+:width: 700px
+```
+
+```{figure} ./_img/ confinement/lar-in-check-ratios.output.png
+:width: 700px
+```
+
+Finally, we generate primaries in the subtraction of the LAr region and the cylinders around each string.
+
+```{figure} ./_img/ confinement/lar-sub-check-xy.output.png
+:width: 700px
+```
+
+```{figure} ./_img/ confinement/lar-sub-check-xz.output.png
+:width: 700px
+```
+
+Then also with an intersection of another cylinder with the height of the strings.
+
+```{figure} ./_img/ confinement/lar-int-and-sub-check-xy.output.png
+:width: 700px
+```
+
+```{figure} ./_img/ confinement/lar-int-and-sub-check-xz.output.png
+:width: 700px
+```
