@@ -71,7 +71,12 @@ set(TESTS_IMAGES
     confinement/lar-sub-check-xy.output.png
     confinement/lar-sub-check-xz.output.png
     confinement/lar-int-and-sub-check-xy.output.png
-    confinement/lar-int-and-sub-check-xz.output.png)
+    confinement/lar-int-and-sub-check-xz.output.png
+    distances/distance-ge-poststep.output.png
+    distances/distance-ge-prestep.output.png
+    distances/distance-ge-average.output.png)
+
+
 
 # cmake-format: on
 

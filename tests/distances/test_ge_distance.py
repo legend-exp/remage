@@ -21,6 +21,7 @@ plt.rcParams["font.size"] = 12
 
 gdml = "gdml/ge-array.gdml"
 outfile = sys.argv[1]
+point = sys.argv[2]
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()
@@ -134,7 +135,7 @@ caption += "compared to the distances calculated by legendhpges is not within a 
 plt.figtext(0.02, 0.04, caption, wrap=True, ha="left", fontsize=11)
 plt.tight_layout(rect=[0, 0.12, 1, 1])
 # plt.tight_layout()
-plt.savefig("distance-ge.output.pdf")
+plt.savefig(f"distance-ge-{point}.output.png")
 
 
 assert are_distances_good
