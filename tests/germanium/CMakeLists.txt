@@ -11,8 +11,9 @@ endforeach()
 add_test(NAME germanium/gen-output COMMAND ${PYTHONPATH} run_e_sims.py)
 set_tests_properties(germanium/gen-output PROPERTIES LABELS extra FIXTURES_SETUP output-fixture)
 
-add_test(NAME germanium/e-range COMMAND ${PYTHONPATH} ./test_e_range.py)
+add_test(NAME germanium/e-range COMMAND ${PYTHONPATH} ./test_electron_interactions.py)
 
 foreach(_test germanium/e-range)
-  set_tests_properties(${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED output-fixture)
+  set_tests_properties(${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED output-fixture
+                                           ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 endforeach()

@@ -1,6 +1,14 @@
 /RMG/Geometry/RegisterDetector Germanium germanium 001
 
+/RMG/Geometry/SetMaxStepSize {MAX_STEP_SIZE_IN_M} m germanium
+
 /run/initialize
+
+# we don't want want multiple scattering, it's going to make it hard to compare
+# to the theoretical range
+/process/inactivate msc
+
+/RMG/Output/Germanium/StoreTrackID true
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Geometrical/AddSolid Sphere
@@ -15,4 +23,4 @@
 /gps/ang/type iso
 /gps/energy {ENERGY} keV
 
-/run/beamOn 1000
+/run/beamOn 2000

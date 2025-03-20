@@ -60,7 +60,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        args: ["-L", "hist,manuel"]
+        args: ["-L", "hist,manuel,inactivate"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.10.0.1"
