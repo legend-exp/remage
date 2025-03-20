@@ -3,13 +3,10 @@
 
 /run/initialize
 
-
 # now generate the primaries
 /RMG/Generator/Select GPS
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/SampleOnSurface true
-/RMG/Generator/Confinement/ForceContainmentCheck true
-
 
 /RMG/Generator/Confinement/Physical/AddVolume ${det}
 /RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
