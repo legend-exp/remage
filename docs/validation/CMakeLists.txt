@@ -45,7 +45,10 @@ set(TESTS_IMAGES
     confinement/vis-surface-sub.output.jpeg
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
-    confinement/vis-surface-trd.output.jpeg)
+    confinement/vis-surface-trd.output.jpeg
+    ranges/e-range-ge-distributions.output.png
+    ranges/e-range-ge-vs-estar.output.png
+    ranges/e-stopping-power-ge-vs-estar.output.png)
 
 # cmake-format: on
 
