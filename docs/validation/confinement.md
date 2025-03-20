@@ -341,19 +341,23 @@ Vertices sampled in geometrical (user defined) volumes
 
 &nbsp;
 
-```{figure} ./_img/confinement/geometrical-or-physical.output.jpeg
-:width: 500px
-Vertices sampled in geometrical (user defined) or physical volumes.
+```{image} ./_img/confinement/geometrical.output.jpeg
+:height: 200px
+:alt: Geometrical (user defined) volumes.
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/geometrical-and-physical.output.jpeg
-:width: 500px
-Vertices sampled in the intersection of geometrical and physical volumes.
+```{image} ./_img/confinement/geometrical-or-physical.output.jpeg
+:height: 200px
+:alt: Geometrical (user defined) or physical volumes.
 ```
 
-&nbsp;
+```{image} ./_img/confinement/geometrical-and-physical.output.jpeg
+:height: 200px
+:alt: Intersection of geometrical and physical volumes.
+```
+
+Checks on sampling for intersections and unions.
+:::
 
 - In the first case, you should see points sampled in three user defined volumes, a section of a cylinder (far left),
   a box (center back) and a sphere (center front - overlapping with a box).
@@ -373,73 +377,67 @@ based on a random direction the number of intersections is computed.
 The following figures show the bounding sphere and initial points (which should be outside the bounding sphere). You should see that the
 grey bounding spheres are large enough to contain the green solids and that the red points all lie outside the grey box.
 
-```{figure} ./_img/confinement/surface-sample-bounding-box-simple.output.jpeg
-:width: 500px
-Bounding sphere for surface sampling with a simple solid (cylinder).
+:::{subfigure} ABC
+:subcaptions: above
+
+```{image} ./_img/confinement/surface-sample-bounding-box-simple.output.jpeg
+:width: 200px
+:alt: Bounding sphere for cylinder.
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/surface-sample-bounding-box-subtraction.output.jpeg
-:width: 500px
-Bounding sphere for surface sampling with a subtraction based solid.
+```{image} ./_img/confinement/surface-sample-bounding-box-subtraction.output.jpeg
+:width: 200px
+:alt: Bounding sphere for subtraction.
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/surface-sample-bounding-box-union.output.jpeg
-:width: 500px
-Bounding sphere for surface sampling with a union (of two boxes) based solid.
+```{image} ./_img/confinement/surface-sample-bounding-box-union.output.jpeg
+:width: 200px
+:alt: Bounding sphere for union.
 ```
 
-&nbsp;
+Checks on the bounding spheres.
+:::
 
 ### Location of sampled vertices
 
 The next figures show the location of generated primaries for various different solids. You should see the
 primaries are contained in the appropriate solid and that they are distributed on the surface.
 
-```{figure} ./_img/confinement/vis-surface-tubby.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on a cylinder (shown in light pink).
+:::{subfigure} AB|CD|EF
+:subcaptions: above
+
+```{image} ./_img/confinement/vis-surface-tubby.output.jpeg
+:width: 300px
+:alt: Sampled on a cylinder (shown in light pink).
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/vis-surface-box.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on a box (shown in green).
+```{image} ./_img/confinement/vis-surface-box.output.jpeg
+:width: 300px
+:alt: Sampled on a box (shown in green).
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/vis-surface-trd.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on a trapezoid (shown in purple).
+```{image} ./_img/confinement/vis-surface-trd.output.jpeg
+:width: 300px
+:alt: Sampled on a trapezoid (shown in purple).
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/vis-surface-uni.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on the union of two boxes (shown in red).
+```{image} ./_img/confinement/vis-surface-uni.output.jpeg
+:width: 300px
+:alt: Sampled on the union of two boxes (shown in red).
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/vis-surface-sub.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on the subtraction of two cylinders (shown in dark pink).
+```{image} ./_img/confinement/vis-surface-sub.output.jpeg
+:width: 300px
+:alt: Sampled on the subtraction of two cylinders (shown in dark pink).
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/vis-surface-con.output.jpeg
-:width: 500px
-Sampled vertices for surface generation on the subtraction of a cone (shown in dark blue).
+```{image} ./_img/confinement/vis-surface-con.output.jpeg
+:width: 300px
+:alt: Sampled vertices on a cone (shown in dark blue).
 ```
 
-&nbsp;
+Checks on the location of vertices for surface sampling.
+:::
 
 ### Statistical tests of uniformity
 
@@ -450,87 +448,68 @@ to that of the surface areas. The tests are based on the same simulation as in t
 First we plot the 3D position of the vertices labelling which side the vertex is closest too by color. If a vertex is not
 close to any side the test will fail.
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-3d.output.png
-:width: 700px
+:::{subfigure} AB|CD|EF
+:subcaptions: above
+
+```{image} ./_img/confinement/confinement.simple-solids-surface-tubby-3d.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-box-3d.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-box-3d.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-3d.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-trd-3d.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-3d.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-uni-3d.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-3d.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-sub-3d.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-con-3d.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-con-3d.output.png
+:width: 400px
 ```
 
+:::
 You should be able to verify that the primaries close to each surface are correctly identified
 and that the primaries are indeed distributed on a surface.
-
-Next the projections onto various axes are shown.
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-projections.output.png
-:width: 700px
-```
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-box-projections.output.png
-:width: 700px
-```
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-projections.output.png
-:width: 700px
-```
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-projections.output.png
-:width: 700px
-```
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-projections.output.png
-:width: 700px
-```
-
-```{figure} ./_img/confinement/confinement.simple-solids-surface-con-projections.output.png
-:width: 700px
-```
-
-These projections should make it clear that the primaries are really generated on the surface.
 
 Finally, we perform the statistical tests comparing the ratio of primaries on each surface
 to the ratio of surface area. You should see only statistical fluctuations.
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-tubby-ratios.output.png
-:width: 700px
+:::{subfigure} AB|CD|EF
+:subcaptions: above
+
+```{image} ./_img/confinement/confinement.simple-solids-surface-tubby-ratios.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-box-ratios.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-box-ratios.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-trd-ratios.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-trd-ratios.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-uni-ratios.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-uni-ratios.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-sub-ratios.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-sub-ratios.output.png
+:width: 400px
 ```
 
-```{figure} ./_img/confinement/confinement.simple-solids-surface-con-ratios.output.png
-:width: 700px
+```{image} ./_img/confinement/confinement.simple-solids-surface-con-ratios.output.png
+:width: 400px
 ```
+
+:::
 
 ## Dedicated simulations for Ge in LAr
 
