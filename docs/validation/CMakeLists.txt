@@ -45,9 +45,8 @@ set(TESTS_IMAGES
     confinement/vis-surface-sub.output.jpeg
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
-    confinement/vis-surface-trd.output.jpeg
+    confinement/vis-surface-trd.output.jpeg)
 
-    )
 # cmake-format: on
 
 # copy them over, but at build time!
