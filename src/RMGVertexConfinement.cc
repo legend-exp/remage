@@ -270,6 +270,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, size_
              this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, this->surface_sample);
     RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
     if (force_containment_check && !this->IsInside(vertex)) {
+
       RMGLog::OutDev(RMGLog::error,
           "Generated vertex not inside sampling volumes (forced containment check): ",
           vertex / CLHEP::cm, " cm");
@@ -280,9 +281,11 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, size_
     if (not success) return false;
 
     if (force_containment_check && !this->IsInside(vertex)) {
+      auto local_pos = this->rotation.inverse() * vertex - this->translation;
+      auto vol_type = this->physical_volume->GetLogicalVolume()->GetSolid()->Inside(local_pos);
       RMGLog::OutDev(RMGLog::error,
           "Generated vertex not inside sampling volumes (forced containment check): ",
-          vertex / CLHEP::cm, " cm");
+          vertex / CLHEP::cm, " cm (", magic_enum::enum_name<EInside>(vol_type), ")");
     }
 
   } else {
