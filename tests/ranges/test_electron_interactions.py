@@ -96,7 +96,7 @@ def calc_stopping_power(filename):
 def test_electron_range_distributions():
     fig, ax = plt.subplots()
 
-    for energy in [200, 500, 1000, 1500, 2000, 3000, 4000]:  # in keV
+    for energy in [300, 500, 1000, 1500, 2000, 3000, 4000]:  # in keV
         eranges = calc_range(f"electrons-ge-{energy}-keV.lh5")
         # convert to mm
         h = hist.new.Reg(200, 0, 7, name="Electron integrated path [mm]").Double()
