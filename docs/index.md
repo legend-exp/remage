@@ -17,31 +17,31 @@ through the `remage` executable:
 
 ```console
 $ remage --help
-remage: simulation framework for germanium experiments 
+remage: simulation framework for germanium experiments
 
 remage [OPTIONS] [macros...]
 
 POSITIONALS:
-  macros FILE ...             One or more remage/Geant4 macro command listings to execute 
+  macros FILE ...             One or more remage/Geant4 macro command listings to execute
 
 OPTIONS:
-  -h,     --help              Print this help message and exit 
-  -q,     --quiet             Print only warnings and errors (same as --log-level=warning) 
-  -v,     --verbose [0]       Increase program verbosity to maximum (same as --log-level=debug) 
-          --version           Print remage's version and exit 
-          --version-rich      Print versions of remage and its dependencies and exit 
-  -l,     --log-level LEVEL [summary]  
-                              Logging level debug|detail|summary|warning|error|fatal|nothing 
-  -s,     --macro-substitutions TEXT ... 
-                              key=value pairs of variables to substitute in macros (syntax as 
-                              for Geant4 aliases) 
-  -i,     --interactive       Open an interactive macro command prompt 
-  -t,     --threads INT       Set the number of threads used by remage 
-  -g,     --gdml-files FILE ... 
-                              Supply one or more GDML files describing the experimental 
-                              geometry 
-  -o,     --output-file FILE  Output file for detector hits 
-  -w,     --overwrite         Overwrite existing output files 
+  -h,     --help              Print this help message and exit
+  -q,     --quiet             Print only warnings and errors (same as --log-level=warning)
+  -v,     --verbose [0]       Increase program verbosity to maximum (same as --log-level=debug)
+          --version           Print remage's version and exit
+          --version-rich      Print versions of remage and its dependencies and exit
+  -l,     --log-level LEVEL [summary]
+                              Logging level debug|detail|summary|warning|error|fatal|nothing
+  -s,     --macro-substitutions TEXT ...
+                              key=value pairs of variables to substitute in macros (syntax as
+                              for Geant4 aliases)
+  -i,     --interactive       Open an interactive macro command prompt
+  -t,     --threads INT       Set the number of threads used by remage
+  -g,     --gdml-files FILE ...
+                              Supply one or more GDML files describing the experimental
+                              geometry
+  -o,     --output-file FILE  Output file for detector hits
+  -w,     --overwrite         Overwrite existing output files
 
 ```
 
