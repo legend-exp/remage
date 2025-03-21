@@ -95,7 +95,7 @@ def make_plot(hit, tolerance=1e-9):
         r = rng.choice([-1, 1], p=[0.5, 0.5], size=len(rpos_loc)) * rpos_loc
         z = sel_hit.zloc
         c = sel_hit.dist_G4
-        cut = c < 5
+        cut = c < 2
 
         s = axs[idx].scatter(
             r[cut],

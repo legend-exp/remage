@@ -1,4 +1,4 @@
-# Distances
+# HPGe detector distance to surface
 
 Geant4 has the possibility to compute the distance of points to the surface of a solid. This is saved in the remage germanium
 output scheme for use in detector post-processing.
