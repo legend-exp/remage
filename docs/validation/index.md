@@ -16,6 +16,7 @@ versioninfo
 confinement
 distances
 observables-ge
+nist
 ```
 
 ```{toctree}

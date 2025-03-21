@@ -79,6 +79,9 @@ set(TESTS_IMAGES
     ranges/e-range-ge-vs-estar.output.png
     ranges/e-stopping-power-ge-vs-estar.output.png
     observables/vis-observables-ge-gdml.output.jpeg)
+    nist/e-range-ge-distributions.output.png
+    nist/e-range-ge-vs-estar.output.png
+    nist/e-stopping-power-ge-vs-estar.output.png)
 
 # cmake-format: on
 
