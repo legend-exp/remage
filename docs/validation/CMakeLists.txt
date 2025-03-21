@@ -74,9 +74,10 @@ set(TESTS_IMAGES
     confinement/lar-int-and-sub-check-xz.output.png
     distances/distance-ge-poststep.output.png
     distances/distance-ge-prestep.output.png
-    distances/distance-ge-average.output.png)
-
-
+    distances/distance-ge-average.output.png
+    ranges/e-range-ge-distributions.output.png
+    ranges/e-range-ge-vs-estar.output.png
+    ranges/e-stopping-power-ge-vs-estar.output.png)
 
 # cmake-format: on
 
@@ -110,7 +111,7 @@ add_custom_command(
 
 # Nice named target so we can run the job easily
 add_custom_target(
-  sphinx-validation ALL
+  sphinx-validation
   DEPENDS ${SPHINX_BUILD}/index.html
   COMMENT "Generating validation report with Sphinx")
 
@@ -124,7 +125,7 @@ add_custom_command(
 
 # Nice named target so we can run the job easily
 add_custom_target(
-  sphinx-validation-latex ALL
+  sphinx-validation-latex
   DEPENDS ${SPHINX_BUILD}/latex/remagesvalidationsuite.tex
   COMMENT "Generating LaTeX validation report with Sphinx")
 

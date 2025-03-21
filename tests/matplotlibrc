@@ -1,0 +1,8 @@
+backend: agg
+figure.figsize: 6, 3.5
+figure.dpi: 192
+savefig.bbox: tight
+# constrained layout should be better than tight layout
+figure.constrained_layout.use: True
+# grid below everything
+axes.axisbelow: True

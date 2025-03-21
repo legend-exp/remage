@@ -32,17 +32,22 @@ points for the surface simulation.
 The next tests relate to generation of points on complex solids, generated from intersections and unions.
 Similar to the previous test simulations are performed both for the surface and the bulk.
 
-```{figure} ./_img/confinement/complex-volume.output.jpeg
-:width: 500px
-Vertices sampled in the bulk of solids.
+:::{subfigure} AB
+:subcaptions: above
+
+```{image} ./_img/confinement/complex-volume.output.jpeg
+:height: 400px
+:alt: Vertices sampled in the bulk of solids.
 ```
 
-&nbsp;
-
-```{figure} ./_img/confinement/complex-surface.output.jpeg
-:width: 500px
-Vertices sampled on the surface of solids.
+```{image} ./_img/confinement/complex-surface.output.jpeg
+:height: 400px
+:alt: Vertices sampled on the surface of solids.
 ```
+
+Vertices sample in complex solids.
+
+:::
 
 &nbsp;
 

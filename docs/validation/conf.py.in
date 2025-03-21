@@ -10,6 +10,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_togglebutton",
     "sphinx_inline_tabs",
+    "sphinx_subfigure",
     "myst_parser",
 ]
 
