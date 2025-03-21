@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <gipert@pm.me>
+// Copyright (C) 2024 Manuel Huber
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,14 @@ bool RMGExceptionHandler::Notify(const char* originOfException, const char* exce
   // the UI manager aborts batch mode, but only emits warnings. Mark them as errors accordingly.
   if (code.find("UIMAN") == 0) { severity = FatalException; }
 
+  // do our remage-internal bookkeeping after changing severities.
   if (severity == JustWarning) {
     fHadWarning = true;
+#if RMG_HAS_GEANT4_11_1_OR_LATER
+  } else if (severity != IgnoreTheIssue) {
+#else
   } else {
+#endif
     fHadError = true;
   }
 
