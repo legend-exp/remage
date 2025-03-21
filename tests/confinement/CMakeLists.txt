@@ -36,8 +36,10 @@ endforeach()
 
 # generate the GDML file
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
-set_tests_properties(confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
-                                                        confine-gdml-fixture)
+
+set_tests_properties(
+  confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP confine-gdml-fixture ENVIRONMENT
+                                     MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 add_test(NAME confinement-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis-ge-array.mac
                                          macros/_vis-export.mac -g gdml/ge-array.gdml -w -l detail)
 
@@ -54,8 +56,10 @@ set_tests_properties(
 
 add_test(NAME confinement-ge/relative-fraction COMMAND ${PYTHONPATH} ./test_confinement_ge.py)
 
-set_tests_properties(confinement-ge/relative-fraction PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                                 confine-output-fixture)
+set_tests_properties(
+  confinement-ge/relative-fraction
+  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-output-fixture ENVIRONMENT
+             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 # test on lar intersection
 add_test(NAME confinement-lar/intersection-gen-output
@@ -68,8 +72,10 @@ set_tests_properties(
 
 add_test(NAME confinement-lar/intersection COMMAND ${PYTHONPATH} ./test_lar_intersection.py)
 
-set_tests_properties(confinement-lar/intersection PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                             confine-lar-in-output-fixture)
+set_tests_properties(
+  confinement-lar/intersection
+  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-output-fixture ENVIRONMENT
+             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 # generate subtraction output
 add_test(NAME confinement-lar/subtraction-gen-output
@@ -85,8 +91,10 @@ set_tests_properties(
 add_test(NAME confinement-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
                                                   test-confine-lar-out.lh5 lar-sub-check)
 
-set_tests_properties(confinement-lar/subtraction PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                            confine-lar-out-output-fixture)
+set_tests_properties(
+  confinement-lar/subtraction
+  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-out-output-fixture ENVIRONMENT
+             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 # generate intersection and subtraction output
 add_test(NAME confinement-lar/intersection-and-subtraction-gen-output
@@ -103,8 +111,10 @@ add_test(NAME confinement-lar/intersection-and-subtraction
          COMMAND ${PYTHONPATH} ./test_lar_subtraction.py test-confine-lar-in-out.lh5
                  lar-int-and-sub-check)
 
-set_tests_properties(confinement-lar/intersection-and-subtraction
-                     PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture)
+set_tests_properties(
+  confinement-lar/intersection-and-subtraction
+  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture ENVIRONMENT
+             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 # test generic surface sampling methods
 add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
@@ -151,8 +161,9 @@ endforeach()
 
 # generate the GDML file
 add_test(NAME confinement-surface/gen-gdml COMMAND ${PYTHONPATH} make_basic_solids.py)
-set_tests_properties(confinement-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
-                                                             confine-surface-gdml-fixture)
+set_tests_properties(
+  confinement-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-gdml-fixture
+                                          ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 # visualise
 set(_solids tubby box con uni sub trd)
@@ -205,7 +216,9 @@ foreach(det ${_solids})
   add_test(NAME confinement-surface/relative-fractions-${det}
            COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
 
-  set_tests_properties(confinement-surface/relative-fractions-${det}
-                       PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det})
+  set_tests_properties(
+    confinement-surface/relative-fractions-${det}
+    PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det} ENVIRONMENT
+               MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 endforeach()
