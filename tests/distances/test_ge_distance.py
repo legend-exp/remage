@@ -21,6 +21,7 @@ plt.rcParams["font.size"] = 12
 
 gdml = "gdml/ge-array.gdml"
 outfile = sys.argv[1]
+point = sys.argv[2]
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()
@@ -94,7 +95,7 @@ def make_plot(hit, tolerance=1e-9):
         r = rng.choice([-1, 1], p=[0.5, 0.5], size=len(rpos_loc)) * rpos_loc
         z = sel_hit.zloc
         c = sel_hit.dist_G4
-        cut = c < 5
+        cut = c < 2
 
         s = axs[idx].scatter(
             r[cut],
@@ -134,7 +135,7 @@ caption += "compared to the distances calculated by legendhpges is not within a 
 plt.figtext(0.02, 0.04, caption, wrap=True, ha="left", fontsize=11)
 plt.tight_layout(rect=[0, 0.12, 1, 1])
 # plt.tight_layout()
-plt.savefig("distance-ge.output.pdf")
+plt.savefig(f"distance-ge-{point}.output.png")
 
 
 assert are_distances_good

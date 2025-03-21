@@ -14,7 +14,9 @@ versioninfo
 :maxdepth: 2
 
 confinement
+distances
 nist
+observables-ge
 ```
 
 ```{toctree}

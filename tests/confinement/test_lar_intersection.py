@@ -5,7 +5,6 @@ import numpy as np
 import pyg4ometry as pg4
 from lgdo import lh5
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 from pygeomtools.detectors import get_sensvol_metadata
 from scipy import stats
 
@@ -101,141 +100,140 @@ for idx, (xt, yt) in enumerate(zip(x, y)):
 vertices["strings"] = strings
 
 # make some plots of the coordinates
+out_path = "lar-in-check"
 
-with PdfPages("lar-in-check.output.pdf") as pdf:
-    # x-y
-    fig, ax = plt.subplots(figsize=(8, 6))
+# x-y
+fig, ax = plt.subplots(figsize=(8, 6))
 
-    cmap = plt.cm.BuPu
-    cmap.set_under("w", 1)
-    hist = plt.hist2d(
-        np.array(1000 * vertices.xloc),
-        np.array(1000 * vertices.yloc),
+cmap = plt.cm.BuPu
+cmap.set_under("w", 1)
+hist = plt.hist2d(
+    np.array(1000 * vertices.xloc),
+    np.array(1000 * vertices.yloc),
+    bins=[100, 100],
+    range=[[-150, 150], [-150, 150]],
+    vmin=0.5,
+    cmap=cmap,
+)
+ax.set_xlabel("x position [mm]")
+ax.set_ylabel("y position [mm]")
+ax.axis("equal")
+
+# set the caption
+caption = "The x-y positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
+caption += "The vertices should be arranged in cylinders of radius 44 mm around each string. A higher density of points should be found near the edges."
+
+plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+plt.tight_layout(rect=[0, 0.12, 1, 1])
+
+plt.savefig(f"{out_path}-xy.output.png")
+
+# x-z
+fig, ax = plt.subplots(1, 5, figsize=(10, 6), sharey=True)
+for s in range(5):
+    min_x = min(1000 * vertices.xloc[vertices.strings == s])
+    hist = ax[s].hist2d(
+        np.array(1000 * vertices.xloc[vertices.strings == s]),
+        np.array(1000 * vertices.zloc[vertices.strings == s]),
         bins=[100, 100],
-        range=[[-150, 150], [-150, 150]],
+        range=[[-150, 150], [-160, 260]],
         vmin=0.5,
         cmap=cmap,
     )
-    ax.set_xlabel("x position [mm]")
-    ax.set_ylabel("y position [mm]")
-    ax.axis("equal")
+    ax[s].set_xlabel("x position [mm]")
+    if s == 0:
+        ax[s].set_ylabel("z position [mm]")
+plt.tight_layout()
 
-    # set the caption
-    caption = "The x-y positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
-    caption += "The vertices should be arranged in cylinders of radius 44 mm around each string. A higher density of points should be found near the edges."
+# set the caption
+caption = "The x-z positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
+caption += "The vertices should be arranged in cylinders (center 50mm and height 400mm) and the regions with HPGe should be visible."
 
-    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
-    plt.tight_layout(rect=[0, 0.12, 1, 1])
+plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+plt.tight_layout(rect=[0, 0.12, 1, 1])
 
-    pdf.savefig()
+plt.savefig(f"{out_path}-xz.output.png")
 
-    # x-z
-    fig, ax = plt.subplots(1, 5, figsize=(10, 6), sharey=True)
-    for s in range(5):
-        min_x = min(1000 * vertices.xloc[vertices.strings == s])
-        hist = ax[s].hist2d(
-            np.array(1000 * vertices.xloc[vertices.strings == s]),
-            np.array(1000 * vertices.zloc[vertices.strings == s]),
-            bins=[100, 100],
-            range=[[-150, 150], [-160, 260]],
-            vmin=0.5,
-            cmap=cmap,
-        )
-        ax[s].set_xlabel("x position [mm]")
-        if s == 0:
-            ax[s].set_ylabel("z position [mm]")
-    plt.tight_layout()
+# now plot the fraction in each detector
+fraction_vert = []
+fraction_vert_err = []
+names = []
+expected_fraction = []
+vert = vertices
+n_tot = len(vert)
 
-    # set the caption
-    caption = "The x-z positions of the vertices for the simulations of the liquid argon inside imaginary mini-shrouds (per string). "
-    caption += "The vertices should be arranged in cylinders (center 50mm and height 400mm) and the regions with HPGe should be visible."
+for s, v in enumerate(det_vol):
+    n_sel_vert = len(vert[vert.strings == s])
+    fraction_vert.append(100 * n_sel_vert / n_tot)
+    fraction_vert_err.append(100 * np.sqrt(n_sel_vert) / n_tot)
+    expected_fraction.append(100 * (vol_tot - v) / total_inside)
 
-    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
-    plt.tight_layout(rect=[0, 0.12, 1, 1])
+fraction_vert = np.array(fraction_vert)
+fraction_vert_err = np.array(fraction_vert_err)
+expected_fraction = np.array(expected_fraction)
 
-    pdf.savefig()
+# get the p-value
 
-    # now plot the fraction in each detector
-    fraction_vert = []
-    fraction_vert_err = []
-    names = []
-    expected_fraction = []
-    vert = vertices
-    n_tot = len(vert)
+test_stat = 2 * np.sum(
+    n_tot * expected_fraction / 100
+    - (fraction_vert * n_tot / 100) * (1 - np.log(fraction_vert / expected_fraction))
+)
 
-    for s, v in enumerate(det_vol):
-        n_sel_vert = len(vert[vert.strings == s])
-        fraction_vert.append(100 * n_sel_vert / n_tot)
-        fraction_vert_err.append(100 * np.sqrt(n_sel_vert) / n_tot)
-        expected_fraction.append(100 * (vol_tot - v) / total_inside)
+# should follow a chi2 distribution with N -1 dof
 
-    fraction_vert = np.array(fraction_vert)
-    fraction_vert_err = np.array(fraction_vert_err)
-    expected_fraction = np.array(expected_fraction)
+N = len(det_vol)
+p = stats.chi2.sf(test_stat, N - 1)
+sigma = stats.norm.ppf(1 - p)
 
-    # get the p-value
+# make the plot
+fig, ax = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 
-    test_stat = 2 * np.sum(
-        n_tot * expected_fraction / 100
-        - (fraction_vert * n_tot / 100)
-        * (1 - np.log(fraction_vert / expected_fraction))
-    )
+ax[0].errorbar(
+    np.arange(5),
+    fraction_vert,
+    yerr=fraction_vert_err,
+    fmt=".",
+    label="Vertices",
+)
+ax[0].errorbar(
+    np.arange(5),
+    expected_fraction,
+    fmt="x",
+    label="Expected",
+)
 
-    # should follow a chi2 distribution with N -1 dof
+ax[0].set_ylabel("Fraction of vertices [%]")
+ax[0].set_xticks(
+    np.arange(5), [f"string {i}" for i in range(5)], rotation=90, fontsize=13
+)
+ax[0].legend()
+ax[0].grid()
 
-    N = len(det_vol)
-    p = stats.chi2.sf(test_stat, N - 1)
-    sigma = stats.norm.ppf(1 - p)
+# make the residual
+ax[1].errorbar(
+    np.arange(5),
+    100 * (fraction_vert - expected_fraction) / expected_fraction,
+    yerr=100 * fraction_vert_err / expected_fraction,
+    fmt=".",
+)
 
-    # make the plot
-    fig, ax = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+ax[1].set_ylabel("Relative Difference [%]")
 
-    ax[0].errorbar(
-        np.arange(5),
-        fraction_vert,
-        yerr=fraction_vert_err,
-        fmt=".",
-        label="Vertices",
-    )
-    ax[0].errorbar(
-        np.arange(5),
-        expected_fraction,
-        fmt="x",
-        label="Expected",
-    )
+ax[0].set_xticks(
+    np.arange(5), [f"string {i}" for i in range(5)], rotation=90, fontsize=13
+)
+ax[1].axhline(y=0, color="red")
+ax[1].grid()
+fig.suptitle(f"Intersection check ({sigma:.1f} $\sigma$)")
 
-    ax[0].set_ylabel("Fraction of vertices [%]")
-    ax[0].set_xticks(
-        np.arange(5), [f"string {i}" for i in range(5)], rotation=90, fontsize=13
-    )
-    ax[0].legend()
-    ax[0].grid()
+caption = "The fraction of the vertices found inside each cylinder. This is compared to the expectation which is that the number "
+caption += "should be proportional to the volume of the cylinder minus the total HPGe volume. The top panel shows the fraction in each string "
+caption += (
+    r"while the lower panel shows the relative difference in % from the expectation"
+)
+plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
+plt.tight_layout(rect=[0, 0.12, 1, 1])
 
-    # make the residual
-    ax[1].errorbar(
-        np.arange(5),
-        100 * (fraction_vert - expected_fraction) / expected_fraction,
-        yerr=100 * fraction_vert_err / expected_fraction,
-        fmt=".",
-    )
-
-    ax[1].set_ylabel("Relative Difference [%]")
-
-    ax[0].set_xticks(
-        np.arange(5), [f"string {i}" for i in range(5)], rotation=90, fontsize=13
-    )
-    ax[1].axhline(y=0, color="red")
-    ax[1].grid()
-    fig.suptitle(f"Intersection check ({sigma:.1f} $\sigma$)")
-
-    caption = "The fraction of the vertices found inside each cylinder. This is compared to the expectation which is that the number "
-    caption += "should be proportional to the volume of the cylinder minus the total HPGe volume. The top panel shows the fraction in each string "
-    caption += (
-        r"while the lower panel shows the relative difference in % from the expectation"
-    )
-    plt.figtext(0.1, 0.06, caption, wrap=True, ha="left", fontsize=11)
-    plt.tight_layout(rect=[0, 0.12, 1, 1])
-
-    pdf.savefig()
+plt.savefig(f"{out_path}-ratios.output.png")
 
 assert sigma < 5

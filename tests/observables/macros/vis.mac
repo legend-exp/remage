@@ -1,0 +1,51 @@
+/RMG/Output/NtuplePerDetector false
+/RMG/Geometry/RegisterDetector Germanium germanium 001
+
+/run/initialize
+
+/vis/open TOOLSSG_OFFSCREEN 1500x1500
+/vis/viewer/reset
+
+# draw the detector
+/vis/drawVolume
+
+# set colors
+/vis/geometry/set/forceSolid
+/vis/geometry/set/colour world 1 1 1 1 0.1
+/vis/geometry/set/colour LAr  0 1 1 1 0.1
+/vis/geometry/set/colour Source 0 0.0 0.2 0.8 1
+/vis/geometry/set/colour germanium 0 1 0.2 1 1
+
+# set the viewpoint
+# /vis/scene/add/axes 0 0 0 0.1 m
+/vis/viewer/set/viewpointVector 0.9 0.9 0.8
+/vis/viewer/set/upVector 0 0 1
+/vis/viewer/zoom 2
+
+# add trajectories and control the coloring
+/vis/scene/add/trajectories smooth
+/vis/scene/endOfEventAction accumulate 99999999
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 5
+
+
+# now generate the primaries
+/RMG/Generator/Select GPS
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface false
+/RMG/Generator/Confinement/ForceContainmentCheck true
+
+
+/RMG/Generator/Confinement/Physical/AddVolume Source
+
+/gps/particle gamma
+/gps/ang/type iso
+
+/gps/energy 100 keV
+/run/beamOn 50
+
+/control/alias export-fn vis-observables-ge-gdml.output
+
+/vis/tsg/offscreen/set/file {export-fn}.jpeg
+/vis/viewer/rebuild
