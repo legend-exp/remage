@@ -15,6 +15,7 @@ versioninfo
 
 confinement
 distances
+observables-ge
 ```
 
 ```{toctree}

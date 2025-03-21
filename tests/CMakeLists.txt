@@ -16,6 +16,7 @@ add_subdirectory(output)
 add_subdirectory(particlefilter)
 add_subdirectory(python)
 add_subdirectory(ranges)
+add_subdirectory(observables)
 add_subdirectory(vertex)
 
 if(RMG_BUILD_EXAMPLES)

@@ -77,7 +77,8 @@ set(TESTS_IMAGES
     distances/distance-ge-average.output.png
     ranges/e-range-ge-distributions.output.png
     ranges/e-range-ge-vs-estar.output.png
-    ranges/e-stopping-power-ge-vs-estar.output.png)
+    ranges/e-stopping-power-ge-vs-estar.output.png
+    observables/vis-observables-ge-gdml.output.jpeg)
 
 # cmake-format: on
 
