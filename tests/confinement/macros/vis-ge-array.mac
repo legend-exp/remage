@@ -1,0 +1,51 @@
+
+/control/execute macros/detectors-fake.mac
+/RMG/Output/NtuplePerDetector false
+
+/run/initialize
+
+/vis/open TOOLSSG_OFFSCREEN 1500x1500
+/vis/viewer/reset
+
+# draw the detector
+/vis/drawVolume
+
+# set colors
+/control/execute macros/colors.mac
+
+#/vis/geometry/set/forceWireframe
+
+# set the viewpoint
+# /vis/scene/add/axes 0 0 0 0.1 m
+/vis/viewer/set/viewpointVector 0.9 0.9 1
+/vis/viewer/set/upVector 0 0 1
+/vis/viewer/zoom 1
+
+# add trajectories and control the coloring
+/vis/scene/add/trajectories smooth
+/vis/scene/endOfEventAction accumulate 99999999
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 5
+
+# set the background to white
+#/vis/viewer/set/background white
+
+
+# now generate the primaries
+/RMG/Generator/Select GPS
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume B.*
+/RMG/Generator/Confinement/Physical/AddVolume C.*
+/RMG/Generator/Confinement/Physical/AddVolume P.*
+/RMG/Generator/Confinement/Physical/AddVolume V.*
+
+
+/gps/particle e-
+/gps/ang/type iso
+
+/gps/energy 1 eV
+/run/beamOn 2000
+
+/control/alias export-fn vis-ge-array.output
+

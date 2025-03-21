@@ -242,7 +242,13 @@ to the ratio of surface area. You should see only statistical fluctuations.
 ## Dedicated simulations for Ge in LAr
 
 The last sub-section of this part of the validation report contains a more specific test with an array
-of HPGe detectors emersed in LAr.
+of HPGe detectors emersed in LAr. The geometry is shown below, showing the HPGe detectors (blue) in
+the red LAr cylinder.
+
+```{figure} ./_img/confinement/vis-ge-array.output.jpeg
+:width: 400px
+:alt: Geant4 visualisation of a HPGe array in LAr.
+```
 
 ### Relative fraction of events per HPGe volume
 

@@ -11,6 +11,8 @@ from legendhpges import make_hpge
 # read the configs
 out_gdml = "gdml/ge-array.gdml"
 det_macro = "macros/detectors-fake.mac"
+colors = "macros/colors.mac"
+
 config_dict = {}
 heights = {}
 for det_type in ["B", "P", "V", "C"]:
@@ -23,7 +25,7 @@ def add_hpge(lar, reg, angle, radius, z, idx, dtype):
     x = radius * np.sin(np.deg2rad(angle))
     y = radius * np.cos(np.deg2rad(angle))
     logical_detector = make_hpge(config_dict[dtype], name=f"{dtype}{idx}", registry=reg)
-    logical_detector.pygeom_color_rgba = (0, 1, 1, 0.2)
+    logical_detector.pygeom_color_rgba = (0, 1, 1, 1)
     physical_detector = pg4.geant4.PhysicalVolume(
         [0, 0, 0], [x, y, z], logical_detector, f"{dtype}{idx}", lar, reg
     )
@@ -40,7 +42,7 @@ def add_hpge(lar, reg, angle, radius, z, idx, dtype):
 reg = pg4.geant4.Registry()
 ws = pg4.geant4.solid.Box("ws", 3000, 3000, 3000, reg, lunit="mm")
 wl = pg4.geant4.LogicalVolume(ws, "G4_Galactic", "wl", reg)
-wl.pygeom_color_rgba = (0.1, 1, 0.1, 0.5)
+wl.pygeom_color_rgba = (0.1, 1, 0.1, 0.1)
 
 reg.setWorld(wl)
 
@@ -50,7 +52,7 @@ lar_s = pg4.geant4.solid.Tubs(
     "LAr_s", 0, 200, 800, 0, 2 * np.pi, registry=reg, lunit="mm"
 )
 lar_l = pg4.geant4.LogicalVolume(lar_s, "G4_lAr", "LAr_l", registry=reg)
-lar_l.pygeom_color_rgba = (1, 0.1, 0, 0.2)
+lar_l.pygeom_color_rgba = (1, 0.1, 0, 0.4)
 pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], lar_l, "LAr", wl, registry=reg)
 
 
@@ -129,8 +131,8 @@ with Path("macros/lar-out-coordinates.mac").open("w") as f:
 pytools.detectors.write_detector_auxvals(reg)
 pytools.geometry.check_registry_sanity(reg, reg)
 
-
 w = pg4.gdml.Writer()
 w.addDetector(reg)
 w.write(out_gdml)
 pytools.detectors.generate_detector_macro(reg, det_macro)
+pytools.visualization.generate_color_macro(reg, colors)

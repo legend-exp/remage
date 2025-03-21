@@ -38,6 +38,12 @@ endforeach()
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
 set_tests_properties(confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP
                                                         confine-gdml-fixture)
+add_test(NAME confinement-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis-ge-array.mac
+                                         macros/_vis-export.mac -g gdml/ge-array.gdml -w -l detail)
+
+set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
+                                                   confine-gdml-fixture)
+set_tests_properties(confinement-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # test on HPGe containment
 add_test(NAME confinement-ge/gen-output COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o

@@ -64,6 +64,7 @@ set(TESTS_IMAGES
     confinement/confinement.simple-solids-surface-tubby-ratios.output.png
     confinement/confinement.simple-solids-surface-uni-ratios.output.png
     confinement/confinement.simple-solids-surface-trd-ratios.output.png
+    confinement/vis-ge-array.output.jpeg
     confinement/relative-ge.output.png
     confinement/lar-in-check-ratios.output.png
     confinement/lar-in-check-xy.output.png
