@@ -35,6 +35,8 @@ compile_commands.json
 
 # python
 
+fontlist-*.json
+
 # Environments
 .env
 .venv

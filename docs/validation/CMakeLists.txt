@@ -45,7 +45,10 @@ set(TESTS_IMAGES
     confinement/vis-surface-sub.output.jpeg
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
-    confinement/vis-surface-trd.output.jpeg)
+    confinement/vis-surface-trd.output.jpeg
+    nist/e-range-ge-distributions.output.png
+    nist/e-range-ge-vs-estar.output.png
+    nist/e-stopping-power-ge-vs-estar.output.png)
 
 # cmake-format: on
 
@@ -79,7 +82,7 @@ add_custom_command(
 
 # Nice named target so we can run the job easily
 add_custom_target(
-  sphinx-validation ALL
+  sphinx-validation
   DEPENDS ${SPHINX_BUILD}/index.html
   COMMENT "Generating validation report with Sphinx")
 
@@ -93,7 +96,7 @@ add_custom_command(
 
 # Nice named target so we can run the job easily
 add_custom_target(
-  sphinx-validation-latex ALL
+  sphinx-validation-latex
   DEPENDS ${SPHINX_BUILD}/latex/remagesvalidationsuite.tex
   COMMENT "Generating LaTeX validation report with Sphinx")
 

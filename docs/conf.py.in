@@ -22,6 +22,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_togglebutton",
     "sphinx_inline_tabs",
+    "sphinx_subfigure",
     "exhale",
     "breathe",
     "myst_parser",
