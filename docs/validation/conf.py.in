@@ -27,6 +27,7 @@ html_theme_options = {
     "source_repository": "https://github.com/legend-exp/remage",
     "source_branch": "main",
     "source_directory": "docs/validation",
+    "announcement": "<em>Work in progress:</em> we are currently populating the validation report, come back at a later point!",
 }
 html_title = f"remage {version} validation suite"
 
