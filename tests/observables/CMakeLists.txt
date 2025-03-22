@@ -22,3 +22,8 @@ add_test(NAME observables-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis.mac -g gdml/
 set_tests_properties(observables-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                                    observables-ge-gdml-fixture)
 set_tests_properties(observables-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
+
+## run
+add_test(NAME observables-ge/run COMMAND ${PYTHONPATH} ./run_sim.py ${REMAGE_PYEXE})
+set_tests_properties(observables-ge/run PROPERTIES LABELS "extra" FIXTURES_REQUIRED
+                                                   observables-ge-gdml-fixture)
