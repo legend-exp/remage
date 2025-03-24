@@ -136,10 +136,14 @@ def remage_run(
     args
         argument list, as passed to the remage CLI utility.
     raise_on_error
-        raise a :class:`RuntimeError` when an error in the C++ application occurs.
-        If false, the function only returns the error code.
+        raise a :class:`RuntimeError` when an error in the C++ application occurs. This
+        applies to non-fatal errors being logged as well as fatal errors. If false, the
+        function only returns the error code, the python-based post-processing will be
+        skipped in any case.
     raise_on_warning
-        raise a :class:`RuntimeError` when an error in the C++ application occurs.
+        raise a :class:`RuntimeError` when a warning (or error) is logged in the C++
+        application. If false, warnings are only logged and the python-based
+        post-processing will be run normally.
     """
     logger = _setup_log()
 
