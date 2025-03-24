@@ -27,4 +27,4 @@ energies = np.concatenate(
 
 for energy in energies:  # in keV
     args = [arg.format(energy) for arg in base_args]
-    remage_run(args, raise_error=True)
+    remage_run(args, raise_on_error=True)

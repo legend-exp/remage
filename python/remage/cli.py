@@ -119,8 +119,32 @@ def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
 
 
 def remage_run(
-    args: list[str] | None = None, *, raise_error: bool = True
+    args: list[str] | None = None,
+    *,
+    raise_on_error: bool = True,
+    raise_on_warning: bool = False,
 ) -> tuple[int, IpcResult]:
+    """
+    Run the remage simulation utility with the provided args.
+
+    Notes
+    -----
+    This is the main entry point for users wanting to run remage from python code.
+
+    Parameters
+    ----------
+    args
+        argument list, as passed to the remage CLI utility.
+    raise_on_error
+        raise a :class:`RuntimeError` when an error in the C++ application occurs. This
+        applies to non-fatal errors being logged as well as fatal errors. If false, the
+        function only returns the error code, the python-based post-processing will be
+        skipped in any case.
+    raise_on_warning
+        raise a :class:`RuntimeError` when a warning (or error) is logged in the C++
+        application. If false, warnings are only logged and the python-based
+        post-processing will be run normally.
+    """
     logger = _setup_log()
 
     ec, termsig, ipc_info = _run_remage_cpp(args)
@@ -138,10 +162,14 @@ def remage_run(
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
         # ec==2 is just a warning, continue in the execution flow.
-        if raise_error:
+        if raise_on_error or raise_on_warning:
             msg = "error while running remage-cpp"
             raise RuntimeError(msg)
         return ec, ipc_info
+
+    if ec == 2 and raise_on_warning:
+        msg = "warning while running remage-cpp"
+        raise RuntimeError(msg)
 
     assert termsig is None  # now we should only have had a graceful exit.
 
@@ -165,4 +193,4 @@ def remage_run(
 
 
 def remage_cli() -> int:
-    return remage_run(raise_error=False)[0]
+    return remage_run(raise_on_error=False)[0]
