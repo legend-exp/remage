@@ -102,7 +102,7 @@ def is_semver(version: str) -> bool:
 
 # https://stackoverflow.com/a/56328457/4279748
 ultimate_replacements = {
-    "{REMAGE_VERSION}": version if is_semver(version) else "latest"
+    "{REMAGE_VERSION}": f"v{version}" if is_semver(version) else "latest"
 }
 
 
