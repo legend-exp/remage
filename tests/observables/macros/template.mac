@@ -5,7 +5,9 @@ $REGISTER_LAR
 $STEP_LIMITS_COMMAND
 $PROD_CUTS_COMMAND
 /run/initialize
+
 /RMG/Processes/Stepping/ResetInitialDecayTime true
+/RMG/Output/Germanium/StepPositionMode Both
 
 $PROC
 $STEP_POINT
@@ -14,4 +16,4 @@ $STEP_POINT
 
 $GENERATOR
 
-/run/beamOn 10000
+/run/beamOn 20000
