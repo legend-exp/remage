@@ -1,0 +1,75 @@
+objects:
+  geometry: pyg4ometry.gdml.Reader(ARGS.gdml).getRegistry()
+
+processing_groups:
+  - name: geds
+
+    detector_mapping:
+      - output: germanium
+
+    detector_objects:
+      phyvol: OBJECTS.geometry.physicalVolumeDict['germanium']
+
+    outputs:
+      - t0
+      - first_evtid
+      - truth_energy
+      - active_energy_pre
+      - active_energy_post
+      - active_energy_avg
+      - smeared_energy_pre
+      - smeared_energy_post
+      - smaeared_energy_avg
+      - r90_pre
+      - r90_post
+      - r90_avg
+      - max_z_avg
+      - max_z_post
+      - max_z_pre
+
+    hit_table_layout: reboost.shape.group.group_by_time(STEPS,window = 10)
+
+    operations:
+      t0: ak.fill_none(ak.firsts(HITS.time, axis=-1), np.nan)
+
+      first_evtid: ak.fill_none(ak.firsts(HITS.evtid, axis=-1), np.nan)
+
+      truth_energy: ak.sum(HITS.edep, axis=-1)
+
+      activeness_pre:
+        reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf_pre*1000,
+        fccd=1, tl=0.5)
+      activeness_post:
+        reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf_post*1000,
+        fccd=1, tl=0.5)
+      activeness_avg:
+        reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf*1000,
+        fccd=1, tl=0.5)
+
+      active_energy_pre: ak.sum(HITS.edep*HITS.activeness_pre, axis=-1)
+      active_energy_post: ak.sum(HITS.edep*HITS.activeness_post, axis=-1)
+      active_energy_avg: ak.sum(HITS.edep*HITS.activeness_avg, axis=-1)
+
+      r90_avg: reboost.hpge.psd.r90(HITS.edep, 1000*HITS.xloc,1000*HITS.yloc,1000*HITS.zloc)
+      r90_post: reboost.hpge.psd.r90(HITS.edep,1000*HITS.xloc_post,1000*HITS.yloc_post,1000*HITS.zloc_post)
+      r90_pre: reboost.hpge.psd.r90(HITS.edep, 1000*HITS.xloc_pre,1000*HITS.yloc_pre,1000*HITS.zloc_pre)
+
+      max_z_pre: ak.fill_none(1000*ak.max(HITS.zloc_pre,axis=-1),np.nan)+20
+      max_z_post: ak.fill_none(1000*ak.max(HITS.zloc_post,axis=-1),np.nan)+20
+      max_z_avg: ak.fill_none(1000*ak.max(HITS.zloc,axis=-1),np.nan)+20
+
+  - name: vertices
+
+    detector_mapping:
+      - output: vertices
+
+    outputs:
+      - xloc
+      - yloc
+      - zloc
+      - rloc
+
+    hit_table_layout: reboost.shape.group.group_by_evtid(STEPS)
+
+    operations:
+      rloc: np.sqrt(HITS.xloc**2+HITS.yloc**2)

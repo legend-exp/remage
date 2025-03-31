@@ -79,7 +79,31 @@ set(TESTS_IMAGES
     observables/vis-observables-ge-gdml.output.jpeg
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
-    nist/e-stopping-power-ge-vs-estar.output.png)
+    nist/e-stopping-power-ge-vs-estar.output.png
+    observables/tracks-bulk-10um-limit.tracks.out0.png
+    observables/tracks-bulk-10um-limit.tracks.out1.png
+    observables/tracks-bulk-10um-limit.tracks.out2.png
+    observables/tracks-bulk-no-limit.tracks.out0.png
+    observables/tracks-bulk-no-limit.tracks.out1.png
+    observables/tracks-bulk-no-limit.tracks.out2.png
+    observables/tracks-bulk-10um-limit.step-hist.png
+    observables/tracks-bulk-10um-limit.step-vs-dist.png
+    observables/tracks-bulk-10um-limit.step-vs-dist-zoom.png
+    observables/tracks-bulk-no-limit.step-hist.png
+    observables/tracks-bulk-no-limit.step-vs-dist.png
+    observables/tracks-bulk-no-limit.step-vs-dist-zoom.png
+    observables/beta-observables.bulk-active-energy.eff.output.png
+    observables/beta-observables.bulk-active-energy.spec.output.png
+    observables/beta-observables.bulk-r90.eff.output.png
+    observables/beta-observables.bulk-r90.spec.output.png
+    observables/beta-observables.bulk-total-energy.eff.output.png
+    observables/beta-observables.bulk-total-energy.spec.output.png
+    observables/beta-observables.surf-total-energy.eff.output.png
+    observables/beta-observables.surf-total-energy.spec.output.png
+    observables/beta-observables.surf-active-energy.eff.output.png
+    observables/beta-observables.surf-active-energy.spec.output.png
+    observables/beta-observables.surf-max-z.eff.output.png
+    observables/beta-observables.surf-max-z.spec.output.png)
 
 # cmake-format: on
 

@@ -1,8 +1,26 @@
 from __future__ import annotations
 
+import logging
 import subprocess
 import sys
 from pathlib import Path
+
+import colorlog
+import dbetto
+from reboost.build_glm import build_glm
+from reboost.build_hit import build_hit
+
+log = logging.getLogger(__name__)
+
+handler = colorlog.StreamHandler()
+handler.setFormatter(
+    colorlog.ColoredFormatter("%(log_color)s%(name)s [%(levelname)s] %(message)s")
+)
+logger = logging.getLogger()
+logger.handlers.clear()
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
 
 rmg = sys.argv[1]
 
@@ -29,6 +47,39 @@ def replace_lines(
                     line_t = replacement + "\n"
                     break
             f.write(line_t)
+
+
+def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yaml"):
+    path = f"{generator_name}/{name}/max_{val}/"
+
+    # directories
+    stp_directory = Path(f"out/{path}/stp/")
+    glm_directory = Path(f"out/{path}/glm/")
+    hit_directory = Path(f"out/{path}/hit/")
+
+    # make the directories
+    hit_directory.mkdir(parents=True, exist_ok=True)
+    glm_directory.mkdir(parents=True, exist_ok=True)
+
+    glm_files = [f"{glm_directory}/out.lh5"]
+    stp_files = [f"{stp_directory}/out.lh5"]
+    hit_files = [f"{hit_directory}/out.lh5"]
+
+    build_glm(
+        glm_files=glm_files,
+        stp_files=stp_files,
+        id_name="evtid",
+    )
+
+    args = dbetto.AttrsDict({"gdml": "gdml/geometry.gdml"})
+    _, _ = build_hit(
+        reboost_config,
+        args=args,
+        stp_files=stp_files,
+        glm_files=glm_files,
+        hit_files=hit_files,
+        buffer=10_000_000,
+    )
 
 
 def run_sim(
@@ -79,7 +130,7 @@ do_surf = True
 energy = 1000
 
 generators = {}
-cuts = [10, 20, 50, 100, 200, None]
+cuts = [10, 50, 100, 200, None]
 
 
 # define some generator commands
@@ -115,6 +166,8 @@ for generator, config in generators.items():
             if step_limits is not None
             else ""
         )
+
+        # run the simulation
         run_sim(
             generator_name=generator,
             name="step_limits",
@@ -125,4 +178,12 @@ for generator, config in generators.items():
             step_points="/RMG/Output/Germanium/StepPositionMode Both",
             generator=config,
             register_lar=False,
+        )
+
+        # post-process it
+        run_reboost(
+            generator_name=generator,
+            name="step_limits",
+            val=step_limits,
+            reboost_config="config/hit_config.yaml",
         )
