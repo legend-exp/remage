@@ -29,12 +29,54 @@ style = {
 
 # Get the BuPu colormap
 cmap = plt.get_cmap("cividis")
+height = 40  # mm
+radius = 40  # mm
 
 
-def get_lh5(generator, name, val):
+def get_cylinder_dist(r, z, radius, height):
+    a = np.array((height / 2.0 - z).to_numpy())
+    b = np.array((z + height / 2).to_numpy())
+    c = np.array((radius - r).to_numpy())
+
+    return np.minimum(np.minimum(a, b), c)
+
+
+def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     path = f"{generator}/{name}/max_{val}/"
     hit_directory = Path(f"out/{path}/hit/")
-    return lh5.read_as("germanium/hit", f"{hit_directory}/out.lh5", "ak")
+
+    data = lh5.read_as("germanium/hit", f"{hit_directory}/out.lh5", "ak")
+    verts = lh5.read_as("vertices/hit", f"{hit_directory}/out.lh5", "ak")
+    verts["dist_to_surf"] = get_cylinder_dist(
+        1000 * verts.rloc, 1000 * verts.zloc, radius, height
+    )
+
+    if dist_low is not None:
+        n_sel = ak.sum(
+            ak.flatten(
+                (verts["dist_to_surf"] > dist_low) & (verts["dist_to_surf"] < dist_high)
+            )
+        )
+    else:
+        n_sel = len(verts)
+
+    hit_ids = np.searchsorted(verts.first_evtid, data.first_evtid)
+    verts = verts[hit_ids]
+
+    data["vert_rloc"] = 1000 * ak.flatten(verts.rloc)
+    data["vert_zloc"] = 1000 * ak.flatten(verts.zloc)
+
+    data["vert_dist_to_surf"] = get_cylinder_dist(
+        data.vert_rloc, data.vert_zloc, radius, height
+    )
+
+    if dist_low is not None:
+        data = data[
+            (data["vert_dist_to_surf"] > dist_low)
+            & (data["vert_dist_to_surf"] < dist_high)
+        ]
+
+    return data, n_sel
 
 
 def get_bins(list_range, list_binning, e_max=1000):
@@ -101,11 +143,11 @@ def plot(
     cuts,
     names,
     fields,
-    n_sim,
     scale="log",
     ylims=None,
     range_zoom=(990, 1010),
     eff_range=(999, 1001),
+    dist_range=None,
     doeff=False,
     figsize=(12, 4),
     legend=True,
@@ -116,20 +158,27 @@ def plot(
 ):
     bins_tmp = np.linspace(xrange[0], xrange[1], n_bins) if n_bins is not None else bins
 
+    if dist_range is None:
+        dist_low = None
+        dist_high = None
+    else:
+        dist_low = dist_range[0]
+        dist_high = dist_range[1]
+
     if not isinstance(names, list):
         names = list(names)
 
     effs = {}
     steps = {}
     eff_def = {}
-
+    n_sels = {}
     colors = [vib.blue, vib.orange, vib.magenta, vib.teal, vib.grey, vib.cyan]
 
     # get default
     for field in fields:
         effs[field] = {}
         steps[field] = {}
-
+        n_sels[field] = {}
         fig, axs = plt.subplots(
             2,
             1,
@@ -138,7 +187,11 @@ def plot(
             sharex=True,
         )
 
-        ak_obj = get_lh5(generator, names[0], None)
+        ak_obj, n_sel = get_lh5(
+            generator, names[0], None, dist_low=dist_low, dist_high=dist_high
+        )
+        n_sels[field]["def"] = n_sel
+
         ak_obj = ak_obj[ak_obj[field] != 0]
         ak_obj[field] = ak_obj[field]
 
@@ -180,9 +233,14 @@ def plot(
 
             effs[field][name] = []
             steps[field][name] = []
+            n_sels[field][name] = []
 
             for idx, val in enumerate(cuts):
-                ak_obj = get_lh5(generator, name, val)
+                ak_obj, n_sel = get_lh5(
+                    generator, name, val, dist_low=dist_low, dist_high=dist_high
+                )
+
+                n_sels[field][name].append(n_sel)
 
                 ak_obj = ak_obj[ak_obj[field] != 0]
                 ak_obj[field] = ak_obj[field]
@@ -248,31 +306,49 @@ def plot(
         if not doeff:
             return
 
-    ## plot the efficiency
+    # plot the efficiency
     fig, ax = plt.subplots()
     for idx, field in enumerate(effs.keys()):
-        eff_def_low = 100 * get_binomial_interval(eff_def[field], n_sim)[0]
-        eff_def_high = 100 * get_binomial_interval(eff_def[field], n_sim)[1]
-        ax.axhline(y=100 * eff_def[field] / n_sim, linestyle="--", color=colors[idx])
+        eff_def_low = (
+            100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[0]
+        )
+        eff_def_high = (
+            100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[1]
+        )
+        ax.axhline(
+            y=100 * eff_def[field] / n_sels[field]["def"],
+            linestyle="--",
+            color=colors[idx],
+        )
 
         ax.axhspan(
-            ymin=100 * eff_def[field] / n_sim - eff_def_low,
-            ymax=100 * eff_def[field] / n_sim + eff_def_high,
+            ymin=100 * eff_def[field] / n_sels[field]["def"] - eff_def_low,
+            ymax=100 * eff_def[field] / n_sels[field]["def"] + eff_def_high,
             alpha=0.2,
             color=colors[idx],
             label="Without step limits",
         )
-        ax.axhline(y=100 * eff_def[field] / n_sim, linestyle="--", color=colors[idx])
+        ax.axhline(
+            y=100 * eff_def[field] / n_sels[field]["def"],
+            linestyle="--",
+            color=colors[idx],
+        )
 
         for name in effs[field]:
             e = effs[field][name]
             s = steps[field][name]
-            err_low = [get_binomial_interval(et, n_sim)[0] * 100 for et in e]
-            err_high = [get_binomial_interval(et, n_sim)[1] * 100 for et in e]
+            err_low = [
+                get_binomial_interval(et, nt)[0] * 100
+                for et, nt in zip(e, n_sels[field][name])
+            ]
+            err_high = [
+                get_binomial_interval(et, nt)[1] * 100
+                for et, nt in zip(e, n_sels[field][name])
+            ]
 
             ax.errorbar(
                 s,
-                100 * np.array(e) / n_sim,
+                100 * np.array(e) / np.array(n_sels[field][name]),
                 yerr=[err_low, err_high],
                 fmt=".",
                 linestyle="--",
@@ -291,10 +367,9 @@ bins = get_bins(
     [(-2, 2), (2, 10), (10, 50), (50, 950), (950, 980), (980, 998), (998, 1002)],
     [0.5, 2, 10, 50, 10, 2, 0.5],
 )
-cuts = [10, 50, 100, 200, None]
+cuts = [10, 20, 50, 100, 200, None]
 
-n_sim = int(sys.argv[1])
-plot_name = sys.argv[2]
+plot_name = sys.argv[1]
 
 # plots for the bulk
 
@@ -302,7 +377,6 @@ plot(
     "beta_bulk",
     (-1, 1020),
     cuts=cuts,
-    n_sim=n_sim,
     names=["step_limits"],
     fields=["truth_energy"],
     doeff=True,
@@ -314,7 +388,6 @@ plot(
     "beta_bulk",
     (-1, 1020),
     cuts=cuts,
-    n_sim=n_sim,
     names=["step_limits"],
     fields=["active_energy_avg"],
     doeff=True,
@@ -324,9 +397,34 @@ plot(
 
 plot(
     "beta_bulk",
+    (-1, 1020),
+    cuts=cuts,
+    dist_range=(0, 1),
+    names=["step_limits"],
+    fields=["active_energy_avg"],
+    doeff=True,
+    save_spec_name=f"{plot_name}.tl-active-energy.spec.output.png",
+    save_eff_name=f"{plot_name}.tl-active-energy.eff.output.png",
+)
+
+
+plot(
+    "beta_bulk",
+    (-1, 1020),
+    cuts=cuts,
+    dist_range=(1, np.inf),
+    names=["step_limits"],
+    fields=["active_energy_avg"],
+    doeff=True,
+    save_spec_name=f"{plot_name}.not-tl-active-energy.spec.output.png",
+    save_eff_name=f"{plot_name}.not-tl-active-energy.eff.output.png",
+)
+
+
+plot(
+    "beta_bulk",
     (0, 2),
     cuts=cuts,
-    n_sim=n_sim,
     eff_range=(1, np.inf),
     names=["step_limits"],
     fields=["r90_avg"],
@@ -343,7 +441,6 @@ plot(
     "beta_surf",
     (-1, 1020),
     cuts=cuts,
-    n_sim=n_sim,
     names=["step_limits"],
     fields=["truth_energy"],
     doeff=True,
@@ -355,7 +452,6 @@ plot(
     "beta_surf",
     (-1, 1020),
     cuts=cuts,
-    n_sim=n_sim,
     names=["step_limits"],
     fields=["active_energy_avg"],
     doeff=True,
@@ -370,7 +466,6 @@ plot(
     "beta_surf",
     (0, 2),
     cuts=cuts,
-    n_sim=n_sim,
     eff_range=(1, np.inf),
     names=["step_limits"],
     fields=["max_z_avg"],
