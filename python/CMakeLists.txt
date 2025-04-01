@@ -91,16 +91,24 @@ set(INSTALL_VENV_DIR ${CMAKE_INSTALL_PREFIX}/share/remage_venv)
 # in this way remage should always run isolated in its environment.
 # we want to use the cpp_config for the install area
 add_custom_command(
-  OUTPUT ${CMAKE_INSTALL_PREFIX}/bin/remage
+  OUTPUT ${CMAKE_INSTALL_PREFIX}/bin/remage ${CMAKE_INSTALL_PREFIX}/share/remage-py3-none-any.whl
+  # prepare venv
   COMMAND ${Python3_EXECUTABLE} -m venv ${INSTALL_VENV_DIR}
   COMMAND ${INSTALL_VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade pip
   COMMAND ${INSTALL_VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade uv
+  # install our package into this venv
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
   COMMAND ln -fs ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
-  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+  # create and install a user-installable wheel
+  COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv build --wheel ${CMAKE_SOURCE_DIR} -o
+          ${CMAKE_INSTALL_PREFIX}/share
+  COMMAND mv ${CMAKE_INSTALL_PREFIX}/share/remage-*-py3-none-any.whl
+          ${CMAKE_INSTALL_PREFIX}/share/remage-py3-none-any.whl
+  # we want to use the cpp_config for the install area
   DEPENDS ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
   COMMENT "Installing remage Python wrapper")
 
 add_custom_target(install-remage-cli DEPENDS ${CMAKE_INSTALL_PREFIX}/bin/remage)
