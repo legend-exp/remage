@@ -68,8 +68,10 @@ processing_groups:
       - yloc
       - zloc
       - rloc
+      - first_evtid
 
     hit_table_layout: reboost.shape.group.group_by_evtid(STEPS)
 
     operations:
       rloc: np.sqrt(HITS.xloc**2+HITS.yloc**2)
+      first_evtid: ak.fill_none(ak.firsts(HITS.evtid, axis=-1), np.nan)

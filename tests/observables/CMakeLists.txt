@@ -42,7 +42,7 @@ add_test(NAME observables-ge/tracks-bulk-10um-limit
 set_tests_properties(observables-ge/tracks-bulk-10um-limit
                      PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture)
 
-add_test(NAME observables-ge/observables COMMAND ${PYTHONPATH} ./plot_observables.py 20000
+add_test(NAME observables-ge/observables COMMAND ${PYTHONPATH} ./plot_observables.py
                                                  beta-observables)
 set_tests_properties(observables-ge/observables PROPERTIES LABELS "extra" FIXTURES_REQUIRED
                                                            observables-ge-run-fixture)

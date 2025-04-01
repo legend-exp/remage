@@ -98,6 +98,10 @@ set(TESTS_IMAGES
     observables/beta-observables.bulk-r90.spec.output.png
     observables/beta-observables.bulk-total-energy.eff.output.png
     observables/beta-observables.bulk-total-energy.spec.output.png
+    observables/beta-observables.not-tl-active-energy.eff.output.png
+    observables/beta-observables.not-tl-active-energy.spec.output.png
+    observables/beta-observables.tl-active-energy.eff.output.png
+    observables/beta-observables.tl-active-energy.spec.output.png
     observables/beta-observables.surf-total-energy.eff.output.png
     observables/beta-observables.surf-total-energy.spec.output.png
     observables/beta-observables.surf-active-energy.eff.output.png
