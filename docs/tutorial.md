@@ -26,6 +26,7 @@ detectors as dictionaries:
 import legendhpges as hpges
 import pyg4ometry as pg4
 from numpy import pi
+import pygeomtools
 
 
 reg = pg4.geant4.Registry()
@@ -88,11 +89,24 @@ lar_l = pg4.geant4.LogicalVolume(lar_s, "G4_lAr", "LAr_l", registry=reg)
 pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], lar_l, "LAr", world_l, registry=reg)
 
 # now place the two HPGe detectors in the argon
-pg4.geant4.PhysicalVolume(
+bege_pv = g4.geant4.PhysicalVolume(
     [0, 0, 0], [5, 0, -3, "cm"], bege_l, "BEGe", lar_l, registry=reg
 )
-pg4.geant4.PhysicalVolume(
+coax_pv = pg4.geant4.PhysicalVolume(
     [0, 0, 0], [-5, 0, -3, "cm"], coax_l, "Coax", lar_l, registry=reg
+)
+
+# register them as sensitive in remage
+# this also saves the metadata into the files for later use
+bege_pv.pygeom_active_detector = pygeomtools.RemageDetectorInfo(
+    "germanium",
+    1,
+    bege_meta,
+)
+coax_pv.pygeom_active_detector = pygeomtools.RemageDetectorInfo(
+    "germanium",
+    2,
+    coax_meta,
 )
 
 # finally create a small radioactive source
@@ -123,9 +137,7 @@ We can also easily save the geometry as a geometry description markup language (
 allows us to input the geometry to `remage`.
 
 ```python
-w = pg4.gdml.Writer()
-w.addDetector(reg)
-w.write("geometry.gdml")
+pygeomtools.write_pygeom(reg, "geometry.gdml")
 ```
 
 ## Visualizing a simple simulation
