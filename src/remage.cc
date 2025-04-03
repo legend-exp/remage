@@ -126,8 +126,10 @@ int main(int argc, char** argv) {
   }
 
   RMGIpc::Setup(pipe_fd);
+  // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(
       RMGIpc::CreateMessage("loglevel", std::string(magic_enum::enum_name(RMGLog::GetLogLevel()))));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);

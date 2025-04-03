@@ -78,3 +78,11 @@ class IpcResult:
             msg = f"ipc returned key {name} more than once"
             raise RuntimeError(msg)
         return gen[0] if len(gen) == 1 else default
+
+    def set(self, name: str, values: list[str]) -> None:
+        self.remove(name)
+        for v in values:
+            self.ipc_info.append([name, v])
+
+    def remove(self, name: str) -> None:
+        self.ipc_info = [msg for msg in self.ipc_info if msg[0] != name]

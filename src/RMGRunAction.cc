@@ -286,6 +286,12 @@ void RMGRunAction::PostprocessOutputFile() const {
     return;
   }
 
+  // we need the main output file in the python wrapper.
+  if (this->IsMaster()) {
+    RMGIpc::SendIpcNonBlocking(
+        RMGIpc::CreateMessage("output_main", fCurrentOutputFile.second.string()));
+  }
+
   // HDF5 C++ might not be thread-safe?
   G4AutoLock l(&RMGConvertLH5Mutex);
 
