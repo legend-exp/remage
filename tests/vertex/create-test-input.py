@@ -25,7 +25,7 @@ def _convert_lh5_to_hdf5(lh5_fn):
     assert ret.returncode == 0
 
 
-INPUT_FILE_ROWS = int(1e5)
+INPUT_FILE_ROWS = int(1e4)
 rng = np.random.default_rng(123456)
 
 # ==================================================
@@ -48,11 +48,10 @@ def _create_pos_input(dtype, vtx_pos_file, units):
 
 
 _create_pos_input(np.float64, "macros/vtx-pos.lh5", "m")
-# _create_pos_input(np.float32, "macros/vtx-pos-float32.lh5", "m")
 _create_pos_input(np.float64, "macros/vtx-pos-mm.lh5", "mm")
 
 # ==================================================
-# kinetcis input.
+# kinetics input.
 
 p_theta = np.acos(rng.uniform(-1, 1, INPUT_FILE_ROWS))
 p_phi = rng.uniform(0, 2 * np.pi, INPUT_FILE_ROWS)

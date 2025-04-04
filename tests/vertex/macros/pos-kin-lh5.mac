@@ -6,4 +6,4 @@
 /RMG/Generator/Select FromFile
 /RMG/Generator/FromFile/FileName macros/vtx-kin.lh5
 
-/run/beamOn 100000
+/run/beamOn 10000

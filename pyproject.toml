@@ -34,6 +34,8 @@ dynamic = ["version"]
 dependencies = [
   "legend-pydataobj",
   "colorlog",
+  "tol_colors",
+  "reboost>=0.2.1",
 ]
 
 [project.optional-dependencies]
