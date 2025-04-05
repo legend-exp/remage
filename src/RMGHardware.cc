@@ -37,6 +37,7 @@ namespace fs = std::filesystem;
 #include "RMGOpticalOutputScheme.hh"
 #include "RMGScintillatorDetector.hh"
 #include "RMGScintillatorOutputScheme.hh"
+#include "RMGTools.hh"
 #include "RMGVertexOutputScheme.hh"
 
 #if RMG_HAS_GDML
@@ -67,6 +68,23 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
+
+    // register detectors from the GDML file, as written by pygeomtools.
+    // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
+    if (fRegisterDetectorsFromGDML) {
+      const auto aux_list = parser.GetAuxList();
+      for (const auto& aux : *aux_list) {
+        if (aux.type != "RMG_detector" || !aux.auxList) { continue; }
+
+        auto det_type_str = aux.value;
+        det_type_str[0] = std::toupper(det_type_str[0]);
+        const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
+
+        for (const auto& det_aux : *aux.auxList) {
+          RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
+        }
+      }
+    }
 
     // Check for overlaps, but with no verbose output.
     if (!fGDMLDisableOverlapCheck) {
@@ -260,6 +278,10 @@ void RMGHardware::DefineCommands() {
       .SetGuidance("Change the number of points sampled for overlap checks")
       .SetStates(G4State_PreInit);
 
+  fMessenger->DeclareProperty("RegisterDetectorsFromGDML", fRegisterDetectorsFromGDML)
+      .SetGuidance("Register all detectors as saved in then GDML auxval structure.")
+      .SetStates(G4State_PreInit);
+
   fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
       .SetGuidance("Use GDML file for geometry definition")
       .SetParameterName("filename", false)
@@ -273,7 +295,7 @@ void RMGHardware::DefineCommands() {
       .SetGuidance("Print list of defined physical volumes")
       .SetStates(G4State_Idle);
 
-  // RegisterDetector cannot be defined with the G4GenericMessenger (it has to many parameters).
+  // RegisterDetector cannot be defined with the G4GenericMessenger (it has too many parameters).
   fHwMessenger = std::make_unique<RMGHardwareMessenger>(this);
 }
 
