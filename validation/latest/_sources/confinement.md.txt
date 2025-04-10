@@ -298,3 +298,5 @@ Then also with an intersection of another cylinder with the height of the string
 ```{figure} ./_img/ confinement/lar-int-and-sub-check-xz.output.png
 :width: 700px
 ```
+
+&nbsp;
