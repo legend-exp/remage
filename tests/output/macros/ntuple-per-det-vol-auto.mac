@@ -1,0 +1,16 @@
+/RMG/Output/NtuplePerDetector true
+/RMG/Output/NtupleUseVolumeName true
+
+/RMG/Geometry/RegisterDetectorsFromGDML true
+
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine UnConfined
+
+/RMG/Generator/Select GPS
+/gps/position 0 0 0
+/gps/ang/type iso
+/gps/particle gamma
+/gps/energy 200 keV
+
+/run/beamOn 50
