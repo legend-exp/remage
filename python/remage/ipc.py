@@ -5,6 +5,8 @@ import os
 import signal
 import subprocess
 
+from ._version import __version__
+
 log = logging.getLogger(__name__)
 
 
@@ -21,7 +23,9 @@ def handle_ipc_message(msg: bytes) -> tuple[bool, list]:
 
     msg_ret = msg
     # handle blocking messages, if necessary.
-    if msg == ["ipc_available", "1"]:
+    if msg[0] == "ipc_available":
+        if msg[1] != __version__:
+            pass  # TODO
         msg_ret = None
     elif is_blocking:
         log.warning("unhandled blocking IPC message %s", str(msg))

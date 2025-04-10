@@ -21,6 +21,7 @@
 #include "G4Threading.hh"
 
 #include "RMGLog.hh"
+#include "RMGVersion.hh"
 
 namespace {
   void ipc_signal_handler(int) {
@@ -48,7 +49,7 @@ void RMGIpc::Setup(int ipc_pipe_fd) {
   }
 
   // note: this is just a test for the blocking mode.
-  if (!SendIpcBlocking(CreateMessage("ipc_available", "1"))) {
+  if (!SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
     RMGLog::Out(RMGLog::error, "blocking test IPC call failed, disabling.");
     fIpcFd = -1;
   }
