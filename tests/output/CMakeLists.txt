@@ -16,7 +16,8 @@ foreach(_file ${_aux})
 endforeach()
 
 # MAIN OUTPUT TESTS
-set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-flat.mac ntuple-flat-with-tracks.mac)
+set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-per-det-auto.mac
+            ntuple-per-det-vol-auto.mac ntuple-flat.mac ntuple-flat-with-tracks.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli-cpp>
