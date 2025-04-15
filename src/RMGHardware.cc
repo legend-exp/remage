@@ -73,8 +73,11 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
     if (fRegisterDetectorsFromGDML) {
       const auto aux_list = parser.GetAuxList();
+      auto had_mapping = false;
+      auto had_detector = false;
       for (const auto& aux : *aux_list) {
         if (aux.type != "RMG_detector" || !aux.auxList) { continue; }
+        had_mapping = true;
 
         auto det_type_str = aux.value;
         det_type_str[0] = std::toupper(det_type_str[0]);
@@ -82,7 +85,15 @@ G4VPhysicalVolume* RMGHardware::Construct() {
 
         for (const auto& det_aux : *aux.auxList) {
           RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
+          had_detector = true;
         }
+      }
+
+      if (!had_mapping) {
+        RMGLog::Out(RMGLog::fatal, "No detector mapping found in the GDML file");
+      }
+      if (!had_detector) {
+        RMGLog::Out(RMGLog::warning, "Empty detector mapping found in the GDML file");
       }
     }
 
