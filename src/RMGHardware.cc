@@ -71,7 +71,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
 
     // register detectors from the GDML file, as written by pygeomtools.
     // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
-    if (fRegisterDetectorsFromGDML) {
+    if (!fRegisterDetectorsFromGDML.empty()) {
       const auto aux_list = parser.GetAuxList();
       auto had_mapping = false;
       auto had_detector = false;
@@ -80,8 +80,13 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         had_mapping = true;
 
         auto det_type_str = aux.value;
-        det_type_str[0] = std::toupper(det_type_str[0]);
+        det_type_str[0] =
+            static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
         const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
+
+        if (fRegisterDetectorsFromGDML.find(det_type) == fRegisterDetectorsFromGDML.end()) {
+          continue;
+        }
 
         for (const auto& det_aux : *aux.auxList) {
           RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
@@ -276,6 +281,16 @@ void RMGHardware::SetMaxStepLimit(double max_step, std::string name) {
   RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", name, max_step);
 }
 
+void RMGHardware::RegisterDetectorsFromGDML(std::string s) {
+  if (s == "All") {
+    for (const auto dt : magic_enum::enum_values<RMGDetectorType>()) {
+      fRegisterDetectorsFromGDML.emplace(dt);
+    }
+  } else {
+    fRegisterDetectorsFromGDML.emplace(RMGTools::ToEnum<RMGDetectorType>(s, "detector type"));
+  }
+}
+
 void RMGHardware::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
@@ -289,8 +304,12 @@ void RMGHardware::DefineCommands() {
       .SetGuidance("Change the number of points sampled for overlap checks")
       .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareProperty("RegisterDetectorsFromGDML", fRegisterDetectorsFromGDML)
-      .SetGuidance("Register all detectors as saved in then GDML auxval structure.")
+  fMessenger->DeclareMethod("RegisterDetectorsFromGDML", &RMGHardware::RegisterDetectorsFromGDML)
+      .SetGuidance(
+          "Register detectors as saved in the GDML auxval structure, as written by pygeomtools.")
+      .SetParameterName("det_type", true)
+      .SetCandidates("All " + RMGTools::GetCandidates<RMGDetectorType>())
+      .SetDefaultValue("All")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("IncludeGDMLFile", &RMGHardware::IncludeGDMLFile)
