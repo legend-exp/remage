@@ -8,6 +8,7 @@ import signal
 import subprocess
 import sys
 import threading
+from collections.abc import Iterable
 from pathlib import Path
 
 import colorlog
@@ -119,8 +120,14 @@ def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
 
 
 def remage_run(
-    args: list[str] | None = None,
+    macros: Iterable[str] | str = (),
     *,
+    gdmls: Iterable[str] | str = (),
+    output: str | None = None,
+    threads: int = 1,
+    overwrite_output: bool = False,
+    macro_substitutions: dict[str, str] | None = None,
+    log_level: str | None = None,
     raise_on_error: bool = True,
     raise_on_warning: bool = False,
 ) -> tuple[int, IpcResult]:
@@ -133,8 +140,20 @@ def remage_run(
 
     Parameters
     ----------
-    args
-        argument list, as passed to the remage CLI utility.
+    macros
+        one or more remage/Geant4 macro command listings to execute.
+    gdmls
+        supply one or more GDML files describing the experimental geometry.
+    output
+        output file for detector hits.
+    threads
+        set the number of threads used by remage
+    overwrite_output
+        overwrite existing output files
+    macro_substitutions
+        key-value-pairs that will be substituted in macros as Geant4 aliases.
+    log_level
+        logging level. One of `debug`, `detail`, `summary`, `warning`, `error`.
     raise_on_error
         raise a :class:`RuntimeError` when an error in the C++ application occurs. This
         applies to non-fatal errors being logged as well as fatal errors. If false, the
@@ -144,6 +163,57 @@ def remage_run(
         raise a :class:`RuntimeError` when a warning (or error) is logged in the C++
         application. If false, warnings are only logged and the python-based
         post-processing will be run normally.
+    """
+    args = []
+    if not isinstance(gdmls, str):
+        for gdml in gdmls:
+            args.append(f"--gdml-files={gdml}")
+    else:
+        args.append(f"--gdml-files={gdmls}")
+
+    if output is not None:
+        args.append(f"--output-file={output}")
+
+    args.append(f"--threads={threads}")
+
+    if overwrite_output:
+        args.append("--overwrite")
+
+    if macro_substitutions is not None:
+        for subst_k, subst_v in macro_substitutions.items():
+            args.append(f"--macro-substitutions={subst_k}={subst_v}")
+
+    if log_level is not None:
+        args.append(f"--log-level={log_level}")
+
+    args.append("--")
+    if not isinstance(macros, str):
+        args.extend(macros)
+    else:
+        args.append(macros)
+
+    return remage_run_from_args(
+        args, raise_on_error=raise_on_error, raise_on_warning=raise_on_warning
+    )
+
+
+def remage_run_from_args(
+    args: list[str] | None = None,
+    *,
+    raise_on_error: bool = True,
+    raise_on_warning: bool = False,
+) -> tuple[int, IpcResult]:
+    """
+    Run the remage simulation utility with the provided args.
+
+    Parameters
+    ----------
+    args
+        argument list, as passed to the remage CLI utility.
+    raise_on_error
+        see :meth:`remage_run`
+    raise_on_warning
+        see :meth:`remage_run`
     """
     logger = _setup_log()
 
@@ -218,4 +288,4 @@ def remage_run(
 
 
 def remage_cli() -> int:
-    return remage_run(raise_on_error=False)[0]
+    return remage_run_from_args(raise_on_error=False)[0]

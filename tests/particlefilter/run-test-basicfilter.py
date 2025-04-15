@@ -9,7 +9,7 @@ macro = "macros/gammafilter.mac"
 output_lh5 = "gammafilter.lh5"
 
 # run remage, produce lh5 output.
-remage_run(["-g", "gdml/geometry.gdml", "-o", output_lh5, "-w", "--", macro])
+remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
 
 # check that no gammas are in the output
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
@@ -22,7 +22,7 @@ macro = "macros/alphafilter.mac"
 output_lh5 = "alphafilter.lh5"
 
 # run remage, produce lh5 output.
-remage_run(["-g", "gdml/geometry.gdml", "-o", output_lh5, "-w", "--", macro])
+remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
 
 # check that no alphas are in the output, but still we end where expected.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")

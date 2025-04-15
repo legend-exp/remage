@@ -9,7 +9,9 @@ macro = "macros/th228-chain.mac"
 output_lh5 = "th228-chain.lh5"
 
 # run remage, produce lh5 output.
-remage_run(["-g", "gdml/geometry-box.gdml", "-o", output_lh5, "-w", "--", macro])
+remage_run(
+    macro, gdmls="gdml/geometry-box.gdml", output=output_lh5, overwrite_output=True
+)
 
 # check that we get to stable isotopes.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
