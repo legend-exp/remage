@@ -172,7 +172,7 @@ def remage_run(
         args.append(f"--gdml-files={gdmls}")
 
     if output is not None:
-        args.append(f"--output={output}")
+        args.append(f"--output-file={output}")
 
     args.append(f"--threads={threads}")
 
