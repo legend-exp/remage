@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-from remage import remage_run
+from remage import remage_run_from_args
 
 base_args = [
     "--macro-substitutions",
@@ -27,4 +27,4 @@ energies = np.concatenate(
 
 for energy in energies:  # in keV
     args = [arg.format(energy) for arg in base_args]
-    remage_run(args, raise_on_error=True)
+    remage_run_from_args(args, raise_on_error=True)

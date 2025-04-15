@@ -33,19 +33,13 @@ with Path(f"macros/{macro}.mac").open("r") as macro_file:
             pos_input_file = m.group(1)
 
 # run remage, produce lh5 output.
-cmd = [
-    "-g",
-    "gdml/geometry.gdml",
-    "-o",
-    output_lh5,
-    "-t",
-    str(nthread),
-    "-l",
-    "summary",
-    "--",
+files = remage_run(
     f"macros/{macro}.mac",
-]
-files = remage_run(cmd)[1].get("output")  # list of output files.
+    gdmls="gdml/geometry.gdml",
+    output=output_lh5,
+    threads=nthread,
+    log_level="summary",
+)[1].get("output")
 if len(files) == 1:
     files = files[0]
 
