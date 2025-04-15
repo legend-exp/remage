@@ -339,7 +339,7 @@ Now we only need to tell `remage` which file name to use for the output.
 going to select the latter by supplying a file name with `.lh5` extension:
 
 ```console
-$ remage --threads 8 --gdml-files geometry.gdml --output output.lh5 -- gammas.mac
+$ remage --threads 8 --gdml-files geometry.gdml --output-file output.lh5 -- gammas.mac
 ```
 
 Geant4 does not support merging LH5 files created by different threads, so we're
