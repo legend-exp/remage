@@ -49,7 +49,11 @@ of remage (access it with
   output scheme, that will not be enabled right away, and
 - `user_init->ActivateOptionalOutputScheme("name")` enables such a registered
   output scheme.
-  :::
+
+Output schemes are often coupled to
+[sensitive detector types](project:./geometry.md#registering-sensitive-detectors).
+At present, it is not possible to register detector types at runtime.
+:::
 
 ## LH5 output
 

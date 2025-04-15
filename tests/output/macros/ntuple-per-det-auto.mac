@@ -1,6 +1,6 @@
 /RMG/Output/NtuplePerDetector true
 
-/RMG/Geometry/RegisterDetectorsFromGDML true
+/RMG/Geometry/RegisterDetectorsFromGDML All
 
 /control/execute macros/_init.mac
 
