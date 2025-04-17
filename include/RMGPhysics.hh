@@ -129,6 +129,16 @@ class RMGPhysics : public G4VModularPhysicsList {
     /** @brief Set the physics realm from a string, for use in the messenger. */
     void SetPhysicsRealmString(std::string realm);
 
+    /** @brief Set production cuts to be enabled for all EM processes.
+     *
+     *  @details Some EM physics lists only apply production cut thresholds to certain processes,
+     *  e.g. those with UV divergence. This can be used to instead force the cuts to be applied
+     *  for all processes. This can be useful to control the output file size.
+     *
+     *  @param store boolean flag for whether to force production cuts to be applied.
+     */
+    void SetEMApplyCutsAll(bool store);
+
     /** @brief Set the production cut for the default region.
      *  @details The same cut is used for electrons, positrons and gammas.
      *  Notes:

@@ -23,6 +23,7 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
+#include "G4EmParameters.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
@@ -112,6 +113,10 @@ void RMGPhysics::SetStoreICLevelData(bool store) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+void RMGPhysics::SetEMApplyCutsAll(bool store) { G4EmParameters::Instance()->SetApplyCuts(store); }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGPhysics::ConstructParticle() {
 
   RMGLog::Out(RMGLog::detail, "Constructing particles");
@@ -171,6 +176,7 @@ void RMGPhysics::ConstructProcess() {
   }
 
   em_constructor->ConstructProcess();
+
 
   // Includes synchrotron radiation, gamma-nuclear, muon-nuclear and
   // e+/e- nuclear interactions
@@ -600,6 +606,12 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("UseGrabmayrsGammaCascades", fUseGrabmayrGammaCascades)
       .SetGuidance("Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.")
+      .SetStates(G4State_PreInit);
+
+
+  fMessenger->DeclareMethod("ForceProductionCutsEM", &RMGPhysics::SetEMApplyCutsAll)
+      .SetGuidance("Force production cuts to be used for all processes.")
+      .SetCandidates("0 1")
       .SetStates(G4State_PreInit);
 }
 
