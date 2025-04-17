@@ -23,6 +23,7 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
+#include "G4EmParameters.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
@@ -112,6 +113,10 @@ void RMGPhysics::SetStoreICLevelData(bool store) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+void RMGPhysics::SetEMApplyCutsAll() { G4EmParameters::Instance()->SetApplyCuts(true); }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 void RMGPhysics::ConstructParticle() {
 
   RMGLog::Out(RMGLog::detail, "Constructing particles");
@@ -171,6 +176,7 @@ void RMGPhysics::ConstructProcess() {
   }
 
   em_constructor->ConstructProcess();
+
 
   // Includes synchrotron radiation, gamma-nuclear, muon-nuclear and
   // e+/e- nuclear interactions
@@ -604,6 +610,11 @@ void RMGPhysics::DefineCommands() {
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
+
+
+  fMessenger->DeclareMethod("ForceProductionCutsEM", &RMGPhysics::SetEMApplyCutsAll)
+      .SetGuidance("Force production cuts to be used for all processes.")
+      .SetStates(G4State_PreInit,G4State_Idle);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab
