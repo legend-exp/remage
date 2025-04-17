@@ -32,7 +32,7 @@ Get started with our [documentation pages](https://remage.readthedocs.io)!
   `remage` executable and a macro file, eliminating the need to write or compile
   C++ code.
 - Various pre-compiled _remage_ versions available on
-  [Docker Hub](https://hub.docker.com/repository/docker/legendexp/remage)
+  [Docker Hub](https://hub.docker.com/r/legendexp/remage)
 - Support for modern [Geant4](https://geant4.web.cern.ch), including:
   - Multithreading
   - [GDML](https://gdml.web.cern.ch/GDML) support

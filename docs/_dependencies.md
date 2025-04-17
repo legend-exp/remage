@@ -14,8 +14,7 @@
 - [HDF5] C++ support for LH5 object persistency
 
 :::{note} Pre-built Docker container images with all necessary dependencies are
-available
-[on Docker Hub](https://hub.docker.com/repository/docker/gipert/remage-base).
+available [on Docker Hub](https://hub.docker.com/r/gipert/remage-base).
 :::
 
 :::{note} Apptainer images can be easily generated with, e.g.:
