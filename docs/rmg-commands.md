@@ -367,6 +367,7 @@ Commands for controlling output from hits in scintillator detectors.
 * `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `StoreTrackID` – Store Track IDs for hits in the output file.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 
@@ -404,6 +405,15 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreTrackID`
+
+Store Track IDs for hits in the output file.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
@@ -579,6 +589,7 @@ Commands for controlling physics processes
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+* `ForceProductionCutsEM` – Force production cuts to be used for all processes.
 
 ### `/RMG/Processes/Realm`
 
@@ -705,6 +716,16 @@ Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 * **Parameter** – `value`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Processes/ForceProductionCutsEM`
+
+Force production cuts to be used for all processes.
+
+* **Parameter** – `arg0`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+  * **Candidates** – `0 1`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Processes/Stepping/`
