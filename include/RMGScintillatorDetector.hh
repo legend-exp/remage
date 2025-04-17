@@ -51,6 +51,9 @@ class RMGScintillatorDetectorHit : public G4VHit {
     G4ThreeVector global_position_pre;
     G4ThreeVector global_position_post;
     double global_time = -1;
+    int track_id = -1;
+    int parent_track_id = -1;
+
     double velocity_pre = -1;
     double velocity_post = -1;
 };

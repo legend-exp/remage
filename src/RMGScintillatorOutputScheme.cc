@@ -66,6 +66,11 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
     ana_man->CreateNtupleIColumn(id, "particle");
+
+    if (fStoreTrackID) {
+      ana_man->CreateNtupleIColumn(id, "trackid");
+      ana_man->CreateNtupleIColumn(id, "parent_trackid");
+    }
     CreateNtupleFOrDColumn(ana_man, id, "edep_in_keV", fStoreSinglePrecisionEnergy);
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
     CreateNtupleFOrDColumn(ana_man, id, "xloc_pre_in_m", fStoreSinglePrecisionPosition);
@@ -157,6 +162,13 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
       ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->particle_type);
+
+      // store track IDs if instructed
+      if (fStoreTrackID) {
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->track_id);
+        ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
+      }
+
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
           fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
@@ -204,6 +216,11 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
       .SetParameterName("det_uid", false)
       .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
+      .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetStates(G4State_Idle);
+
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")

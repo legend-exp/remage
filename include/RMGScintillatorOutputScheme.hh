@@ -57,6 +57,7 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+    bool fStoreTrackID = false;
 };
 
 #endif
