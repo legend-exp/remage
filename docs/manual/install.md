@@ -60,12 +60,12 @@ Since the latest remage versions, it is possible to include remage into your jup
 To set up your jupyter kernel, you only have to provide the correct `kernel.json` file to your jupyter installation. This means you first have to find your jupyters share folder and create the `kernel.json` file there.
 
 ```console
-cd ~/.local/share/jupyter
-mkdir kernels
-cd kernels
-mkdir remage
-cd remage
-touch kernel.json
+$ cd ~/.local/share/jupyter
+$ mkdir kernels
+$ cd kernels
+$ mkdir remage
+$ cd remage
+$ touch kernel.json
 ```
 
 The contents of this kernel file now depends on how you installed remage.
@@ -103,7 +103,7 @@ If you instead installed using docker it should look something like this: I did 
 
 ### Jupyter from source
 
-We are assuming that you have built remage using the `remage-base_latest` container. In this case, after `make install`-ing remage, the kernel file is almost the same as if you used the pre-built library. You only have to additionally tell the kernel where you installed remage with the export paths. The main issue here is, that `env` does not expand shell variables like `$PATH`, it only overwrites them. So we have to set them up ourself. The first path for "PATH=..." and "LD_LIBRARY_PATH..." should be the path where you installed remage. (Replace `remage/install/path/...` with the path the terminal told you to export when you did `cmake ..`). Also remember to replace `/path/to/remage_base_latest.sif` with the actual path of your image.
+We are assuming that you have built remage using the `remage-base_latest` container and followed the explanation [above](#building-from-source). In this case, after `make install`-ing remage, the kernel file is almost the same as if you used the pre-built library. You only have to additionally tell the kernel where you installed remage with the export paths. The main issue here is, that `env` does not expand shell variables like `$PATH`, it only overwrites them. So we have to set them up ourself. The first path for `"PATH=..."` and `"LD_LIBRARY_PATH..."` should be the path where you installed remage. (Replace `remage/install/path/...` with the path the terminal told you to export when you did `cmake ..` during the installation). Also remember to replace `/path/to/remage_base_latest.sif` with the actual path of your image.
 
 ```json
 {
@@ -140,11 +140,11 @@ Because that is not the prettiest solution, you could also write a small setup s
 For this you should write a small bash script in a folder of your liking.
 
 ```console
-cd # To go back to your home directory
-mkdir scripts
-cd scripts
-touch remage_kernel_setup.sh
-chmod +x remage_kernel_setup.sh
+$ cd # To go back to your home directory
+$ mkdir scripts
+$ cd scripts
+$ touch remage_kernel_setup.sh
+$ chmod +x remage_kernel_setup.sh
 ```
 
 In the setup script `remage_kernel_setup.sh` you should now write something like this:
@@ -185,10 +185,10 @@ Remember to replace `/path/to/remage_base_latest.sif` with the actual path of yo
 
 ### Jupyter on NERSC
 
-Setting up the remage jupyter kernel on NERSC is exactly the same as setting up the legend-sw kernel on NERSC like explained [on Confluence](https://legend-exp.atlassian.net/wiki/spaces/LEGEND/pages/261750878/Computing+at+NERSC#Python-notebooks-in-Shifter-containers). In order to make sure the kernel does not have to first pull the remage version from Docker, maybe lets first pull it ourselves:
+Setting up the remage jupyter kernel on NERSC is exactly the same as setting up the legend-sw kernel on NERSC as explained [on Confluence](https://legend-exp.atlassian.net/wiki/spaces/LEGEND/pages/261750878/Computing+at+NERSC#Python-notebooks-in-Shifter-containers). In order to make sure the kernel does not have to first pull the remage version from Docker, maybe lets first pull it ourselves:
 
 ```console
-shifterimg -v pull legendexp/remage:latest
+$ shifterimg -v pull legendexp/remage:latest
 ```
 
 The rest is literally the same as in the Confluence explanation:
@@ -197,12 +197,12 @@ The rest is literally the same as in the Confluence explanation:
 $ cd ~/.local/share/jupyter
 $ mkdir kernels
 $ cd kernels
-$ mkdir legend-base
-$ cd legend-base
+$ mkdir remage
+$ cd remage
 $ touch kernel.json
 ```
 
-The only difference to the Confluence version is that in the `kernel.json` instead of "--image=legendexp/legend-software:latest" we write "--image=legendexp/remage:latest" and instead of "/opt/conda/bin/python3" we write "python". Now maybe also change the name from ""display_name": "legend-sw"," to ""display_name": "remage",". In the end your `kernel.json` should look like this:
+The only difference to the Confluence version is that in the `kernel.json` instead of `"--image=legendexp/legend-software:latest"` we write `"--image=legendexp/remage:latest"` and instead of `"/opt/conda/bin/python3"` we write `"python"`. Now maybe also change the name from `"display_name": "legend-sw",` to `"display_name": "remage",`. In the end your `kernel.json` should look like this:
 
 ```json
 {
@@ -228,7 +228,7 @@ Now after refreshing JupyterLab you should see the "remage" kernel in your noteb
 
 ### Example Jupyter file for testing
 
-To test if it works, open up a new notebook and select the remage kernel! You might have to search for it under "Select another Kernel" "Jupyter kernel..." depending on your installation, the name should be equal to the name under "display_name" in the `kernel.json`. Now first start with a simple cell to check if the kernel starts successfully:
+To test if it works, open up a new notebook and select the remage kernel! You might have to search for it under "Select another Kernel" "Jupyter kernel..." depending on your installation, the name should be equal to the name under `display_name` in the `kernel.json`. Now first start with a simple cell to check if the kernel starts successfully:
 
 ```python
 # Change this to the path where you want to save simulation geometry and data
@@ -325,12 +325,15 @@ macro_content = macro_content.replace("$GENERATOR", generator)
 macro_file.write_text(macro_content)
 
 start = time.time()
+
+result = subprocess.run(
+    f"remage {macro_path} -g {gdml_path} -o {output_directory}/out.lh5 -w -t 1",
+    shell=True
+)
 # Check if remage encountered errors. Exit code 0 means everything worked fine. Exit code 2 are only Warnings.
-if subprocess.run(
-    f"remage {macro_path} -g {gdml_path} -o {output_directory}/out.lh5 -w -t 1  ",
-    shell=True,
-) not in {0, 2}:
+if result.returncode not in {0, 2}:
     raise ValueError("remage encountered an error.")
+
 end = time.time()
 print(end - start)
 ```
@@ -343,9 +346,6 @@ import awkward as ak
 import hist
 import matplotlib.pyplot as plt
 
-# macro_path, gdml_path, output_directory = setup_macros_and_geometry()
-# if subprocess.run(f"remage {macro_path} -g {gdml_path} -o {output_directory}/out.lh5 -w -t 1  ", shell=True,).returncode not in {0,2}:
-#    raise ValueError("remage encountered an error")
 data = lh5.read_as(f"stp/germanium", f"{output_directory}/out.lh5", "ak")
 # with awkward arrays, we can easily "build events" by grouping by the event identifier
 evt = ak.unflatten(data, ak.run_lengths(data.evtid))
@@ -360,4 +360,4 @@ plt.yscale("log")
 ```
 
 If everything worked you should now be able to run the full simulation chain in a notebook, like you did just now!
-![Geometry visualization](https://media.tenor.com/lCKwsD2OW1kAAAAj/happy-cat-happy-happy-cat.gif)
+![Happy visualization](https://media.tenor.com/lCKwsD2OW1kAAAAj/happy-cat-happy-happy-cat.gif)
