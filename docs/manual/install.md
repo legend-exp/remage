@@ -191,7 +191,7 @@ Setting up the remage jupyter kernel on NERSC is exactly the same as setting up 
 shifterimg -v pull legendexp/remage:latest
 ```
 
-The rest is literaly the same as in the Confluence explanation:
+The rest is literally the same as in the Confluence explanation:
 
 ```console
 $ cd ~/.local/share/jupyter
@@ -228,7 +228,7 @@ Now after refreshing JupyterLab you should see the "remage" kernel in your noteb
 
 ### Example Jupyter file for testing
 
-To test if it works, open up a new notebook and select the remage kernel! You might have to search for it under "Select another Kernel" "Jupyter kernel..." depending on your installation, the name should be equal to the name under "display_name" in the `kernel.json`. Now first start with a simple cell to check if the kernel starts succesfully:
+To test if it works, open up a new notebook and select the remage kernel! You might have to search for it under "Select another Kernel" "Jupyter kernel..." depending on your installation, the name should be equal to the name under "display_name" in the `kernel.json`. Now first start with a simple cell to check if the kernel starts successfully:
 
 ```python
 # Change this to the path where you want to save simulation geometry and data
