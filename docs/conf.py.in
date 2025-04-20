@@ -3,6 +3,9 @@ import sys
 import os
 import subprocess
 
+from pygments.lexers.shell import BashSessionLexer
+
+
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
@@ -40,8 +43,20 @@ exhale_args = {
 
 breathe_projects = {}
 
-myst_enable_extensions = ["colon_fence", "substitution"]
+myst_enable_extensions = ["colon_fence", "substitution", "attrs_block"]
 myst_heading_anchors = 3
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "numba": ("https://numba.readthedocs.io/en/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "pint": ("https://pint.readthedocs.io/en/stable", None),
+    "lgdo": ("https://legend-pydataobj.readthedocs.io/en/stable", None),
+    "pyg4ometry": ("https://pyg4ometry.readthedocs.io/en/stable", None),
+    "dbetto": ("https://dbetto.readthedocs.io/en/stable/", None),
+}
 
 if on_rtd:
     # assume build has been prepared in .readthedocs.yml
@@ -75,7 +90,7 @@ html_theme_options = {
 }
 html_title = f"{project} {version}"
 
-exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md"]
+exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md", "_deps"]
 
 # warnings filtering
 warnings_filter_silent = True
@@ -113,6 +128,20 @@ def _replace(app, docname, source):
     source[0] = result
 
 
+class RemageSessionLexer(BashSessionLexer):
+    """
+    Like BashSessionLexer, but treats "remage> " as the prompt.
+    """
+    name = "Remage shell session"
+    aliases = ["remage"]
+    # Primary‐prompt regex: match lines that start with “remage> ”
+    _ps1rgx = re.compile(r'^(remage> )(.*\n?)')
+    # Continuation prompt (if you don’t want any special one, just empty)
+    _ps2 = ''
+
+
 def setup(app):
+    app.add_lexer('remage', RemageSessionLexer)
+
     app.add_config_value("ultimate_replacements", {}, True)
     app.connect("source-read", _replace)
