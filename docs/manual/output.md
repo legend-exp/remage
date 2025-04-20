@@ -1,3 +1,5 @@
+(manual-output)=
+
 # Output
 
 :::{todo}
