@@ -120,7 +120,6 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
   return false;
 }
 
-
 // get the intersections between the solid and an arbitrary line, defined by start and dir
 std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
     G4ThreeVector dir) const {
@@ -128,9 +127,8 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
-        "where the physical volume is not set this probably means you are trying to "
-        "generically ",
-        "sample a geometrical volume which instead should be natively sampled");
+        "where the physical volume is not set. This probably means you are trying to "
+        "generically sample a geometrical volume which instead should be natively sampled");
 
   auto solid = this->physical_volume->GetLogicalVolume()->GetSolid();
 
@@ -172,9 +170,8 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir,
 
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot generate directions for a SampleableObject ",
-        "where the physical volume is not set this probably means you are trying to "
-        "generically ",
-        "sample a geometrical volume which instead should be natively sampled");
+        "where the physical volume is not set. This probably means you are trying to "
+        "generically sample a geometrical volume which instead should be natively sampled");
 
   // Get the center and radius of a bounding sphere around the shape
   G4double bounding_radius =
@@ -263,7 +260,6 @@ bool RMGVertexConfinement::SampleableObject::Sample(G4ThreeVector& vertex, size_
   // 1) native sampling
   // 2) volume sampling with containment check
   // 3) general surface sampling
-
 
   if (this->native_sample) {
     vertex = this->translation +
@@ -494,7 +490,6 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
               bb_y, bb_z);
     } // sampling_solid and native_sample and surface_sample must hold a valid value at this point
 
-
     // determine solid transformation w.r.t. world volume reference
 
     // found paths to the mother volume.
@@ -624,7 +619,6 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
 void RMGVertexConfinement::Reset() {
   // take lock, just not to race with the fVolumesInitialized flag elsewhere.
 
-
   G4AutoLock lock(&fGeometryMutex);
   fVolumesInitialized = true;
   fPhysicalVolumes.clear();
@@ -674,10 +668,6 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
-      // strategy: sample a point in the geometrical user volume or the
-      // physical user volume depending on the smallest surface/volume. Then
-      // check if it is inside the other volume
-
       if (fGeomVolumeSolids.empty() or fPhysicalVolumes.empty()) {
         RMGLog::Out(RMGLog::fatal, "'IntersectPhysicalWithGeometrical' mode is set but ",
             "either no physical or no geometrical volumes have been added");
@@ -688,7 +678,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       while (calls <= RMGVVertexGenerator::fMaxAttempts) {
         calls++;
 
-        // chose a volume
+        // choose a volume
         SampleableObject choice_nonconst;
         bool physical_first = true;
 
@@ -747,10 +737,6 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
     }
 
     case SamplingMode::kSubtractGeometrical: {
-      // strategy: sample a point in the geometrical user volume or the
-      // physical user volume depending on the smallest surface/volume. Then
-      // check if it is inside the other volume
-
       if (fGeomVolumeSolids.empty() and fPhysicalVolumes.empty()) {
         RMGLog::Out(RMGLog::fatal, "'SubtractGeometrical' mode is set but ",
             " no physical and no geometrical volumes have been added");
@@ -771,13 +757,12 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       while (calls <= RMGVVertexGenerator::fMaxAttempts) {
         calls++;
 
-        // chose a volume
+        // choose a volume
         SampleableObject choice_nonconst;
         bool physical_first = true;
 
         if (fOnSurface) {
-
-          // check the user has set which volume to samplg first from
+          // check the user has set which volume to sample first from
           if (fFirstSamplingVolumeType == VolumeType::kUnset)
             RMGLog::Out(RMGLog::fatal, "For surface sampling vertex confinment mode it is required ",
                 "to set the type of volume to sample first (geometrical or physical).");
@@ -788,9 +773,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
                                            : fGeomVolumeSolids.SurfaceWeightedRand();
         } else {
-
-
-          // if both physical and geometrical volumes are present and order is not set chose based on the total volume
+          // if both physical and geometrical volumes are present and order is
+          // not set choose based on the total volume
           if (fFirstSamplingVolumeType == VolumeType::kUnset && has_geometrical && has_physical)
             physical_first = fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume;
           else if (has_physical && not has_geometrical) physical_first = true;
@@ -807,7 +791,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
 
         if (!success) {
-          RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
+          RMGLog::Out(RMGLog::error, "Sampling unsuccessful, return dummy vertex");
           vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
           return false;
         }
@@ -826,7 +810,6 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
                                           : "Chosen vertex fails intersection criteria. ");
 
         // now check for subtractions
-
         if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) return true;
 
         RMGLog::Out(RMGLog::debug, "Chosen vertex fails intersection criteria.");
@@ -843,6 +826,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
       return false;
     }
+
     case SamplingMode::kUnionAll: {
       // strategy: just sample uniformly in/on all geometrical and physical volumes
 

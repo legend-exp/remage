@@ -96,7 +96,15 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * RMGVertexConfinement::SamplingMode). */
     bool GenerateVertex(G4ThreeVector& v) override;
 
-    // to be used in the messenger class
+    /**
+     * This function is used by the messenger command to add a physical
+     * volume(s) to the list of volumes to consider for sampling.
+     *
+     * @param name The name of the physical volume or a regular expression
+     * supported by \ref std::regex
+     * @param copy_nr The copy number of the physical volume or a regular
+     * expression supported by \ref std::regex
+     */
     void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr = ".*");
 
     inline void AddGeometricalVolume(GenericGeometricalSolidData& data) {
@@ -116,7 +124,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * @c G4VPhysicalVolume or geometrical volume defined by a @c G4VSolid . The
      * sampling can be performed either on the surface or in the volume of the solid.
      *
-     *  This structure must contain at least a non-null pointer, between the @c physical_volume and
+     * This structure must contain at least a non-null pointer, between the @c physical_volume and
      * @c sampling_solid arguments. The idea is that:
      *  - physical volumes get always a bounding box assigned, but at later time
      *  - purely geometrical volumes only have the sampling_solid member defined
