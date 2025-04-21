@@ -174,7 +174,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param force_containment_check Whether to force a check on where the point is
          * inside the solid.
          * @param n_trials The total number of trials performed.
-         *
          */
         [[nodiscard]] bool Sample(G4ThreeVector& vertex, size_t max_attempts,
             bool force_containment_check, size_t& n_trials) const;
@@ -191,7 +190,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param max_attempts The maximum number of attempts to find a valid vertex.
          * @param n_max The maximum number of intersections possible for the solid,
          * can be an overestimate.
-         *
          */
         [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, size_t max_attempts,
             size_t n_max) const;
@@ -223,7 +221,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          *
          * @param dir The direction vector for the point.
          * @param pos The initial position for the point.
-         *
          */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
@@ -264,9 +261,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         template<typename... Args> void emplace_back(Args&&... args);
-        [[nodiscard]] inline bool empty() const { return data.empty(); }
-        inline SampleableObject& back() { return data.back(); }
-        inline void clear() { data.clear(); }
         inline void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
         }
@@ -350,6 +344,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       this->SafeBack(GeometricalSolidType::kSphere).sphere_outer_radius = r;
     }
 
+    inline void SetGeomCylinderInnerRadius(double r) {
+      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
+    }
     inline void SetGeomCylinderInnerRadius(double r) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
     }
