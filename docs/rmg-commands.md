@@ -738,11 +738,7 @@ Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 
 Force production cuts to be used for all processes.
 
-* **Parameter** – `arg0`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-  * **Candidates** – `0 1`
-* **Allowed states** – `PreInit`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Processes/Stepping/`
 

@@ -120,6 +120,7 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G
   return hit_coll;
 }
 
+
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   // exit fast if no threshold is configured.
   if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
@@ -146,8 +147,105 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   return false;
 }
 
+RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
+    std::vector<RMGGermaniumDetectorHit*> hits) {
+
+  auto hit = new RMGGermaniumDetectorHit();
+
+  if (hits.empty()) {
+    RMGLog::OutDev(RMGLog::error, "Cannot average empty set of hits");
+    return nullptr;
+  }
+
+  hit->energy_deposition = 0;
+  for (auto hit_tmp : hits) hit->energy_deposition += hit_tmp->energy_deposition;
+
+  // by construction the particle type, detuid and track id should all be the same
+  hit->detector_uid = hits.front()->detector_uid;
+  hit->particle_type = hits.front()->particle_type;
+  hit->track_id = hits.front()->track_id;
+  hit->parent_track_id = hits.front()->parent_track_id;
+
+  // time from first hit
+  hit->global_time = hits.front()->global_time;
+
+  // positions from first and last step
+  hit->global_position_prestep = hits.front()->global_position_prestep;
+  hit->global_position_poststep = hits.back()->global_position_poststep;
+
+  // issue: this could be outside the volume!
+  hit->global_position_average = (hit->global_position_prestep + hit->global_position_poststep) / 2.;
+
+  hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
+  hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
+
+  // what to do about the average??
+  return hit;
+}
+
+RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
+    const RMGGermaniumDetectorHitsCollection* hits) {
+
+  // create a container for the output hits
+  auto out = new RMGGermaniumDetectorHitsCollection();
+
+  std::vector<std::vector<RMGGermaniumDetectorHit*>> hits_vector;
+
+  // keep track of the current cluster
+  RMGGermaniumDetectorHit* prev_hit = nullptr;
+
+  for (auto hit : *hits->GetVector()) {
+
+    if (!hit) continue;
+
+    // within track clustering
+    bool start_new_cluster =
+        (prev_hit == nullptr) or (hit->track_id != prev_hit->track_id) or
+        (hit->detector_uid != prev_hit->detector_uid) or
+        (std::abs(hit->global_time - prev_hit->global_time) > fClusterTimeThreshold) or
+        ((hit->global_position_prestep - prev_hit->global_position_prestep).mag() > fClusterDistance);
+
+    // add the hit to the correct vector
+    if (start_new_cluster) {
+      hits_vector.push_back(std::vector<RMGGermaniumDetectorHit*>());
+      hits_vector.back().push_back(hit);
+      prev_hit = hit;
+    } else {
+      hits_vector.back().push_back(hit);
+    }
+  }
+
+  // average the hits
+  int index = 0;
+  for (const auto& value : hits_vector) {
+
+    // average the hit and insert into the collection
+    auto averaged_hit = AverageHits(value);
+    out->insert(averaged_hit);
+
+    // print hits in each cluster
+    RMGLog::Out(RMGLog::debug, "Cluster ", index);
+    for (const auto& hit_tmp : value) { hit_tmp->Print(); }
+
+    // print the averaged hit
+    RMGLog::Out(RMGLog::debug, "Averaged hit :");
+    averaged_hit->Print();
+
+    index++;
+  }
+
+
+  return out;
+}
+
+
 void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
+
+  // get the hit collection - with preclustering if requested
   auto hit_coll = GetHitColl(event);
+
+  if (fPreClusterHits) hit_coll = PreClusterHits(hit_coll);
+
   if (!hit_coll) return;
 
   if (hit_coll->entries() <= 0) {
@@ -165,8 +263,6 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
     for (auto hit : *hit_coll->GetVector()) {
 
       if (!hit or (hit->energy_deposition == 0 and this->fDiscardZeroEnergyHits)) continue;
-
-      hit->Print();
 
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 

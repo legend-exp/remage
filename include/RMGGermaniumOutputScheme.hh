@@ -72,6 +72,15 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
      */
     bool ShouldDiscardEvent(const G4Event* event) override;
 
+    /** @brief Perform a basic reduction of the hits collection removing very short steps.
+     */
+    RMGGermaniumDetectorHitsCollection* PreClusterHits(
+        const RMGGermaniumDetectorHitsCollection* hits);
+
+    /** @brief Average a cluster of hits to produce one effective hit */
+    RMGGermaniumDetectorHit* AverageHits(std::vector<RMGGermaniumDetectorHit*> hits);
+
+
     /** @brief Wraps @c G4UserStackingAction::StackingActionNewStage
      *  @details discard all waiting events, if @c ShouldDiscardEvent() is true.
      */
@@ -118,6 +127,12 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionPosition = false;
 
     bool fStoreTrackID = false;
+    bool fPreClusterHits = true;
+
+    // clustering pars
+
+    double fClusterTimeThreshold = 10 * CLHEP::us;
+    double fClusterDistance = 10 * CLHEP::um;
 
     PositionMode fPositionMode = PositionMode::kAverage;
 };

@@ -46,7 +46,7 @@ void RMGGermaniumDetectorHit::Print() {
       " / Particle: ", this->particle_type,
       " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
       " / Position (prestep): ", this->global_position_prestep / CLHEP::m, " m",
-      " / Time: ", this->global_time / CLHEP::ns, " ns");
+      " / Time: ", this->global_time / CLHEP::ns, " ns", " / trackid ", this->track_id);
 }
 
 void RMGGermaniumDetectorHit::Draw() {
