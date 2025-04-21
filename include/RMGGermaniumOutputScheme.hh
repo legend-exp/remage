@@ -104,6 +104,18 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     /** @brief Set which position is used for the steps */
     inline void SetPositionMode(PositionMode mode) { fPositionMode = mode; }
 
+    /** @brief Set a distance to compute together steps in the bulk. */
+    inline void SetClusterDistance(double threshold) { fClusterDistance = threshold; }
+
+    /** @brief Set a distance to compute together steps in the surface */
+    inline void SetClusterDistanceSurface(double threshold) { fClusterDistanceSurface = threshold; }
+
+    /** @brief Set the thickness of the surface region. */
+    inline void SetSurfaceThickness(double thickness) { fSurfaceThickness = thickness; }
+
+    /** @brief Set the time threshold for pre-clustering. */
+    inline void SetClusterTimeThreshold(double threshold) { fClusterTimeThreshold = threshold; }
+
   protected:
 
     [[nodiscard]] inline std::string GetNtuplenameFlat() const override { return "germanium"; }
@@ -130,10 +142,12 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fPreClusterHits = true;
 
     // clustering pars
-
     double fClusterTimeThreshold = 10 * CLHEP::us;
     double fClusterDistance = 10 * CLHEP::um;
+    double fClusterDistanceSurface = 1 * CLHEP::um;
+    double fSurfaceThickness = 2 * CLHEP::mm;
 
+    // mode of position to store
     PositionMode fPositionMode = PositionMode::kAverage;
 };
 

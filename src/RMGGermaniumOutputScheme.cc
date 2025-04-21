@@ -194,7 +194,7 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
   std::vector<std::vector<RMGGermaniumDetectorHit*>> hits_vector;
 
   // keep track of the current cluster
-  RMGGermaniumDetectorHit* prev_hit = nullptr;
+  RMGGermaniumDetectorHit* cluster_first_hit = nullptr;
 
   for (auto hit : *hits->GetVector()) {
 
@@ -202,16 +202,32 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
 
     // within track clustering
     bool start_new_cluster =
-        (prev_hit == nullptr) or (hit->track_id != prev_hit->track_id) or
-        (hit->detector_uid != prev_hit->detector_uid) or
-        (std::abs(hit->global_time - prev_hit->global_time) > fClusterTimeThreshold) or
-        ((hit->global_position_prestep - prev_hit->global_position_prestep).mag() > fClusterDistance);
+        (cluster_first_hit == nullptr) or (hit->track_id != cluster_first_hit->track_id) or
+        (hit->detector_uid != cluster_first_hit->detector_uid) or
+        (std::abs(hit->global_time - cluster_first_hit->global_time) > fClusterTimeThreshold);
+
+    // check distances
+    if (!start_new_cluster) {
+      bool is_surface = hit->distance_to_surface_average < fSurfaceThickness;
+      bool is_surface_first_hit = cluster_first_hit->distance_to_surface_average < fSurfaceThickness;
+
+      // start a new cluster if the previous step was in the surface and the new is in the bulk
+      bool surface_transition = (is_surface != is_surface_first_hit);
+
+      // get the right distance to pre-cluster
+      double threshold = is_surface ? fClusterDistanceSurface : fClusterDistance;
+
+      start_new_cluster =
+          surface_transition ||
+          (hit->global_position_average - cluster_first_hit->global_position_average).mag() >
+              threshold;
+    }
 
     // add the hit to the correct vector
     if (start_new_cluster) {
       hits_vector.push_back(std::vector<RMGGermaniumDetectorHit*>());
       hits_vector.back().push_back(hit);
-      prev_hit = hit;
+      cluster_first_hit = hit;
     } else {
       hits_vector.back().push_back(hit);
     }
@@ -266,6 +282,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
       if (!hit or (hit->energy_deposition == 0 and this->fDiscardZeroEnergyHits)) continue;
 
+      hit->Print();
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
@@ -394,6 +411,27 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessenger->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
+          &RMGGermaniumOutputScheme::SetClusterDistance)
+      .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+  fMessenger
+      ->DeclareMethodWithUnit("SetPreClusterDistanceSurface", "um",
+          &RMGGermaniumOutputScheme::SetClusterDistanceSurface)
+      .SetGuidance("Set a distance threshold for the surface pre-clustering.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetSurfaceThickness", "mm",
+          &RMGGermaniumOutputScheme::SetSurfaceThickness)
+      .SetGuidance("Set a surface thickness for the Germanium detector.")
+      .SetParameterName("thickness", false)
       .SetStates(G4State_Idle);
 
   fMessenger

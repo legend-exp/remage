@@ -188,9 +188,9 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->parent_track_id = step->GetTrack()->GetParentID();
 
   // get various distances
-  hit->distance_to_surface_prestep = DistanceToSurface(hit->physical_volume, position_prestep);
-  hit->distance_to_surface_poststep = DistanceToSurface(hit->physical_volume, position_poststep);
-  hit->distance_to_surface_average = DistanceToSurface(hit->physical_volume, position_average);
+  hit->distance_to_surface_prestep = DistanceToSurface(pv, position_prestep);
+  hit->distance_to_surface_poststep = DistanceToSurface(pv, position_poststep);
+  hit->distance_to_surface_average = DistanceToSurface(pv, position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
