@@ -61,6 +61,8 @@ class RMGGermaniumDetectorHit : public G4VHit {
     double global_time = -1;
     int track_id = -1;
     int parent_track_id = -1;
+
+    G4VPhysicalVolume* physical_volume = nullptr;
 };
 
 using RMGGermaniumDetectorHitsCollection = G4THitsCollection<RMGGermaniumDetectorHit>;
@@ -95,7 +97,7 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
      * @param pv The physical volume to find the distance to.
      * @param position The position to evaluate the distance for.
      */
-    double DistanceToSurface(const G4VPhysicalVolume* pv, const G4ThreeVector& position);
+    static double DistanceToSurface(const G4VPhysicalVolume* pv, const G4ThreeVector& position);
 
     /** @brief Check if the step point is contained in a physical volume registered as a Germanium detector.
      *

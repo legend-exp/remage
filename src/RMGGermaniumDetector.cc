@@ -152,14 +152,14 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto position_poststep = poststep->GetPosition();
   const auto position_average = (position_prestep + position_poststep) / 2.;
 
-  // check containment of pre and post-step point
+  // check containment of prestep point
   auto prestep_inside = this->CheckStepPointContainment(prestep);
-  // auto poststep_inside = this->CheckStepPointContainment(poststep);
 
   if (not prestep_inside) return false;
 
   // retrieve unique id for persistency, take from the prestep
   const auto pv = prestep->GetTouchableHandle()->GetVolume();
+
   auto pv_name = pv->GetName();
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
@@ -170,6 +170,10 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   // create a new hit and fill it
   auto* hit = new RMGGermaniumDetectorHit();
+
+  // pointer to the physical volume
+  hit->physical_volume = pv;
+
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
@@ -184,9 +188,9 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->parent_track_id = step->GetTrack()->GetParentID();
 
   // get various distances
-  hit->distance_to_surface_prestep = DistanceToSurface(pv, position_prestep);
-  hit->distance_to_surface_poststep = DistanceToSurface(pv, position_poststep);
-  hit->distance_to_surface_average = DistanceToSurface(pv, position_average);
+  hit->distance_to_surface_prestep = DistanceToSurface(hit->physical_volume, position_prestep);
+  hit->distance_to_surface_poststep = DistanceToSurface(hit->physical_volume, position_poststep);
+  hit->distance_to_surface_average = DistanceToSurface(hit->physical_volume, position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);

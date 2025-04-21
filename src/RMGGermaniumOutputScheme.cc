@@ -178,8 +178,10 @@ RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
 
   hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
   hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
+  hit->distance_to_surface_average =
+      RMGGermaniumDetector::DistanceToSurface(hits.back()->physical_volume,
+          hit->global_position_average);
 
-  // what to do about the average??
   return hit;
 }
 
