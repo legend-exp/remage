@@ -1,3 +1,5 @@
+(manual-generators)=
+
 # Event generators
 
 :::{todo}

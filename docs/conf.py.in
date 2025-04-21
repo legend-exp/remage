@@ -43,7 +43,7 @@ exhale_args = {
 
 breathe_projects = {}
 
-myst_enable_extensions = ["colon_fence", "substitution", "attrs_block"]
+myst_enable_extensions = ["colon_fence", "substitution", "attrs_block", "deflist", "dollarmath"]
 myst_heading_anchors = 3
 
 intersphinx_mapping = {
