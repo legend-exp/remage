@@ -8,6 +8,7 @@ set(PYTHON_SOURCES
     ${_r}/pyproject.toml
     ${_r}/cmake/cpp_config.py.in
     ${_r}/python/remage/__init__.py
+    ${_r}/python/remage/find_remage.py
     ${_r}/python/remage/cli.py
     ${_r}/python/remage/ipc.py)
 # cmake-format: on
@@ -69,8 +70,9 @@ add_custom_command(
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND ${VENV_DIR}/bin/python -m uv pip -q install --reinstall ${_pkg_install}
+  COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND printf -- "-- Installed python wrapper "
-  COMMAND bash -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
+  COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
   DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
   COMMENT "Installing remage Python wrapper into the virtual environment")
 
@@ -106,6 +108,7 @@ add_custom_command(
           ${CMAKE_INSTALL_PREFIX}/share
   COMMAND mv ${CMAKE_INSTALL_PREFIX}/share/remage-*-py3-none-any.whl
           ${CMAKE_INSTALL_PREFIX}/share/remage-py3-none-any.whl
+  COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   # we want to use the cpp_config for the install area
   DEPENDS ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
   WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
