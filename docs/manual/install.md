@@ -101,8 +101,7 @@ output_path = path + "output.lh5"
 
 start = time.time()
 result = subprocess.run(
-    f"remage {macro_path} -g {gdml_path} -o {output_path} -w -t 1",
-    shell=True
+    f"remage {macro_path} -g {gdml_path} -o {output_path} -w -t 1", shell=True
 )
 # Check if remage encountered errors. Exit code 0 means everything worked fine. Exit code 2 are only Warnings.
 if result.returncode not in {0, 2}:
