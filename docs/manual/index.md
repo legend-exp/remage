@@ -12,4 +12,5 @@ generators.md
 input.md
 output.md
 visualization.md
+jupyter.md
 :::
