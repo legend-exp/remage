@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_PARTICLE_FILTER_OUTPUT_SCHEME_HH_
-#define _RMG_PARTICLE_FILTER_OUTPUT_SCHEME_HH_
+#ifndef _RMG_PARTICLE_FILTER_SCHEME_HH_
+#define _RMG_PARTICLE_FILTER_SCHEME_HH_
 
 #include <optional>
 #include <set>
@@ -33,11 +33,11 @@
  *  Also does nothing if no particle is specified. If no volume is specified the filter
  *  is applied to all volumes.
  */
-class RMGParticleFilterOutputScheme : public RMGVOutputScheme {
+class RMGParticleFilterScheme : public RMGVOutputScheme {
 
   public:
 
-    RMGParticleFilterOutputScheme();
+    RMGParticleFilterScheme();
 
     /** @brief Wraps @c G4UserStackingAction::StackingActionClassify
      *  @details This is used to classify all specified particles as @c fKill if

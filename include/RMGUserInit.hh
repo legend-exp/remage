@@ -26,9 +26,9 @@
 #include "G4UserSteppingAction.hh"
 #include "G4UserTrackingAction.hh"
 
-#include "RMGIsotopeFilterOutputScheme.hh"
+#include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
-#include "RMGParticleFilterOutputScheme.hh"
+#include "RMGParticleFilterScheme.hh"
 #include "RMGTrackOutputScheme.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
@@ -76,8 +76,8 @@ class RMGUserInit {
 
     // default output schemes
     inline void RegisterDefaultOptionalOutputSchemes() {
-      AddOptionalOutputScheme<RMGIsotopeFilterOutputScheme>("IsotopeFilter");
-      AddOptionalOutputScheme<RMGParticleFilterOutputScheme>("ParticleFilter");
+      AddOptionalOutputScheme<RMGIsotopeFilterScheme>("IsotopeFilter");
+      AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
       AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
     }
 
