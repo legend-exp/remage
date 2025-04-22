@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_ISOTOPE_FILTER_OUTPUT_SCHEME_HH_
-#define _RMG_ISOTOPE_FILTER_OUTPUT_SCHEME_HH_
+#ifndef _RMG_ISOTOPE_FILTER_SCHEME_HH_
+#define _RMG_ISOTOPE_FILTER_SCHEME_HH_
 
 #include <optional>
 #include <set>
@@ -34,11 +34,11 @@ class RMGIsotopeFilterEventInformation : public G4VUserEventInformation {
 };
 
 class G4Event;
-class RMGIsotopeFilterOutputScheme : public RMGVOutputScheme {
+class RMGIsotopeFilterScheme : public RMGVOutputScheme {
 
   public:
 
-    RMGIsotopeFilterOutputScheme();
+    RMGIsotopeFilterScheme();
 
     bool ShouldDiscardEvent(const G4Event*) override;
     std::optional<bool> StackingActionNewStage(int) override;

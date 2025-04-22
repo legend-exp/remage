@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "RMGIsotopeFilterOutputScheme.hh"
+#include "RMGIsotopeFilterScheme.hh"
 
 #include <set>
 
@@ -23,9 +23,9 @@
 
 #include "RMGLog.hh"
 
-RMGIsotopeFilterOutputScheme::RMGIsotopeFilterOutputScheme() { this->DefineCommands(); }
+RMGIsotopeFilterScheme::RMGIsotopeFilterScheme() { this->DefineCommands(); }
 
-void RMGIsotopeFilterOutputScheme::TrackingActionPre(const G4Track* aTrack) {
+void RMGIsotopeFilterScheme::TrackingActionPre(const G4Track* aTrack) {
   const auto particle = aTrack->GetParticleDefinition();
   if (!particle->IsGeneralIon()) return;
   const int z = particle->GetAtomicNumber();
@@ -45,7 +45,7 @@ void RMGIsotopeFilterOutputScheme::TrackingActionPre(const G4Track* aTrack) {
 }
 
 // invoked in RMGEventAction::EndOfEventAction()
-bool RMGIsotopeFilterOutputScheme::ShouldDiscardEvent(const G4Event* event) {
+bool RMGIsotopeFilterScheme::ShouldDiscardEvent(const G4Event* event) {
   // exit fast if no threshold is configured.
   if (fIsotopes.empty()) return false;
 
@@ -59,8 +59,8 @@ bool RMGIsotopeFilterOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   return info == nullptr;
 }
 
-std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterOutputScheme::
-    StackingActionClassify(const G4Track* aTrack, int stage) {
+std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterScheme::StackingActionClassify(const G4Track* aTrack,
+    int stage) {
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
 
@@ -71,7 +71,7 @@ std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterOutputScheme::
   return std::nullopt;
 }
 
-std::optional<bool> RMGIsotopeFilterOutputScheme::StackingActionNewStage(const int stage) {
+std::optional<bool> RMGIsotopeFilterScheme::StackingActionNewStage(const int stage) {
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
   // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
@@ -83,12 +83,12 @@ std::optional<bool> RMGIsotopeFilterOutputScheme::StackingActionNewStage(const i
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
-void RMGIsotopeFilterOutputScheme::DefineCommands() {
+void RMGIsotopeFilterScheme::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/IsotopeFilter/",
       "Commands for filtering event out by created isotopes.");
 
-  fMessenger->DeclareMethod("AddIsotope", &RMGIsotopeFilterOutputScheme::AddIsotope)
+  fMessenger->DeclareMethod("AddIsotope", &RMGIsotopeFilterScheme::AddIsotope)
       .SetGuidance("Add an isotope to the list. Only events that have a track with this isotope at "
                    "any point in time will be persisted.")
       .SetParameterName(0, "A", false, false)

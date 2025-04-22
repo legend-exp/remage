@@ -27,11 +27,11 @@
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
-#include "RMGIsotopeFilterOutputScheme.hh"
+#include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGOpticalOutputScheme.hh"
-#include "RMGParticleFilterOutputScheme.hh"
+#include "RMGParticleFilterScheme.hh"
 #include "RMGScintillatorOutputScheme.hh"
 #include "RMGTrackOutputScheme.hh"
 #include "RMGVOutputScheme.hh"
@@ -51,9 +51,9 @@ void init_extra() {
   new RMGOpticalOutputScheme();
   new RMGVertexOutputScheme();
   new RMGScintillatorOutputScheme();
-  new RMGIsotopeFilterOutputScheme();
+  new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
-  new RMGParticleFilterOutputScheme();
+  new RMGParticleFilterScheme();
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "RMGParticleFilterOutputScheme.hh"
+#include "RMGParticleFilterScheme.hh"
 
 #include <set>
 
@@ -22,9 +22,9 @@
 
 #include "RMGLog.hh"
 
-RMGParticleFilterOutputScheme::RMGParticleFilterOutputScheme() { this->DefineCommands(); }
+RMGParticleFilterScheme::RMGParticleFilterScheme() { this->DefineCommands(); }
 
-void RMGParticleFilterOutputScheme::AddKeepVolume(std::string name) {
+void RMGParticleFilterScheme::AddKeepVolume(std::string name) {
   if (!fKillVolumes.empty()) {
     RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
                                   "Trying to assign keep-volume but a kill-volume already exists.");
@@ -33,7 +33,7 @@ void RMGParticleFilterOutputScheme::AddKeepVolume(std::string name) {
   fKeepVolumes.insert(name);
 }
 
-void RMGParticleFilterOutputScheme::AddKillVolume(std::string name) {
+void RMGParticleFilterScheme::AddKillVolume(std::string name) {
   if (!fKeepVolumes.empty()) {
     RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
                                   "Trying to assign kill-volume but a keep-volume already exists.");
@@ -42,8 +42,8 @@ void RMGParticleFilterOutputScheme::AddKillVolume(std::string name) {
   fKillVolumes.insert(name);
 }
 
-std::optional<G4ClassificationOfNewTrack> RMGParticleFilterOutputScheme::
-    StackingActionClassify(const G4Track* aTrack, int) {
+std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActionClassify(const G4Track* aTrack,
+    int) {
 
   const int pdg = aTrack->GetDefinition()->GetPDGEncoding();
   // If the particle is not marked to kill, let it go
@@ -73,28 +73,28 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterOutputScheme::
   // iii) Particle is not in the keep volume.
   // iiii) Particle is not the primary particle.
   RMGLog::OutDev(RMGLog::debug, "Filtering out particle with PDG code ", pdg,
-      " in RMGParticleFilterOutputScheme");
+      " in RMGParticleFilterScheme");
   return fKill;
 }
 
-void RMGParticleFilterOutputScheme::DefineCommands() {
+void RMGParticleFilterScheme::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/ParticleFilter/",
       "Commands for filtering particles out by PDG encoding.");
 
-  fMessenger->DeclareMethod("AddParticle", &RMGParticleFilterOutputScheme::AddParticle)
+  fMessenger->DeclareMethod("AddParticle", &RMGParticleFilterScheme::AddParticle)
       .SetGuidance("Add a particle to be filtered out by its PDG code. User is responsible for "
                    "correct PDG code.")
       .SetParameterName(0, "PDGcode", false, false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("AddKeepVolume", &RMGParticleFilterOutputScheme::AddKeepVolume)
+  fMessenger->DeclareMethod("AddKeepVolume", &RMGParticleFilterScheme::AddKeepVolume)
       .SetGuidance("Add a physical volume by name in which all specified Particles will be kept. "
                    "They will be killed everywhere else. Can NOT be mixed with KillVolumes.")
       .SetParameterName(0, "PhysicalVolumeName", false, false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("AddKillVolume", &RMGParticleFilterOutputScheme::AddKillVolume)
+  fMessenger->DeclareMethod("AddKillVolume", &RMGParticleFilterScheme::AddKillVolume)
       .SetGuidance("Add a physical volume by name in which all specified Particles will be killed. "
                    "They will only be killed in this volume. Can NOT be mixed with KeepVolumes.")
       .SetParameterName(0, "PhysicalVolumeName", false, false)

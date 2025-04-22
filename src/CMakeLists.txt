@@ -17,7 +17,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGermaniumDetector.hh
     ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGGrabmayrGCReader.hh
-    ${_root}/include/RMGIsotopeFilterOutputScheme.hh
+    ${_root}/include/RMGIsotopeFilterScheme.hh
     ${_root}/include/RMGIpc.hh
     ${_root}/include/RMGLog.hh
     ${_root}/include/RMGManager.hh
@@ -27,7 +27,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalDetector.hh
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
-    ${_root}/include/RMGParticleFilterOutputScheme.hh
+    ${_root}/include/RMGParticleFilterScheme.hh
     ${_root}/include/RMGPhysics.hh
     ${_root}/include/RMGRunAction.hh
     ${_root}/include/RMGRun.hh
@@ -62,7 +62,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
     ${_root}/src/RMGIpc.cc
-    ${_root}/src/RMGIsotopeFilterOutputScheme.cc
+    ${_root}/src/RMGIsotopeFilterScheme.cc
     ${_root}/src/RMGLog.cc
     ${_root}/src/RMGManager.cc
     ${_root}/src/RMGMasterGenerator.cc
@@ -71,7 +71,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGOpticalDetector.cc
     ${_root}/src/RMGOpticalOutputScheme.cc
     ${_root}/src/RMGOpWLSProcess.cc
-    ${_root}/src/RMGParticleFilterOutputScheme.cc
+    ${_root}/src/RMGParticleFilterScheme.cc
     ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGScintillatorDetector.cc
