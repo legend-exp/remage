@@ -13,7 +13,7 @@ from pathlib import Path
 
 import colorlog
 
-from .cpp_config import REMAGE_CPP_EXE_PATH
+from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 
 log = logging.getLogger(__name__)
@@ -21,8 +21,11 @@ log = logging.getLogger(__name__)
 
 def _run_remage_cpp(
     args: list[str] | None = None,
+    is_cli: bool = False,
 ) -> tuple[int, signal.Signals, IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
+
+    remage_exe = find_remage_cpp()
 
     # open pipe for IPC C++ -> python.
     pipe_r, pipe_w = os.pipe()
@@ -30,22 +33,24 @@ def _run_remage_cpp(
     os.set_inheritable(pipe_w, True)
 
     if args is None:
-        # reuse our own argv[0] to have helpful help messages.
-        # but is is expanded (by the kernel?), so find out if we are in $PATH.
         argv = list(sys.argv)
         exe_name = Path(argv[0]).name
-        if shutil.which(exe_name) == sys.argv[0]:
-            argv[0] = exe_name
     else:
-        argv = [REMAGE_CPP_EXE_PATH, *args]
+        argv = [remage_exe, *args]
+        exe_name = Path(sys.argv[0]).name if is_cli else None
 
-    if "--pipe-fd" in argv[1:]:
-        msg = "cannot pass --pipe-fd"
+    if exe_name is not None and shutil.which(exe_name) == sys.argv[0]:
+        # reuse our own argv[0] to have helpful help messages.
+        # but is is expanded (by the kernel?), so find out if we are in $PATH.
+        argv[0] = exe_name
+
+    if any("--pipe-fd" in av for av in argv[1:]):
+        msg = "cannot pass internal argument --pipe-fd"
         raise RuntimeError(msg)
 
     proc = subprocess.Popen(
-        [argv[0], "--pipe-fd", str(pipe_w), *argv[1:]],
-        executable=REMAGE_CPP_EXE_PATH,
+        [argv[0], f"--pipe-fd={pipe_w}", *argv[1:]],
+        executable=remage_exe,
         pass_fds=(pipe_w,),
     )
 
@@ -217,7 +222,7 @@ def remage_run_from_args(
     """
     logger = _setup_log()
 
-    ec, termsig, ipc_info = _run_remage_cpp(args)
+    ec, termsig, ipc_info = _run_remage_cpp(args, is_cli=args is None)
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
         log.error(

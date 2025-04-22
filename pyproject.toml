@@ -78,11 +78,14 @@ Changelog = "https://github.com/legend-exp/remage/releases"
 version.source = "vcs"
 build.hooks.vcs.version-file = "python/remage/_version.py"
 
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = ["python/**/*"]
+exclude = ["python/CMakeLists.txt"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["python/remage"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"python/remage/cpp_config.py" = "remage/cpp_config.py"
+ignore-vcs = true
 
 [tool.hatch.envs.default]
 features = ["test"]
