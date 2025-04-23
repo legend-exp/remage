@@ -191,6 +191,8 @@ RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
 std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::CombineLowEnergyElectronTracks(
     std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map) {
 
+  RMGLog::Out(RMGLog::debug, "Merging low energy electron tracks ");
+
 
   // for tracks below an energy threshold look for a close neighbour to merge it with
   // only done for e-.
@@ -217,6 +219,12 @@ std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::C
     for (const auto& [second_trackid, second_input_hits] : hits_map) {
       if (second_trackid == trackid) continue;
 
+      // only cluster into high energy tracks
+      energy = 0;
+      for (auto hit : second_input_hits) { energy += hit->energy_deposition; }
+
+      if (energy < fTrackEnergyThreshold) continue;
+
       // compute distance between the first step of this track and that of the
       // other track.
       if ((input_hits.front()->global_position_prestep -
@@ -231,6 +239,8 @@ std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::C
             output_hits[trackid].begin(), output_hits[trackid].end());
 
         output_hits.erase(trackid);
+        RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
+
         break;
       }
     }
@@ -381,12 +391,14 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       G4ThreeVector position;
       double distance = 0;
 
-      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
+      // all gamma interactions are discrete at the post-step
+      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep or
+          hit->particle_type == 22) {
         position = hit->global_position_prestep;
         distance = hit->distance_to_surface_prestep;
-      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep) {
-        position = hit->global_position_poststep;
-        distance = hit->distance_to_surface_poststep;
+      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
+        position = hit->global_position_prestep;
+        distance = hit->distance_to_surface_prestep;
       } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kAverage or
                  fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
 
@@ -411,8 +423,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
 
         // save post-step
-        position = hit->global_position_poststep;
-        distance = hit->distance_to_surface_poststep;
+        position = hit->global_position_prestep;
+        distance = hit->distance_to_surface_prestep;
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
             fStoreSinglePrecisionPosition);
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
@@ -423,8 +435,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
             fStoreSinglePrecisionPosition);
 
         // save avg
-        position = hit->global_position_average;
-        distance = hit->distance_to_surface_average;
+        position = hit->global_position_poststep;
+        distance = hit->distance_to_surface_poststep;
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
             fStoreSinglePrecisionPosition);
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,

@@ -182,8 +182,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionPosition = false;
 
     bool fStoreTrackID = false;
-    bool fPreClusterHits = true;
-    bool fCombineLowEnergyTracks = true;
+    bool fPreClusterHits = false;
+    bool fCombineLowEnergyTracks = false;
 
     // clustering pars
     double fClusterTimeThreshold = 10 * CLHEP::us;
