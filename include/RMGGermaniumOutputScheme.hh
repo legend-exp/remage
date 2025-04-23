@@ -112,7 +112,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
      *  If a track is below a certain threshold then the code searches through the
      * other tracks to see if there is one where the first pre-step point is
      * within the cluster distance of this track. If so they are combined for further
-     * pre-clustering.
+     * pre-clustering. In the case multiple nearby tracks are found the highest
+     * energy one is used.
      *
      * @returns A map of steps after combining low energy tracks.
      */

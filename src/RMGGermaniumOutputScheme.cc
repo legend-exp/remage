@@ -216,6 +216,10 @@ std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::C
                            : fClusterDistance;
 
     // now search for another track to merge it with
+    int cluster_trackid = -1;
+    float cluster_energy = 0;
+
+    // loop over secondary tracks
     for (const auto& [second_trackid, second_input_hits] : hits_map) {
       if (second_trackid == trackid) continue;
 
@@ -223,26 +227,29 @@ std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::C
       energy = 0;
       for (auto hit : second_input_hits) { energy += hit->energy_deposition; }
 
-      if (energy < fTrackEnergyThreshold) continue;
 
       // compute distance between the first step of this track and that of the
       // other track.
-      if ((input_hits.front()->global_position_prestep -
-              second_input_hits.front()->global_position_prestep)
-              .mag() < threshold) {
+      if (energy > cluster_energy && (input_hits.front()->global_position_prestep -
+                                         second_input_hits.front()->global_position_prestep)
+                                             .mag() < threshold) {
 
-        // change all the track-ids
-        for (auto hit : output_hits[trackid]) { hit->track_id = second_trackid; }
-
-        // add these elements to the start of the second track
-        output_hits[second_trackid].insert(output_hits[second_trackid].begin(),
-            output_hits[trackid].begin(), output_hits[trackid].end());
-
-        output_hits.erase(trackid);
-        RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
-
-        break;
+        cluster_energy = energy;
+        cluster_trackid = second_trackid;
       }
+    }
+
+    if (cluster_trackid != -1) {
+
+      // change all the track-ids
+      for (auto hit : output_hits[trackid]) { hit->track_id = cluster_trackid; }
+
+      // add these elements to the start of the second track
+      output_hits[cluster_trackid].insert(output_hits[cluster_trackid].begin(),
+          output_hits[trackid].begin(), output_hits[trackid].end());
+
+      output_hits.erase(trackid);
+      RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
     }
   }
   return output_hits;
