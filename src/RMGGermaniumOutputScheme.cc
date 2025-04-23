@@ -169,13 +169,16 @@ RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
   // time from first hit
   hit->global_time = hits.front()->global_time;
 
-  // positions from first and last step
+  // The cluster represents a list of consecutive steps, so we can
+  // take the pre and post step from the first and last hit in the cluster.
   hit->global_position_prestep = hits.front()->global_position_prestep;
   hit->global_position_poststep = hits.back()->global_position_poststep;
 
   // issue: this could be outside the volume!
   hit->global_position_average = (hit->global_position_prestep + hit->global_position_poststep) / 2.;
 
+  // compute the distance to the surface, for the pre/post step this is already done
+  // but a new calculation is needed for the average.
   hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
   hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
   hit->distance_to_surface_average =
@@ -188,50 +191,68 @@ RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
 RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
     const RMGGermaniumDetectorHitsCollection* hits) {
 
-  // create a container for the output hits
-  auto out = new RMGGermaniumDetectorHitsCollection();
+  // organise hits into a map based on trackid
+  std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map;
 
+  for (auto hit : *hits->GetVector()) hits_map[hit->track_id].push_back(hit);
+
+  // create a vector of clusters of hits
   std::vector<std::vector<RMGGermaniumDetectorHit*>> hits_vector;
 
   // keep track of the current cluster
   RMGGermaniumDetectorHit* cluster_first_hit = nullptr;
 
-  for (auto hit : *hits->GetVector()) {
+  // loop over trackid and then hits in each track
+  for (const auto& [trackid, input_hits] : hits_map) {
+    for (auto hit : input_hits) {
 
-    if (!hit) continue;
+      if (!hit) continue;
 
-    // within track clustering
-    bool start_new_cluster =
-        (cluster_first_hit == nullptr) or (hit->track_id != cluster_first_hit->track_id) or
-        (hit->detector_uid != cluster_first_hit->detector_uid) or
-        (std::abs(hit->global_time - cluster_first_hit->global_time) > fClusterTimeThreshold);
+      // within track clustering
 
-    // check distances
-    if (!start_new_cluster) {
-      bool is_surface = hit->distance_to_surface_average < fSurfaceThickness;
-      bool is_surface_first_hit = cluster_first_hit->distance_to_surface_average < fSurfaceThickness;
+      // if the hit is:
+      // - the first in a track
+      // - in a new detector (compared to the current cluster)
+      // - more than the time-threshold since the first hit of the cluster
+      // then we need to start a new cluster.
 
-      // start a new cluster if the previous step was in the surface and the new is in the bulk
-      bool surface_transition = (is_surface != is_surface_first_hit);
+      bool start_new_cluster =
+          (cluster_first_hit == nullptr) or (hit->track_id != cluster_first_hit->track_id) or
+          (hit->detector_uid != cluster_first_hit->detector_uid) or
+          (std::abs(hit->global_time - cluster_first_hit->global_time) > fClusterTimeThreshold);
 
-      // get the right distance to pre-cluster
-      double threshold = is_surface ? fClusterDistanceSurface : fClusterDistance;
+      // check distances and if the track moved from surface to bulk
+      if (!start_new_cluster) {
+        bool is_surface = hit->distance_to_surface_average < fSurfaceThickness;
+        bool is_surface_first_hit =
+            cluster_first_hit->distance_to_surface_average < fSurfaceThickness;
 
-      start_new_cluster =
-          surface_transition ||
-          (hit->global_position_average - cluster_first_hit->global_position_average).mag() >
-              threshold;
-    }
+        // start a new cluster if the previous step was in the surface and the new is in the bulk
+        bool surface_transition = (is_surface != is_surface_first_hit);
 
-    // add the hit to the correct vector
-    if (start_new_cluster) {
-      hits_vector.push_back(std::vector<RMGGermaniumDetectorHit*>());
-      hits_vector.back().push_back(hit);
-      cluster_first_hit = hit;
-    } else {
-      hits_vector.back().push_back(hit);
+        // get the right distance to pre-cluster
+        double threshold = is_surface ? fClusterDistanceSurface : fClusterDistance;
+
+        // start a new cluster also if the distance is above the threshold
+        start_new_cluster =
+            surface_transition ||
+            (hit->global_position_average - cluster_first_hit->global_position_average).mag() >
+                threshold;
+      }
+
+      // add the hit to the correct vector
+      if (start_new_cluster) {
+        hits_vector.push_back(std::vector<RMGGermaniumDetectorHit*>());
+        hits_vector.back().push_back(hit);
+        cluster_first_hit = hit;
+      } else {
+        hits_vector.back().push_back(hit);
+      }
     }
   }
+
+  // create a container for the output hits
+  auto out = new RMGGermaniumDetectorHitsCollection();
 
   // average the hits
   int index = 0;
