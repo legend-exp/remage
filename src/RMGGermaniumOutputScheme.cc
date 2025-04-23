@@ -188,6 +188,55 @@ RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
   return hit;
 }
 
+std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::CombineLowEnergyElectronTracks(
+    std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map) {
+
+
+  // for tracks below an energy threshold look for a close neighbour to merge it with
+  // only done for e-.
+  std::map<int, std::vector<RMGGermaniumDetectorHit*>> output_hits = hits_map;
+
+  for (const auto& [trackid, input_hits] : hits_map) {
+
+    // only apply to e-
+    if (input_hits.front()->particle_type != 11) continue;
+
+    // compute energy of each track
+    double energy = 0;
+    for (auto hit : input_hits) { energy += hit->energy_deposition; }
+
+    // continue for high energy tracks
+    if (energy > fTrackEnergyThreshold) continue;
+
+    // distance threshold to merge tracks
+    double threshold = (input_hits.front()->distance_to_surface_prestep) < fSurfaceThickness
+                           ? fClusterDistanceSurface
+                           : fClusterDistance;
+
+    // now search for another track to merge it with
+    for (const auto& [second_trackid, second_input_hits] : hits_map) {
+      if (second_trackid == trackid) continue;
+
+      // compute distance between the first step of this track and that of the
+      // other track.
+      if ((input_hits.front()->global_position_prestep -
+              second_input_hits.front()->global_position_prestep)
+              .mag() < threshold) {
+
+        // change all the track-ids
+        for (auto hit : output_hits[trackid]) { hit->track_id = second_trackid; }
+
+        // add these elements to the start of the second track
+        output_hits[second_trackid].insert(output_hits[second_trackid].begin(),
+            output_hits[trackid].begin(), output_hits[trackid].end());
+
+        output_hits.erase(trackid);
+        break;
+      }
+    }
+  }
+  return output_hits;
+}
 RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
     const RMGGermaniumDetectorHitsCollection* hits) {
 
@@ -195,6 +244,9 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
   std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map;
 
   for (auto hit : *hits->GetVector()) hits_map[hit->track_id].push_back(hit);
+
+  // if requested we can combine low energy tracks to reduce further file size
+  if (fCombineLowEnergyTracks) hits_map = CombineLowEnergyElectronTracks(hits_map);
 
   // create a vector of clusters of hits
   std::vector<std::vector<RMGGermaniumDetectorHit*>> hits_vector;
@@ -434,6 +486,13 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
+  fMessenger->DeclareProperty("PreClusterOutputs", fPreClusterHits)
+      .SetGuidance("Pre-Cluster output hits before saving")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("CombineLowEnergyElectronTracks", fCombineLowEnergyTracks)
+      .SetGuidance("Merge low energy electron tracks.")
+      .SetStates(G4State_Idle);
 
   fMessenger
       ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
@@ -449,10 +508,24 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger
+      ->DeclareMethodWithUnit("SetPreTimeThreshold", "us",
+          &RMGGermaniumOutputScheme::SetClusterTimeThreshold)
+      .SetGuidance("Set a time threshold for  pre-clustering.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
       ->DeclareMethodWithUnit("SetSurfaceThickness", "mm",
           &RMGGermaniumOutputScheme::SetSurfaceThickness)
       .SetGuidance("Set a surface thickness for the Germanium detector.")
       .SetParameterName("thickness", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetElectronTrackEnergyThreshold", "keV",
+          &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold)
+      .SetGuidance("Set a energy threshold for tracks to be merged.")
+      .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessenger

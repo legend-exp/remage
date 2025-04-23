@@ -206,16 +206,19 @@ Commands for controlling output from hits in germanium detectors.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
 * `SetPreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
+* `SetPreTimeThreshold * Set a time threshold for` – pre-clustering.
 * `SetSurfaceThickness` – Set a surface thickness for the Germanium detector.
+* `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
-* `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `StepPositionMode` – Select which position of the step to store
 
 ### `/RMG/Output/Germanium/EdepCutLow`
@@ -246,6 +249,24 @@ Set an upper energy cut that has to be met for this event to be stored.
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
+### `/RMG/Output/Germanium/PreClusterOutputs`
+
+Pre-Cluster output hits before saving
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/CombineLowEnergyElectronTracks`
+
+Merge low energy electron tracks.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
 ### `/RMG/Output/Germanium/SetPreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
@@ -274,6 +295,20 @@ Set a distance threshold for the surface pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
+### `/RMG/Output/Germanium/SetPreTimeThreshold`
+
+Set a time threshold for  pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `us`
+  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
+
 ### `/RMG/Output/Germanium/SetSurfaceThickness`
 
 Set a surface thickness for the Germanium detector.
@@ -286,6 +321,20 @@ Set a surface thickness for the Germanium detector.
   * **Omittable** – `True`
   * **Default value** – `mm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/SetElectronTrackEnergyThreshold`
+
+Set a energy threshold for tracks to be merged.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
