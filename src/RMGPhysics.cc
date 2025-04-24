@@ -113,10 +113,6 @@ void RMGPhysics::SetStoreICLevelData(bool store) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void RMGPhysics::SetEMApplyCutsAll() { G4EmParameters::Instance()->SetApplyCuts(true); }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::ConstructParticle() {
 
   RMGLog::Out(RMGLog::detail, "Constructing particles");
@@ -610,11 +606,6 @@ void RMGPhysics::DefineCommands() {
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
-
-
-  fMessenger->DeclareMethod("ForceProductionCutsEM", &RMGPhysics::SetEMApplyCutsAll)
-      .SetGuidance("Force production cuts to be used for all processes.")
-      .SetStates(G4State_PreInit, G4State_Idle);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab
