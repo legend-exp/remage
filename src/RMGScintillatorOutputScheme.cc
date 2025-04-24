@@ -31,7 +31,17 @@
 
 namespace u = CLHEP;
 
-RMGScintillatorOutputScheme::RMGScintillatorOutputScheme() { this->DefineCommands(); }
+RMGScintillatorOutputScheme::RMGScintillatorOutputScheme() {
+
+  this->DefineCommands();
+
+  // set default clustering parameters
+  fPreClusterPars.cluster_time_threshold = 10 * CLHEP::us;
+  fPreClusterPars.cluster_distance = 100 * CLHEP::um;
+  fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
+  fPreClusterPars.combine_low_energy_tracks = false;
+}
+
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
@@ -136,6 +146,11 @@ bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 // invoked in RMGEventAction::EndOfEventAction()
 void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
   auto hit_coll = GetHitColl(event);
+
+  // pre-cluster the hits if requested
+  if (fPreClusterHits)
+    hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, false, true);
+
   if (!hit_coll) return;
 
   if (hit_coll->entries() <= 0) {
@@ -219,6 +234,39 @@ void RMGScintillatorOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetStates(G4State_Idle);
+
+  // clustering pars
+
+  fMessenger->DeclareProperty("PreClusterOutputs", fPreClusterHits)
+      .SetGuidance("Pre-Cluster output hits before saving")
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
+      .SetGuidance("Merge low energy electron tracks.")
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
+          &RMGScintillatorOutputScheme::SetClusterDistance)
+      .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetPreTimeThreshold", "us",
+          &RMGScintillatorOutputScheme::SetClusterTimeThreshold)
+      .SetGuidance("Set a time threshold for  pre-clustering.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+
+  fMessenger
+      ->DeclareMethodWithUnit("SetElectronTrackEnergyThreshold", "keV",
+          &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold)
+      .SetGuidance("Set a energy threshold for tracks to be merged.")
+      .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
 

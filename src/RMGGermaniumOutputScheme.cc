@@ -166,7 +166,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   auto hit_coll = GetHitColl(event);
 
 
-  if (fPreClusterHits) hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars);
+  if (fPreClusterHits)
+    hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
 
   if (!hit_coll) return;
 

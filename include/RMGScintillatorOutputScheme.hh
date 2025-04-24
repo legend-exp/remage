@@ -23,6 +23,7 @@
 #include "G4GenericMessenger.hh"
 
 #include "RMGDetectorHit.hh"
+#include "RMGOutputTools.hh"
 #include "RMGScintillatorDetector.hh"
 #include "RMGVOutputScheme.hh"
 
@@ -40,6 +41,22 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
+
+    /** @brief Set a distance to compute together steps in the bulk. */
+    inline void SetClusterDistance(double threshold) {
+      fPreClusterPars.cluster_distance = threshold;
+    }
+
+
+    /** @brief Set the time threshold for pre-clustering. */
+    inline void SetClusterTimeThreshold(double threshold) {
+      fPreClusterPars.cluster_time_threshold = threshold;
+    }
+
+    /** @brief Set the energy threshold to merge electron tracks.*/
+    inline void SetElectronTrackEnergyThreshold(double threshold) {
+      fPreClusterPars.track_energy_threshold = threshold;
+    }
 
   protected:
 
@@ -59,6 +76,11 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
     bool fStoreTrackID = false;
+
+    bool fPreClusterHits = false;
+
+    /** @brief Parameters for pre-clustering. */
+    RMGOutputTools::ClusterPars fPreClusterPars;
 };
 
 #endif

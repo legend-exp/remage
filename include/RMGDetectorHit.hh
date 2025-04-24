@@ -82,7 +82,7 @@ class RMGDetectorHit : public G4VHit {
     double velocity_pre = -1;
     double velocity_post = -1;
 
-    G4Colour fDrawColour;
+    G4Colour fDrawColour = G4Colour(0, 0, 1);
 };
 
 using RMGDetectorHitsCollection = G4THitsCollection<RMGDetectorHit>;

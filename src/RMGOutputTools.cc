@@ -22,7 +22,8 @@
 #include "RMGDetectorHit.hh"
 #include "RMGLog.hh"
 
-RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits) {
+RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
+    bool compute_distance_to_surface, bool compute_velocity) {
 
   auto hit = new RMGDetectorHit();
 
@@ -53,17 +54,24 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits) 
 
   // compute the distance to the surface, for the pre/post step this is already done
   // but a new calculation is needed for the average.
-  hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
-  hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
-  hit->distance_to_surface_average =
-      distance_to_surface(hits.back()->physical_volume, hit->global_position_average);
+  if (compute_distance_to_surface) {
+    hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
+    hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
+    hit->distance_to_surface_average =
+        distance_to_surface(hits.back()->physical_volume, hit->global_position_average);
+  }
+  // prestep velocity from the first hit and poststep from the last
+  if (compute_velocity) {
+    hit->velocity_pre = hits.front()->velocity_pre;
+    hit->velocity_post = hits.back()->velocity_post;
+  }
 
   return hit;
 }
 
 std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
     combine_low_energy_tracks(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-        RMGOutputTools::ClusterPars cluster_pars
+        RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface
 
     ) {
 
@@ -88,9 +96,10 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
 
     // distance threshold to merge tracks
     double threshold =
-        (input_hits.front()->distance_to_surface_prestep) < cluster_pars.surface_thickness
-            ? cluster_pars.cluster_distance_surface
-            : cluster_pars.cluster_distance;
+        (not has_distance_to_surface) or
+                ((input_hits.front()->distance_to_surface_prestep) > cluster_pars.surface_thickness)
+            ? cluster_pars.cluster_distance
+            : cluster_pars.cluster_distance_surface;
 
     // now search for another track to merge it with
     int cluster_trackid = -1;
@@ -132,7 +141,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
   return output_hits;
 }
 RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHitsCollection* hits,
-    RMGOutputTools::ClusterPars cluster_pars) {
+    RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity) {
 
   // organise hits into a map based on trackid
   std::map<int, std::vector<RMGDetectorHit*>> hits_map;
@@ -141,7 +150,7 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
 
   // if requested we can combine low energy tracks to reduce further file size
   if (cluster_pars.combine_low_energy_tracks)
-    hits_map = combine_low_energy_tracks(hits_map, cluster_pars);
+    hits_map = combine_low_energy_tracks(hits_map, cluster_pars, has_distance_to_surface);
 
   // create a vector of clusters of hits
   std::vector<std::vector<RMGDetectorHit*>> hits_vector;
@@ -171,9 +180,11 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
 
       // check distances and if the track moved from surface to bulk
       if (!start_new_cluster) {
-        bool is_surface = hit->distance_to_surface_average < cluster_pars.surface_thickness;
+        bool is_surface = has_distance_to_surface and
+                          (hit->distance_to_surface_average < cluster_pars.surface_thickness);
         bool is_surface_first_hit =
-            cluster_first_hit->distance_to_surface_average < cluster_pars.surface_thickness;
+            has_distance_to_surface and
+            (cluster_first_hit->distance_to_surface_average < cluster_pars.surface_thickness);
 
         // start a new cluster if the previous step was in the surface and the new is in the bulk
         bool surface_transition = (is_surface != is_surface_first_hit);
@@ -208,7 +219,7 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   for (const auto& value : hits_vector) {
 
     // average the hit and insert into the collection
-    auto averaged_hit = average_hits(value);
+    auto averaged_hit = average_hits(value, has_distance_to_surface, has_velocity);
     out->insert(averaged_hit);
 
     // print hits in each cluster

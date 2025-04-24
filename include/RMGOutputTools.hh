@@ -47,29 +47,34 @@ namespace RMGOutputTools {
    * The steps in every track are looped through and combined into effective steps. A step is
    * added to the current cluster if:
    *
-   * - it does not move from the surface region (defined by the @c
-   * distance_to_surface<fSurfaceThickness) to the bulk or visa versa.
+   * - If the flag @c has_distance_to_surface is set. The step must not move from the surface region
+   * (defined by the @c distance_to_surface<fSurfaceThickness) to the bulk or visa versa.
    * - the time difference between the step and the first of the cluster is not above @c
    * fClusterTimeThreshold ,
    * - the distance between the step and the first of the cluster is not above @c fClusterDistance
    * (for the bulk) or
-   * @c fClusterSurfaceDistance for the surface.
+   * @c fClusterSurfaceDistance for the surface (if @c has_distance_to_surface is true).
    * - the hits in each cluster are then combined into one effective step with @c AverageHits
    *
    * @returns a collection of hits after pre-clustering.
    */
   RMGDetectorHitsCollection* pre_cluster_hits(const RMGDetectorHitsCollection* hits,
-      ClusterPars cluster_pars);
+      ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity);
 
   /** @brief Average a cluster of hits to produce one effective hit.
    *
    * @details The steps in a cluster are average with the energy being the sum over the steps,
-   * and the pre/post step position / distance to surface computed from the first/last step.
+   * and the pre/post step position / distance / velcity to surface computed from the first/last step.
    * Other fields must be the same for all steps in the cluster and are taken from the first step.
+   *
+   * @param hits the vector of hits to average
+   * @param compute_distance_to_surface boolean flag of whether to compute the distance to surface.
+   * @param compute_velocity boolean flag of whether to compute velocity.
    *
    * @returns the averaged hit.
    */
-  RMGDetectorHit* average_hits(std::vector<RMGDetectorHit*> hits);
+  RMGDetectorHit* average_hits(std::vector<RMGDetectorHit*> hits, bool compute_distance_to_surface,
+      bool compute_velocity);
 
   /** @brief Combine low energy electron tracks into their neighbours.
    *
@@ -83,12 +88,18 @@ namespace RMGOutputTools {
    * pre-clustering. In the case multiple nearby tracks are found the highest
    * energy one is used.
    *
+   * @param hits_map a map of vectors of @c RMGDetectorHit pointers with the key
+   * being the track id.
+   * @param cluster_pars a @ref RMGOutputTools::ClusterPars struct of the parameters for clustering.
+   * @param has_distance_surface a flag of whether the hits have the distance to surface field,
+   * and clustering should be performed separately for surface and bulk.
+   *
    * @returns A map of steps after combining low energy tracks.
    */
   std::map<int, std::vector<RMGDetectorHit*>> combine_low_energy_tracks(std::map<int,
                                                                             std::vector<RMGDetectorHit*>>
                                                                             hits_map,
-      ClusterPars cluster_pars);
+      ClusterPars cluster_pars, bool has_distance_to_surface);
 
 } // namespace RMGOutputTools
 
