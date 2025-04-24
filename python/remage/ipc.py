@@ -10,7 +10,7 @@ from ._version import __version__
 log = logging.getLogger(__name__)
 
 
-def handle_ipc_message(msg: bytes) -> tuple[bool, list]:
+def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
     # parse the IPC message structure.
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
@@ -22,15 +22,21 @@ def handle_ipc_message(msg: bytes) -> tuple[bool, list]:
     msg = [tuple(record) if len(record) > 1 else record[0] for record in msg]
 
     msg_ret = msg
+    is_fatal = False
     # handle blocking messages, if necessary.
     if msg[0] == "ipc_available":
         if msg[1] != __version__:
-            pass  # TODO
+            log.error(
+                "remage-cpp version %s does not match python-wrapper version %s",
+                msg[1],
+                __version__,
+            )
+            is_fatal = True
         msg_ret = None
     elif is_blocking:
         log.warning("unhandled blocking IPC message %s", str(msg))
 
-    return is_blocking, msg_ret
+    return is_blocking, msg_ret, is_fatal
 
 
 def ipc_thread_fn(
@@ -58,10 +64,12 @@ def ipc_thread_fn(
                     msg = msg_buf[0:msg_end].decode("utf-8")
                     msg_buf = msg_buf[msg_end:]
 
-                    is_blocking, unhandled_msg = handle_ipc_message(msg)
+                    is_blocking, unhandled_msg, is_fatal = handle_ipc_message(msg)
                     if unhandled_msg is not None:
                         unhandled_ipc_messages.append(unhandled_msg)
-                    if is_blocking:
+                    if is_fatal:  # the handler wants to stop the app.
+                        proc.send_signal(signal.SIGTERM)
+                    elif is_blocking:
                         proc.send_signal(signal.SIGUSR2)  # send continuation signal.
     except OSError as e:
         if e.errno == 9:  # bad file descriptor.
