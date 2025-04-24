@@ -31,6 +31,8 @@
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
+/** @brief Class to describe the scintillator detector, mainly handles processing of the detected
+ * hits. Extends @c G4VSensitiveDetector */
 class RMGScintillatorDetector : public G4VSensitiveDetector {
 
   public:
