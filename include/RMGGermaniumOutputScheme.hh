@@ -49,14 +49,6 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    /** @brief Enum of which position of the hit to store. */
-    enum class PositionMode {
-      kPreStep,  /**Store the prestep point. */
-      kPostStep, /**Store the poststep point. */
-      kAverage,  /**Store the average. */
-      kBoth,     /**Store both post and prestep */
-    };
-
     RMGGermaniumOutputScheme();
 
     /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
@@ -95,7 +87,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
     /** @brief Set which position is used for the steps */
-    inline void SetPositionMode(PositionMode mode) { fPositionMode = mode; }
+    inline void SetPositionMode(RMGOutputTools::PositionMode mode) { fPositionMode = mode; }
 
     /** @brief Set a distance to compute together steps in the bulk. */
     inline void SetClusterDistance(double threshold) {
@@ -151,7 +143,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     RMGOutputTools::ClusterPars fPreClusterPars;
 
     // mode of position to store
-    PositionMode fPositionMode = PositionMode::kAverage;
+    RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
 };
 
 #endif

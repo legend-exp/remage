@@ -96,7 +96,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_in_m", fStoreSinglePrecisionPosition);
 
     // save also a second position if requested
-    if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+    if (fPositionMode == RMGOutputTools::PositionMode::kBoth) {
 
       CreateNtupleFOrDColumn(ana_man, id, "xloc_pre_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "yloc_pre_in_m", fStoreSinglePrecisionPosition);
@@ -208,29 +208,9 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
           fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
-
-      // extract position and distance
-      G4ThreeVector position;
-      double distance = 0;
-
-      // all gamma interactions are discrete at the post-step
-      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPostStep or
-          hit->particle_type == 22) {
-        position = hit->global_position_prestep;
-        distance = hit->distance_to_surface_prestep;
-      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kPreStep) {
-        position = hit->global_position_prestep;
-        distance = hit->distance_to_surface_prestep;
-      } else if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kAverage or
-                 fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
-
-        position = hit->global_position_average;
-        distance = hit->distance_to_surface_average;
-      } else
-        RMGLog::Out(RMGLog::fatal,
-            "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
-            magic_enum::enum_name<PositionMode>(fPositionMode));
-
+      // get the position and distance to save
+      G4ThreeVector position = RMGOutputTools::get_position(hit, fPositionMode);
+      double distance = RMGOutputTools::get_distance(hit, fPositionMode);
 
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
           fStoreSinglePrecisionPosition);
@@ -242,7 +222,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
           fStoreSinglePrecisionPosition);
 
       // save also post-step if requested
-      if (fPositionMode == RMGGermaniumOutputScheme::PositionMode::kBoth) {
+      if (fPositionMode == RMGOutputTools::PositionMode::kBoth) {
 
         // save post-step
         position = hit->global_position_prestep;
@@ -302,7 +282,7 @@ std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int s
 void RMGGermaniumOutputScheme::SetPositionModeString(std::string mode) {
 
   try {
-    this->SetPositionMode(RMGTools::ToEnum<PositionMode>(mode, "position mode"));
+    this->SetPositionMode(RMGTools::ToEnum<RMGOutputTools::PositionMode>(mode, "position mode"));
   } catch (const std::bad_cast&) { return; }
 }
 void RMGGermaniumOutputScheme::DefineCommands() {
@@ -405,7 +385,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessenger->DeclareMethod("StepPositionMode", &RMGGermaniumOutputScheme::SetPositionModeString)
       .SetGuidance("Select which position of the step to store")
       .SetParameterName("mode", false)
-      .SetCandidates(RMGTools::GetCandidates<PositionMode>())
+      .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
       .SetStates(G4State_Idle)
       .SetToBeBroadcasted(true);
 }

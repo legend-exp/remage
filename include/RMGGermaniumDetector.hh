@@ -27,12 +27,11 @@
 
 #include "RMGDetectorHit.hh"
 
-
-/** @brief Class to describe the germanium detector, mainly handles processing of the detected hits.
- * Extends @c G4VSensitiveDetector */
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
+/** @brief Class to describe the germanium detector, mainly handles processing of the detected hits.
+ * Extends @c G4VSensitiveDetector */
 class RMGGermaniumDetector : public G4VSensitiveDetector {
 
   public:

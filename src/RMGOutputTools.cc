@@ -22,6 +22,47 @@
 #include "RMGDetectorHit.hh"
 #include "RMGLog.hh"
 
+#include "magic_enum/magic_enum.hpp"
+
+
+G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
+  G4ThreeVector position;
+
+  // all gamma interactions are discrete at the post-step
+  if (mode == RMGOutputTools::PositionMode::kPostStep or hit->particle_type == 22) {
+    position = hit->global_position_poststep;
+  } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
+    position = hit->global_position_prestep;
+  } else if (mode == RMGOutputTools::PositionMode::kAverage or
+             mode == RMGOutputTools::PositionMode::kBoth) {
+
+    position = hit->global_position_average;
+  } else
+    RMGLog::Out(RMGLog::fatal, "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
+        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode));
+
+  return position;
+}
+
+double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
+  double distance = 0;
+
+  // all gamma interactions are discrete at the post-step
+  if (mode == RMGOutputTools::PositionMode::kPostStep or hit->particle_type == 22) {
+    distance = hit->distance_to_surface_poststep;
+  } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
+    distance = hit->distance_to_surface_prestep;
+  } else if (mode == RMGOutputTools::PositionMode::kAverage or
+             mode == RMGOutputTools::PositionMode::kBoth) {
+
+    distance = hit->distance_to_surface_average;
+  } else
+    RMGLog::Out(RMGLog::fatal, "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
+        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode));
+
+  return distance;
+}
+
 RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
     bool compute_distance_to_surface, bool compute_velocity) {
 

@@ -481,6 +481,7 @@ Commands for controlling output from hits in scintillator detectors.
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
@@ -489,6 +490,7 @@ Commands for controlling output from hits in scintillator detectors.
 * `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `StepPositionMode` – Select which position of the step to store
 
 ### `/RMG/Output/Scintillator/EdepCutLow`
 
@@ -524,6 +526,15 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreParticleVelocities`
+
+Store velocities of particle in the output file.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
@@ -614,6 +625,16 @@ Use float32 (instead of float64) for energy output.
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/IsotopeFilter/`

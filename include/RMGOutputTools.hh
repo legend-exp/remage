@@ -23,6 +23,15 @@
 
 namespace RMGOutputTools {
 
+  /** @brief Enum of which position of the hit to store. */
+  enum class PositionMode {
+    kPreStep,  /**Store the prestep point. */
+    kPostStep, /**Store the poststep point. */
+    kAverage,  /**Store the average. */
+    kBoth,     /**Store both post and prestep */
+  };
+
+
   /** @brief Container for the parameters of step pre-clustering. */
   struct ClusterPars {
       bool combine_low_energy_tracks;
@@ -32,6 +41,24 @@ namespace RMGOutputTools {
       double cluster_distance_surface;
       double cluster_time_threshold;
   };
+
+  /** @brief Get the position to save for a given hit.
+   *
+   * @details If the mode is @c kPostStep or if the particle is a gamma
+   * then the post-step point is used. This is since gamma's have only
+   * discrete interactions happening at the post-step.
+   * Otherwise if mode is @c kPreStep the prestep point is extracted, if it is either
+   * @c kBoth or @c kAverage the average of pre and post step is used (in the case of
+   * @c kBoth the pre and post step will also be saved separately).
+   */
+  G4ThreeVector get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode);
+
+  /** @brief Get the distance to surface to save for a given hit.
+   *
+   * @details The logic is the same as for @ref RMGOutputTools::get_position
+   */
+  double get_distance(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode);
+
 
   /** @brief Compute the distance from the point to the surface of the physical volume.
    * @details Checks distance to surfaces of mother volume.
