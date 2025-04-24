@@ -31,33 +31,6 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
-/// \cond this triggers a sphinx error
-G4ThreadLocal G4Allocator<RMGScintillatorDetectorHit>* RMGScintillatorDetectorHitAllocator = nullptr;
-/// \endcond
-
-// NOTE: does this make sense?
-G4bool RMGScintillatorDetectorHit::operator==(const RMGScintillatorDetectorHit& right) const {
-  return this == &right;
-}
-
-void RMGScintillatorDetectorHit::Print() {
-  RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
-      " / Particle: ", this->particle_type,
-      " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
-      " / Position: ", this->global_position_pre / CLHEP::m, " m",
-      " / Time: ", this->global_time / CLHEP::ns, " ns");
-}
-
-void RMGScintillatorDetectorHit::Draw() {
-  const auto vis_man = G4VVisManager::GetConcreteInstance();
-  if (vis_man and this->energy_deposition > 0) {
-    G4Circle circle(this->global_position_pre);
-    circle.SetScreenSize(5);
-    circle.SetFillStyle(G4Circle::filled);
-    circle.SetVisAttributes(G4VisAttributes(G4Colour(0, 0, 1)));
-    vis_man->Draw(circle);
-  }
-}
 
 RMGScintillatorDetector::RMGScintillatorDetector() : G4VSensitiveDetector("Scintillator") {
 
@@ -70,9 +43,8 @@ void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection =
-      new RMGScintillatorDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
-          G4VSensitiveDetector::collectionName[0]);
+  fHitsCollection = new RMGDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
+      G4VSensitiveDetector::collectionName[0]);
 
   // associate it with the G4HCofThisEvent object
   auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
@@ -118,12 +90,12 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   RMGLog::OutDev(RMGLog::debug, "Hit in scintillator detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
-  auto* hit = new RMGScintillatorDetectorHit();
+  auto* hit = new RMGDetectorHit();
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
-  hit->global_position_pre = prestep->GetPosition();
-  hit->global_position_post = poststep->GetPosition();
+  hit->global_position_prestep = prestep->GetPosition();
+  hit->global_position_poststep = poststep->GetPosition();
   hit->global_time = prestep->GetGlobalTime();
 
   // track ids

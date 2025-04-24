@@ -22,14 +22,16 @@
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
 
+#include "RMGDetectorHit.hh"
 #include "RMGGermaniumDetector.hh"
+#include "RMGOutputTools.hh"
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
 /** @brief Output scheme for Germanium detectors.
  *
  *  @details This output scheme records the hits in the Germanium detectors.
- *  The properties of each @c RMGGermaniumDetectorHit are recorded:
+ *  The properties of each @c RMGDetectorHit are recorded:
  *  - event index,
  *  - particle type,
  *  - time,
@@ -72,54 +74,6 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
      */
     bool ShouldDiscardEvent(const G4Event* event) override;
 
-    /** @brief Perform a basic reduction of the hits collection removing very short steps.
-     *
-     *  @details This is based on a "within" track clustering (but note that some low energy tracks
-     * can be merged by @c CombineLowEnergyTracks .
-     * The steps in every track are looped through and combined into effective steps. A step is
-     * added to the current cluster if:
-     *
-     * - it does not move from the surface region (defined by the @c
-     * distance_to_surface<fSurfaceThickness) to the bulk or visa versa.
-     * - the time difference between the step and the first of the cluster is not above @c
-     * fClusterTimeThreshold ,
-     * - the distance between the step and the first of the cluster is not above @c fClusterDistance
-     * (for the bulk) or
-     * @c fClusterSurfaceDistance for the surface.
-     * - the hits in each cluster are then combined into one effective step with @c AverageHits
-     *
-     * @returns a collection of hits after pre-clustering.
-     */
-    RMGGermaniumDetectorHitsCollection* PreClusterHits(
-        const RMGGermaniumDetectorHitsCollection* hits);
-
-    /** @brief Average a cluster of hits to produce one effective hit.
-     *
-     * @details The steps in a cluster are average with the energy being the sum over the steps,
-     * and the pre/post step position / distance to surface computed from the first/last step.
-     * Other fields must be the same for all steps in the cluster and are taken from the first step.
-     *
-     * @returns the averaged hit.
-     */
-    RMGGermaniumDetectorHit* AverageHits(std::vector<RMGGermaniumDetectorHit*> hits);
-
-    /** @brief Combine low energy electron tracks into their neighbours.
-     *
-     *  @details Some interactions of gammas, eg. Compton scattering or the
-     * photoelectric effect can produce very low energy electron tracks. This function
-     * reads a map of steps in each track (keyed by trackid), it then computes the
-     * total energy in each electron track.
-     *  If a track is below a certain threshold then the code searches through the
-     * other tracks to see if there is one where the first pre-step point is
-     * within the cluster distance of this track. If so they are combined for further
-     * pre-clustering. In the case multiple nearby tracks are found the highest
-     * energy one is used.
-     *
-     * @returns A map of steps after combining low energy tracks.
-     */
-    std::map<int, std::vector<RMGGermaniumDetectorHit*>> CombineLowEnergyElectronTracks(
-        std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map);
-
     /** @brief Wraps @c G4UserStackingAction::StackingActionNewStage
      *  @details discard all waiting events, if @c ShouldDiscardEvent() is true.
      */
@@ -144,20 +98,28 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void SetPositionMode(PositionMode mode) { fPositionMode = mode; }
 
     /** @brief Set a distance to compute together steps in the bulk. */
-    inline void SetClusterDistance(double threshold) { fClusterDistance = threshold; }
+    inline void SetClusterDistance(double threshold) {
+      fPreClusterPars.cluster_distance = threshold;
+    }
 
     /** @brief Set a distance to compute together steps in the surface */
-    inline void SetClusterDistanceSurface(double threshold) { fClusterDistanceSurface = threshold; }
+    inline void SetClusterDistanceSurface(double threshold) {
+      fPreClusterPars.cluster_distance_surface = threshold;
+    }
 
     /** @brief Set the thickness of the surface region. */
-    inline void SetSurfaceThickness(double thickness) { fSurfaceThickness = thickness; }
+    inline void SetSurfaceThickness(double thickness) {
+      fPreClusterPars.surface_thickness = thickness;
+    }
 
     /** @brief Set the time threshold for pre-clustering. */
-    inline void SetClusterTimeThreshold(double threshold) { fClusterTimeThreshold = threshold; }
+    inline void SetClusterTimeThreshold(double threshold) {
+      fPreClusterPars.cluster_time_threshold = threshold;
+    }
 
     /** @brief Set the energy threshold to merge electron tracks.*/
     inline void SetElectronTrackEnergyThreshold(double threshold) {
-      fTrackEnergyThreshold = threshold;
+      fPreClusterPars.track_energy_threshold = threshold;
     }
 
   protected:
@@ -166,7 +128,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   private:
 
-    RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);
+    RMGDetectorHitsCollection* GetHitColl(const G4Event*);
     void SetPositionModeString(std::string mode);
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
@@ -184,14 +146,9 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     bool fStoreTrackID = false;
     bool fPreClusterHits = false;
-    bool fCombineLowEnergyTracks = false;
 
-    // clustering pars
-    double fClusterTimeThreshold = 10 * CLHEP::us;
-    double fClusterDistance = 10 * CLHEP::um;
-    double fClusterDistanceSurface = 1 * CLHEP::um;
-    double fSurfaceThickness = 2 * CLHEP::mm;
-    double fTrackEnergyThreshold = 10 * CLHEP::keV;
+    /** @brief Parameters for pre-clustering. */
+    RMGOutputTools::ClusterPars fPreClusterPars;
 
     // mode of position to store
     PositionMode fPositionMode = PositionMode::kAverage;

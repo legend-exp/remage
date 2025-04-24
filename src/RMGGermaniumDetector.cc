@@ -31,34 +31,8 @@
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGOutputTools.hh"
 
-/// \cond this triggers a sphinx error
-G4ThreadLocal G4Allocator<RMGGermaniumDetectorHit>* RMGGermaniumDetectorHitAllocator = nullptr;
-/// \endcond
-
-// NOTE: does this make sense?
-G4bool RMGGermaniumDetectorHit::operator==(const RMGGermaniumDetectorHit& right) const {
-  return this == &right;
-}
-
-void RMGGermaniumDetectorHit::Print() {
-  RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
-      " / Particle: ", this->particle_type,
-      " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
-      " / Position (prestep): ", this->global_position_prestep / CLHEP::m, " m",
-      " / Time: ", this->global_time / CLHEP::ns, " ns", " / trackid ", this->track_id);
-}
-
-void RMGGermaniumDetectorHit::Draw() {
-  const auto vis_man = G4VVisManager::GetConcreteInstance();
-  if (vis_man and this->energy_deposition > 0) {
-    G4Circle circle(this->global_position_prestep);
-    circle.SetScreenSize(5);
-    circle.SetFillStyle(G4Circle::filled);
-    circle.SetVisAttributes(G4VisAttributes(G4Colour(1, 0, 0)));
-    vis_man->Draw(circle);
-  }
-}
 
 RMGGermaniumDetector::RMGGermaniumDetector() : G4VSensitiveDetector("Germanium") {
 
@@ -71,46 +45,13 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection =
-      new RMGGermaniumDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
-          G4VSensitiveDetector::collectionName[0]);
+  fHitsCollection = new RMGDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
+      G4VSensitiveDetector::collectionName[0]);
 
   // associate it with the G4HCofThisEvent object
   auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
       G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]);
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
-}
-
-double RMGGermaniumDetector::DistanceToSurface(const G4VPhysicalVolume* pv,
-    const G4ThreeVector& position) {
-
-  // get logical volume and solid
-  auto pv_name = pv->GetName();
-  const auto lv = pv->GetLogicalVolume();
-  const auto sv = lv->GetSolid();
-
-  // get translation
-  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
-  tf.Invert();
-
-  // Get distance to surface.
-  // First transform coordinates into local system
-
-  double dist = sv->DistanceToOut(tf.TransformPoint(position));
-
-  // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  auto local_no_daughters = lv->GetNoDaughters();
-  // increase by one to keep positive in reverse loop.
-  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
-    const auto sample_physical = lv->GetDaughter(sample_no - 1);
-    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
-    sample_tf.Invert();
-    const auto sample_point = sample_tf.TransformPoint(position);
-    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
-    const double sample_dist = sample_solid->DistanceToIn(sample_point);
-    if (sample_dist < dist) { dist = sample_dist; }
-  }
-  return dist;
 }
 
 bool RMGGermaniumDetector::CheckStepPointContainment(const G4StepPoint* step_point) {
@@ -169,7 +110,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
-  auto* hit = new RMGGermaniumDetectorHit();
+  auto* hit = new RMGDetectorHit();
 
   // pointer to the physical volume
   hit->physical_volume = pv;
@@ -188,9 +129,9 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->parent_track_id = step->GetTrack()->GetParentID();
 
   // get various distances
-  hit->distance_to_surface_prestep = DistanceToSurface(pv, position_prestep);
-  hit->distance_to_surface_poststep = DistanceToSurface(pv, position_poststep);
-  hit->distance_to_surface_average = DistanceToSurface(pv, position_average);
+  hit->distance_to_surface_prestep = RMGOutputTools::distance_to_surface(pv, position_prestep);
+  hit->distance_to_surface_poststep = RMGOutputTools::distance_to_surface(pv, position_poststep);
+  hit->distance_to_surface_average = RMGOutputTools::distance_to_surface(pv, position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);

@@ -86,7 +86,7 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
   }
 }
 
-RMGScintillatorDetectorHitsCollection* RMGScintillatorOutputScheme::GetHitColl(const G4Event* event) {
+RMGDetectorHitsCollection* RMGScintillatorOutputScheme::GetHitColl(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
 
   auto hit_coll_id = sd_man->GetCollectionID("Scintillator/Hits");
@@ -95,8 +95,8 @@ RMGScintillatorDetectorHitsCollection* RMGScintillatorOutputScheme::GetHitColl(c
     return nullptr;
   }
 
-  auto hit_coll = dynamic_cast<RMGScintillatorDetectorHitsCollection*>(
-      event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll =
+      dynamic_cast<RMGDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
@@ -172,17 +172,17 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
           fStoreSinglePrecisionEnergy);
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getX() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_prestep.getX() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getY() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_prestep.getY() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_pre.getZ() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_prestep.getZ() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getX() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_poststep.getX() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getY() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_poststep.getY() / u::m,
           fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_post.getZ() / u::m,
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->global_position_poststep.getZ() / u::m,
           fStoreSinglePrecisionPosition);
       FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->velocity_pre / u::m * u::ns,
           fStoreSinglePrecisionPosition);

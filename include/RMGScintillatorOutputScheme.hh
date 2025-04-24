@@ -22,6 +22,7 @@
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
 
+#include "RMGDetectorHit.hh"
 #include "RMGScintillatorDetector.hh"
 #include "RMGVOutputScheme.hh"
 
@@ -46,7 +47,7 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
   private:
 
-    RMGScintillatorDetectorHitsCollection* GetHitColl(const G4Event*);
+    RMGDetectorHitsCollection* GetHitColl(const G4Event*);
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();

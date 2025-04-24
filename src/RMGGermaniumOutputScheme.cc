@@ -29,11 +29,23 @@
 #include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGOutputTools.hh"
 #include "RMGTools.hh"
 
 namespace u = CLHEP;
 
-RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() { this->DefineCommands(); }
+RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
+
+  this->DefineCommands();
+
+  // set default clustering parameters
+  fPreClusterPars.cluster_time_threshold = 10 * CLHEP::us;
+  fPreClusterPars.cluster_distance = 10 * CLHEP::um;
+  fPreClusterPars.cluster_distance_surface = 1 * CLHEP::um;
+  fPreClusterPars.surface_thickness = 2 * CLHEP::mm;
+  fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
+  fPreClusterPars.combine_low_energy_tracks = false;
+}
 
 
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
@@ -100,7 +112,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   }
 }
 
-RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* event) {
+RMGDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* event) {
   auto sd_man = G4SDManager::GetSDMpointer();
 
   auto hit_coll_id = sd_man->GetCollectionID("Germanium/Hits");
@@ -109,8 +121,8 @@ RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G
     return nullptr;
   }
 
-  auto hit_coll = dynamic_cast<RMGGermaniumDetectorHitsCollection*>(
-      event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll =
+      dynamic_cast<RMGDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
@@ -147,212 +159,14 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   return false;
 }
 
-RMGGermaniumDetectorHit* RMGGermaniumOutputScheme::AverageHits(
-    std::vector<RMGGermaniumDetectorHit*> hits) {
-
-  auto hit = new RMGGermaniumDetectorHit();
-
-  if (hits.empty()) {
-    RMGLog::OutDev(RMGLog::error, "Cannot average empty set of hits");
-    return nullptr;
-  }
-
-  hit->energy_deposition = 0;
-  for (auto hit_tmp : hits) hit->energy_deposition += hit_tmp->energy_deposition;
-
-  // by construction the particle type, detuid and track id should all be the same
-  hit->detector_uid = hits.front()->detector_uid;
-  hit->particle_type = hits.front()->particle_type;
-  hit->track_id = hits.front()->track_id;
-  hit->parent_track_id = hits.front()->parent_track_id;
-
-  // time from first hit
-  hit->global_time = hits.front()->global_time;
-
-  // The cluster represents a list of consecutive steps, so we can
-  // take the pre and post step from the first and last hit in the cluster.
-  hit->global_position_prestep = hits.front()->global_position_prestep;
-  hit->global_position_poststep = hits.back()->global_position_poststep;
-
-  // issue: this could be outside the volume!
-  hit->global_position_average = (hit->global_position_prestep + hit->global_position_poststep) / 2.;
-
-  // compute the distance to the surface, for the pre/post step this is already done
-  // but a new calculation is needed for the average.
-  hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
-  hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
-  hit->distance_to_surface_average =
-      RMGGermaniumDetector::DistanceToSurface(hits.back()->physical_volume,
-          hit->global_position_average);
-
-  return hit;
-}
-
-std::map<int, std::vector<RMGGermaniumDetectorHit*>> RMGGermaniumOutputScheme::CombineLowEnergyElectronTracks(
-    std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map) {
-
-  RMGLog::Out(RMGLog::debug, "Merging low energy electron tracks ");
-
-
-  // for tracks below an energy threshold look for a close neighbour to merge it with
-  // only done for e-.
-  std::map<int, std::vector<RMGGermaniumDetectorHit*>> output_hits = hits_map;
-
-  for (const auto& [trackid, input_hits] : hits_map) {
-
-    // only apply to e-
-    if (input_hits.front()->particle_type != 11) continue;
-
-    // compute energy of each track
-    double energy = 0;
-    for (auto hit : input_hits) { energy += hit->energy_deposition; }
-
-    // continue for high energy tracks
-    if (energy > fTrackEnergyThreshold) continue;
-
-    // distance threshold to merge tracks
-    double threshold = (input_hits.front()->distance_to_surface_prestep) < fSurfaceThickness
-                           ? fClusterDistanceSurface
-                           : fClusterDistance;
-
-    // now search for another track to merge it with
-    int cluster_trackid = -1;
-    float cluster_energy = 0;
-
-    // loop over secondary tracks
-    for (const auto& [second_trackid, second_input_hits] : hits_map) {
-      if (second_trackid == trackid) continue;
-
-      // only cluster into high energy tracks
-      energy = 0;
-      for (auto hit : second_input_hits) { energy += hit->energy_deposition; }
-
-
-      // compute distance between the first step of this track and that of the
-      // other track.
-      if (energy > cluster_energy && (input_hits.front()->global_position_prestep -
-                                         second_input_hits.front()->global_position_prestep)
-                                             .mag() < threshold) {
-
-        cluster_energy = energy;
-        cluster_trackid = second_trackid;
-      }
-    }
-
-    if (cluster_trackid != -1) {
-
-      // change all the track-ids
-      for (auto hit : output_hits[trackid]) { hit->track_id = cluster_trackid; }
-
-      // add these elements to the start of the second track
-      output_hits[cluster_trackid].insert(output_hits[cluster_trackid].begin(),
-          output_hits[trackid].begin(), output_hits[trackid].end());
-
-      output_hits.erase(trackid);
-      RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
-    }
-  }
-  return output_hits;
-}
-RMGGermaniumDetectorHitsCollection* RMGGermaniumOutputScheme::PreClusterHits(
-    const RMGGermaniumDetectorHitsCollection* hits) {
-
-  // organise hits into a map based on trackid
-  std::map<int, std::vector<RMGGermaniumDetectorHit*>> hits_map;
-
-  for (auto hit : *hits->GetVector()) hits_map[hit->track_id].push_back(hit);
-
-  // if requested we can combine low energy tracks to reduce further file size
-  if (fCombineLowEnergyTracks) hits_map = CombineLowEnergyElectronTracks(hits_map);
-
-  // create a vector of clusters of hits
-  std::vector<std::vector<RMGGermaniumDetectorHit*>> hits_vector;
-
-  // keep track of the current cluster
-  RMGGermaniumDetectorHit* cluster_first_hit = nullptr;
-
-  // loop over trackid and then hits in each track
-  for (const auto& [trackid, input_hits] : hits_map) {
-    for (auto hit : input_hits) {
-
-      if (!hit) continue;
-
-      // within track clustering
-
-      // if the hit is:
-      // - the first in a track
-      // - in a new detector (compared to the current cluster)
-      // - more than the time-threshold since the first hit of the cluster
-      // then we need to start a new cluster.
-
-      bool start_new_cluster =
-          (cluster_first_hit == nullptr) or (hit->track_id != cluster_first_hit->track_id) or
-          (hit->detector_uid != cluster_first_hit->detector_uid) or
-          (std::abs(hit->global_time - cluster_first_hit->global_time) > fClusterTimeThreshold);
-
-      // check distances and if the track moved from surface to bulk
-      if (!start_new_cluster) {
-        bool is_surface = hit->distance_to_surface_average < fSurfaceThickness;
-        bool is_surface_first_hit =
-            cluster_first_hit->distance_to_surface_average < fSurfaceThickness;
-
-        // start a new cluster if the previous step was in the surface and the new is in the bulk
-        bool surface_transition = (is_surface != is_surface_first_hit);
-
-        // get the right distance to pre-cluster
-        double threshold = is_surface ? fClusterDistanceSurface : fClusterDistance;
-
-        // start a new cluster also if the distance is above the threshold
-        start_new_cluster =
-            surface_transition ||
-            (hit->global_position_average - cluster_first_hit->global_position_average).mag() >
-                threshold;
-      }
-
-      // add the hit to the correct vector
-      if (start_new_cluster) {
-        hits_vector.push_back(std::vector<RMGGermaniumDetectorHit*>());
-        hits_vector.back().push_back(hit);
-        cluster_first_hit = hit;
-      } else {
-        hits_vector.back().push_back(hit);
-      }
-    }
-  }
-
-  // create a container for the output hits
-  auto out = new RMGGermaniumDetectorHitsCollection();
-
-  // average the hits
-  int index = 0;
-  for (const auto& value : hits_vector) {
-
-    // average the hit and insert into the collection
-    auto averaged_hit = AverageHits(value);
-    out->insert(averaged_hit);
-
-    // print hits in each cluster
-    RMGLog::Out(RMGLog::debug, "Cluster ", index);
-    for (const auto& hit_tmp : value) { hit_tmp->Print(); }
-
-    // print the averaged hit
-    RMGLog::Out(RMGLog::debug, "Averaged hit :");
-    averaged_hit->Print();
-
-    index++;
-  }
-
-
-  return out;
-}
-
 
 void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
   // get the hit collection - with preclustering if requested
   auto hit_coll = GetHitColl(event);
 
-  if (fPreClusterHits) hit_coll = PreClusterHits(hit_coll);
+
+  if (fPreClusterHits) hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars);
 
   if (!hit_coll) return;
 
@@ -509,7 +323,8 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance("Pre-Cluster output hits before saving")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("CombineLowEnergyElectronTracks", fCombineLowEnergyTracks)
+  fMessenger
+      ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
       .SetStates(G4State_Idle);
 
