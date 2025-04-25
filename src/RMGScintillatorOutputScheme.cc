@@ -306,7 +306,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetPreTimeThreshold", "us",
+      ->DeclareMethodWithUnit("SetPreClusterTimeThreshold", "us",
           &RMGScintillatorOutputScheme::SetClusterTimeThreshold)
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
