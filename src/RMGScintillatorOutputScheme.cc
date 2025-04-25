@@ -41,6 +41,7 @@ RMGScintillatorOutputScheme::RMGScintillatorOutputScheme() {
   fPreClusterPars.cluster_distance = 100 * CLHEP::um;
   fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
   fPreClusterPars.combine_low_energy_tracks = false;
+  fPreClusterPars.reassign_gamma_energy = false;
 }
 
 
@@ -291,6 +292,9 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetGuidance("Merge low energy electron tracks.")
       .SetStates(G4State_Idle);
 
+  fMessenger->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
+      .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
+      .SetStates(G4State_Idle);
   fMessenger
       ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
           &RMGScintillatorOutputScheme::SetClusterDistance)

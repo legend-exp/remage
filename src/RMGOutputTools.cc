@@ -110,11 +110,53 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   return hit;
 }
 
+void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+    RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface) {
+
+  RMGLog::Out(RMGLog::debug, "Merging gamma tracks ");
+
+
+  // for tracks of gammas look for a step close to each post-step point
+  // to redistribute the energy to
+  for (const auto& [trackid, input_hits] : hits_map) {
+
+    // only apply to gamma
+    if (input_hits.front()->particle_type != 22) continue;
+
+    // loop through the track
+    for (auto hit : input_hits) {
+
+      // only focus on hits with an energy deposit
+      if (hit->energy_deposition == 0) continue;
+
+      // extract a threshold
+      double threshold = (not has_distance_to_surface) or ((hit->distance_to_surface_prestep) >
+                                                              cluster_pars.surface_thickness)
+                             ? cluster_pars.cluster_distance
+                             : cluster_pars.cluster_distance_surface;
+
+
+      // loop over secondary tracks
+      for (const auto& [second_trackid, second_input_hits] : hits_map) {
+        if (second_trackid == trackid) continue;
+
+        // compute distance between the gamma post-step and the first hit of the other track and
+        // that of the other track.
+        if ((hit->global_position_poststep - second_input_hits.front()->global_position_prestep).mag() <
+            threshold) {
+          // give this hit the energy deposition
+          second_input_hits.front()->energy_deposition += hit->energy_deposition;
+          hit->energy_deposition = 0;
+        }
+      }
+    }
+  }
+}
+
+
 std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
     combine_low_energy_tracks(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-        RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface
-
-    ) {
+        RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface) {
 
   RMGLog::Out(RMGLog::debug, "Merging low energy electron tracks ");
 
@@ -181,6 +223,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
   }
   return output_hits;
 }
+
 RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHitsCollection* hits,
     RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity) {
 
@@ -192,6 +235,9 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   // if requested we can combine low energy tracks to reduce further file size
   if (cluster_pars.combine_low_energy_tracks)
     hits_map = combine_low_energy_tracks(hits_map, cluster_pars, has_distance_to_surface);
+
+  if (cluster_pars.reassign_gamma_energy)
+    redistribute_gamma_energy(hits_map, cluster_pars, has_distance_to_surface);
 
   // create a vector of clusters of hits
   std::vector<std::vector<RMGDetectorHit*>> hits_vector;

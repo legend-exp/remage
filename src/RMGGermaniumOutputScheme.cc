@@ -45,6 +45,7 @@ RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
   fPreClusterPars.surface_thickness = 2 * CLHEP::mm;
   fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
   fPreClusterPars.combine_low_energy_tracks = false;
+  fPreClusterPars.reassign_gamma_energy = false;
 }
 
 
@@ -307,6 +308,9 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessenger
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
+      .SetStates(G4State_Idle);
+  fMessenger->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
+      .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
       .SetStates(G4State_Idle);
 
   fMessenger

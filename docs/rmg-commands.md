@@ -208,6 +208,7 @@ Commands for controlling output from hits in germanium detectors.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
 * `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
 * `SetPreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
 * `SetPreTimeThreshold * Set a time threshold for` – pre-clustering.
@@ -261,6 +262,15 @@ Pre-Cluster output hits before saving
 ### `/RMG/Output/Germanium/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/RedistributeGammaEnergy`
+
+Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`
@@ -485,6 +495,7 @@ Commands for controlling output from hits in scintillator detectors.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
 * `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
 * `SetPreTimeThreshold * Set a time threshold for` – pre-clustering.
 * `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
@@ -559,6 +570,15 @@ Pre-Cluster output hits before saving
 ### `/RMG/Output/Scintillator/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/RedistributeGammaEnergy`
+
+Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
 * **Parameter** – `value`
   * **Parameter type** – `b`

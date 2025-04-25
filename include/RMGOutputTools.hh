@@ -35,6 +35,7 @@ namespace RMGOutputTools {
   /** @brief Container for the parameters of step pre-clustering. */
   struct ClusterPars {
       bool combine_low_energy_tracks;
+      bool reassign_gamma_energy;
       double track_energy_threshold;
       double surface_thickness;
       double cluster_distance;
@@ -127,6 +128,17 @@ namespace RMGOutputTools {
                                                                             std::vector<RMGDetectorHit*>>
                                                                             hits_map,
       ClusterPars cluster_pars, bool has_distance_to_surface);
+
+  /** @brief Search for hits close to any gamma track and reassign the energy deposit to that track.
+   *
+   * @details Gamma particles do not deposit energy, however as part of some interactions a very
+   * small "local" energy deposit happen, due to atomic binding energy. This method search through
+   * the gamma tracks and for each it looks for a nearby electron hit to instead assign this small
+   * local energy deposit too, this can avoid writing out the gamma tracks in the output scheme.
+   */
+  void redistribute_gamma_energy(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+      ClusterPars cluster_pars, bool has_distance_to_surface);
+
 
 } // namespace RMGOutputTools
 
