@@ -15,6 +15,8 @@
 
 #include "RMGOutputTools.hh"
 
+#include <memory>
+
 #include "G4AffineTransform.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VSolid.hh"
@@ -66,12 +68,11 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
 RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
     bool compute_distance_to_surface, bool compute_velocity) {
 
-  auto hit = new RMGDetectorHit();
-
   if (hits.empty()) {
     RMGLog::OutDev(RMGLog::error, "Cannot average empty set of hits");
     return nullptr;
   }
+  auto hit = new RMGDetectorHit();
 
   hit->energy_deposition = 0;
   for (auto hit_tmp : hits) hit->energy_deposition += hit_tmp->energy_deposition;
@@ -291,6 +292,7 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
       if (start_new_cluster) {
         hits_vector.push_back(std::vector<RMGDetectorHit*>());
         hits_vector.back().push_back(hit);
+
         cluster_first_hit = hit;
       } else {
         hits_vector.back().push_back(hit);
@@ -302,24 +304,12 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   auto out = new RMGDetectorHitsCollection();
 
   // average the hits
-  int index = 0;
   for (const auto& value : hits_vector) {
 
     // average the hit and insert into the collection
     auto averaged_hit = average_hits(value, has_distance_to_surface, has_velocity);
     out->insert(averaged_hit);
-
-    // print hits in each cluster
-    RMGLog::Out(RMGLog::debug, "Cluster ", index);
-    for (const auto& hit_tmp : value) { hit_tmp->Print(); }
-
-    // print the averaged hit
-    RMGLog::Out(RMGLog::debug, "Averaged hit :");
-    averaged_hit->Print();
-
-    index++;
   }
-
 
   return out;
 }

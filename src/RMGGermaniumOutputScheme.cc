@@ -135,6 +135,7 @@ RMGDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* e
 
 
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
+
   // exit fast if no threshold is configured.
   if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
 
@@ -166,9 +167,9 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   // get the hit collection - with preclustering if requested
   auto hit_coll = GetHitColl(event);
 
-
   if (fPreClusterHits)
     hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
+
 
   if (!hit_coll) return;
 
@@ -254,6 +255,9 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->AddNtupleRow(ntupleid);
     }
   }
+
+  // if needed we should delete the collection we own
+  if (fPreClusterHits) delete hit_coll;
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
@@ -309,6 +313,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
       .SetStates(G4State_Idle);
+
   fMessenger->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
       .SetStates(G4State_Idle);

@@ -15,6 +15,7 @@
 
 #include "RMGScintillatorOutputScheme.hh"
 
+#include <memory>
 #include <set>
 
 #include "G4AnalysisManager.hh"
@@ -243,6 +244,8 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->AddNtupleRow(ntupleid);
     }
   }
+
+  if (fPreClusterHits) delete hit_coll;
 }
 void RMGScintillatorOutputScheme::SetPositionModeString(std::string mode) {
 
