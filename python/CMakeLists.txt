@@ -69,7 +69,8 @@ add_custom_command(
   OUTPUT ${VENV_DIR}/bin/remage
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${VENV_DIR}/bin/python -m uv pip -q install --reinstall ${_pkg_install}
+  COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python
+          -m uv pip -q install --reinstall ${_pkg_install}
   COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
@@ -101,11 +102,14 @@ add_custom_command(
   # install our package into this venv
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
+  COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL}
+          ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
   COMMAND ln -fs ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
   # create and install a user-installable wheel
-  COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv build --wheel ${CMAKE_SOURCE_DIR} -o
-          ${CMAKE_INSTALL_PREFIX}/share
+  COMMAND
+    SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL}
+    ${INSTALL_VENV_DIR}/bin/python -m uv build --wheel ${CMAKE_SOURCE_DIR} -o
+    ${CMAKE_INSTALL_PREFIX}/share
   COMMAND mv ${CMAKE_INSTALL_PREFIX}/share/remage-*-py3-none-any.whl
           ${CMAKE_INSTALL_PREFIX}/share/remage-py3-none-any.whl
   COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
