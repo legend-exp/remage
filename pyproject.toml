@@ -78,6 +78,9 @@ Changelog = "https://github.com/legend-exp/remage/releases"
 version.source = "vcs"
 build.hooks.vcs.version-file = "python/remage/_version.py"
 
+[tool.hatch.version.raw-options]
+dist_name = "remage"
+
 [tool.hatch.build.targets.sdist]
 ignore-vcs = true
 include = ["python/**/*"]
