@@ -5,12 +5,9 @@
 :::{todo}
 
 - one-table versus multi-table configurations
-- step point selection
 - vertex table
-- list of output schemes and description of specific features
 - track output scheme
 - isotope, energy filtering
-- store event only if energy deposition in germanium
   :::
 
 _remage_ supports all output formats supported by
@@ -151,7 +148,7 @@ The event is then discarded if the energy is less than or equal to `ELOW` or les
 This mechanism will remove the data from the event across all output schemes, not only the Germanium!
 :::
 
-Similarly, for simulations involving optical photons it is possible to discard all optical 
+Similarly, for simulations involving optical photons it is possible to discard all optical
 photon tracks before simulating them if no energy was deposited in Germanium. This can be enabled
 with the:
 
@@ -184,7 +181,7 @@ this clustering can be performed differently for surface and bulk hits
 ## Scintillator detectors
 
 This output scheme is used to record the steps in scintillation detectors (typically LAr),
-this is a calometric approach recording the energy deposited and steps. While the Optical 
+this is a calometric approach recording the energy deposited and steps. While the Optical
 output scheme is instead used for recording the detected optical photons.
 Most functionality is similar to the Germanium output scheme with a few exceptions.
 
@@ -192,16 +189,113 @@ Most functionality is similar to the Germanium output scheme with a few exceptio
 - The stacking possibility for optical tracks is not implemented,
 - The velocity of the particles can be saved using the
 
-`/RMG/Output/Scintillator/StoreParticleVelocities` 
+`/RMG/Output/Scintillator/StoreParticleVelocities`
 
 macro command.
 
 ## Data reduction methods
 
-Often Geant4 takes steps much shorter than those that are meaningfull in a HPGe or a 
+Often Geant4 takes steps much shorter than those that are meaningful in a HPGe or a
 scintillation detector. For example the typical dimension of charge clouds
 produced by interactions in Germanium are 1-2 mm, so we are not sensitive to tracking at um levels.
-To reduce the file size while retaining the useful information for computing observables of interest 
-we have implemented some "pre-clustering" routines.
+To reduce the file size while retaining the useful information for computing observables of interest
+we have implemented some "pre-clustering" routines. These routines combine together steps that are very
+very close together.
 
-# Vertex and track outputs
+:::{note}
+The aim of this (pre)-clustering is only to make a minimal reduction of information which cannot be useful!
+Further, more aggressive clustering may be needed for some applications.
+:::
+
+In order to have an efficient algorithm for pre-clustering we take use a "within-track" approach,
+this clusters only steps in the same `G4Track`, with some exceptions for very low energy tracks.
+In this way we only have to iterate through the steps in each event once. This also means the rows in our output are still interpretable
+with steps in the detector (just with a larger step length). The clustering is handled by the
+function:
+
+```C++
+  RMGDetectorHitsCollection* pre_cluster_hits(const RMGDetectorHitsCollection* hits,
+      ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity);
+```
+
+This takes in the pointer to the original `RMGDetectorHitsCollection` returning a pointer
+to a new collection of clustered hits.
+
+:::{note}
+This design makes it easy to include additional clustering algorithms, a similar function just needs to be written.
+:::
+Pre-clustering can be enabled with the macro command:
+
+`/RMG/Output/Germanium/PreClusterOutputs True`
+
+and similar for the `Scintillator` output scheme.
+
+_remage_ first organises the hits by track id. Some processes in _Geant4_ produce
+a large number of secondary tracks due to atomic de-excitation, these tracks typically
+have a very low energy and range (however they are still produced since production cuts
+are not applied for most gamma interactions). Thus they are not expected to impact observables of interest.
+In many cases, after pre-clustering of high energy electrons, these tracks could form the majority
+of the output. We implemented the possibility to merge these tracks prior to pre-clustering
+which can be enabled with the macro command:
+
+`/RMG/Output/Germanium/CombineLowEnergyElectronTracks True`
+
+or similar for the Scintillator output.
+
+:::{warning}
+This means in some cases there are steps in the output that are the combination of steps in different
+Geant4 tracks.
+:::
+
+This command will select electron tracks with energy lower than a threshold, which is by default 10 keV,
+but can be changed with the macro command:
+
+`/RMG/Output/Germanium/SetElectronTrackEnergyThreshold {ENERGY}`
+
+and similar for the Scintillator output. For each track, we search for tracks which have a first pre-step
+point within the cluster radius of the first pre-step point of the low energy track. The low energy track
+is then merged with the neighbour track with the highest energy. In addition, Geant4 will sometimes
+associated some deposited energy with gamma tracks (due to atomic binding energy), optionally the
+user can request instead redistributing this energy to the secondary electron tracks with the command:
+
+`/RMG/Output/Germanium/RedistributeGammaEnergy True`
+
+this then means the gamma tracks would not have energy deposits and do not need to be written out in the
+output file (unless this is explicitly requested).
+
+After these two pre-processing steps the pre-clustering proceeds by looping through the steps in each
+track. For each step the distance to the first step in the current cluster is calculated, if this distance
+is less than the user defined distance, and the time difference is less than the time threshold,
+the step is added to the current cluster.
+
+The distance / time thresholds used for pre-clustering can be set with:
+
+`/RMG/Output/Germanium/SetPreClusterDistance`
+
+`/RMG/Output/Germanium/SetPreClusterTimeThreshold`
+
+and similar for the Scintillator output scheme.
+
+Germanium detectors, where the surface region has substantially different properties to the bulk, we
+give the possibility to cluster with a different threshold for the surface region of the detector.
+This is by default the region within 2 mm of the detector surface but can be changed with the command:
+
+`/RMG/Output/Germanium/SetSurfaceThickness`
+
+then a threshold can be set specifically for this region with:
+
+`/RMG/Output/Germanium/SetPreClusterDistanceSurface`
+
+this will apply this threshold for any step where the distance to surface is less than the surface
+thickness. With this option a new cluster will also be formed if a step moves from the surface to bulk region
+of the Germanium (or visa versa). With these options we provide a sophisticated mechanism for handling
+the surface of Germanium detectors.
+
+For each cluster, we then compute an "effective" step, where the time, pre-step position, distance to surface,
+velocity is taken from the first step. The post-step position, distance are evalauted from the last step while the
+energy deposit is summed over all steps. The average of the pre-step position and post-step position is computed.
+All other fields are constant within a track and are taken from the first step.
+
+:::{note}
+In this way the output still represents a step, just with a longer effective step length.
+:::
