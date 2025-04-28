@@ -418,8 +418,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
         el.native_sample = false;
         if (fOnSurface)
-          RMGLog::OutDev(RMGLog::warning,
-              "Surface sampling is on the outside of the mother volume for volumes with daughters.");
+          RMGLog::OutDev(RMGLog::warning, "Surface sampling is on the outside of the mother volume "
+                                          "for volumes with daughters.");
 
       } else {
         RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
