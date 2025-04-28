@@ -261,6 +261,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         template<typename... Args> void emplace_back(Args&&... args);
+        [[nodiscard]] inline bool empty() const { return data.empty(); }
+        inline SampleableObject& back() { return data.back(); }
+        inline void clear() { data.clear(); }
         inline void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
         }
