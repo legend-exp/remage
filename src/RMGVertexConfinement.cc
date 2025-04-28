@@ -124,6 +124,7 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
     G4ThreeVector dir) const {
 
+
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
@@ -153,8 +154,11 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
     int_point = int_point + dist * dir;
 
     if (dist < kInfinity) intersections.push_back(int_point);
+
+
     counter++;
   }
+
 
   if (intersections.size() % 2)
     RMGLog::OutDev(RMGLog::fatal, "Found ", intersections.size(), " intersections. However,",
@@ -227,12 +231,12 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(G4ThreeVector&
     auto random_int = static_cast<size_t>(n_max * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
+
       vertex = intersections[random_int];
       return true;
     }
     calls++;
   }
-
   RMGLog::Out(RMGLog::error, "Exceeded maximum number of allowed iterations (", max_attempts,
       "), check that your surfaces are efficiently ",
       "sampleable and try, eventually, to increase the threshold through the dedicated ",
@@ -410,15 +414,20 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
     // if the solid is simple one can avoid using bounding volumes for
     // sampling.  Both volume and native surface sampling are available
+
+    RMGLog::Out(RMGLog::summary, "solid ", solid_type, " is sampleable ? ",
+        RMGGeneratorUtil::IsSampleable(solid_type));
     if (RMGGeneratorUtil::IsSampleable(solid_type)) {
       RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
       // if there are no daughters one can avoid doing containment checks
       if (log_vol->GetNoDaughters() > 0) {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
-        el.native_sample = false;
+
+        // surface sampling still works for solids with daughters natively
+        el.native_sample = false; // fOnSurface;
         if (fOnSurface)
-          RMGLog::OutDev(RMGLog::warning, "Surface sampling is on the outside of the mother volume "
+          RMGLog::OutDev(RMGLog::summary, "Surface sampling is on the outside of the mother volume "
                                           "for volumes with daughters.");
 
       } else {
@@ -426,6 +435,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         el.native_sample = true;
       }
       el.surface_sample = fOnSurface;
+      el.max_num_intersections = fSurfaceSampleMaxIntersections;
+
     }
     // if it's not sampleable, cannot perform native surface sampling
     else if (fOnSurface) {
