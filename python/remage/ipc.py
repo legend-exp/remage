@@ -81,8 +81,15 @@ class IpcResult:
     def __init__(self, ipc_info):
         self.ipc_info = ipc_info
 
-    def get(self, name: str) -> list[str]:
-        return [msg[1] for msg in self.ipc_info if len(msg) == 2 and msg[0] == name]
+    def get(self, name: str, expected_len: int = 1) -> list[str]:
+        msgs = [
+            msg[1:]
+            for msg in self.ipc_info
+            if len(msg) == expected_len + 1 and msg[0] == name
+        ]
+        if expected_len == 1:
+            return [msg[1] for msg in msgs]
+        return msgs
 
     def get_single(self, name: str, default: str) -> str:
         gen = self.get(name)
