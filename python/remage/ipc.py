@@ -88,7 +88,7 @@ class IpcResult:
             if len(msg) == expected_len + 1 and msg[0] == name
         ]
         if expected_len == 1:
-            return [msg[1] for msg in msgs]
+            return [msg[0] for msg in msgs]
         return msgs
 
     def get_single(self, name: str, default: str) -> str:
