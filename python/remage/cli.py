@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import contextlib
 import logging
 import os
@@ -8,12 +9,12 @@ import signal
 import subprocess
 import sys
 import threading
-import argparse
 from collections.abc import Iterable
 from pathlib import Path
 
 import colorlog
 from lgdo import lh5
+from reboost.build_hit import build_hit
 
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
@@ -287,21 +288,35 @@ def remage_run_from_args(
         see :meth:`remage_run`
     """
     logger = _setup_log()
-    
+
     parser = argparse.ArgumentParser(allow_abbrev=False, add_help=False)
-    
+
     # python only arguments
-    parser.add_argument("-m","--merge-output-files", action="store_true",
-        help="Flag to merge output files")
-    parser.add_argument("-r","--reshape-output", action="store_true",
-        help="Flag to reshape output steps so the output is `hit` oriented.")
-    parser.add_argument("-T","--time-window-in-us", required=False,type=float,
-        help="Time window (in us) to group together steps for reshping")
-    
+    parser.add_argument(
+        "-m",
+        "--merge-output-files",
+        action="store_true",
+        help="Flag to merge output files",
+    )
+    parser.add_argument(
+        "-r",
+        "--reshape-output",
+        action="store_true",
+        help="Flag to reshape output steps so the output is `hit` oriented.",
+    )
+    parser.add_argument(
+        "-T",
+        "--time-window-in-us",
+        required=False,
+        type=float,
+        metavar="",
+        help="Time window in microseconds to group steps for reshaping.",
+    )
+
     py_args, cpp_args = parser.parse_known_args(args)
-    
+
     ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
-    
+
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
         log.error(
@@ -348,8 +363,8 @@ def remage_run_from_args(
     # output post-processing (merging multiple LH5 files)
     output_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
-    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"  # noqa: F841
-    registered_detectors = ipc_info.get("detector", 3)  # noqa: F841
+    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
+    registered_detectors = ipc_info.get("detector", 3)
 
     # we might have no output file.
     if len(output_files) > 1 and main_output_file is not None:
@@ -359,23 +374,35 @@ def remage_run_from_args(
         }
         if output_file_exts == {".lh5"}:
             # merge output files if requested
-            if py_args.merge_output_files and py_args.reshape_output:
-                # config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window_in_us)
-                # build_hit(
-                #    config
-                #    {},
-                #    stp_files = output_files,
-                #    glm_files = None,
-                #    hit_files = main_output_file
-                # )
-                msg = "Reshaping output files is not implemented yet"
-                raise NotImplementedError(msg)
+            if py_args.reshape_output:
+                msg = "Begin reshaping output files."
+                log.info(msg)
 
-            lh5.concat.lh5concat(
-                lh5_files=output_files,
-                output=main_output_file,
-                overwrite=overwrite_output,
-            )
+                hit_files = (
+                    main_output_file if py_args.merge_output_files else output_files
+                )
+                config = get_rebooost_config(
+                    registered_detectors,
+                    ["vertices"],
+                    time_window=args.time_window_in_us,
+                )
+                build_hit(
+                    config,
+                    {},
+                    stp_files=output_files,
+                    glm_files=None,
+                    hit_files=hit_files,
+                )
+
+            elif py_args.merge_output_files:
+                msg = "Begin merging output files."
+                log.info(msg)
+
+                lh5.concat.lh5concat(
+                    lh5_files=output_files,
+                    output=main_output_file,
+                    overwrite=overwrite_output,
+                )
 
             if py_args.merge_output_files:
                 # set the merged output file for downstream consumers.
