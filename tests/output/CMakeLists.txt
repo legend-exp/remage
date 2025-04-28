@@ -20,10 +20,9 @@ set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-per-det-auto.mac
             ntuple-per-det-vol-auto.mac ntuple-flat.mac ntuple-flat-with-tracks.mac)
 
 foreach(_mac ${_macros})
-  add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh $<TARGET_FILE:remage-cli-cpp>
-                                            ${PYTHONPATH} ${_remage_to_lh5} ${_mac})
-  add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh $<TARGET_FILE:remage-cli-cpp>
-                                            ${_mac})
+  add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
+                                            ${_remage_to_lh5} ${_mac})
+  add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh ${REMAGE_PYEXE} ${_mac})
 endforeach()
 
 list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
