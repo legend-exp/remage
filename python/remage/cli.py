@@ -34,7 +34,7 @@ def get_rebooost_config(
     reshape_table_list
         a list of the table in the remage file that need to be reshaped
         (i.e. Germanium or Scintillator output)
-    other_table_lust
+    other_table_list
         other tables in the file.
     time_window
         time window to use for building hits (in us).
