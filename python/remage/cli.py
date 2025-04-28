@@ -12,50 +12,59 @@ from collections.abc import Iterable
 from pathlib import Path
 
 import colorlog
+from lgdo import lh5
 
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 
 log = logging.getLogger(__name__)
 
-def get_rebooost_config(reshape_table_list:list[str],other_table_list:list[str],*,time_window:float=10)->dict:
+
+def get_rebooost_config(
+    reshape_table_list: list[str],
+    other_table_list: list[str],
+    *,
+    time_window: float = 10,
+) -> dict:
     """Get the config file to run reboost.
 
     Parameters
     ----------
     reshape_table_list
-        a list of the table in the remage file that need to be reshaped 
+        a list of the table in the remage file that need to be reshaped
         (i.e. Germanium or Scintillator output)
-    other_table_lust    
+    other_table_lust
         other tables in the file.
     time_window
         time window to use for building hits (in us).
-    
+
     Returns
     -------
     config file as a dictionary.
     """
 
-    config = { "processing_groups": []}
+    config = {"processing_groups": []}
 
     # get the config for tables to be reshaped
-    reshape_tables = { 
-            "name": "all",
-            "detector_mapping": [{"output":table for table in reshape_table_list}
-            ],
-            "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
-        }
+    reshape_tables = {
+        "name": "all",
+        "detector_mapping": [{"output": table} for table in reshape_table_list],
+        "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
+    }
     config["processing_groups"].append(reshape_tables)
-    
+
     for other in other_table_list:
-        config["processing_groups"].append({
+        config["processing_groups"].append(
+            {
                 "name": other,
                 "detector_mapping": [
                     {"output": other},
                 ],
-            })
+            }
+        )
 
     return config
+
 
 def _run_remage_cpp(
     args: list[str] | None = None,
@@ -330,36 +339,31 @@ def remage_run_from_args(
             Path(p).suffix.lower() for p in [*output_files, main_output_file]
         }
         if output_file_exts == {".lh5"}:
-            
             # merge output files if requested
+            if args.merge_output_files and args.reshape_output_files:
+                # config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window)
+                # build_hit(
+                #    config
+                #    {},
+                #    stp_files = output_files,
+                #    glm_files = None,
+                #    hit_files = main_output_file
+                # )
+                msg = "Reshaping output files is not implemented yet"
+                raise NotImplementedError(msg)
+            lh5.concat.lh5concat(
+                lh5_files=output_files,
+                output=main_output_file,
+                overwrite=overwrite_output,
+            )
+
             if args.merge_output_files:
-                if args.reshape_output_files:
-                    
-                    #config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window)
-                    #build_hit(
-                    #    config
-                    #    {},
-                    #    stp_files = output_files,
-                    #    glm_files = None,
-                    #    hit_files = main_output_file
-                    #)
-                    msg = "Reshaping output files is not implemented yet"
-                    raise NotImplementedError(msg)
-
-                else:
-
-                    lh5.concat.lh5concat(
-                    lh5_files=output_files,
-                    output=main_output_file,
-                    overwrite=overwrite_output)
-                
                 # set the merged output file for downstream consumers.
                 ipc_info.set("output", [main_output_file])
-                
-                # delete un-merged output files.
-                 for f in output_files:
-                     Path(f).unlink()
 
+                # delete un-merged output files.
+                for f in output_files:
+                    Path(f).unlink()
 
     elif len(output_files) > 1:
         # no main output file, which is wrong.

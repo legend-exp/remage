@@ -90,7 +90,8 @@ int main(int argc, char** argv) {
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_flag("-m,--merge", merge_out_files, "Merge output files");
-  app.add_flag("-r,--reshape", reshape_out_files, "Reshape output files (group steps) so output is `hit` oriented");
+  app.add_flag("-r,--reshape", reshape_out_files,
+      "Reshape output files (group steps) so output is `hit` oriented");
   app.add_flag("-T,--time_window", time_window, "Time window for grouping steps, in us.");
 
   app.add_option("--pipe-fd", pipe_fd,
