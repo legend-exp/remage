@@ -418,8 +418,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
         el.native_sample = false;
         if (fOnSurface)
-          RMGLog::OutDev(RMGLog::error,
-              "Surface sampling is not implemented for volumes with daughters");
+            RMGLog::OutDev(RMGLog::warning,
+                "Surface sampling is on the mother volume for volumes with daughters.");
 
       } else {
         RMGLog::OutDev(RMGLog::debug, "Has no daughters, no containment check needed");
@@ -431,8 +431,8 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     else if (fOnSurface) {
 
       if (log_vol->GetNoDaughters() > 0)
-        RMGLog::OutDev(RMGLog::error,
-            "Surface sampling is not implemented for volumes with daughters");
+        RMGLog::OutDev(RMGLog::warning,
+            "Surface sampling is on the mother volume for volumes with daughters.");
 
       RMGLog::Out(RMGLog::debug, "Physical volume '", el.physical_volume->GetName(),
           "' does not satisfy requirements for native surface sampling so resort to general "
