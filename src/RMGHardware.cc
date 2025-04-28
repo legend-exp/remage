@@ -30,6 +30,7 @@ namespace fs = std::filesystem;
 #include "RMGGermaniumDetector.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGHardwareMessenger.hh"
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGNavigationTools.hh"
@@ -271,6 +272,9 @@ void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_n
     RMGLog::OutFormat(RMGLog::detail,
         "Registered physical volume '{}' (copy nr. {}) as {} detector type (uid={})", pv_name,
         copy_nr, magic_enum::enum_name(type), uid);
+
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("detector",
+        fmt::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)));
   }
 }
 
