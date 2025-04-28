@@ -347,9 +347,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     inline void SetGeomCylinderInnerRadius(double r) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
     }
-    inline void SetGeomCylinderInnerRadius(double r) {
-      this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
-    }
     inline void SetGeomCylinderOuterRadius(double r) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_outer_radius = r;
     }
