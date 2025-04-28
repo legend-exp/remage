@@ -18,6 +18,44 @@ from .ipc import IpcResult, ipc_thread_fn
 
 log = logging.getLogger(__name__)
 
+def get_rebooost_config(reshape_table_list:list[str],other_table_list:list[str],*,time_window:float=10)->dict:
+    """Get the config file to run reboost.
+
+    Parameters
+    ----------
+    reshape_table_list
+        a list of the table in the remage file that need to be reshaped 
+        (i.e. Germanium or Scintillator output)
+    other_table_lust    
+        other tables in the file.
+    time_window
+        time window to use for building hits (in us).
+    
+    Returns
+    -------
+    config file as a dictionary.
+    """
+
+    config = { "processing_groups": []}
+
+    # get the config for tables to be reshaped
+    reshape_tables = { 
+            "name": "all",
+            "detector_mapping": [{"output":table for table in reshape_table_list}
+            ],
+            "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
+        }
+    config["processing_groups"].append(reshape_tables)
+    
+    for other in other_table_list:
+        config["processing_groups"].append({
+                "name": other,
+                "detector_mapping": [
+                    {"output": other},
+                ],
+            })
+
+    return config
 
 def _run_remage_cpp(
     args: list[str] | None = None,
@@ -131,6 +169,9 @@ def remage_run(
     output: str | None = None,
     threads: int = 1,
     overwrite_output: bool = False,
+    merge_output_files: bool = False,
+    reshape_output_files: bool = False,
+    time_window: float | None = None,
     macro_substitutions: dict[str, str] | None = None,
     log_level: str | None = None,
     raise_on_error: bool = True,
@@ -155,6 +196,12 @@ def remage_run(
         set the number of threads used by remage
     overwrite_output
         overwrite existing output files
+    merge_output_files
+        merge output files from individual threads.
+    reshape_output_files
+        reshape output files to be hit oriented.
+    time_window
+        time window to group together steps.
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
@@ -180,6 +227,15 @@ def remage_run(
         args.append(f"--output-file={output}")
 
     args.append(f"--threads={threads}")
+
+    if merge_output_files:
+        args.append("--merge")
+
+    if reshape_output_files:
+        args.append("--reshape")
+
+    if time_window is not None:
+        args.append(f"--time_window {time_window}")
 
     if overwrite_output:
         args.append("--overwrite")
@@ -266,6 +322,7 @@ def remage_run_from_args(
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"  # noqa: F841
     registered_detectors = ipc_info.get("detector", 3)  # noqa: F841
+
     # we might have no output file.
     if len(output_files) > 1 and main_output_file is not None:
         assert main_output_file not in output_files
@@ -273,17 +330,37 @@ def remage_run_from_args(
             Path(p).suffix.lower() for p in [*output_files, main_output_file]
         }
         if output_file_exts == {".lh5"}:
-            pass
-            # lh5.concat.lh5concat(
-            #     lh5_files=output_files,
-            #     output=main_output_file,
-            #     overwrite=overwrite_output,
-            # )
-            # set the merged output file for downstream consumers.
-            # ipc_info.set("output", [main_output_file])
-            # delete un-merged output files.
-            # for f in output_files:
-            #     Path(f).unlink()
+            
+            # merge output files if requested
+            if args.merge_output_files:
+                if args.reshape_output_files:
+                    
+                    #config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window)
+                    #build_hit(
+                    #    config
+                    #    {},
+                    #    stp_files = output_files,
+                    #    glm_files = None,
+                    #    hit_files = main_output_file
+                    #)
+                    msg = "Reshaping output files is not implemented yet"
+                    raise NotImplementedError(msg)
+
+                else:
+
+                    lh5.concat.lh5concat(
+                    lh5_files=output_files,
+                    output=main_output_file,
+                    overwrite=overwrite_output)
+                
+                # set the merged output file for downstream consumers.
+                ipc_info.set("output", [main_output_file])
+                
+                # delete un-merged output files.
+                 for f in output_files:
+                     Path(f).unlink()
+
+
     elif len(output_files) > 1:
         # no main output file, which is wrong.
         msg = "invalid output information returned over ipc"
