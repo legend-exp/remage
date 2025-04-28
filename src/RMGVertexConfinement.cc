@@ -124,7 +124,6 @@ bool RMGVertexConfinement::SampleableObject::IsInside(const G4ThreeVector& verte
 std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersections(G4ThreeVector start,
     G4ThreeVector dir) const {
 
-
   // check if the physical volume exists
   if ((not this->physical_volume) or (not this->physical_volume->GetLogicalVolume()->GetSolid()))
     RMGLog::OutDev(RMGLog::fatal, "Cannot find number of intersections for a SampleableObject ",
@@ -154,11 +153,8 @@ std::vector<G4ThreeVector> RMGVertexConfinement::SampleableObject::GetIntersecti
     int_point = int_point + dist * dir;
 
     if (dist < kInfinity) intersections.push_back(int_point);
-
-
     counter++;
   }
-
 
   if (intersections.size() % 2)
     RMGLog::OutDev(RMGLog::fatal, "Found ", intersections.size(), " intersections. However,",
@@ -415,8 +411,6 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     // if the solid is simple one can avoid using bounding volumes for
     // sampling.  Both volume and native surface sampling are available
 
-    RMGLog::Out(RMGLog::summary, "solid ", solid_type, " is sampleable ? ",
-        RMGGeneratorUtil::IsSampleable(solid_type));
     if (RMGGeneratorUtil::IsSampleable(solid_type)) {
       RMGLog::OutDev(RMGLog::debug, "Is sampleable natively (no bounding boxes)");
       el.sampling_solid = solid;
