@@ -36,8 +36,6 @@ namespace u = CLHEP;
 
 RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
 
-  this->DefineCommands();
-
   // set default clustering parameters
   fPreClusterPars.cluster_time_threshold = 10 * CLHEP::us;
   fPreClusterPars.cluster_distance = 10 * CLHEP::um;
@@ -46,6 +44,9 @@ RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
   fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
   fPreClusterPars.combine_low_energy_tracks = false;
   fPreClusterPars.reassign_gamma_energy = false;
+
+  this->DefineCommands();
+
 }
 
 

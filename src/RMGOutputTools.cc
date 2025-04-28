@@ -244,10 +244,11 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   std::vector<std::vector<RMGDetectorHit*>> hits_vector;
 
   // keep track of the current cluster
-  RMGDetectorHit* cluster_first_hit = nullptr;
 
   // loop over trackid and then hits in each track
   for (const auto& [trackid, input_hits] : hits_map) {
+    RMGDetectorHit* cluster_first_hit = nullptr;
+
     for (auto hit : input_hits) {
 
       if (!hit) continue;
@@ -265,7 +266,6 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
                                (hit->detector_uid != cluster_first_hit->detector_uid) or
                                (std::abs(hit->global_time - cluster_first_hit->global_time) >
                                    cluster_pars.cluster_time_threshold);
-
       // check distances and if the track moved from surface to bulk
       if (!start_new_cluster) {
         bool is_surface = has_distance_to_surface and
@@ -281,11 +281,13 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
         double threshold =
             is_surface ? cluster_pars.cluster_distance_surface : cluster_pars.cluster_distance;
 
+
         // start a new cluster also if the distance is above the threshold
         start_new_cluster =
             surface_transition ||
-            (hit->global_position_average - cluster_first_hit->global_position_average).mag() >
+            (hit->global_position_average - cluster_first_hit->global_position_average).mag() >=
                 threshold;
+
       }
 
       // add the hit to the correct vector
