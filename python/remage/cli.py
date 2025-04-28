@@ -265,6 +265,7 @@ def remage_run_from_args(
     output_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"  # noqa: F841
+    registered_detectors = ipc_info.get("detector", 3)  # noqa: F841
     # we might have no output file.
     if len(output_files) > 1 and main_output_file is not None:
         assert main_output_file not in output_files
