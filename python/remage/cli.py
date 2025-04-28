@@ -8,6 +8,7 @@ import signal
 import subprocess
 import sys
 import threading
+import argparse
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -238,13 +239,13 @@ def remage_run(
     args.append(f"--threads={threads}")
 
     if merge_output_files:
-        args.append("--merge")
+        args.append("--merge-output-files")
 
     if reshape_output_files:
-        args.append("--reshape")
+        args.append("--reshape-output")
 
     if time_window is not None:
-        args.append(f"--time_window {time_window}")
+        args.append(f"--time-window-in-us {time_window}")
 
     if overwrite_output:
         args.append("--overwrite")
@@ -286,8 +287,21 @@ def remage_run_from_args(
         see :meth:`remage_run`
     """
     logger = _setup_log()
-
-    ec, termsig, ipc_info = _run_remage_cpp(args, is_cli=args is None)
+    
+    parser = argparse.ArgumentParser(allow_abbrev=False, add_help=False)
+    
+    # python only arguments
+    parser.add_argument("-m","--merge-output-files", action="store_true",
+        help="Flag to merge output files")
+    parser.add_argument("-r","--reshape-output", action="store_true",
+        help="Flag to reshape output steps so the output is `hit` oriented.")
+    parser.add_argument("-T","--time-window-in-us", required=False,type=float,
+        help="Time window (in us) to group together steps for reshping")
+    
+    py_args, cpp_args = parser.parse_known_args(args)
+    
+    ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
+    
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
         log.error(
@@ -298,6 +312,11 @@ def remage_run_from_args(
 
     # clean-up should run always, irrespective of exit code.
     _cleanup_tmp_files(ipc_info)
+
+    if "-h" in cpp_args or "--help" in cpp_args:
+        print()  # noqa: T201
+        print("PYTHON-ONLY OPTIONS:")  # noqa: T201
+        print("\n".join(parser.format_help().split("\n")[3:]))  # noqa: T201
 
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
@@ -340,8 +359,8 @@ def remage_run_from_args(
         }
         if output_file_exts == {".lh5"}:
             # merge output files if requested
-            if args.merge_output_files and args.reshape_output_files:
-                # config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window)
+            if py_args.merge_output_files and py_args.reshape_output:
+                # config get_rebooost_config(reshape_table_list,other_table_list,time_window = args.time_window_in_us)
                 # build_hit(
                 #    config
                 #    {},
@@ -351,13 +370,14 @@ def remage_run_from_args(
                 # )
                 msg = "Reshaping output files is not implemented yet"
                 raise NotImplementedError(msg)
+
             lh5.concat.lh5concat(
                 lh5_files=output_files,
                 output=main_output_file,
                 overwrite=overwrite_output,
             )
 
-            if args.merge_output_files:
+            if py_args.merge_output_files:
                 # set the merged output file for downstream consumers.
                 ipc_info.set("output", [main_output_file])
 

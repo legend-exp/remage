@@ -59,9 +59,6 @@ int main(int argc, char** argv) {
   int nthreads = 1;
   bool interactive = false;
   bool overwrite_output = false;
-  bool merge_out_files = false;
-  bool reshape_out_files = false;
-  double time_window = 0;
 
   int pipe_fd = -1;
   std::vector<std::string> gdmls;
@@ -89,10 +86,6 @@ int main(int argc, char** argv) {
       ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
-  app.add_flag("-m,--merge", merge_out_files, "Merge output files");
-  app.add_flag("-r,--reshape", reshape_out_files,
-      "Reshape output files (group steps) so output is `hit` oriented");
-  app.add_flag("-T,--time_window", time_window, "Time window for grouping steps, in us.");
 
   app.add_option("--pipe-fd", pipe_fd,
          "Pipe file descriptor for inter-process communication (internal)")
