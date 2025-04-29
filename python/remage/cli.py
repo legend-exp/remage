@@ -166,9 +166,11 @@ def remage_run(
     merge_output_files
         merge output files from individual threads.
     reshape_output_files
-        reshape output files to be hit oriented.
+        perhaps a reshaping of the output files so that each row in the output
+        table represents the steps in a physical interaction in a detector, based on the
+        time-window. This results in each column being a :class:`VectorOfVectors`.
     time_window
-        time window to group together steps.
+        time window to group together steps, in us.
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
@@ -318,8 +320,16 @@ def remage_run_from_args(
     remage_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
-    detector_info = ipc_info.get("detector", 3)
-    registered_detectors = [f"det{int(det[1]):03d}" for det in detector_info]
+    detector_info = ipc_info.get("output_table", 2)
+
+    # registered scintillator or germanium detectors
+    registered_detectors = list(
+        {
+            det[1]
+            for det in detector_info
+            if det[0] == "germanium" or det[0] == "scintillator"
+        }
+    )
 
     # we might have no output file.
     if len(remage_files) > 1 and main_output_file is not None:
@@ -330,8 +340,6 @@ def remage_run_from_args(
 
         # post-processing only for lh5 files
         if output_file_exts == {".lh5"}:
-            msg = "Begin python based post-processing."
-            log.info(msg)
             time_start = time.time()
 
             # get the output files
@@ -345,23 +353,20 @@ def remage_run_from_args(
 
             # if reshaping was requested call reboost
             if py_args.reshape_output:
-                msg = "Begin reshaping output files."
+                msg = "Reshaping output files."
                 log.info(msg)
 
-                print(registered_detectors)
                 # get the additional tables to copy
                 extra_tables = utils.get_extra_tables(
                     original_files[0], registered_detectors
                 )
-                print(extra_tables)
 
                 config = utils.get_rebooost_config(
                     registered_detectors,
                     extra_tables,
                     time_window=py_args.time_window_in_us,
                 )
-                print(original_files)
-                print(output_files)
+
                 # use reboost to post-process outputs
                 build_hit(
                     config,
@@ -373,7 +378,7 @@ def remage_run_from_args(
 
             # else use lh5concat
             elif py_args.merge_output_files:
-                msg = "Begin merging output files"
+                msg = "Merging output files"
                 log.info(msg)
 
                 lh5concat(
@@ -385,9 +390,6 @@ def remage_run_from_args(
             if py_args.merge_output_files or py_args.reshape_output:
                 # set the merged output file for downstream consumers.
                 ipc_info.set("output", output_files)
-
-                msg = "Deleting original remage files."
-                log.info(msg)
 
                 # delete un-merged output files.
                 for f in original_files:
