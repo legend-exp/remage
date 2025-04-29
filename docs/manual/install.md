@@ -84,7 +84,28 @@ If you have installed remage from a pre-built binary using apptainer, your kerne
 }
 ```
 
-If you instead installed using docker it should look something like this: I did not get this working yet :cry:
+If you instead installed using docker it should look something like this:
+
+```json
+{
+  "argv": [
+    "sh",
+    "-c",
+    "docker run --rm --network=host --entrypoint python -v $XDG_RUNTIME_DIR:$XDG_RUNTIME_DIR -v $(pwd):$(pwd) -w $(pwd) legendexp/remage:dev -m ipykernel_launcher -f {connection_file}"
+  ],
+  "display_name": "remage (docker-dev)",
+  "language": "python",
+  "metadata": {
+    "debugger": true
+  }
+}
+```
+
+:::{note} On macOS `--network=host` is not supported. Try `"docker run --rm --entrypoint python -v $(pwd):/work -v $HOME/.jupyter/runtime:/root/.jupyter/runtime -w /work legendexp/remage:dev -m ipykernel_launcher -f {connection_file}"` instead. This is untested and not sure if it works.
+:::
+
+:::{warning} Upon start, the kernel will start a new docker container, but for some reason the container will never be terminated, unless you manually os.\_exit(0) from within the kernel.
+:::
 
 Now after refreshing JupyterLab/VSCode you should be able to find the "remage" kernel in your notebooks! You might have to search for it under "Select another Kernel" "Jupyter kernel..." depending on your installation, the name should be equal to the name under `display_name` in the `kernel.json`.
 
