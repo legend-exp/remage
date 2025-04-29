@@ -389,9 +389,9 @@ def remage_run_from_args(
                 for f in original_files:
                     Path(f).unlink()
 
-        msg = f"Finished post-processing which took {time.time()-time_start} s" 
+        msg = f"Finished post-processing which took {int(time.time()-time_start)} s" 
         log.info(msg)
-        
+
     elif len(remage_files) > 1:
         # no main output file, which is wrong.
         msg = "invalid output information returned over ipc"
