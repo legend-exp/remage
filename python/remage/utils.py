@@ -57,9 +57,9 @@ def get_rebooost_config(
 def get_extra_tables(file: str, detectors: list[str]) -> list[str]:
     """Extract the additional tables in the output file (not detectors)."""
 
-    tables = lh5.ls(file, lh5_group="stp")
+    tables = lh5.ls(file, lh5_group="stp/")
 
-    return [tab for tab in tables if tab not in detectors]
+    return [tab.split("/")[1] for tab in tables if tab.split("/")[1] not in detectors]
 
 
 def make_tmp(files: list[str] | str) -> list[str]:

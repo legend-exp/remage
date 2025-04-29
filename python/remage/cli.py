@@ -266,6 +266,7 @@ def remage_run_from_args(
         required=False,
         type=float,
         metavar="",
+        default=10,
         help="Time window in microseconds to group steps for reshaping.",
     )
     py_args, cpp_args = parser.parse_known_args(args)
@@ -317,7 +318,8 @@ def remage_run_from_args(
     remage_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
-    registered_detectors = ipc_info.get("detector", 3)
+    detector_info = ipc_info.get("detector", 3)
+    registered_detectors = [f"det{int(det[1]):03d}" for det in detector_info]
 
     # we might have no output file.
     if len(remage_files) > 1 and main_output_file is not None:
@@ -328,7 +330,6 @@ def remage_run_from_args(
 
         # post-processing only for lh5 files
         if output_file_exts == {".lh5"}:
-
             msg = "Begin python based post-processing."
             log.info(msg)
             time_start = time.time()
@@ -347,17 +348,20 @@ def remage_run_from_args(
                 msg = "Begin reshaping output files."
                 log.info(msg)
 
+                print(registered_detectors)
                 # get the additional tables to copy
                 extra_tables = utils.get_extra_tables(
                     original_files[0], registered_detectors
                 )
+                print(extra_tables)
 
                 config = utils.get_rebooost_config(
                     registered_detectors,
                     extra_tables,
-                    time_window=args.time_window_in_us,
+                    time_window=py_args.time_window_in_us,
                 )
-
+                print(original_files)
+                print(output_files)
                 # use reboost to post-process outputs
                 build_hit(
                     config,
@@ -382,14 +386,14 @@ def remage_run_from_args(
                 # set the merged output file for downstream consumers.
                 ipc_info.set("output", output_files)
 
-                msg = f"Deleting original remage files."
+                msg = "Deleting original remage files."
                 log.info(msg)
 
                 # delete un-merged output files.
                 for f in original_files:
                     Path(f).unlink()
 
-        msg = f"Finished post-processing which took {int(time.time()-time_start)} s" 
+        msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
         log.info(msg)
 
     elif len(remage_files) > 1:
@@ -397,7 +401,6 @@ def remage_run_from_args(
         msg = "invalid output information returned over ipc"
         raise ValueError(msg)
     ipc_info.remove("output_main")
-
 
     return ec, ipc_info
 
