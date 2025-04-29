@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from lgdo import lh5
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,13 @@ def get_rebooost_config(
 
     return config
 
+def get_extra_tables(file:str,detectors:list[str])->list[str]:
+    """Extract the additional tables in the output file (not detectors)."""
 
+    tables = lh5.ls(file,lh5_group = "stp")
+    
+    return [tab in tables if tab not in detectors]
+    
 def make_tmp(files: list[str] | str) -> list[str]:
     """Append files with a '.' so they can be overwritten."""
 
