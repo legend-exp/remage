@@ -101,6 +101,8 @@ void RMGIsotopeFilterScheme::DefineCommands() {
                    "had not been produced in the same event.")
       .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
                    "isotope filter does not force the photons to be simulated.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 }
 

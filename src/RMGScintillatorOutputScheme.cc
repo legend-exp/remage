@@ -185,14 +185,13 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/",
       "Commands for controlling output from hits in scintillator detectors.");
 
-  fMessenger
-      ->DeclareMethodWithUnit("SetEdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
+  fMessenger->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetEdepCutHigh", "keV", &RMGScintillatorOutputScheme::SetEdepCutHigh)
+      ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGScintillatorOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
@@ -205,10 +204,14 @@ void RMGScintillatorOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 }
 

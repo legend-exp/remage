@@ -2,7 +2,7 @@
 # have to generate high statistics for all ntuples to be filled.
 /RMG/Manager/Randomization/Seed 1403045780
 
-/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Geometry/GDMLDisableOverlapCheck
 
 /run/initialize
 

@@ -327,7 +327,7 @@ void RMGManager::DefineCommands() {
 
   fMessenger->DeclareProperty("Interactive", fInteractive)
       .SetGuidance("Enable interactive mode")
-      .SetParameterName("interactive", true)
+      .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle);
 
@@ -359,7 +359,6 @@ void RMGManager::DefineCommands() {
       .SetGuidance("Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)")
       .SetParameterName("n", false)
       .SetRange("n >= 0")
-      .SetDefaultValue("1")
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fRandMessenger->DeclareMethod("InternalSeed", &RMGManager::SetRandEngineInternalSeed)

@@ -87,6 +87,7 @@ void RMGTrackingAction::DefineCommands() {
   fMessenger->DeclareProperty("ResetInitialDecayTime", fResetInitialDecayTime)
       .SetGuidance("If the initial step is a radioactive decay, reset the global time of all its "
                    "secondary tracks to 0.")
+      .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 

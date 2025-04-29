@@ -17,6 +17,6 @@
 
 /RMG/Generator/Select MUSUNCosmicMuons
 
-/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile MUSUN_10k_events.dat
+/RMG/Generator/MUSUNCosmicMuons/MUSUNFile MUSUN_10k_events.dat
 
 /run/beamOn 10
