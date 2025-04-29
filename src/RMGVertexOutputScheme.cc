@@ -18,6 +18,7 @@
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
@@ -31,6 +32,7 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto vid = RMGManager::Instance()->RegisterNtuple("vertices",
       ana_man->CreateNtuple("vertices", "Primary vertex data"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evertices"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -44,6 +46,7 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fStorePrimaryParticleInformation) {
     auto pid = RMGManager::Instance()->RegisterNtuple("particles",
         ana_man->CreateNtuple("particles", "Primary particle data"));
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1eparticles"));
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");
