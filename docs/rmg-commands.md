@@ -204,16 +204,18 @@ Commands for controlling output from hits in germanium detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `SetPreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
-* `SetPreTimeThreshold * Set a time threshold for` – pre-clustering.
-* `SetSurfaceThickness` – Set a surface thickness for the Germanium detector.
-* `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `SurfaceThickness` – Set a surface thickness for the Germanium detector.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
@@ -277,7 +279,7 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetPreClusterDistance`
+### `/RMG/Output/Germanium/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
 
@@ -291,7 +293,7 @@ Set a distance threshold for the bulk pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetPreClusterDistanceSurface`
+### `/RMG/Output/Germanium/PreClusterDistanceSurface`
 
 Set a distance threshold for the surface pre-clustering.
 
@@ -305,7 +307,7 @@ Set a distance threshold for the surface pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetPreTimeThreshold`
+### `/RMG/Output/Germanium/PreClusterTimeThreshold`
 
 Set a time threshold for  pre-clustering.
 
@@ -319,7 +321,7 @@ Set a time threshold for  pre-clustering.
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetSurfaceThickness`
+### `/RMG/Output/Germanium/SurfaceThickness`
 
 Set a surface thickness for the Germanium detector.
 
@@ -333,7 +335,7 @@ Set a surface thickness for the Germanium detector.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetElectronTrackEnergyThreshold`
+### `/RMG/Output/Germanium/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
 
@@ -497,9 +499,9 @@ Commands for controlling output from hits in scintillator detectors.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `SetPreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
-* `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StepPositionMode` – Select which position of the step to store
@@ -595,7 +597,7 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/SetPreClusterDistance`
+### `/RMG/Output/Scintillator/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
 
@@ -609,7 +611,7 @@ Set a distance threshold for the bulk pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/SetPreClusterTimeThreshold`
+### `/RMG/Output/Scintillator/PreClusterTimeThreshold`
 
 Set a time threshold for  pre-clustering.
 
@@ -623,7 +625,7 @@ Set a time threshold for  pre-clustering.
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/SetElectronTrackEnergyThreshold`
+### `/RMG/Output/Scintillator/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
 

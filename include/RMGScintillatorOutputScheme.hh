@@ -16,9 +16,9 @@
 #ifndef _RMG_SCINTILLATOR_OUTPUT_SCHEME_HH_
 #define _RMG_SCINTILLATOR_OUTPUT_SCHEME_HH_
 
+#include <memory>
 #include <optional>
 #include <set>
-#include <memory>
 
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"

@@ -161,7 +161,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
   auto hit_coll = GetHitColl(event);
 
   if (!hit_coll) return;
-  
+
   if (hit_coll->entries() <= 0) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
     return;
@@ -172,7 +172,6 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
   // pre-cluster the hits if requested
   if (fPreClusterHits)
     hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, false, true);
-
 
 
   auto rmg_man = RMGManager::Instance();

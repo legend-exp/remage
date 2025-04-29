@@ -339,8 +339,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SurfaceThickness", "mm",
-          &RMGGermaniumOutputScheme::SetSurfaceThickness)
+      ->DeclareMethodWithUnit("SurfaceThickness", "mm", &RMGGermaniumOutputScheme::SetSurfaceThickness)
       .SetGuidance("Set a surface thickness for the Germanium detector.")
       .SetParameterName("thickness", false)
       .SetStates(G4State_Idle);
