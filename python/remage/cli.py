@@ -9,11 +9,12 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 from collections.abc import Iterable
 from pathlib import Path
 
 import colorlog
-from lgdo import lh5
+from lgdo.lh5.concat import lh5concat
 from reboost.build_hit import build_hit
 
 from . import utils
@@ -108,7 +109,7 @@ def _setup_log() -> logging.Logger:
     logger = logging.getLogger("remage")
 
     if sys.stderr.isatty():
-        fmt = "%(log_color)s[%(levelname)s %(name)s%(reset)s %(message)s"
+        fmt = "%(log_color)s[%(levelname)s  -> %(reset)s %(message)s"
 
         handler = colorlog.StreamHandler()
         handler.setFormatter(colorlog.ColoredFormatter(fmt))
@@ -267,7 +268,6 @@ def remage_run_from_args(
         metavar="",
         help="Time window in microseconds to group steps for reshaping.",
     )
-
     py_args, cpp_args = parser.parse_known_args(args)
 
     ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
@@ -328,6 +328,11 @@ def remage_run_from_args(
 
         # post-processing only for lh5 files
         if output_file_exts == {".lh5"}:
+
+            msg = "Begin python based post-processing."
+            log.info(msg)
+            time_start = time.time()
+
             # get the output files
             output_files = (
                 [main_output_file] if py_args.merge_output_files else remage_files
@@ -364,10 +369,10 @@ def remage_run_from_args(
 
             # else use lh5concat
             elif py_args.merge_output_files:
-                msg = "Begin merging output files."
+                msg = "Begin merging output files"
                 log.info(msg)
 
-                lh5.concat.lh5concat(
+                lh5concat(
                     lh5_files=original_files,
                     output=main_output_file,
                     overwrite=overwrite_output,
@@ -377,15 +382,22 @@ def remage_run_from_args(
                 # set the merged output file for downstream consumers.
                 ipc_info.set("output", output_files)
 
+                msg = f"Deleting original remage files."
+                log.info(msg)
+
                 # delete un-merged output files.
                 for f in original_files:
                     Path(f).unlink()
 
-    elif len(output_files) > 1:
+        msg = f"Finished post-processing which took {time.time()-time_start} s" 
+        log.info(msg)
+        
+    elif len(remage_files) > 1:
         # no main output file, which is wrong.
         msg = "invalid output information returned over ipc"
         raise ValueError(msg)
     ipc_info.remove("output_main")
+
 
     return ec, ipc_info
 
