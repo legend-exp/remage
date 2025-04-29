@@ -59,7 +59,6 @@ int main(int argc, char** argv) {
   int nthreads = 1;
   bool interactive = false;
   bool overwrite_output = false;
-
   int pipe_fd = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
@@ -86,7 +85,6 @@ int main(int argc, char** argv) {
       ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
-
   app.add_option("--pipe-fd", pipe_fd,
          "Pipe file descriptor for inter-process communication (internal)")
       ->group(""); // group("") hides the option from help output.
