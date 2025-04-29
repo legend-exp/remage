@@ -20,6 +20,7 @@
 #include "G4EventManager.hh"
 #include "G4OpticalPhoton.hh"
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
@@ -31,6 +32,7 @@ RMGTrackOutputScheme::RMGTrackOutputScheme() { this->DefineCommands(); }
 void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   auto vid = RMGManager::Instance()->RegisterNtuple("tracks",
       ana_man->CreateNtuple("tracks", "Track vertex data"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1etracks"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleIColumn(vid, "trackid");
@@ -50,6 +52,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto pid = RMGManager::Instance()->RegisterNtuple("processes",
       ana_man->CreateNtuple("processes", "process name mapping"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1eprocesses"));
   ana_man->CreateNtupleIColumn(pid, "procid");
   ana_man->CreateNtupleSColumn(pid, "name");
   ana_man->FinishNtuple(pid);
