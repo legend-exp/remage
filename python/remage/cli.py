@@ -341,9 +341,11 @@ def remage_run_from_args(
             if py_args.reshape_output:
                 msg = "Begin reshaping output files."
                 log.info(msg)
-                
-                # get the additional tables to copy 
-                extra_tables = utils.get_extra_tables(original_files[0],registered_detectors)
+
+                # get the additional tables to copy
+                extra_tables = utils.get_extra_tables(
+                    original_files[0], registered_detectors
+                )
 
                 config = utils.get_rebooost_config(
                     registered_detectors,
