@@ -18,6 +18,7 @@
 
 #include <optional>
 #include <set>
+#include <memory>
 
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"

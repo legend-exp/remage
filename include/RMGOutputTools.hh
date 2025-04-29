@@ -50,7 +50,7 @@ namespace RMGOutputTools {
    * discrete interactions happening at the post-step.
    * Otherwise if mode is @c kPreStep the prestep point is extracted, if it is either
    * @c kBoth or @c kAverage the average of pre and post step is used (in the case of
-   * @c kBoth the pre and post step will also be saved separately).
+   * @c kBoth the pre and post step should also be saved separately).
    */
   G4ThreeVector get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode);
 

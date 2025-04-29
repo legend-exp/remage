@@ -166,12 +166,8 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
   // get the hit collection - with preclustering if requested
   auto hit_coll = GetHitColl(event);
-  
+
   if (!hit_coll) return;
-
-  if (fPreClusterHits)
-    hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
-
 
   if (hit_coll->entries() <= 0) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
@@ -179,6 +175,10 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   } else {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
+
+  if (fPreClusterHits)
+    hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
+
 
   auto rmg_man = RMGManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
