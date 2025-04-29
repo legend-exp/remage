@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import contextlib
 import logging
 import os
@@ -8,11 +9,15 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 from collections.abc import Iterable
 from pathlib import Path
 
 import colorlog
+from lgdo.lh5.concat import lh5concat
+from reboost.build_hit import build_hit
 
+from . import utils
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 
@@ -104,7 +109,7 @@ def _setup_log() -> logging.Logger:
     logger = logging.getLogger("remage")
 
     if sys.stderr.isatty():
-        fmt = "%(log_color)s[%(levelname)s %(name)s%(reset)s %(message)s"
+        fmt = "%(log_color)s[%(levelname)s  -> %(reset)s %(message)s"
 
         handler = colorlog.StreamHandler()
         handler.setFormatter(colorlog.ColoredFormatter(fmt))
@@ -131,6 +136,9 @@ def remage_run(
     output: str | None = None,
     threads: int = 1,
     overwrite_output: bool = False,
+    merge_output_files: bool = False,
+    reshape_output_files: bool = False,
+    time_window: float | None = None,
     macro_substitutions: dict[str, str] | None = None,
     log_level: str | None = None,
     raise_on_error: bool = True,
@@ -155,6 +163,14 @@ def remage_run(
         set the number of threads used by remage
     overwrite_output
         overwrite existing output files
+    merge_output_files
+        merge output files from individual threads.
+    reshape_output_files
+        perhaps a reshaping of the output files so that each row in the output
+        table represents the steps in a physical interaction in a detector, based on the
+        time-window. This results in each column being a :class:`VectorOfVectors`.
+    time_window
+        time window to group together steps, in us.
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
@@ -180,6 +196,15 @@ def remage_run(
         args.append(f"--output-file={output}")
 
     args.append(f"--threads={threads}")
+
+    if merge_output_files:
+        args.append("--merge-output-files")
+
+    if reshape_output_files:
+        args.append("--reshape-output")
+
+    if time_window is not None:
+        args.append(f"--time-window-in-us={time_window}")
 
     if overwrite_output:
         args.append("--overwrite")
@@ -222,7 +247,34 @@ def remage_run_from_args(
     """
     logger = _setup_log()
 
-    ec, termsig, ipc_info = _run_remage_cpp(args, is_cli=args is None)
+    parser = argparse.ArgumentParser(allow_abbrev=False, add_help=False)
+
+    # python only arguments
+    parser.add_argument(
+        "-m",
+        "--merge-output-files",
+        action="store_true",
+        help="Flag to merge output files",
+    )
+    parser.add_argument(
+        "-r",
+        "--reshape-output",
+        action="store_true",
+        help="Flag to reshape output steps so the output is `hit` oriented.",
+    )
+    parser.add_argument(
+        "-T",
+        "--time-window-in-us",
+        required=False,
+        type=float,
+        metavar="",
+        default=10,
+        help="Time window in microseconds to group steps for reshaping.",
+    )
+    py_args, cpp_args = parser.parse_known_args(args)
+
+    ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
+
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
         log.error(
@@ -233,6 +285,9 @@ def remage_run_from_args(
 
     # clean-up should run always, irrespective of exit code.
     _cleanup_tmp_files(ipc_info)
+
+    if "-h" in cpp_args or "--help" in cpp_args:
+        print("\n".join(parser.format_help().split("\n")[3:]))  # noqa: T201
 
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
@@ -262,29 +317,88 @@ def remage_run_from_args(
     logger.setLevel(levels_rmg_to_py[log_level])
 
     # output post-processing (merging multiple LH5 files)
-    output_files = ipc_info.get("output")
+    remage_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
-    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"  # noqa: F841
-    registered_detectors = ipc_info.get("detector", 3)  # noqa: F841
-    # we might have no output file.
-    if len(output_files) > 1 and main_output_file is not None:
-        assert main_output_file not in output_files
-        output_file_exts = {
-            Path(p).suffix.lower() for p in [*output_files, main_output_file]
+    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
+    detector_info = ipc_info.get("output_table", 2)
+
+    # registered scintillator or germanium detectors
+    registered_detectors = list(
+        {
+            det[1]
+            for det in detector_info
+            if det[0] == "germanium" or det[0] == "scintillator"
         }
+    )
+
+    # we might have no output file.
+    if len(remage_files) > 1 and main_output_file is not None:
+        assert main_output_file not in remage_files
+        output_file_exts = {
+            Path(p).suffix.lower() for p in [*remage_files, main_output_file]
+        }
+
+        # post-processing only for lh5 files
         if output_file_exts == {".lh5"}:
-            pass
-            # lh5.concat.lh5concat(
-            #     lh5_files=output_files,
-            #     output=main_output_file,
-            #     overwrite=overwrite_output,
-            # )
-            # set the merged output file for downstream consumers.
-            # ipc_info.set("output", [main_output_file])
-            # delete un-merged output files.
-            # for f in output_files:
-            #     Path(f).unlink()
-    elif len(output_files) > 1:
+            time_start = time.time()
+
+            # get the output files
+            output_files = (
+                [main_output_file] if py_args.merge_output_files else remage_files
+            )
+
+            # merge output files if requested
+            if py_args.reshape_output or py_args.merge_output_files:
+                original_files = utils.make_tmp(remage_files)
+
+            # if reshaping was requested call reboost
+            if py_args.reshape_output:
+                msg = "Reshaping output files."
+                log.info(msg)
+
+                # get the additional tables to copy
+                extra_tables = utils.get_extra_tables(
+                    original_files[0], registered_detectors
+                )
+
+                config = utils.get_rebooost_config(
+                    registered_detectors,
+                    extra_tables,
+                    time_window=py_args.time_window_in_us,
+                )
+
+                # use reboost to post-process outputs
+                build_hit(
+                    config,
+                    {},
+                    stp_files=original_files,
+                    glm_files=None,
+                    hit_files=output_files,
+                )
+
+            # else use lh5concat
+            elif py_args.merge_output_files:
+                msg = "Merging output files"
+                log.info(msg)
+
+                lh5concat(
+                    lh5_files=original_files,
+                    output=main_output_file,
+                    overwrite=overwrite_output,
+                )
+
+            if py_args.merge_output_files or py_args.reshape_output:
+                # set the merged output file for downstream consumers.
+                ipc_info.set("output", output_files)
+
+                # delete un-merged output files.
+                for f in original_files:
+                    Path(f).unlink()
+
+        msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
+        log.info(msg)
+
+    elif len(remage_files) > 1:
         # no main output file, which is wrong.
         msg = "invalid output information returned over ipc"
         raise ValueError(msg)

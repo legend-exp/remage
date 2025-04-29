@@ -32,10 +32,10 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "legend-pydataobj",
+  "legend-pydataobj<1.12",
   "colorlog",
   "tol_colors",
-  "reboost>=0.2.1",
+  "reboost>=0.2.4",
 ]
 
 [project.optional-dependencies]
