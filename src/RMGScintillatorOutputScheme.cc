@@ -36,15 +36,13 @@ namespace u = CLHEP;
 RMGScintillatorOutputScheme::RMGScintillatorOutputScheme() {
 
   // set default clustering parameters
-  fPreClusterPars.cluster_time_threshold = 10 * CLHEP::us;
-  fPreClusterPars.cluster_distance = 100 * CLHEP::um;
-  fPreClusterPars.track_energy_threshold = 10 * CLHEP::keV;
+  fPreClusterPars.cluster_time_threshold = 10 * u::us;
+  fPreClusterPars.cluster_distance = 100 * u::um;
+  fPreClusterPars.track_energy_threshold = 10 * u::keV;
   fPreClusterPars.combine_low_energy_tracks = false;
   fPreClusterPars.reassign_gamma_energy = false;
-  
+
   this->DefineCommands();
-
-
 }
 
 
@@ -183,7 +181,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
     for (auto hit : *hit_coll->GetVector()) {
       if (!hit or (hit->energy_deposition == 0 and this->fDiscardZeroEnergyHits)) continue;
       hit->Print();
-  
+
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
@@ -281,7 +279,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessenger->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
       .SetGuidance("Discard hits with zero energy.")
       .SetStates(G4State_Idle);
-      
+
   fMessenger->DeclareProperty("StoreParticleVelocities", fStoreVelocity)
       .SetGuidance("Store velocities of particle in the output file.")
       .SetStates(G4State_Idle);

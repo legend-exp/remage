@@ -96,7 +96,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   hit->energy_deposition = step->GetTotalEnergyDeposit();
   hit->global_position_prestep = prestep->GetPosition();
   hit->global_position_poststep = poststep->GetPosition();
-  hit->global_position_average = (poststep->GetPosition()+prestep->GetPosition())/2.;
+  hit->global_position_average = (poststep->GetPosition() + prestep->GetPosition()) / 2.;
   hit->global_time = prestep->GetGlobalTime();
 
   // track ids

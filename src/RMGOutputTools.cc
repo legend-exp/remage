@@ -18,6 +18,8 @@
 #include <memory>
 
 #include "G4AffineTransform.hh"
+#include "G4Electron.hh"
+#include "G4Gamma.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VSolid.hh"
 
@@ -31,7 +33,8 @@ G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::
   G4ThreeVector position;
 
   // all gamma interactions are discrete at the post-step
-  if (mode == RMGOutputTools::PositionMode::kPostStep or hit->particle_type == 22) {
+  if (mode == RMGOutputTools::PositionMode::kPostStep or
+      hit->particle_type == G4Gamma::GammaDefinition()->GetPDGEncoding()) {
     position = hit->global_position_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     position = hit->global_position_prestep;
@@ -50,7 +53,8 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
   double distance = 0;
 
   // all gamma interactions are discrete at the post-step
-  if (mode == RMGOutputTools::PositionMode::kPostStep or hit->particle_type == 22) {
+  if (mode == RMGOutputTools::PositionMode::kPostStep or
+      hit->particle_type == G4Gamma::GammaDefinition()->GetPDGEncoding()) {
     distance = hit->distance_to_surface_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     distance = hit->distance_to_surface_prestep;
@@ -116,13 +120,12 @@ void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDete
 
   RMGLog::Out(RMGLog::debug, "Merging gamma tracks ");
 
-
   // for tracks of gammas look for a step close to each post-step point
   // to redistribute the energy to
   for (const auto& [trackid, input_hits] : hits_map) {
 
     // only apply to gamma
-    if (input_hits.front()->particle_type != 22) continue;
+    if (input_hits.front()->particle_type != G4Gamma::GammaDefinition()->GetPDGEncoding()) continue;
 
     // loop through the track
     for (auto hit : input_hits) {
@@ -169,7 +172,8 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
   for (const auto& [trackid, input_hits] : hits_map) {
 
     // only apply to e-
-    if (input_hits.front()->particle_type != 11) continue;
+    if (input_hits.front()->particle_type != G4Electron::ElectronDefinition()->GetPDGEncoding())
+      continue;
 
     // compute energy of each track
     double energy = 0;
@@ -287,7 +291,6 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
             surface_transition ||
             (hit->global_position_average - cluster_first_hit->global_position_average).mag() >=
                 threshold;
-
       }
 
       // add the hit to the correct vector

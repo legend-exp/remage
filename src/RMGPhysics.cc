@@ -23,7 +23,6 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
-#include "G4EmParameters.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
@@ -172,7 +171,6 @@ void RMGPhysics::ConstructProcess() {
   }
 
   em_constructor->ConstructProcess();
-
 
   // Includes synchrotron radiation, gamma-nuclear, muon-nuclear and
   // e+/e- nuclear interactions
