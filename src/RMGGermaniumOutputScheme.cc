@@ -319,34 +319,34 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
+      ->DeclareMethodWithUnit("PreClusterDistance", "um",
           &RMGGermaniumOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
   fMessenger
-      ->DeclareMethodWithUnit("SetPreClusterDistanceSurface", "um",
+      ->DeclareMethodWithUnit("PreClusterDistanceSurface", "um",
           &RMGGermaniumOutputScheme::SetClusterDistanceSurface)
       .SetGuidance("Set a distance threshold for the surface pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetPreTimeThreshold", "us",
+      ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
           &RMGGermaniumOutputScheme::SetClusterTimeThreshold)
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetSurfaceThickness", "mm",
+      ->DeclareMethodWithUnit("SurfaceThickness", "mm",
           &RMGGermaniumOutputScheme::SetSurfaceThickness)
       .SetGuidance("Set a surface thickness for the Germanium detector.")
       .SetParameterName("thickness", false)
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetElectronTrackEnergyThreshold", "keV",
+      ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
           &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold)
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)

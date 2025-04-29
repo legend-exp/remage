@@ -491,13 +491,14 @@ Commands for controlling output from hits in scintillator detectors.
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `PreClusterOutputs` – Pre-Cluster output hits before saving
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
 * `SetPreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `SetPreTimeThreshold * Set a time threshold for` – pre-clustering.
+* `SetPreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
 * `SetElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
@@ -537,6 +538,15 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
@@ -599,7 +609,7 @@ Set a distance threshold for the bulk pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/SetPreTimeThreshold`
+### `/RMG/Output/Scintillator/SetPreClusterTimeThreshold`
 
 Set a time threshold for  pre-clustering.
 

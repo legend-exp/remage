@@ -305,14 +305,14 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
       .SetStates(G4State_Idle);
   fMessenger
-      ->DeclareMethodWithUnit("SetPreClusterDistance", "um",
+      ->DeclareMethodWithUnit("PreClusterDistance", "um",
           &RMGScintillatorOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("SetPreClusterTimeThreshold", "us",
+      ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
           &RMGScintillatorOutputScheme::SetClusterTimeThreshold)
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
@@ -320,7 +320,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
 
 
   fMessenger
-      ->DeclareMethodWithUnit("SetElectronTrackEnergyThreshold", "keV",
+      ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
           &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold)
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)
