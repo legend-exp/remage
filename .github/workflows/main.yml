@@ -55,6 +55,7 @@ jobs:
         run: |
           mamba repoquery whoneeds -t python
           mamba repoquery whoneeds -t numpy
+          mamba repoquery whoneeds -t libboost-python
           exit 1
 
       - name: Build project
