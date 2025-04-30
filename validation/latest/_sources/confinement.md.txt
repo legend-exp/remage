@@ -57,7 +57,7 @@ Vertices sample in complex solids.
 &nbsp;
 
 You should see points generated on the polycone (back left), in a box with a center cut out (directly in front of the polycone), in a solid formed of the intersection
-of a box and sphere (back right). For the bulk simulation you should also see points generated in the sphere with a box inside (front right). Again you should be able
+of a box and sphere (back right). You should also see points generated in the sphere with a box inside (front right). Again you should be able
 to appreciate a higher density of points on the surface in the surface simulation.
 
 ## Unions and intersections
