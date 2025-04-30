@@ -1,3 +1,5 @@
+(manual-confine)=
+
 # Vertex confinement
 
 :::{todo}
