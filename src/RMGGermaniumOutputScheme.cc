@@ -416,52 +416,6 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
-
-  fMessenger
-      ->DeclareMethod("AddDetectorForEdepThreshold", &RMGGermaniumOutputScheme::AddEdepCutDetector)
-      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
-      .SetParameterName("det_uid", false)
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
-      .SetGuidance("Discard optical photons (before simulating them), if no edep in germanium "
-                   "detectors occurred in the same event.")
-      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
-                   "germanium edep filter does not force the photons to be simulated.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
-      .SetGuidance("Use float32 (instead of float64) for position output.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
-      .SetGuidance("Use float32 (instead of float64) for energy output.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
-      .SetGuidance("Discard hits with zero energy.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
-      .SetGuidance("Store Track IDs for hits in the output file.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareMethod("StepPositionMode", &RMGGermaniumOutputScheme::SetPositionModeString)
-      .SetGuidance("Select which position of the step to store")
-      .SetParameterName("mode", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

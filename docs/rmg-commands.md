@@ -208,18 +208,6 @@ Commands for controlling output from hits in germanium detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `PreClusterOutputs` – Pre-Cluster output hits before saving
-* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
-* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
-* `SurfaceThickness` – Set a surface thickness for the Germanium detector.
-* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
@@ -273,18 +261,20 @@ Discard optical photons (before simulating them), if no edep in germanium detect
 If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
 :::
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
@@ -300,18 +290,20 @@ Use float32 (instead of float64) for energy output.
 
 Discard hits with zero energy.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreTrackID`
 
 Store Track IDs for hits in the output file.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StepPositionMode`
@@ -344,27 +336,30 @@ Commands for controlling clustering of hits in germanium detectors.
 
 Pre-Cluster output hits before saving
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/Cluster/RedistributeGammaEnergy`
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/Cluster/PreClusterDistance`
@@ -435,88 +430,6 @@ Set a energy threshold for tracks to be merged.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
-
-Take this detector into account for the filtering by /EdepThreshold.
-
-* **Parameter** – `det_uid`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
-
-Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
-
-:::{note}
-If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
-:::
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
-
-Discard hits with zero energy.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreTrackID`
-
-Store Track IDs for hits in the output file.
-
-* **Parameter** – `value`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/PreClusterOutputs`
-
-Pre-Cluster output hits before saving
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StepPositionMode`
-
-Select which position of the step to store
-
-* **Parameter** – `mode`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `PreStep PostStep Average Both`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/Vertex/`
@@ -633,45 +546,50 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 Discard hits with zero energy.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreParticleVelocities`
 
 Store velocities of particle in the output file.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreTrackID`
 
 Store Track IDs for hits in the output file.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StepPositionMode`
@@ -702,27 +620,30 @@ Commands for controlling clustering of hits in scintillator detectors.
 
 Pre-Cluster output hits before saving
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/Cluster/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/Cluster/RedistributeGammaEnergy`
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/Cluster/PreClusterDistance`
@@ -765,36 +686,6 @@ Set a energy threshold for tracks to be merged.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StepPositionMode`
-
-Select which position of the step to store
-
-* **Parameter** – `mode`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `PreStep PostStep Average Both`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/IsotopeFilter/`
