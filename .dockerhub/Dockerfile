@@ -34,7 +34,8 @@ RUN mkdir -p src build /opt/remage && \
         ctest --output-on-failure --label-exclude 'vis'; \
     fi && \
     cd .. && \
-    rm -rf build src
+    rm -rf build src && \
+    /opt/remage/bin/remage --help # populate numba cache
 
 ENV PATH="/opt/remage/bin:$PATH" \
     LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH"
