@@ -104,6 +104,7 @@ add_custom_command(
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL}
           ${INSTALL_VENV_DIR}/bin/python -m uv -q pip install --reinstall ${CMAKE_SOURCE_DIR}
+  COMMAND ${INSTALL_VENV_DIR}/bin/python -m uv -q pip uninstall pyfcutils
   COMMAND ln -fs ${INSTALL_VENV_DIR}/bin/remage ${CMAKE_INSTALL_PREFIX}/bin/remage
   # create and install a user-installable wheel
   COMMAND
