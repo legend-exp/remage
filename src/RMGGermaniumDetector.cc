@@ -54,29 +54,6 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
-bool RMGGermaniumDetector::CheckStepPointContainment(const G4StepPoint* step_point) {
-
-  const auto pv = step_point->GetTouchableHandle()->GetVolume();
-  auto pv_name = pv->GetName();
-  const auto pv_copynr = step_point->GetTouchableHandle()->GetCopyNumber();
-
-  // check if physical volume is registered as germanium detector
-  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
-  try {
-    auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
-    if (d_type != RMGDetectorType::kGermanium) {
-      RMGLog::OutFormatDev(RMGLog::debug,
-          "Volume '{}' (copy nr. {} not registered as germanium detector", pv_name, pv_copynr);
-      return false;
-    }
-  } catch (const std::out_of_range& e) {
-    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {}) not registered as detector",
-        pv_name, pv_copynr);
-    return false;
-  }
-  return true;
-}
-
 bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
   RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
@@ -94,7 +71,8 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto position_average = (position_prestep + position_poststep) / 2.;
 
   // check containment of prestep point
-  auto prestep_inside = this->CheckStepPointContainment(prestep);
+  auto prestep_inside =
+      RMGOutputTools::check_step_point_containment(prestep, RMGDetectorType::kGermanium);
 
   if (not prestep_inside) return false;
 

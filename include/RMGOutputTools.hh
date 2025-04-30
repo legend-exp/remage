@@ -19,7 +19,10 @@
 #include <map>
 #include <vector>
 
+#include "G4Step.hh"
+
 #include "RMGDetectorHit.hh"
+#include "RMGDetectorMetadata.hh"
 
 namespace RMGOutputTools {
 
@@ -103,6 +106,13 @@ namespace RMGOutputTools {
    */
   RMGDetectorHit* average_hits(std::vector<RMGDetectorHit*> hits, bool compute_distance_to_surface,
       bool compute_velocity);
+
+  /** @brief Check if the step point is contained in a physical volume registered as a detector.
+   *
+   * @param step_point The step point (either post or pre step) to check.
+   * @param det_type Type of detector to check for.
+   */
+  bool check_step_point_containment(const G4StepPoint* step_point, RMGDetectorType det_type);
 
   /** @brief Combine low energy electron tracks into their neighbours.
    *

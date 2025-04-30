@@ -51,12 +51,6 @@ class RMGGermaniumDetector : public G4VSensitiveDetector {
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
 
-    /** @brief Check if the step point is contained in a physical volume registered as a Germanium detector.
-     *
-     * @param step_point The step point (either post or pre step) to check.
-     */
-    bool CheckStepPointContainment(const G4StepPoint* step_point);
-
   private:
 
     RMGDetectorHitsCollection* fHitsCollection = nullptr;

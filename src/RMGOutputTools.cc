@@ -21,10 +21,13 @@
 #include "G4Electron.hh"
 #include "G4Gamma.hh"
 #include "G4LogicalVolume.hh"
+#include "G4TransportationManager.hh"
 #include "G4VSolid.hh"
 
 #include "RMGDetectorHit.hh"
+#include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -87,6 +90,9 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   hit->track_id = hits.front()->track_id;
   hit->parent_track_id = hits.front()->parent_track_id;
 
+  // all physical volumes should be the same
+  hit->physical_volume = hits.back()->physical_volume;
+
   // time from first hit
   hit->global_time = hits.front()->global_time;
 
@@ -98,6 +104,15 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   // issue: this could be outside the volume!
   hit->global_position_average = (hit->global_position_prestep + hit->global_position_poststep) / 2.;
 
+  // check if the average point is inside
+  auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+
+  if (navigator->LocateGlobalPointAndSetup(hit->global_position_average) != hit->physical_volume) {
+    RMGLog::Out(RMGLog::warning, "Average of the hits is inside volume, aborting clustering for "
+                                 "these points!");
+    return nullptr;
+  }
+
   // compute the distance to the surface, for the pre/post step this is already done
   // but a new calculation is needed for the average.
   if (compute_distance_to_surface) {
@@ -106,6 +121,8 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
     hit->distance_to_surface_average =
         distance_to_surface(hits.back()->physical_volume, hit->global_position_average);
   }
+
+
   // prestep velocity from the first hit and poststep from the last
   if (compute_velocity) {
     hit->velocity_pre = hits.front()->velocity_pre;
@@ -113,6 +130,30 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   }
 
   return hit;
+}
+
+bool RMGOutputTools::check_step_point_containment(const G4StepPoint* step_point,
+    RMGDetectorType det_type) {
+
+  const auto pv = step_point->GetTouchableHandle()->GetVolume();
+  auto pv_name = pv->GetName();
+  const auto pv_copynr = step_point->GetTouchableHandle()->GetCopyNumber();
+
+  // check if physical volume is registered as germanium detector
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
+  try {
+    auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
+    if (d_type != det_type) {
+      RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {} not registered as {} detector",
+          pv_name, pv_copynr, magic_enum::enum_name<RMGDetectorType>(det_type));
+      return false;
+    }
+  } catch (const std::out_of_range& e) {
+    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {}) not registered as detector",
+        pv_name, pv_copynr);
+    return false;
+  }
+  return true;
 }
 
 void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
@@ -248,7 +289,6 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   std::vector<std::vector<RMGDetectorHit*>> hits_vector;
 
   // keep track of the current cluster
-
   // loop over trackid and then hits in each track
   for (const auto& [trackid, input_hits] : hits_map) {
     RMGDetectorHit* cluster_first_hit = nullptr;
@@ -313,7 +353,9 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
 
     // average the hit and insert into the collection
     auto averaged_hit = average_hits(value, has_distance_to_surface, has_velocity);
-    out->insert(averaged_hit);
+    if (averaged_hit) out->insert(averaged_hit);
+    else
+      for (auto hit : value) out->insert(hit);
   }
 
   return out;
