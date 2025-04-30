@@ -65,8 +65,7 @@ jobs:
         run: |
           rm -rf build
           export PATH="$PWD/local/bin:$PATH"
-          export DYLD_LIBRARY_PATH="$PWD/local/lib:$DYLD_LIBRARY_PATH"
-          export DYLD_FALLBACK_LIBRARY_PATH="$CONDA_PREFIX/lib"
+          export DYLD_FALLBACK_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
