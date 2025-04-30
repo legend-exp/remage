@@ -39,9 +39,9 @@ det_map = {
 vertices = lh5.read_as("stp/vertices", outfile, "ak")
 
 uint = np.array(np.full_like(vertices.time, -1), dtype=int)
-xlocal = np.array(1000 * vertices.xloc)
-ylocal = np.array(1000 * vertices.yloc)
-zlocal = np.array(1000 * vertices.zloc)
+xlocal = np.array(1000 * vertices.xloc.to_numpy())
+ylocal = np.array(1000 * vertices.yloc.to_numpy())
+zlocal = np.array(1000 * vertices.zloc.to_numpy())
 
 positions = np.array(
     np.transpose(

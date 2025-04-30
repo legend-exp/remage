@@ -25,9 +25,9 @@ reg = pg4.gdml.Reader(gdml).getRegistry()
 
 
 def add_local_pos(vertices, pos):
-    xlocal = np.array(1000 * vertices.xloc)
-    ylocal = np.array(1000 * vertices.yloc)
-    zlocal = np.array(1000 * vertices.zloc)
+    xlocal = np.array(1000 * vertices.xloc.to_numpy())
+    ylocal = np.array(1000 * vertices.yloc.to_numpy())
+    zlocal = np.array(1000 * vertices.zloc.to_numpy())
 
     vertices["xlocal"] = xlocal - pos[0]
     vertices["ylocal"] = ylocal - pos[1]
@@ -202,9 +202,9 @@ for idx, fun in enumerate(funcs):
     y = vertices.ylocal
     z = vertices.zlocal
     is_close = fun(
-        np.array(vertices.xlocal),
-        np.array(vertices.ylocal),
-        np.array(vertices.zlocal),
+        np.array(vertices.xlocal.to_numpy()),
+        np.array(vertices.ylocal.to_numpy()),
+        np.array(vertices.zlocal.to_numpy()),
     )
     indices[is_close] = idx
 
