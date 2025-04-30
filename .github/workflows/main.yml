@@ -46,10 +46,16 @@ jobs:
           brew install opencascade cgal gmp mpfr boost
 
           conda install conda-forge::geant4
+          
+          #exit 1
+          #conda remove --force numpy # installed by default?
+          #echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
           mamba repoquery whoneeds -t python
+          mamba repoquery whoneeds -t numpy
           exit 1
-          conda remove --force numpy # installed by default?
-          echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
       - name: Build project
         run: |
