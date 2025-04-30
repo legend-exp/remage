@@ -159,6 +159,7 @@ jobs:
           brew install opencascade cgal gmp mpfr boost
 
           conda install conda-forge::geant4
+          conda remove numpy # installed by default?
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
           hash -r
           which ranlib
