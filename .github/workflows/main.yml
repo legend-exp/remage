@@ -47,6 +47,7 @@ jobs:
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make | tee -a build.log
           make install | tee -a build.log
+
       - name: check version equality
         run: |
           cd build
@@ -56,6 +57,7 @@ jobs:
             echo "::error::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
             exit 1
           fi
+
       - name: Compare checked-in doc dump with current result
         if: ${{ matrix.container_version != 'slim' }}
         run: |
@@ -71,9 +73,11 @@ jobs:
             echo "$docs_diff"
             exit 1
           fi
+
       - name: Setup and start xvfb (enables Geant4 visualization)
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
+
       - name: Run full test suite
         if: ${{ matrix.container_version != 'slim' }}
         env:
@@ -81,6 +85,7 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
+
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
@@ -96,6 +101,7 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure --label-exclude 'extra|vis'
+
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
         run: |
@@ -103,6 +109,7 @@ jobs:
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
           make sphinx-validation
+
       - name: Upload validation report to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
         uses: actions/upload-artifact@v4
