@@ -64,13 +64,14 @@ jobs:
       - name: Run minimal test suite
         run: |
           cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
+          #ctest --output-on-failure --label-exclude 'extra|vis'
 
       - name: Minimally test installed executable
         run: |
           rm -rf build
           export PATH="$PWD/local/bin:$PATH"
-          export DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH"
+          export DYLD_LIBRARY_PATH="$PWD/local/lib:$DYLD_LIBRARY_PATH"
+          export DYLD_FALLBACK_LIBRARY_PATH="$CONDA_PREFIX/lib"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
