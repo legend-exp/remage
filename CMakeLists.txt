@@ -286,7 +286,8 @@ message(STATUS "WWW:   export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH")
 if(NOT APPLE)
   message(STATUS "WWW:   export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
 else()
-  message(STATUS "WWW:   export DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
+  message(STATUS "WWW:   export DYLD_FALLBACK_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/"
+                 "lib:$DYLD_FALLBACK_LIBRARY_PATH")
 endif()
 # cmake-lint: disable=W0106
 message(
