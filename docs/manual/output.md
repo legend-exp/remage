@@ -229,11 +229,11 @@ to a new collection of clustered hits.
 :::{note}
 This design makes it easy to include additional clustering algorithms, a similar function just needs to be written.
 :::
-Pre-clustering can be enabled with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumpreclusteroutputs):
+Pre-clustering can be enabled with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumclusterpreclusteroutputs):
 
-`/RMG/Output/Germanium/PreClusterOutputs`
+`/RMG/Output/Germanium/Cluster/PreClusterOutputs`
 
-and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorpreclusteroutputs).
+and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorclusterpreclusteroutputs).
 
 We first organise the hits by track id (the index of the G4Track within the event). Some processes in Geant4 produce
 a large number of secondary tracks due to atomic de-excitation, these tracks typically
@@ -243,11 +243,11 @@ In many cases, after pre-clustering of high energy electrons, these tracks could
 of the output.
 
 We implemented the possibility to merge these tracks prior to pre-clustering
-which can be enabled with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumcombinelowenergyelectrontracks):
+which can be enabled with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumclustercombinelowenergyelectrontracks):
 
-`/RMG/Output/Germanium/CombineLowEnergyElectronTracks`
+`/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks`
 
-or similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorcombinelowenergyelectrontracks).
+or similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorclustercombinelowenergyelectrontracks).
 
 :::{warning}
 This means in some cases there are steps in the output that are the combination of steps in different
@@ -255,23 +255,23 @@ Geant4 tracks.
 :::
 
 This command will select electron tracks with energy lower than a threshold, which is by default 10 keV,
-but can be changed with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumelectrontrackenergythreshold):
+but can be changed with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumclusterelectrontrackenergythreshold):
 
-`/RMG/Output/Germanium/ElectronTrackEnergyThreshold {ENERGY}`
+`/RMG/Output/Germanium/Cluster/ElectronTrackEnergyThreshold {ENERGY}`
 
-and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorelectrontrackenergythreshold).
+and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorclusterelectrontrackenergythreshold).
 For each track, we search for tracks which have a first pre-step
 point within the cluster radius of the first pre-step point of the low energy track. The low energy track
 is then merged with the neighbour track with the highest energy. In addition, Geant4 will sometimes
 associated some deposited energy with gamma tracks (due to atomic binding energy), optionally the
 user can request instead redistributing this energy to the secondary electron tracks with the
-[command](project:../rmg-commands.md#rmgoutputgermaniumredistributegammaenergy):
+[command](project:../rmg-commands.md#rmgoutputgermaniumclusterredistributegammaenergy):
 
-`/RMG/Output/Germanium/RedistributeGammaEnergy`
+`/RMG/Output/Germanium/Cluster/RedistributeGammaEnergy`
 
 this then means the gamma tracks would not have energy deposits and do not need to be written out in the
 output file (unless this is explicitly requested). Or similarly for the _Scintillator_ output scheme
-[link](project:../rmg-commands.md#rmgoutputscintillatorredistributegammaenergy).
+[link](project:../rmg-commands.md#rmgoutputscintillatorclusterredistributegammaenergy).
 
 After these two pre-processing steps the pre-clustering proceeds by looping through the steps in each
 track. For each step the distance to the first step in the current cluster is calculated, if this distance
@@ -279,28 +279,28 @@ is less than the user defined distance, and the time difference is less than the
 the step is added to the current cluster.
 
 The distance / time thresholds used for pre-clustering can be set with the commands
-([link]project:../rmg-commands.md#rmgoutputgermaniumpreclusterdistance), and
-[link](project:../rmg-commands.md#rmgoutputgermaniumpreclustertimethreshold)):
+([link]project:../rmg-commands.md#rmgoutputgermaniumclusterpreclusterdistance), and
+[link](project:../rmg-commands.md#rmgoutputgermaniumclusterpreclustertimethreshold)):
 
 ```console
-/RMG/Output/Germanium/PreClusterDistance
-/RMG/Output/Germanium/PreClusterTimeThreshold
+/RMG/Output/Germanium/Cluster/PreClusterDistance
+/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold
 ```
 
-and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorpreclusterdistance), and
-[link](project:../rmg-commands.md#rmgoutputscintillatorpreclustertimethreshold):
+and similar for the _Scintillator_ output scheme [link](project:../rmg-commands.md#rmgoutputscintillatorclusterpreclusterdistance), and
+[link](project:../rmg-commands.md#rmgoutputscintillatorclusterpreclustertimethreshold):
 
 Germanium detectors, where the surface region has substantially different properties to the bulk, we
 give the possibility to cluster with a different threshold for the surface region of the detector.
 This is by default the region within 2 mm of the detector surface but can be changed with the
-[command](project:../rmg-commands.md#rmgoutputgermaniumsurfacethickness):
+[command](project:../rmg-commands.md#rmgoutputgermaniumclustersurfacethickness):
 
-`/RMG/Output/Germanium/SurfaceThickness {DEPTH} mm`
+`/RMG/Output/Germanium/Cluster/SurfaceThickness {DEPTH} mm`
 
 then a threshold can be set specifically for this region with
-[the command](project:../rmg-commands.md#rmgoutputgermaniumpreclusterdistancesurface):
+[the command](project:../rmg-commands.md#rmgoutputgermaniumclusterpreclusterdistancesurface):
 
-`/RMG/Output/Germanium/PreClusterDistanceSurface`
+`/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface`
 
 this will apply this threshold for any step where the distance to surface is less than the surface
 thickness. With this option a new cluster will also be formed if a step moves from the surface to bulk region

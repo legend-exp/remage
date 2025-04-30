@@ -200,6 +200,10 @@ This setting is not respected by all output formats.
 Commands for controlling output from hits in germanium detectors.
 
 
+**Sub-directories:**
+
+* `/RMG/Output/Germanium/Cluster/` – Commands for controlling clustering of hits in germanium detectors.
+
 **Commands:**
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
@@ -252,7 +256,91 @@ Set an upper energy cut that has to be met for this event to be stored.
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/PreClusterOutputs`
+### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
+
+Take this detector into account for the filtering by /EdepThreshold.
+
+* **Parameter** – `det_uid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
+
+Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+
+:::{note}
+If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
+:::
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreTrackID`
+
+Store Track IDs for hits in the output file.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Germanium/Cluster/`
+
+Commands for controlling clustering of hits in germanium detectors.
+
+
+**Commands:**
+
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `SurfaceThickness` – Set a surface thickness for the Germanium detector.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+
+### `/RMG/Output/Germanium/Cluster/PreClusterOutputs`
 
 Pre-Cluster output hits before saving
 
@@ -261,7 +349,7 @@ Pre-Cluster output hits before saving
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/CombineLowEnergyElectronTracks`
+### `/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
 
@@ -270,7 +358,7 @@ Merge low energy electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/RedistributeGammaEnergy`
+### `/RMG/Output/Germanium/Cluster/RedistributeGammaEnergy`
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
@@ -279,7 +367,7 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/PreClusterDistance`
+### `/RMG/Output/Germanium/Cluster/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
 
@@ -293,7 +381,7 @@ Set a distance threshold for the bulk pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/PreClusterDistanceSurface`
+### `/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface`
 
 Set a distance threshold for the surface pre-clustering.
 
@@ -307,7 +395,7 @@ Set a distance threshold for the surface pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/PreClusterTimeThreshold`
+### `/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold`
 
 Set a time threshold for  pre-clustering.
 
@@ -321,7 +409,7 @@ Set a time threshold for  pre-clustering.
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SurfaceThickness`
+### `/RMG/Output/Germanium/Cluster/SurfaceThickness`
 
 Set a surface thickness for the Germanium detector.
 
@@ -335,7 +423,7 @@ Set a surface thickness for the Germanium detector.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/ElectronTrackEnergyThreshold`
+### `/RMG/Output/Germanium/Cluster/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
 
@@ -488,6 +576,10 @@ Use float32 (instead of float64) for energy output.
 Commands for controlling output from hits in scintillator detectors.
 
 
+**Sub-directories:**
+
+* `/RMG/Output/Scintillator/Cluster/` – Commands for controlling clustering of hits in scintillator detectors.
+
 **Commands:**
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
@@ -496,12 +588,6 @@ Commands for controlling output from hits in scintillator detectors.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
-* `PreClusterOutputs` – Pre-Cluster output hits before saving
-* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
-* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
-* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StepPositionMode` – Select which position of the step to store
@@ -570,7 +656,49 @@ Store Track IDs for hits in the output file.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/PreClusterOutputs`
+### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `value`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Scintillator/Cluster/`
+
+Commands for controlling clustering of hits in scintillator detectors.
+
+
+**Commands:**
+
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+
+### `/RMG/Output/Scintillator/Cluster/PreClusterOutputs`
 
 Pre-Cluster output hits before saving
 
@@ -579,7 +707,7 @@ Pre-Cluster output hits before saving
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/CombineLowEnergyElectronTracks`
+### `/RMG/Output/Scintillator/Cluster/CombineLowEnergyElectronTracks`
 
 Merge low energy electron tracks.
 
@@ -588,7 +716,7 @@ Merge low energy electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/RedistributeGammaEnergy`
+### `/RMG/Output/Scintillator/Cluster/RedistributeGammaEnergy`
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
@@ -597,7 +725,7 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/PreClusterDistance`
+### `/RMG/Output/Scintillator/Cluster/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
 
@@ -611,7 +739,7 @@ Set a distance threshold for the bulk pre-clustering.
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/PreClusterTimeThreshold`
+### `/RMG/Output/Scintillator/Cluster/PreClusterTimeThreshold`
 
 Set a time threshold for  pre-clustering.
 
@@ -625,7 +753,7 @@ Set a time threshold for  pre-clustering.
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/ElectronTrackEnergyThreshold`
+### `/RMG/Output/Scintillator/Cluster/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
 

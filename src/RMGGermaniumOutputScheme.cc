@@ -292,59 +292,111 @@ void RMGGermaniumOutputScheme::SetPositionModeString(std::string mode) {
 }
 void RMGGermaniumOutputScheme::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/",
-      "Commands for controlling output from hits in germanium detectors.");
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/",
+      "Commands for controlling output from hits in germanium detectors."));
 
-  fMessenger->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
+  fMessengers.back()
+      ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
+  fMessengers.back()
+      ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("PreClusterOutputs", fPreClusterHits)
+  fMessengers.back()
+      ->DeclareMethod("AddDetectorForEdepThreshold", &RMGGermaniumOutputScheme::AddEdepCutDetector)
+      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
+      .SetParameterName("det_uid", false)
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
+      .SetGuidance("Discard optical photons (before simulating them), if no edep in germanium "
+                   "detectors occurred in the same event.")
+      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
+                   "germanium edep filter does not force the photons to be simulated.")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
+      .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
+      .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
+      .SetGuidance("Discard hits with zero energy.")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("StoreTrackID", fStoreTrackID)
+      .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetStates(G4State_Idle);
+
+
+  fMessengers.back()
+      ->DeclareMethod("StepPositionMode", &RMGGermaniumOutputScheme::SetPositionModeString)
+      .SetGuidance("Select which position of the step to store")
+      .SetParameterName("mode", false)
+      .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
+      .SetStates(G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+
+  // clustering pars
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/Cluster/",
+      "Commands for controlling clustering of hits in germanium detectors."));
+
+  fMessengers.back()
+      ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
       .SetGuidance("Pre-Cluster output hits before saving")
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
+  fMessengers.back()
+      ->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistance", "um",
           &RMGGermaniumOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistanceSurface", "um",
           &RMGGermaniumOutputScheme::SetClusterDistanceSurface)
       .SetGuidance("Set a distance threshold for the surface pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
           &RMGGermaniumOutputScheme::SetClusterTimeThreshold)
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("SurfaceThickness", "mm", &RMGGermaniumOutputScheme::SetSurfaceThickness)
       .SetGuidance("Set a surface thickness for the Germanium detector.")
       .SetParameterName("thickness", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
           &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold)
       .SetGuidance("Set a energy threshold for tracks to be merged.")

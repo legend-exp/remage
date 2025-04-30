@@ -124,7 +124,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     RMGDetectorHitsCollection* GetHitColl(const G4Event*);
     void SetPositionModeString(std::string mode);
 
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void DefineCommands();
 
     double fEdepCutLow = -1;

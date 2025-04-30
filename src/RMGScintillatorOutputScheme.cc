@@ -257,60 +257,88 @@ void RMGScintillatorOutputScheme::SetPositionModeString(std::string mode) {
 
 void RMGScintillatorOutputScheme::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/",
-      "Commands for controlling output from hits in scintillator detectors.");
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/",
+      "Commands for controlling output from hits in scintillator detectors."));
 
-  fMessenger->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
+  fMessengers.back()
+      ->DeclareMethodWithUnit("SetEdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
-      ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGScintillatorOutputScheme::SetEdepCutHigh)
+  fMessengers.back()
+      ->DeclareMethodWithUnit("SetEdepCutHigh", "keV", &RMGScintillatorOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethod("AddDetectorForEdepThreshold", &RMGScintillatorOutputScheme::AddEdepCutDetector)
       .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
       .SetParameterName("det_uid", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
+  fMessengers.back()
+      ->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
       .SetGuidance("Discard hits with zero energy.")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("StoreParticleVelocities", fStoreVelocity)
+  fMessengers.back()
+      ->DeclareProperty("StoreParticleVelocities", fStoreVelocity)
       .SetGuidance("Store velocities of particle in the output file.")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("StoreTrackID", fStoreTrackID)
+  fMessengers.back()
+      ->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
       .SetStates(G4State_Idle);
 
+  fMessengers.back()
+      ->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
+      .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
+      .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetStates(G4State_Idle);
+
+
+  fMessengers.back()
+      ->DeclareMethod("StepPositionMode", &RMGScintillatorOutputScheme::SetPositionModeString)
+      .SetGuidance("Select which position of the step to store")
+      .SetParameterName("mode", false)
+      .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
+      .SetStates(G4State_Idle)
+      .SetToBeBroadcasted(true);
+
   // clustering pars
 
-  fMessenger->DeclareProperty("PreClusterOutputs", fPreClusterHits)
+  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/Cluster/",
+      "Commands for controlling clustering of hits in scintillator detectors."));
+
+  fMessengers.back()
+      ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
       .SetGuidance("Pre-Cluster output hits before saving")
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
+  fMessengers.back()
+      ->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
       .SetStates(G4State_Idle);
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistance", "um",
           &RMGScintillatorOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
           &RMGScintillatorOutputScheme::SetClusterTimeThreshold)
       .SetGuidance("Set a time threshold for  pre-clustering.")
@@ -318,33 +346,12 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
 
-  fMessenger
+  fMessengers.back()
       ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
           &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold)
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
-
-
-  fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
-      .SetGuidance("Use float32 (instead of float64) for position output.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
-      .SetGuidance("Use float32 (instead of float64) for energy output.")
-      .SetParameterName("boolean", true)
-      .SetDefaultValue("true")
-      .SetStates(G4State_Idle);
-
-
-  fMessenger->DeclareMethod("StepPositionMode", &RMGScintillatorOutputScheme::SetPositionModeString)
-      .SetGuidance("Select which position of the step to store")
-      .SetParameterName("mode", false)
-      .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
-      .SetStates(G4State_Idle)
-      .SetToBeBroadcasted(true);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
