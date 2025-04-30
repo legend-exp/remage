@@ -154,18 +154,14 @@ jobs:
 
       - name: Install Geant4 and native dependencies
         run: |
-          which ranlib
           # native dependencies for pyg4ometry
           brew update
           brew install opencascade cgal gmp mpfr boost
-          hash -r
-          which ranlib
 
           conda install conda-forge::geant4
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
           hash -r
           which ranlib
-          exit 1
 
       - name: Build project
         run: |
