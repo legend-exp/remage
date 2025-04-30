@@ -47,20 +47,8 @@ jobs:
 
           conda install conda-forge::geant4
 
-          #exit 1
-          #conda remove --force numpy # installed by default?
-          #echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
-
-      - name: Test
-        run: |
-          mamba repoquery whoneeds -t python
-          mamba repoquery whoneeds -t numpy
-          mamba repoquery whoneeds -t libboost-python
-          mamba repoquery whoneeds -t libopenblas
-          mamba repoquery whoneeds -t libblas
-          mamba repoquery whoneeds -t libcblas
-          mamba repoquery whoneeds -t liblapack
-          exit 1
+          conda remove --force numpy liblapack libcblas libblas libopenblas # installed by default?
+          echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
       - name: Build project
         run: |
@@ -79,7 +67,7 @@ jobs:
         run: |
           rm -rf build
           export PATH="$PWD/local/bin:$PATH"
-          export DYLD_LIBRARY_PATH="$PWD/local/lib:$DYLD_LIBRARY_PATH"
+          export DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
