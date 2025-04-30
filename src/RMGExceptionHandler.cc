@@ -27,11 +27,7 @@ bool RMGExceptionHandler::Notify(const char* originOfException, const char* exce
   // do our remage-internal bookkeeping after changing severities.
   if (severity == JustWarning) {
     fHadWarning = true;
-#if RMG_HAS_GEANT4_11_1_OR_LATER
   } else if (severity != IgnoreTheIssue) {
-#else
-  } else {
-#endif
     fHadError = true;
   }
 
