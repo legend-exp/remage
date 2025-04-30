@@ -96,18 +96,6 @@ if(Geant4_FOUND)
   message(STATUS "Found Geant4 v" ${Geant4_VERSION})
 endif()
 
-if(Geant4_VERSION VERSION_GREATER_EQUAL "11.2.0")
-  set(RMG_HAS_GEANT4_11_2_OR_LATER 1)
-else()
-  set(RMG_HAS_GEANT4_11_2_OR_LATER 0)
-endif()
-
-if(Geant4_VERSION VERSION_GREATER_EQUAL "11.1.0")
-  set(RMG_HAS_GEANT4_11_1_OR_LATER 1)
-else()
-  set(RMG_HAS_GEANT4_11_1_OR_LATER 0)
-endif()
-
 # check for optional components
 find_package(Geant4 QUIET OPTIONAL_COMPONENTS hdf5 usolids multithreaded gdml ui_all vis_all)
 
