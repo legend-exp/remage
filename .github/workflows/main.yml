@@ -177,7 +177,7 @@ jobs:
         run: |
           rm -rf build
           export PATH="$PWD/local/bin:$PATH"
-          export DYLD_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_LIBRARY_PATH"
+          export DYLD_FALLBACK_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
   deploy_validation_report:
@@ -204,7 +204,6 @@ jobs:
           else
             echo "dir=latest" >> $GITHUB_ENV
           fi
-
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
