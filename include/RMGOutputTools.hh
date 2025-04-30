@@ -89,7 +89,7 @@ namespace RMGOutputTools {
    *
    * @returns a collection of hits after pre-clustering.
    */
-  RMGDetectorHitsCollection* pre_cluster_hits(const RMGDetectorHitsCollection* hits,
+  std::shared_ptr<RMGDetectorHitsCollection> pre_cluster_hits(const RMGDetectorHitsCollection* hits,
       ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity);
 
   /** @brief Average a cluster of hits to produce one effective hit.

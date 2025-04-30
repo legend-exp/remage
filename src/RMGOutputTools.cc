@@ -270,7 +270,8 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
   return output_hits;
 }
 
-RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHitsCollection* hits,
+std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(const RMGDetectorHitsCollection*
+                                                                                hits,
     RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity) {
 
   // organise hits into a map based on trackid
@@ -346,7 +347,7 @@ RMGDetectorHitsCollection* RMGOutputTools::pre_cluster_hits(const RMGDetectorHit
   }
 
   // create a container for the output hits
-  auto out = new RMGDetectorHitsCollection();
+  auto out = std::shared_ptr<RMGDetectorHitsCollection>();
 
   // average the hits
   for (const auto& value : hits_vector) {

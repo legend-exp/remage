@@ -176,9 +176,11 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
-  if (fPreClusterHits)
-    hit_coll = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
-
+  std::shared_ptr<RMGDetectorHitsCollection> _clustered_hits;
+  if (fPreClusterHits) {
+    _clustered_hits = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
+    hit_coll = _clustered_hits.get(); // get an unmanaged ptr for use in this function
+  }
 
   auto rmg_man = RMGManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
@@ -255,9 +257,6 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->AddNtupleRow(ntupleid);
     }
   }
-
-  // if needed we should delete the collection we own
-  if (fPreClusterHits) delete hit_coll;
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
@@ -319,11 +318,15 @@ void RMGGermaniumOutputScheme::DefineCommands() {
                    "detectors occurred in the same event.")
       .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
                    "germanium edep filter does not force the photons to be simulated.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
@@ -334,11 +337,15 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
       .SetGuidance("Discard hits with zero energy.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
 
@@ -358,16 +365,22 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
       .SetGuidance("Pre-Cluster output hits before saving")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
@@ -376,6 +389,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
+
   fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistanceSurface", "um",
           &RMGGermaniumOutputScheme::SetClusterDistanceSurface)

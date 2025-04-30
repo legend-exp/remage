@@ -219,7 +219,7 @@ with steps in the detector (just with a larger step length). The clustering is h
 function {cpp:func}`RMGOutputTools::pre_cluster_hits`:
 
 ```c++
-  RMGDetectorHitsCollection* pre_cluster_hits(const RMGDetectorHitsCollection* hits,
+  std::shared_ptr<RMGDetectorHitsCollection> pre_cluster_hits(const RMGDetectorHitsCollection* hits,
       ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity);
 ```
 
@@ -227,8 +227,13 @@ This takes in the pointer to the original {cpp:type}`RMGDetectorHitsCollection` 
 to a new collection of clustered hits.
 
 :::{note}
-This design makes it easy to include additional clustering algorithms, a similar function just needs to be written.
-:::
+
+- The function returns a shared pointer to the hit collection, for some applications it may be necessary
+  to extract also an unmanaged pointer, for example to make this collection look identical to that
+  obtained directly from Geant4.
+- This design makes it easy to include additional clustering algorithms, a similar function just needs to be written.
+  :::
+
 Pre-clustering can be enabled with the macro [command](project:../rmg-commands.md#rmgoutputgermaniumclusterpreclusteroutputs):
 
 `/RMG/Output/Germanium/Cluster/PreClusterOutputs`
