@@ -193,13 +193,11 @@ void RMGPhysics::ConstructProcess() {
 
   // Hadronic Physics
 
-#if RMG_HAS_GEANT4_11_2_OR_LATER
   // Geant4 11.2 changed this to 1 year, which is rather short for our use case.
   // Reset it to the old default of Geant4 11.0/11.1.
   // note: this still might be too short for very rare decays, but it can be increased with
   // a macro command.
   G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(1.0e+27 * u::ns);
-#endif
 
   /*
   G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false );
