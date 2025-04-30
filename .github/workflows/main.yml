@@ -50,6 +50,9 @@ jobs:
           conda remove --force numpy liblapack libcblas libblas libopenblas # installed by default?
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
+          mamba repoquery whoneeds icu
+          exit 1
+
       - name: Build project
         run: |
           mkdir build
