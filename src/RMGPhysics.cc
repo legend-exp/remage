@@ -78,24 +78,37 @@ namespace u = CLHEP;
 
 RMGPhysics::RMGPhysics() {
 
-  G4VUserPhysicsList::defaultCutValue = 0.1 * u::mm;
-  this->SetPhysicsRealm(PhysicsRealm::kDoubleBetaDecay);
-
+  // verbosity
   G4VModularPhysicsList::verboseLevel = RMGLog::GetLogLevel() <= RMGLog::debug ? 1 : 0;
   // need to set this here for it to take effect...?
   G4HadronicParameters::Instance()->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
+  // set default cut values, tuned to 100 keV in germanium
+  float cut_val = 0.1 * u::mm;
+  G4VUserPhysicsList::defaultCutValue = cut_val;
+
+  // default region
+  fProdCuts = ProdCutStore(cut_val);
+  fProdCuts.gamma = cut_val;
+  fProdCuts.electron = cut_val;
+  fProdCuts.positron = cut_val;
+
+  // sensitive region
+  fProdCutsSensitive = ProdCutStore(cut_val);
+  fProdCutsSensitive.gamma = cut_val;
+  fProdCutsSensitive.electron = cut_val;
+  fProdCutsSensitive.positron = cut_val;
+
+  this->SetCuts();
+
+  // define messenger commands
   this->DefineCommands();
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::SetUseGammaAngCorr(bool b) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetCorrelatedGamma(b);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::SetGammaTwoJMAX(int max_two_j) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
@@ -103,14 +116,10 @@ void RMGPhysics::SetGammaTwoJMAX(int max_two_j) {
   pars->SetTwoJMAX(max_two_j);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::SetStoreICLevelData(bool store) {
   auto pars = G4NuclearLevelData::GetInstance()->GetParameters();
   pars->SetStoreICLevelData(store);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::ConstructParticle() {
 
@@ -123,8 +132,6 @@ void RMGPhysics::ConstructParticle() {
   G4IonConstructor::ConstructParticle();
   G4ShortLivedConstructor::ConstructParticle();
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::ConstructProcess() {
 
@@ -296,8 +303,6 @@ void RMGPhysics::ConstructProcess() {
   step_limits->ConstructProcess();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::ConstructOptical() {
 
   RMGLog::Out(RMGLog::detail, "Adding optical physics");
@@ -355,8 +360,6 @@ void RMGPhysics::ConstructOptical() {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::SetCuts() {
 
   RMGLog::Out(RMGLog::debug, "Setting particle cut values");
@@ -395,75 +398,7 @@ void RMGPhysics::SetCuts() {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void RMGPhysics::SetPhysicsRealm(PhysicsRealm realm) {
-  switch (realm) {
-    case PhysicsRealm::kDoubleBetaDecay:
-      RMGLog::Out(RMGLog::summary, "Realm set to DoubleBetaDecay");
-
-      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCuts.gamma = 0.1 * u::mm;
-      fProdCuts.electron = 0.1 * u::mm;
-      fProdCuts.positron = 0.1 * u::mm;
-
-      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCutsSensitive.gamma = 0.1 * u::mm;
-      fProdCutsSensitive.electron = 0.1 * u::mm;
-      fProdCutsSensitive.positron = 0.1 * u::mm;
-      break;
-
-    case PhysicsRealm::kDarkMatter:
-      RMGLog::Out(RMGLog::summary, "Realm set to DarkMatter");
-
-      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCuts.gamma = 5 * u::um;
-      fProdCuts.electron = 0.5 * u::um;
-      fProdCuts.positron = 0.5 * u::um;
-
-      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCutsSensitive.gamma = 5 * u::um;
-      fProdCutsSensitive.electron = 0.5 * u::um;
-      fProdCutsSensitive.positron = 0.5 * u::um;
-      break;
-
-    case PhysicsRealm::kCosmicRays:
-      RMGLog::Out(RMGLog::summary, "Realm set to CosmicRays (cut-per-region)");
-      fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCuts.gamma = 5 * u::cm;
-      fProdCuts.electron = 1 * u::cm;
-      fProdCuts.positron = 1 * u::cm;
-      fProdCuts.proton = 5 * u::mm;
-
-      fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
-      fProdCutsSensitive.gamma = 30 * u::mm;
-      fProdCutsSensitive.electron = 40 * u::um;
-      fProdCutsSensitive.positron = 40 * u::um;
-      break;
-
-    case PhysicsRealm::kLArScintillation:
-      RMGLog::Out(RMGLog::warning, "LAr scintillation realm unimplemented");
-      break;
-    case PhysicsRealm::kUserDefined:
-      RMGLog::Out(RMGLog::summary,
-          "User requested custom physics realm, based on directly setting production cuts.");
-
-      break;
-  }
-
-  this->SetCuts();
-  fPhysicsRealm = realm;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::SetSensitiveProductionCut(double cut) {
-
-  if (this->fPhysicsRealmSet) {
-    RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
-        " while the realm has already been explicitly set, this will override the production cuts");
-  }
 
   RMGLog::OutFormat(RMGLog::summary,
       "Setting user defined production cuts for sensitive region to {} mm", cut / u::mm);
@@ -474,16 +409,9 @@ void RMGPhysics::SetSensitiveProductionCut(double cut) {
   fProdCutsSensitive.positron = cut;
 
   this->SetCuts();
-  fPhysicsRealm = PhysicsRealm::kUserDefined;
 }
-////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGPhysics::SetDefaultProductionCut(double cut) {
-
-  if (this->fPhysicsRealmSet) {
-    RMGLog::Out(RMGLog::warning, "Setting the production cuts for the sensitive region",
-        " while the realm has already been explicitly set, this will override the production cuts");
-  }
 
   RMGLog::OutFormat(RMGLog::summary,
       "Setting user defined production cuts for default region to {} mm", cut / u::mm);
@@ -494,11 +422,7 @@ void RMGPhysics::SetDefaultProductionCut(double cut) {
   fProdCuts.positron = cut;
 
   this->SetCuts();
-  fPhysicsRealm = PhysicsRealm::kUserDefined;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 
 void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
   try {
@@ -513,40 +437,22 @@ void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
   } catch (const std::bad_cast&) { return; }
 }
 
-void RMGPhysics::SetPhysicsRealmString(std::string realm) {
-
-  fPhysicsRealmSet = true;
-  try {
-    this->SetPhysicsRealm(RMGTools::ToEnum<PhysicsRealm>(realm, "physics realm"));
-  } catch (const std::bad_cast&) { return; }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 void RMGPhysics::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/",
       "Commands for controlling physics processes");
 
-  fMessenger->DeclareMethod("Realm", &RMGPhysics::SetPhysicsRealmString)
-      .SetGuidance("Set simulation realm (cut values for particles in (sensitive) detector")
-      .SetParameterName("realm", false)
-      .SetCandidates(RMGTools::GetCandidates<PhysicsRealm>())
-      .SetStates(G4State_PreInit, G4State_Idle);
-
   fMessenger
       ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
       .SetGuidance("Set simulation production cuts, for default region for electrons, positions, "
-                   "and gammas. Notes: this overrides the values from the physics realm. This does "
-                   "not apply to protons, alphas or generic ions.")
+                   "and gammas. Note: this does not apply to protons, alphas or generic ions.")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger
       ->DeclareMethodWithUnit("SensitiveProductionCut", "mm", &RMGPhysics::SetSensitiveProductionCut)
       .SetGuidance("Set simulation production cuts, for sensitive region for electrons, positions, "
-                   "and gammas. Notes: this overrides the values from the physics realm. This does "
-                   "not apply to protons, alphas or generic ions.")
+                   "and gammas. Note: this does not apply to protons, alphas or generic ions.")
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 

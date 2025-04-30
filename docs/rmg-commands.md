@@ -833,9 +833,8 @@ Commands for controlling physics processes
 
 **Commands:**
 
-* `Realm` – Set simulation realm (cut values for particles in (sensitive) detector
-* `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
-* `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
+* `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
+* `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -846,19 +845,9 @@ Commands for controlling physics processes
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 
-### `/RMG/Processes/Realm`
-
-Set simulation realm (cut values for particles in (sensitive) detector
-
-* **Parameter** – `realm`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `DoubleBetaDecay DarkMatter CosmicRays LArScintillation UserDefined`
-* **Allowed states** – `PreInit Idle`
-
 ### `/RMG/Processes/DefaultProductionCut`
 
-Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
+Set simulation production cuts, for default region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
@@ -872,7 +861,7 @@ Set simulation production cuts, for default region for electrons, positions, and
 
 ### `/RMG/Processes/SensitiveProductionCut`
 
-Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this overrides the values from the physics realm. This does not apply to protons, alphas or generic ions.
+Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
