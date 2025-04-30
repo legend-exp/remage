@@ -106,12 +106,9 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
 
   // check if the average point is inside
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-
-  if (navigator->LocateGlobalPointAndSetup(hit->global_position_average) != hit->physical_volume) {
-    RMGLog::Out(RMGLog::warning, "Average of the hits is inside volume, aborting clustering for "
-                                 "these points!");
+  if (navigator->LocateGlobalPointAndSetup(hit->global_position_average) != hit->physical_volume)
     return nullptr;
-  }
+
 
   // compute the distance to the surface, for the pre/post step this is already done
   // but a new calculation is needed for the average.
@@ -347,7 +344,7 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(cons
   }
 
   // create a container for the output hits
-  auto out = std::shared_ptr<RMGDetectorHitsCollection>();
+  auto out = std::make_shared<RMGDetectorHitsCollection>();
 
   // average the hits
   for (const auto& value : hits_vector) {
@@ -355,8 +352,13 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(cons
     // average the hit and insert into the collection
     auto averaged_hit = average_hits(value, has_distance_to_surface, has_velocity);
     if (averaged_hit) out->insert(averaged_hit);
-    else
-      for (auto hit : value) out->insert(hit);
+    else {
+
+      for (auto hit : value) {
+        hit->Print();
+        out->insert(new RMGDetectorHit(*hit));
+      }
+    }
   }
 
   return out;

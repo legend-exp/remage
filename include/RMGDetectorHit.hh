@@ -44,7 +44,8 @@ class RMGDetectorHit : public G4VHit {
     RMGDetectorHit() = default;
     ~RMGDetectorHit() = default;
 
-    RMGDetectorHit(RMGDetectorHit const&) = delete;
+    RMGDetectorHit(const RMGDetectorHit&) = default;
+
     RMGDetectorHit& operator=(RMGDetectorHit const&) = delete;
     RMGDetectorHit(RMGDetectorHit&&) = delete;
     RMGDetectorHit& operator=(RMGDetectorHit&&) = delete;
