@@ -16,29 +16,81 @@
 #ifndef _RMG_SCINTILLATOR_OUTPUT_SCHEME_HH_
 #define _RMG_SCINTILLATOR_OUTPUT_SCHEME_HH_
 
+#include <memory>
 #include <optional>
 #include <set>
 
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
 
+#include "RMGDetectorHit.hh"
+#include "RMGOutputTools.hh"
 #include "RMGScintillatorDetector.hh"
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
+/** @brief Output scheme for Scintillator detectors.
+ *
+ *  @details This output scheme records the hits in the Scintillator detectors.
+ *  The properties of each @c RMGDetectorHit are recorded:
+ *  - event index,
+ *  - particle type,
+ *  - time,
+ *  - position,
+ *  - energy deposition,
+ *  - velocity of the particle (optional),
+ *
+ * Optionally, the track ID and parent track ID can be stored as well as the
+ * detector ID for the single table output mode.
+ *
+ */
 class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGScintillatorOutputScheme();
 
+    /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
+
+    /** @brief Store the information from the event, invoked in @c RMGEventAction::EndOfEventAction
+     * @details Only steps with non-zero energy are stored, unless @c fDiscardZeroEnergyHits is false.
+     */
     void StoreEvent(const G4Event*) override;
+
+    /** @brief Decide whether to store the event, invoked in @c RMGEventAction::EndOfEventAction
+     *  @details @c true if the event should be discarded, else @c false .
+     *  The event is discarded if there is no hit in the Scintillator volumes or the energy range
+     *  condition is not met.
+     */
     bool ShouldDiscardEvent(const G4Event*) override;
 
+    /** @brief Set a lower cut on the energy deposited in the event to store it. */
     inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
+
+    /** @brief Set a upper cut on the energy deposited in the event to store it. */
     inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
+
+    /** @brief Add a detector uid to the list of detectors to apply the energy cut for. */
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
+
+    /** @brief Set which position is used for the steps */
+    inline void SetPositionMode(RMGOutputTools::PositionMode mode) { fPositionMode = mode; }
+
+    /** @brief Set a distance to compute together steps in the bulk. */
+    inline void SetClusterDistance(double threshold) {
+      fPreClusterPars.cluster_distance = threshold;
+    }
+
+    /** @brief Set the time threshold for pre-clustering. */
+    inline void SetClusterTimeThreshold(double threshold) {
+      fPreClusterPars.cluster_time_threshold = threshold;
+    }
+
+    /** @brief Set the energy threshold to merge electron tracks.*/
+    inline void SetElectronTrackEnergyThreshold(double threshold) {
+      fPreClusterPars.track_energy_threshold = threshold;
+    }
 
   protected:
 
@@ -46,9 +98,10 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
   private:
 
-    RMGScintillatorDetectorHitsCollection* GetHitColl(const G4Event*);
+    RMGDetectorHitsCollection* GetHitColl(const G4Event*);
+    void SetPositionModeString(std::string mode);
 
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void DefineCommands();
 
     double fEdepCutLow = -1;
@@ -57,6 +110,18 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+    bool fStoreTrackID = false;
+
+    bool fPreClusterHits = false;
+    bool fDiscardZeroEnergyHits = true;
+
+    /** @brief Parameters for pre-clustering. */
+    RMGOutputTools::ClusterPars fPreClusterPars;
+
+    /** @brief Mode of positions to store. */
+    RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
+
+    bool fStoreVelocity = false;
 };
 
 #endif

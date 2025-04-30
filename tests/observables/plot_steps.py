@@ -98,7 +98,7 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
     ax.set_ylabel("Counts")
     ax.set_xlabel("Step size [um]")
     ax.set_xlim(range[0], range[1])
-    ax.set_yscale("log")
+    ax.set_yscale("linear")
 
     plt.tight_layout()
 
@@ -115,6 +115,8 @@ plot_tracks(data, 1, f"{name}.tracks.out1.png")
 plot_tracks(data, 2, f"{name}.tracks.out2.png")
 
 shaped = group_by_evtid(data).view_as("ak")
+
+
 cluster_idx = cluster_by_step_length(
     shaped.trackid,
     shaped.xloc,
@@ -123,6 +125,7 @@ cluster_idx = cluster_by_step_length(
     shaped.dist_to_surf,
     surf_cut=0,
     threshold=100,
+    threshold_surf=0,
 ).view_as("ak")
 
 cluster_x = apply_cluster(cluster_idx, shaped.xloc).view_as("ak")

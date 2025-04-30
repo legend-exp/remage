@@ -16,20 +16,23 @@
 #ifndef _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 #define _RMG_GERMANIUM_OUTPUT_SCHEME_HH_
 
+#include <memory>
 #include <optional>
 #include <set>
 
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
 
+#include "RMGDetectorHit.hh"
 #include "RMGGermaniumDetector.hh"
+#include "RMGOutputTools.hh"
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
 /** @brief Output scheme for Germanium detectors.
  *
  *  @details This output scheme records the hits in the Germanium detectors.
- *  The properties of each @c RMGGermaniumDetectorHit are recorded:
+ *  The properties of each @c RMGDetectorHit are recorded:
  *  - event index,
  *  - particle type,
  *  - time,
@@ -46,14 +49,6 @@ class G4Event;
 class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   public:
-
-    /** @brief Enum of which position of the hit to store. */
-    enum class PositionMode {
-      kPreStep,  /**Store the prestep point. */
-      kPostStep, /**Store the poststep point. */
-      kAverage,  /**Store the average. */
-      kBoth,     /**Store both post and prestep */
-    };
 
     RMGGermaniumOutputScheme();
 
@@ -93,7 +88,32 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
     /** @brief Set which position is used for the steps */
-    inline void SetPositionMode(PositionMode mode) { fPositionMode = mode; }
+    inline void SetPositionMode(RMGOutputTools::PositionMode mode) { fPositionMode = mode; }
+
+    /** @brief Set a distance to compute together steps in the bulk. */
+    inline void SetClusterDistance(double threshold) {
+      fPreClusterPars.cluster_distance = threshold;
+    }
+
+    /** @brief Set a distance to compute together steps in the surface */
+    inline void SetClusterDistanceSurface(double threshold) {
+      fPreClusterPars.cluster_distance_surface = threshold;
+    }
+
+    /** @brief Set the thickness of the surface region. */
+    inline void SetSurfaceThickness(double thickness) {
+      fPreClusterPars.surface_thickness = thickness;
+    }
+
+    /** @brief Set the time threshold for pre-clustering. */
+    inline void SetClusterTimeThreshold(double threshold) {
+      fPreClusterPars.cluster_time_threshold = threshold;
+    }
+
+    /** @brief Set the energy threshold to merge electron tracks.*/
+    inline void SetElectronTrackEnergyThreshold(double threshold) {
+      fPreClusterPars.track_energy_threshold = threshold;
+    }
 
   protected:
 
@@ -101,10 +121,10 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   private:
 
-    RMGGermaniumDetectorHitsCollection* GetHitColl(const G4Event*);
+    RMGDetectorHitsCollection* GetHitColl(const G4Event*);
     void SetPositionModeString(std::string mode);
 
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void DefineCommands();
 
     double fEdepCutLow = -1;
@@ -118,8 +138,13 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionPosition = false;
 
     bool fStoreTrackID = false;
+    bool fPreClusterHits = false;
 
-    PositionMode fPositionMode = PositionMode::kAverage;
+    /** @brief Parameters for pre-clustering. */
+    RMGOutputTools::ClusterPars fPreClusterPars;
+
+    // mode of position to store
+    RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
 };
 
 #endif
