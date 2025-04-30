@@ -194,7 +194,7 @@ void RMGGeneratorMUSUNCosmicMuons::DefineCommands() {
   fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/MUSUNCosmicMuons/",
       "Commands for controlling the MUSUN µ generator");
 
-  fMessenger->DeclareMethod("SetMUSUNFile", &RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile)
+  fMessenger->DeclareMethod("MUSUNFile", &RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile)
       .SetGuidance("Set the MUSUN input file")
       .SetParameterName("MUSUNFileName", false)
       .SetToBeBroadcasted(true)

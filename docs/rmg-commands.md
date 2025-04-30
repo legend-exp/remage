@@ -37,7 +37,7 @@ General commands for controlling the application
 
 Enable interactive mode
 
-* **Parameter** – `interactive`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
@@ -102,7 +102,6 @@ Select the initial seed for randomization (CLHEP::HepRandom::setTheSeed)
 * **Parameter** – `n`
   * **Parameter type** – `i`
   * **Omittable** – `False`
-  * **Default value** – `1`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Manager/Randomization/InternalSeed`
@@ -203,8 +202,8 @@ Commands for controlling output from hits in germanium detectors.
 
 **Commands:**
 
-* `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
@@ -213,7 +212,7 @@ Commands for controlling output from hits in germanium detectors.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `StepPositionMode` – Select which position of the step to store
 
-### `/RMG/Output/Germanium/SetEdepCutLow`
+### `/RMG/Output/Germanium/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
 
@@ -227,7 +226,7 @@ Set a lower energy cut that has to be met for this event to be stored.
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/SetEdepCutHigh`
+### `/RMG/Output/Germanium/EdepCutHigh`
 
 Set an upper energy cut that has to be met for this event to be stored.
 
@@ -258,45 +257,50 @@ Discard optical photons (before simulating them), if no edep in germanium detect
 If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
 :::
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
 
 Discard hits with zero energy.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StoreTrackID`
 
 Store Track IDs for hits in the output file.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/StepPositionMode`
@@ -325,36 +329,40 @@ Commands for controlling output of primary vertices.
 
 Store information on primary particle details (not only vertex data).
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
 
 Do not store vertex/primary particle data.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/StoreSinglePrecisionPosition`
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/Scintillator/`
@@ -364,13 +372,13 @@ Commands for controlling output from hits in scintillator detectors.
 
 **Commands:**
 
-* `SetEdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `SetEdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 
-### `/RMG/Output/Scintillator/SetEdepCutLow`
+### `/RMG/Output/Scintillator/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
 
@@ -384,7 +392,7 @@ Set a lower energy cut that has to be met for this event to be stored.
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Scintillator/SetEdepCutHigh`
+### `/RMG/Output/Scintillator/EdepCutHigh`
 
 Set an upper energy cut that has to be met for this event to be stored.
 
@@ -411,18 +419,20 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/IsotopeFilter/`
@@ -455,9 +465,10 @@ Discard optical photons (before simulating them), if the specified isotopes had 
 If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
 :::
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/Track/`
@@ -469,7 +480,7 @@ Commands for controlling output of track vertices.
 
 * `AddProcessFilter` – Only include tracks created by this process.
 * `AddParticleFilter` – Only include tracks with this particle.
-* `SetEnergyFilter` – Only include tracks with kinetic energy above this threshold.
+* `EnergyFilter` – Only include tracks with kinetic energy above this threshold.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 
@@ -491,7 +502,7 @@ Only include tracks with this particle.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Track/SetEnergyFilter`
+### `/RMG/Output/Track/EnergyFilter`
 
 Only include tracks with kinetic energy above this threshold.
 
@@ -504,18 +515,20 @@ Only include tracks with kinetic energy above this threshold.
 
 Use float32 (instead of float64) for position output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Track/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/ParticleFilter/`
@@ -622,18 +635,20 @@ Set simulation production cuts, for sensitive region for electrons, positions, a
 
 Add optical processes to the physics list
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/OpticalPhysicsMaxOneWLSPhoton`
 
 Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/LowEnergyEMPhysics`
@@ -662,20 +677,20 @@ Add hadronic processes to the physics list
 
 Use thermal scattering cross sections for neutrons
 
-* **Parameter** – `arg0`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
-  * **Candidates** – `0 1`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/EnableGammaAngularCorrelation`
 
 Set correlated gamma emission flag
 
-* **Parameter** – `arg0`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
-  * **Candidates** – `0 1`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/GammaTwoJMAX`
@@ -692,19 +707,20 @@ Set max 2J for sampling of angular correlations
 
 Store e- internal conversion data
 
-* **Parameter** – `arg0`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
-  * **Candidates** – `0 1`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/UseGrabmayrsGammaCascades`
 
 Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ## `/RMG/Processes/Stepping/`
@@ -741,9 +757,9 @@ Set to -1 to disable this feature.
 
 If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
   * **Default value** – `true`
 * **Allowed states** – `Idle`
 
@@ -782,9 +798,10 @@ Commands for controlling geometry definitions
 
 Disable the automatic overlap check after loading a GDML file
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/GDMLOverlapCheckNumPoints`
@@ -919,9 +936,9 @@ Commands for controlling the MUSUN µ generator
 
 **Commands:**
 
-* `SetMUSUNFile` – Set the MUSUN input file
+* `MUSUNFile` – Set the MUSUN input file
 
-### `/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile`
+### `/RMG/Generator/MUSUNCosmicMuons/MUSUNFile`
 
 Set the MUSUN input file
 
@@ -1205,9 +1222,10 @@ Reset all parameters of vertex confinement, so that it can be reconfigured.
 
 If true (or omitted argument), sample on the surface of solids
 
-* **Parameter** – `flag`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/SamplingMode`
@@ -1254,9 +1272,10 @@ Set maximum number of intersections of a line with the surface. Note: can be set
 
 If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.
 
-* **Parameter** – `flag`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/Physical/`

@@ -143,17 +143,21 @@ void RMGTrackOutputScheme::DefineCommands() {
       .SetParameterName("pdgid", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("SetEnergyFilter", &RMGTrackOutputScheme::SetEnergyFilter)
+  fMessenger->DeclareMethod("EnergyFilter", &RMGTrackOutputScheme::SetEnergyFilter)
       .SetGuidance("Only include tracks with kinetic energy above this threshold.")
       .SetParameterName("energy", false)
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 }
 

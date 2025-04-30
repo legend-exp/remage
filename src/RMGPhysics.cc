@@ -536,7 +536,6 @@ void RMGPhysics::DefineCommands() {
       .SetCandidates(RMGTools::GetCandidates<PhysicsRealm>())
       .SetStates(G4State_PreInit, G4State_Idle);
 
-
   fMessenger
       ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
       .SetGuidance("Set simulation production cuts, for default region for electrons, positions, "
@@ -555,11 +554,15 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
       .SetGuidance("Add optical processes to the physics list")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareProperty("OpticalPhysicsMaxOneWLSPhoton", fUseOpticalCustomWLS)
       .SetGuidance(
           "Use a custom wavelegth shifting process that produces at maximum one secondary photon.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
@@ -574,16 +577,16 @@ void RMGPhysics::DefineCommands() {
       .SetDefaultValue(RMGTools::GetCandidate(HadronicPhysicsListOption::kShielding))
       .SetStates(G4State_PreInit);
 
-  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("ThermalScattering", &RMGPhysics::SetUseThermalScattering)
       .SetGuidance("Use thermal scattering cross sections for neutrons")
-      .SetCandidates("0 1")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
-  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)
       .SetGuidance("Set correlated gamma emission flag")
-      .SetCandidates("0 1")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("GammaTwoJMAX", &RMGPhysics::SetGammaTwoJMAX)
@@ -592,14 +595,16 @@ void RMGPhysics::DefineCommands() {
       .SetRange("x > 0")
       .SetStates(G4State_PreInit);
 
-  // TODO: upstream bug with bools in G4GenericMessenger (only numeric values work).
   fMessenger->DeclareMethod("StoreICLevelData", &RMGPhysics::SetStoreICLevelData)
       .SetGuidance("Store e- internal conversion data")
-      .SetCandidates("0 1")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareProperty("UseGrabmayrsGammaCascades", fUseGrabmayrGammaCascades)
       .SetGuidance("Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 }
 
