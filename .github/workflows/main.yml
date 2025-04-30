@@ -17,7 +17,7 @@ concurrency:
 jobs:
   test_on_mac:
     name: Test on macOS
-    runs-on: macos-15
+    runs-on: macos-latest
     defaults:
       run:
         shell: bash -el {0}
@@ -46,8 +46,6 @@ jobs:
           brew install opencascade cgal gmp mpfr boost
 
           conda install conda-forge::geant4
-
-          conda remove --force numpy liblapack libcblas libblas libopenblas # installed by default?
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
       - name: Build project
@@ -61,7 +59,7 @@ jobs:
       - name: Run minimal test suite
         run: |
           cd build
-          #ctest --output-on-failure --label-exclude 'extra|vis'
+          ctest --output-on-failure --label-exclude 'extra|vis'
 
       - name: Minimally test installed executable
         run: |
