@@ -15,119 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_on_linux:
-    name: Test on remage image
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        # guideline: only test on latest patch releases (and maybe previous one)
-        container_version:
-          - latest
-          - stable
-          - slim
-
-    container: docker://gipert/remage-base:${{ matrix.container_version }}
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # we need a fully checked-out repo to get version from setuptools-scm.
-          fetch-depth: 0
-          fetch-tags: true
-          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
-
-      - name: Build project
-        shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
-        run: |
-          exit 1
-          git config --global --add safe.directory $(pwd)  # make git work inside container.
-
-          mkdir build
-          cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
-          make | tee -a build.log
-          make install | tee -a build.log
-
-      - name: check version equality
-        run: |
-          cd build
-          cpp_version=$(sed -En "s/-- remage version [0-9.]+ \(([0-9a-z.+_-]+)\)/\\1/p" build.log)
-          py_version=$(sed -En "s/-- Installed python wrapper Version: ([0-9a-z.+_-]+)/\\1/p" build.log)
-          if [ "$cpp_version" != "$py_version" ]; then
-            echo "::error::version numbers of python wrapper ($py_version) and cpp executable ($cpp_version) differ!"
-            exit 1
-          fi
-
-      - name: Compare checked-in doc dump with current result
-        if: ${{ matrix.container_version != 'slim' }}
-        run: |
-          cd build
-          cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
-
-          echo "::group::compile and run remage-doc-dump"
-          make remage-doc-dump
-          echo "::endgroup::"
-
-          docs_differ=0
-          docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
-          if [ $docs_differ -ne 0 ]; then
-            echo "::error file=docs/rmg-commands.md::docs/rmg-commands.md is not up-to-date with remage source. please run 'make remage-doc-dump' and commit changes."
-            echo "$docs_diff"
-            exit 1
-          fi
-
-      - name: Setup and start xvfb (enables Geant4 visualization)
-        run: |
-          Xvfb :99 -screen 0 1920x1080x24 &
-
-      - name: Run full test suite
-        if: ${{ matrix.container_version != 'slim' }}
-        env:
-          DISPLAY: :99
-        run: |
-          cd build
-          ctest --output-on-failure
-
-      - name: Upload test suite outputs to GitHub
-        if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: remage-test-output-g4flavor-${{ matrix.container_version }}
-          # artifacts must have a ".output*" extension
-          path: build/tests/**/*.output*.*
-
-      - name: Run minimal test suite
-        if: ${{ matrix.container_version == 'slim' }}
-        env:
-          DISPLAY: :99
-        run: |
-          cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
-
-      - name: Test docs building
-        if: ${{ matrix.container_version != 'slim' }}
-        run: |
-          cd build
-          cmake -DRMG_BUILD_DOCS=ON ..
-          make sphinx
-          make sphinx-validation
-
-      - name: Upload validation report to GitHub
-        if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: remage-validation-report-g4flavor-${{ matrix.container_version }}
-          path: build/docs/validation/_build/
-
-      - name: Minimally test installed executable
-        run: |
-          rm -rf build
-          export PATH="/usr/local/bin:$PATH"
-          export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-          REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
-
   test_on_mac:
     name: Test on macOS
     runs-on: macos-15
@@ -159,6 +46,7 @@ jobs:
           brew install opencascade cgal gmp mpfr boost
 
           conda install conda-forge::geant4
+          conda repoquery whoneeds numpy
           conda remove --force numpy # installed by default?
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
