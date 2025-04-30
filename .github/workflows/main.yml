@@ -41,6 +41,7 @@ jobs:
       - name: Build project
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
+          exit 1
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
           mkdir build
@@ -153,12 +154,18 @@ jobs:
 
       - name: Install Geant4 and native dependencies
         run: |
+          which ranlib
           # native dependencies for pyg4ometry
           brew update
           brew install opencascade cgal gmp mpfr boost
+          hash -r
+          which ranlib
 
           conda install conda-forge::geant4
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
+          hash -r
+          which ranlib
+          exit 1
 
       - name: Build project
         run: |
