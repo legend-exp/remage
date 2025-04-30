@@ -42,6 +42,7 @@ jobs:
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
           git config --global --add safe.directory $(pwd)  # make git work inside container.
+
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
@@ -63,9 +64,11 @@ jobs:
         run: |
           cd build
           cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
+
           echo "::group::compile and run remage-doc-dump"
           make remage-doc-dump
           echo "::endgroup::"
+
           docs_differ=0
           docs_diff=$(diff -u ../docs/rmg-commands.md ../docs/rmg-commands.md.bak) || docs_differ=$?
           if [ $docs_differ -ne 0 ]; then
