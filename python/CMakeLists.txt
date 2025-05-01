@@ -57,12 +57,15 @@ set_target_properties(python-virtualenv PROPERTIES PYTHONPATH ${VENV_DIR}/bin/py
 # it hardcodes the path to the current python executable (e.g. the one of the
 # virtualenv) in the script's shebang
 
-# need more packages if we also want to use this venv later for tests
+# need more packages if we also want to use this venv later for tests or docs.
+set(_pkg_install_extras "")
 if(BUILD_TESTING)
-  set(_pkg_install "${CMAKE_SOURCE_DIR}[test]")
-else()
-  set(_pkg_install ${CMAKE_SOURCE_DIR})
+  list(APPEND _pkg_install_extras "test")
 endif()
+if(BUILD_DOCS)
+  list(APPEND _pkg_install_extras "docs")
+endif()
+string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
 
 # now we want to use the cpp_config for the build area
 add_custom_command(
@@ -70,7 +73,7 @@ add_custom_command(
   COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
           ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python
-          -m uv pip -q install --reinstall ${_pkg_install}
+          -m uv pip -q install --reinstall "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
   COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'

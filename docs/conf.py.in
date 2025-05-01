@@ -18,6 +18,8 @@ copyright = "2020, the LEGEND Collaboration"
 author = "The remage developers"
 
 extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
     "sphinx.ext.graphviz",
@@ -46,6 +48,12 @@ breathe_projects = {}
 myst_enable_extensions = ["colon_fence", "substitution", "attrs_block", "deflist", "dollarmath"]
 myst_heading_anchors = 3
 
+# sphinx-napoleon
+# enforce consistent usage of NumPy-style docstrings
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_use_ivar = True
+
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable", None),
@@ -57,6 +65,20 @@ intersphinx_mapping = {
     "pyg4ometry": ("https://pyg4ometry.readthedocs.io/en/stable", None),
     "dbetto": ("https://dbetto.readthedocs.io/en/stable/", None),
 }
+
+# sphinx-autodoc
+
+autodoc_default_options = {
+    "ignore-module-all": True,
+    # ignore some common members from NamedTuples.
+    "exclude-members": "_asdict, _fields, _field_defaults, _make, _replace",
+}
+
+# Include __init__() docstring in class docstring
+autoclass_content = "both"
+autodoc_typehints = "description"
+autodoc_typehints_description_target = "all"
+autodoc_typehints_format = "short"
 
 if on_rtd:
     # assume build has been prepared in .readthedocs.yml

@@ -1,5 +1,4 @@
 find_package(Doxygen REQUIRED)
-find_package(Sphinx REQUIRED)
 
 # find remage headers
 get_target_property(REMAGE_PUBLIC_HEADER_DIR remage INTERFACE_INCLUDE_DIRECTORIES)
@@ -79,9 +78,18 @@ endforeach()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
 
+get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
+
+set(_python_src "${PROJECT_SOURCE_DIR}/python/remage")
+
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b html
+  COMMAND rm -rf ${SPHINX_SOURCE}/api
+  COMMAND echo ${PYTHONPATH}
+  COMMAND
+    ${PYTHONPATH} -m sphinx.ext.apidoc --private --module-first --force --output-dir
+    "${SPHINX_SOURCE}/api" "${_python_src}" "${_python_src}/_version.py"
+  COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html
           -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${SPHINX_EXTENSIONS} ${DOXYGEN_INDEX_FILE}
