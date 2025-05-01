@@ -20,8 +20,10 @@ void IsotopeOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto rmg_man = RMGManager::Instance();
 
-  auto id = rmg_man->RegisterNtuple(OutputRegisterID,
-      ana_man->CreateNtuple("IsotopeOutput", "Event data"));
+  auto id = rmg_man->RegisterNtuple(
+      OutputRegisterID,
+      ana_man->CreateNtuple("IsotopeOutput", "Event data")
+  );
 
   ana_man->CreateNtupleIColumn(id, "evtid");
   // Could be done with particle PDG but this way it is human readable

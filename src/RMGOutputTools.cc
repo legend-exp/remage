@@ -46,8 +46,11 @@ G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::
 
     position = hit->global_position_average;
   } else
-    RMGLog::Out(RMGLog::fatal, "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
-        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode));
+    RMGLog::Out(
+        RMGLog::fatal,
+        "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
+        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode)
+    );
 
   return position;
 }
@@ -66,14 +69,20 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
 
     distance = hit->distance_to_surface_average;
   } else
-    RMGLog::Out(RMGLog::fatal, "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
-        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode));
+    RMGLog::Out(
+        RMGLog::fatal,
+        "fPositionMode is not set to kPreStep, kPostStep or kAverage instead ",
+        magic_enum::enum_name<RMGOutputTools::PositionMode>(mode)
+    );
 
   return distance;
 }
 
-RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
-    bool compute_distance_to_surface, bool compute_velocity) {
+RMGDetectorHit* RMGOutputTools::average_hits(
+    std::vector<RMGDetectorHit*> hits,
+    bool compute_distance_to_surface,
+    bool compute_velocity
+) {
 
   if (hits.empty()) {
     RMGLog::OutDev(RMGLog::error, "Cannot average empty set of hits");
@@ -115,8 +124,10 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   if (compute_distance_to_surface) {
     hit->distance_to_surface_prestep = hits.front()->distance_to_surface_prestep;
     hit->distance_to_surface_poststep = hits.back()->distance_to_surface_poststep;
-    hit->distance_to_surface_average =
-        distance_to_surface(hits.back()->physical_volume, hit->global_position_average);
+    hit->distance_to_surface_average = distance_to_surface(
+        hits.back()->physical_volume,
+        hit->global_position_average
+    );
   }
 
 
@@ -129,8 +140,10 @@ RMGDetectorHit* RMGOutputTools::average_hits(std::vector<RMGDetectorHit*> hits,
   return hit;
 }
 
-bool RMGOutputTools::check_step_point_containment(const G4StepPoint* step_point,
-    RMGDetectorType det_type) {
+bool RMGOutputTools::check_step_point_containment(
+    const G4StepPoint* step_point,
+    RMGDetectorType det_type
+) {
 
   const auto pv = step_point->GetTouchableHandle()->GetVolume();
   auto pv_name = pv->GetName();
@@ -141,20 +154,32 @@ bool RMGOutputTools::check_step_point_containment(const G4StepPoint* step_point,
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != det_type) {
-      RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {} not registered as {} detector",
-          pv_name, pv_copynr, magic_enum::enum_name<RMGDetectorType>(det_type));
+      RMGLog::OutFormatDev(
+          RMGLog::debug,
+          "Volume '{}' (copy nr. {} not registered as {} detector",
+          pv_name,
+          pv_copynr,
+          magic_enum::enum_name<RMGDetectorType>(det_type)
+      );
       return false;
     }
   } catch (const std::out_of_range& e) {
-    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {}) not registered as detector",
-        pv_name, pv_copynr);
+    RMGLog::OutFormatDev(
+        RMGLog::debug,
+        "Volume '{}' (copy nr. {}) not registered as detector",
+        pv_name,
+        pv_copynr
+    );
     return false;
   }
   return true;
 }
 
-void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-    RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface) {
+void RMGOutputTools::redistribute_gamma_energy(
+    std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+    RMGOutputTools::ClusterPars cluster_pars,
+    bool has_distance_to_surface
+) {
 
   RMGLog::Out(RMGLog::debug, "Merging gamma tracks ");
 
@@ -172,8 +197,8 @@ void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDete
       if (hit->energy_deposition == 0) continue;
 
       // extract a threshold
-      double threshold = (not has_distance_to_surface) or ((hit->distance_to_surface_prestep) >
-                                                              cluster_pars.surface_thickness)
+      double threshold = (not has_distance_to_surface
+                         ) or ((hit->distance_to_surface_prestep) > cluster_pars.surface_thickness)
                              ? cluster_pars.cluster_distance
                              : cluster_pars.cluster_distance_surface;
 
@@ -196,9 +221,11 @@ void RMGOutputTools::redistribute_gamma_energy(std::map<int, std::vector<RMGDete
 }
 
 
-std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
-    combine_low_energy_tracks(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-        RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface) {
+std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_tracks(
+    std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+    RMGOutputTools::ClusterPars cluster_pars,
+    bool has_distance_to_surface
+) {
 
   RMGLog::Out(RMGLog::debug, "Merging low energy electron tracks ");
 
@@ -221,11 +248,11 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
     if (energy > cluster_pars.track_energy_threshold) continue;
 
     // distance threshold to merge tracks
-    double threshold =
-        (not has_distance_to_surface) or
-                ((input_hits.front()->distance_to_surface_prestep) > cluster_pars.surface_thickness)
-            ? cluster_pars.cluster_distance
-            : cluster_pars.cluster_distance_surface;
+    double threshold = (not has_distance_to_surface) or
+                               ((input_hits.front()->distance_to_surface_prestep) >
+                                cluster_pars.surface_thickness)
+                           ? cluster_pars.cluster_distance
+                           : cluster_pars.cluster_distance_surface;
 
     // now search for another track to merge it with
     int cluster_trackid = -1;
@@ -243,7 +270,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
       // compute distance between the first step of this track and that of the
       // other track.
       if (energy > cluster_energy && (input_hits.front()->global_position_prestep -
-                                         second_input_hits.front()->global_position_prestep)
+                                      second_input_hits.front()->global_position_prestep)
                                              .mag() < threshold) {
 
         cluster_energy = energy;
@@ -257,8 +284,11 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
       for (auto hit : output_hits[trackid]) { hit->track_id = cluster_trackid; }
 
       // add these elements to the start of the second track
-      output_hits[cluster_trackid].insert(output_hits[cluster_trackid].begin(),
-          output_hits[trackid].begin(), output_hits[trackid].end());
+      output_hits[cluster_trackid].insert(
+          output_hits[cluster_trackid].begin(),
+          output_hits[trackid].begin(),
+          output_hits[trackid].end()
+      );
 
       output_hits.erase(trackid);
       RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
@@ -267,9 +297,12 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
   return output_hits;
 }
 
-std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(const RMGDetectorHitsCollection*
-                                                                                hits,
-    RMGOutputTools::ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity) {
+std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
+    const RMGDetectorHitsCollection* hits,
+    RMGOutputTools::ClusterPars cluster_pars,
+    bool has_distance_to_surface,
+    bool has_velocity
+) {
 
   // organise hits into a map based on trackid
   std::map<int, std::vector<RMGDetectorHit*>> hits_map;
@@ -307,28 +340,27 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(cons
                                (hit->track_id != cluster_first_hit->track_id) or
                                (hit->detector_uid != cluster_first_hit->detector_uid) or
                                (std::abs(hit->global_time - cluster_first_hit->global_time) >
-                                   cluster_pars.cluster_time_threshold);
+                                cluster_pars.cluster_time_threshold);
       // check distances and if the track moved from surface to bulk
       if (!start_new_cluster) {
         bool is_surface = has_distance_to_surface and
                           (hit->distance_to_surface_average < cluster_pars.surface_thickness);
-        bool is_surface_first_hit =
-            has_distance_to_surface and
-            (cluster_first_hit->distance_to_surface_average < cluster_pars.surface_thickness);
+        bool is_surface_first_hit = has_distance_to_surface and
+                                    (cluster_first_hit->distance_to_surface_average <
+                                     cluster_pars.surface_thickness);
 
         // start a new cluster if the previous step was in the surface and the new is in the bulk
         bool surface_transition = (is_surface != is_surface_first_hit);
 
         // get the right distance to pre-cluster
-        double threshold =
-            is_surface ? cluster_pars.cluster_distance_surface : cluster_pars.cluster_distance;
+        double threshold = is_surface ? cluster_pars.cluster_distance_surface
+                                      : cluster_pars.cluster_distance;
 
 
         // start a new cluster also if the distance is above the threshold
-        start_new_cluster =
-            surface_transition ||
-            (hit->global_position_average - cluster_first_hit->global_position_average).mag() >=
-                threshold;
+        start_new_cluster = surface_transition || (hit->global_position_average -
+                                                   cluster_first_hit->global_position_average)
+                                                          .mag() >= threshold;
       }
 
       // add the hit to the correct vector
@@ -365,8 +397,7 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(cons
 }
 
 
-double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv,
-    const G4ThreeVector& position) {
+double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
 
   // get logical volume and solid
   auto pv_name = pv->GetName();

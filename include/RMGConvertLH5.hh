@@ -34,15 +34,19 @@ class RMGConvertLH5 {
   public:
 
     static bool ConvertToLH5(std::string, std::string, bool, bool part_of_batch = false);
-    static bool ConvertFromLH5(std::string, std::string, bool, bool part_of_batch,
-        std::map<std::string, std::map<std::string, std::string>>&);
+    static bool ConvertFromLH5(
+        std::string,
+        std::string,
+        bool,
+        bool part_of_batch,
+        std::map<std::string, std::map<std::string, std::string>>&
+    );
 
     inline static bool fIsStandalone = false;
 
   private:
 
-    inline RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run,
-        bool part_of_batch)
+    inline RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run, bool part_of_batch)
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fDryRun(dry_run),
           fIsPartOfBatch(part_of_batch) {};
 
@@ -64,8 +68,11 @@ class RMGConvertLH5 {
 
     bool ConvertToLH5Internal();
 
-    std::pair<std::string, std::vector<std::string>> ReadNullSepDataset(H5::Group&, std::string,
-        std::string);
+    std::pair<std::string, std::vector<std::string>> ReadNullSepDataset(
+        H5::Group&,
+        std::string,
+        std::string
+    );
 
     static inline const std::regex names_split_re = std::regex("(_in_.+?)?\\0");
     static inline const std::regex names_split_re_end = std::regex("(_in_.+?)$");
@@ -91,8 +98,15 @@ class RMGConvertLH5 {
     template<typename... Args> inline void LH5Log(RMGLog::LogLevel loglevel, const Args&... args) {
       if (fDryRun && loglevel < RMGLog::error) return;
       std::string fn_prefix = fIsPartOfBatch ? " (" + fHdf5FileName + ")" : "";
-      RMGLog::Out(loglevel, "", fIsStandalone ? "" : "ConvertLH5", fDryRun ? "[dry-run]" : "",
-          fn_prefix, ": ", args...);
+      RMGLog::Out(
+          loglevel,
+          "",
+          fIsStandalone ? "" : "ConvertLH5",
+          fDryRun ? "[dry-run]" : "",
+          fn_prefix,
+          ": ",
+          args...
+      );
     }
 
     std::string fHdf5FileName;

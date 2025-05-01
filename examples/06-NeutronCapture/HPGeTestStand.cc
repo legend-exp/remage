@@ -64,9 +64,14 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
   // Place Volumes
   // ooooooooooooooooooooooOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOoooooooooooooooooooo
 
-  auto mat_enr_ge = new G4Material("CryogenicEnrichedGermanium",
-      density = 5.56 * u::g / (u::cm * u::cm * u::cm), n_components = 1, state = G4State::kStateSolid,
-      temperature = LAr->GetTemperature(), pressure = LAr->GetPressure());
+  auto mat_enr_ge = new G4Material(
+      "CryogenicEnrichedGermanium",
+      density = 5.56 * u::g / (u::cm * u::cm * u::cm),
+      n_components = 1,
+      state = G4State::kStateSolid,
+      temperature = LAr->GetTemperature(),
+      pressure = LAr->GetPressure()
+  );
 
   mat_enr_ge->AddElement(el_enr_ge, n_atoms = 1);
 
@@ -79,26 +84,34 @@ G4VPhysicalVolume* HPGeTestStand::DefineGeometry() {
   auto hpge_s = new G4Box("HPGe", 10 * u::cm, 10 * u::cm, 10 * u::cm);
 
 
-  auto hpge1_l =
-      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe1");
-  auto hpge2_l =
-      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe2");
-  auto hpge3_l =
-      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe3");
-  auto hpge4_l =
-      new G4LogicalVolume(hpge_s, G4Material::GetMaterial("CryogenicEnrichedGermanium"), "HPGe4");
+  auto hpge1_l = new G4LogicalVolume(
+      hpge_s,
+      G4Material::GetMaterial("CryogenicEnrichedGermanium"),
+      "HPGe1"
+  );
+  auto hpge2_l = new G4LogicalVolume(
+      hpge_s,
+      G4Material::GetMaterial("CryogenicEnrichedGermanium"),
+      "HPGe2"
+  );
+  auto hpge3_l = new G4LogicalVolume(
+      hpge_s,
+      G4Material::GetMaterial("CryogenicEnrichedGermanium"),
+      "HPGe3"
+  );
+  auto hpge4_l = new G4LogicalVolume(
+      hpge_s,
+      G4Material::GetMaterial("CryogenicEnrichedGermanium"),
+      "HPGe4"
+  );
 
 
   // Place HPGe Detectors
   auto spacing = 10.5 * u::cm;
-  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, +spacing, 0), hpge1_l, "HPGe1", world_l, false,
-      0);
-  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, -spacing, 0), hpge2_l, "HPGe2", world_l, false,
-      0);
-  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, +spacing, 0), hpge3_l, "HPGe3", world_l, false,
-      0);
-  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, -spacing, 0), hpge4_l, "HPGe4", world_l, false,
-      0);
+  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, +spacing, 0), hpge1_l, "HPGe1", world_l, false, 0);
+  new G4PVPlacement(nullptr, G4ThreeVector(+spacing, -spacing, 0), hpge2_l, "HPGe2", world_l, false, 0);
+  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, +spacing, 0), hpge3_l, "HPGe3", world_l, false, 0);
+  new G4PVPlacement(nullptr, G4ThreeVector(-spacing, -spacing, 0), hpge4_l, "HPGe4", world_l, false, 0);
 
 
   return world_p;

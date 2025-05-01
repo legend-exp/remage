@@ -149,8 +149,7 @@ class RMGLog {
   private:
 
     template<typename T>
-    static void Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed = true,
-        bool do_flush = true);
+    static void Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed = true, bool do_flush = true);
 
     /**
      * Converts a log level to a string */

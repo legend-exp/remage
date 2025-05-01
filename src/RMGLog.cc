@@ -114,15 +114,29 @@ bool RMGLog::SupportsColors(const std::ostream& os) {
   if (!::isatty(::fileno(the_stream))) return false;
 
   // check the value of the TERM variable
-  const std::vector<std::string> terms = {"ansi", "color", "console", "cygwin", "gnome", "konsole",
-      "kterm", "linux", "msys", "putty", "rxvt", "screen", "vt100", "xterm"};
+  const std::vector<std::string> terms =
+      {"ansi",
+       "color",
+       "console",
+       "cygwin",
+       "gnome",
+       "konsole",
+       "kterm",
+       "linux",
+       "msys",
+       "putty",
+       "rxvt",
+       "screen",
+       "vt100",
+       "xterm"};
 
   auto env_p = std::getenv("TERM");
   if (env_p == nullptr) return false;
   std::string env_s{env_p};
 
-  return std::any_of(std::begin(terms), std::end(terms),
-      [&](const auto term) { return env_s.find(term) != std::string::npos; });
+  return std::any_of(std::begin(terms), std::end(terms), [&](const auto term) {
+    return env_s.find(term) != std::string::npos;
+  });
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

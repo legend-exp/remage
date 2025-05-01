@@ -57,8 +57,10 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
     auto vertex = G4ThreeVector();
     auto done = fVertexGeneratorObj->GenerateVertex(vertex);
     if (!done) { // try aborting gracefully
-      RMGLog::Out(RMGLog::error,
-          "Primary vertex generation did not succeed, trying to abort the run gracefully");
+      RMGLog::Out(
+          RMGLog::error,
+          "Primary vertex generation did not succeed, trying to abort the run gracefully"
+      );
       RMGManager::Instance()->GetG4RunManager()->AbortRun();
     }
     RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
@@ -84,11 +86,18 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       break;
     case Confinement::kFromFile: fVertexGeneratorObj = std::make_unique<RMGVertexFromFile>(); break;
     default:
-      RMGLog::Out(RMGLog::fatal, "No sampling strategy for confinement '",
-          static_cast<int>(fConfinement), "' specified (implement me)");
+      RMGLog::Out(
+          RMGLog::fatal,
+          "No sampling strategy for confinement '",
+          static_cast<int>(fConfinement),
+          "' specified (implement me)"
+      );
   }
-  RMGLog::OutFormat(RMGLog::debug, "Primary vertex confinement strategy set to {}",
-      magic_enum::enum_name<RMGMasterGenerator::Confinement>(code));
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "Primary vertex confinement strategy set to {}",
+      magic_enum::enum_name<RMGMasterGenerator::Confinement>(code)
+  );
 }
 
 void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
@@ -104,8 +113,10 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       // fVertexGeneratorObj will hold nullptr after a call to release()
       fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGeneratorObj.release());
 #else
-      RMGLog::OutFormat(RMGLog::fatal,
-          "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON");
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "BxDecay0 not available, please build remage with -DRMG_USE_BXDECAY0=ON"
+      );
 #endif
       break;
     case Generator::kCosmicMuons:
@@ -118,17 +129,23 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
-      RMGLog::Out(RMGLog::fatal, "No known implementation for generator '",
-          static_cast<int>(fGenerator), "' (implement me)");
+      RMGLog::Out(
+          RMGLog::fatal,
+          "No known implementation for generator '",
+          static_cast<int>(fGenerator),
+          "' (implement me)"
+      );
   }
-  RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}",
-      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator));
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "Primary generator set to {}",
+      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator)
+  );
 }
 
 void RMGMasterGenerator::SetConfinementString(std::string code) {
   try {
-    this->SetConfinement(
-        RMGTools::ToEnum<RMGMasterGenerator::Confinement>(code, "confinement code"));
+    this->SetConfinement(RMGTools::ToEnum<RMGMasterGenerator::Confinement>(code, "confinement code"));
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -143,14 +160,20 @@ void RMGMasterGenerator::SetUserGenerator(RMGVGenerator* gen) {
   fGenerator = RMGMasterGenerator::Generator::kUserDefined;
   fGeneratorObj = std::unique_ptr<RMGVGenerator>(gen);
 
-  RMGLog::OutFormat(RMGLog::debug, "Primary generator set to {}",
-      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator));
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "Primary generator set to {}",
+      magic_enum::enum_name<RMGMasterGenerator::Generator>(fGenerator)
+  );
 }
 
 void RMGMasterGenerator::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/",
-      "Commands for controlling generators");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Generator/",
+      "Commands for controlling generators"
+  );
 
   fMessenger->DeclareMethod("Confine", &RMGMasterGenerator::SetConfinementString)
       .SetGuidance("Select primary confinement strategy")

@@ -42,8 +42,12 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
       // inspired by G4RadioactiveDecay::IsApplicable
       if (lifetime > fDaughterKillLifetime && excitation <= 0) {
-        RMGLog::OutFormat(RMGLog::debug, "Killing daughter nucleus {} (lifetime={} us)",
-            ion->GetParticleName(), lifetime / CLHEP::us);
+        RMGLog::OutFormat(
+            RMGLog::debug,
+            "Killing daughter nucleus {} (lifetime={} us)",
+            ion->GetParticleName(),
+            lifetime / CLHEP::us
+        );
 
         // note: UserSteppingAction is not called after step 0. Secondaries might be generated if
         // RadioactiveDecay takes place at step 1.
@@ -58,24 +62,32 @@ void RMGSteppingAction::SetDaughterKillLifetime(double max_lifetime) {
 
   fDaughterKillLifetime = max_lifetime;
   if (fDaughterKillLifetime > 0 && G4Threading::IsMasterThread()) {
-    RMGLog::OutFormat(RMGLog::summary,
+    RMGLog::OutFormat(
+        RMGLog::summary,
         "Enabled killing of daughter nuclei with a lifetime longer than {} us.",
-        fDaughterKillLifetime / CLHEP::us);
+        fDaughterKillLifetime / CLHEP::us
+    );
   }
 }
 
 void RMGSteppingAction::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/Stepping/",
-      "Commands for controlling physics processes");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Processes/Stepping/",
+      "Commands for controlling physics processes"
+  );
 
   fMessenger
-      ->DeclareMethodWithUnit("DaughterNucleusMaxLifetime", "us",
-          &RMGSteppingAction::SetDaughterKillLifetime)
-      .SetGuidance("Determines which unstable daughter nuclei will be killed, if they are at rest, "
-                   "depending on their lifetime.")
-      .SetGuidance("This applies to the defined lifetime of the nucleus, and not on the sampled "
-                   "actual halflife of the simulated particle.")
+      ->DeclareMethodWithUnit("DaughterNucleusMaxLifetime", "us", &RMGSteppingAction::SetDaughterKillLifetime)
+      .SetGuidance(
+          "Determines which unstable daughter nuclei will be killed, if they are at rest, "
+          "depending on their lifetime."
+      )
+      .SetGuidance(
+          "This applies to the defined lifetime of the nucleus, and not on the sampled "
+          "actual halflife of the simulated particle."
+      )
       .SetGuidance("Set to -1 to disable this feature.")
       .SetParameterName("max_lifetime", false)
       .SetDefaultValue("-1")

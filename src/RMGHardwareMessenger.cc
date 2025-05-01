@@ -60,7 +60,8 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
 
   auto p_reuse = new G4UIparameter("allow_id_reuse", 'b', true);
   p_reuse->SetGuidance(
-      "append this volume to a previously allocated unique detector id, instead of erroring out.");
+      "append this volume to a previously allocated unique detector id, instead of erroring out."
+  );
   p_reuse->SetDefaultValue("false");
   fRegisterCmd->SetParameter(p_reuse);
 

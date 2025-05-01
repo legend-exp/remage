@@ -90,12 +90,13 @@ void RMGManager::Initialize() {
       else fNThreads = std::min(fNThreads, G4Threading::G4GetNumberOfCores());
       fG4RunManager->SetNumberOfThreads(fNThreads);
       if (!IsExecSequential())
-        RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)",
-            fNThreads);
+        RMGLog::OutFormat(RMGLog::detail, "Execution is multi-threaded ({} threads are used)", fNThreads);
       else {
-        RMGLog::OutFormat(RMGLog::warning,
+        RMGLog::OutFormat(
+            RMGLog::warning,
             "multi-threaded execution with {} threads requested, but executing sequentially",
-            fNThreads);
+            fNThreads
+        );
       }
     }
   }
@@ -191,11 +192,12 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
   // set the appropriate thread init for this run manager type. Use the actuial type to decide, and
   // not the requested type: It is possible to override the resulting run manager type in the environment.
   if (dynamic_cast<G4TaskRunManager*>(fG4RunManager.get()) != nullptr) {
-    fG4RunManager->SetUserInitialization(
-        new RMGWorkerInitialization<G4UserTaskThreadInitialization>());
+    fG4RunManager->SetUserInitialization(new RMGWorkerInitialization<G4UserTaskThreadInitialization>(
+    ));
   } else if (dynamic_cast<G4MTRunManager*>(fG4RunManager.get()) != nullptr) {
     fG4RunManager->SetUserInitialization(
-        new RMGWorkerInitialization<G4UserWorkerThreadInitialization>());
+        new RMGWorkerInitialization<G4UserWorkerThreadInitialization>()
+    );
   } else if (!IsExecSequential()) {
     RMGLog::OutDev(RMGLog::fatal, "Unknown type of MT run manager.");
   }
@@ -279,16 +281,24 @@ void RMGManager::CheckRandEngineMTState() {
   if (fG4RunManager == nullptr || IsExecSequential() || GetRandIsControlled() ||
       fIsRandControlledAtEngineChange || fRandEngineName.empty())
     return;
-  RMGLog::Out(RMGLog::warning,
+  RMGLog::Out(
+      RMGLog::warning,
       "Setting a random engine and a seed requires to set a seed before changing the rand engine "
-      "in MT mode. Otherwise results are non-deterministic.");
+      "in MT mode. Otherwise results are non-deterministic."
+  );
 }
 
 void RMGManager::SetRandEngineSeed(long seed) {
   CheckRandEngineMTState();
   if (seed >= std::numeric_limits<long>::max()) {
-    RMGLog::Out(RMGLog::error, "Seed ", seed, " is too large. Largest possible seed is ",
-        std::numeric_limits<long>::max(), ". Setting seed to 0.");
+    RMGLog::Out(
+        RMGLog::error,
+        "Seed ",
+        seed,
+        " is too large. Largest possible seed is ",
+        std::numeric_limits<long>::max(),
+        ". Setting seed to 0."
+    );
     CLHEP::HepRandom::setTheSeed(0);
   } else CLHEP::HepRandom::setTheSeed(seed);
   RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
@@ -322,8 +332,11 @@ void RMGManager::SetRandSystemEntropySeed() {
 
 void RMGManager::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/",
-      "General commands for controlling the application");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Manager/",
+      "General commands for controlling the application"
+  );
 
   fMessenger->DeclareProperty("Interactive", fInteractive)
       .SetGuidance("Enable interactive mode")
@@ -337,8 +350,11 @@ void RMGManager::DefineCommands() {
       .SetRange("n > 0")
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  fLogMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Logging/",
-      "Commands for controlling application logging");
+  fLogMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Manager/Logging/",
+      "Commands for controlling application logging"
+  );
 
   fLogMessenger->DeclareMethod("LogLevel", &RMGManager::SetLogLevel)
       .SetGuidance("Set verbosity level of application log")
@@ -346,8 +362,11 @@ void RMGManager::DefineCommands() {
       .SetCandidates(RMGTools::GetCandidates<RMGLog::LogLevel>())
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  fRandMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Manager/Randomization/",
-      "Commands for controlling randomization settings");
+  fRandMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Manager/Randomization/",
+      "Commands for controlling randomization settings"
+  );
 
   fRandMessenger->DeclareMethod("RandomEngine", &RMGManager::SetRandEngine)
       .SetGuidance("Select the random engine (CLHEP)")
@@ -371,8 +390,11 @@ void RMGManager::DefineCommands() {
       .SetGuidance("Select a random initial seed from system entropy")
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  fOutputMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/",
-      "Commands for controlling the simulation output");
+  fOutputMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Output/",
+      "Commands for controlling the simulation output"
+  );
 
   fOutputMessenger->DeclareMethod("FileName", &RMGManager::SetOutputFileName)
       .SetGuidance("Set output file name for object persistency")
@@ -380,8 +402,10 @@ void RMGManager::DefineCommands() {
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fOutputMessenger->DeclareProperty("NtuplePerDetector", fOutputNtuplePerDetector)
-      .SetGuidance("Create a ntuple for each sensitive detector to store hits. Otherwise, store "
-                   "all hits of one detector type in one ntuple.")
+      .SetGuidance(
+          "Create a ntuple for each sensitive detector to store hits. Otherwise, store "
+          "all hits of one detector type in one ntuple."
+      )
       .SetParameterName("nt_per_det", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
