@@ -15,7 +15,13 @@ build:
   jobs:
     post_checkout: # for setuptools_scm to work correctly.
       - git fetch --unshallow || true
-    pre_build: # prepare Doxyfile, run Doxygen, prepare Sphinx
+    pre_build:
+      # prepare python docs build
+      - pip install .
+      - rm -rf docs/api
+      - sphinx-apidoc --private --module-first --force --output-dir
+        docs/api python/remage/ python/remage/_version.py
+      # prepare Doxyfile, run Doxygen, prepare Sphinx
       - cd docs && wget --quiet https://geant4.kek.jp/Reference/11.3.0/geant4.tag
       - export DOXYGEN_DOT_PATH=$(which dot)
       - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g

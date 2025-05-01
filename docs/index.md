@@ -85,7 +85,8 @@ remage validation report <https://legend-exp.github.io/remage/validation/{REMAGE
 :maxdepth: 1
 
 Developer's guide <developer>
-api/index
+Python API reference <api/modules>
+C++ API reference <api/index>
 Good ol' Doxygen <https://remage.readthedocs.io/en/latest/doxygen/annotated.html>
 Source Code <https://github.com/legend-exp/remage>
 License <https://github.com/legend-exp/remage/blob/main/LICENSE>

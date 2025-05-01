@@ -59,6 +59,7 @@ docs = [
   "sphinx-togglebutton",
   "sphinx-inline-tabs",
   "sphinx-subfigure",
+  "sphinx",
   "exhale",
   "breathe",
   "myst-parser",
