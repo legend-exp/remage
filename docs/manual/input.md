@@ -1,3 +1,5 @@
+(input)=
+
 # Input event vertices and kinematics
 
 :::{todo}

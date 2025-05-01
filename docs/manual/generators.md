@@ -6,11 +6,13 @@
 
 - list of built-in generators and documentation
 - muon generators
-- comment on interplay with vertex confinement
-- link to input.md
   :::
 
 We generate particles of interest using Geant4 macro commands (see [link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#macro-commands) for some background).
+
+This section of the user manual describes generation of the kinematics of events. However, for some generators
+this can also involve generation of positions of the primary particles (for example for muons). In most
+other cases the position is handled by the vertex confinement commands descrbed in <project:./confinement.md>.
 
 ## General particle source
 
@@ -56,14 +58,26 @@ For example we can generate decays of $^{40}$K with:
 /gps/ion 19 40
 ```
 
-:::{warning}
+:::{note}
 In some cases the lifetime of the nuclei is quite long, this would result in the times
-in the output files being large, possibly leading to numerical issues. The macro
-command <project:../rmg-commands.md#rmgprocessessteppingresetinitialdecaytime> will
-reset the times to instead be the time since the decay.
+in the output files being large, possibly leading to numerical issues. _remage_ will
+reset the times to be the time since the start of the decay by default unless the macro
+command <project:../rmg-commands.md#rmgprocessessteppingresetinitialdecaytime> is set to
+False.
 :::
 
-Geant4 will propagate the decays of the nuclei until a stable daughter is reached.
+### Decay chains
+
+By default geant4 will propagate the decays of the nuclei until a stable daughter is reached, unless the time
+goes beyond the time threshold for radioactive decays, set at $10^{27}$ ns (around $3 \times 10^{10}$ yrs).
+
+:::{warning}
+In some cases the lifetime of daughter nuclei can be very long, this can lead
+to numerical inaccuracy in the times saved to the output files. _remage_ will warn
+you if a track has a global time large enough that the precision is less than 1$\mu$s.
+This will occur when times go beyond around 285 yrs.
+:::
+
 In some cases, it may be required to simulate only a part of a decay chain. To do this
 we can use the `/process/had/rdm/nucleusLimits [aMin] [aMax] [zMin] [zMax]` macro command
 [docs](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Fundamentals/biasing.html?highlight=grdm#limited-radionuclides).
@@ -136,3 +150,51 @@ For example we can generate two-neutrino double beta decay to the 0+ ground stat
 - More information on the double beta decay commands can be obtained with `/control/manual /bxdecay0/generator/dbd`
 - The verbosity of _bxdecay0_ can be increased with `/bxdecay0/generator/verbosity LEVEL` where LEVEL is 0, 1, 2 and 3.
   :::
+
+## Generating events from input files
+
+For more complicated or custom event generators _remage_ supports the possibility
+to read in directly event kinematics (or positions) from input files.
+
+The functionality for reading input files is described in <project:./input.md>.
+For generating event kinematics we support reading `lh5` files with the following format.
+
+```console
+/
+└── vtx · HDF5 group
+    └── kin · table{px,py,pz,ekin,g4_pid}
+        ├── ekin · array<1>{real} ── {'units': 'keV'}
+        ├── g4_pid · array<1>{real}
+        ├── px · array<1>{real} ── {'units': ''}
+        ├── py · array<1>{real} ── {'units': ''}
+        └── pz · array<1>{real} ── {'units': ''}
+
+```
+
+Here:
+
+- `ekin` (double) is the kinetic energy,
+- `g4_pid` (int) is the particle code (see [link](https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf)),
+- `px,py,pz` (double) are the x,y, and z momenta.
+
+:::{tip}
+
+- It is supported to supply units for the energy with the `lh5` attributes. It is then assumed the
+  momenta have the same units!
+- The python package _revertex_ [docs](https://revertex.readthedocs.io/en/latest/) contains
+  functionality for generating input files in the correct format.
+  :::
+
+Once this input file is created it can be read into _remage_ as an event generator using
+the macro commands [docs](project:../rmg-commands.md#rmggeneratorfromfilefilename):
+
+```console
+/RMG/Generator/Select FromFile
+/RMG/Generator/FromFile/FileName {FILE_PATH}
+```
+
+Where `{FILE_PATH}` is the path to the input `lh5` file.
+
+:::{warning}
+This functionality is currently limited to events where a single primary particle is produced per event.
+:::
