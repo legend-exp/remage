@@ -229,7 +229,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::
 
     // now search for another track to merge it with
     int cluster_trackid = -1;
-    float cluster_energy = 0;
+    double cluster_energy = 0;
 
     // loop over secondary tracks
     for (const auto& [second_trackid, second_input_hits] : hits_map) {
@@ -333,7 +333,7 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(cons
 
       // add the hit to the correct vector
       if (start_new_cluster) {
-        hits_vector.push_back(std::vector<RMGDetectorHit*>());
+        hits_vector.emplace_back();
         hits_vector.back().push_back(hit);
 
         cluster_first_hit = hit;
