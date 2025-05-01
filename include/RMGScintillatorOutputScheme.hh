@@ -116,7 +116,7 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     bool fDiscardZeroEnergyHits = true;
 
     /** @brief Parameters for pre-clustering. */
-    RMGOutputTools::ClusterPars fPreClusterPars;
+    RMGOutputTools::ClusterPars fPreClusterPars{};
 
     /** @brief Mode of positions to store. */
     RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
