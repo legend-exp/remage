@@ -42,7 +42,11 @@ OPTIONS:
                               geometry
   -o,     --output-file FILE  Output file for detector hits
   -w,     --overwrite         Overwrite existing output files
-
+  -m, --merge-output-files
+                        Flag to merge output files
+  -r, --reshape-output  Flag to reshape output steps so the output is `hit` oriented.
+  -T , --time-window-in-us
+                        Time window in microseconds to group steps for reshaping.
 ```
 
 Macro files can use all available upstream Geant4 macro commands, as well as the

@@ -1,6 +1,8 @@
 # User Manual
 
 :::{toctree}
+:maxdepth: 1
+
 install.md
 running.md
 geometry.md
