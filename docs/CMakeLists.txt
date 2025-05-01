@@ -89,6 +89,7 @@ add_custom_command(
   COMMAND
     ${PYTHONPATH} -m sphinx.ext.apidoc --private --module-first --force --output-dir
     "${SPHINX_SOURCE}/api" "${_python_src}" "${_python_src}/_version.py"
+    "${_python_src}/__main__.py"
   COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html
           -Dbreathe_projects.remage=${DOXYGEN_OUTPUT_DIR}/xml ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
