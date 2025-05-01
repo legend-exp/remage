@@ -6,7 +6,6 @@
 
 - examples
 - tricks for vertex visualization
-- link to input.md
   :::
 
 _remage_ supports generating event vertices either in the bulk or on the
@@ -164,6 +163,42 @@ All sampling modes described above are available, with few notes/limitations:
   to sample the candidate surface vertices from must be set with
   <project:../rmg-commands.md#rmggeneratorconfinementfirstsamplingvolume>. This
   is not optional.
+
+## Vertices from an input file
+
+For more complicated vertex confinement _remage_ supports the possibility
+to read in directly event primary positions from input files.
+
+The functionality for reading input files is described in <project:./input.md>.
+For generating vertices we support reading `lh5` files with the following format.
+
+```console
+/
+└── vtx · HDF5 group
+    └── pos · table{xloc,yloc,zloc}
+        ├── xloc · array<1>{real} ── {'units': 'mm'}
+        ├── yloc · array<1>{real} ── {'units': 'mm'}
+        └── zloc · array<1>{real} ── {'units': 'mm'}
+```
+
+:::{note}
+
+- The `lh5` attributes allow to specify the units,
+- The positions should be the _global_ coordinates.
+- The python package _revertex_ [docs](https://revertex.readthedocs.io/en/latest/) contains
+  functionality for generating input files in the correct format.
+  :::
+
+These vertices can then be read into _remage_ with the macro commands
+[docs](project:../rmg-commands.md#rmggeneratorconfinementfromfilefilename):
+
+```console
+
+/RMG/Generator/Confine FromFile
+/RMG/Generator/Confinement/FromFile/FileName {FILE_PATH}
+```
+
+Where {FILE_PATH} is the path to the input file.
 
 [^1]:
     J. A. Detwiler, R. Henning, R. A. Johnson and M. G. Marino, in IEEE
