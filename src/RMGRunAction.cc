@@ -122,8 +122,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     auto orig_file_type = fCurrentOutputFile.second.extension();
     if (fCurrentOutputFile.first != fCurrentOutputFile.second &&
         (orig_file_type == ".lh5" || orig_file_type == ".LH5")) {
-      auto worker_tmp =
-          fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
+      auto worker_tmp = fs::path(G4Analysis::GetTnFileName(fCurrentOutputFile.first.string(), "hdf5"));
       RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", worker_tmp));
     }
 
@@ -160,10 +159,17 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   if (this->IsMaster()) {
     auto tt = fmt::localtime(std::chrono::system_clock::to_time_t(fRMGRun->GetStartTime()));
 
-    RMGLog::OutFormat(RMGLog::summary,
-        "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}", fRMGRun->GetRunID(), tt);
-    RMGLog::OutFormat(RMGLog::summary, "Number of events to be processed: {:d}",
-        fRMGRun->GetNumberOfEventToBeProcessed());
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}",
+        fRMGRun->GetRunID(),
+        tt
+    );
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "Number of events to be processed: {:d}",
+        fRMGRun->GetNumberOfEventToBeProcessed()
+    );
   }
 
   auto g4manager = G4RunManager::GetRunManager();
@@ -185,18 +191,25 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     int n_ev = fRMGRun->GetNumberOfEvent();
     int n_ev_requested = fRMGRun->GetNumberOfEventToBeProcessed();
 
-    RMGLog::OutFormat(RMGLog::summary,
+    RMGLog::OutFormat(
+        RMGLog::summary,
         "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
-        fRMGRun->GetRunID(), n_ev, fmt::localtime(std::chrono::system_clock::to_time_t(time_now)));
+        fRMGRun->GetRunID(),
+        n_ev,
+        fmt::localtime(std::chrono::system_clock::to_time_t(time_now))
+    );
     if (n_ev != n_ev_requested) {
-      RMGLog::OutFormat(RMGLog::warning,
+      RMGLog::OutFormat(
+          RMGLog::warning,
           "Run nr. {:d} only simulated {:d} events, out of {:d} events requested!",
-          fRMGRun->GetRunID(), n_ev, n_ev_requested);
+          fRMGRun->GetRunID(),
+          n_ev,
+          n_ev_requested
+      );
     }
 
     auto start_time = fRMGRun->GetStartTime();
-    auto tot_elapsed_s =
-        std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
+    auto tot_elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
     long partial = 0;
     long elapsed_d = (tot_elapsed_s - partial) / 86400;
     partial += elapsed_d * 86400;
@@ -206,16 +219,24 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     partial += elapsed_m * 60;
     long elapsed_s = tot_elapsed_s - partial;
 
-    RMGLog::OutFormat(RMGLog::summary,
-        "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds", elapsed_d,
-        elapsed_h, elapsed_m, elapsed_s);
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "Stats: run time was {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
+        elapsed_d,
+        elapsed_h,
+        elapsed_m,
+        elapsed_s
+    );
 
-    auto total_sec_hres =
-        (double)std::chrono::duration<double>(time_now - fRMGRun->GetStartTime()).count();
+    auto total_sec_hres = (double)std::chrono::duration<double>(time_now - fRMGRun->GetStartTime())
+                              .count();
 
-    RMGLog::OutFormat(RMGLog::summary,
+    RMGLog::OutFormat(
+        RMGLog::summary,
         "Stats: average event processing time was {:.5g} seconds/event = {:.5g} events/second",
-        total_sec_hres / n_ev, n_ev / total_sec_hres);
+        total_sec_hres / n_ev,
+        n_ev / total_sec_hres
+    );
 
     if (n_ev < 100)
       RMGLog::Out(RMGLog::summary, "Stats: Event processing time might be inaccurate");
@@ -250,8 +271,9 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
 
   // TODO: realpath
   auto path = fs::path(manager->GetOutputFileName());
-  auto path_for_overwrite =
-      fs::path(G4Analysis::GetTnFileName(path.string(), path.extension().string()));
+  auto path_for_overwrite = fs::path(
+      G4Analysis::GetTnFileName(path.string(), path.extension().string())
+  );
   if (fs::exists(path_for_overwrite) && !manager->GetOutputOverwriteFiles()) {
     RMGLog::Out(RMGLog::error, "Output file ", path_for_overwrite.string(), " does already exists.");
     // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at
@@ -267,8 +289,8 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
     std::uniform_int_distribution<int> dist(10000, 99999);
     std::random_device rd;
 
-    std::string new_fn =
-        ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() + ".hdf5";
+    std::string new_fn = ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() +
+                         ".hdf5";
     auto new_path = path.parent_path() / new_fn;
     return {new_path, path};
   }
@@ -289,7 +311,8 @@ void RMGRunAction::PostprocessOutputFile() const {
   // we need the main output file in the python wrapper.
   if (this->IsMaster()) {
     RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_main", fCurrentOutputFile.second.string()));
+        RMGIpc::CreateMessage("output_main", fCurrentOutputFile.second.string())
+    );
   }
 
   // HDF5 C++ might not be thread-safe?
@@ -304,8 +327,12 @@ void RMGRunAction::PostprocessOutputFile() const {
 
   if (!fs::exists(worker_tmp)) {
     if (!this->IsMaster() || RMGManager::Instance()->IsExecSequential()) {
-      RMGLog::Out(RMGLog::error, "Temporary output file ", worker_tmp.string(),
-          " not found for conversion.");
+      RMGLog::Out(
+          RMGLog::error,
+          "Temporary output file ",
+          worker_tmp.string(),
+          " not found for conversion."
+      );
     }
     return;
   }
@@ -314,8 +341,12 @@ void RMGRunAction::PostprocessOutputFile() const {
   auto nt_dir = RMGManager::Instance()->GetOutputNtupleDirectory();
   // note: do not do a dry-run here, as it takes a lot of memory.
   if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), nt_dir, false)) {
-    RMGLog::Out(RMGLog::error, "Conversion of output file ", worker_tmp.string(),
-        " to LH5 failed. Data is potentially corrupted.");
+    RMGLog::Out(
+        RMGLog::error,
+        "Conversion of output file ",
+        worker_tmp.string(),
+        " to LH5 failed. Data is potentially corrupted."
+    );
     return;
   }
 #else
@@ -324,11 +355,17 @@ void RMGRunAction::PostprocessOutputFile() const {
 
   try {
     fs::rename(worker_tmp, worker_lh5);
-    RMGLog::Out(RMGLog::summary, "Moved output file ", worker_tmp.string(), " to ",
-        worker_lh5.string());
+    RMGLog::Out(RMGLog::summary, "Moved output file ", worker_tmp.string(), " to ", worker_lh5.string());
   } catch (const fs::filesystem_error& e) {
-    RMGLog::Out(RMGLog::error, "Moving output file ", worker_tmp.string(), " to ",
-        worker_lh5.string(), " failed: ", e.what());
+    RMGLog::Out(
+        RMGLog::error,
+        "Moving output file ",
+        worker_tmp.string(),
+        " to ",
+        worker_lh5.string(),
+        " failed: ",
+        e.what()
+    );
   }
 }
 

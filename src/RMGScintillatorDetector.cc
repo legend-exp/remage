@@ -43,12 +43,15 @@ void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection = new RMGDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
-      G4VSensitiveDetector::collectionName[0]);
+  fHitsCollection = new RMGDetectorHitsCollection(
+      G4VSensitiveDetector::SensitiveDetectorName,
+      G4VSensitiveDetector::collectionName[0]
+  );
 
   // associate it with the G4HCofThisEvent object
   auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
-      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]);
+      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]
+  );
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
@@ -74,13 +77,21 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGDetectorType::kScintillator) {
-      RMGLog::OutFormatDev(RMGLog::debug,
-          "Volume '{}' (copy nr. {} not registered as scintillator detector", pv_name, pv_copynr);
+      RMGLog::OutFormatDev(
+          RMGLog::debug,
+          "Volume '{}' (copy nr. {} not registered as scintillator detector",
+          pv_name,
+          pv_copynr
+      );
       return false;
     }
   } catch (const std::out_of_range& e) {
-    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {}) not registered as detector",
-        pv_name, pv_copynr);
+    RMGLog::OutFormatDev(
+        RMGLog::debug,
+        "Volume '{}' (copy nr. {}) not registered as detector",
+        pv_name,
+        pv_copynr
+    );
     return false;
   }
 

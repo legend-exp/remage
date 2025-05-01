@@ -75,8 +75,13 @@ class RMGHardware : public G4VUserDetectorConstruction {
      * @param copy_nr The copy number for the physical volume.
      * @param allow_uid_reuse Flag to allow a uid to be reused
      */
-    void RegisterDetector(RMGDetectorType type, const std::string& pv_name, int uid,
-        int copy_nr = 0, bool allow_uid_reuse = false);
+    void RegisterDetector(
+        RMGDetectorType type,
+        const std::string& pv_name,
+        int uid,
+        int copy_nr = 0,
+        bool allow_uid_reuse = false
+    );
 
     /** @brief Extract a map of the detector metadata, one element for each sensitive detector physical volume and copy_nr. */
     inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }

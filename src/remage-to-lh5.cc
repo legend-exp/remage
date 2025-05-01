@@ -32,10 +32,8 @@ int main(int argc, char** argv) {
 
   CLI::App app{"remage-to-lh5: convert HDF5 file output files in-place to LH5"};
   app.add_flag("-v", verbosity, "Increase verbosity");
-  app.add_flag("-n,--dry-run",
-      dry_run, "Do not modify the on-disk files, only test the changes (on a full in-memory copy of the file)");
-  app.add_option("--ntuple-group", ntuple_group_name,
-         "HDF5 group name that remage was instructed to use")
+  app.add_flag("-n,--dry-run", dry_run, "Do not modify the on-disk files, only test the changes (on a full in-memory copy of the file)");
+  app.add_option("--ntuple-group", ntuple_group_name, "HDF5 group name that remage was instructed to use")
       ->capture_default_str();
   app.add_option("input_files", file_names, "Input HDF5 files")->type_name("FILE")->required();
   CLI11_PARSE(app, argc, argv);
@@ -55,8 +53,11 @@ int main(int argc, char** argv) {
 
   struct rusage usage{};
   if (!getrusage(RUSAGE_SELF, &usage)) {
-    RMGLog::OutFormat(RMGLog::debug, "peak memory usage: {} MiB",
-        usage.ru_maxrss / 1024); // maxrss is in kilobytes.
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "peak memory usage: {} MiB",
+        usage.ru_maxrss / 1024
+    ); // maxrss is in kilobytes.
   }
 
   return RMGLog::HadError() ? 1 : 0;

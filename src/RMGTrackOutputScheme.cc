@@ -30,8 +30,10 @@ RMGTrackOutputScheme::RMGTrackOutputScheme() { this->DefineCommands(); }
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  auto vid = RMGManager::Instance()->RegisterNtuple("tracks",
-      ana_man->CreateNtuple("tracks", "Track vertex data"));
+  auto vid = RMGManager::Instance()->RegisterNtuple(
+      "tracks",
+      ana_man->CreateNtuple("tracks", "Track vertex data")
+  );
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1etracks"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
@@ -50,8 +52,10 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   ana_man->FinishNtuple(vid);
 
-  auto pid = RMGManager::Instance()->RegisterNtuple("processes",
-      ana_man->CreateNtuple("processes", "process name mapping"));
+  auto pid = RMGManager::Instance()->RegisterNtuple(
+      "processes",
+      ana_man->CreateNtuple("processes", "process name mapping")
+  );
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1eprocesses"));
   ana_man->CreateNtupleIColumn(pid, "procid");
   ana_man->CreateNtupleSColumn(pid, "name");
@@ -76,8 +80,9 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
 
   auto write = true;
   write &= (fFilterProcess.empty() || fFilterProcess.find(proc_name) != fFilterProcess.end());
-  write &= (fFilterParticle.empty() ||
-            fFilterParticle.find(primary->GetPDGcode()) != fFilterParticle.end());
+  write &=
+      (fFilterParticle.empty() ||
+       fFilterParticle.find(primary->GetPDGcode()) != fFilterParticle.end());
   write &= (fFilterEnergy == -1 || track->GetKineticEnergy() >= fFilterEnergy);
   if (!write) return;
 
@@ -91,8 +96,11 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
 
   auto ntupleid = rmg_man->GetNtupleID("tracks");
   int col_id = 0;
-  ana_man->FillNtupleIColumn(ntupleid, col_id++,
-      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID());
+  ana_man->FillNtupleIColumn(
+      ntupleid,
+      col_id++,
+      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID()
+  );
   ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetTrackID());
   ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetParentID());
   ana_man->FillNtupleIColumn(ntupleid, col_id++, proc_id);
@@ -101,14 +109,34 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getX() / u::m, fStoreSinglePrecisionPosition);
   FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getY() / u::m, fStoreSinglePrecisionPosition);
   FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getZ() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, primary->GetMomentum().getX() / u::MeV,
-      fStoreSinglePrecisionEnergy);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, primary->GetMomentum().getY() / u::MeV,
-      fStoreSinglePrecisionEnergy);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, primary->GetMomentum().getZ() / u::MeV,
-      fStoreSinglePrecisionEnergy);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, track->GetKineticEnergy() / u::MeV,
-      fStoreSinglePrecisionEnergy);
+  FillNtupleFOrDColumn(
+      ana_man,
+      ntupleid,
+      col_id++,
+      primary->GetMomentum().getX() / u::MeV,
+      fStoreSinglePrecisionEnergy
+  );
+  FillNtupleFOrDColumn(
+      ana_man,
+      ntupleid,
+      col_id++,
+      primary->GetMomentum().getY() / u::MeV,
+      fStoreSinglePrecisionEnergy
+  );
+  FillNtupleFOrDColumn(
+      ana_man,
+      ntupleid,
+      col_id++,
+      primary->GetMomentum().getZ() / u::MeV,
+      fStoreSinglePrecisionEnergy
+  );
+  FillNtupleFOrDColumn(
+      ana_man,
+      ntupleid,
+      col_id++,
+      track->GetKineticEnergy() / u::MeV,
+      fStoreSinglePrecisionEnergy
+  );
 
   ana_man->AddNtupleRow(ntupleid);
 }
@@ -130,8 +158,11 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
 
 void RMGTrackOutputScheme::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Track/",
-      "Commands for controlling output of track vertices.");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Output/Track/",
+      "Commands for controlling output of track vertices."
+  );
 
   fMessenger->DeclareMethod("AddProcessFilter", &RMGTrackOutputScheme::AddProcessFilter)
       .SetGuidance("Only include tracks created by this process.")

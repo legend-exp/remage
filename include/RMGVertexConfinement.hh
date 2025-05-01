@@ -145,8 +145,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param is_native_sampleable A flag of whether the solid is natively sampeable.
          * @param on_surface A flag of whether the solid should be sampled on the surface.
          */
-        SampleableObject(G4VPhysicalVolume* physvol, G4RotationMatrix rot, G4ThreeVector trans,
-            G4VSolid* solid, bool is_native_sampleable = false, bool on_surface = false);
+        SampleableObject(
+            G4VPhysicalVolume* physvol,
+            G4RotationMatrix rot,
+            G4ThreeVector trans,
+            G4VSolid* solid,
+            bool is_native_sampleable = false,
+            bool on_surface = false
+        );
 
         // NOTE: G4 volume/solid pointers should be fully owned by G4, avoid trying to delete them
         ~SampleableObject() = default;
@@ -175,8 +181,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * inside the solid.
          * @param n_trials The total number of trials performed.
          */
-        [[nodiscard]] bool Sample(G4ThreeVector& vertex, size_t max_attempts,
-            bool force_containment_check, size_t& n_trials) const;
+        [[nodiscard]] bool Sample(
+            G4ThreeVector& vertex,
+            size_t max_attempts,
+            bool force_containment_check,
+            size_t& n_trials
+        ) const;
 
         /**
          * @brief Generate a point on the surface of the solid.
@@ -191,8 +201,11 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param n_max The maximum number of intersections possible for the solid,
          * can be an overestimate.
          */
-        [[nodiscard]] bool GenerateSurfacePoint(G4ThreeVector& vertex, size_t max_attempts,
-            size_t n_max) const;
+        [[nodiscard]] bool GenerateSurfacePoint(
+            G4ThreeVector& vertex,
+            size_t max_attempts,
+            size_t n_max
+        ) const;
 
         // methods for the generic surface sampling
         /**
@@ -209,8 +222,10 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          *
          * @returns A vector of the points of intersection.
          */
-        [[nodiscard]] std::vector<G4ThreeVector> GetIntersections(G4ThreeVector start,
-            G4ThreeVector dir) const;
+        [[nodiscard]] std::vector<G4ThreeVector> GetIntersections(
+            G4ThreeVector start,
+            G4ThreeVector dir
+        ) const;
 
         /**
          * @brief Get a position and direction for the generic surface sampling algorithm.
@@ -329,7 +344,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void AddExcludedGeometricalVolumeString(std::string solid);
 
     GenericGeometricalSolidData& SafeBack(
-        std::optional<GeometricalSolidType> solid_type = std::nullopt);
+        std::optional<GeometricalSolidType> solid_type = std::nullopt
+    );
 
     // FIXME: there is no easy way to set the position vector all at once with
     // G4GenericMessenger. Only ::DeclarePropertyWithUnit() accepts vectors and

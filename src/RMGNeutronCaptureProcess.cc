@@ -109,8 +109,7 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
 
   auto particleDef_gamma = G4Gamma::Gamma();
   for (const G4int energy : input.eg) {
-    auto particle_gamma =
-        new G4DynamicParticle(particleDef_gamma, energy * u::keV, G4RandomDirection());
+    auto particle_gamma = new G4DynamicParticle(particleDef_gamma, energy * u::keV, G4RandomDirection());
     auto secondary_gamma = new G4Track(particle_gamma, time, location);
     secondary_gamma->SetWeight(fWeight);
     secondary_gamma->SetTouchableHandle(aTrack.GetTouchableHandle());

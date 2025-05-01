@@ -70,11 +70,11 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
       continue;
     }
 
-    auto id =
-        rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
+    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
     registered_ntuples.emplace(ntuple_name, id);
     RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("scintillator\x1e") + ntuple_name));
+        RMGIpc::CreateMessage("output_table", std::string("scintillator\x1e") + ntuple_name)
+    );
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
@@ -120,8 +120,9 @@ RMGDetectorHitsCollection* RMGScintillatorOutputScheme::GetHitColl(const G4Event
     return nullptr;
   }
 
-  auto hit_coll =
-      dynamic_cast<RMGDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll = dynamic_cast<RMGDetectorHitsCollection*>(
+      event->GetHCofThisEvent()->GetHC(hit_coll_id)
+  );
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
@@ -149,8 +150,13 @@ bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
-    RMGLog::Out(RMGLog::debug, "Discarding event - energy threshold has not been met", event_edep,
-        fEdepCutLow, fEdepCutHigh);
+    RMGLog::Out(
+        RMGLog::debug,
+        "Discarding event - energy threshold has not been met",
+        event_edep,
+        fEdepCutLow,
+        fEdepCutHigh
+    );
     return true;
   }
 
@@ -200,48 +206,108 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
       }
 
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
-          fStoreSinglePrecisionEnergy);
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          hit->energy_deposition / u::keV,
+          fStoreSinglePrecisionEnergy
+      );
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
 
       // extract position based on position mode and hit
       G4ThreeVector position = RMGOutputTools::get_position(hit, fPositionMode);
 
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getX() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getY() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getZ() / u::m,
+          fStoreSinglePrecisionPosition
+      );
 
       // save also the other points if requested
       if (fPositionMode == RMGOutputTools::PositionMode::kBoth) {
 
         // save post-step
         position = hit->global_position_prestep;
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getX() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getY() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getZ() / u::m,
+            fStoreSinglePrecisionPosition
+        );
 
         // save avg
         position = hit->global_position_poststep;
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getX() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getY() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getZ() / u::m,
+            fStoreSinglePrecisionPosition
+        );
       }
 
       if (fStoreVelocity) {
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->velocity_pre / u::m * u::ns,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->velocity_post / u::m * u::ns,
-            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            hit->velocity_pre / u::m * u::ns,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            hit->velocity_post / u::m * u::ns,
+            fStoreSinglePrecisionPosition
+        );
       }
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
@@ -257,8 +323,13 @@ void RMGScintillatorOutputScheme::SetPositionModeString(std::string mode) {
 
 void RMGScintillatorOutputScheme::DefineCommands() {
 
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/",
-      "Commands for controlling output from hits in scintillator detectors."));
+  fMessengers.push_back(
+      std::make_unique<G4GenericMessenger>(
+          this,
+          "/RMG/Output/Scintillator/",
+          "Commands for controlling output from hits in scintillator detectors."
+      )
+  );
 
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
@@ -324,8 +395,13 @@ void RMGScintillatorOutputScheme::DefineCommands() {
 
   // clustering pars
 
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Scintillator/Cluster/",
-      "Commands for controlling clustering of hits in scintillator detectors."));
+  fMessengers.push_back(
+      std::make_unique<G4GenericMessenger>(
+          this,
+          "/RMG/Output/Scintillator/Cluster/",
+          "Commands for controlling clustering of hits in scintillator detectors."
+      )
+  );
 
   fMessengers.back()
       ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
@@ -349,22 +425,27 @@ void RMGScintillatorOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("PreClusterDistance", "um",
-          &RMGScintillatorOutputScheme::SetClusterDistance)
+      ->DeclareMethodWithUnit("PreClusterDistance", "um", &RMGScintillatorOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
-          &RMGScintillatorOutputScheme::SetClusterTimeThreshold)
+      ->DeclareMethodWithUnit(
+          "PreClusterTimeThreshold",
+          "us",
+          &RMGScintillatorOutputScheme::SetClusterTimeThreshold
+      )
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
-          &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold)
+      ->DeclareMethodWithUnit(
+          "ElectronTrackEnergyThreshold",
+          "keV",
+          &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold
+      )
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);

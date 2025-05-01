@@ -74,24 +74,33 @@ class RMGAnalysisReader final {
         }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleDColumn. */
-        auto SetNtupleDColumn(const std::string& name, G4double& value,
-            const std::vector<std::string>& allowed_units = {}) {
+        auto SetNtupleDColumn(
+            const std::string& name,
+            G4double& value,
+            const std::vector<std::string>& allowed_units = {}
+        ) {
           AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleDColumn(fNtupleId, name, value);
         }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleFColumn. */
-        auto SetNtupleFColumn(const std::string& name, G4float& value,
-            const std::vector<std::string>& allowed_units = {}) {
+        auto SetNtupleFColumn(
+            const std::string& name,
+            G4float& value,
+            const std::vector<std::string>& allowed_units = {}
+        ) {
           AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleFColumn(fNtupleId, name, value);
         }
         /**
          * @brief wraps @ref G4VAnalysisReader::SetNtupleIColumn. */
-        auto SetNtupleIColumn(const std::string& name, G4int& value,
-            const std::vector<std::string>& allowed_units = {}) {
+        auto SetNtupleIColumn(
+            const std::string& name,
+            G4int& value,
+            const std::vector<std::string>& allowed_units = {}
+        ) {
           AssertSetup(true);
           AssertUnit(name, allowed_units);
           return fReader->SetNtupleIColumn(fNtupleId, name, value);
@@ -109,8 +118,13 @@ class RMGAnalysisReader final {
       private:
 
         // only allow creation or moving in parent.
-        inline Access(G4AutoLock lock, G4VAnalysisReader* reader, int nt,
-            const std::map<std::string, std::string>* u, bool setup)
+        inline Access(
+            G4AutoLock lock,
+            G4VAnalysisReader* reader,
+            int nt,
+            const std::map<std::string, std::string>* u,
+            bool setup
+        )
             : fReader(reader), fNtupleId(nt), fUnits(u), fLock(std::move(lock)), fCanSetup(setup) {};
         Access(Access&&) = default;
 
@@ -148,12 +162,21 @@ class RMGAnalysisReader final {
      * @param force_ext force a file extension/reader type. should be a lowercase file extension
      * like @c lh5, @c hdf5, @c csv, @c root.
      */
-    [[nodiscard]] Access OpenFile(const std::string& file_name, std::string ntuple_dir_name,
-        std::string ntuple_name, G4AutoLock lock, std::string force_ext = "");
+    [[nodiscard]] Access OpenFile(
+        const std::string& file_name,
+        std::string ntuple_dir_name,
+        std::string ntuple_name,
+        G4AutoLock lock,
+        std::string force_ext = ""
+    );
     /**
      * @overload */
-    [[nodiscard]] Access OpenFile(const std::string& file_name, std::string ntuple_dir_name,
-        std::string ntuple_name, std::string force_ext = "");
+    [[nodiscard]] Access OpenFile(
+        const std::string& file_name,
+        std::string ntuple_dir_name,
+        std::string ntuple_name,
+        std::string force_ext = ""
+    );
 
     /**
      * @brief if any file is open for reading, close the reader. Also clean-up temporary files.

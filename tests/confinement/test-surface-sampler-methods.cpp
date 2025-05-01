@@ -35,8 +35,12 @@ class MyDetectorConstruction : public G4VUserDetectorConstruction {
     G4LogicalVolume* fLog;
     G4ThreeVector fCenter;
 
-    MyDetectorConstruction(G4ThreeVector center, G4double radius, std::vector<G4ThreeVector> points,
-        G4LogicalVolume* solid_log) {
+    MyDetectorConstruction(
+        G4ThreeVector center,
+        G4double radius,
+        std::vector<G4ThreeVector> points,
+        G4LogicalVolume* solid_log
+    ) {
       fCenter = center;
       fRadius = radius;
       fPoints = points;
@@ -142,7 +146,8 @@ int RunVis(RMGVertexConfinement::SampleableObject obj, std::string name) {
   UImanager->ApplyCommand("/vis/viewer/set/globalLineWidthScale 1.5");
   UImanager->ApplyCommand("/vis/viewer/set/upVector 0 0 1");
   UImanager->ApplyCommand(
-      "/vis/tsg/offscreen/set/file surface-sample-bounding-box-" + name + ".output.jpeg");
+      "/vis/tsg/offscreen/set/file surface-sample-bounding-box-" + name + ".output.jpeg"
+  );
   UImanager->ApplyCommand("/vis/viewer/rebuild");
 
   delete visManager;
@@ -154,8 +159,15 @@ int RunVis(RMGVertexConfinement::SampleableObject obj, std::string name) {
 G4VPhysicalVolume* get_phy_volume(G4VSolid* solid, std::string material_string) {
   auto material = G4NistManager::Instance()->FindOrBuildMaterial(material_string);
   auto logicalVolume = new G4LogicalVolume(solid, material, "log_vol");
-  auto physicalVolume = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicalVolume, "phy_vol",
-      nullptr, false, 0);
+  auto physicalVolume = new G4PVPlacement(
+      nullptr,
+      G4ThreeVector(0, 0, 0),
+      logicalVolume,
+      "phy_vol",
+      nullptr,
+      false,
+      0
+  );
 
   return physicalVolume;
 }
@@ -175,16 +187,24 @@ int main(int argc, char* argv[]) {
   // tubs
   auto tubby = new G4Tubs("tubby", 0 * mm, 50 * mm, 50 * mm, 0, 360 * deg);
   auto tubby_phy = get_phy_volume(tubby, "G4_SKIN_ICRP");
-  auto obj_tub = RMGVertexConfinement::SampleableObject(tubby_phy, G4RotationMatrix(),
-      G4ThreeVector(), nullptr);
+  auto obj_tub = RMGVertexConfinement::SampleableObject(
+      tubby_phy,
+      G4RotationMatrix(),
+      G4ThreeVector(),
+      nullptr
+  );
 
   sampleables["tubs"] = obj_tub;
 
   auto small_tubby = new G4Tubs("small_tubby", 0 * mm, 10 * mm, 50 * mm, 0, 360 * deg);
   auto subby = new G4SubtractionSolid("subby", tubby, small_tubby);
   auto subby_phy = get_phy_volume(subby, "G4_SKIN_ICRP");
-  auto obj_sub = RMGVertexConfinement::SampleableObject(subby_phy, G4RotationMatrix(),
-      G4ThreeVector(), nullptr);
+  auto obj_sub = RMGVertexConfinement::SampleableObject(
+      subby_phy,
+      G4RotationMatrix(),
+      G4ThreeVector(),
+      nullptr
+  );
 
   sampleables["sub"] = obj_sub;
 
@@ -194,8 +214,12 @@ int main(int argc, char* argv[]) {
 
   auto solid = new G4UnionSolid("solid", box, small_box, nullptr, G4ThreeVector(0, 0, 60 * mm));
   auto union_phy = get_phy_volume(solid, "G4_SKIN_ICRP");
-  auto obj_box = RMGVertexConfinement::SampleableObject(union_phy, G4RotationMatrix(),
-      G4ThreeVector(), nullptr);
+  auto obj_box = RMGVertexConfinement::SampleableObject(
+      union_phy,
+      G4RotationMatrix(),
+      G4ThreeVector(),
+      nullptr
+  );
 
   sampleables["uni"] = obj_box;
 
@@ -203,8 +227,10 @@ int main(int argc, char* argv[]) {
     auto obj = sampleables["tubs"]; // make a basic geometry - first just a G4Tubs
 
     // shoot along x
-    std::vector<G4ThreeVector> ints =
-        obj.GetIntersections(G4ThreeVector(60 * mm, 0, 0), G4ThreeVector(-1, 0, 0));
+    std::vector<G4ThreeVector> ints = obj.GetIntersections(
+        G4ThreeVector(60 * mm, 0, 0),
+        G4ThreeVector(-1, 0, 0)
+    );
 
     if (ints.size() != 2) {
       std::cout << "The number of intersections should be 2" << std::endl;
@@ -243,13 +269,14 @@ int main(int argc, char* argv[]) {
 
     // tests passed
     return 0;
-
   } else if (test_type == "test-intersections-subtraction") {
     auto obj = sampleables["sub"];
 
     // shoot along x
-    std::vector<G4ThreeVector> ints =
-        obj.GetIntersections(G4ThreeVector(60 * mm, 0, 0), G4ThreeVector(-1, 0, 0));
+    std::vector<G4ThreeVector> ints = obj.GetIntersections(
+        G4ThreeVector(60 * mm, 0, 0),
+        G4ThreeVector(-1, 0, 0)
+    );
 
     if (ints.size() != 4) {
       std::cout << "The number of intersections should be 4" << std::endl;
@@ -283,8 +310,10 @@ int main(int argc, char* argv[]) {
     auto obj = sampleables["uni"];
 
     // shoot along x
-    std::vector<G4ThreeVector> ints =
-        obj.GetIntersections(G4ThreeVector(90 * mm, 0, 0), G4ThreeVector(-1, 0, 0));
+    std::vector<G4ThreeVector> ints = obj.GetIntersections(
+        G4ThreeVector(90 * mm, 0, 0),
+        G4ThreeVector(-1, 0, 0)
+    );
 
     if (ints.size() != 2) {
       std::cout << "The number of intersections should be 2" << std::endl;
@@ -312,7 +341,6 @@ int main(int argc, char* argv[]) {
         return 1;
       }
     }
-
   } else if (test_type == "test-containment-union") {
     auto obj = sampleables["uni"];
 
@@ -326,16 +354,15 @@ int main(int argc, char* argv[]) {
 
       if (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) != EInside::kSurface) {
 
-        std::string side =
-            (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) == EInside::kInside)
-                ? "Inside"
-                : "Outside";
+        std::string side = (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) ==
+                            EInside::kInside)
+                               ? "Inside"
+                               : "Outside";
         std::cout << "the sampled position is not inside the solid it is " << side << " " << pos
                   << std::endl;
         return 1;
       }
     }
-
   } else if (test_type == "test-containment-subtraction") {
     auto obj = sampleables["sub"];
 
@@ -349,27 +376,24 @@ int main(int argc, char* argv[]) {
 
       if (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) != EInside::kSurface) {
 
-        std::string side =
-            (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) == EInside::kInside)
-                ? "Inside"
-                : "Outside";
+        std::string side = (obj.physical_volume->GetLogicalVolume()->GetSolid()->Inside(pos) ==
+                            EInside::kInside)
+                               ? "Inside"
+                               : "Outside";
         std::cout << "the sampled position is not inside the solid it is " << side << std::endl;
         return 1;
       }
     }
-
   } else if (test_type == "test-points-union") {
 
     // get some points to plot
     auto obj = sampleables["uni"];
     RunVis(obj, "union");
-
   } else if (test_type == "test-points-subtraction") {
 
     // get some points to plot
     auto obj = sampleables["sub"];
     return RunVis(obj, "subtraction");
-
   } else if (test_type == "test-points-basic") {
 
     // get some points to plot

@@ -4,7 +4,7 @@ Standard: c++17
 TabWidth: 8
 UseCRLF: false
 UseTab: Never
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: BlockIndent
 AlignArrayOfStructures: None
 AlignConsecutiveMacros: None
 AlignConsecutiveAssignments: None
@@ -14,7 +14,6 @@ AlignEscapedNewlines: Right
 AlignOperands: Align
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortEnumsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Always
@@ -26,8 +25,8 @@ AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false
+BinPackParameters: false
 BreakBeforeBraces: Attach
 BreakBeforeBinaryOperators: None
 BreakInheritanceList: BeforeColon
@@ -79,11 +78,13 @@ MacroBlockBegin: ""
 MacroBlockEnd: ""
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
-PenaltyBreakAssignment: 2
+PenaltyBreakAssignment: 100000
 PenaltyBreakBeforeFirstCallParameter: 999
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 120
+PenaltyBreakOpenParenthesis: 1
 PenaltyBreakString: 1000
+PenaltyBreakScopeResolution: 10000
 PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 100000

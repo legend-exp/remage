@@ -53,8 +53,7 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
   if (!G4Threading::IsMasterThread()) return;
 
   if (!fReader->GetLockedReader()) {
-    RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(),
-        "' not found or in wrong format");
+    RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(), "' not found or in wrong format");
   }
 }
 
@@ -99,14 +98,20 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  RMGLog::OutFormat(RMGLog::debug,
-      "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV", row_data.fG4Pid,
-      row_data.fPx, row_data.fPy, row_data.fPz, row_data.fEkin);
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV",
+      row_data.fG4Pid,
+      row_data.fPx,
+      row_data.fPy,
+      row_data.fPz,
+      row_data.fEkin
+  );
 
   G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
 
-  const std::map<std::string, double> units = {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV},
-      {"MeV", u::MeV}, {"GeV", u::GeV}};
+  const std::map<std::string, double> units =
+      {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV}, {"MeV", u::MeV}, {"GeV", u::GeV}};
 
   fGun->SetParticleDefinition(particle);
   fGun->SetParticlePosition(fParticlePosition);
@@ -118,12 +123,17 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
 
 void RMGGeneratorFromFile::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/FromFile/",
-      "Commands for controlling reading event data from file");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Generator/FromFile/",
+      "Commands for controlling reading event data from file"
+  );
 
   fMessenger->DeclareMethod("FileName", &RMGGeneratorFromFile::OpenFile)
-      .SetGuidance("Set name of the file containing vertex kinetics for the next run. See the "
-                   "documentation for a specification of the format.")
+      .SetGuidance(
+          "Set name of the file containing vertex kinetics for the next run. See the "
+          "documentation for a specification of the format."
+      )
       .SetParameterName("filename", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 

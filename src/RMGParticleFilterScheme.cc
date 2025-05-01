@@ -26,8 +26,11 @@ RMGParticleFilterScheme::RMGParticleFilterScheme() { this->DefineCommands(); }
 
 void RMGParticleFilterScheme::AddKeepVolume(std::string name) {
   if (!fKillVolumes.empty()) {
-    RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
-                                  "Trying to assign keep-volume but a kill-volume already exists.");
+    RMGLog::OutDev(
+        RMGLog::fatal,
+        "Conflicting requests for kill/keep volume in ParticleFilter. "
+        "Trying to assign keep-volume but a kill-volume already exists."
+    );
   }
 
   fKeepVolumes.insert(name);
@@ -35,15 +38,20 @@ void RMGParticleFilterScheme::AddKeepVolume(std::string name) {
 
 void RMGParticleFilterScheme::AddKillVolume(std::string name) {
   if (!fKeepVolumes.empty()) {
-    RMGLog::OutDev(RMGLog::fatal, "Conflicting requests for kill/keep volume in ParticleFilter. "
-                                  "Trying to assign kill-volume but a keep-volume already exists.");
+    RMGLog::OutDev(
+        RMGLog::fatal,
+        "Conflicting requests for kill/keep volume in ParticleFilter. "
+        "Trying to assign kill-volume but a keep-volume already exists."
+    );
   }
 
   fKillVolumes.insert(name);
 }
 
-std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActionClassify(const G4Track* aTrack,
-    int) {
+std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActionClassify(
+    const G4Track* aTrack,
+    int
+) {
 
   const int pdg = aTrack->GetDefinition()->GetPDGEncoding();
   // If the particle is not marked to kill, let it go
@@ -61,9 +69,11 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
 
   // If this is the primary particle we can not kill it without crashing the simulation
   if (aTrack->GetTrackID() == 0) {
-    RMGLog::OutDev(RMGLog::warning,
+    RMGLog::OutDev(
+        RMGLog::warning,
         "ParticleFilter: The primary particle was specified to kill. "
-        "This would cause the simulation to crash... so simulating it anyways. ");
+        "This would cause the simulation to crash... so simulating it anyways. "
+    );
     return std::nullopt;
   }
 
@@ -72,31 +82,44 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
   // ii) No Kill volume specified or the particle is in the kill volume.
   // iii) Particle is not in the keep volume.
   // iiii) Particle is not the primary particle.
-  RMGLog::OutDev(RMGLog::debug, "Filtering out particle with PDG code ", pdg,
-      " in RMGParticleFilterScheme");
+  RMGLog::OutDev(
+      RMGLog::debug,
+      "Filtering out particle with PDG code ",
+      pdg,
+      " in RMGParticleFilterScheme"
+  );
   return fKill;
 }
 
 void RMGParticleFilterScheme::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/ParticleFilter/",
-      "Commands for filtering particles out by PDG encoding.");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Output/ParticleFilter/",
+      "Commands for filtering particles out by PDG encoding."
+  );
 
   fMessenger->DeclareMethod("AddParticle", &RMGParticleFilterScheme::AddParticle)
-      .SetGuidance("Add a particle to be filtered out by its PDG code. User is responsible for "
-                   "correct PDG code.")
+      .SetGuidance(
+          "Add a particle to be filtered out by its PDG code. User is responsible for "
+          "correct PDG code."
+      )
       .SetParameterName(0, "PDGcode", false, false)
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareMethod("AddKeepVolume", &RMGParticleFilterScheme::AddKeepVolume)
-      .SetGuidance("Add a physical volume by name in which all specified Particles will be kept. "
-                   "They will be killed everywhere else. Can NOT be mixed with KillVolumes.")
+      .SetGuidance(
+          "Add a physical volume by name in which all specified Particles will be kept. "
+          "They will be killed everywhere else. Can NOT be mixed with KillVolumes."
+      )
       .SetParameterName(0, "PhysicalVolumeName", false, false)
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareMethod("AddKillVolume", &RMGParticleFilterScheme::AddKillVolume)
-      .SetGuidance("Add a physical volume by name in which all specified Particles will be killed. "
-                   "They will only be killed in this volume. Can NOT be mixed with KeepVolumes.")
+      .SetGuidance(
+          "Add a physical volume by name in which all specified Particles will be killed. "
+          "They will only be killed in this volume. Can NOT be mixed with KeepVolumes."
+      )
       .SetParameterName(0, "PhysicalVolumeName", false, false)
       .SetStates(G4State_Idle);
 }

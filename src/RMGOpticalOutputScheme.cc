@@ -56,11 +56,11 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       continue;
     }
 
-    auto id =
-        rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
+    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
     registered_ntuples.emplace(ntuple_name, id);
     RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("optical\x1e") + ntuple_name));
+        RMGIpc::CreateMessage("output_table", std::string("optical\x1e") + ntuple_name)
+    );
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
@@ -81,8 +81,9 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
     return;
   }
 
-  auto hit_coll =
-      dynamic_cast<RMGOpticalDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll = dynamic_cast<RMGOpticalDetectorHitsCollection*>(
+      event->GetHCofThisEvent()->GetHC(hit_coll_id)
+  );
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");

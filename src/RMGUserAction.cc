@@ -41,7 +41,8 @@ void RMGUserAction::BuildForMaster() const {
   if (user_generator) generator_primary->SetUserGenerator(user_generator().release());
 
   this->SetUserAction(
-      new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled()));
+      new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled())
+  );
   RMGGrabmayrGCReader::GetInstance();
 }
 
@@ -53,8 +54,7 @@ void RMGUserAction::Build() const {
   auto user_generator = user_init->GetUserGenerator();
   if (user_generator) generator_primary->SetUserGenerator(user_generator().release());
 
-  auto run_action =
-      new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled());
+  auto run_action = new RMGRunAction(generator_primary, RMGManager::Instance()->IsPersistencyEnabled());
   auto event_action = new RMGEventAction(run_action);
 
   // Add the remage-internal stepping action and optional user-specified custom stepping actions.

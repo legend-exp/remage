@@ -62,8 +62,13 @@ bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
       }
 
       const auto unit_name = reader.GetUnit("xloc");
-      const std::map<std::string, double> units = {{"", CLHEP::m}, {"nm", CLHEP::nm},
-          {"um", CLHEP::um}, {"mm", CLHEP::mm}, {"cm", CLHEP::cm}, {"m", CLHEP::m}};
+      const std::map<std::string, double> units =
+          {{"", CLHEP::m},
+           {"nm", CLHEP::nm},
+           {"um", CLHEP::um},
+           {"mm", CLHEP::mm},
+           {"cm", CLHEP::cm},
+           {"m", CLHEP::m}};
 
       vertex = G4ThreeVector{fXpos, fYpos, fZpos} * units.at(unit_name);
       return true;
@@ -83,8 +88,7 @@ void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
   if (!G4Threading::IsMasterThread()) return;
 
   if (!fReader->GetLockedReader()) {
-    RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(),
-        "' not found or in wrong format");
+    RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(), "' not found or in wrong format");
   }
 }
 
@@ -97,12 +101,17 @@ void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
 
 void RMGVertexFromFile::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/Confinement/FromFile/",
-      "Commands for controlling reading event vertex positions from file");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Generator/Confinement/FromFile/",
+      "Commands for controlling reading event vertex positions from file"
+  );
 
   fMessenger->DeclareMethod("FileName", &RMGVertexFromFile::OpenFile)
-      .SetGuidance("Set name of the file containing vertex positions for the next run. See the "
-                   "documentation for a specification of the format.")
+      .SetGuidance(
+          "Set name of the file containing vertex positions for the next run. See the "
+          "documentation for a specification of the format."
+      )
       .SetParameterName("filename", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 

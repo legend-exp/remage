@@ -45,12 +45,15 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection = new RMGDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
-      G4VSensitiveDetector::collectionName[0]);
+  fHitsCollection = new RMGDetectorHitsCollection(
+      G4VSensitiveDetector::SensitiveDetectorName,
+      G4VSensitiveDetector::collectionName[0]
+  );
 
   // associate it with the G4HCofThisEvent object
   auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
-      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]);
+      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]
+  );
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
@@ -71,8 +74,10 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto position_average = (position_prestep + position_poststep) / 2.;
 
   // check containment of prestep point
-  auto prestep_inside =
-      RMGOutputTools::check_step_point_containment(prestep, RMGDetectorType::kGermanium);
+  auto prestep_inside = RMGOutputTools::check_step_point_containment(
+      prestep,
+      RMGDetectorType::kGermanium
+  );
 
   if (not prestep_inside) return false;
 
