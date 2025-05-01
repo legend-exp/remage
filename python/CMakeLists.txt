@@ -8,6 +8,7 @@ set(PYTHON_SOURCES
     ${_r}/pyproject.toml
     ${_r}/cmake/cpp_config.py.in
     ${_r}/python/remage/__init__.py
+    ${_r}/python/remage/__main__.py
     ${_r}/python/remage/find_remage.py
     ${_r}/python/remage/cli.py
     ${_r}/python/remage/ipc.py)
