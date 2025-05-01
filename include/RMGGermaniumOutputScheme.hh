@@ -141,7 +141,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     bool fPreClusterHits = false;
 
     /** @brief Parameters for pre-clustering. */
-    RMGOutputTools::ClusterPars fPreClusterPars;
+    RMGOutputTools::ClusterPars fPreClusterPars{};
 
     // mode of position to store
     RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
