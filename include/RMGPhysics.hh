@@ -34,8 +34,8 @@ class RMGPhysics : public G4VModularPhysicsList {
 
     /** @brief Constructor for @c RMGPhysics , this sets the default choices.
      *
-     * @details This sets the default prdduction cuts values and physics realm. By default a cut of
-     * 0.1 mm is used and the PhysicsRealm @c kDoubleBetaDecay .
+     * @details This sets the default prdduction cuts values. By default a cut
+     * of 0.1 mm is used.
      */
     RMGPhysics();
 
@@ -43,26 +43,6 @@ class RMGPhysics : public G4VModularPhysicsList {
     RMGPhysics& operator=(RMGPhysics const&) = delete;
     RMGPhysics(RMGPhysics&&) = delete;
     RMGPhysics& operator=(RMGPhysics&&) = delete;
-
-    /** @brief The physics realm is a set of choices of production cuts, tuned for different physics use cases.*/
-    enum class PhysicsRealm {
-
-      /** @brief The default values for the energy thresholds are tuned to 100 keV in natural
-       * germanium (i.e., the BBdecay realm). */
-      kDoubleBetaDecay,
-
-      /** @brief These values are tuned to ~1 keV for gamma, e+, e- in natural germanium. */
-      kDarkMatter,
-
-      /** @brief  These values are much longer intended for cosmic ray simulations. */
-      kCosmicRays,
-
-      /** @brief Currently not implemented. */
-      kLArScintillation,
-
-      /** @brief Custom user defined production cuts */
-      kUserDefined
-    };
 
     /** @brief Enum to specify a EM physics list from Geant4, see
      * [Geant4-manual](https://geant4.web.cern.ch/documentation/dev/plg_html/PhysicsListGuide/physicslistguide.html)
@@ -112,8 +92,6 @@ class RMGPhysics : public G4VModularPhysicsList {
      * @details  Defines a set of production cuts for the default region
      * and also for the G4Region "SensitiveRegion". This is created in RMGHardware, but this
      * behavior might be changed in a derived class, so careful here!
-     * This function should be called after @c SetPhysicsRealm which is used to define the
-     * production cut values.
      */
     void SetCuts() override;
 
@@ -123,16 +101,9 @@ class RMGPhysics : public G4VModularPhysicsList {
     /** @brief Sets the energy range for the production cut table*/
     void SetHighEnergyRange(G4double high_energy) { fHighEnergyRange = high_energy; };
 
-    /** @brief Set the production cuts for the chosen physics realm.*/
-    void SetPhysicsRealm(PhysicsRealm realm);
-
-    /** @brief Set the physics realm from a string, for use in the messenger. */
-    void SetPhysicsRealmString(std::string realm);
-
     /** @brief Set the production cut for the default region.
      *  @details The same cut is used for electrons, positrons and gammas.
      *  Notes:
-     *   - This overrides the choices from the Physics Realm.
      *   - No production cut alpha or generic ion is set.
      *  @param cut the production cut value for the default region.
      */
@@ -141,7 +112,6 @@ class RMGPhysics : public G4VModularPhysicsList {
     /** @brief Set the production cut for the sensitive region.
      *  @details The same cut is used for electrons, positrons and gammas.
      *  Notes:
-     *   - This overrides the choices from the Physics Realm.
      *   - No production cut alpha or generic ion is set.
      *  @param cut the production cut value for the sensitive region.
      */
@@ -171,7 +141,6 @@ class RMGPhysics : public G4VModularPhysicsList {
 
   private:
 
-    PhysicsRealm fPhysicsRealm = PhysicsRealm::kDoubleBetaDecay;
     ProdCutStore fProdCuts = {};
     ProdCutStore fProdCutsSensitive = {};
     bool fConstructOptical = false;
@@ -182,7 +151,6 @@ class RMGPhysics : public G4VModularPhysicsList {
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
     G4double fLowEnergyRange = 250 * CLHEP::eV;
     G4double fHighEnergyRange = 100. * CLHEP::GeV;
-    bool fPhysicsRealmSet = false;
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
 };
