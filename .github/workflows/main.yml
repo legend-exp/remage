@@ -41,7 +41,6 @@ jobs:
       - name: Build project
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
-          exit 1
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
           mkdir build
@@ -172,7 +171,7 @@ jobs:
       - name: Run minimal test suite
         run: |
           cd build
-          ctest --output-on-failure --label-exclude 'vis'
+          ctest --output-on-failure
 
       - name: Minimally test installed executable
         run: |
