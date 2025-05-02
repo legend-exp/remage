@@ -94,7 +94,7 @@ add_custom_command(
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${SPHINX_EXTENSIONS} ${DOXYGEN_INDEX_FILE}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  remage-venv-docs ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
+  remage-cli ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
 
 # Nice named target so we can run the job easily
 add_custom_target(
