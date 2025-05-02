@@ -25,7 +25,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-int RMGConvertLH5::iter_children(long int, const char* name, const H5L_info_t*, void* op_data) {
+int RMGConvertLH5::iter_children(hid_t, const char* name, const H5L_info_t*, void* op_data) {
   auto ntuples = static_cast<std::vector<std::string>*>(op_data);
   ntuples->push_back(name);
   return 0;
