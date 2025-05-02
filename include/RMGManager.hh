@@ -57,11 +57,17 @@ class RMGManager {
     [[nodiscard]] inline auto GetUserInit() const { return fUserInit; }
     [[nodiscard]] inline int GetPrintModulo() const { return fPrintModulo; }
 
-    inline bool IsExecSequential() {
+    [[nodiscard]] inline bool IsExecSequential() {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
     [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
     inline const std::string& GetOutputFileName() { return fOutputFile; }
+    [[nodiscard]] inline bool HasOutputFileNameNone() const {
+      return fOutputFile == OUTPUT_FILE_NONE;
+    }
+    [[nodiscard]] inline bool HasOutputFileName() const {
+      return !fOutputFile.empty() && fOutputFile != OUTPUT_FILE_NONE;
+    }
     [[nodiscard]] inline bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
     inline const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
     [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
@@ -172,7 +178,8 @@ class RMGManager {
     bool fIsRandControlledAtEngineChange = false;
     std::string fRandEngineName;
 
-    std::string fOutputFile = "detector-hits.root";
+    static inline const std::string OUTPUT_FILE_NONE = "none";
+    std::string fOutputFile;
     bool fOutputOverwriteFiles = false;
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;

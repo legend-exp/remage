@@ -40,8 +40,9 @@ add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.p
 set_tests_properties(
   confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP confine-gdml-fixture ENVIRONMENT
                                      MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
-add_test(NAME confinement-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis-ge-array.mac
-                                         macros/_vis-export.mac -g gdml/ge-array.gdml -w -l detail)
+add_test(NAME confinement-ge/vis
+         COMMAND ${REMAGE_PYEXE} macros/vis-ge-array.mac macros/_vis-export.mac -g
+                 gdml/ge-array.gdml -o none -l detail)
 
 set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                                    confine-gdml-fixture)
@@ -182,7 +183,7 @@ foreach(det ${_solids})
 
   add_test(NAME confinement-surface/${det}-vis
            COMMAND ${REMAGE_PYEXE} macros/vis-surface-${det}.mac macros/_vis-export.mac -g
-                   gdml/simple-solids.gdml -w -l detail)
+                   gdml/simple-solids.gdml -o none -l detail)
 
   set_tests_properties(
     confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED

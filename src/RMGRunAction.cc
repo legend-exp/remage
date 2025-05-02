@@ -93,6 +93,11 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   if (fIsPersistencyEnabled) this->SetupAnalysisManager();
 
+  if (!manager->HasOutputFileName()) {
+    manager->EnablePersistency(false);
+    fIsPersistencyEnabled = false;
+  }
+
   // Check again, SetupAnalysisManager might have modified fIsPersistencyEnabled.
   if (fIsPersistencyEnabled) {
     auto ana_man = G4AnalysisManager::Instance();
@@ -138,9 +143,11 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   if (!fIsPersistencyEnabled && this->IsMaster()) {
     // Warn user if persistency is disabled if there are detectors defined.
-    auto level = manager->GetDetectorConstruction()->GetAllActiveOutputSchemes().empty()
-                     ? RMGLog::summary
-                     : RMGLog::warning;
+    auto level = RMGLog::summary;
+    if (!manager->GetDetectorConstruction()->GetAllActiveOutputSchemes().empty() &&
+        !manager->HasOutputFileNameNone()) {
+      level = RMGLog::warning;
+    }
     RMGLog::Out(level, "Object persistency disabled");
   }
 
@@ -268,6 +275,13 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
 std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
   auto manager = RMGManager::Instance();
+
+  if (!manager->HasOutputFileName()) {
+    RMGLog::OutDev(RMGLog::error, "tried to open file 'none'");
+    // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at
+    // this stage. also, there is no clean way to abort an run before the run started.
+    std::abort();
+  }
 
   // TODO: realpath
   auto path = fs::path(manager->GetOutputFileName());
