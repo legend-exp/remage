@@ -833,8 +833,8 @@ Commands for controlling physics processes
 
 **Commands:**
 
-* `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this does not apply to protons, alphas or generic ions.
-* `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this does not apply to protons, alphas or generic ions.
+* `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
+* `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -847,7 +847,7 @@ Commands for controlling physics processes
 
 ### `/RMG/Processes/DefaultProductionCut`
 
-Set simulation production cuts, for default region for electrons, positions, and gammas. Notes: this does not apply to protons, alphas or generic ions.
+Set simulation production cuts, for default region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
@@ -861,7 +861,7 @@ Set simulation production cuts, for default region for electrons, positions, and
 
 ### `/RMG/Processes/SensitiveProductionCut`
 
-Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Notes: this does not apply to protons, alphas or generic ions.
+Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 
 * **Parameter** – `cut`
   * **Parameter type** – `d`
