@@ -34,6 +34,7 @@ RUN mkdir -p src build /opt/remage && \
         ctest --output-on-failure --label-exclude 'vis'; \
     fi && \
     cd .. && \
+    uv --no-cache pip install . && \ # also install the package into the container-provided main venv
     rm -rf build src && \
     LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH" /opt/remage/bin/remage --version # populate numba cache
 
