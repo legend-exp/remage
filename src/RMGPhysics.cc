@@ -462,7 +462,7 @@ void RMGPhysics::DefineCommands() {
       ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
       .SetGuidance(
           "Set simulation production cuts, for default region for electrons, positions, "
-          "and gammas. Notes: this does not apply to protons, alphas or generic ions."
+          "and gammas. Note: this does not apply to protons, alphas or generic ions."
       )
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
@@ -471,7 +471,7 @@ void RMGPhysics::DefineCommands() {
       ->DeclareMethodWithUnit("SensitiveProductionCut", "mm", &RMGPhysics::SetSensitiveProductionCut)
       .SetGuidance(
           "Set simulation production cuts, for sensitive region for electrons, positions, "
-          "and gammas. Notes: this does not apply to protons, alphas or generic ions."
+          "and gammas. Note: this does not apply to protons, alphas or generic ions."
       )
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
