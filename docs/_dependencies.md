@@ -1,13 +1,13 @@
 ### Required dependencies
 
-- [CMake] 3.12 or higher
-- [Geant4] 11.0.3 or higher
+- [CMake] 3.14 or higher
+- [Geant4] 11.2.2 or higher
 - Python3 interpreter
 
 ### Optional dependencies
 
 - [Geant4] support for:
-  - [HDF5] object persistency
+  - [HDF5] object persistency (also needed for LH5)
   - Multithreading
   - GDML geometry description
 - [ROOT] 6.06 or higher
