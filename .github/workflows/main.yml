@@ -168,7 +168,7 @@ jobs:
           make
           make install
 
-      - name: Run minimal test suite
+      - name: Run full test suite
         run: |
           cd build
           ctest --output-on-failure
