@@ -50,8 +50,8 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
         RMGLog::Out(RMGLog::fatal, "Failed to read next line after re-opening the file. Exit!");
       }
     }
-  } while (line[0] == '%' || (line.find("version") !=
-                                 std::string::npos)); // This could be outsourced to SetStartLocation
+  } while (line[0] == '%' || (line.find("version") != std::string::npos)
+  ); // This could be outsourced to SetStartLocation
 
   // parse line and return as struct
   GammaCascadeLine gamma_cascade{};
@@ -120,18 +120,26 @@ void RMGGrabmayrGCReader::RandomizeFiles() {
 
 void RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation(const int answer) {
   fGammaCascadeRandomStartLocation = answer;
-  RMGLog::Out(RMGLog::detail,
-      "setting fGammaCascadeRandomStartLocation to: ", fGammaCascadeRandomStartLocation);
+  RMGLog::Out(
+      RMGLog::detail,
+      "setting fGammaCascadeRandomStartLocation to: ",
+      fGammaCascadeRandomStartLocation
+  );
   RandomizeFiles();
 }
 
 void RMGGrabmayrGCReader::DefineCommands() {
-  fGenericMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/GrabmayrGammaCascades/",
-      "Control Peters gamma cascade model");
+  fGenericMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/GrabmayrGammaCascades/",
+      "Control Peters gamma cascade model"
+  );
 
   fGenericMessenger
-      ->DeclareMethod("SetGammaCascadeRandomStartLocation",
-          &RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation)
+      ->DeclareMethod(
+          "SetGammaCascadeRandomStartLocation",
+          &RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation
+      )
       .SetGuidance("Set the whether the start location in the gamma cascade file is random or not")
       .SetGuidance("0 = don't")
       .SetGuidance("1 = do")

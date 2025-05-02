@@ -81,8 +81,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         had_mapping = true;
 
         auto det_type_str = aux.value;
-        det_type_str[0] =
-            static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
+        det_type_str[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
         const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
 
         if (fRegisterDetectorsFromGDML.find(det_type) == fRegisterDetectorsFromGDML.end()) {
@@ -106,8 +105,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // Check for overlaps, but with no verbose output.
     if (!fGDMLDisableOverlapCheck) {
       RMGLog::Out(RMGLog::summary, "Checking for overlaps in GDML geometry...");
-      auto test_vol =
-          new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
+      auto test_vol = new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
       test_vol->TestOverlapInTree();
     }
 #else
@@ -116,14 +114,21 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   } else {
     fWorld = this->DefineGeometry();
     if (!fWorld)
-      RMGLog::Out(RMGLog::fatal, "DefineGeometry() returned nullptr. ",
-          "Did you forget to reimplement the base class method, or to specify a GDML file?");
+      RMGLog::Out(
+          RMGLog::fatal,
+          "DefineGeometry() returned nullptr. ",
+          "Did you forget to reimplement the base class method, or to specify a GDML file?"
+      );
   }
 
   // attach user max step sizes to logical volumes
   for (const auto& el : fPhysVolStepLimits) {
-    RMGLog::OutFormat(RMGLog::debug, "Setting max user step size for volume '{}' to {}", el.first,
-        el.second);
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "Setting max user step size for volume '{}' to {}",
+        el.first,
+        el.second
+    );
     auto vol = RMGNavigationTools::FindPhysicalVolume(el.first);
     if (!vol) {
       RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
@@ -136,11 +141,19 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     const auto lv = pv->GetLogicalVolume();
     // only set to sensitive region if not already done
     if (lv->GetRegion()) {
-      RMGLog::OutFormatDev(RMGLog::debug, "Logical volume {} is already assigned to region {}",
-          lv->GetName(), lv->GetRegion()->GetName());
+      RMGLog::OutFormatDev(
+          RMGLog::debug,
+          "Logical volume {} is already assigned to region {}",
+          lv->GetName(),
+          lv->GetRegion()->GetName()
+      );
     } else {
-      RMGLog::OutFormat(RMGLog::debug, "Assigning logical volume {} to region {}", lv->GetName(),
-          fSensitiveRegion->GetName());
+      RMGLog::OutFormat(
+          RMGLog::debug,
+          "Assigning logical volume {} to region {}",
+          lv->GetName(),
+          fSensitiveRegion->GetName()
+      );
       lv->SetRegion(fSensitiveRegion);
       fSensitiveRegion->AddRootLogicalVolume(lv);
     }
@@ -165,8 +178,11 @@ void RMGHardware::ConstructSDandField() {
     // initialize a concrete detector, if not done yet
     // TODO: allow user to register custom detectors
     if (active_dets.find(v.type) == active_dets.end()) {
-      RMGLog::Out(RMGLog::debug, "Registering new sensitive detector of type ",
-          magic_enum::enum_name(v.type));
+      RMGLog::Out(
+          RMGLog::debug,
+          "Registering new sensitive detector of type ",
+          magic_enum::enum_name(v.type)
+      );
 
       G4VSensitiveDetector* obj = nullptr;
       std::shared_ptr<RMGVOutputScheme> output;
@@ -184,15 +200,23 @@ void RMGHardware::ConstructSDandField() {
           output = std::make_shared<RMGScintillatorOutputScheme>();
           break;
         default:
-          RMGLog::OutDev(RMGLog::fatal, "No behaviour for sensitive detector type '",
-              magic_enum::enum_name<RMGDetectorType>(v.type), "' implemented (implement me)");
+          RMGLog::OutDev(
+              RMGLog::fatal,
+              "No behaviour for sensitive detector type '",
+              magic_enum::enum_name<RMGDetectorType>(v.type),
+              "' implemented (implement me)"
+          );
       }
       sd_man->AddNewDetector(obj);
       active_dets.emplace(v.type, obj);
 
       if (!output) {
-        RMGLog::OutDev(RMGLog::fatal, "No output scheme sensitive detector type '",
-            magic_enum::enum_name(v.type), "' implemented (implement me)");
+        RMGLog::OutDev(
+            RMGLog::fatal,
+            "No output scheme sensitive detector type '",
+            magic_enum::enum_name(v.type),
+            "' implemented (implement me)"
+        );
       }
       fActiveOutputSchemes.emplace_back(output);
     }
@@ -206,9 +230,14 @@ void RMGHardware::ConstructSDandField() {
       this->SetSensitiveDetector(lv, active_dets[v.type]);
     }
 
-    RMGLog::OutFormat(RMGLog::debug,
+    RMGLog::OutFormat(
+        RMGLog::debug,
         "Registered new sensitive detector volume of type {}: {} (uid={}, lv={})",
-        magic_enum::enum_name(v.type), pv->GetName().c_str(), v.uid, lv->GetName().c_str());
+        magic_enum::enum_name(v.type),
+        pv->GetName().c_str(),
+        v.uid,
+        lv->GetName().c_str()
+    );
   }
 
   // also store primary vertex data, if we have any other output.
@@ -236,16 +265,24 @@ void RMGHardware::ConstructSDandField() {
 
     G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
     mat->GetIonisation()->SetBirksConstant(bc);
-    RMGLog::OutFormat(RMGLog::debug, "Birks constant of material {} set to {} mm/MeV from GDML",
-        mat->GetName(), bc / (CLHEP::mm / CLHEP::MeV));
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "Birks constant of material {} set to {} mm/MeV from GDML",
+        mat->GetName(),
+        bc / (CLHEP::mm / CLHEP::MeV)
+    );
   }
 }
 
-void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_name, int uid,
-    int copy_nr, bool allow_uid_reuse) {
+void RMGHardware::RegisterDetector(
+    RMGDetectorType type,
+    const std::string& pv_name,
+    int uid,
+    int copy_nr,
+    bool allow_uid_reuse
+) {
   if (fActiveDetectorsInitialized) {
-    RMGLog::Out(RMGLog::error,
-        "Active detectors cannot be mutated after constructing the detector.");
+    RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
     return;
   }
 
@@ -265,16 +302,28 @@ void RMGHardware::RegisterDetector(RMGDetectorType type, const std::string& pv_n
   // FIXME: can this be done with emplace?
   auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name}});
   if (!r_value.second) { // if insertion did not take place
-    RMGLog::OutFormat(RMGLog::warning,
-        "Physical volume '{}' (copy number {}) has already been registered as detector", pv_name,
-        copy_nr);
+    RMGLog::OutFormat(
+        RMGLog::warning,
+        "Physical volume '{}' (copy number {}) has already been registered as detector",
+        pv_name,
+        copy_nr
+    );
   } else {
-    RMGLog::OutFormat(RMGLog::detail,
-        "Registered physical volume '{}' (copy nr. {}) as {} detector type (uid={})", pv_name,
-        copy_nr, magic_enum::enum_name(type), uid);
+    RMGLog::OutFormat(
+        RMGLog::detail,
+        "Registered physical volume '{}' (copy nr. {}) as {} detector type (uid={})",
+        pv_name,
+        copy_nr,
+        magic_enum::enum_name(type),
+        uid
+    );
 
-    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("detector",
-        fmt::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)));
+    RMGIpc::SendIpcNonBlocking(
+        RMGIpc::CreateMessage(
+            "detector",
+            fmt::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)
+        )
+    );
   }
 }
 
@@ -297,8 +346,11 @@ void RMGHardware::RegisterDetectorsFromGDML(std::string s) {
 
 void RMGHardware::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Geometry/",
-      "Commands for controlling geometry definitions");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Geometry/",
+      "Commands for controlling geometry definitions"
+  );
 
   fMessenger->DeclareProperty("GDMLDisableOverlapCheck", fGDMLDisableOverlapCheck)
       .SetGuidance("Disable the automatic overlap check after loading a GDML file")
@@ -312,7 +364,8 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareMethod("RegisterDetectorsFromGDML", &RMGHardware::RegisterDetectorsFromGDML)
       .SetGuidance(
-          "Register detectors as saved in the GDML auxval structure, as written by pygeomtools.")
+          "Register detectors as saved in the GDML auxval structure, as written by pygeomtools."
+      )
       .SetParameterName("det_type", true)
       .SetCandidates("All " + RMGTools::GetCandidates<RMGDetectorType>())
       .SetDefaultValue("All")

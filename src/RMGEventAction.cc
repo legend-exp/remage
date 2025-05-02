@@ -48,8 +48,7 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
     auto start_time = current_run->GetStartTime();
     auto time_now = std::chrono::system_clock::now();
-    auto tot_elapsed_s =
-        std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
+    auto tot_elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(time_now - start_time).count();
     long partial = 0;
     long elapsed_d = (tot_elapsed_s - partial) / 86400;
     partial += elapsed_d * 86400;
@@ -59,9 +58,17 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
     partial += elapsed_m * 60;
     long elapsed_s = tot_elapsed_s - partial;
 
-    RMGLog::OutFormat(RMGLog::summary, "Processing event nr. {:d} ({:d}%), at {:d} days, {:d} hours, {:d} minutes and {:d} seconds",
-        event->GetEventID() + 1, (int)((event->GetEventID() + 1) * 100. / tot_events), elapsed_d,
-        elapsed_h, elapsed_m, elapsed_s);
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "Processing event nr. {:d} ({:d}%), at {:d} days, {:d} hours, {:d} minutes and {:d} "
+        "seconds",
+        event->GetEventID() + 1,
+        (int)((event->GetEventID() + 1) * 100. / tot_events),
+        elapsed_d,
+        elapsed_h,
+        elapsed_m,
+        elapsed_s
+    );
   }
 
   if (RMGManager::Instance()->IsPersistencyEnabled()) { fRunAction->ClearOutputDataFields(); }

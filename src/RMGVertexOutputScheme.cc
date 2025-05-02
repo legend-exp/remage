@@ -30,8 +30,10 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->RegisterNtuple("vertices",
-      ana_man->CreateNtuple("vertices", "Primary vertex data"));
+  auto vid = RMGManager::Instance()->RegisterNtuple(
+      "vertices",
+      ana_man->CreateNtuple("vertices", "Primary vertex data")
+  );
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evertices"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
@@ -44,8 +46,10 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()->RegisterNtuple("particles",
-        ana_man->CreateNtuple("particles", "Primary particle data"));
+    auto pid = RMGManager::Instance()->RegisterNtuple(
+        "particles",
+        ana_man->CreateNtuple("particles", "Primary particle data")
+    );
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1eparticles"));
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
@@ -80,12 +84,27 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
       int vcol_id = 0;
       ana_man->FillNtupleIColumn(vntupleid, vcol_id++, event->GetEventID());
       ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
-      FillNtupleFOrDColumn(ana_man, vntupleid, vcol_id++, primary_vertex->GetX0() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, vntupleid, vcol_id++, primary_vertex->GetY0() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, vntupleid, vcol_id++, primary_vertex->GetZ0() / u::m,
-          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(
+          ana_man,
+          vntupleid,
+          vcol_id++,
+          primary_vertex->GetX0() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          vntupleid,
+          vcol_id++,
+          primary_vertex->GetY0() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          vntupleid,
+          vcol_id++,
+          primary_vertex->GetZ0() / u::m,
+          fStoreSinglePrecisionPosition
+      );
       ana_man->FillNtupleIColumn(vntupleid, vcol_id++, n_primaries);
 
       // NOTE: must be called here for hit-oriented output
@@ -99,14 +118,34 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, event->GetEventID());
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, j);
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, primary->GetPDGcode());
-          FillNtupleFOrDColumn(ana_man, pntupleid, pcol_id++,
-              primary->GetMomentum().getX() / u::MeV, fStoreSinglePrecisionEnergy);
-          FillNtupleFOrDColumn(ana_man, pntupleid, pcol_id++,
-              primary->GetMomentum().getY() / u::MeV, fStoreSinglePrecisionEnergy);
-          FillNtupleFOrDColumn(ana_man, pntupleid, pcol_id++,
-              primary->GetMomentum().getZ() / u::MeV, fStoreSinglePrecisionEnergy);
-          FillNtupleFOrDColumn(ana_man, pntupleid, pcol_id++, primary->GetKineticEnergy() / u::MeV,
-              fStoreSinglePrecisionEnergy);
+          FillNtupleFOrDColumn(
+              ana_man,
+              pntupleid,
+              pcol_id++,
+              primary->GetMomentum().getX() / u::MeV,
+              fStoreSinglePrecisionEnergy
+          );
+          FillNtupleFOrDColumn(
+              ana_man,
+              pntupleid,
+              pcol_id++,
+              primary->GetMomentum().getY() / u::MeV,
+              fStoreSinglePrecisionEnergy
+          );
+          FillNtupleFOrDColumn(
+              ana_man,
+              pntupleid,
+              pcol_id++,
+              primary->GetMomentum().getZ() / u::MeV,
+              fStoreSinglePrecisionEnergy
+          );
+          FillNtupleFOrDColumn(
+              ana_man,
+              pntupleid,
+              pcol_id++,
+              primary->GetKineticEnergy() / u::MeV,
+              fStoreSinglePrecisionEnergy
+          );
 
           // NOTE: must be called here for hit-oriented output
           ana_man->AddNtupleRow(pntupleid);
@@ -118,8 +157,11 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
 void RMGVertexOutputScheme::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Vertex/",
-      "Commands for controlling output of primary vertices.");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Output/Vertex/",
+      "Commands for controlling output of primary vertices."
+  );
 
   fMessenger->DeclareProperty("StorePrimaryParticleInformation", fStorePrimaryParticleInformation)
       .SetGuidance("Store information on primary particle details (not only vertex data).")

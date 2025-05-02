@@ -72,11 +72,11 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       continue;
     }
 
-    auto id =
-        rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
+    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
     registered_ntuples.emplace(ntuple_name, id);
     RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("germanium\x1e") + ntuple_name));
+        RMGIpc::CreateMessage("output_table", std::string("germanium\x1e") + ntuple_name)
+    );
 
     // store the indices
     ana_man->CreateNtupleIColumn(id, "evtid");
@@ -122,8 +122,9 @@ RMGDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* e
     return nullptr;
   }
 
-  auto hit_coll =
-      dynamic_cast<RMGDetectorHitsCollection*>(event->GetHCofThisEvent()->GetHC(hit_coll_id));
+  auto hit_coll = dynamic_cast<RMGDetectorHitsCollection*>(
+      event->GetHCofThisEvent()->GetHC(hit_coll_id)
+  );
 
   if (!hit_coll) {
     RMGLog::Out(RMGLog::error, "Could not find hit collection associated with event");
@@ -153,8 +154,13 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
-    RMGLog::Out(RMGLog::debug, "Discarding event - energy threshold has not been met", event_edep,
-        fEdepCutLow, fEdepCutHigh);
+    RMGLog::Out(
+        RMGLog::debug,
+        "Discarding event - energy threshold has not been met",
+        event_edep,
+        fEdepCutLow,
+        fEdepCutHigh
+    );
     return true;
   }
 
@@ -208,22 +214,41 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->parent_track_id);
       }
 
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, hit->energy_deposition / u::keV,
-          fStoreSinglePrecisionEnergy);
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          hit->energy_deposition / u::keV,
+          fStoreSinglePrecisionEnergy
+      );
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
       // get the position and distance to save
       G4ThreeVector position = RMGOutputTools::get_position(hit, fPositionMode);
       double distance = RMGOutputTools::get_distance(hit, fPositionMode);
 
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-          fStoreSinglePrecisionPosition);
-      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
-          fStoreSinglePrecisionPosition);
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getX() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getY() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          position.getZ() / u::m,
+          fStoreSinglePrecisionPosition
+      );
+      FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m, fStoreSinglePrecisionPosition);
 
       // save also post-step if requested
       if (fPositionMode == RMGOutputTools::PositionMode::kBoth) {
@@ -231,26 +256,54 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
         // save post-step
         position = hit->global_position_prestep;
         distance = hit->distance_to_surface_prestep;
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
-            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getX() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getY() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getZ() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m, fStoreSinglePrecisionPosition);
 
         // save avg
         position = hit->global_position_poststep;
         distance = hit->distance_to_surface_poststep;
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getX() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getY() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, position.getZ() / u::m,
-            fStoreSinglePrecisionPosition);
-        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m,
-            fStoreSinglePrecisionPosition);
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getX() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getY() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            position.getZ() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m, fStoreSinglePrecisionPosition);
       }
 
       // NOTE: must be called here for hit-oriented output
@@ -259,8 +312,10 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   }
 }
 
-std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(const G4Track* aTrack,
-    int stage) {
+std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(
+    const G4Track* aTrack,
+    int stage
+) {
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
 
@@ -291,8 +346,13 @@ void RMGGermaniumOutputScheme::SetPositionModeString(std::string mode) {
 }
 void RMGGermaniumOutputScheme::DefineCommands() {
 
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/",
-      "Commands for controlling output from hits in germanium detectors."));
+  fMessengers.push_back(
+      std::make_unique<G4GenericMessenger>(
+          this,
+          "/RMG/Output/Germanium/",
+          "Commands for controlling output from hits in germanium detectors."
+      )
+  );
 
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
@@ -314,10 +374,14 @@ void RMGGermaniumOutputScheme::DefineCommands() {
 
   fMessengers.back()
       ->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
-      .SetGuidance("Discard optical photons (before simulating them), if no edep in germanium "
-                   "detectors occurred in the same event.")
-      .SetGuidance("note: If another output scheme also requests the photons to be discarded, the "
-                   "germanium edep filter does not force the photons to be simulated.")
+      .SetGuidance(
+          "Discard optical photons (before simulating them), if no edep in germanium "
+          "detectors occurred in the same event."
+      )
+      .SetGuidance(
+          "note: If another output scheme also requests the photons to be discarded, the "
+          "germanium edep filter does not force the photons to be simulated."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -359,8 +423,13 @@ void RMGGermaniumOutputScheme::DefineCommands() {
 
 
   // clustering pars
-  fMessengers.push_back(std::make_unique<G4GenericMessenger>(this, "/RMG/Output/Germanium/Cluster/",
-      "Commands for controlling clustering of hits in germanium detectors."));
+  fMessengers.push_back(
+      std::make_unique<G4GenericMessenger>(
+          this,
+          "/RMG/Output/Germanium/Cluster/",
+          "Commands for controlling clustering of hits in germanium detectors."
+      )
+  );
 
   fMessengers.back()
       ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
@@ -384,22 +453,27 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("PreClusterDistance", "um",
-          &RMGGermaniumOutputScheme::SetClusterDistance)
+      ->DeclareMethodWithUnit("PreClusterDistance", "um", &RMGGermaniumOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("PreClusterDistanceSurface", "um",
-          &RMGGermaniumOutputScheme::SetClusterDistanceSurface)
+      ->DeclareMethodWithUnit(
+          "PreClusterDistanceSurface",
+          "um",
+          &RMGGermaniumOutputScheme::SetClusterDistanceSurface
+      )
       .SetGuidance("Set a distance threshold for the surface pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("PreClusterTimeThreshold", "us",
-          &RMGGermaniumOutputScheme::SetClusterTimeThreshold)
+      ->DeclareMethodWithUnit(
+          "PreClusterTimeThreshold",
+          "us",
+          &RMGGermaniumOutputScheme::SetClusterTimeThreshold
+      )
       .SetGuidance("Set a time threshold for  pre-clustering.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
@@ -411,8 +485,11 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareMethodWithUnit("ElectronTrackEnergyThreshold", "keV",
-          &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold)
+      ->DeclareMethodWithUnit(
+          "ElectronTrackEnergyThreshold",
+          "keV",
+          &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold
+      )
       .SetGuidance("Set a energy threshold for tracks to be merged.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);

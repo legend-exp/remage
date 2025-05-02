@@ -109,15 +109,21 @@ class RMGManager {
     inline int RegisterNtuple(int det_uid, int ntuple_id) {
       auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
       if (!res.second)
-        RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
-            det_uid);
+        RMGLog::OutFormatDev(
+            RMGLog::fatal,
+            "Ntuple for detector with UID {} is already registered",
+            det_uid
+        );
       return this->GetNtupleID(det_uid);
     }
     inline int RegisterNtuple(std::string det_uid, int ntuple_id) {
       auto res = fNtupleIDsS.emplace(det_uid, ntuple_id);
       if (!res.second)
-        RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered",
-            det_uid);
+        RMGLog::OutFormatDev(
+            RMGLog::fatal,
+            "Ntuple for detector with UID {} is already registered",
+            det_uid
+        );
       return this->GetNtupleID(det_uid);
     }
     inline int GetNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }

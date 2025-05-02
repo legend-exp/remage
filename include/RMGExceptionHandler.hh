@@ -28,8 +28,12 @@ class RMGExceptionHandler : public G4ExceptionHandler {
     RMGExceptionHandler(const RMGExceptionHandler&) = delete;
     RMGExceptionHandler& operator=(const RMGExceptionHandler&) = delete;
 
-    bool Notify(const char* originOfException, const char* exceptionCode,
-        G4ExceptionSeverity severity, const char* description) override;
+    bool Notify(
+        const char* originOfException,
+        const char* exceptionCode,
+        G4ExceptionSeverity severity,
+        const char* description
+    ) override;
 
     [[nodiscard]] inline bool HadWarning() const { return fHadWarning; }
     [[nodiscard]] inline bool HadError() const { return fHadError; }

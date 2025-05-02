@@ -42,9 +42,12 @@ void RMGTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 
   if (check_global_time && !fHadLongTimeWarning &&
       aTrack->GetGlobalTime() > fMaxRepresentableGlobalTime) {
-    RMGLog::Out(RMGLog::warning, "encountered long global time (> ",
+    RMGLog::Out(
+        RMGLog::warning,
+        "encountered long global time (> ",
         fMaxRepresentableGlobalTime / CLHEP::year,
-        " yr). Global time precision might be worse than 1 us.");
+        " yr). Global time precision might be worse than 1 us."
+    );
     fHadLongTimeWarning = true;
   }
 }
@@ -63,8 +66,11 @@ bool RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
   auto secondaries_in_current_step = aTrack->GetStep()->GetNumberOfSecondariesInCurrentStep();
   // if we have more secondaries than from the final decay, the earlier ones will have larger times.
   if (secondaries_in_current_step != secondaries->size()) {
-    RMGLog::Out(RMGLog::warning, "inconsistent (non-monotonous) timing in event ",
-        G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID());
+    RMGLog::Out(
+        RMGLog::warning,
+        "inconsistent (non-monotonous) timing in event ",
+        G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID()
+    );
   }
 
   for (auto sec : *secondaries) { sec->SetGlobalTime(0.); }
@@ -81,21 +87,31 @@ void RMGTrackingAction::SetLongGlobalTimeUncertaintyWarning(double uncert) {
 
 void RMGTrackingAction::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/Stepping/",
-      "Commands for controlling physics processes");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Processes/Stepping/",
+      "Commands for controlling physics processes"
+  );
 
   fMessenger->DeclareProperty("ResetInitialDecayTime", fResetInitialDecayTime)
-      .SetGuidance("If the initial step is a radioactive decay, reset the global time of all its "
-                   "secondary tracks to 0.")
+      .SetGuidance(
+          "If the initial step is a radioactive decay, reset the global time of all its "
+          "secondary tracks to 0."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareMethodWithUnit("LargeGlobalTimeUncertaintyWarning", "us",
-          &RMGTrackingAction::SetLongGlobalTimeUncertaintyWarning)
-      .SetGuidance("Warn if the global times of tracks get too large to provide the requested time "
-                   "uncertainty.")
+      ->DeclareMethodWithUnit(
+          "LargeGlobalTimeUncertaintyWarning",
+          "us",
+          &RMGTrackingAction::SetLongGlobalTimeUncertaintyWarning
+      )
+      .SetGuidance(
+          "Warn if the global times of tracks get too large to provide the requested time "
+          "uncertainty."
+      )
       .SetDefaultValue("1")
       .SetStates(G4State_Idle);
 }

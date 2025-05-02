@@ -89,8 +89,12 @@ namespace RMGOutputTools {
    *
    * @returns a collection of hits after pre-clustering.
    */
-  std::shared_ptr<RMGDetectorHitsCollection> pre_cluster_hits(const RMGDetectorHitsCollection* hits,
-      ClusterPars cluster_pars, bool has_distance_to_surface, bool has_velocity);
+  std::shared_ptr<RMGDetectorHitsCollection> pre_cluster_hits(
+      const RMGDetectorHitsCollection* hits,
+      ClusterPars cluster_pars,
+      bool has_distance_to_surface,
+      bool has_velocity
+  );
 
   /** @brief Average a cluster of hits to produce one effective hit.
    *
@@ -104,8 +108,11 @@ namespace RMGOutputTools {
    *
    * @returns the averaged hit.
    */
-  RMGDetectorHit* average_hits(std::vector<RMGDetectorHit*> hits, bool compute_distance_to_surface,
-      bool compute_velocity);
+  RMGDetectorHit* average_hits(
+      std::vector<RMGDetectorHit*> hits,
+      bool compute_distance_to_surface,
+      bool compute_velocity
+  );
 
   /** @brief Check if the step point is contained in a physical volume registered as a detector.
    *
@@ -134,10 +141,11 @@ namespace RMGOutputTools {
    *
    * @returns A map of steps after combining low energy tracks.
    */
-  std::map<int, std::vector<RMGDetectorHit*>> combine_low_energy_tracks(std::map<int,
-                                                                            std::vector<RMGDetectorHit*>>
-                                                                            hits_map,
-      ClusterPars cluster_pars, bool has_distance_to_surface);
+  std::map<int, std::vector<RMGDetectorHit*>> combine_low_energy_tracks(
+      std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+      ClusterPars cluster_pars,
+      bool has_distance_to_surface
+  );
 
   /** @brief Search for hits close to any gamma track and reassign the energy deposit to that track.
    *
@@ -146,8 +154,11 @@ namespace RMGOutputTools {
    * the gamma tracks and for each it looks for a nearby electron hit to instead assign this small
    * local energy deposit too, this can avoid writing out the gamma tracks in the output scheme.
    */
-  void redistribute_gamma_energy(std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-      ClusterPars cluster_pars, bool has_distance_to_surface);
+  void redistribute_gamma_energy(
+      std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+      ClusterPars cluster_pars,
+      bool has_distance_to_surface
+  );
 
 
 } // namespace RMGOutputTools

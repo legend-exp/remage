@@ -41,16 +41,14 @@ bool RMGConvertLH5::ExistsByType(H5::H5Location& loc, std::string name, H5O_type
   return loc.nameExists(name) && loc.childObjType(name) == type;
 }
 
-void RMGConvertLH5::SetStringAttribute(H5::H5Object& obj, std::string attr_name,
-    std::string attr_value) {
+void RMGConvertLH5::SetStringAttribute(H5::H5Object& obj, std::string attr_name, std::string attr_value) {
   H5::StrType att_dtype(0, H5T_VARIABLE);
   H5::DataSpace scalar(H5S_SCALAR);
   auto att = obj.createAttribute(attr_name, att_dtype, scalar);
   att.write(att_dtype, attr_value);
 }
 
-std::optional<std::string> RMGConvertLH5::GetStringAttribute(H5::H5Object& obj,
-    std::string attr_name) {
+std::optional<std::string> RMGConvertLH5::GetStringAttribute(H5::H5Object& obj, std::string attr_name) {
   if (!obj.attrExists("datatype")) return std::nullopt;
   auto att_writer = obj.openAttribute(attr_name);
   if (att_writer.getDataType().getClass() != H5T_STRING) return std::nullopt;
@@ -65,8 +63,7 @@ void RMGConvertLH5::CreateUIntDataset(H5::Group& obj, std::string dset_name, uin
   att.write(&attr_value, H5::PredType::STD_I32LE);
 }
 
-void RMGConvertLH5::CreateStringDataset(H5::Group& obj, std::string dset_name,
-    std::string attr_value) {
+void RMGConvertLH5::CreateStringDataset(H5::Group& obj, std::string dset_name, std::string attr_value) {
   H5::StrType att_dtype(0, attr_value.size() + 1);
   H5::DataSpace scalar(H5S_SCALAR);
   auto att = obj.createDataSet(dset_name, att_dtype, scalar);
@@ -76,8 +73,11 @@ void RMGConvertLH5::CreateStringDataset(H5::Group& obj, std::string dset_name,
 ////////////////////////////////////////////////////////////////////////////////////////////
 // HDF5 -> LH5 (output files):
 
-std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDataset(H5::Group& det_group,
-    std::string dset_name, std::string ntuple_log_prefix) {
+std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDataset(
+    H5::Group& det_group,
+    std::string dset_name,
+    std::string ntuple_log_prefix
+) {
   std::vector<std::string> vec;
 
   auto dset = det_group.openDataSet(dset_name);
@@ -208,10 +208,18 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       det_group.moveLink(column_tmp + "/pages", lgdo_name);
     } else {
       // create a new empty dataset, as we have none.
-      auto col_idx = std::distance(names_parts.begin(),
-          std::find(names_parts.begin(), names_parts.end(), column));
-      LH5Log(RMGLog::warning, ntuple_log_prefix, "column ", lgdo_name,
-          " - no data, creating with type ", forms_parts[col_idx]);
+      auto col_idx = std::distance(
+          names_parts.begin(),
+          std::find(names_parts.begin(), names_parts.end(), column)
+      );
+      LH5Log(
+          RMGLog::warning,
+          ntuple_log_prefix,
+          "column ",
+          lgdo_name,
+          " - no data, creating with type ",
+          forms_parts[col_idx]
+      );
 
       hsize_t dset_dataspace_dim[1] = {0};
       H5::DataSpace dset_dataspace(1, dset_dataspace_dim);
@@ -271,8 +279,12 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   // script before (it will delete the header group below).
   if (!ExistsByType(hfile, "header", H5O_TYPE_GROUP) ||
       !ExistsByType(hfile, ntuple_group_name, H5O_TYPE_GROUP)) {
-    LH5Log(RMGLog::error, "not a remage HDF5 output file or already converted (missing header or ",
-        ntuple_group_name, " groups)?");
+    LH5Log(
+        RMGLog::error,
+        "not a remage HDF5 output file or already converted (missing header or ",
+        ntuple_group_name,
+        " groups)?"
+    );
     return false;
   }
   auto header_group = hfile.openGroup("header");
@@ -292,8 +304,11 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   }
   // make the root HDF5 group an LH5 struct.
   if (!ntuples_group.attrExists("datatype")) {
-    SetStringAttribute(ntuples_group, "datatype",
-        "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}");
+    SetStringAttribute(
+        ntuples_group,
+        "datatype",
+        "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}"
+    );
   }
 
   if (ntuples_group.attrExists("type")) ntuples_group.removeAttr("type");
@@ -319,8 +334,12 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   return ntuple_success;
 }
 
-bool RMGConvertLH5::ConvertToLH5(std::string hdf5_file_name, std::string ntuple_group_name,
-    bool dry_run, bool part_of_batch) {
+bool RMGConvertLH5::ConvertToLH5(
+    std::string hdf5_file_name,
+    std::string ntuple_group_name,
+    bool dry_run,
+    bool part_of_batch
+) {
   auto conv = RMGConvertLH5(hdf5_file_name, ntuple_group_name, dry_run, part_of_batch);
   try {
     return conv.ConvertToLH5Internal();
@@ -346,8 +365,10 @@ std::string RMGConvertLH5::HDFDataTypeToForm(H5::DataType dtype) {
   }
 }
 
-bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group,
-    std::map<std::string, std::string>& units_map) {
+bool RMGConvertLH5::ConvertTableToNTuple(
+    H5::Group& det_group,
+    std::map<std::string, std::string>& units_map
+) {
   const std::string ntuple_name = det_group.getObjName();
   const std::string ntuple_log_prefix = "ntuple " + ntuple_name + " - ";
   LH5Log(RMGLog::detail, ntuple_log_prefix, "visiting");
@@ -411,8 +432,16 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group,
     if (out_column_count == 0) {
       out_entries_count = dims[0];
     } else if (out_entries_count != dims[0]) {
-      LH5Log(RMGLog::error, ntuple_log_prefix, "mismatch for entry count for column ", column, " ",
-          out_entries_count, " vs ", dims[0]);
+      LH5Log(
+          RMGLog::error,
+          ntuple_log_prefix,
+          "mismatch for entry count for column ",
+          column,
+          " ",
+          out_entries_count,
+          " vs ",
+          dims[0]
+      );
       return false;
     }
     dset_column.removeAttr("datatype");
@@ -431,7 +460,8 @@ bool RMGConvertLH5::ConvertTableToNTuple(H5::Group& det_group,
 }
 
 bool RMGConvertLH5::ConvertFromLH5Internal(
-    std::map<std::string, std::map<std::string, std::string>>& units_map) {
+    std::map<std::string, std::map<std::string, std::string>>& units_map
+) {
   // using the core driver with no backing storage will allow to change the file purely in-memory.
   // warning: this will internally allocate approx. the full file size!
   H5::FileAccPropList fapl;
@@ -467,9 +497,13 @@ bool RMGConvertLH5::ConvertFromLH5Internal(
   return ntuple_success;
 }
 
-bool RMGConvertLH5::ConvertFromLH5(std::string lh5_file_name, std::string ntuple_group_name,
-    bool dry_run, bool part_of_batch,
-    std::map<std::string, std::map<std::string, std::string>>& units_map) {
+bool RMGConvertLH5::ConvertFromLH5(
+    std::string lh5_file_name,
+    std::string ntuple_group_name,
+    bool dry_run,
+    bool part_of_batch,
+    std::map<std::string, std::map<std::string, std::string>>& units_map
+) {
   auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, dry_run, part_of_batch);
   try {
     return conv.ConvertFromLH5Internal(units_map);

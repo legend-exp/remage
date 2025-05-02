@@ -63,8 +63,11 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
       break;
     }
     default: {
-      RMGLog::OutFormat(RMGLog::fatal, "\"{}\" sky shape not implemented!",
-          magic_enum::enum_name<SkyShape>(fSkyShape));
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "\"{}\" sky shape not implemented!",
+          magic_enum::enum_name<SkyShape>(fSkyShape)
+      );
       break;
     }
   }
@@ -104,10 +107,19 @@ void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
   d_cart.setMag(1 * u::m);
   fGun->SetParticleMomentumDirection(d_cart);
 
-  RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
-      fEcoMug->GetGenerationTheta() / u::deg, fEcoMug->GetGenerationPhi() / u::deg);
-  RMGLog::OutFormat(RMGLog::debug, "...direction (x,y,z) = ({:.4g}, {:.4g}, {:.4g}) m",
-      d_cart.getX() / u::m, d_cart.getY() / u::m, d_cart.getZ() / u::m);
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
+      fEcoMug->GetGenerationTheta() / u::deg,
+      fEcoMug->GetGenerationPhi() / u::deg
+  );
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "...direction (x,y,z) = ({:.4g}, {:.4g}, {:.4g}) m",
+      d_cart.getX() / u::m,
+      d_cart.getY() / u::m,
+      d_cart.getZ() / u::m
+  );
 
   const auto& p_tot = fEcoMug->GetGenerationMomentum() * u::GeV;
   RMGLog::OutFormat(RMGLog::debug, "...momentum {:.4g} GeV/c", p_tot / u::GeV);
@@ -127,8 +139,11 @@ void RMGGeneratorCosmicMuons::DefineCommands() {
 
   // NOTE: SetUnit(Category) is not thread-safe
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/CosmicMuons/",
-      "Commands for controlling the µ generator");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Generator/CosmicMuons/",
+      "Commands for controlling the µ generator"
+  );
 
   fMessenger->DeclareMethod("SkyShape", &RMGGeneratorCosmicMuons::SetSkyShape)
       .SetGuidance("Geometrical shape of the µ generation surface")

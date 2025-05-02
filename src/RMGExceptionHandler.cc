@@ -17,8 +17,12 @@
 
 #include "G4ExceptionHandler.hh"
 
-bool RMGExceptionHandler::Notify(const char* originOfException, const char* exceptionCode,
-    G4ExceptionSeverity severity, const char* description) {
+bool RMGExceptionHandler::Notify(
+    const char* originOfException,
+    const char* exceptionCode,
+    G4ExceptionSeverity severity,
+    const char* description
+) {
 
   auto code = std::string(exceptionCode);
   // the UI manager aborts batch mode, but only emits warnings. Mark them as errors accordingly.

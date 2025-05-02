@@ -30,11 +30,23 @@ G4ThreadLocal G4Allocator<RMGDetectorHit>* RMGDetectorHitAllocator = nullptr;
 G4bool RMGDetectorHit::operator==(const RMGDetectorHit& right) const { return this == &right; }
 
 void RMGDetectorHit::Print() {
-  RMGLog::Out(RMGLog::debug, "Detector UID: ", this->detector_uid,
-      " / Particle: ", this->particle_type,
-      " / Energy: ", G4BestUnit(this->energy_deposition, "Energy"),
-      " / Position (prestep): ", this->global_position_prestep / CLHEP::m, " m",
-      " / Time: ", this->global_time / CLHEP::ns, " ns", " / trackid ", this->track_id);
+  RMGLog::Out(
+      RMGLog::debug,
+      "Detector UID: ",
+      this->detector_uid,
+      " / Particle: ",
+      this->particle_type,
+      " / Energy: ",
+      G4BestUnit(this->energy_deposition, "Energy"),
+      " / Position (prestep): ",
+      this->global_position_prestep / CLHEP::m,
+      " m",
+      " / Time: ",
+      this->global_time / CLHEP::ns,
+      " ns",
+      " / trackid ",
+      this->track_id
+  );
 }
 
 void RMGDetectorHit::Draw() {

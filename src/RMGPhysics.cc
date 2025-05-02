@@ -218,14 +218,16 @@ void RMGPhysics::ConstructProcess() {
 
   if (fHadronicPhysicsListOption != HadronicPhysicsListOption::kNone) {
     RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
-    G4VPhysicsConstructor* hElasticPhysics =
-        new G4HadronElasticPhysicsHP(G4VModularPhysicsList::verboseLevel);
+    G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(
+        G4VModularPhysicsList::verboseLevel
+    );
     hElasticPhysics->ConstructProcess();
 
     if (fUseThermalScattering) {
       RMGLog::Out(RMGLog::detail, "Adding neutron thermal scattering elastic physics");
-      G4VPhysicsConstructor* hThermalScatteringPhysics =
-          new G4ThermalNeutrons(G4VModularPhysicsList::verboseLevel);
+      G4VPhysicsConstructor* hThermalScatteringPhysics = new G4ThermalNeutrons(
+          G4VModularPhysicsList::verboseLevel
+      );
       hThermalScatteringPhysics->ConstructProcess();
     }
 
@@ -258,8 +260,9 @@ void RMGPhysics::ConstructProcess() {
       // Mostly similar to examples/extended/Hadr04
       auto pManager = G4Neutron::Neutron()->GetProcessManager();
       // Find the existing neutron capture process
-      auto neutronCaptureProcess =
-          dynamic_cast<G4NeutronCaptureProcess*>(pManager->GetProcess("nCapture"));
+      auto neutronCaptureProcess = dynamic_cast<G4NeutronCaptureProcess*>(
+          pManager->GetProcess("nCapture")
+      );
 
       // Overwrite the old Process, keeping all of the interactions
       if (neutronCaptureProcess) {
@@ -280,8 +283,7 @@ void RMGPhysics::ConstructProcess() {
     }
 
     RMGLog::Out(RMGLog::detail, "Adding stopping physics");
-    G4VPhysicsConstructor* stoppingPhysics =
-        new G4StoppingPhysics(G4VModularPhysicsList::verboseLevel);
+    G4VPhysicsConstructor* stoppingPhysics = new G4StoppingPhysics(G4VModularPhysicsList::verboseLevel);
     stoppingPhysics->ConstructProcess();
 
     RMGLog::Out(RMGLog::detail, "Adding ion physics");
@@ -393,15 +395,21 @@ void RMGPhysics::SetCuts() {
     cuts->SetProductionCut(fProdCutsSensitive.proton, "proton");
     region->SetProductionCuts(cuts);
   } else {
-    RMGLog::Out(RMGLog::warning, "Could not find G4Region 'SensitiveRegion' in the store. ",
-        "No special production cuts applied");
+    RMGLog::Out(
+        RMGLog::warning,
+        "Could not find G4Region 'SensitiveRegion' in the store. ",
+        "No special production cuts applied"
+    );
   }
 }
 
 void RMGPhysics::SetSensitiveProductionCut(double cut) {
 
-  RMGLog::OutFormat(RMGLog::summary,
-      "Setting user defined production cuts for sensitive region to {} mm", cut / u::mm);
+  RMGLog::OutFormat(
+      RMGLog::summary,
+      "Setting user defined production cuts for sensitive region to {} mm",
+      cut / u::mm
+  );
 
   fProdCutsSensitive = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
   fProdCutsSensitive.gamma = cut;
@@ -413,8 +421,11 @@ void RMGPhysics::SetSensitiveProductionCut(double cut) {
 
 void RMGPhysics::SetDefaultProductionCut(double cut) {
 
-  RMGLog::OutFormat(RMGLog::summary,
-      "Setting user defined production cuts for default region to {} mm", cut / u::mm);
+  RMGLog::OutFormat(
+      RMGLog::summary,
+      "Setting user defined production cuts for default region to {} mm",
+      cut / u::mm
+  );
 
   fProdCuts = ProdCutStore(G4VUserPhysicsList::defaultCutValue);
   fProdCuts.gamma = cut;
@@ -432,27 +443,36 @@ void RMGPhysics::SetLowEnergyEMOptionString(std::string option) {
 
 void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
   try {
-    fHadronicPhysicsListOption =
-        RMGTools::ToEnum<HadronicPhysicsListOption>(option, "hadronic physics list option");
+    fHadronicPhysicsListOption = RMGTools::ToEnum<HadronicPhysicsListOption>(
+        option,
+        "hadronic physics list option"
+    );
   } catch (const std::bad_cast&) { return; }
 }
 
 void RMGPhysics::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Processes/",
-      "Commands for controlling physics processes");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Processes/",
+      "Commands for controlling physics processes"
+  );
 
   fMessenger
       ->DeclareMethodWithUnit("DefaultProductionCut", "mm", &RMGPhysics::SetDefaultProductionCut)
-      .SetGuidance("Set simulation production cuts, for default region for electrons, positions, "
-                   "and gammas. Note: this does not apply to protons, alphas or generic ions.")
+      .SetGuidance(
+          "Set simulation production cuts, for default region for electrons, positions, "
+          "and gammas. Notes: this does not apply to protons, alphas or generic ions."
+      )
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
   fMessenger
       ->DeclareMethodWithUnit("SensitiveProductionCut", "mm", &RMGPhysics::SetSensitiveProductionCut)
-      .SetGuidance("Set simulation production cuts, for sensitive region for electrons, positions, "
-                   "and gammas. Note: this does not apply to protons, alphas or generic ions.")
+      .SetGuidance(
+          "Set simulation production cuts, for sensitive region for electrons, positions, "
+          "and gammas. Notes: this does not apply to protons, alphas or generic ions."
+      )
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 
@@ -464,7 +484,8 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("OpticalPhysicsMaxOneWLSPhoton", fUseOpticalCustomWLS)
       .SetGuidance(
-          "Use a custom wavelegth shifting process that produces at maximum one secondary photon.")
+          "Use a custom wavelegth shifting process that produces at maximum one secondary photon."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);

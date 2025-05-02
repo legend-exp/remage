@@ -55,8 +55,10 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
     return;
   }
   std::istringstream iss(firstLine);
-  std::vector<std::string> tokens(std::istream_iterator<std::string>{iss},
-      std::istream_iterator<std::string>());
+  std::vector<std::string> tokens(
+      std::istream_iterator<std::string>{iss},
+      std::istream_iterator<std::string>()
+  );
   size_t numColumns = tokens.size();
 
   // Define header template
@@ -80,8 +82,10 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
                        "#column double py\n"
                        "#column double pz\n";
   } else
-    RMGLog::Out(RMGLog::fatal,
-        "MUSUN format not identified! It has " + to_string(numColumns) + " columns. Exit.");
+    RMGLog::Out(
+        RMGLog::fatal,
+        "MUSUN format not identified! It has " + to_string(numColumns) + " columns. Exit."
+    );
 
 
   // Create a temporary file and write the header
@@ -160,8 +164,13 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   if (input_data.fType == 10) fGun->SetParticleDefinition(theParticleTable->FindParticle("mu-"));
   else fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
 
-  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m",
-      input_data.fX * u::cm / u::m, input_data.fY * u::cm / u::m, input_data.fZ * u::cm / u::m);
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "...origin ({:.4g}, {:.4g}, {:.4g}) m",
+      input_data.fX * u::cm / u::m,
+      input_data.fY * u::cm / u::m,
+      input_data.fZ * u::cm / u::m
+  );
   fGun->SetParticlePosition({input_data.fX * u::cm, input_data.fY * u::cm, input_data.fZ * u::cm});
 
   if (input_data.fTheta != 0 && input_data.fPhi != 0) {
@@ -170,13 +179,22 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
     d_cart.setPhi(input_data.fPhi);     // in rad
     d_cart.setMag(1 * u::m);
     fGun->SetParticleMomentumDirection(d_cart);
-    RMGLog::OutFormat(RMGLog::debug, "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
-        input_data.fTheta / u::deg, input_data.fPhi / u::deg);
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
+        input_data.fTheta / u::deg,
+        input_data.fPhi / u::deg
+    );
   } else {
     G4ThreeVector d_cart(input_data.fPx, input_data.fPy, input_data.fPz);
     fGun->SetParticleMomentumDirection(d_cart);
-    RMGLog::OutFormat(RMGLog::debug, "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) deg",
-        input_data.fPx, input_data.fPy, input_data.fPz);
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) deg",
+        input_data.fPx,
+        input_data.fPy,
+        input_data.fPz
+    );
   }
 
   RMGLog::OutFormat(RMGLog::debug, "...energy {:.4g} GeV", input_data.fEkin);
@@ -191,8 +209,11 @@ void RMGGeneratorMUSUNCosmicMuons::DefineCommands() {
 
   // NOTE: SetUnit(Category) is not thread-safe
 
-  fMessenger = std::make_unique<G4GenericMessenger>(this, "/RMG/Generator/MUSUNCosmicMuons/",
-      "Commands for controlling the MUSUN µ generator");
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Generator/MUSUNCosmicMuons/",
+      "Commands for controlling the MUSUN µ generator"
+  );
 
   fMessenger->DeclareMethod("MUSUNFile", &RMGGeneratorMUSUNCosmicMuons::SetMUSUNFile)
       .SetGuidance("Set the MUSUN input file")

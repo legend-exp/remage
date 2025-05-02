@@ -46,8 +46,10 @@ class RMGVOutputScheme {
     virtual inline void StoreEvent(const G4Event*) {}
 
     // hook into RMGStackingAction.
-    virtual inline std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*,
-        const int) {
+    virtual inline std::optional<G4ClassificationOfNewTrack> StackingActionClassify(
+        const G4Track*,
+        const int
+    ) {
       return std::nullopt;
     }
     virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
@@ -75,13 +77,22 @@ class RMGVOutputScheme {
     }
 
     // helper functions for output schemes.
-    inline void CreateNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, std::string name,
-        bool use_float) {
+    inline void CreateNtupleFOrDColumn(
+        G4AnalysisManager* ana_man,
+        int nt,
+        std::string name,
+        bool use_float
+    ) {
       if (use_float) ana_man->CreateNtupleFColumn(nt, name);
       else ana_man->CreateNtupleDColumn(nt, name);
     }
-    inline void FillNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, int col, double val,
-        bool use_float) {
+    inline void FillNtupleFOrDColumn(
+        G4AnalysisManager* ana_man,
+        int nt,
+        int col,
+        double val,
+        bool use_float
+    ) {
       if (use_float)
         ana_man->FillNtupleFColumn(nt, col, val); // NOLINT(cppcoreguidelines-narrowing-conversions)
       else ana_man->FillNtupleDColumn(nt, col, val);

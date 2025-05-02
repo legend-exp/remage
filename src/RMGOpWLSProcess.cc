@@ -42,10 +42,14 @@ G4VParticleChange* RMGOpWLSProcess::PostStepDoIt(const G4Track& aTrack, const G4
   // ... otherwise we expect to get exactly 1 shifted photon out, and the old track to be stopped.
   if (particleChange->GetNumberOfSecondaries() != 1 ||
       particleChange->GetTrackStatus() != fStopAndKill) {
-    RMGLog::OutFormat(RMGLog::error,
+    RMGLog::OutFormat(
+        RMGLog::error,
         "{}: Got unexpected particleChange with status={} numOfSecondaries={} (in material {})",
-        GetProcessName(), magic_enum::enum_name<G4TrackStatus>(particleChange->GetTrackStatus()),
-        particleChange->GetNumberOfSecondaries(), mat->GetName());
+        GetProcessName(),
+        magic_enum::enum_name<G4TrackStatus>(particleChange->GetTrackStatus()),
+        particleChange->GetNumberOfSecondaries(),
+        mat->GetName()
+    );
     return particleChange;
   }
 
@@ -67,8 +71,7 @@ void RMGOpWLSProcess::BuildPhysicsTable(const G4ParticleDefinition& aParticleTyp
 
   pRegProcess->BuildPhysicsTable(aParticleType);
 
-  RMGLog::OutFormat(RMGLog::detail, "{}: replace WLS mean number of emitted photons",
-      GetProcessName());
+  RMGLog::OutFormat(RMGLog::detail, "{}: replace WLS mean number of emitted photons", GetProcessName());
 
   const auto materialTable = G4Material::GetMaterialTable();
   for (auto mat : *materialTable) {
@@ -79,23 +82,33 @@ void RMGOpWLSProcess::BuildPhysicsTable(const G4ParticleDefinition& aParticleTyp
     // to stop G4OpWLS from performing poissonian sampling.
     double mean_num = mpt->GetConstProperty(kWLSMEANNUMBERPHOTONS);
     if (mean_num > 1.0) {
-      RMGLog::OutFormat(RMGLog::warning,
+      RMGLog::OutFormat(
+          RMGLog::warning,
           "{}: found WLS mean emission number > 1 for material {} - process not applicable!",
-          GetProcessName(), mat->GetName());
+          GetProcessName(),
+          mat->GetName()
+      );
       continue;
     }
 
     // just for safety.
     if (!G4Threading::IsMasterThread()) {
-      RMGLog::OutFormat(RMGLog::fatal, "{}: trying to modify gemometry from worker thread",
-          GetProcessName());
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "{}: trying to modify gemometry from worker thread",
+          GetProcessName()
+      );
       continue;
     }
 
     mpt->AddConstProperty("RMG_WLSMEANNUMBERPHOTONS", mean_num, true);
     mpt->RemoveConstProperty("WLSMEANNUMBERPHOTONS");
 
-    RMGLog::OutFormat(RMGLog::debug, "{}: removed original WLS mean emission number for material {}",
-        GetProcessName(), mat->GetName());
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "{}: removed original WLS mean emission number for material {}",
+        GetProcessName(),
+        mat->GetName()
+    );
   }
 }

@@ -38,8 +38,12 @@ G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) con
 }
 
 void RMGOpticalDetectorHit::Print() {
-  RMGLog::OutFormat(RMGLog::debug, "Detector UID: {} / Wavelength: {} nm", this->detector_uid,
-      this->photon_wavelength / CLHEP::nm);
+  RMGLog::OutFormat(
+      RMGLog::debug,
+      "Detector UID: {} / Wavelength: {} nm",
+      this->detector_uid,
+      this->photon_wavelength / CLHEP::nm
+  );
 }
 
 void RMGOpticalDetectorHit::Draw() {
@@ -70,12 +74,15 @@ void RMGOpticalDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
-  fHitsCollection = new RMGOpticalDetectorHitsCollection(G4VSensitiveDetector::SensitiveDetectorName,
-      G4VSensitiveDetector::collectionName[0]);
+  fHitsCollection = new RMGOpticalDetectorHitsCollection(
+      G4VSensitiveDetector::SensitiveDetectorName,
+      G4VSensitiveDetector::collectionName[0]
+  );
 
   // associate it with the G4HCofThisEvent object
   auto hc_id = G4SDManager::GetSDMpointer()->GetCollectionID(
-      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]);
+      G4VSensitiveDetector::SensitiveDetectorName + "/" + G4VSensitiveDetector::collectionName[0]
+  );
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
@@ -105,13 +112,21 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGDetectorType::kOptical) {
-      RMGLog::OutFormatDev(RMGLog::debug,
-          "Volume '{}' (copy nr. {} not registered as optical detector", pv_name, pv_copynr);
+      RMGLog::OutFormatDev(
+          RMGLog::debug,
+          "Volume '{}' (copy nr. {} not registered as optical detector",
+          pv_name,
+          pv_copynr
+      );
       return false;
     }
   } catch (const std::out_of_range& e) {
-    RMGLog::OutFormatDev(RMGLog::debug, "Volume '{}' (copy nr. {} not registered as detector",
-        pv_name, pv_copynr);
+    RMGLog::OutFormatDev(
+        RMGLog::debug,
+        "Volume '{}' (copy nr. {} not registered as detector",
+        pv_name,
+        pv_copynr
+    );
     return false;
   }
 
