@@ -48,7 +48,7 @@ class RMGConvertLH5 {
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    static int iter_children(long int, const char*, const H5L_info_t*, void*);
+    static int iter_children(hid_t, const char*, const H5L_info_t*, void*);
     static std::vector<std::string> GetChildren(H5::Group&);
 
     bool ExistsByType(H5::H5Location&, std::string, H5O_type_t);
