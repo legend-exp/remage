@@ -31,9 +31,3 @@ set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra DEPENDS output/buil
 # SPECIAL TESTS
 add_test(NAME output/th228-chain COMMAND ${PYTHONPATH} run-test-th228-chain.py)
 set_tests_properties(output/th228-chain PROPERTIES LABELS extra)
-
-# Geant4 <= 11.0.3 is deleting non-empty HDF5 files after a successful run, so disable the tests.
-if(Geant4_VERSION VERSION_LESS "11.0.4" OR NOT RMG_HAS_HDF5)
-  set_tests_properties(${_macros_hdf5} PROPERTIES DISABLED True)
-  set_tests_properties("output/th228-chain" PROPERTIES DISABLED True)
-endif()
