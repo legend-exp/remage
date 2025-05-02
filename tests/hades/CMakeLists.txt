@@ -24,6 +24,7 @@ endforeach()
 
 if(NOT BxDecay0_FOUND)
   set_tests_properties("hades/run-2nbb.mac" PROPERTIES DISABLED True)
+  set_tests_properties("hades/vis-2nbb.mac" PROPERTIES DISABLED True)
 endif()
 
 if(BxDecay0_THREADSAFE)
