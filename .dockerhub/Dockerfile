@@ -35,7 +35,7 @@ RUN mkdir -p src build /opt/remage && \
     fi && \
     cd .. && \
     # also install the package into the container-provided main venv
-    uv --no-cache pip install . && \
+    uv --no-cache pip install ./src && \
     rm -rf build src && \
     LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH" /opt/remage/bin/remage --version # populate numba cache
 
