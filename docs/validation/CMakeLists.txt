@@ -131,9 +131,11 @@ add_custom_target(
 # configure conf.py
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
 
+get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
+
 add_custom_command(
   OUTPUT ${SPHINX_BUILD}/index.html
-  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
+  COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE} ${COPIED_IMGS}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
@@ -142,12 +144,13 @@ add_custom_command(
 # Nice named target so we can run the job easily
 add_custom_target(
   sphinx-validation
-  DEPENDS ${SPHINX_BUILD}/index.html
+  DEPENDS ${SPHINX_BUILD}/index.html remage-cli
   COMMENT "Generating validation report with Sphinx")
 
 add_custom_command(
   OUTPUT ${SPHINX_BUILD}/latex/remagesvalidationsuite.tex
-  COMMAND ${SPHINX_EXECUTABLE} --fail-on-warning -q -b latex ${SPHINX_SOURCE} ${SPHINX_BUILD}/latex
+  COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b latex ${SPHINX_SOURCE}
+          ${SPHINX_BUILD}/latex
   WORKING_DIRECTORY ${SPHINX_SOURCE}
   DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${DOXYGEN_INDEX_FILE} ${COPIED_IMGS}
   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py

@@ -63,10 +63,13 @@ set(_pkg_install_extras "")
 if(BUILD_TESTING)
   list(APPEND _pkg_install_extras "test")
 endif()
-if(BUILD_DOCS)
+if(RMG_BUILD_DOCS)
   list(APPEND _pkg_install_extras "docs")
 endif()
 string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
+
+# store this so the dependency installation step below is repeated whenever this changes.
+file(WRITE "${VENV_DIR}/remage-pkg-extras" "${_pkg_install}")
 
 # now we want to use the cpp_config for the build area
 add_custom_command(
@@ -79,6 +82,7 @@ add_custom_command(
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
   DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
+          "${VENV_DIR}/remage-pkg-extras"
   COMMENT "Installing remage Python wrapper into the virtual environment")
 
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)

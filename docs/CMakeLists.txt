@@ -84,8 +84,7 @@ set(_python_src "${PROJECT_SOURCE_DIR}/python/remage")
 
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND rm -rf ${SPHINX_SOURCE}/api
-  COMMAND echo ${PYTHONPATH}
+  COMMAND rm -rf "${SPHINX_SOURCE}/api"
   COMMAND
     ${PYTHONPATH} -m sphinx.ext.apidoc --private --module-first --force --output-dir
     "${SPHINX_SOURCE}/api" "${_python_src}" "${_python_src}/_version.py"
@@ -100,7 +99,7 @@ add_custom_command(
 # Nice named target so we can run the job easily
 add_custom_target(
   sphinx ALL
-  DEPENDS ${SPHINX_INDEX_FILE}
+  DEPENDS ${SPHINX_INDEX_FILE} remage-cli
   COMMENT "Generating Sphinx docs")
 
 # Add an install target to install the docs
