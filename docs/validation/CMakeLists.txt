@@ -131,6 +131,8 @@ add_custom_target(
 # configure conf.py
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
 
+get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
+
 add_custom_command(
   OUTPUT ${SPHINX_BUILD}/index.html
   COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
