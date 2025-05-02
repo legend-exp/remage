@@ -191,7 +191,7 @@ hits = lh5.read_as("stp/germanium", outfile, "ak")
 
 hits = add_local_pos(hits, pos)
 vertices = add_local_pos(vertices, pos)
-indices = np.array(np.full_like(vertices.time, -1))
+indices = np.array(np.full_like(vertices.time.to_numpy(), -1))
 
 # search for vertices being close to the sides
 funcs = select_sides[dtype]["func"]

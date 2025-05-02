@@ -22,9 +22,9 @@ foreach(_mac ${_macros})
   set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS mt)
 endforeach()
 
-# Geant4 11.0 has navigation bugs leading to flaky CI test runs.
-if(Geant4_VERSION VERSION_LESS "11.1.0")
+if(NOT BxDecay0_FOUND)
   set_tests_properties("hades/run-2nbb.mac" PROPERTIES DISABLED True)
+  set_tests_properties("hades/vis-2nbb.mac" PROPERTIES DISABLED True)
 endif()
 
 if(BxDecay0_THREADSAFE)
@@ -32,11 +32,6 @@ if(BxDecay0_THREADSAFE)
     add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t 2 macros/${_mac})
     set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS "mt;extra")
   endforeach()
-
-  # Geant4 11.0 has navigation bugs leading to flaky CI test runs.
-  if(Geant4_VERSION VERSION_LESS "11.1.0")
-    set_tests_properties("hades-mt/run-2nbb.mac" PROPERTIES DISABLED True)
-  endif()
 endif()
 
 list(TRANSFORM _macros_extra PREPEND "hades/")

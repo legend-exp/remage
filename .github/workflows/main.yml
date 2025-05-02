@@ -168,10 +168,10 @@ jobs:
           make
           make install
 
-      - name: Run minimal test suite
+      - name: Run full test suite
         run: |
           cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
+          ctest --output-on-failure
 
       - name: Minimally test installed executable
         run: |
@@ -204,6 +204,7 @@ jobs:
           else
             echo "dir=latest" >> $GITHUB_ENV
           fi
+
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
