@@ -55,7 +55,7 @@ $ make install
 
 ## Setting up Jupyter
 
-Since the latest remage versions, it is possible to include remage into your jupyter python kernel. This allows you to run everything within a single jupyter notebook. Because the setup is very easy, this might be more comfortable and easier than using the CLI (depending on your experience and use-case). Keep in mind that interactive visualization, like the pyg4ometry or Geant4 visualizer, might be very buggy in a notebook. You can still try it, but you can not say that we did not warn you!
+Since the latest remage versions, it is possible to include remage into your jupyter python kernel. This allows you to run everything within a single jupyter notebook. Keep in mind that interactive visualization, like the pyg4ometry or Geant4 visualizer, might be very buggy in a notebook.
 
 To set up your jupyter kernel, you only have to provide the correct `kernel.json` file to your jupyter installation.
 
