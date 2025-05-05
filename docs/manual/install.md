@@ -84,4 +84,4 @@ If you have installed remage from a pre-built binary using apptainer, your kerne
 }
 ```
 
-Now after refreshing JupyterLab/VSCode you should be able to find the "remage" kernel in your notebooks!
+Now after refreshing JupyterLab/VSCode you should be able to find the "remage container" kernel in your notebooks!
