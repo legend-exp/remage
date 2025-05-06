@@ -4,7 +4,6 @@
 
 :::{todo}
 
-- list of built-in generators and documentation
 - muon generators
   :::
 
@@ -12,7 +11,25 @@ We generate particles of interest using Geant4 macro commands (see [link](https:
 
 This section of the user manual describes generation of the kinematics of events. However, for some generators
 this can also involve generation of positions of the primary particles (for example for muons). In most
-other cases the position is handled by the vertex confinement commands descrbed in <project:./confinement.md>.
+other cases the position is handled by the vertex confinement commands described in <project:./confinement.md>.
+
+You can check the list of all available generators in remage [here](project:../rmg-commands.md#rmggeneratorselect) under **candidates**. This section of the manual will cover the usage of
+
+- General particle source (`GPS`)
+- Double-beta decay physics (`BxDecay0`)
+- From custom files (`FromFile`)
+- Sampled cosmogenic muons (`CosmicMuons`)
+- From MUSUN input file (`MUSUNCosmicMuons`)
+
+:::{note}
+Adding generators with C++ code is possible using the `RMGUserInit` system
+of remage (access it with
+`auto user_init = RMGManager::Instance()->GetUserInit()`):
+
+- `user_init->SetUserGenerator<T>(...);` adds the generator `new T(...)` which must inherit from `RMGVGenerator`.
+
+You can then activate your generator with the macro command `/RMG/Generator/Select UserDefined`.
+:::
 
 ## General particle source
 
@@ -35,7 +52,7 @@ the macro commands (see [docs](project:../rmg-commands.md#rmggeneratorselect)):
 These commands should be placed after `/run/initialize`
 :::
 
-Many other macro commands are available for more complicated generated
+Many other macro commands are available for more complicated generators
 [link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#macro-commands])! Similar commands can be used to generate other primary particles, for example `gamma`, `alpha` or `mu-`.
 
 ## Generating decays
@@ -198,3 +215,25 @@ Where `{FILE_PATH}` is the path to the input `lh5` file.
 :::{warning}
 This functionality is currently limited to events where a single primary particle is produced per event.
 :::
+
+## Sampling cosmic muons
+
+The `CosmicMuons` generator utilizes [EcoMug](https://doi.org/10.1016/j.nima.2021.165732) to efficienctly sample cosmic-ray muons from a definable skyshape as well as a customizable energy and angular range.
+
+```console
+/RMG/Generator/Select CosmicMuons
+/RMG/Generator/CosmicMuons/SkyShape Plane
+/RMG/Generator/CosmicMuons/SkyPlaneHeight 0.05
+/RMG/Generator/CosmicMuons/MomentumMax 500 GeV/c
+```
+
+Detailed information for all of the macro options related can be found [here](project:../rmg-commands.md#rmggeneratorcosmicmuons).
+
+## Using MUSUN input files
+
+To accurately represent the muon spectrum at underground facilities, the option to read in primary muons from text files is supported. The shape of these files is expected to follow the shape of MUSUN output files. Detailed information about MUSUN and how to get access to the source code can be found [here](https://doi.org/10.1016/j.cpc.2008.10.013).
+
+```console
+/RMG/Generator/Select MUSUNCosmicMuons
+/RMG/Generator/MUSUNCosmicMuons/SetMUSUNFile /path/to/musun_input.dat
+```
