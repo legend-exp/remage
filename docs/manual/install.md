@@ -55,19 +55,24 @@ $ make install
 
 ## Setting up Jupyter
 
-Since the latest remage versions, it is possible to include remage into your jupyter python kernel. This allows you to run everything within a single jupyter notebook. Keep in mind that interactive visualization, like the pyg4ometry or Geant4 visualizer, might be very buggy in a notebook.
-
-To set up your jupyter kernel, you only have to provide the correct `kernel.json` file to your jupyter installation.
+To set up a _remage_-aware Jupyter kernel, you only have to provide the correct
+`kernel.json` file to your Jupyter installation.
 
 ```console
 $ mkdir -p ~/.local/share/jupyter/kernels/remage
 $ touch ~/.local/share/jupyter/kernels/remage/kernel.json
 ```
 
-:::{note} If you are using a jupyter that is installed inside of a virtual environment (or in vscode your default python interpreter is inside a venv) then you probably need to add the `kernel.json` to the share folder of that jupyter installation instead.
+:::{note}
+If Jupyter is installed inside a virtual environment (or in VSCode your default
+Python interpreter is inside a virtual environment) then you probably need to
+add the `kernel.json` to the `share` folder of that Jupyter installation
+instead.
 :::
 
-If you have installed remage from a pre-built binary using apptainer, your kernel file should look something like this (remember to replace `/path/to/remage_latest.sif` with your actual path):
+If you have installed _remage_ from a pre-built binary using Apptainer, your
+kernel file should look something like this (remember to replace
+`/path/to/remage_latest.sif` with your actual path):
 
 ```json
 {
@@ -84,4 +89,10 @@ If you have installed remage from a pre-built binary using apptainer, your kerne
 }
 ```
 
-Now after refreshing JupyterLab/VSCode you should be able to find the "remage container" kernel in your notebooks!
+Now after refreshing JupyterLab/VSCode you should be able to find the "remage
+container" kernel in your notebooks!
+
+:::{warning}
+Interactive visualization, like the pyg4ometry or Geant4 visualizer, might be
+not work as expected in a notebook.
+:::
