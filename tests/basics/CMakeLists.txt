@@ -10,10 +10,10 @@ foreach(_file ${_files})
 endforeach()
 
 add_test(NAME basics/macro-substitution
-         COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -w --macro-substitutions ENERGY=1000
+         COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o none --macro-substitutions ENERGY=1000
                  GENERATOR=GPS -- macros/run.mac)
 
 # this will fail because the user did not specify all variables to be substituted
 add_test(NAME basics/macro-substitution-missing COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -s
-                                                        ENERGY=1000 -w -- macros/run.mac)
+                                                        ENERGY=1000 -o none -- macros/run.mac)
 set_tests_properties(basics/macro-substitution-missing PROPERTIES WILL_FAIL TRUE)

@@ -56,6 +56,19 @@ Output schemes are often coupled to
 At present, it is not possible to register detector types at runtime.
 :::
 
+## Output file types
+
+The selection of the output file type depends on the file extension of the specified
+output file. Possible output file types include `lh5`, `hdf5`, or `root`—or any
+other file format that `G4AnlasisManager` can write; but these are not tested
+regularly.
+
+:::{note}
+remage will not produce an output file, if no output file name is provided by the
+user. Specify `-o none` to acknowledge the warning that is emitted when output
+schemes are registered, but no file will be created.
+:::
+
 ## LH5 output
 
 It is possible to directly write a LH5 file from _remage_, to facilitate reading

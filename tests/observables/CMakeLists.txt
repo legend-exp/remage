@@ -16,8 +16,8 @@ set_tests_properties(observables-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SE
                                                         observables-ge-gdml-fixture)
 
 # visualise it
-add_test(NAME observables-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis.mac -g gdml/geometry.gdml -w
-                                         -l detail)
+add_test(NAME observables-ge/vis COMMAND ${REMAGE_PYEXE} macros/vis.mac -g gdml/geometry.gdml -o
+                                         none -l detail)
 
 set_tests_properties(observables-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                                    observables-ge-gdml-fixture)
