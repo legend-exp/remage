@@ -1,6 +1,6 @@
 ARG REMAGE_BASE_FLAVOR="stable"
 
-FROM gipert/remage-base:$REMAGE_BASE_FLAVOR
+FROM legendexp/remage-base:$REMAGE_BASE_FLAVOR
 
 LABEL maintainer.name="Luigi Pertoldi"
 LABEL maintainer.email="gipert@pm.me"
