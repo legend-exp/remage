@@ -21,8 +21,6 @@ from . import utils
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 
-log = logging.getLogger(__name__)
-
 
 def _run_remage_cpp(
     args: list[str] | None = None,
@@ -254,13 +252,16 @@ def remage_run_from_args(
         "-m",
         "--merge-output-files",
         action="store_true",
-        help="Flag to merge output files",
+        help="Merge output files from each remage thread into a single output file",
     )
     parser.add_argument(
         "-r",
         "--reshape-output",
         action="store_true",
-        help="Flag to reshape output steps so the output is `hit` oriented.",
+        help=(
+            "'Reshape' the output table so that steps "
+            "are grouped by event (see also --time-window-in-us)"
+        ),
     )
     parser.add_argument(
         "-T",
@@ -269,7 +270,10 @@ def remage_run_from_args(
         type=float,
         metavar="",
         default=10,
-        help="Time window in microseconds to group steps for reshaping.",
+        help=(
+            'Time window (in microseconds) to use to group steps into "hits" '
+            "(see remage docs and also --reshape-output). Default is 10 microseconds."
+        ),
     )
     py_args, cpp_args = parser.parse_known_args(args)
 
@@ -277,7 +281,7 @@ def remage_run_from_args(
 
     # print an error message for the termination signal, similar to what bash does.
     if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
-        log.error(
+        logger.error(
             "remage-cpp exited with signal %s (%s)",
             termsig.name,
             signal.strsignal(termsig),
@@ -316,46 +320,43 @@ def remage_run_from_args(
     }
     logger.setLevel(levels_rmg_to_py[log_level])
 
-    # output post-processing (merging multiple LH5 files)
     remage_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
     detector_info = ipc_info.get("output_table", 2)
 
-    # registered scintillator or germanium detectors
-    registered_detectors = list(
-        {
-            det[1]
-            for det in detector_info
-            if det[0] == "germanium" or det[0] == "scintillator"
-        }
-    )
+    if main_output_file is None:
+        ipc_info.remove("output_main")
+        return ec, ipc_info
 
-    # we might have no output file.
-    if len(remage_files) > 1 and main_output_file is not None:
-        assert main_output_file not in remage_files
-        output_file_exts = {
-            Path(p).suffix.lower() for p in [*remage_files, main_output_file]
-        }
+    output_file_exts = {
+        Path(p).suffix.lower() for p in [*remage_files, main_output_file]
+    }
 
-        # post-processing only for lh5 files
-        if output_file_exts == {".lh5"}:
-            time_start = time.time()
+    assert len(output_file_exts) == 1
 
-            # get the output files
-            output_files = (
-                [main_output_file] if py_args.merge_output_files else remage_files
+    # LH5 output post-processing
+    if output_file_exts == {".lh5"}:
+        assert (len(remage_files) == 0 and main_output_file is None) or (
+            len(remage_files) > 0 and main_output_file is not None
+        )
+
+        time_start = time.time()
+
+        if py_args.reshape_output:
+            msg = "Reshaping output files"
+            logger.info(msg)
+
+            # registered scintillator or germanium detectors
+            registered_detectors = list(
+                {
+                    det[1]
+                    for det in detector_info
+                    if det[0] == "germanium" or det[0] == "scintillator"
+                }
             )
 
-            # merge output files if requested
-            if py_args.reshape_output or py_args.merge_output_files:
-                original_files = utils.make_tmp(remage_files)
-
-            # if reshaping was requested call reboost
-            if py_args.reshape_output:
-                msg = "Reshaping output files."
-                log.info(msg)
-
+            with utils.tmp_renamed_files(remage_files) as original_files:
                 # get the additional tables to copy
                 extra_tables = utils.get_extra_tables(
                     original_files[0], registered_detectors
@@ -373,35 +374,28 @@ def remage_run_from_args(
                     {},
                     stp_files=original_files,
                     glm_files=None,
-                    hit_files=output_files,
+                    hit_files=remage_files,
                 )
 
-            # else use lh5concat
-            elif py_args.merge_output_files:
-                msg = "Merging output files"
-                log.info(msg)
+            # set the merged output file for downstream consumers.
+            ipc_info.set("output", remage_files)
 
+        if py_args.merge_output_files:
+            msg = "Merging output files"
+            logger.info(msg)
+
+            with utils.tmp_renamed_files(remage_files) as original_files:
                 lh5concat(
                     lh5_files=original_files,
                     output=main_output_file,
                     overwrite=overwrite_output,
                 )
 
-            if py_args.merge_output_files or py_args.reshape_output:
-                # set the merged output file for downstream consumers.
-                ipc_info.set("output", output_files)
-
-                # delete un-merged output files.
-                for f in original_files:
-                    Path(f).unlink()
+            ipc_info.set("output", main_output_file)
 
         msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
-        log.info(msg)
+        logger.info(msg)
 
-    elif len(remage_files) > 1:
-        # no main output file, which is wrong.
-        msg = "invalid output information returned over ipc"
-        raise ValueError(msg)
     ipc_info.remove("output_main")
 
     return ec, ipc_info
