@@ -160,3 +160,6 @@ messages_control.disable = [
   "wrong-import-position",
   "too-many-nested-blocks"
 ]
+
+[tool.codespell]
+ignore-words-list = "hist, manuel, inactivate"

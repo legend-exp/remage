@@ -93,6 +93,6 @@ Now after refreshing JupyterLab/VSCode you should be able to find the "remage
 container" kernel in your notebooks!
 
 :::{warning}
-Interactive visualization, like the pyg4ometry or Geant4 visualizer, might be
+Interactive visualization, like the pyg4ometry or Geant4 visualizer, might
 not work as expected in a notebook.
 :::
