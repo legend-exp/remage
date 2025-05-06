@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from pathlib import Path
 
 from lgdo import lh5
@@ -63,7 +64,10 @@ def get_extra_tables(file: str, detectors: list[str]) -> list[str]:
 
 
 def make_tmp(files: list[str] | str) -> list[str]:
-    """Append files with a '.' so they can be overwritten."""
+    """Hide files.
+
+    Prepend a `.` to their name and rename them on disk.
+    """
 
     if isinstance(files, str):
         files = [files]
@@ -77,3 +81,36 @@ def make_tmp(files: list[str] | str) -> list[str]:
         renamed_files.append(str(new_path))
 
     return renamed_files
+
+
+def un_make_tmp(files: list[str] | str) -> list[str]:
+    """Un-hide files.
+
+    Remove `.` from name and rename on disk.
+    """
+    if isinstance(files, str):
+        files = [files]
+
+    renamed_files = []
+
+    for f in files:
+        path = Path(f)
+        new_path = path.with_name(path.name.removeprefix("."))
+        path.rename(new_path)
+        renamed_files.append(str(new_path))
+
+    return renamed_files
+
+
+@contextmanager
+def tmp_renamed_files(remage_files):
+    """Temporarily rename files, restoring originals on error and deleting temps on success."""
+    originals = make_tmp(remage_files)
+    try:
+        yield originals
+    except Exception:
+        un_make_tmp(originals)
+        raise
+    else:
+        for f in originals:
+            Path(f).unlink()
