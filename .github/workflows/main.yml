@@ -28,7 +28,7 @@ jobs:
           - stable
           - slim
 
-    container: docker://gipert/remage-base:${{ matrix.container_version }}
+    container: docker://legendexp/remage-base:${{ matrix.container_version }}
 
     steps:
       - uses: actions/checkout@v4
