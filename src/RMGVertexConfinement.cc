@@ -229,7 +229,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir, G4
 bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(
     G4ThreeVector& vertex,
     size_t max_attempts,
-    size_t n_max
+    size_t max_intersections
 ) const {
 
   size_t calls = 0;
@@ -250,12 +250,23 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(
     // We have to select one, to keep independence of the sampled points
     // and weight by the number of intersections.
 
-    auto random_int = static_cast<size_t>(n_max * G4UniformRand());
+    auto random_int = static_cast<size_t>(max_intersections * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
 
       vertex = intersections[random_int];
       return true;
+    } else if (max_intersections < intersections.size()) {
+      RMGLog::Out(
+          RMGLog::error,
+          "Exceeded maximum number of allowed line intersections (",
+          intersections.size(),
+          " > ",
+          max_intersections,
+          "), adjust your value for macro command "
+          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections. Returning dummy vertex"
+      );
+      return false;
     }
     calls++;
   }
