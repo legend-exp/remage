@@ -204,7 +204,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] bool GenerateSurfacePoint(
             G4ThreeVector& vertex,
             size_t max_attempts,
-            size_t n_max
+            size_t max_intersections
         ) const;
 
         // methods for the generic surface sampling
@@ -249,7 +249,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         bool surface_sample = false;
         bool native_sample = false;
-        int max_num_intersections = -1;
+        size_t max_num_intersections = 0;
     };
 
     /** A collection of @c SampleableObjects . Can be used
@@ -330,7 +330,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
     bool fLastSolidExcluded = false;
-    int fSurfaceSampleMaxIntersections = -1;
+    size_t fSurfaceSampleMaxIntersections = 0;
 
     // counters used for the current run.
     size_t fTrials = 0;
