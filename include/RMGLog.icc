@@ -11,7 +11,6 @@
 
 #include <sstream>
 #include <fstream>
-#include <stdexcept>
 
 #include "globals.hh"
 
@@ -42,10 +41,8 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
   RMGLog::Print(loglevel, message, true);
   RMGLog::Print(loglevel, "\n", false);
 
-  // throw exception if error is fatal
-  if (loglevel == fatal) {
-    throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
-  }
+  // abort if error is fatal
+  if (loglevel == fatal) std::abort();
 }
 
 // ---------------------------------------------------------
@@ -60,10 +57,8 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... ar
   (RMGLog::Print(loglevel, args, false, false), ...);
   RMGLog::Print(loglevel, "\n", false);
 
-  // throw exception if error is fatal
-  if (loglevel == fatal) {
-    throw std::runtime_error("A fatal exception has occurred, the execution cannot continue.");
-  }
+  // abort if error is fatal
+  if (loglevel == fatal) std::abort();
 }
 
 // ---------------------------------------------------------
