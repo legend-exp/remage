@@ -38,12 +38,12 @@ RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
 
   // set default clustering parameters
   fPreClusterPars.cluster_time_threshold = 10 * u::us;
-  fPreClusterPars.cluster_distance = 10 * u::um;
-  fPreClusterPars.cluster_distance_surface = 1 * u::um;
+  fPreClusterPars.cluster_distance = 50 * u::um;
+  fPreClusterPars.cluster_distance_surface = 0 * u::um;
   fPreClusterPars.surface_thickness = 2 * u::mm;
   fPreClusterPars.track_energy_threshold = 10 * u::keV;
-  fPreClusterPars.combine_low_energy_tracks = false;
-  fPreClusterPars.reassign_gamma_energy = false;
+  fPreClusterPars.combine_low_energy_tracks = true;
+  fPreClusterPars.reassign_gamma_energy = true;
 
   this->DefineCommands();
 }
