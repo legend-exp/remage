@@ -500,7 +500,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
 
         // surface sampling still works for solids with daughters natively
-        el.native_sample = false; // fOnSurface;
+        el.native_sample = fOnSurface;
         if (fOnSurface)
           RMGLog::OutDev(
               RMGLog::summary,
@@ -534,16 +534,6 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       el.native_sample = false;
       el.surface_sample = true;
       el.max_num_intersections = fSurfaceSampleMaxIntersections;
-
-      if (fSurfaceSampleMaxIntersections < 2)
-        RMGLog::Out(
-            RMGLog::fatal,
-            " for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of "
-            "lines a ",
-            "line can intersect with the surface must be set with "
-            "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
-            "Note: this can be an overestimate."
-        );
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
@@ -593,6 +583,16 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           bb_z
       );
     } // sampling_solid and native_sample and surface_sample must hold a valid value at this point
+
+    if (el.surface_sample && !el.native_sample && el.max_num_intersections < 2) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of "
+          "lines a line can intersect with the surface must be set with "
+          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
+          "Note: this can be an overestimate."
+      );
+    }
 
     // determine solid transformation w.r.t. world volume reference
 
