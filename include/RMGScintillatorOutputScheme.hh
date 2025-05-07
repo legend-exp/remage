@@ -112,7 +112,7 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionPosition = false;
     bool fStoreTrackID = false;
 
-    bool fPreClusterHits = false;
+    bool fPreClusterHits = True;
     bool fDiscardZeroEnergyHits = true;
 
     /** @brief Parameters for pre-clustering. */
