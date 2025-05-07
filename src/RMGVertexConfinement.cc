@@ -229,7 +229,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir, G4
 bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(
     G4ThreeVector& vertex,
     size_t max_attempts,
-    size_t n_max
+    size_t max_intersections
 ) const {
 
   size_t calls = 0;
@@ -250,12 +250,23 @@ bool RMGVertexConfinement::SampleableObject::GenerateSurfacePoint(
     // We have to select one, to keep independence of the sampled points
     // and weight by the number of intersections.
 
-    auto random_int = static_cast<size_t>(n_max * G4UniformRand());
+    auto random_int = static_cast<size_t>(max_intersections * G4UniformRand());
 
     if (random_int <= intersections.size() - 1) {
 
       vertex = intersections[random_int];
       return true;
+    } else if (max_intersections < intersections.size()) {
+      RMGLog::Out(
+          RMGLog::error,
+          "Exceeded maximum number of allowed line intersections (",
+          intersections.size(),
+          " > ",
+          max_intersections,
+          "), adjust your value for macro command "
+          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections. Returning dummy vertex"
+      );
+      return false;
     }
     calls++;
   }
@@ -500,7 +511,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
         RMGLog::OutDev(RMGLog::debug, "Has daughters, containment check needed");
 
         // surface sampling still works for solids with daughters natively
-        el.native_sample = false; // fOnSurface;
+        el.native_sample = fOnSurface;
         if (fOnSurface)
           RMGLog::OutDev(
               RMGLog::summary,
@@ -534,16 +545,6 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       el.native_sample = false;
       el.surface_sample = true;
       el.max_num_intersections = fSurfaceSampleMaxIntersections;
-
-      if (fSurfaceSampleMaxIntersections < 2)
-        RMGLog::Out(
-            RMGLog::fatal,
-            " for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of "
-            "lines a ",
-            "line can intersect with the surface must be set with "
-            "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
-            "Note: this can be an overestimate."
-        );
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
@@ -593,6 +594,16 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           bb_z
       );
     } // sampling_solid and native_sample and surface_sample must hold a valid value at this point
+
+    if (el.surface_sample && !el.native_sample && el.max_num_intersections < 2) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of "
+          "lines a line can intersect with the surface must be set with "
+          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
+          "Note: this can be an overestimate."
+      );
+    }
 
     // determine solid transformation w.r.t. world volume reference
 
