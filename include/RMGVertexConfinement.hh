@@ -249,7 +249,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         bool surface_sample = false;
         bool native_sample = false;
-        int max_num_intersections = 10;
+        int max_num_intersections = -1;
     };
 
     /** A collection of @c SampleableObjects . Can be used
