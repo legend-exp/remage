@@ -1,7 +1,9 @@
 # Extending _remage_
 
 :::{todo}
+
 Add more information.
+
 :::
 
 Advanced applications can extend _remage_ and link against `libremage` with the
