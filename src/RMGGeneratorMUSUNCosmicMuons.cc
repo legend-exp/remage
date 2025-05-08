@@ -107,9 +107,7 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 
   if (!fInputData) {
     if (!G4Threading::IsMasterThread()) {
-      RMGLog::Out(RMGLog::fatal, "on worker, but data not initialized");
-      std::abort();
-      return;
+      RMGLog::OutDev(RMGLog::fatal, "on worker, but data not initialized");
     }
 
     // include in lock

@@ -64,10 +64,12 @@ $ touch ~/.local/share/jupyter/kernels/remage/kernel.json
 ```
 
 :::{note}
+
 If Jupyter is installed inside a virtual environment (or in VSCode your default
 Python interpreter is inside a virtual environment) then you probably need to
 add the `kernel.json` to the `share` folder of that Jupyter installation
 instead.
+
 :::
 
 If you have installed _remage_ from a pre-built binary using Apptainer, your
@@ -93,6 +95,8 @@ Now after refreshing JupyterLab/VSCode you should be able to find the "remage
 container" kernel in your notebooks!
 
 :::{warning}
-Interactive visualization, like the pyg4ometry or Geant4 visualizer, might
-not work as expected in a notebook.
+
+Interactive visualization, like the pyg4ometry or Geant4 visualizer, might not
+work as expected in a notebook.
+
 :::

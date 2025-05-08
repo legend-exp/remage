@@ -133,8 +133,8 @@ viewer.view()
 
 ![Geometry visualization](_img/tutorial-pyg4-view.jpg)
 
-We can also easily save the geometry as a geometry description markup language (GDML) file. This format
-allows us to input the geometry to `remage`.
+We can also easily save the geometry as a geometry description markup language
+(GDML) file. This format allows us to input the geometry to `remage`.
 
 ```python
 pygeomtools.write_pygeom(reg, "geometry.gdml")
@@ -142,8 +142,8 @@ pygeomtools.write_pygeom(reg, "geometry.gdml")
 
 ## Visualizing a simple simulation
 
-By following instructions in the [installation](./manual/install) section, you should
-have access to the `remage` executable. We are now ready to simulate some
+By following instructions in the [installation](./manual/install) section, you
+should have access to the `remage` executable. We are now ready to simulate some
 particle physics with it.
 
 Like any other Geant4-based application, we need to configure the simulation
@@ -212,11 +212,11 @@ radioactive source:
 /run/beamOn 50
 ```
 
-The macro commands should be placed in a plain text file
-(conventionally ended with the `.mac` suffix). For example the
-complete macro file is shown below.
+The macro commands should be placed in a plain text file (conventionally ended
+with the `.mac` suffix). For example the complete macro file is shown below.
 
 :::{admonition} Complete macro file (`vis-gammas.mac`)
+
 :class: dropdown
 
 ```text
@@ -272,8 +272,10 @@ $ remage --interactive --gdml-files geometry.gdml -- vis-gammas.mac
 ```
 
 :::{note}
-Interactive visualization requires passing `--interactive` to the
-`remage` executable.
+
+Interactive visualization requires passing `--interactive` to the `remage`
+executable.
+
 :::
 
 Interactions in HPGes and in LAr are marked in red and blue, respectively.
@@ -281,8 +283,9 @@ Interactions in HPGes and in LAr are marked in red and blue, respectively.
 ![Simulation visualization](_img/tutorial-g4-view.jpg)
 
 :::{tip}
-With Apptainer, additional tweaks are required in order to allow for graphics
-to be displayed, e.g.
+
+With Apptainer, additional tweaks are required in order to allow for graphics to
+be displayed, e.g.
 
 ```console
 $ apptainer run \
@@ -294,12 +297,15 @@ $ apptainer run \
 ```
 
 and similarly with Docker.
+
 :::
 
 :::{tip}
+
 If `remage` from the Apptainer image refuses to run simulations, this might be
 due to some of your environment variables from outside the container. Give
 `--cleanenv` a try.
+
 :::
 
 ## Storing simulated data on disk
