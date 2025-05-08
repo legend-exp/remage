@@ -19,13 +19,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "G4Circle.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
-#include "G4UnitsTable.hh"
-#include "G4VVisManager.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
