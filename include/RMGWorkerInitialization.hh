@@ -24,9 +24,11 @@
 
 #include "RMGManager.hh"
 
+/// \cond this creates weird namespaces @<long number>
 namespace {
   G4Mutex RMGWorkerInitializationRNGMutex = G4MUTEX_INITIALIZER;
 } // namespace
+/// \endcond
 
 template<typename ThreadInitialization>
 class RMGWorkerInitialization : public ThreadInitialization {
