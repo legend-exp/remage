@@ -17,17 +17,16 @@
 #define _RMG_VERTEX_CONFINEMENT_HH_
 
 #include <chrono>
+#include <memory>
 #include <optional>
-#include <queue>
 #include <regex>
+#include <string>
 #include <vector>
 
 #include "G4AutoLock.hh"
 #include "G4GenericMessenger.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
-#include "G4Transform3D.hh"
-#include "G4UnitsTable.hh"
 
 #include "RMGVVertexGenerator.hh"
 
