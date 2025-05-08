@@ -134,11 +134,10 @@ RMGDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* e
   return hit_coll;
 }
 
-
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   // exit fast if no threshold is configured.
-  if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
+  if ((fEdepCutLow < 0 && fEdepCutHigh < 0)) return false;
 
   auto hit_coll = GetHitColl(event);
   if (!hit_coll) return false;
@@ -148,11 +147,13 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   for (auto hit : *hit_coll->GetVector()) {
     if (!hit) continue;
-    if (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end())
+
+    if (fEdepCutDetectors.empty() or
+        (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end()))
       event_edep += hit->energy_deposition;
   }
 
-  if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
+  if ((fEdepCutLow >= 0 && event_edep <= fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
     RMGLog::Out(
         RMGLog::debug,
@@ -368,7 +369,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
 
   fMessengers.back()
       ->DeclareMethod("AddDetectorForEdepThreshold", &RMGGermaniumOutputScheme::AddEdepCutDetector)
-      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
+      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.")
       .SetParameterName("det_uid", false)
       .SetStates(G4State_Idle);
 
