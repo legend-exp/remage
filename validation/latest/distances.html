@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Comparison with NIST" href="nist.html" /><link rel="prev" title="Vertex confinement" href="confinement.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>HPGe detector distance to surface - remage 0.10.3.dev123+ga23910f validation suite</title>
+        <title>HPGe detector distance to surface - remage 0.10.3.dev132+g6da9417 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -173,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.10.3.dev123+ga23910f validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.10.3.dev132+g6da9417 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -200,7 +200,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.10.3.dev123+ga23910f validation suite</span>
+  <span class="sidebar-brand-text">remage 0.10.3.dev132+g6da9417 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -267,13 +267,15 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="hpge-detector-distance-to-surface">
 <h1>HPGe detector distance to surface<a class="headerlink" href="#hpge-detector-distance-to-surface" title="Link to this heading">¶</a></h1>
-<p>Geant4 has the possibility to compute the distance of points to the surface of a solid. This is saved in the remage germanium
-output scheme for use in detector post-processing.
-This section of the validation report validates this calculation by comparing to one from python.</p>
-<p>These tests fill fail if the difference is large, and we also produce some plots showing the computed distance
-compared to the profile of the detectors.</p>
-<p>In this output scheme it is possible to save the position of the step based on either the pre or post-step point
-or the average of the two. All three options are used.</p>
+<p>Geant4 has the possibility to compute the distance of points to the surface of a
+solid. This is saved in the remage germanium output scheme for use in detector
+post-processing. This section of the validation report validates this
+calculation by comparing to one from python.</p>
+<p>These tests fill fail if the difference is large, and we also produce some plots
+showing the computed distance compared to the profile of the detectors.</p>
+<p>In this output scheme it is possible to save the position of the step based on
+either the pre or post-step point or the average of the two. All three options
+are used.</p>
 <figure class="align-default" id="id1">
 <a class="reference internal image-reference" href="_images/distance-ge-average.output.png"><img alt="_images/distance-ge-average.output.png" src="_images/distance-ge-average.output.png" style="width: 800px;" />
 </a>

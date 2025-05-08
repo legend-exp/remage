@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="HPGe detector distance to surface" href="distances.html" /><link rel="prev" title="About this validation report" href="versioninfo.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Vertex confinement - remage 0.10.3.dev123+ga23910f validation suite</title>
+        <title>Vertex confinement - remage 0.10.3.dev132+g6da9417 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -173,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.10.3.dev123+ga23910f validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.10.3.dev132+g6da9417 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -200,7 +200,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.10.3.dev123+ga23910f validation suite</span>
+  <span class="sidebar-brand-text">remage 0.10.3.dev132+g6da9417 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -273,12 +273,15 @@
 </style>
 <section class="tex2jax_ignore mathjax_ignore" id="vertex-confinement">
 <h1>Vertex confinement<a class="headerlink" href="#vertex-confinement" title="Link to this heading">¶</a></h1>
-<p>This section of the validation suite describes the generation of primary event vertices and their confinement within a particular geometrical or
-physical volume.</p>
-<p>These tests consist both of Geant4 visualisation plots showing the location of generated primaries as well as some statistical tests.</p>
+<p>This section of the validation suite describes the generation of primary event
+vertices and their confinement within a particular geometrical or physical
+volume.</p>
+<p>These tests consist both of Geant4 visualisation plots showing the location of
+generated primaries as well as some statistical tests.</p>
 <section id="natively-sampleable-solids">
 <h2>Natively sampleable solids<a class="headerlink" href="#natively-sampleable-solids" title="Link to this heading">¶</a></h2>
-<p>The first set of tests are related to sampling on the bulk or the surface of simple solids, these can be sampled natively (i.e. without rejection sampling).</p>
+<p>The first set of tests are related to sampling on the bulk or the surface of
+simple solids, these can be sampled natively (i.e. without rejection sampling).</p>
 <figure class="sphinx-subfigure align-default" id="id1">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -297,14 +300,16 @@ physical volume.</p>
 </figcaption>
 </figure>
 <p> </p>
-<p>You should see that the primaries are generated in the cylinder (far left), box (front center), orb (back and center) and also
-for the bulk simulation in the sphere section (front). It should also be possible to appreciate an apparent higher density of
-points for the surface simulation.</p>
+<p>You should see that the primaries are generated in the cylinder (far left), box
+(front center), orb (back and center) and also for the bulk simulation in the
+sphere section (front). It should also be possible to appreciate an apparent
+higher density of points for the surface simulation.</p>
 </section>
 <section id="complex-solids">
 <h2>Complex solids<a class="headerlink" href="#complex-solids" title="Link to this heading">¶</a></h2>
-<p>The next tests relate to generation of points on complex solids, generated from intersections and unions.
-Similar to the previous test simulations are performed both for the surface and the bulk.</p>
+<p>The next tests relate to generation of points on complex solids, generated from
+intersections and unions. Similar to the previous test simulations are performed
+both for the surface and the bulk.</p>
 <figure class="sphinx-subfigure align-default" id="id2">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -323,15 +328,20 @@ Similar to the previous test simulations are performed both for the surface and 
 </figcaption>
 </figure>
 <p> </p>
-<p>You should see points generated on the polycone (back left), in a box with a center cut out (directly in front of the polycone), in a solid formed of the intersection
-of a box and sphere (back right). You should also see points generated in the sphere with a box inside (front right). Again you should be able
-to appreciate a higher density of points on the surface in the surface simulation.</p>
+<p>You should see points generated on the polycone (back left), in a box with a
+center cut out (directly in front of the polycone), in a solid formed of the
+intersection of a box and sphere (back right). You should also see points
+generated in the sphere with a box inside (front right). Again you should be
+able to appreciate a higher density of points on the surface in the surface
+simulation.</p>
 </section>
 <section id="unions-and-intersections">
 <h2>Unions and intersections<a class="headerlink" href="#unions-and-intersections" title="Link to this heading">¶</a></h2>
-<p>remage also has the possibility to generate primaries in a geometrical volume, i.e. a user defined shape not necessarily corresponding to any physical
-volume in the detector. In addition, there is the possibility to select vertices just in the intersection of a physical and geometrical volume or in the union
-of some physical and geometrical volumes. This subsection validates these features.</p>
+<p>remage also has the possibility to generate primaries in a geometrical volume,
+i.e. a user defined shape not necessarily corresponding to any physical volume
+in the detector. In addition, there is the possibility to select vertices just
+in the intersection of a physical and geometrical volume or in the union of some
+physical and geometrical volumes. This subsection validates these features.</p>
 <figure class="sphinx-subfigure align-default" id="id3">
 <div class="sphinx-subfigure-grid ss-layout-default-ABC" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -355,22 +365,30 @@ of some physical and geometrical volumes. This subsection validates these featur
 </figcaption>
 </figure>
 <ul class="simple">
-<li><p>In the first case, you should see points sampled in three user defined volumes, a section of a cylinder (far left),
-a box (center back) and a sphere (center front - overlapping with a box).</p></li>
-<li><p>In the second plot, the primaries are generated eithert in the sphere (from the previous section), or a box (back right), or the small section of a cylinder (front center).</p></li>
-<li><p>Finally in the last case primaries should be generated in the intersection of the sphere (front right) with a user defined smaller sphere.</p></li>
+<li><p>In the first case, you should see points sampled in three user defined
+volumes, a section of a cylinder (far left), a box (center back) and a sphere
+(center front - overlapping with a box).</p></li>
+<li><p>In the second plot, the primaries are generated eithert in the sphere (from
+the previous section), or a box (back right), or the small section of a
+cylinder (front center).</p></li>
+<li><p>Finally in the last case primaries should be generated in the intersection of
+the sphere (front right) with a user defined smaller sphere.</p></li>
 </ul>
 </section>
 <section id="generic-surface-sampling">
 <h2>Generic surface sampling<a class="headerlink" href="#generic-surface-sampling" title="Link to this heading">¶</a></h2>
-<p><em>remage</em> has a dedicated algorithm for sampling points on the surface of any solid. The next section of the
-validation report provides tests on the intermediate steps of this algorithm and on the final result.</p>
+<p><em>remage</em> has a dedicated algorithm for sampling points on the surface of any
+solid. The next section of the validation report provides tests on the
+intermediate steps of this algorithm and on the final result.</p>
 <section id="bounding-sphere">
 <h3>Bounding sphere<a class="headerlink" href="#bounding-sphere" title="Link to this heading">¶</a></h3>
-<p>The surface sampling algorithm requires a bounding sphere containing the solid. Points are then generated outside this bounding sphere, and
-based on a random direction the number of intersections is computed.</p>
-<p>The following figures show the bounding sphere and initial points (which should be outside the bounding sphere). You should see that the
-grey bounding spheres are large enough to contain the green solids and that the red points all lie outside the grey box.</p>
+<p>The surface sampling algorithm requires a bounding sphere containing the solid.
+Points are then generated outside this bounding sphere, and based on a random
+direction the number of intersections is computed.</p>
+<p>The following figures show the bounding sphere and initial points (which should
+be outside the bounding sphere). You should see that the grey bounding spheres
+are large enough to contain the green solids and that the red points all lie
+outside the grey box.</p>
 <figure class="sphinx-subfigure align-default" id="id4">
 <div class="sphinx-subfigure-grid ss-layout-default-ABC" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -396,8 +414,9 @@ grey bounding spheres are large enough to contain the green solids and that the 
 </section>
 <section id="location-of-sampled-vertices">
 <h3>Location of sampled vertices<a class="headerlink" href="#location-of-sampled-vertices" title="Link to this heading">¶</a></h3>
-<p>The next figures show the location of generated primaries for various different solids. You should see the
-primaries are contained in the appropriate solid and that they are distributed on the surface.</p>
+<p>The next figures show the location of generated primaries for various different
+solids. You should see the primaries are contained in the appropriate solid and
+that they are distributed on the surface.</p>
 <figure class="sphinx-subfigure align-default" id="id5">
 <div class="sphinx-subfigure-grid ss-layout-default-AB_CD_EF" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -438,11 +457,13 @@ primaries are contained in the appropriate solid and that they are distributed o
 </section>
 <section id="statistical-tests-of-uniformity">
 <h3>Statistical tests of uniformity<a class="headerlink" href="#statistical-tests-of-uniformity" title="Link to this heading">¶</a></h3>
-<p>The final part of the test for the generic surface sampler is a series of statistical tests on the uniformity of the points on
-the surface of the shapes. This is based on counting the number of primaries on each face of the solids and comparing the ratio
-to that of the surface areas. The tests are based on the same simulation as in the previous section.</p>
-<p>First we plot the 3D position of the vertices labelling which side the vertex is closest too by color. If a vertex is not
-close to any side the test will fail.</p>
+<p>The final part of the test for the generic surface sampler is a series of
+statistical tests on the uniformity of the points on the surface of the shapes.
+This is based on counting the number of primaries on each face of the solids and
+comparing the ratio to that of the surface areas. The tests are based on the
+same simulation as in the previous section.</p>
+<p>First we plot the 3D position of the vertices labelling which side the vertex is
+closest too by color. If a vertex is not close to any side the test will fail.</p>
 <figure class="sphinx-subfigure align-default">
 <div class="sphinx-subfigure-grid ss-layout-default-AB_CD_EF" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -471,10 +492,11 @@ close to any side the test will fail.</p>
 </div>
 </div>
 </figure>
-<p>You should be able to verify that the primaries close to each surface are correctly identified
-and that the primaries are indeed distributed on a surface.</p>
-<p>Finally, we perform the statistical tests comparing the ratio of primaries on each surface
-to the ratio of surface area. You should see only statistical fluctuations.</p>
+<p>You should be able to verify that the primaries close to each surface are
+correctly identified and that the primaries are indeed distributed on a surface.</p>
+<p>Finally, we perform the statistical tests comparing the ratio of primaries on
+each surface to the ratio of surface area. You should see only statistical
+fluctuations.</p>
 <figure class="sphinx-subfigure align-default">
 <div class="sphinx-subfigure-grid ss-layout-default-AB_CD_EF" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
@@ -507,17 +529,18 @@ to the ratio of surface area. You should see only statistical fluctuations.</p>
 </section>
 <section id="dedicated-simulations-for-ge-in-lar">
 <h2>Dedicated simulations for Ge in LAr<a class="headerlink" href="#dedicated-simulations-for-ge-in-lar" title="Link to this heading">¶</a></h2>
-<p>The last sub-section of this part of the validation report contains a more specific test with an array
-of HPGe detectors emersed in LAr. The geometry is shown below, showing the HPGe detectors (blue) in
-the red LAr cylinder.</p>
+<p>The last sub-section of this part of the validation report contains a more
+specific test with an array of HPGe detectors emersed in LAr. The geometry is
+shown below, showing the HPGe detectors (blue) in the red LAr cylinder.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="_images/vis-ge-array.output.jpeg"><img alt="Geant4 visualisation of a HPGe array in LAr." src="_images/vis-ge-array.output.jpeg" style="width: 400px;" />
 </a>
 </figure>
 <section id="relative-fraction-of-events-per-hpge-volume">
 <h3>Relative fraction of events per HPGe volume<a class="headerlink" href="#relative-fraction-of-events-per-hpge-volume" title="Link to this heading">¶</a></h3>
-<p>The first test consists of generating events uniformly across all the HPGe detectors and checking
-that the fraction of primaries in each volume matches the ratio of the volumes.</p>
+<p>The first test consists of generating events uniformly across all the HPGe
+detectors and checking that the fraction of primaries in each volume matches the
+ratio of the volumes.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="_images/relative-ge.output.png"><img alt="_images/relative-ge.output.png" src="_images/relative-ge.output.png" style="width: 700px;" />
 </a>
@@ -525,11 +548,11 @@ that the fraction of primaries in each volume matches the ratio of the volumes.<
 </section>
 <section id="generation-in-parts-of-the-lar-volume">
 <h3>Generation in parts of the LAr volume<a class="headerlink" href="#generation-in-parts-of-the-lar-volume" title="Link to this heading">¶</a></h3>
-<p>We generate events in intersection of the LAr volume surrounding the detectors and a cylinder
-around each detector string. We plot a histogram of the positions of the primaries
-which should show gaps due to the HPGe detectors. And we compute the ratio of primaries
-in each cylinder, which should be proportional to the volume of the cylinder minus that
-of the Germanium.</p>
+<p>We generate events in intersection of the LAr volume surrounding the detectors
+and a cylinder around each detector string. We plot a histogram of the positions
+of the primaries which should show gaps due to the HPGe detectors. And we
+compute the ratio of primaries in each cylinder, which should be proportional to
+the volume of the cylinder minus that of the Germanium.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="_images/lar-in-check-xy.output.png"><img alt="_images/lar-in-check-xy.output.png" src="_images/lar-in-check-xy.output.png" style="width: 700px;" />
 </a>
@@ -542,7 +565,8 @@ of the Germanium.</p>
 <a class="reference internal image-reference" href="_images/lar-in-check-ratios.output.png"><img alt="_images/lar-in-check-ratios.output.png" src="_images/lar-in-check-ratios.output.png" style="width: 700px;" />
 </a>
 </figure>
-<p>Finally, we generate primaries in the subtraction of the LAr region and the cylinders around each string.</p>
+<p>Finally, we generate primaries in the subtraction of the LAr region and the
+cylinders around each string.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="_images/lar-sub-check-xy.output.png"><img alt="_images/lar-sub-check-xy.output.png" src="_images/lar-sub-check-xy.output.png" style="width: 700px;" />
 </a>
@@ -551,7 +575,8 @@ of the Germanium.</p>
 <a class="reference internal image-reference" href="_images/lar-sub-check-xz.output.png"><img alt="_images/lar-sub-check-xz.output.png" src="_images/lar-sub-check-xz.output.png" style="width: 700px;" />
 </a>
 </figure>
-<p>Then also with an intersection of another cylinder with the height of the strings.</p>
+<p>Then also with an intersection of another cylinder with the height of the
+strings.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="_images/lar-int-and-sub-check-xy.output.png"><img alt="_images/lar-int-and-sub-check-xy.output.png" src="_images/lar-int-and-sub-check-xy.output.png" style="width: 700px;" />
 </a>
