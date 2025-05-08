@@ -23,12 +23,14 @@
 #include "RMGLog.hh"
 #include "RMGVersion.hh"
 
+/// \cond this creates weird namespaces @<long number>
 namespace {
   void ipc_signal_handler(int) {
     if (!RMGIpc::fWaitForIpc.is_lock_free()) return;
     RMGIpc::fWaitForIpc = true;
   }
 } // namespace
+/// \endcond
 
 void RMGIpc::Setup(int ipc_pipe_fd) {
   if (!G4Threading::IsMasterThread()) {

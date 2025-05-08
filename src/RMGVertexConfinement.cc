@@ -15,8 +15,7 @@
 
 #include "RMGVertexConfinement.hh"
 
-#include <chrono>
-#include <optional>
+#include <queue>
 
 #include "G4AutoLock.hh"
 #include "G4Box.hh"
@@ -30,7 +29,6 @@
 #include "G4Tubs.hh"
 #include "G4UnitsTable.hh"
 #include "G4VPhysicalVolume.hh"
-#include "G4VisExtent.hh"
 #include "Randomize.hh"
 
 #include "RMGGeneratorUtil.hh"

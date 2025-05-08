@@ -10,11 +10,11 @@ users can have a look at the {doc}`tutorial` or the provided
 
 ## Quick start
 
-The installation process is documented in {doc}`manual/install`. In the
-simplest application, the user can simulate particle interactions in an
-existing {doc}`manual/geometry` through the `remage` executable by providing a
-"macro" configuration file. Macro files can use all available upstream Geant4
-macro commands, as well as the [remage macro interface](./rmg-commands).
+The installation process is documented in {doc}`manual/install`. In the simplest
+application, the user can simulate particle interactions in an existing
+{doc}`manual/geometry` through the `remage` executable by providing a "macro"
+configuration file. Macro files can use all available upstream Geant4 macro
+commands, as well as the [remage macro interface](./rmg-commands).
 
 ## Next steps
 

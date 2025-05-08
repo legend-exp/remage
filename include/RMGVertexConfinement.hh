@@ -17,17 +17,16 @@
 #define _RMG_VERTEX_CONFINEMENT_HH_
 
 #include <chrono>
+#include <memory>
 #include <optional>
-#include <queue>
 #include <regex>
+#include <string>
 #include <vector>
 
 #include "G4AutoLock.hh"
 #include "G4GenericMessenger.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
-#include "G4Transform3D.hh"
-#include "G4UnitsTable.hh"
 
 #include "RMGVVertexGenerator.hh"
 
@@ -198,7 +197,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          *
          * @param vertex The sampled vertex,
          * @param max_attempts The maximum number of attempts to find a valid vertex.
-         * @param n_max The maximum number of intersections possible for the solid,
+         * @param max_intersections The maximum number of intersections possible for the solid,
          * can be an overestimate.
          */
         [[nodiscard]] bool GenerateSurfacePoint(

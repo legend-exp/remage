@@ -7,36 +7,42 @@ user must provide a geometry definition. There are two supported approaches:
   [command line](./running.md) or using the macro command
   <project:../rmg-commands.md#rmggeometryincludegdmlfile>.
 - Override {cpp:func}`RMGHardware::DefineGeometry` in a subclass of
-  `RMGHardware` and register it using {cpp:func}`RMGManager::SetUserInit`.
-  A practical example is in `examples/02-hpge`.
+  `RMGHardware` and register it using {cpp:func}`RMGManager::SetUserInit`. A
+  practical example is in `examples/02-hpge`.
 
 :::{seealso}
+
 The [pyg4ometry](https://pyg4ometry.readthedocs.io) Python library provides
 powerful tools for building Monte Carlo geometries and exporting them as GDML.
 Relevant pyg4ometry-based packages include:
 
 - [legend-pygeom-tools](https://legend-pygeom-tools.readthedocs.io) – general
   geometry routines and extensions
-- [legend-pygeom-hpges](https://legend-pygeom-hpges.readthedocs.io) – high-purity
-  germanium detector models
+- [legend-pygeom-hpges](https://legend-pygeom-hpges.readthedocs.io) –
+  high-purity germanium detector models
 - [legend-pygeom-optics](https://legend-pygeom-optics.readthedocs.io) – optical
   properties for Geant4 materials
 
 Full geometry implementations based on these tools:
 
-- [legend-pygeom-l200](https://github.com/legend-exp/legend-pygeom-l200) – LEGEND-200
-- [legend-pygeom-l1000](https://github.com/legend-exp/legend-pygeom-l1000) – LEGEND-1000
-  :::
+- [legend-pygeom-l200](https://github.com/legend-exp/legend-pygeom-l200) –
+  LEGEND-200
+- [legend-pygeom-l1000](https://github.com/legend-exp/legend-pygeom-l1000) –
+  LEGEND-1000
+
+:::
 
 ## Registering sensitive detectors
 
-Sensitive detector volumes must be registered so that particle interactions
-are recorded in the output. In _remage_, this can be done in several ways.
-Each detector has a unique id (`uid`) and a _type_, which determines how hits
-are processed and stored.
+Sensitive detector volumes must be registered so that particle interactions are
+recorded in the output. In _remage_, this can be done in several ways. Each
+detector has a unique id (`uid`) and a _type_, which determines how hits are
+processed and stored.
 
 :::{note}
+
 Custom detector types cannot currently be registered at runtime.
+
 :::
 
 The simplest method is to use the
@@ -57,9 +63,11 @@ metadata, using the
 <project:../rmg-commands.md#rmggeometryregisterdetectorsfromgdml> command.
 
 :::{tip}
+
 The `legend-pygeom-tools` package automatically includes such metadata when
 writing GDML with
 [`write_pygeom()`](https://legend-pygeom-tools.readthedocs.io/en/stable/api/pygeomtools.html#pygeomtools.write.write_pygeom).
+
 :::
 
 ## Inspecting geometry
@@ -95,7 +103,9 @@ remage> /RMG/Geometry/PrintListOfPhysicalVolumes
 ```
 
 :::{tip}
-As seen above, the Geant4 overlap checker is enabled by default if GDML input
-is provided. It can be disabled with the
+
+As seen above, the Geant4 overlap checker is enabled by default if GDML input is
+provided. It can be disabled with the
 <project:../rmg-commands.md#rmggeometrygdmldisableoverlapcheck> command.
+
 :::
