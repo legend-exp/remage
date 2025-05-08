@@ -45,8 +45,8 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     path = f"{generator}/{name}/max_{val}/"
     hit_directory = Path(f"out/{path}/hit/")
 
-    data = lh5.read_as("germanium/hit", f"{hit_directory}/out.lh5", "ak")
-    verts = lh5.read_as("vertices/hit", f"{hit_directory}/out.lh5", "ak")
+    data = lh5.read_as("hit/germanium", f"{hit_directory}/out.lh5", "ak")
+    verts = lh5.read_as("hit/vertices", f"{hit_directory}/out.lh5", "ak")
     verts["dist_to_surf"] = get_cylinder_dist(
         1000 * verts.rloc, 1000 * verts.zloc, radius, height
     )
