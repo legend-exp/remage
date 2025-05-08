@@ -30,7 +30,8 @@ section of the manual will cover the usage of:
 
 :::{note}
 
-Adding generators with C++ code is possible using the {cpp:class}`RMGUserInit` system:
+Adding generators with C++ code is possible using the {cpp:class}`RMGUserInit`
+system:
 
 ```cpp
 auto user_init = RMGManager::Instance()->GetUserInit();
@@ -57,8 +58,8 @@ particles. In most cases we will use in-built _remage_ commands for the
 positions (see {ref}`manual-confine`).
 
 However, for the kinematics the GPS commands are often sufficient, for example
-to generate electrons with a fixed energy and isotropic direction we can use
-the macro commands (see [docs](project:../rmg-commands.md#rmggeneratorselect)):
+to generate electrons with a fixed energy and isotropic direction we can use the
+macro commands (see [docs](project:../rmg-commands.md#rmggeneratorselect)):
 
 ```
 /RMG/Generator/Select GPS
@@ -87,13 +88,13 @@ too (`/RMG/Generator/Select G4Gun`), a more basic alternative to the GPS.
 
 ## Generating nuclear decays
 
-A special case of the GPS can be used to generate radioactive decays. This is done
-by producing an ion which Geant4 will then handle the decays of and the production of
-secondary particles.
+A special case of the GPS can be used to generate radioactive decays. This is
+done by producing an ion which Geant4 will then handle the decays of and the
+production of secondary particles.
 
-The simplest case can be used to generate ions which only undergo a single decay (and
-have a stable daughter nuclei). For generate an ion with a given $A$, $Z$ with the
-command `/gps/ion Z A`
+The simplest case can be used to generate ions which only undergo a single decay
+(and have a stable daughter nuclei). For generate an ion with a given $A$, $Z$
+with the command `/gps/ion Z A`
 ([link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#id7)).
 
 For example we can generate decays of $^{40}$K with:
@@ -108,10 +109,11 @@ For example we can generate decays of $^{40}$K with:
 
 :::{note}
 
-In some cases the lifetime of the nuclei is quite long, this would result in the times
-in the output files being large, possibly leading to numerical issues. _remage_ will
-reset the times to be the time since the start of the decay by default unless the macro
-command <project:../rmg-commands.md#rmgprocessessteppingresetinitialdecaytime> is set to
+In some cases the lifetime of the nuclei is quite long, this would result in the
+times in the output files being large, possibly leading to numerical issues.
+_remage_ will reset the times to be the time since the start of the decay by
+default unless the macro command
+<project:../rmg-commands.md#rmgprocessessteppingresetinitialdecaytime> is set to
 False.
 
 :::
@@ -124,20 +126,20 @@ radioactive decays, set at $10^{27}$ ns (around $3 \times 10^{10}$ yrs).
 
 :::{warning}
 
-In some cases the lifetime of daughter nuclei can be very long, this can lead
-to numerical inaccuracy in the times saved to the output files. _remage_ will
-warn you if a track has a global time large enough that the precision is less
-than 1$\mu$s. This will occur when times go beyond around 285 years.
+In some cases the lifetime of daughter nuclei can be very long, this can lead to
+numerical inaccuracy in the times saved to the output files. _remage_ will warn
+you if a track has a global time large enough that the precision is less than
+1$\mu$s. This will occur when times go beyond around 285 years.
 
 :::
 
 In some cases, it may be required to simulate only a part of a decay chain. To
-do this we can use the `/process/had/rdm/nucleusLimits [aMin] [aMax] [zMin]
-[zMax]` macro command
+do this we can use the
+`/process/had/rdm/nucleusLimits [aMin] [aMax] [zMin] [zMax]` macro command
 [docs](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Fundamentals/biasing.html?highlight=grdm#limited-radionuclides).
 
-This will result in any nuclei having $A$ outside of the range `[aMin, aMax]` or $Z$
-outside of `[zMin, zMax]` being killed (before having a chance to decay).
+This will result in any nuclei having $A$ outside of the range `[aMin, aMax]` or
+$Z$ outside of `[zMin, zMax]` being killed (before having a chance to decay).
 
 For example to generate decays of $^{222}$Rn until $^{210}$Pb we can use the
 commands:
@@ -158,8 +160,8 @@ This will allow the decays of $^{222}$Rn $(Z=86, A=222)$ and its daughters:
 - $^{214}$Bi: ($Z=83$, $A=214$),
 - $^{214}$Po: ($Z=84$, $A=214$).
 
-However, the decay of $^{210}$Pb would not be allowed due to the value
-of $A=210$.
+However, the decay of $^{210}$Pb would not be allowed due to the value of
+$A=210$.
 
 :::{note}
 
@@ -195,8 +197,8 @@ Where:
 - `MODE` (int): is an index the double beta decay mode labelling the decay type,
   a table of implemented decay modes can be found in
   [link](https://github.com/BxCppDev/bxdecay0/tree/develop?tab=readme-ov-file#list-of-supported-double-beta-decay-modes).
-- `LEVEL` (int): is a index of the energy level of the daughter nuclei, the
-  list of available levels are
+- `LEVEL` (int): is a index of the energy level of the daughter nuclei, the list
+  of available levels are
   [documented here](https://github.com/BxCppDev/bxdecay0/tree/develop?tab=readme-ov-file#list-of-daughter-nucleus-excited-states-in-double-beta-decay).
 
 For example we can generate two-neutrino double beta decay to the $0^+$ ground
@@ -234,9 +236,8 @@ correct angular and momentum distribution of generated tracks.
 ```
 
 A macro command interface to the library is available below
-<project:../rmg-commands.md#rmggeneratorcosmicmuons>. For further
-documentation, refer to the [original
-publication](https://doi.org/10.1016/j.nima.2021.165732).
+<project:../rmg-commands.md#rmggeneratorcosmicmuons>. For further documentation,
+refer to the [original publication](https://doi.org/10.1016/j.nima.2021.165732).
 
 ### MUSUN
 

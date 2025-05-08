@@ -96,7 +96,7 @@ container" kernel in your notebooks!
 
 :::{warning}
 
-Interactive visualization, like the pyg4ometry or Geant4 visualizer, might
-not work as expected in a notebook.
+Interactive visualization, like the pyg4ometry or Geant4 visualizer, might not
+work as expected in a notebook.
 
 :::

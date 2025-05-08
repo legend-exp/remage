@@ -16,9 +16,9 @@ command, since it prevents us to measure the true integrated particle path
 length in the simulation (unless a very short step size limit is set).
 
 We calculate stopping power and integrated path length of the simulated
-electrons and compare them with data from the [ESTAR
-database](https://physics.nist.gov/PhysRefData/Star/Text/ESTAR.html) (a short
-description of the reported quantities is available
+electrons and compare them with data from the
+[ESTAR database](https://physics.nist.gov/PhysRefData/Star/Text/ESTAR.html) (a
+short description of the reported quantities is available
 [here](https://physics.nist.gov/PhysRefData/Star/Text/method.html)).
 
 :::{subfigure} AA|BC

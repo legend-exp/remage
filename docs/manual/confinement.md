@@ -9,13 +9,12 @@
 
 :::
 
-_remage_ supports generating event vertices either in the bulk or on the
-surface of various solids. This is essential for simulating, for example, the
-decay of radioactive isotopes in detector components.
+_remage_ supports generating event vertices either in the bulk or on the surface
+of various solids. This is essential for simulating, for example, the decay of
+radioactive isotopes in detector components.
 
 To enable vertex confinement, activate the corresponding generator using
-<project:../rmg-commands.md#rmggeneratorconfine> (see
-{ref}`manual-generators`):
+<project:../rmg-commands.md#rmggeneratorconfine> (see {ref}`manual-generators`):
 
 ```
 /RMG/Generator/Confine Volume
@@ -39,10 +38,10 @@ physical volume named e.g. `C000RG1`, do:
 /RMG/Generator/Confinement/Physical/AddVolume C000RG1
 ```
 
-`C000RG1` must be part of the provided geometry implementation.
-An optional second argument sets the copy number. You can also use regular
-expressions (via [`std::regex`](https://en.cppreference.com/w/cpp/regex)) to
-match multiple volumes:
+`C000RG1` must be part of the provided geometry implementation. An optional
+second argument sets the copy number. You can also use regular expressions (via
+[`std::regex`](https://en.cppreference.com/w/cpp/regex)) to match multiple
+volumes:
 
 ```
 /RMG/Generator/Confinement/Physical/AddVolume C\w+
@@ -121,8 +120,7 @@ volumes, formally:
 \cap (\overline{G^\prime_1} \cup \ldots \cup \overline{G^\prime_m})
 ```
 
-Geometrical solids can be added to the group of solids to be subtracted with
-the
+Geometrical solids can be added to the group of solids to be subtracted with the
 <project:../rmg-commands.md#rmggeneratorconfinementgeometricaladdexcludedsolid>
 command.
 
@@ -130,9 +128,9 @@ command.
 
 The functionality of `IntersectPhysicalWithGeometrical` is still available. If
 both physical and geometrical volumes are defined with
-<project:../rmg-commands.md#rmggeneratorconfinementphysicaladdvolume>,
-the intersection between them will be computed before subtracting the other
-solids. Formally:
+<project:../rmg-commands.md#rmggeneratorconfinementphysicaladdvolume>, the
+intersection between them will be computed before subtracting the other solids.
+Formally:
 
 ```{math}
 [(P_1 \cup \ldots P_n) \cap (G_1 \cup \ldots \cup G_m)]
@@ -143,17 +141,17 @@ solids. Formally:
 
 ## Bulk versus surface
 
-By default, _remage_ will sample vertices in the bulk of solids. Activate sampling
-on surfaces with the
+By default, _remage_ will sample vertices in the bulk of solids. Activate
+sampling on surfaces with the
 <project:../rmg-commands.md#rmggeneratorconfinementsampleonsurface> command.
 
 _remage_ can exactly sample in the bulk or surface of some simple solids
 (`G4Box`, `G4Sphere`, `G4Orb` and `G4Tubs`, see
 {cpp:func}`RMGGeneratorUtil::rand`). For other volumes, Monte Carlo sampling
 methods are implemented. For sampling in the bulk of an arbitrary Geant4 solid,
-a rejection-sampling method is implementing by using Geant4's solid extent
-and {cpp:func}`G4VSolid::Inside`. For sampling on the surface of an arbitrary
-Geant4 solid, the algorithm described in [^1] is implemented.
+a rejection-sampling method is implementing by using Geant4's solid extent and
+{cpp:func}`G4VSolid::Inside`. For sampling on the surface of an arbitrary Geant4
+solid, the algorithm described in [^1] is implemented.
 
 All sampling modes described above are available, with few notes/limitations:
 
@@ -170,11 +168,12 @@ All sampling modes described above are available, with few notes/limitations:
 
 ## Vertices from an input file
 
-For more complicated vertex confinement _remage_ supports the possibility
-to read in directly event primary positions from input files.
+For more complicated vertex confinement _remage_ supports the possibility to
+read in directly event primary positions from input files.
 
 The functionality for reading input files is described in <project:./input.md>.
-For generating vertices we support reading `lh5` files with the following format.
+For generating vertices we support reading `lh5` files with the following
+format.
 
 ```console
 /
@@ -189,8 +188,9 @@ For generating vertices we support reading `lh5` files with the following format
 
 - The `lh5` attributes allow to specify the units,
 - The positions should be the _global_ coordinates.
-- The python package _revertex_ [docs](https://revertex.readthedocs.io/en/latest/) contains
-  functionality for generating input files in the correct format.
+- The python package _revertex_
+  [docs](https://revertex.readthedocs.io/en/latest/) contains functionality for
+  generating input files in the correct format.
 
 :::
 

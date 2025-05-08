@@ -16,8 +16,8 @@
 
 :::{note}
 
-Pre-built Docker container images with all necessary dependencies are
-available [on Docker Hub](https://hub.docker.com/r/legendexp/remage-base).
+Pre-built Docker container images with all necessary dependencies are available
+[on Docker Hub](https://hub.docker.com/r/legendexp/remage-base).
 
 :::
 
