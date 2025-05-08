@@ -78,6 +78,11 @@ repos:
         language: pygrep
         entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
         exclude: .pre-commit-config.yaml
+      - id: disallow-end-fence
+        name: "disallow ::: fences not on their own line"
+        language: pygrep
+        entry: "[^\\n]:*:::\\n|[^\\n]:*:::\\{"
+        types_or: [markdown]
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: "v0.24.1"
