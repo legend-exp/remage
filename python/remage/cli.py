@@ -384,6 +384,7 @@ def remage_run_from_args(
                 stp_files=original_files,
                 glm_files=None,
                 hit_files=remage_files,
+                out_field="stp",
             )
 
         # set the merged output file for downstream consumers.

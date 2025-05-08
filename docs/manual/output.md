@@ -243,13 +243,15 @@ pointer to a new collection of clustered hits.
   similar function just needs to be written.
   :::
 
-Pre-clustering can be enabled with
+Pre-clustering is enabled by default for the Scintillator and Germanium
+output schemes, it can be disabled with the command
 <project:../rmg-commands.md#rmgoutputgermaniumclusterpreclusteroutputs> and
 similarly for the _Scintillator_ output scheme:
 <project:../rmg-commands.md#rmgoutputscintillatorclusterpreclusteroutputs>.
 
-We first organise the hits by track id (the index of the `G4Track` within the
-event). Some processes in Geant4 produce a large number of secondary tracks due
+This clustering works by by first organise the hits by track id
+(the index of the `G4Track` within the event).
+Some processes in Geant4 produce a large number of secondary tracks due
 to atomic de-excitation, these tracks typically have a very low energy and
 range (however they are still produced since production cuts are not applied
 for most gamma interactions). Thus they are not expected to impact observables
@@ -311,6 +313,14 @@ This will apply this threshold for any step where the distance to surface is
 less than the surface thickness. With this option a new cluster will also be
 formed if a step moves from the surface to bulk region of the germanium (or
 vice-versa).
+
+:::{note}
+By default pre-clustering is performed for both the _Germanium_ and _Scintillator_
+output schemes with 50 $\mu$m distance for Germanium. By default
+clustering is not applied to the surface for _Germanium_ (within the surface thickness
+set by default as 2 mm). For the _Scintillator_ output scheme we use 500 $\mu$ m cluster
+distance by default. For both outputs a 10$\mu$ m time threshold is used by default.
+:::
 
 These options provide a sophisticated mechanism for handling the surface of
 HPGe detectors!
