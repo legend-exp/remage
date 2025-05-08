@@ -10,7 +10,7 @@ import subprocess
 import sys
 import threading
 import time
-from collections.abc import Iterable
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import colorlog
@@ -23,7 +23,7 @@ from .ipc import IpcResult, ipc_thread_fn
 
 
 def _run_remage_cpp(
-    args: list[str] | None = None,
+    args: Sequence[str] | None = None,
     is_cli: bool = False,
 ) -> tuple[int, signal.Signals, IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
@@ -128,55 +128,57 @@ def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
 
 
 def remage_run(
-    macros: Iterable[str] | str = (),
+    macros: Sequence[str] | str = (),
     *,
-    gdmls: Iterable[str] | str = (),
+    gdml_files: Sequence[str] | str = (),
     output: str | None = None,
     threads: int = 1,
     overwrite_output: bool = False,
     merge_output_files: bool = False,
-    reshape_output_files: bool = False,
+    flat_output: bool = False,
     time_window: float | None = None,
-    macro_substitutions: dict[str, str] | None = None,
+    macro_substitutions: Mapping[str, str] | None = None,
     log_level: str | None = None,
     raise_on_error: bool = True,
     raise_on_warning: bool = False,
 ) -> tuple[int, IpcResult]:
-    """
-    Run the remage simulation utility with the provided args.
+    """Run the remage simulation utility with the provided args.
 
-    Notes
-    -----
-    This is the main entry point for users wanting to run remage from python code.
+    This is the main entry point for users wanting to run remage from Python
+    code.
 
     Parameters
     ----------
     macros
         one or more remage/Geant4 macro command listings to execute.
-    gdmls
+    gdml_files
         supply one or more GDML files describing the experimental geometry.
     output
         output file for detector hits.
     threads
-        set the number of threads used by remage
+        set the number of threads used by remage.
     overwrite_output
-        overwrite existing output files
+        overwrite existing output files.
     merge_output_files
-        merge output files from individual threads.
-    reshape_output_files
-        perhaps a reshaping of the output files so that each row in the output
-        table represents the steps in a physical interaction in a detector, based on the
-        time-window. This results in each column being a :class:`VectorOfVectors`.
+        merge output files created by individual remage threads.
+    flat_output
+        if ``False``, perform a reshaping of the output files so that each row
+        in the output table contains data about all steps in a physical
+        interaction in a detector, based on the time-window. This results in
+        each column being a :class:`~lgdo.types.vectorofvectors.VectorOfVectors`.
+        If ``True``, the output table will be flat with each row holding
+        information about a single Geant4 step.
     time_window
-        time window to group together steps, in us.
+        time window to group together steps into hits, in microseconds.
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
-        logging level. One of `debug`, `detail`, `summary`, `warning`, `error`.
+        logging level. One of `debug`, `detail`, `summary`, `warning`, `error`,
+        `fatal`, `nothing`.
     raise_on_error
         raise a :class:`RuntimeError` when an error in the C++ application occurs. This
         applies to non-fatal errors being logged as well as fatal errors. If false, the
-        function only returns the error code, the python-based post-processing will be
+        function only returns the error code, the Python-based post-processing will be
         skipped in any case.
     raise_on_warning
         raise a :class:`RuntimeError` when a warning (or error) is logged in the C++
@@ -184,11 +186,11 @@ def remage_run(
         post-processing will be run normally.
     """
     args = []
-    if not isinstance(gdmls, str):
-        for gdml in gdmls:
+    if not isinstance(gdml_files, str):
+        for gdml in gdml_files:
             args.append(f"--gdml-files={gdml}")
     else:
-        args.append(f"--gdml-files={gdmls}")
+        args.append(f"--gdml-files={gdml_files}")
 
     if output is not None:
         args.append(f"--output-file={output}")
@@ -198,8 +200,8 @@ def remage_run(
     if merge_output_files:
         args.append("--merge-output-files")
 
-    if reshape_output_files:
-        args.append("--reshape-output")
+    if flat_output:
+        args.append("--flat-output")
 
     if time_window is not None:
         args.append(f"--time-window-in-us={time_window}")
@@ -255,24 +257,22 @@ def remage_run_from_args(
         help="Merge output files from each remage thread into a single output file",
     )
     parser.add_argument(
-        "-r",
-        "--reshape-output",
+        "--flat-output",
         action="store_true",
         help=(
-            "'Reshape' the output table so that steps "
-            "are grouped by event (see also --time-window-in-us)"
+            "Disable reshaping of the output table, such that each "
+            "row refers to a single Geant4 step."
         ),
     )
     parser.add_argument(
-        "-T",
         "--time-window-in-us",
         required=False,
         type=float,
         metavar="",
         default=10,
         help=(
-            'Time window (in microseconds) to use to group steps into "hits" '
-            "(see remage docs and also --reshape-output). Default is 10 microseconds."
+            "Time window (in microseconds) used to reshape the output executable "
+            "(see remage docs). Default is 10 microseconds."
         ),
     )
     py_args, cpp_args = parser.parse_known_args(args)
@@ -337,7 +337,7 @@ def remage_run_from_args(
     assert len(output_file_exts) == 1
 
     if output_file_exts != {".lh5"}:
-        if py_args.reshape_output or py_args.merge_output_files:
+        if not py_args.flat_output or py_args.merge_output_files:
             logger.error(
                 "merging or reshaping is not supported for output format %s",
                 next(iter(output_file_exts)).lstrip("."),
@@ -352,7 +352,7 @@ def remage_run_from_args(
 
     time_start = time.time()
 
-    if py_args.reshape_output:
+    if not py_args.flat_output:
         msg = "Reshaping output files"
         logger.info(msg)
 

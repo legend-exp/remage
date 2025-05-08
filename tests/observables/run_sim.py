@@ -120,7 +120,7 @@ def run_sim(
         "macros/template.mac", macro_directory / Path(macro_file), replacements
     )
     subprocess.run(
-        f"{rmg} {macro_directory / macro_file} -g gdml/geometry.gdml -o {stp_directory}/out.lh5 -w -t 1  ",
+        f"{rmg} {macro_directory / macro_file} -g gdml/geometry.gdml -o {stp_directory}/out.lh5 --flat-output -w -t 1  ",
         shell=True,
         check=False,
     )

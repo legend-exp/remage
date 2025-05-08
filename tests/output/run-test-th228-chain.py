@@ -10,7 +10,11 @@ output_lh5 = "th228-chain.lh5"
 
 # run remage, produce lh5 output.
 remage_run(
-    macro, gdmls="gdml/geometry-box.gdml", output=output_lh5, overwrite_output=True
+    macro,
+    gdml_files="gdml/geometry-box.gdml",
+    output=output_lh5,
+    flat_output=True,
+    overwrite_output=True,
 )
 
 # check that we get to stable isotopes.

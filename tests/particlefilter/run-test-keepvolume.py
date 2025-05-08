@@ -9,7 +9,13 @@ macro = "macros/keepvolume-outside.mac"
 output_lh5 = "keepvolume-outside.lh5"
 
 # run remage, produce lh5 output.
-remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
+remage_run(
+    macro,
+    gdml_files="gdml/geometry.gdml",
+    output=output_lh5,
+    flat_output=True,
+    overwrite_output=True,
+)
 
 # If we are outside of the keep volume we expect similar results to being inside the kill volume.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
@@ -24,7 +30,13 @@ macro = "macros/keepvolume-inside.mac"
 output_lh5 = "keepvolume-inside.lh5"
 
 # run remage, produce lh5 output.
-remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
+remage_run(
+    macro,
+    gdml_files="gdml/geometry.gdml",
+    output=output_lh5,
+    flat_output=True,
+    overwrite_output=True,
+)
 
 # If we are inside the keepvolume, we expect similar results to being outside the kill volume.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")

@@ -9,7 +9,13 @@ macro = "macros/killvolume-inside.mac"
 output_lh5 = "killvolume-inside.lh5"
 
 # run remage, produce lh5 output.
-remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
+remage_run(
+    macro,
+    gdml_files="gdml/geometry.gdml",
+    output=output_lh5,
+    flat_output=True,
+    overwrite_output=True,
+)
 
 # check that no alphas are in the output
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
@@ -24,7 +30,13 @@ macro = "macros/killvolume-outside.mac"
 output_lh5 = "killvolume-outside.lh5"
 
 # run remage, produce lh5 output.
-remage_run(macro, gdmls="gdml/geometry.gdml", output=output_lh5, overwrite_output=True)
+remage_run(
+    macro,
+    gdml_files="gdml/geometry.gdml",
+    output=output_lh5,
+    flat_output=True,
+    overwrite_output=True,
+)
 
 # Here we expect everything to be normal. We do not know how many alphas we will get, but we should get some.
 tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
