@@ -137,7 +137,7 @@ RMGDetectorHitsCollection* RMGGermaniumOutputScheme::GetHitColl(const G4Event* e
 bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   // exit fast if no threshold is configured.
-  if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
+  if ((fEdepCutLow < 0 && fEdepCutHigh < 0) ) return false;
 
   auto hit_coll = GetHitColl(event);
   if (!hit_coll) return false;
