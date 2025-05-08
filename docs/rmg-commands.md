@@ -208,7 +208,7 @@ Commands for controlling output from hits in germanium detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 * `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
@@ -246,7 +246,7 @@ Set an upper energy cut that has to be met for this event to be stored.
 
 ### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
 
-Take this detector into account for the filtering by /EdepThreshold.
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
