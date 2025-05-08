@@ -311,9 +311,11 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
   return {path, path};
 }
 
+/// \cond this creates weird namespaces @<long number>
 namespace {
   G4Mutex RMGConvertLH5Mutex = G4MUTEX_INITIALIZER;
 }
+/// \endcond
 
 void RMGRunAction::PostprocessOutputFile() const {
 
