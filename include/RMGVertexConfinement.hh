@@ -198,7 +198,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          *
          * @param vertex The sampled vertex,
          * @param max_attempts The maximum number of attempts to find a valid vertex.
-         * @param n_max The maximum number of intersections possible for the solid,
+         * @param max_intersections The maximum number of intersections possible for the solid,
          * can be an overestimate.
          */
         [[nodiscard]] bool GenerateSurfacePoint(

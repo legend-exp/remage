@@ -24,14 +24,21 @@
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
 
+/** @brief Functionality for simple output post-processing (i.e., pre-clustering and similar)
+ * shared between multiple output schemes.
+ */
 namespace RMGOutputTools {
 
   /** @brief Enum of which position of the hit to store. */
   enum class PositionMode {
-    kPreStep,  /**Store the prestep point. */
-    kPostStep, /**Store the poststep point. */
-    kAverage,  /**Store the average. */
-    kBoth,     /**Store both post and prestep */
+    /**Store the prestep point. */
+    kPreStep,
+    /**Store the poststep point. */
+    kPostStep,
+    /**Store the average. */
+    kAverage,
+    /**Store both post and prestep */
+    kBoth,
   };
 
 
@@ -136,7 +143,7 @@ namespace RMGOutputTools {
    * @param hits_map a map of vectors of @c RMGDetectorHit pointers with the key
    * being the track id.
    * @param cluster_pars a @ref RMGOutputTools::ClusterPars struct of the parameters for clustering.
-   * @param has_distance_surface a flag of whether the hits have the distance to surface field,
+   * @param has_distance_to_surface a flag of whether the hits have the distance to surface field,
    * and clustering should be performed separately for surface and bulk.
    *
    * @returns A map of steps after combining low energy tracks.
