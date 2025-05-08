@@ -276,12 +276,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
   auto manager = RMGManager::Instance();
 
-  if (!manager->HasOutputFileName()) {
-    RMGLog::OutDev(RMGLog::error, "tried to open file 'none'");
-    // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at
-    // this stage. also, there is no clean way to abort an run before the run started.
-    std::abort();
-  }
+  if (!manager->HasOutputFileName()) { RMGLog::OutDev(RMGLog::fatal, "tried to open file 'none'"); }
 
   // TODO: realpath
   auto path = fs::path(manager->GetOutputFileName());
@@ -289,10 +284,7 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
       G4Analysis::GetTnFileName(path.string(), path.extension().string())
   );
   if (fs::exists(path_for_overwrite) && !manager->GetOutputOverwriteFiles()) {
-    RMGLog::Out(RMGLog::error, "Output file ", path_for_overwrite.string(), " does already exists.");
-    // need to abort here (and not use ::fatal), as Geant4 is not prepared to take exceptions at
-    // this stage. also, there is no clean way to abort an run before the run started.
-    std::abort();
+    RMGLog::Out(RMGLog::fatal, "Output file ", path_for_overwrite.string(), " does already exists.");
   }
 
   auto ext = path.extension();
