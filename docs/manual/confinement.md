@@ -6,7 +6,8 @@
 
 - examples
 - tricks for vertex visualization
-  :::
+
+:::
 
 _remage_ supports generating event vertices either in the bulk or on the
 surface of various solids. This is essential for simulating, for example, the
@@ -67,8 +68,10 @@ Other shapes, such as boxes and cylinders, are also supported.
 ## Sampling modes
 
 :::{note}
+
 In this section, sampling in the bulk of volumes is assumed. For documentation
 about sampling on surfaces, see next section.
+
 :::
 
 Once a list of solids is defined, we need to select the sampling mode (i.e. how
@@ -124,6 +127,7 @@ the
 command.
 
 :::{note}
+
 The functionality of `IntersectPhysicalWithGeometrical` is still available. If
 both physical and geometrical volumes are defined with
 <project:../rmg-commands.md#rmggeneratorconfinementphysicaladdvolume>,
@@ -187,13 +191,13 @@ For generating vertices we support reading `lh5` files with the following format
 - The positions should be the _global_ coordinates.
 - The python package _revertex_ [docs](https://revertex.readthedocs.io/en/latest/) contains
   functionality for generating input files in the correct format.
-  :::
+
+:::
 
 These vertices can then be read into _remage_ with the macro commands
 [docs](project:../rmg-commands.md#rmggeneratorconfinementfromfilefilename):
 
 ```console
-
 /RMG/Generator/Confine FromFile
 /RMG/Generator/Confinement/FromFile/FileName {FILE_PATH}
 ```

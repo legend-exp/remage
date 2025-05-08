@@ -217,6 +217,7 @@ The macro commands should be placed in a plain text file
 complete macro file is shown below.
 
 :::{admonition} Complete macro file (`vis-gammas.mac`)
+
 :class: dropdown
 
 ```text
@@ -272,8 +273,10 @@ $ remage --interactive --gdml-files geometry.gdml -- vis-gammas.mac
 ```
 
 :::{note}
+
 Interactive visualization requires passing `--interactive` to the
 `remage` executable.
+
 :::
 
 Interactions in HPGes and in LAr are marked in red and blue, respectively.
@@ -281,6 +284,7 @@ Interactions in HPGes and in LAr are marked in red and blue, respectively.
 ![Simulation visualization](_img/tutorial-g4-view.jpg)
 
 :::{tip}
+
 With Apptainer, additional tweaks are required in order to allow for graphics
 to be displayed, e.g.
 
@@ -294,12 +298,15 @@ $ apptainer run \
 ```
 
 and similarly with Docker.
+
 :::
 
 :::{tip}
+
 If `remage` from the Apptainer image refuses to run simulations, this might be
 due to some of your environment variables from outside the container. Give
 `--cleanenv` a try.
+
 :::
 
 ## Storing simulated data on disk

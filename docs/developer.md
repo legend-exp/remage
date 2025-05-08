@@ -63,11 +63,15 @@ $ make install
 ```
 
 :::{warning}
+
 If you want to run the _remage_ tests the cmake flag `-DBUILD_TESTING=ON` is required.
+
 :::
 
 :::{note}
+
 A list of available Make targets can be printed by running `make help`.
+
 :::
 
 ## Code style
@@ -123,6 +127,7 @@ $ ctest --output-on-failure # show test output only if test fails
 :::
 
 :::{tip}
+
 If you want to open a fancy UI to check the output of `vis` tests, you may
 achieve it by:
 
@@ -133,7 +138,8 @@ achieve it by:
    the very beginning (after `/control/execute`)
 1. run the visualization with
    `remage -i -g gdml/geometry.gdml -- macros/themacro.mac`
-   :::
+
+:::
 
 ### Configuring CMake
 
@@ -224,6 +230,7 @@ $ make sphinx
 ```
 
 :::{tip}
+
 Implicit cross-references are automatically generated for all headers until
 level 3 (i.e. `###` headers in markdown). The level can be adjusted through the
 `myst_heading_anchors = DEPTH` setting in `conf.py`.
@@ -234,9 +241,11 @@ To reference a remage macro command auto-generated documentation section type
 
 Further reading on the [myst-parser
 documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors).
+
 :::
 
 :::{tip}
+
 To reference the C++ API docs, use the `{cpp}` domain. For example:
 
 - `` {cpp:class}`RMGHardware` `` becomes {cpp:class}`RMGHardware`
@@ -245,6 +254,7 @@ To reference the C++ API docs, use the `{cpp}` domain. For example:
 
 A full list of domain roles can be found
 [here](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html).
+
 :::
 
 You'll need a Doxygen installation and Python software dependencies specified in
@@ -298,16 +308,22 @@ set(TESTS_IMAGES
 ```
 
 :::{note}
+
 PDF images cannot be displayed in the validation report, convert them to bitmap.
+
 :::
 
 :::{warning}
+
 `make sphinx-validation` assumes that the images from the test suite have
 already been generated. Make sure to manually run `ctest` before building the
 validation report.
+
 :::
 
 :::{note}
+
 The validation report is not deployed for pull requests. Instead, the HTML
 pages can be downloaded as GitHub action artifact.
+
 :::

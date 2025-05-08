@@ -14,11 +14,16 @@
 - [BxDecay0] 1.0.10 or higher
 - [HDF5] C++ support for LH5 object persistency
 
-:::{note} Pre-built Docker container images with all necessary dependencies are
+:::{note}
+
+Pre-built Docker container images with all necessary dependencies are
 available [on Docker Hub](https://hub.docker.com/r/legendexp/remage-base).
+
 :::
 
-:::{note} Apptainer images can be easily generated with, e.g.:
+:::{note}
+
+Apptainer images can be easily generated with, e.g.:
 
 ```console
  $ apptainer build remage-base_latest.sif docker://legendexp/remage-base:latest
@@ -26,6 +31,7 @@ available [on Docker Hub](https://hub.docker.com/r/legendexp/remage-base).
 
 For more details, have a look at
 [the documentation](https://apptainer.org/docs/user/main/build_a_container.html).
+
 :::
 
 [CMake]: https://cmake.org

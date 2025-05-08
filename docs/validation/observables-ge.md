@@ -39,6 +39,7 @@ We generate electrons uniformly in the bulk of the Germanium. This is performed 
 We generate 1 MeV electrons and plot the steps for geant4, both without step limits and with 10 um step limitations.
 
 :::{subfigure} ABC|DEF
+
 :subcaptions: above
 
 ```{image} ./_img/observables/tracks-bulk-no-limit.tracks.out0.png
@@ -72,6 +73,7 @@ the second row uses 10 um step limits. You should see constrained electron track
 some isolated steps / tracks due to Bremsstralhung.
 
 :::
+
 &nbsp;
 &nbsp;
 
@@ -80,6 +82,7 @@ distance of the steps to the detector surface. This is shown for a large range o
 and also zooming into events close to the surface.
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/observables/tracks-bulk-no-limit.step-hist.png
@@ -101,6 +104,7 @@ the step lengths be limited to 10 um in the second case.
 &nbsp;
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist.png
@@ -117,11 +121,14 @@ Joint distribution of step length and distance to detector surface for 1 MeV ele
 Without step limits you should see step limits smaller close to the detector surface, due to
 the safety mechanism in Geant4. Two populations of events are expected to be present
 due to the multiple column scatter (MSC) and Ionisation processes in Geant4. With step limits the step lengths should be limited to 10 um.
+
 :::
+
 &nbsp;
 &nbsp;
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist-zoom.png
@@ -135,7 +142,9 @@ due to the multiple column scatter (MSC) and Ionisation processes in Geant4. Wit
 ```
 
 Joint distribution of step length and distance to detector surface for 1 MeV electrons in Germanium zooming into small distances. Similar trends as in the previous plot should be present.
+
 :::
+
 &nbsp;
 &nbsp;
 
@@ -212,6 +221,7 @@ from the variations due to step limitations we select the energies corresponding
 in the bulk (distance greater than one mm).
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/observables/beta-observables.tl-active-energy.spec.output.png
@@ -231,7 +241,9 @@ Energy spectra for 1 MeV electrons in Germanium, selecting vertices in the trans
 &nbsp;&nbsp;
 
 Similar to the previous tests we also plot the fraction of events with energy within 1 keV of the full energy peak.
+
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/observables/beta-observables.tl-active-energy.eff.output.png
@@ -247,6 +259,7 @@ Similar to the previous tests we also plot the fraction of events with energy wi
 Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the step limits.
 
 :::
+
 &nbsp;
 &nbsp;
 

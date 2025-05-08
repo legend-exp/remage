@@ -8,7 +8,8 @@
 - vertex table
 - track output scheme
 - isotope, energy filtering
-  :::
+
+:::
 
 _remage_ supports all output formats supported by
 [`G4AnalysisManager`](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Analysis/managers.html)
@@ -18,8 +19,10 @@ type to use is selected by the specified output file name (`.h5`, `.root`,
 `.csv`, `.xml`, `.lh5`).
 
 :::{note}
+
 LH5, HDF5 and ROOT output formats require Geant4 to be explicitly compiled with
 support for the HDF5 or ROOT libraries, respectively.
+
 :::
 
 The contents of the output files is determined by _output schemes_. An output
@@ -40,6 +43,7 @@ output schemes can be enabled with the
 `/RMG/Output/ActivateOutputScheme [name]`.
 
 :::{note}
+
 Adding output schemes with C++ code is possible using the `RMGUserInit` system
 of remage (access it with
 `auto user_init = RMGManager::Instance()->GetUserInit()`:
@@ -54,6 +58,7 @@ of remage (access it with
 Output schemes are often coupled to
 [sensitive detector types](project:./geometry.md#registering-sensitive-detectors).
 At present, it is not possible to register detector types at runtime.
+
 :::
 
 ## Output file types
@@ -64,9 +69,11 @@ other file format that `G4AnlasisManager` can write; but these are not tested
 regularly.
 
 :::{note}
+
 remage will not produce an output file, if no output file name is provided by the
 user. Specify `-o none` to acknowledge the warning that is emitted when output
 schemes are registered, but no file will be created.
+
 :::
 
 ## LH5 output
@@ -78,6 +85,7 @@ To use this feature, simply specify an output file with a `.lh5` extension, and
 remage will perform the file conversion automatically.
 
 :::{note}
+
 Additionally, the standalone tool `remage-to-lh5` is provided to convert a
 default Geant4 HDF5 file to a LH5 file. With this, executing
 `remage -o output.lh5 [...]` is roughly equivalent to the combination of
@@ -162,8 +170,10 @@ command is not used). The event is then discarded if the energy is less than
 or equal to `ELOW` or less than `EHIGH`.
 
 :::{note}
+
 This mechanism will remove the data from the event across all output schemes,
 not only the _Germanium_!
+
 :::
 
 Similarly, for simulations involving optical photons it is possible to discard
@@ -178,8 +188,10 @@ set to `Average` (the default), `Both` (saves) also the pre and post steps, or
 `Pre`/`Post`.
 
 :::{important}
+
 For gammas the position saved is always that of the post-step, since all gamma
 interactions are discrete.
+
 :::
 
 Typically only steps where some energy was deposited are written out to disk,
@@ -218,9 +230,11 @@ some "pre-clustering" routines. These routines combine together steps that are
 very close together.
 
 :::{note}
+
 The aim of this (pre)-clustering is only to make a minimal reduction of
 information which cannot be useful! Further, more aggressive clustering may be
 needed for some applications.
+
 :::
 
 In order to have an efficient algorithm for pre-clustering we take use a
@@ -241,7 +255,8 @@ pointer to a new collection of clustered hits.
   Geant4.
 - This design makes it easy to include additional clustering algorithms, a
   similar function just needs to be written.
-  :::
+
+:::
 
 Pre-clustering is enabled by default for the Scintillator and Germanium
 output schemes, it can be disabled with the command
@@ -265,8 +280,10 @@ and similarly for the _Scintillator_ output scheme:
 <project:../rmg-commands.md#rmgoutputscintillatorclustercombinelowenergyelectrontracks>.
 
 :::{warning}
+
 This means in some cases there are steps in the output that are the combination
 of steps in different Geant4 tracks.
+
 :::
 
 This command will select electron tracks with energy lower than a threshold,
@@ -315,11 +332,13 @@ formed if a step moves from the surface to bulk region of the germanium (or
 vice-versa).
 
 :::{note}
+
 By default pre-clustering is performed for both the _Germanium_ and _Scintillator_
 output schemes with 50 $\mu$m distance for Germanium. By default
 clustering is not applied to the surface for _Germanium_ (within the surface thickness
 set by default as 2 mm). For the _Scintillator_ output scheme we use 500 $\mu$ m cluster
 distance by default. For both outputs a 10$\mu$ m time threshold is used by default.
+
 :::
 
 These options provide a sophisticated mechanism for handling the surface of
@@ -335,5 +354,7 @@ For each cluster, we then compute an "effective" step:
 All other fields are constant within a track and are taken from the first step.
 
 :::{note}
+
 In this way the output still represents a step, just with a longer effective step length.
+
 :::

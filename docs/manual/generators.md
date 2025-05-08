@@ -6,7 +6,8 @@
 
 - list of built-in generators and documentation
 - muon generators
-  :::
+
+:::
 
 We generate particles of interest using Geant4 macro commands (see
 [link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#macro-commands)
@@ -28,6 +29,7 @@ section of the manual will cover the usage of:
 - Cosmic muons (`CosmicMuons`), including support for MUSUN (`MUSUNCosmicMuons`)
 
 :::{note}
+
 Adding generators with C++ code is possible using the {cpp:class}`RMGUserInit` system:
 
 ```cpp
@@ -65,7 +67,9 @@ the macro commands (see [docs](project:../rmg-commands.md#rmggeneratorselect)):
 ```
 
 :::{note}
+
 These commands should be placed after `/run/initialize`
+
 :::
 
 Many other macro commands are available for more complicated generators
@@ -74,9 +78,11 @@ Similar commands can be used to generate other primary particles, for example
 `gamma`, `alpha` or `mu-`.
 
 :::{note}
+
 _remage_ supports
 [`G4ParticleGun`](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/GettingStarted/eventDef.html#g4particlegun)
 too (`/RMG/Generator/Select G4Gun`), a more basic alternative to the GPS.
+
 :::
 
 ## Generating nuclear decays
@@ -101,11 +107,13 @@ For example we can generate decays of $^{40}$K with:
 ```
 
 :::{note}
+
 In some cases the lifetime of the nuclei is quite long, this would result in the times
 in the output files being large, possibly leading to numerical issues. _remage_ will
 reset the times to be the time since the start of the decay by default unless the macro
 command <project:../rmg-commands.md#rmgprocessessteppingresetinitialdecaytime> is set to
 False.
+
 :::
 
 ### Nuclear decay chains
@@ -115,10 +123,12 @@ daughter is reached, unless the time goes beyond the time threshold for
 radioactive decays, set at $10^{27}$ ns (around $3 \times 10^{10}$ yrs).
 
 :::{warning}
+
 In some cases the lifetime of daughter nuclei can be very long, this can lead
 to numerical inaccuracy in the times saved to the output files. _remage_ will
 warn you if a track has a global time large enough that the precision is less
 than 1$\mu$s. This will occur when times go beyond around 285 years.
+
 :::
 
 In some cases, it may be required to simulate only a part of a decay chain. To
@@ -152,7 +162,9 @@ However, the decay of $^{210}$Pb would not be allowed due to the value
 of $A=210$.
 
 :::{note}
+
 This mechanism can be used to select arbitrary sections of decay chains!
+
 :::
 
 ## Double-beta decay physics
@@ -201,7 +213,8 @@ state of $^{76}$Ge with:
   `/control/manual /bxdecay0/generator/dbd`
 - The verbosity of _bxdecay0_ can be increased with
   `/bxdecay0/generator/verbosity LEVEL` where `LEVEL` is 0, 1, 2 and 3.
-  :::
+
+:::
 
 ## Cosmic muons
 
@@ -272,7 +285,8 @@ Here:
 - The python package _revertex_
   [docs](https://revertex.readthedocs.io/en/latest/) contains functionality for
   generating input files in the correct format.
-  :::
+
+:::
 
 Once this input file is created it can be read into _remage_ as an event
 generator using the macro command
@@ -286,6 +300,8 @@ generator using the macro command
 Where `{FILE_PATH}` is the path to the input LH5 file.
 
 :::{warning}
+
 This functionality is currently limited to events where a single primary
 particle is produced per event.
+
 :::

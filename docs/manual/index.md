@@ -1,6 +1,6 @@
 # User Manual
 
-:::{toctree}
+```{toctree}
 :maxdepth: 1
 
 install.md
@@ -13,4 +13,4 @@ input.md
 output.md
 visualization.md
 extend.md
-:::
+```

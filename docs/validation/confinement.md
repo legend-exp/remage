@@ -10,6 +10,7 @@ These tests consist both of Geant4 visualisation plots showing the location of g
 The first set of tests are related to sampling on the bulk or the surface of simple solids, these can be sampled natively (i.e. without rejection sampling).
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/native-volume.output.jpeg
@@ -38,6 +39,7 @@ The next tests relate to generation of points on complex solids, generated from 
 Similar to the previous test simulations are performed both for the surface and the bulk.
 
 :::{subfigure} AB
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/complex-volume.output.jpeg
@@ -67,6 +69,7 @@ volume in the detector. In addition, there is the possibility to select vertices
 of some physical and geometrical volumes. This subsection validates these features.
 
 :::{subfigure} ABC
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/geometrical.output.jpeg
@@ -85,6 +88,7 @@ of some physical and geometrical volumes. This subsection validates these featur
 ```
 
 Checks on sampling for intersections and unions.
+
 :::
 
 - In the first case, you should see points sampled in three user defined volumes, a section of a cylinder (far left),
@@ -106,6 +110,7 @@ The following figures show the bounding sphere and initial points (which should 
 grey bounding spheres are large enough to contain the green solids and that the red points all lie outside the grey box.
 
 :::{subfigure} ABC
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/surface-sample-bounding-box-simple.output.jpeg
@@ -124,6 +129,7 @@ grey bounding spheres are large enough to contain the green solids and that the 
 ```
 
 Checks on the bounding spheres.
+
 :::
 
 ### Location of sampled vertices
@@ -132,6 +138,7 @@ The next figures show the location of generated primaries for various different 
 primaries are contained in the appropriate solid and that they are distributed on the surface.
 
 :::{subfigure} AB|CD|EF
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/vis-surface-tubby.output.jpeg
@@ -165,6 +172,7 @@ primaries are contained in the appropriate solid and that they are distributed o
 ```
 
 Checks on the location of vertices for surface sampling.
+
 :::
 
 ### Statistical tests of uniformity
@@ -177,6 +185,7 @@ First we plot the 3D position of the vertices labelling which side the vertex is
 close to any side the test will fail.
 
 :::{subfigure} AB|CD|EF
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/confinement.simple-solids-surface-tubby-3d.output.png
@@ -204,6 +213,7 @@ close to any side the test will fail.
 ```
 
 :::
+
 You should be able to verify that the primaries close to each surface are correctly identified
 and that the primaries are indeed distributed on a surface.
 
@@ -211,6 +221,7 @@ Finally, we perform the statistical tests comparing the ratio of primaries on ea
 to the ratio of surface area. You should see only statistical fluctuations.
 
 :::{subfigure} AB|CD|EF
+
 :subcaptions: above
 
 ```{image} ./_img/confinement/confinement.simple-solids-surface-tubby-ratios.output.png

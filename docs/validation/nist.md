@@ -22,6 +22,7 @@ description of the reported quantities is available
 [here](https://physics.nist.gov/PhysRefData/Star/Text/method.html)).
 
 :::{subfigure} AA|BC
+
 :subcaptions: above
 
 ```{image} ./_img/nist/e-range-ge-vs-estar.output.png
@@ -45,6 +46,8 @@ tuning of production cuts or step length).
 :::
 
 :::{note}
+
 Simulation and analysis scripts are available in
 [`tests/nist`](https://github.com/legend-exp/remage/tree/main/tests/nist).
+
 :::
