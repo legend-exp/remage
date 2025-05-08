@@ -64,7 +64,8 @@ $ make install
 
 :::{warning}
 
-If you want to run the _remage_ tests the cmake flag `-DBUILD_TESTING=ON` is required.
+If you want to run the _remage_ tests the cmake flag `-DBUILD_TESTING=ON` is
+required.
 
 :::
 
@@ -239,8 +240,8 @@ To reference a remage macro command auto-generated documentation section type
 `<project:./rmg-commands.md#rmgmanagerinteractive>`, which will render as
 <project:./rmg-commands.md#rmgmanagerinteractive>.
 
-Further reading on the [myst-parser
-documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors).
+Further reading on the
+[myst-parser documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors).
 
 :::
 
@@ -249,8 +250,10 @@ documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
 To reference the C++ API docs, use the `{cpp}` domain. For example:
 
 - `` {cpp:class}`RMGHardware` `` becomes {cpp:class}`RMGHardware`
-- `` {cpp:func}`RMGHardware::RegisterDetector` `` becomes {cpp:func}`RMGHardware::RegisterDetector`
-- `` {cpp:func}`RMGGeneratorUtil::IsSampleable` `` becomes {cpp:func}`RMGGeneratorUtil::IsSampleable`
+- `` {cpp:func}`RMGHardware::RegisterDetector` `` becomes
+  {cpp:func}`RMGHardware::RegisterDetector`
+- `` {cpp:func}`RMGGeneratorUtil::IsSampleable` `` becomes
+  {cpp:func}`RMGGeneratorUtil::IsSampleable`
 
 A full list of domain roles can be found
 [here](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html).
@@ -287,17 +290,17 @@ update the documentation automatically.
 Validation reports are automatically generated and uploaded as web pages to
 https://legend-exp.github.io/remage/validation for each remage version and for
 the `stable` tag of the `remage-base` container image. The source files are
-stored in the remage repository below `docs/validation` and can be built
-locally through the `sphinx-validation` target:
+stored in the remage repository below `docs/validation` and can be built locally
+through the `sphinx-validation` target:
 
 ```console
 $ cd remage/build/
 $ make sphinx-validation
 ```
 
-CMake will copy images from the `build/tests` folder at build time and make
-them available for the report pages. To include new images to the report, you
-need to explicitly list them in the `TESTS_IMAGES` variable defined in
+CMake will copy images from the `build/tests` folder at build time and make them
+available for the report pages. To include new images to the report, you need to
+explicitly list them in the `TESTS_IMAGES` variable defined in
 `docs/validation/CMakeLists.txt`:
 
 ```cmake
@@ -323,7 +326,7 @@ validation report.
 
 :::{note}
 
-The validation report is not deployed for pull requests. Instead, the HTML
-pages can be downloaded as GitHub action artifact.
+The validation report is not deployed for pull requests. Instead, the HTML pages
+can be downloaded as GitHub action artifact.
 
 :::
