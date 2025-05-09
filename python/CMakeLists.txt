@@ -69,7 +69,7 @@ endif()
 string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
 
 # store this so the dependency installation step below is repeated whenever this changes.
-file(WRITE "${VENV_DIR}/remage-pkg-extras" "${_pkg_install}")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/remage-pkg.in" "${VENV_DIR}/remage-pkg")
 
 # now we want to use the cpp_config for the build area
 add_custom_command(
@@ -82,7 +82,7 @@ add_custom_command(
   COMMAND printf -- "-- Installed python wrapper "
   COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
   DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
-          "${VENV_DIR}/remage-pkg-extras"
+          "${VENV_DIR}/remage-pkg"
   COMMENT "Installing remage Python wrapper into the virtual environment")
 
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)
@@ -123,6 +123,7 @@ add_custom_command(
   COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
   # we want to use the cpp_config for the install area
   DEPENDS ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.install.py
+          "${VENV_DIR}/remage-pkg"
   WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
   COMMENT "Installing remage Python wrapper")
 
