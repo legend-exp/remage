@@ -19,6 +19,7 @@
 #include <ctime>
 #include <limits>
 #include <random>
+#include <unistd.h>
 
 #include "G4AnalysisManager.hh"
 #include "G4AnalysisUtilities.hh"
@@ -100,8 +101,20 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   // Check again, SetupAnalysisManager might have modified fIsPersistencyEnabled.
   if (fIsPersistencyEnabled) {
-    auto ana_man = G4AnalysisManager::Instance();
     fCurrentOutputFile = BuildOutputFile();
+
+    // check if the directory actually exists and is writable.
+    auto parent_path = fs::absolute(fCurrentOutputFile.first).parent_path();
+    if (!fs::is_directory(parent_path) || access(parent_path.string().c_str(), W_OK | X_OK) != 0) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Output file parent directory ",
+          parent_path.string(),
+          " does not exist or is not writable."
+      );
+    }
+
+    auto ana_man = G4AnalysisManager::Instance();
     auto fn = fCurrentOutputFile.first.string();
 
     // ntuple merging is only supported for some file types. Unfortunately, the function to
@@ -135,9 +148,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
     // If opening failed, disable persistency.
     if (!success) {
-      if (this->IsMaster()) RMGLog::Out(RMGLog::error, "Failed opening output file ", fn);
-      manager->EnablePersistency(false);
-      fIsPersistencyEnabled = false;
+      if (this->IsMaster()) RMGLog::Out(RMGLog::fatal, "Failed opening output file ", fn);
     }
   }
 
