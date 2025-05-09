@@ -76,6 +76,28 @@ output schemes are registered, but no file will be created.
 
 :::
 
+In case a multithreaded simulation is requested with the `-t` or `--threads` option 
+(see {ref}`running`), the output file names with be appended with the thread number.
+_remage_ will produce one output file per thread appending `_t$id` where `$id` is the
+thread number before the file extension.
+
+For example running _remage_ with:
+
+``` 
+remage -o OUTPUT.lh5 -t 8
+```
+will result in output files `OUTPUT_t0.lh5,... OUTPUT_t7.lh5`.
+
+For the LH5 output format it is possible to merge the output files before
+saving to disk, this can be enabled with the `--merge-output-files` (or `-m`)
+option.
+
+:::{warning}
+Merging involves some additional I/O operations so for some simulations may increase run time! _remage_ will report
+the amount of time spent merging the files.
+:::
+
+
 ## LH5 output
 
 It is possible to directly write a LH5 file from _remage_, to facilitate reading
@@ -98,6 +120,26 @@ $ mv output.{hdf5,lh5}
 ```
 
 :::
+### Reshaping output tables
+
+For the LH5 output and _Germanium_ or _Scintillator_ output  we implemented a "reshaping"
+of the output tables. This groups together rows in the same output table that have the 
+same simulated Geant4 evtid and also with times with the user defined time window (more later). In this way
+the rows of the output table represent physical interactions in each output table.
+
+The means the columns  of the output table are converted from [LH5 Array's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Array) objects to [LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors). However, this grouping is lossless.
+
+This is enabled by default for `.lh5` file outputs, it can be supressed with the `--flat-output`  flag to 
+the _remage_ exectuable. The time window used to group together rows can be set with the `--time-window-in-us`
+flag, the units are $\mu$s and by default a window of 10$\mu$s is used.
+
+:::{warning}
+Reshaping involves some additional I/O operations so for some simulations may increase run time! _remage_ will report
+the amount of time spent reshaping the files.
+:::
+
+It is possible to supply both the `-m` and `-r` flags to simulataneously merge and reshape the output files.
+
 
 ## Physical units
 
