@@ -77,9 +77,9 @@ output schemes are registered, but no file will be created.
 :::
 
 In case a multithreaded simulation is requested with the `-t` or `--threads`
-option (see {ref}`running`), the output file names with be appended with the
+option (see {ref}`running`), the output file names will be appended with the
 thread number. _remage_ will produce one output file per thread appending
-`_t$id` where `$id` is the thread number before the file extension.
+`_t$id`, where `$id` is the thread number, before the file extension.
 
 For example running _remage_ with:
 
@@ -89,12 +89,18 @@ remage -o OUTPUT.lh5 -t 8
 
 will result in output files `OUTPUT_t0.lh5,..., OUTPUT_t7.lh5`.
 
-For the LH5 output format it is possible to merge the output files before saving
-to disk, this can be enabled with the `--merge-output-files` (or `-m`) option.
+Geant4 automatically merges these files into a single one at the end of a run
+for all supported formats, except for HDF5. For the LH5 output format, _remage_
+can merge the output files before saving to disk. This feature can be enabled
+with the `--merge-output-files` (or `-m`) option.
 
-:::{warning} Merging involves some additional I/O operations so for some
-simulations may increase run time! _remage_ will report the amount of time spent
-merging the files. :::
+:::{warning}
+
+Merging involves some additional I/O operations so for some simulations may
+increase run time! _remage_ will report the amount of time spent merging the
+files.
+
+:::
 
 ## LH5 output
 
@@ -133,14 +139,45 @@ objects to
 [LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors).
 However, this grouping is lossless.
 
-This is enabled by default for `.lh5` file outputs, it can be suppressed with
-the `--flat-output` flag to the _remage_ executable. The time window used to
-group together rows can be set with the `--time-window-in-us` flag, the units
-are $\mu$s and by default a window of 10$\mu$s is used.
+Without reshaping, the output table is flat: each column (`evtid`, `edep`, ...)
+is a one-dimensional array:
 
-:::{warning} Reshaping involves some additional I/O operations so for some
-simulations may increase run time! _remage_ will report the amount of time spent
-reshaping the files. :::
+```
+[{evtid: 0, particle: 11, edep: 20.1, time: 0.158, xloc: -0.0222, ...},
+ {evtid: 0, particle: 11, edep: 50.1, time: 0.251, xloc: -0.0178, ...},
+ {evtid: 0, particle: 11, edep: 74.9, time: 0.522, xloc: -0.0767, ...},
+ {evtid: 2, particle: 11, edep: 0.431, time: 0.344, xloc: -0.0335, ...},
+ {evtid: 2, particle: 11, edep: 109, time: 0.423, xloc: -0.0542, ...},
+ {evtid: 3, particle: 11, edep: 70.2, time: 0.0545, xloc: -0.0128, ...},
+ ...,
+ {evtid: 44, particle: 11, edep: 88.4, time: 0.484, xloc: -0.0313, ...},
+ {evtid: 49, particle: 11, edep: 33.1, time: 0.848, xloc: -0.126, ...},
+ {evtid: 49, particle: 11, edep: 115, time: 0.85, xloc: -0.125, yloc: ..., ...}]
+```
+
+With reshaping, columns acquire one additional dimension:
+
+```
+[{edep: [20.1, 50.1, ..., 74.9], evtid: [0, ..., 0], particle: ..., ...},
+ {edep: [0.431, 109], evtid: [2, 2], particle: [11, 11], ...},
+ {edep: [70.2], evtid: [3], particle: [11], time: [...], ...},
+ ...,
+ {edep: [88.4], evtid: [44], particle: [...], ...},
+ {edep: [33.1, 115], evtid: [49, 49], particle: ..., ...}]
+```
+
+This behavior is enabled by default for `.lh5` file outputs, it can be
+suppressed with the `--flat-output` flag to the _remage_ executable. The time
+window used to group together rows can be set with the `--time-window-in-us`
+flag, the units are $\mu$s and by default a window of 10$\mu$s is used.
+
+:::{warning}
+
+Reshaping involves some additional I/O operations so for some simulations may
+increase run time! _remage_ will report the amount of time spent reshaping the
+files.
+
+:::
 
 It is possible to supply both the `-m` and `-r` flags to simultaneously merge
 and reshape the output files.
