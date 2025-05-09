@@ -49,8 +49,9 @@ set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_R
 set_tests_properties(confinement-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # test on HPGe containment
-add_test(NAME confinement-ge/gen-output COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o
-                                                test-confine.lh5 -- macros/test-ge-confine.mac)
+add_test(NAME confinement-ge/gen-output
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine.lh5 --flat-output --
+                 macros/test-ge-confine.mac)
 set_tests_properties(
   confinement-ge/gen-output PROPERTIES LABELS extra FIXTURES_SETUP confine-output-fixture
                                        FIXTURES_REQUIRED confine-gdml-fixture)
@@ -64,8 +65,8 @@ set_tests_properties(
 
 # test on lar intersection
 add_test(NAME confinement-lar/intersection-gen-output
-         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in.lh5 --
-                 macros/lar-in.mac)
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in.lh5 --flat-output
+                 -- macros/lar-in.mac)
 set_tests_properties(
   confinement-lar/intersection-gen-output
   PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-output-fixture FIXTURES_REQUIRED
@@ -80,8 +81,8 @@ set_tests_properties(
 
 # generate subtraction output
 add_test(NAME confinement-lar/subtraction-gen-output
-         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-out.lh5 --
-                 macros/lar-out.mac)
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-out.lh5
+                 --flat-output -- macros/lar-out.mac)
 
 set_tests_properties(
   confinement-lar/subtraction-gen-output
@@ -99,8 +100,8 @@ set_tests_properties(
 
 # generate intersection and subtraction output
 add_test(NAME confinement-lar/intersection-and-subtraction-gen-output
-         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in-out.lh5 --
-                 macros/lar-in-and-out.mac)
+         COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine-lar-in-out.lh5
+                 --flat-output -- macros/lar-in-and-out.mac)
 
 set_tests_properties(
   confinement-lar/intersection-and-subtraction-gen-output
@@ -207,7 +208,7 @@ foreach(det ${_solids})
 
   add_test(NAME confinement-surface/${det}-gen
            COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
-                   detail -o test-confine-surface-${det}-out.lh5)
+                   detail --flat-output -o test-confine-surface-${det}-out.lh5)
 
   set_tests_properties(
     confinement-surface/${det}-gen

@@ -1,0 +1,102 @@
+stp : {'datatype': 'struct{det001,det002,det011,det012,vertices}'}
+stp/det001 : {'datatype': 'table{edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/det001/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/det001/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det001/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det001/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/det001/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det001/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det001/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det001/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det001/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det001/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002 : {'datatype': 'table{edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/det002/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/det002/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det002/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det002/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/det002/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det002/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det002/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det002/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det002/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det002/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011 : {'datatype': 'table{dist_to_surf,edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/det011/dist_to_surf : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det011/dist_to_surf/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/dist_to_surf/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/det011/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det011/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det011/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/det011/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det011/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det011/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det011/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det011/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det011/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012 : {'datatype': 'table{dist_to_surf,edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/det012/dist_to_surf : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det012/dist_to_surf/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/dist_to_surf/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/det012/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det012/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/det012/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/det012/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det012/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det012/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/det012/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/det012/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/det012/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/vertices : {'datatype': 'table{evtid,n_part,time,xloc,yloc,zloc}'}
+stp/vertices/evtid : {'datatype': 'array<1>{real}'}
+stp/vertices/n_part : {'datatype': 'array<1>{real}'}
+stp/vertices/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/vertices/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}

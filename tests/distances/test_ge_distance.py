@@ -18,6 +18,7 @@ from pygeomtools import get_sensvol_metadata
 
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12
+plt.rcParams["figure.constrained_layout.use"] = False
 
 gdml = "gdml/ge-array.gdml"
 outfile = sys.argv[1]

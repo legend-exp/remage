@@ -1,0 +1,29 @@
+stp : {'datatype': 'struct{germanium,scintillator,vertices}'}
+stp/germanium : {'datatype': 'table{evtid,det_uid,particle,trackid,parent_trackid,edep,time,xloc,yloc,zloc,dist_to_surf}'}
+stp/germanium/det_uid : {'datatype': 'array<1>{real}'}
+stp/germanium/dist_to_surf : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/germanium/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/germanium/evtid : {'datatype': 'array<1>{real}'}
+stp/germanium/parent_trackid : {'datatype': 'array<1>{real}'}
+stp/germanium/particle : {'datatype': 'array<1>{real}'}
+stp/germanium/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/germanium/trackid : {'datatype': 'array<1>{real}'}
+stp/germanium/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/germanium/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/germanium/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/scintillator : {'datatype': 'table{evtid,det_uid,particle,edep,time,xloc,yloc,zloc}'}
+stp/scintillator/det_uid : {'datatype': 'array<1>{real}'}
+stp/scintillator/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/scintillator/evtid : {'datatype': 'array<1>{real}'}
+stp/scintillator/particle : {'datatype': 'array<1>{real}'}
+stp/scintillator/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/scintillator/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/scintillator/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/scintillator/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
+stp/vertices/evtid : {'datatype': 'array<1>{real}'}
+stp/vertices/n_part : {'datatype': 'array<1>{real}'}
+stp/vertices/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/vertices/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}

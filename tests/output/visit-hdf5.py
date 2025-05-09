@@ -10,7 +10,7 @@ hfile = h5py.File(sys.argv[1], "r")
 
 def visit(name: str):
     if dump_lh5_datatype:
-        print(name, ":", hfile[name].attrs.get("datatype"))
+        print(name, ":", dict(hfile[name].attrs))
     else:
         print(name)
 

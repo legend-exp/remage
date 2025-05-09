@@ -35,8 +35,9 @@ with Path(f"macros/{macro}.mac").open("r") as macro_file:
 # run remage, produce lh5 output.
 files = remage_run(
     f"macros/{macro}.mac",
-    gdmls="gdml/geometry.gdml",
+    gdml_files="gdml/geometry.gdml",
     output=output_lh5,
+    flat_output=True,
     threads=nthread,
     log_level="summary",
 )[1].get("output")

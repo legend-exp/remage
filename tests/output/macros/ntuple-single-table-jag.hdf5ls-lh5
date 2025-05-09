@@ -1,0 +1,61 @@
+stp : {'datatype': 'struct{germanium,scintillator,vertices}'}
+stp/germanium : {'datatype': 'table{det_uid,dist_to_surf,edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/germanium/det_uid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/germanium/det_uid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/det_uid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/dist_to_surf : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/germanium/dist_to_surf/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/dist_to_surf/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/germanium/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/germanium/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/germanium/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/germanium/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/germanium/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/germanium/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/germanium/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/germanium/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/germanium/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator : {'datatype': 'table{det_uid,edep,evtid,particle,time,xloc,yloc,zloc}'}
+stp/scintillator/det_uid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/scintillator/det_uid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/det_uid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/edep : {'datatype': 'array<1>{array<1>{real}}', 'units': 'keV'}
+stp/scintillator/edep/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/edep/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/evtid : {'datatype': 'array<1>{array<1>{real}}'}
+stp/scintillator/evtid/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/evtid/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/particle : {'datatype': 'array<1>{array<1>{real}}'}
+stp/scintillator/particle/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/particle/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/time : {'datatype': 'array<1>{array<1>{real}}', 'units': 'ns'}
+stp/scintillator/time/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/time/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/xloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/scintillator/xloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/xloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/yloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/scintillator/yloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/yloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/scintillator/zloc : {'datatype': 'array<1>{array<1>{real}}', 'units': 'm'}
+stp/scintillator/zloc/cumulative_length : {'datatype': 'array<1>{real}'}
+stp/scintillator/zloc/flattened_data : {'datatype': 'array<1>{real}'}
+stp/vertices : {'datatype': 'table{evtid,n_part,time,xloc,yloc,zloc}'}
+stp/vertices/evtid : {'datatype': 'array<1>{real}'}
+stp/vertices/n_part : {'datatype': 'array<1>{real}'}
+stp/vertices/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/vertices/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}

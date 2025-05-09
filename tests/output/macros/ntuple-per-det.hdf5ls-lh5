@@ -1,42 +1,42 @@
-stp : struct{det001,det002,det011,det012,vertices}
-stp/det001 : table{evtid,particle,edep,time,xloc,yloc,zloc}
-stp/det001/edep : array<1>{real}
-stp/det001/evtid : array<1>{real}
-stp/det001/particle : array<1>{real}
-stp/det001/time : array<1>{real}
-stp/det001/xloc : array<1>{real}
-stp/det001/yloc : array<1>{real}
-stp/det001/zloc : array<1>{real}
-stp/det002 : table{evtid,particle,edep,time,xloc,yloc,zloc}
-stp/det002/edep : array<1>{real}
-stp/det002/evtid : array<1>{real}
-stp/det002/particle : array<1>{real}
-stp/det002/time : array<1>{real}
-stp/det002/xloc : array<1>{real}
-stp/det002/yloc : array<1>{real}
-stp/det002/zloc : array<1>{real}
-stp/det011 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
-stp/det011/dist_to_surf : array<1>{real}
-stp/det011/edep : array<1>{real}
-stp/det011/evtid : array<1>{real}
-stp/det011/particle : array<1>{real}
-stp/det011/time : array<1>{real}
-stp/det011/xloc : array<1>{real}
-stp/det011/yloc : array<1>{real}
-stp/det011/zloc : array<1>{real}
-stp/det012 : table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}
-stp/det012/dist_to_surf : array<1>{real}
-stp/det012/edep : array<1>{real}
-stp/det012/evtid : array<1>{real}
-stp/det012/particle : array<1>{real}
-stp/det012/time : array<1>{real}
-stp/det012/xloc : array<1>{real}
-stp/det012/yloc : array<1>{real}
-stp/det012/zloc : array<1>{real}
-stp/vertices : table{evtid,time,xloc,yloc,zloc,n_part}
-stp/vertices/evtid : array<1>{real}
-stp/vertices/n_part : array<1>{real}
-stp/vertices/time : array<1>{real}
-stp/vertices/xloc : array<1>{real}
-stp/vertices/yloc : array<1>{real}
-stp/vertices/zloc : array<1>{real}
+stp : {'datatype': 'struct{det001,det002,det011,det012,vertices}'}
+stp/det001 : {'datatype': 'table{evtid,particle,edep,time,xloc,yloc,zloc}'}
+stp/det001/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/det001/evtid : {'datatype': 'array<1>{real}'}
+stp/det001/particle : {'datatype': 'array<1>{real}'}
+stp/det001/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/det001/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det001/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det001/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det002 : {'datatype': 'table{evtid,particle,edep,time,xloc,yloc,zloc}'}
+stp/det002/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/det002/evtid : {'datatype': 'array<1>{real}'}
+stp/det002/particle : {'datatype': 'array<1>{real}'}
+stp/det002/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/det002/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det002/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det002/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det011 : {'datatype': 'table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}'}
+stp/det011/dist_to_surf : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det011/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/det011/evtid : {'datatype': 'array<1>{real}'}
+stp/det011/particle : {'datatype': 'array<1>{real}'}
+stp/det011/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/det011/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det011/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det011/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det012 : {'datatype': 'table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf}'}
+stp/det012/dist_to_surf : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det012/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
+stp/det012/evtid : {'datatype': 'array<1>{real}'}
+stp/det012/particle : {'datatype': 'array<1>{real}'}
+stp/det012/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/det012/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det012/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/det012/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
+stp/vertices/evtid : {'datatype': 'array<1>{real}'}
+stp/vertices/n_part : {'datatype': 'array<1>{real}'}
+stp/vertices/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+stp/vertices/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+stp/vertices/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}

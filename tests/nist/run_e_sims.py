@@ -11,6 +11,7 @@ base_args = [
     "gdml/geometry.gdml",
     "--output-file",
     "electrons-ge-{}-keV.lh5",
+    "--flat-output",
     "--overwrite",
     "--quiet",
     "macros/run.mac",
