@@ -133,10 +133,10 @@ objects to
 [LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors).
 However, this grouping is lossless.
 
-This is enabled by default for `.lh5` file outputs, it can be suppressed with the
-`--flat-output` flag to the _remage_ executable. The time window used to group
-together rows can be set with the `--time-window-in-us` flag, the units are
-$\mu$s and by default a window of 10$\mu$s is used.
+This is enabled by default for `.lh5` file outputs, it can be suppressed with
+the `--flat-output` flag to the _remage_ executable. The time window used to
+group together rows can be set with the `--time-window-in-us` flag, the units
+are $\mu$s and by default a window of 10$\mu$s is used.
 
 :::{warning} Reshaping involves some additional I/O operations so for some
 simulations may increase run time! _remage_ will report the amount of time spent
