@@ -97,6 +97,8 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
         proc_name_hash ^= (uint32_t)b;
         proc_name_hash *= 0x01000193;
       }
+      // xor-fold down to 16 bit.
+      proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
       fProcessMap.emplace(proc_name, proc_name_hash);
     }
     proc_id = fProcessMap[proc_name];
@@ -156,10 +158,16 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   const auto ana_man = G4AnalysisManager::Instance();
   auto ntupleid = rmg_man->GetNtupleID("processes");
 
+  std::set<uint32_t> proc_ids; // to check for duplicates.
+
   for (auto [proc_name, proc_id] : fProcessMap) {
     ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
     ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
     ana_man->AddNtupleRow(ntupleid);
+
+    if (!proc_ids.insert(proc_id).second) {
+      RMGLog::OutDev(RMGLog::error, "duplicate process name hash ", proc_id);
+    }
   }
 }
 
