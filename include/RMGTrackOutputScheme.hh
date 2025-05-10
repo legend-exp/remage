@@ -58,7 +58,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
 
-    std::map<std::string, int> fProcessMap;
+    std::map<std::string, uint32_t> fProcessMap;
 
     std::set<std::string> fFilterProcess;
     std::set<int> fFilterParticle;
