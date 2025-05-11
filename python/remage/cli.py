@@ -9,17 +9,14 @@ import signal
 import subprocess
 import sys
 import threading
-import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import colorlog
-from lgdo.lh5.concat import lh5concat
-from reboost.build_hit import build_hit
 
-from . import utils
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
+from .post_proc import post_proc
 
 
 def _run_remage_cpp(
@@ -320,91 +317,13 @@ def remage_run_from_args(
     }
     logger.setLevel(levels_rmg_to_py[log_level])
 
-    remage_files = ipc_info.get("output")
-    main_output_file = ipc_info.get_single("output_main", None)
-    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
-    detector_info = ipc_info.get("output_table", 2)
-
-    ipc_info.remove("output_main")
-
-    if main_output_file is None:
-        return ec, ipc_info
-
-    output_file_exts = {
-        Path(p).suffix.lower() for p in [*remage_files, main_output_file]
-    }
-
-    assert len(output_file_exts) == 1
-
-    if output_file_exts != {".lh5"}:
-        if not py_args.flat_output or py_args.merge_output_files:
-            logger.error(
-                "merging or reshaping is not supported for output format %s",
-                next(iter(output_file_exts)).lstrip("."),
-            )
-
-        return ec, ipc_info
-
-    # LH5 output post-processing
-    assert (len(remage_files) == 0 and main_output_file is None) or (
-        len(remage_files) > 0 and main_output_file is not None
+    # apply python-based post-processing.
+    post_proc(
+        ipc_info,
+        py_args.flat_output,
+        py_args.merge_output_files,
+        py_args.time_window_in_us,
     )
-
-    time_start = time.time()
-
-    if not py_args.flat_output:
-        msg = "Reshaping output files"
-        logger.info(msg)
-
-        # registered scintillator or germanium detectors
-        registered_detectors = list(
-            {
-                det[1]
-                for det in detector_info
-                if det[0] == "germanium" or det[0] == "scintillator"
-            }
-        )
-
-        with utils.tmp_renamed_files(remage_files) as original_files:
-            # get the additional tables to copy
-            extra_tables = utils.get_extra_tables(
-                original_files[0], registered_detectors
-            )
-
-            config = utils.get_rebooost_config(
-                registered_detectors,
-                extra_tables,
-                time_window=py_args.time_window_in_us,
-            )
-
-            # use reboost to post-process outputs
-            build_hit(
-                config,
-                {},
-                stp_files=original_files,
-                glm_files=None,
-                hit_files=remage_files,
-                out_field="stp",
-            )
-
-        # set the merged output file for downstream consumers.
-        ipc_info.set("output", remage_files)
-
-    if py_args.merge_output_files:
-        msg = "Merging output files"
-        logger.info(msg)
-
-        with utils.tmp_renamed_files(remage_files) as original_files:
-            lh5concat(
-                lh5_files=original_files,
-                output=main_output_file,
-                overwrite=overwrite_output,
-            )
-
-        ipc_info.set("output", main_output_file)
-
-    msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
-    logger.info(msg)
 
     return ec, ipc_info
 

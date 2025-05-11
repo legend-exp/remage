@@ -11,7 +11,8 @@ set(PYTHON_SOURCES
     ${_r}/python/remage/__main__.py
     ${_r}/python/remage/find_remage.py
     ${_r}/python/remage/cli.py
-    ${_r}/python/remage/ipc.py)
+    ${_r}/python/remage/ipc.py
+    ${_r}/python/remage/post_proc.py)
 # cmake-format: on
 
 # get the output name of the remage-cli target (set in src/CMakeLists.txt)
