@@ -89,7 +89,17 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   int proc_id = -1;
   if (proc) {
     if (fProcessMap.find(proc_name) == fProcessMap.end()) {
-      fProcessMap.emplace(proc_name, fProcessMap.size());
+      // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
+      // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+      // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
+      uint32_t proc_name_hash = 0x811c9dc5;
+      for (char& b : proc_name) {
+        proc_name_hash ^= (uint32_t)b;
+        proc_name_hash *= 0x01000193;
+      }
+      // xor-fold down to 16 bit.
+      proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
+      fProcessMap.emplace(proc_name, proc_name_hash);
     }
     proc_id = fProcessMap[proc_name];
   }
@@ -148,10 +158,16 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   const auto ana_man = G4AnalysisManager::Instance();
   auto ntupleid = rmg_man->GetNtupleID("processes");
 
+  std::set<uint32_t> proc_ids; // to check for duplicates.
+
   for (auto [proc_name, proc_id] : fProcessMap) {
     ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
     ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
     ana_man->AddNtupleRow(ntupleid);
+
+    if (!proc_ids.insert(proc_id).second) {
+      RMGLog::OutDev(RMGLog::error, "duplicate process name hash ", proc_id);
+    }
   }
 }
 
