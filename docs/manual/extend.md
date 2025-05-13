@@ -13,17 +13,17 @@ target_link_libraries(myapp PRIVATE RMG::remage)
 
 ## Forwarding arguments
 
-The `RMGManager` is crucial for any of your code to extend _remage_. You can
-access it via
+The {cpp:class}`RMGManager` is crucial for any of your code to extend _remage_.
+You can access it via
 
 ```c++
 #include "RMGManager.hh"
-...
+/*...*/
 RMGManager manager("myapp", argc, argv);
 ```
 
-Using the `RMGManager` you can forward the properties that you otherwise would
-have forwarded through CLI arguments:
+Using the {cpp:class}`RMGManager` you can forward the properties that you
+otherwise would have forwarded through CLI arguments:
 
 ```c++
 manager.IncludeMacroFile(macroName);
@@ -33,14 +33,14 @@ manager.SetNumberOfThreads(nthreads);
 manager.SetOutputOverwriteFiles(overwrite);
 ```
 
-For all of the possible options check the public functions of the `RMGManager`
-[here]{cpp:class}`RMGManager`.
+For all of the possible options check the public functions of the
+{cpp:class}`RMGManager`.
 
 ## Registering custom classes
 
 To register your own custom C++ classes to _remage_ you can use pre-defined
 methods of _remage_. They are distributed in two places: as class methods of
-either `RMGManager` or `RMGUserInit`.
+either {cpp:class}`RMGManager` or {cpp:class}`RMGUserInit`.
 
 ```c++
 manager.SetUserInit(new MyGeometry());
@@ -48,30 +48,31 @@ manager.SetUserInit(new MyPhysicsList());
 ```
 
 The `SetUserInit()` method supports a detector geometry inheriting from
-`RMGHardware`, a runmanager inheriting from `G4RunManager`, a vismanager
-inheriting from `G4VisManager` and a custom physics list inheriting from
-`G4VUserPhysicsList`.
+{cpp:class}`RMGHardware`, a runmanager inheriting from `G4RunManager`, a
+vismanager inheriting from `G4VisManager` and a custom physics list inheriting
+from `G4VUserPhysicsList`.
 
 If you want to register more custom classes, you will have to use the
-`RMGUserInit` class. Access it with
-`auto user_init = RMGManager::Instance()->GetUserInit()`. The `RMGUserInit` now
-lets you register more custom classes:
+{cpp:class}`RMGUserInit` class. Access it with
+`auto user_init = RMGManager::Instance()->GetUserInit();`. The obtained instance
+now lets you register more custom classes that can customize the simulation flow
+more than macro commands:
 
 ```c++
-user_init->AddOutputScheme<T>(...);
-user_init->AddSteppingAction<T>(...);
-user_init->AddTrackingAction<T>(...);
-user_init->SetUserGenerator<T>(...);
-user_init->AddOptionalOutputScheme<T>("name", ...);
+user_init->AddOutputScheme<T>(/*...*/);
+user_init->AddSteppingAction<T>(/*...*/);
+user_init->AddTrackingAction<T>(/*...*/);
+user_init->SetUserGenerator<T>(/*...*/);
+user_init->AddOptionalOutputScheme<T>("name", /*...*/);
 user_init->ActivateOptionalOutputScheme("name");
 ```
 
-Where you replace `T` with your class and `...` with the arguments your class
-would take when doing `new T(...)`. Your `SteppingAction` should inherit from
-`G4UserSteppingAction`, the `TrackingAction` from `G4UserTrackingAction`, the
-generator from `RMGVGenerator` and your custom `OutputScheme` from
-`RMGVOutputScheme`. For more info about `RMGUserInit` see
-[here]{cpp:class}`RMGUserInit`.
+Where you replace `T` with the name of your class and `/*...*/` with the
+arguments your class constructor would take when doing `new T(/*...*/)`. Your
+stepping action should inherit from `G4UserSteppingAction`, the tracking action
+from `G4UserTrackingAction`, the generator from {cpp:class}`RMGVGenerator` and
+your custom output scheme from {cpp:class}`RMGVOutputScheme`. For more info
+about {cpp:class}`RMGUserInit` check the API docs.
 
 ## Starting the run
 
