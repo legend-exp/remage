@@ -59,10 +59,10 @@ now lets you register more custom classes that can customize the simulation flow
 more than macro commands:
 
 ```c++
-user_init->AddOutputScheme<T>(/*...*/);
 user_init->AddSteppingAction<T>(/*...*/);
 user_init->AddTrackingAction<T>(/*...*/);
 user_init->SetUserGenerator<T>(/*...*/);
+user_init->AddOutputScheme<T>(/*...*/);
 user_init->AddOptionalOutputScheme<T>("name", /*...*/);
 user_init->ActivateOptionalOutputScheme("name");
 ```
