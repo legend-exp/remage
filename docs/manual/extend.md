@@ -84,5 +84,5 @@ manager.Run();
 ```
 
 This means after `manager.Run()` you can add more custom C++ code that you wish
-to be run after finishing the simulation. For some examples check the
-[example folder](project:../../examples)
+to be run after finishing the simulation. For some examples check the examples
+folder.
