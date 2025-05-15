@@ -38,9 +38,9 @@ For all of the possible options check the public functions of the
 
 ## Registering custom classes
 
-To register your own custom C++ classes to _remage_ you can use pre-defined
-methods of _remage_. They are distributed in two places: as class methods of
-either {cpp:class}`RMGManager` or {cpp:class}`RMGUserInit`.
+To register your own custom C++ classes within _remage_ you can use some
+pre-defined methods of _remage_. They are distributed in two places: as class
+methods of either {cpp:class}`RMGManager` or {cpp:class}`RMGUserInit`.
 
 ```c++
 manager.SetUserInit(new MyGeometry());
@@ -48,9 +48,9 @@ manager.SetUserInit(new MyPhysicsList());
 ```
 
 The `SetUserInit()` method supports a detector geometry inheriting from
-{cpp:class}`RMGHardware`, a runmanager inheriting from `G4RunManager`, a
-vismanager inheriting from `G4VisManager` and a custom physics list inheriting
-from `G4VUserPhysicsList`.
+{cpp:class}`RMGHardware`, a run manager inheriting from `G4RunManager`, a
+visualization manager inheriting from `G4VisManager` and a custom physics list
+inheriting from `G4VUserPhysicsList`.
 
 If you want to register more custom classes, you will have to use the
 {cpp:class}`RMGUserInit` class. Access it with
@@ -84,6 +84,6 @@ manager.Initialize();
 manager.Run();
 ```
 
-This means after `manager.Run()` you can add more custom C++ code that you wish
-to be run after finishing the simulation. For some examples check the examples
-folder.
+This means after {cpp:func}`RMGManager::Run` you can add more custom C++ code
+that you wish to be run after finishing the simulation. For some examples check
+the examples folder.
