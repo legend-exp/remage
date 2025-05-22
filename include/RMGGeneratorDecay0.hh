@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
 
 #include "RMGVGenerator.hh"
@@ -31,6 +32,11 @@ class G4Event;
 class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
+
+    enum class DecayMode {
+      k2vbb,
+      k0vbb
+    };
 
     RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
     RMGGeneratorDecay0() = delete;
@@ -47,6 +53,18 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
   private:
 
     std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
+
+    std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
+    void DefineCommands();
+    void SetMode(std::string mode);
+
+    DecayMode fDecayMode = DecayMode::k2vbb;
+    // BxDecay0 wants G4 variables
+    G4String nuclide;
+    G4int seed;
+    G4int dbd_mode;
+    G4int dbd_level;
+    G4bool debug;
 };
 
 #endif
