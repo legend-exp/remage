@@ -27,7 +27,7 @@ class RMGEventAction : public G4UserEventAction {
   public:
 
     RMGEventAction(RMGRunAction*);
-    inline ~RMGEventAction() = default;
+    ~RMGEventAction() = default;
 
     RMGEventAction(RMGEventAction const&) = delete;
     RMGEventAction& operator=(RMGEventAction const&) = delete;

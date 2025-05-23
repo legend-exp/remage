@@ -48,10 +48,10 @@ class RMGRunAction : public G4UserRunAction {
     void BeginOfRunAction(const G4Run*) override;
     void EndOfRunAction(const G4Run*) override;
 
-    [[nodiscard]] inline int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
+    [[nodiscard]] int GetCurrentRunPrintModulo() const { return fCurrentPrintModulo; }
 
-    [[nodiscard]] inline const auto& GetAllOutputDataFields() { return fOutputDataFields; }
-    inline void ClearOutputDataFields() {
+    [[nodiscard]] const auto& GetAllOutputDataFields() { return fOutputDataFields; }
+    void ClearOutputDataFields() {
       for (auto& el : fOutputDataFields) el->ClearBeforeEvent();
     }
 

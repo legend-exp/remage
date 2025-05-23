@@ -83,12 +83,12 @@ class RMGLog {
     /**
      * Returns the minimum log level for screen output.
      * @return log level */
-    static inline RMGLog::LogLevel GetLogLevel() { return fMinimumLogLevel; }
+    static RMGLog::LogLevel GetLogLevel() { return fMinimumLogLevel; }
 
     /**
      * Returns true if the loglevel is prefixed to every message.
      * Default: true */
-    static inline bool GetPrefix() { return fUsePrefix; }
+    static bool GetPrefix() { return fUsePrefix; }
 
     /** @} */
     /** \name Setters */
@@ -97,15 +97,15 @@ class RMGLog {
     /**
      * Sets the minimum log level for screen output.
      * @param loglevel log level */
-    static inline void SetLogLevel(RMGLog::LogLevel loglevel) { fMinimumLogLevel = loglevel; }
+    static void SetLogLevel(RMGLog::LogLevel loglevel) { fMinimumLogLevel = loglevel; }
 
     /**
      * Toggle if the loglevel is prefixed to every message. */
-    static inline void SetPrefix(bool flag) { fUsePrefix = flag; }
+    static void SetPrefix(bool flag) { fUsePrefix = flag; }
 
     /**
      * Toggle if a startup message is shown before the first log message. */
-    static inline void SetInihibitStartupInfo(bool flag) { fFirstOutputDone = flag; }
+    static void SetInihibitStartupInfo(bool flag) { fFirstOutputDone = flag; }
 
     /** @} */
     /** \name Miscellaneous */
@@ -124,7 +124,7 @@ class RMGLog {
     static void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args);
 
     template<typename T, typename... Args>
-    static inline void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
+    static void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
       RMGLog::Out(loglevel, msg_first, msg_other...);
     }
 
@@ -134,15 +134,15 @@ class RMGLog {
 
     /**
      * @return string containing the version number  */
-    static inline const std::string& GetVersion() { return fVersion; }
+    static const std::string& GetVersion() { return fVersion; }
 
     static bool SupportsColors(const std::ostream& os);
 
     template<RMGLog::Ansi color, typename T>
     static std::string Colorize(const T& msg, std::ostream& os, bool bold = false);
 
-    inline static bool HadWarning() { return fHadWarning; }
-    inline static bool HadError() { return fHadError; }
+    static bool HadWarning() { return fHadWarning; }
+    static bool HadError() { return fHadError; }
 
     /** @} */
 

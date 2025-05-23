@@ -36,9 +36,7 @@ class RMGTrackingAction : public G4UserTrackingAction {
 
     void PreUserTrackingAction(const G4Track*) override;
     void PostUserTrackingAction(const G4Track*) override;
-    inline G4TrackingManager* GetTrackingManager() {
-      return G4UserTrackingAction::fpTrackingManager;
-    };
+    G4TrackingManager* GetTrackingManager() { return G4UserTrackingAction::fpTrackingManager; };
 
   private:
 

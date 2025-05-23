@@ -38,17 +38,17 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     void EndOfRunAction(const G4Run*) override;
 
     // always store vertex data, so that results are not skewed if events are discarded.
-    [[nodiscard]] inline bool StoreAlways() const override { return true; }
+    [[nodiscard]] bool StoreAlways() const override { return true; }
 
   protected:
 
-    [[nodiscard]] inline std::string GetNtupleName(RMGDetectorMetadata) const override {
+    [[nodiscard]] std::string GetNtupleName(RMGDetectorMetadata) const override {
       throw std::logic_error("step output scheme has no detectors");
     }
 
-    inline void AddParticleFilter(const int pdg) { fFilterParticle.insert(pdg); }
-    inline void AddProcessFilter(const std::string proc) { fFilterProcess.insert(proc); }
-    inline void SetEnergyFilter(double energy) { fFilterEnergy = energy; }
+    void AddParticleFilter(const int pdg) { fFilterParticle.insert(pdg); }
+    void AddProcessFilter(const std::string proc) { fFilterProcess.insert(proc); }
+    void SetEnergyFilter(double energy) { fFilterEnergy = energy; }
 
   private:
 

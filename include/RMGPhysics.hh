@@ -75,7 +75,7 @@ class RMGPhysics : public G4VModularPhysicsList {
         ProdCutStore() = default;
 
         /** @brief Constructor setting the default production cut @c def_cut */
-        inline ProdCutStore(double def_cut)
+        ProdCutStore(double def_cut)
             : gamma(def_cut), electron(def_cut), positron(def_cut), proton(def_cut), alpha(def_cut),
               generic_ion(def_cut) {}
 

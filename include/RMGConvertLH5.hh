@@ -46,7 +46,7 @@ class RMGConvertLH5 {
 
   private:
 
-    inline RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run, bool part_of_batch)
+    RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run, bool part_of_batch)
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fDryRun(dry_run),
           fIsPartOfBatch(part_of_batch) {};
 
@@ -95,7 +95,7 @@ class RMGConvertLH5 {
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    template<typename... Args> inline void LH5Log(RMGLog::LogLevel loglevel, const Args&... args) {
+    template<typename... Args> void LH5Log(RMGLog::LogLevel loglevel, const Args&... args) {
       if (fDryRun && loglevel < RMGLog::error) return;
       std::string fn_prefix = fIsPartOfBatch ? " (" + fHdf5FileName + ")" : "";
       RMGLog::Out(

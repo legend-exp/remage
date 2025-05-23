@@ -16,7 +16,7 @@ class TestGeometry : public RMGHardware {
 
   public:
 
-    inline G4VPhysicalVolume* DefineGeometry() override {
+    G4VPhysicalVolume* DefineGeometry() override {
       auto LAr = G4NistManager::Instance()->FindOrBuildMaterial("G4_lAr");
 
       auto world_s = new G4Box("world", 0.5 * u::m, 0.5 * u::m, 0.5 * u::m);

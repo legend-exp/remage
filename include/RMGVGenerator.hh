@@ -30,23 +30,23 @@ class RMGVGenerator {
 
     RMGVGenerator() = delete;
 
-    inline RMGVGenerator(std::string name) : fGeneratorName(name) {};
+    RMGVGenerator(std::string name) : fGeneratorName(name) {};
 
-    virtual inline ~RMGVGenerator() = default;
+    virtual ~RMGVGenerator() = default;
 
     RMGVGenerator(RMGVGenerator const&) = delete;
     RMGVGenerator& operator=(RMGVGenerator const&) = delete;
     RMGVGenerator(RMGVGenerator&&) = delete;
     RMGVGenerator& operator=(RMGVGenerator&&) = delete;
 
-    virtual inline void BeginOfRunAction(const G4Run*) {};
-    virtual inline void EndOfRunAction(const G4Run*) {};
+    virtual void BeginOfRunAction(const G4Run*) {};
+    virtual void EndOfRunAction(const G4Run*) {};
 
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
     virtual void GeneratePrimaries(G4Event*) = 0;
 
-    inline void SetReportingFrequency(int freq) { fReportingFrequency = freq; }
-    inline std::string GetGeneratorName() { return fGeneratorName; }
+    void SetReportingFrequency(int freq) { fReportingFrequency = freq; }
+    std::string GetGeneratorName() { return fGeneratorName; }
 
   protected:
 

@@ -50,7 +50,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     void SetParticlePosition(G4ThreeVector) override {}
 
     void BeginOfRunAction(const G4Run*) override;
-    inline void EndOfRunAction(const G4Run*) override {}
+    void EndOfRunAction(const G4Run*) override {}
 
   private:
 

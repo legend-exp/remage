@@ -30,7 +30,7 @@ class RMGIsotopeFilterEventInformation : public G4VUserEventInformation {
   public:
 
     RMGIsotopeFilterEventInformation() = default;
-    inline void Print() const override {}
+    void Print() const override {}
 };
 
 class G4Event;
@@ -45,7 +45,7 @@ class RMGIsotopeFilterScheme : public RMGVOutputScheme {
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
     void TrackingActionPre(const G4Track* aTrack) override;
 
-    inline void AddIsotope(int a, int z) { fIsotopes.insert({a, z}); }
+    void AddIsotope(int a, int z) { fIsotopes.insert({a, z}); }
 
   private:
 

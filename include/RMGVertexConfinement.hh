@@ -106,15 +106,15 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      */
     void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr = ".*");
 
-    inline void AddGeometricalVolume(GenericGeometricalSolidData& data) {
+    void AddGeometricalVolume(GenericGeometricalSolidData& data) {
       fGeomVolumeData.emplace_back(data);
     }
     void Reset();
 
-    inline void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
-    inline void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
+    void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
+    void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
 
-    inline std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
+    std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
     }
 
@@ -258,7 +258,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     struct SampleableObjectCollection {
 
         SampleableObjectCollection() = default;
-        inline ~SampleableObjectCollection() { data.clear(); }
+        ~SampleableObjectCollection() { data.clear(); }
 
         /** @brief Select a @c SampleableObject from the collection, weighted by surface area.
          *  @returns a reference to the chosen @c SampleableObject .
@@ -275,14 +275,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         template<typename... Args> void emplace_back(Args&&... args);
-        [[nodiscard]] inline bool empty() const { return data.empty(); }
-        inline SampleableObject& back() { return data.back(); }
-        inline void clear() { data.clear(); }
-        inline void insert(SampleableObjectCollection& other) {
+        [[nodiscard]] bool empty() const { return data.empty(); }
+        SampleableObject& back() { return data.back(); }
+        void clear() { data.clear(); }
+        void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
         }
 
-        std::vector<SampleableObject> data = {};
+        std::vector<SampleableObject> data;
         double total_volume = 0;
         double total_surface = 0;
     };
@@ -292,7 +292,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     struct VolumeTreeEntry {
         VolumeTreeEntry() = delete;
         VolumeTreeEntry(const VolumeTreeEntry&) = default;
-        inline VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
+        VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
 
         G4VPhysicalVolume* physvol;
 
@@ -350,41 +350,41 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     // G4GenericMessenger. Only ::DeclarePropertyWithUnit() accepts vectors and
     // one cannot call functions with more than 2 arguments (3 coordinated + 1
     // units needed). Ugly!
-    inline void SetGeomVolumeCenter(const G4ThreeVector& v) { this->SafeBack().volume_center = v; }
-    inline void SetGeomVolumeCenterX(double x) { this->SafeBack().volume_center.setX(x); }
-    inline void SetGeomVolumeCenterY(double y) { this->SafeBack().volume_center.setY(y); }
-    inline void SetGeomVolumeCenterZ(double z) { this->SafeBack().volume_center.setZ(z); }
+    void SetGeomVolumeCenter(const G4ThreeVector& v) { this->SafeBack().volume_center = v; }
+    void SetGeomVolumeCenterX(double x) { this->SafeBack().volume_center.setX(x); }
+    void SetGeomVolumeCenterY(double y) { this->SafeBack().volume_center.setY(y); }
+    void SetGeomVolumeCenterZ(double z) { this->SafeBack().volume_center.setZ(z); }
 
-    inline void SetGeomSphereInnerRadius(double r) {
+    void SetGeomSphereInnerRadius(double r) {
       this->SafeBack(GeometricalSolidType::kSphere).sphere_inner_radius = r;
     }
-    inline void SetGeomSphereOuterRadius(double r) {
+    void SetGeomSphereOuterRadius(double r) {
       this->SafeBack(GeometricalSolidType::kSphere).sphere_outer_radius = r;
     }
 
-    inline void SetGeomCylinderInnerRadius(double r) {
+    void SetGeomCylinderInnerRadius(double r) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_inner_radius = r;
     }
-    inline void SetGeomCylinderOuterRadius(double r) {
+    void SetGeomCylinderOuterRadius(double r) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_outer_radius = r;
     }
-    inline void SetGeomCylinderHeight(double h) {
+    void SetGeomCylinderHeight(double h) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_height = h;
     }
-    inline void SetGeomCylinderStartingAngle(double a) {
+    void SetGeomCylinderStartingAngle(double a) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_starting_angle = a;
     }
-    inline void SetGeomCylinderSpanningAngle(double a) {
+    void SetGeomCylinderSpanningAngle(double a) {
       this->SafeBack(GeometricalSolidType::kCylinder).cylinder_spanning_angle = a;
     }
 
-    inline void SetGeomBoxXLength(double x) {
+    void SetGeomBoxXLength(double x) {
       this->SafeBack(GeometricalSolidType::kBox).box_x_length = x;
     }
-    inline void SetGeomBoxYLength(double y) {
+    void SetGeomBoxYLength(double y) {
       this->SafeBack(GeometricalSolidType::kBox).box_y_length = y;
     }
-    inline void SetGeomBoxZLength(double z) {
+    void SetGeomBoxZLength(double z) {
       this->SafeBack(GeometricalSolidType::kBox).box_z_length = z;
     }
 

@@ -29,13 +29,13 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorGPS() : RMGVGenerator("GPS") {
+    RMGGeneratorGPS() : RMGVGenerator("GPS") {
       fParticleSource = std::make_unique<G4GeneralParticleSource>();
     }
 
-    inline ~RMGGeneratorGPS() = default;
+    ~RMGGeneratorGPS() = default;
 
-    inline void GeneratePrimaries(G4Event* event) override {
+    void GeneratePrimaries(G4Event* event) override {
       G4AutoLock lock(&fMutex);
 
       // the GPS is inherently thread-unsafe. only one source can be manipulated/used at a time.

@@ -49,53 +49,43 @@ class RMGManager {
     RMGManager& operator=(RMGManager&&) = delete;
 
     // getters
-    static inline RMGManager* Instance() { return fRMGManager; }
+    static RMGManager* Instance() { return fRMGManager; }
     G4RunManager* GetG4RunManager();
     G4VisManager* GetG4VisManager();
     RMGHardware* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
-    [[nodiscard]] inline auto GetUserInit() const { return fUserInit; }
-    [[nodiscard]] inline int GetPrintModulo() const { return fPrintModulo; }
+    [[nodiscard]] auto GetUserInit() const { return fUserInit; }
+    [[nodiscard]] int GetPrintModulo() const { return fPrintModulo; }
 
-    [[nodiscard]] inline bool IsExecSequential() {
+    [[nodiscard]] bool IsExecSequential() {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
-    [[nodiscard]] inline bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
-    inline const std::string& GetOutputFileName() { return fOutputFile; }
-    [[nodiscard]] inline bool HasOutputFileNameNone() const {
-      return fOutputFile == OUTPUT_FILE_NONE;
-    }
-    [[nodiscard]] inline bool HasOutputFileName() const {
+    [[nodiscard]] bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
+    const std::string& GetOutputFileName() { return fOutputFile; }
+    [[nodiscard]] bool HasOutputFileNameNone() const { return fOutputFile == OUTPUT_FILE_NONE; }
+    [[nodiscard]] bool HasOutputFileName() const {
       return !fOutputFile.empty() && fOutputFile != OUTPUT_FILE_NONE;
     }
-    [[nodiscard]] inline bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
-    inline const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
-    [[nodiscard]] inline bool GetOutputNtuplePerDetector() const {
-      return fOutputNtuplePerDetector;
-    }
-    [[nodiscard]] inline bool GetOutputNtupleUseVolumeName() const {
-      return fOutputNtupleUseVolumeName;
-    }
+    [[nodiscard]] bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
+    const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
+    [[nodiscard]] bool GetOutputNtuplePerDetector() const { return fOutputNtuplePerDetector; }
+    [[nodiscard]] bool GetOutputNtupleUseVolumeName() const { return fOutputNtupleUseVolumeName; }
 
     // setters
-    inline void SetUserInit(G4RunManager* g4_manager) {
+    void SetUserInit(G4RunManager* g4_manager) {
       fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager);
     }
-    inline void SetUserInit(G4VisManager* vis) {
-      fG4VisManager = std::unique_ptr<G4VisManager>(vis);
-    }
-    inline void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
-    inline void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
+    void SetUserInit(G4VisManager* vis) { fG4VisManager = std::unique_ptr<G4VisManager>(vis); }
+    void SetUserInit(RMGHardware* det) { fDetectorConstruction = det; }
+    void SetUserInit(G4VUserPhysicsList* proc) { fPhysicsList = proc; }
 
-    inline void SetInteractive(bool flag = true) { fInteractive = flag; }
-    inline void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
-    inline void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
+    void SetInteractive(bool flag = true) { fInteractive = flag; }
+    void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
+    void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
-    inline void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
-    inline void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
-    inline void RegisterG4Alias(std::string alias, std::string value) {
-      fG4Aliases.emplace(alias, value);
-    }
+    void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
+    void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
+    void RegisterG4Alias(std::string alias, std::string value) { fG4Aliases.emplace(alias, value); }
     void Initialize();
     void Run();
 
@@ -104,15 +94,15 @@ class RMGManager {
     void SetRandEngineInternalSeed(int index);
     void SetRandSystemEntropySeed();
     bool ApplyRandEngineForCurrentThread();
-    [[nodiscard]] inline bool GetRandIsControlled() const { return fIsRandControlled; }
-    [[nodiscard]] inline bool GetRandEngineSelected() const { return !fRandEngineName.empty(); }
+    [[nodiscard]] bool GetRandIsControlled() const { return fIsRandControlled; }
+    [[nodiscard]] bool GetRandEngineSelected() const { return !fRandEngineName.empty(); }
 
     void SetLogLevel(std::string level);
 
-    inline void SetOutputFileName(std::string filename) { fOutputFile = filename; }
-    inline void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
-    inline void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
-    inline int RegisterNtuple(int det_uid, int ntuple_id) {
+    void SetOutputFileName(std::string filename) { fOutputFile = filename; }
+    void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
+    void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
+    int RegisterNtuple(int det_uid, int ntuple_id) {
       auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
       if (!res.second)
         RMGLog::OutFormatDev(
@@ -122,7 +112,7 @@ class RMGManager {
         );
       return this->GetNtupleID(det_uid);
     }
-    inline int RegisterNtuple(std::string det_uid, int ntuple_id) {
+    int RegisterNtuple(std::string det_uid, int ntuple_id) {
       auto res = fNtupleIDsS.emplace(det_uid, ntuple_id);
       if (!res.second)
         RMGLog::OutFormatDev(
@@ -132,26 +122,26 @@ class RMGManager {
         );
       return this->GetNtupleID(det_uid);
     }
-    inline int GetNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
-    inline int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
+    int GetNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
+    int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
 
-    [[nodiscard]] inline bool HadWarning() const {
+    [[nodiscard]] bool HadWarning() const {
       return fExceptionHandler->HadWarning() || RMGLog::HadWarning();
     }
-    [[nodiscard]] inline bool HadError() const {
+    [[nodiscard]] bool HadError() const {
       return fExceptionHandler->HadError() || RMGLog::HadError();
     }
 
     // NOLINTNEXTLINE(readability-make-member-function-const)
-    inline void ActivateOptionalOutputScheme(std::string name) {
+    void ActivateOptionalOutputScheme(std::string name) {
       GetUserInit()->ActivateOptionalOutputScheme(name);
     }
 
-    inline static void AbortRunGracefully() {
+    static void AbortRunGracefully() {
       if (!fAbortRun.is_lock_free()) return;
       fAbortRun = true;
     }
-    inline static bool ShouldAbortRun() { return fAbortRun; }
+    static bool ShouldAbortRun() { return fAbortRun; }
 
   private:
 
