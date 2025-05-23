@@ -46,42 +46,42 @@ class RMGUserInit {
     RMGUserInit& operator=(RMGUserInit&&) = delete;
 
     // getters
-    [[nodiscard]] inline auto GetSteppingActions() const { return fSteppingActions; }
-    [[nodiscard]] inline auto GetTrackingActions() const { return fTrackingActions; }
-    [[nodiscard]] inline auto GetOutputSchemes() const { return fOutputSchemes; }
-    [[nodiscard]] inline auto GetOptionalOutputSchemes() const { return fOptionalOutputSchemes; }
-    [[nodiscard]] inline auto GetUserGenerator() const { return fUserGenerator; }
+    [[nodiscard]] auto GetSteppingActions() const { return fSteppingActions; }
+    [[nodiscard]] auto GetTrackingActions() const { return fTrackingActions; }
+    [[nodiscard]] auto GetOutputSchemes() const { return fOutputSchemes; }
+    [[nodiscard]] auto GetOptionalOutputSchemes() const { return fOptionalOutputSchemes; }
+    [[nodiscard]] auto GetUserGenerator() const { return fUserGenerator; }
 
     // setters
-    template<typename T, typename... Args> inline void AddSteppingAction(Args&&... args) {
+    template<typename T, typename... Args> void AddSteppingAction(Args&&... args) {
       Add<T>(&fSteppingActions, std::forward<Args>(args)...);
     }
 
-    template<typename T, typename... Args> inline void AddTrackingAction(Args&&... args) {
+    template<typename T, typename... Args> void AddTrackingAction(Args&&... args) {
       Add<T>(&fTrackingActions, std::forward<Args>(args)...);
     }
 
-    template<typename T, typename... Args> inline void AddOutputScheme(Args&&... args) {
+    template<typename T, typename... Args> void AddOutputScheme(Args&&... args) {
       Add<T>(&fOutputSchemes, std::forward<Args>(args)...);
     }
 
     template<typename T, typename... Args>
-    inline void AddOptionalOutputScheme(std::string name, Args&&... args) {
+    void AddOptionalOutputScheme(std::string name, Args&&... args) {
       Add<T>(&fOptionalOutputSchemes, name, std::forward<Args>(args)...);
     }
 
-    template<typename T, typename... Args> inline void SetUserGenerator(Args&&... args) {
+    template<typename T, typename... Args> void SetUserGenerator(Args&&... args) {
       Set<T>(fUserGenerator, std::forward<Args>(args)...);
     }
 
     // default output schemes
-    inline void RegisterDefaultOptionalOutputSchemes() {
+    void RegisterDefaultOptionalOutputSchemes() {
       AddOptionalOutputScheme<RMGIsotopeFilterScheme>("IsotopeFilter");
       AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
       AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
     }
 
-    inline void ActivateOptionalOutputScheme(std::string name) {
+    void ActivateOptionalOutputScheme(std::string name) {
       auto it = fOptionalOutputSchemes.find(name);
       if (it == fOptionalOutputSchemes.end()) {
         RMGLog::Out(RMGLog::fatal, "Optional output scheme '", name, "' not found!");
@@ -95,16 +95,15 @@ class RMGUserInit {
     template<typename T> using late_init_vec = std::vector<late_init_fn<T>>;
     template<typename K, typename T> using late_init_map = std::map<K, late_init_fn<T>>;
 
-    template<typename B, typename T, typename... Args>
-    inline late_init_fn<B> CreateInit(Args&&... args) {
+    template<typename B, typename T, typename... Args> late_init_fn<B> CreateInit(Args&&... args) {
       return std::bind(&std::make_unique<T, Args&...>, std::forward<Args>(args)...);
     }
-    template<typename B, typename T> inline late_init_fn<B> CreateInit() {
+    template<typename B, typename T> late_init_fn<B> CreateInit() {
       return [] { return std::make_unique<T>(); };
     }
 
     template<typename T, typename B, typename... Args>
-    inline void Add(late_init_vec<B>* vec, Args&&... args) {
+    void Add(late_init_vec<B>* vec, Args&&... args) {
       static_assert(std::is_base_of<B, T>::value);
 
       // capture the passed arguments for the constructor to be called later.
@@ -112,7 +111,7 @@ class RMGUserInit {
       vec->emplace_back(std::move(create));
     }
     template<typename T, typename B, typename K, typename... Args>
-    inline void Add(late_init_map<K, B>* map, K k, Args&&... args) {
+    void Add(late_init_map<K, B>* map, K k, Args&&... args) {
       static_assert(std::is_base_of<B, T>::value);
 
       // capture the passed arguments for the constructor to be called later.
@@ -120,7 +119,7 @@ class RMGUserInit {
       map->emplace(k, std::move(create));
     }
     template<typename T, typename B, typename... Args>
-    inline void Set(late_init_fn<B>& fn, Args&&... args) {
+    void Set(late_init_fn<B>& fn, Args&&... args) {
       static_assert(std::is_base_of<B, T>::value);
 
       // capture the passed arguments for the constructor to be called later.

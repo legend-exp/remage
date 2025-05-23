@@ -35,27 +35,27 @@ class RMGVVertexGenerator {
 
   public:
 
-    inline RMGVVertexGenerator(std::string name) : fGeneratorName(name) {}
+    RMGVVertexGenerator(std::string name) : fGeneratorName(name) {}
 
-    virtual inline ~RMGVVertexGenerator() = default;
+    virtual ~RMGVVertexGenerator() = default;
 
     RMGVVertexGenerator(RMGVVertexGenerator const&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator const&) = delete;
     RMGVVertexGenerator(RMGVVertexGenerator&&) = delete;
     RMGVVertexGenerator& operator=(RMGVVertexGenerator&&) = delete;
 
-    virtual inline void BeginOfRunAction(const G4Run*) {};
-    virtual inline void EndOfRunAction(const G4Run*) {};
+    virtual void BeginOfRunAction(const G4Run*) {};
+    virtual void EndOfRunAction(const G4Run*) {};
 
-    virtual inline bool GenerateVertex(G4ThreeVector& v) {
+    virtual bool GenerateVertex(G4ThreeVector& v) {
       v = kDummyPrimaryPosition;
       return false;
     }
-    inline void SetMaxAttempts(int val) { fMaxAttempts = val; }
-    [[nodiscard]] inline int GetMaxAttempts() const { return fMaxAttempts; }
+    void SetMaxAttempts(int val) { fMaxAttempts = val; }
+    [[nodiscard]] int GetMaxAttempts() const { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0
-    inline void ShootVertex(G4ThreeVector& v) override { GenerateVertex(v); }
+    void ShootVertex(G4ThreeVector& v) override { GenerateVertex(v); }
 #endif
 
   protected:

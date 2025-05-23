@@ -32,14 +32,14 @@ namespace {
 
 template<typename ThreadInitialization>
 class RMGWorkerInitialization : public ThreadInitialization {
-    static_assert(std::is_base_of<G4UserWorkerThreadInitialization, ThreadInitialization>::value);
+    static_assert(std::is_base_of_v<G4UserWorkerThreadInitialization, ThreadInitialization>);
 
   public:
 
     RMGWorkerInitialization() = default;
     ~RMGWorkerInitialization() = default;
 
-    inline void SetupRNGEngine(const CLHEP::HepRandomEngine* aRNGEngine) const override {
+    void SetupRNGEngine(const CLHEP::HepRandomEngine* aRNGEngine) const override {
       G4AutoLock l(&RMGWorkerInitializationRNGMutex);
 
       auto rmg_man = RMGManager::Instance();

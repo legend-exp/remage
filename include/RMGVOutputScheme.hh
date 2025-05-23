@@ -37,62 +37,48 @@ class RMGVOutputScheme {
     virtual ~RMGVOutputScheme() = default;
 
     // initialization.
-    virtual inline void AssignOutputNames(G4AnalysisManager*) {}
+    virtual void AssignOutputNames(G4AnalysisManager*) {}
 
     // functions for individual events.
-    virtual inline void ClearBeforeEvent() {}
-    virtual inline bool ShouldDiscardEvent(const G4Event*) { return false; }
-    [[nodiscard]] virtual inline bool StoreAlways() const { return false; }
-    virtual inline void StoreEvent(const G4Event*) {}
+    virtual void ClearBeforeEvent() {}
+    virtual bool ShouldDiscardEvent(const G4Event*) { return false; }
+    [[nodiscard]] virtual bool StoreAlways() const { return false; }
+    virtual void StoreEvent(const G4Event*) {}
 
     // hook into RMGStackingAction.
-    virtual inline std::optional<G4ClassificationOfNewTrack> StackingActionClassify(
-        const G4Track*,
-        const int
-    ) {
+    virtual std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, const int) {
       return std::nullopt;
     }
-    virtual inline std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
+    virtual std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
     // hook into G4TrackingAction.
-    virtual inline void TrackingActionPre(const G4Track*) {};
+    virtual void TrackingActionPre(const G4Track*) {};
 
-    virtual inline void EndOfRunAction(const G4Run*) {};
+    virtual void EndOfRunAction(const G4Run*) {};
 
     // only to be called by the manager, before calling AssignOutputNames.
-    inline void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
-    inline void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
+    void SetNtuplePerDetector(bool ntuple_per_det) { fNtuplePerDetector = ntuple_per_det; }
+    void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
 
   protected:
 
-    [[nodiscard]] virtual inline std::string GetNtupleName(RMGDetectorMetadata det) const {
+    [[nodiscard]] virtual std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
         if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
         return fmt::format("det{:03}", det.uid);
       }
       return GetNtuplenameFlat();
     }
-    [[nodiscard]] virtual inline std::string GetNtuplenameFlat() const {
+    [[nodiscard]] virtual std::string GetNtuplenameFlat() const {
       throw new std::logic_error("GetNtuplenameFlat not implemented");
     }
 
     // helper functions for output schemes.
-    inline void CreateNtupleFOrDColumn(
-        G4AnalysisManager* ana_man,
-        int nt,
-        std::string name,
-        bool use_float
-    ) {
+    void CreateNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, std::string name, bool use_float) {
       if (use_float) ana_man->CreateNtupleFColumn(nt, name);
       else ana_man->CreateNtupleDColumn(nt, name);
     }
-    inline void FillNtupleFOrDColumn(
-        G4AnalysisManager* ana_man,
-        int nt,
-        int col,
-        double val,
-        bool use_float
-    ) {
+    void FillNtupleFOrDColumn(G4AnalysisManager* ana_man, int nt, int col, double val, bool use_float) {
       if (use_float)
         ana_man->FillNtupleFColumn(nt, col, val); // NOLINT(cppcoreguidelines-narrowing-conversions)
       else ana_man->FillNtupleDColumn(nt, col, val);

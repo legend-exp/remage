@@ -29,22 +29,18 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
 
   public:
 
-    inline RMGGeneratorG4Gun() : RMGVGenerator("G4Gun") {
+    RMGGeneratorG4Gun() : RMGVGenerator("G4Gun") {
       fParticleGun = std::make_unique<G4ParticleGun>();
     }
-    inline ~RMGGeneratorG4Gun() = default;
+    ~RMGGeneratorG4Gun() = default;
 
     RMGGeneratorG4Gun(RMGGeneratorG4Gun const&) = delete;
     RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun const&) = delete;
     RMGGeneratorG4Gun(RMGGeneratorG4Gun&&) = delete;
     RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun&&) = delete;
 
-    inline void GeneratePrimaries(G4Event* event) override {
-      fParticleGun->GeneratePrimaryVertex(event);
-    }
-    inline void SetParticlePosition(G4ThreeVector vec) override {
-      fParticleGun->SetParticlePosition(vec);
-    }
+    void GeneratePrimaries(G4Event* event) override { fParticleGun->GeneratePrimaryVertex(event); }
+    void SetParticlePosition(G4ThreeVector vec) override { fParticleGun->SetParticlePosition(vec); }
 
   private:
 

@@ -118,7 +118,7 @@ class RMGAnalysisReader final {
       private:
 
         // only allow creation or moving in parent.
-        inline Access(
+        Access(
             G4AutoLock lock,
             G4VAnalysisReader* reader,
             int nt,
@@ -198,7 +198,7 @@ class RMGAnalysisReader final {
 
     /**
      * @brief get the file name of the current open file, or an empty string. */
-    [[nodiscard]] inline auto& GetFileName() const { return fFileName; }
+    [[nodiscard]] auto& GetFileName() const { return fFileName; }
 
   private:
 
@@ -207,7 +207,7 @@ class RMGAnalysisReader final {
     G4VAnalysisReader* fReader = nullptr;
     int fNtupleId = -1;
 
-    std::map<std::string, std::string> fUnits{};
+    std::map<std::string, std::string> fUnits;
     bool fHasUnits = false;
 
     std::string fFileName;

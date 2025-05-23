@@ -50,7 +50,7 @@ class RMGParticleFilterScheme : public RMGVOutputScheme {
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
     /** @brief Add a particle, identified by its PDG code, to the list of particles to kill. */
-    inline void AddParticle(int pdg) { fParticles.insert(pdg); }
+    void AddParticle(int pdg) { fParticles.insert(pdg); }
 
     /** @brief Add a physical volume, by name, to the volumes in which the filter will
      *  not be applied.
