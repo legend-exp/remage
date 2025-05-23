@@ -61,7 +61,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     DecayMode fDecayMode = DecayMode::k2vbb;
     // BxDecay0 wants G4 variables
     G4String nuclide;
-    G4int seed;
+    long seed;
     G4int dbd_mode;
     G4int dbd_level;
     G4bool debug;

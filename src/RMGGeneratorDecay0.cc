@@ -65,12 +65,34 @@ void RMGGeneratorDecay0::SetMode(std::string mode) {
   } else {
     RMGLog::Out(RMGLog::error, "Unknown decay mode");
   }
-  seed = static_cast<G4int>(G4UniformRand() * std::numeric_limits<G4int>::max());
-  debug = false;
+
+  seed = CLHEP::HepRandom::getTheSeed();
+
+  // Sanity check
+  if (seed <= 0) {
+    RMGLog::Out(RMGLog::error, "Seed seems invalid or uninitialized. Setting seed to 0.");
+    seed = 0;
+  }
+
+  // This should never occur on most systems, as the only way is through the internal CLHEP table
+  // and the values there are all below the max int32.
+  if (seed > std::numeric_limits<int>::max()) {
+    int new_seed = seed - std::numeric_limits<int>::max();
+    RMGLog::Out(
+        RMGLog::warning,
+        "Seed ",
+        seed,
+        " is too large for BxDecay0. Largest possible seed is ",
+        std::numeric_limits<int>::max(),
+        ". Setting seed to ",
+        new_seed
+    );
+    seed = new_seed;
+  }
 
   bxdecay0_g4::PrimaryGeneratorAction::ConfigurationInterface& configInt = fDecay0G4Generator
                                                                                ->GrabConfiguration();
-
+  debug = false;
   configInt.reset_mdl();
   configInt.decay_category = "dbd";
   configInt.nuclide = nuclide;

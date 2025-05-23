@@ -288,15 +288,16 @@ void RMGManager::CheckRandEngineMTState() {
   );
 }
 
-void RMGManager::SetRandEngineSeed(long seed) {
+void RMGManager::SetRandEngineSeed(int seed) {
   CheckRandEngineMTState();
-  if (seed >= std::numeric_limits<long>::max()) {
+  // this should actually never occur, as the Geant4 messenger should check this
+  if (seed >= std::numeric_limits<int>::max()) {
     RMGLog::Out(
         RMGLog::error,
         "Seed ",
         seed,
         " is too large. Largest possible seed is ",
-        std::numeric_limits<long>::max(),
+        std::numeric_limits<int>::max(),
         ". Setting seed to 0."
     );
     CLHEP::HepRandom::setTheSeed(0);
