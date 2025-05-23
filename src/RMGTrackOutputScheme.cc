@@ -101,7 +101,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
       proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
       fProcessMap.emplace(proc_name, proc_name_hash);
     }
-    proc_id = fProcessMap[proc_name];
+    proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
   auto ntupleid = rmg_man->GetNtupleID("tracks");
@@ -160,8 +160,8 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
 
   std::set<uint32_t> proc_ids; // to check for duplicates.
 
-  for (auto [proc_name, proc_id] : fProcessMap) {
-    ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
+  for (auto& [proc_name, proc_id] : fProcessMap) {
+    ana_man->FillNtupleIColumn(ntupleid, 0, static_cast<int>(proc_id));
     ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
     ana_man->AddNtupleRow(ntupleid);
 

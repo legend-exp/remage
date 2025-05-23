@@ -26,8 +26,8 @@ class RMGRun : public G4Run {
 
     using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
-    [[nodiscard]] inline const TimePoint& GetStartTime() const { return fStartTime; }
-    inline void SetStartTime(TimePoint t) { fStartTime = t; }
+    [[nodiscard]] const TimePoint& GetStartTime() const { return fStartTime; }
+    void SetStartTime(TimePoint t) { fStartTime = t; }
 
   private:
 

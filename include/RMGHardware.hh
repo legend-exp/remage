@@ -84,28 +84,28 @@ class RMGHardware : public G4VUserDetectorConstruction {
     );
 
     /** @brief Extract a map of the detector metadata, one element for each sensitive detector physical volume and copy_nr. */
-    inline const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
+    const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
 
     /** @brief Extract the detector metadata for a given detector.
      *
      * @param det the detector identifier, a pair of the physical volume name and the copy number.
      */
-    inline const auto& GetDetectorMetadata(const std::pair<std::string, int>& det) {
+    const auto& GetDetectorMetadata(const std::pair<std::string, int>& det) {
       return fDetectorMetadata.at(det);
     }
 
 
-    inline const auto& GetActiveDetectorList() { return fActiveDetectors; }
-    [[nodiscard]] inline const auto& GetAllActiveOutputSchemes() { return fActiveOutputSchemes; }
+    const auto& GetActiveDetectorList() { return fActiveDetectors; }
+    [[nodiscard]] const auto& GetAllActiveOutputSchemes() { return fActiveOutputSchemes; }
 
     /** @brief Add a GDML file to the geometry.
      *
      * @param filename file name to add.
      */
-    inline void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
+    void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
 
     /** @brief Method to define geometry directly, the user must reimplement the base class method. */
-    inline virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
+    virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
 
     /** @brief Set the maximum step size.
      *
@@ -117,8 +117,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
      */
     void SetMaxStepLimit(double max_step, std::string name);
 
-    inline void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
-    inline void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
+    void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
+    void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
 
   private:
 

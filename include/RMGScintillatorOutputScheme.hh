@@ -66,35 +66,33 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
     bool ShouldDiscardEvent(const G4Event*) override;
 
     /** @brief Set a lower cut on the energy deposited in the event to store it. */
-    inline void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
+    void SetEdepCutLow(double threshold) { fEdepCutLow = threshold; }
 
     /** @brief Set a upper cut on the energy deposited in the event to store it. */
-    inline void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
+    void SetEdepCutHigh(double threshold) { fEdepCutHigh = threshold; }
 
     /** @brief Add a detector uid to the list of detectors to apply the energy cut for. */
-    inline void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
+    void AddEdepCutDetector(int det_uid) { fEdepCutDetectors.insert(det_uid); }
 
     /** @brief Set which position is used for the steps */
-    inline void SetPositionMode(RMGOutputTools::PositionMode mode) { fPositionMode = mode; }
+    void SetPositionMode(RMGOutputTools::PositionMode mode) { fPositionMode = mode; }
 
     /** @brief Set a distance to compute together steps in the bulk. */
-    inline void SetClusterDistance(double threshold) {
-      fPreClusterPars.cluster_distance = threshold;
-    }
+    void SetClusterDistance(double threshold) { fPreClusterPars.cluster_distance = threshold; }
 
     /** @brief Set the time threshold for pre-clustering. */
-    inline void SetClusterTimeThreshold(double threshold) {
+    void SetClusterTimeThreshold(double threshold) {
       fPreClusterPars.cluster_time_threshold = threshold;
     }
 
     /** @brief Set the energy threshold to merge electron tracks.*/
-    inline void SetElectronTrackEnergyThreshold(double threshold) {
+    void SetElectronTrackEnergyThreshold(double threshold) {
       fPreClusterPars.track_energy_threshold = threshold;
     }
 
   protected:
 
-    [[nodiscard]] inline std::string GetNtuplenameFlat() const override { return "scintillator"; }
+    [[nodiscard]] std::string GetNtuplenameFlat() const override { return "scintillator"; }
 
   private:
 

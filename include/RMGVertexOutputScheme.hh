@@ -34,11 +34,11 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     void StoreEvent(const G4Event*) override;
 
     // always store vertex data, so that results are not skewed if events are discarded.
-    [[nodiscard]] inline bool StoreAlways() const override { return true; }
+    [[nodiscard]] bool StoreAlways() const override { return true; }
 
   protected:
 
-    [[nodiscard]] inline std::string GetNtupleName(RMGDetectorMetadata) const override {
+    [[nodiscard]] std::string GetNtupleName(RMGDetectorMetadata) const override {
       throw std::logic_error("vertex output scheme has no detectors");
     }
 

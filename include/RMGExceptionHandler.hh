@@ -35,8 +35,8 @@ class RMGExceptionHandler : public G4ExceptionHandler {
         const char* description
     ) override;
 
-    [[nodiscard]] inline bool HadWarning() const { return fHadWarning; }
-    [[nodiscard]] inline bool HadError() const { return fHadError; }
+    [[nodiscard]] bool HadWarning() const { return fHadWarning; }
+    [[nodiscard]] bool HadError() const { return fHadError; }
 
   private:
 

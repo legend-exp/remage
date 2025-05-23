@@ -22,7 +22,7 @@ class RMGUserAction : public G4VUserActionInitialization {
 
   public:
 
-    inline RMGUserAction() = default;
+    RMGUserAction() = default;
     ~RMGUserAction() override = default;
 
     RMGUserAction(RMGUserAction const&) = delete;
