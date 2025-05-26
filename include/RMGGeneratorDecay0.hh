@@ -29,6 +29,15 @@ namespace bxdecay0_g4 {
 }
 
 class G4Event;
+/** @brief Integration of the BxDecay0 generator into remage.
+ *
+ *  This class links the BxDecay0 primary generator action with the remage vertex generator,
+ *  allowing the simulation of various decay processes.
+ *
+ *  Additionally it offers
+ *  more convenient commands to set the generator mode and process by
+ *  writing into the BxDecay0 configuration interface.
+ */
 class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
@@ -57,6 +66,10 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
       k0v4b            // 0+ -> 0+ Quadruple beta decay
     };
 
+    /** @brief Constructor that links the BxDecay0 generator action to remage.
+     *  @param prim_gen Pointer to the remage primary vertex generator.
+     *  @details  BxDecay0's primary generator action will own the pointer
+     */
     RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
     RMGGeneratorDecay0() = delete;
     ~RMGGeneratorDecay0();
@@ -66,12 +79,20 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     RMGGeneratorDecay0(RMGGeneratorDecay0&&) = delete;
     RMGGeneratorDecay0& operator=(RMGGeneratorDecay0&&) = delete;
 
+    /** @brief Calls to @c fDecay0G4Generator to generate the primary for the event.
+     */
     void GeneratePrimaries(G4Event*) override;
     void SetParticlePosition(G4ThreeVector) override{};
 
+    /** @brief Updates the seed and configuration at the beginning of each run.
+     *  @details Only does something if any remage set up command was used ( @c fUpdateSeeds is true).
+     */
     void BeginOfRunAction(const G4Run*) override;
     inline void EndOfRunAction(const G4Run*) override {}
 
+    /** @brief Sets BxDecay0 to run in background mode and sets the specific isotope.
+     *  @param isotope The isotope to set (e.g. "Co60").
+     */
     void SetBackground(std::string);
 
     void SetUpdateSeeds(bool value) { fUpdateSeeds = value; }
@@ -84,9 +105,16 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
 
+    /** @brief Sets whether the generator should update the seed and configuration at the beginning of a run.
+     *  Should only be true if the user has used a remage command to set the generator mode.
+     */
     bool fUpdateSeeds = false;
 
-    // Nested messenger class
+    /** @brief Nested messenger class to handle the more complex dbd command for the BxDecay0
+     * generator. This class allows setting the isotope, process, and energy level for the double
+     * beta decay mode. The energy level is optional and the process is specified from a predefined
+     * set of processes instead as an integer.
+     */
     class BxMessenger : public G4UImessenger {
       public:
 
