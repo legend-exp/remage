@@ -33,9 +33,28 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
 
   public:
 
-    enum class DecayMode {
-      k2vbb,
-      k0vbb
+    // This matches the BxDecay0 numbering, shifted by 1 as BxDecay0 starts counting at 1.
+    enum class Process {
+      k0vbb,           // neutrinoless double beta decay
+      k0vbb_lambda_0,  // 0+ -> 0+ {2n} with RHC lambda
+      k0vbb_lambda_02, // 0+ -> 0+, 2+ {N*} with RHC lambda
+      k2vbb,           // 2 neutrino double beta decay
+      k0vbb_M1,        // 0+ -> 0+ {2n} (Majoron, SI=1)
+      k0vbb_M2,        // 0+ -> 0+ {2n} (Majoron, SI=2)
+      k0vbb_M3,        // 0+ -> 0+ {2n} (Majoron, SI=3)
+      k0vbb_M7,        // 0+ -> 0+ {2n} (Majoron, SI=7)
+      k0vbb_lambda_2,  // 0+ -> 2+ {2n} with RHC lambda
+      k2vbb_2,         // 0+ -> 2+ {2n}, {N*}
+      k0vkb,           // EC + beta+  0+ -> 0+, 2+
+      k2vkb,           // EC + beta+  0+ -> 0+, 2+
+      k0v2k,           // double EC  0+ -> 0+, 2+
+      k2v2k,           // double EC  0+ -> 0+, 2+
+      k2vbb_bos0,      //  0+ -> 0+ with bosonic neutrinos
+      k2vbb_bos2,      // 0+ -> 2+ with bosonic neutrinos
+      k0vbb_eta_s,     // 0+ -> 0+ with RHC eta simplified expression
+      k0vbb_eta_nmes,  //  0+ -> 0+ with RHC eta and specific NMEs
+      k2vbb_lv,        // 0+ -> 0+ with Lorentz violation
+      k0v4b            // 0+ -> 0+ Quadruple beta decay
     };
 
     RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
@@ -50,21 +69,41 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     void GeneratePrimaries(G4Event*) override;
     void SetParticlePosition(G4ThreeVector) override{};
 
+    void BeginOfRunAction(const G4Run*) override;
+    inline void EndOfRunAction(const G4Run*) override {}
+
+    void SetBackground(std::string);
+
+    void SetUpdateSeeds(bool value) { fUpdateSeeds = value; }
+
+
   private:
 
     std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
-    void SetMode(std::string mode);
 
-    DecayMode fDecayMode = DecayMode::k2vbb;
-    // BxDecay0 wants G4 variables
-    G4String nuclide;
-    long seed;
-    G4int dbd_mode;
-    G4int dbd_level;
-    G4bool debug;
+    bool fUpdateSeeds = false;
+
+    // Nested messenger class
+    class BxMessenger : public G4UImessenger {
+      public:
+
+        BxMessenger(RMGGeneratorDecay0* gen);
+        ~BxMessenger();
+
+        void SetNewValue(G4UIcommand* command, G4String newValues) override;
+
+      private:
+
+        RMGGeneratorDecay0* fGen;
+        G4UIcommand* fGeneratorCmd;
+
+        void GeneratorCmd(const std::string& parameters);
+    };
+
+    std::unique_ptr<BxMessenger> fUIMessenger;
 };
 
 #endif
