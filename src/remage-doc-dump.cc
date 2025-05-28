@@ -24,6 +24,7 @@
 #include "G4UImanager.hh"
 
 #include "RMGGeneratorCosmicMuons.hh"
+#include "RMGGeneratorDecay0.hh"
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
@@ -54,13 +55,14 @@ void init_extra() {
   new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
+  // confinments
+  new RMGVertexConfinement();
+  auto vertex_gen = new RMGVertexFromFile();
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
+  new RMGGeneratorDecay0(vertex_gen); // needs a vertex generator
   new RMGGeneratorFromFile();
-  // confinments
-  new RMGVertexConfinement();
-  new RMGVertexFromFile();
 }
 
 void list_tree(G4UIcommandTree* tree);
