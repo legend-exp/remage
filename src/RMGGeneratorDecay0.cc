@@ -25,6 +25,7 @@
 #include "RMGTools.hh"
 
 #if RMG_HAS_BXDECAY0
+#include "bxdecay0/bb_utils.h"
 #include "bxdecay0_g4/primary_generator_action.hh"
 #endif
 
@@ -67,7 +68,7 @@ void RMGGeneratorDecay0::BeginOfRunAction(const G4Run*) {
     // This should never occur on most systems, as the only way is through the internal CLHEP table
     // and the values there are all below the max int32.
     if (seed > std::numeric_limits<int>::max()) {
-      int new_seed = seed - std::numeric_limits<int>::max();
+      long new_seed = seed - std::numeric_limits<int>::max();
       RMGLog::Out(
           RMGLog::warning,
           "Seed ",
@@ -82,7 +83,7 @@ void RMGGeneratorDecay0::BeginOfRunAction(const G4Run*) {
 
     bxdecay0_g4::PrimaryGeneratorAction::ConfigurationInterface&
         configInt = fDecay0G4Generator->GrabConfiguration();
-    configInt.seed = seed;
+    configInt.seed = static_cast<int>(seed);
     RMGLog::Out(RMGLog::debug, "BxDecay0 generator: seed set to ", seed);
     fDecay0G4Generator->SetConfigHasChanged(true);
   }
@@ -96,7 +97,7 @@ void RMGGeneratorDecay0::SetBackground(std::string isotope) {
   configInt.decay_category = "background";
   configInt.nuclide = isotope;
   configInt.debug = false; // If we want a debug mode, we need to add a command for it
-  SetUpdateSeeds(true);    // The seed and config update should now be done in BeginOfRunAction
+  fUpdateSeeds = true;     // The seed and config update should now be done in BeginOfRunAction
 }
 
 void RMGGeneratorDecay0::DefineCommands() {
@@ -106,11 +107,13 @@ void RMGGeneratorDecay0::DefineCommands() {
       "/RMG/Generator/BxDecay0/",
       "Commands for controlling the BxDecay0 generator"
   );
-
+  std::string isot_cand;
+  for (const auto& isot : bxdecay0::background_isotopes()) { isot_cand += std::string(isot) + ' '; }
   // Need an additional command because both modes expect different parameters.
   fMessenger->DeclareMethod("background", &RMGGeneratorDecay0::SetBackground)
       .SetGuidance("Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'")
-      .SetParameterName("isotope", false) // Do we want to add an enum for every supported isotope?
+      .SetParameterName("isotope", false)
+      .SetCandidates(isot_cand)
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 
@@ -126,9 +129,10 @@ RMGGeneratorDecay0::BxMessenger::BxMessenger(RMGGeneratorDecay0* gen) : fGen(gen
       ->SetGuidance("Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator");
 
   auto isotope = new G4UIparameter("isotope", 's', false);
-  isotope->SetGuidance(
-      "Set the isotope for the double beta decay"
-  ); // Do we want to add an enum for every supported isotope?
+  isotope->SetGuidance("Set the isotope for the double beta decay");
+  std::string isot_cand;
+  for (const auto& isot : bxdecay0::dbd_isotopes()) { isot_cand += std::string(isot) + ' '; }
+  isotope->SetParameterCandidates(isot_cand.c_str());
   fGeneratorCmd->SetParameter(isotope);
 
   auto process = new G4UIparameter("process", 's', false);
@@ -168,11 +172,10 @@ void RMGGeneratorDecay0::BxMessenger::GeneratorCmd(const std::string& parameters
   configInt.reset_mdl();
   configInt.decay_category = "dbd";
   configInt.nuclide = isotope;
-  configInt.dbd_mode = static_cast<int>(p) +
-                       1; // The enum starts at 0, but BxDecay0 starts counting at 1
+  configInt.dbd_mode = static_cast<int>(p);
   configInt.dbd_level = level;
-  configInt.debug = false;    // If we want a debug mode, we need to add it to the command
-  fGen->SetUpdateSeeds(true); // The seed and config update should now be done in BeginOfRunAction
+  configInt.debug = false;   // If we want a debug mode, we need to add it to the command
+  fGen->fUpdateSeeds = true; // The seed and config update should now be done in BeginOfRunAction
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
