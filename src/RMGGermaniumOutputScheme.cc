@@ -397,6 +397,8 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessengers.back()
