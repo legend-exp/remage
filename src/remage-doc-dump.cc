@@ -24,7 +24,9 @@
 #include "G4UImanager.hh"
 
 #include "RMGGeneratorCosmicMuons.hh"
+#if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
+#endif
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
@@ -61,7 +63,9 @@ void init_extra() {
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
+#if RMG_HAS_BXDECAY0
   new RMGGeneratorDecay0(vertex_gen); // needs a vertex generator
+#endif
   new RMGGeneratorFromFile();
 }
 
