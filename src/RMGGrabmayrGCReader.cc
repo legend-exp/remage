@@ -50,8 +50,8 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
         RMGLog::Out(RMGLog::fatal, "Failed to read next line after re-opening the file. Exit!");
       }
     }
-  } while (line[0] == '%' || (line.find("version") != std::string::npos)
-  ); // This could be outsourced to SetStartLocation
+  } while (line[0] == '%' || (line.find("version") !=
+                              std::string::npos)); // This could be outsourced to SetStartLocation
 
   // parse line and return as struct
   GammaCascadeLine gamma_cascade{};

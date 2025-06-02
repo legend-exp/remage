@@ -192,8 +192,9 @@ void RMGManager::SetUpDefaultG4RunManager(G4RunManagerType type) {
   // set the appropriate thread init for this run manager type. Use the actuial type to decide, and
   // not the requested type: It is possible to override the resulting run manager type in the environment.
   if (dynamic_cast<G4TaskRunManager*>(fG4RunManager.get()) != nullptr) {
-    fG4RunManager->SetUserInitialization(new RMGWorkerInitialization<G4UserTaskThreadInitialization>(
-    ));
+    fG4RunManager->SetUserInitialization(
+        new RMGWorkerInitialization<G4UserTaskThreadInitialization>()
+    );
   } else if (dynamic_cast<G4MTRunManager*>(fG4RunManager.get()) != nullptr) {
     fG4RunManager->SetUserInitialization(
         new RMGWorkerInitialization<G4UserWorkerThreadInitialization>()
