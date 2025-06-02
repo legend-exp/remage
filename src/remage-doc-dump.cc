@@ -23,6 +23,7 @@
 #include "G4UIcommandTree.hh"
 #include "G4UImanager.hh"
 
+#include "RMGConfig.hh"
 #include "RMGGeneratorCosmicMuons.hh"
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
@@ -57,9 +58,15 @@ void init_extra() {
   new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
+
   // confinments
   new RMGVertexConfinement();
+#if RMG_HAS_BXDECAY0
   auto vertex_gen = new RMGVertexFromFile();
+#else
+  new RMGVertexFromFile(); // So the compiler does not complain about unused variable.
+#endif
+
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
