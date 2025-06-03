@@ -90,7 +90,7 @@ class RMGManager {
     void Run();
 
     void SetRandEngine(std::string name);
-    void SetRandEngineSeed(long seed);
+    void SetRandEngineSeed(int seed);
     void SetRandEngineInternalSeed(int index);
     void SetRandSystemEntropySeed();
     bool ApplyRandEngineForCurrentThread();

@@ -1141,10 +1141,11 @@ Commands for controlling generators
 
 **Sub-directories:**
 
+* `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
 * `/RMG/Generator/MUSUNCosmicMuons/` – Commands for controlling the MUSUN µ generator
 * `/RMG/Generator/CosmicMuons/` – Commands for controlling the µ generator
+* `/RMG/Generator/BxDecay0/` – Commands for controlling the BxDecay0 generator
 * `/RMG/Generator/FromFile/` – Commands for controlling reading event data from file
-* `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
 
 **Commands:**
 
@@ -1169,268 +1170,6 @@ Select event generator
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
-* **Allowed states** – `PreInit Idle`
-
-## `/RMG/Generator/MUSUNCosmicMuons/`
-
-Commands for controlling the MUSUN µ generator
-
-
-**Commands:**
-
-* `MUSUNFile` – Set the MUSUN input file
-
-### `/RMG/Generator/MUSUNCosmicMuons/MUSUNFile`
-
-Set the MUSUN input file
-
-* **Parameter** – `MUSUNFileName`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-## `/RMG/Generator/CosmicMuons/`
-
-Commands for controlling the µ generator
-
-
-**Commands:**
-
-* `SkyShape` – Geometrical shape of the µ generation surface
-* `SkyPlaneSize` – Length of the side of the sky, if it has a planar shape
-* `SkyPlaneHeight` – Height of the sky, if it has a planar shape
-* `MomentumMin` – Minimum momentum of the generated muon
-* `MomentumMax` – Maximum momentum of the generated muon
-* `ThetaMin` – Minimum azimutal angle of the generated muon momentum
-* `ThetaMax` – Maximum azimutal angle of the generated muon momentum
-* `PhiMin` – Minimum zenith angle of the generated muon momentum
-* `PhiMax` – Maximum zenith angle of the generated muon momentum
-* `SpherePositionThetaMin` – Minimum azimutal angle of the generated muon position on the sphere
-* `SpherePositionThetaMax` – Maximum azimutal angle of the generated muon position on the sphere
-* `SpherePositionPhiMin` – Minimum zenith angle of the generated muon position on the sphere
-* `SpherePositionPhiMax` – Maximum zenith angle of the generated muon position on the sphere
-
-### `/RMG/Generator/CosmicMuons/SkyShape`
-
-Geometrical shape of the µ generation surface
-
-* **Parameter** – `shape`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `Plane Sphere`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SkyPlaneSize`
-
-Length of the side of the sky, if it has a planar shape
-
-* **Range of parameters** – `l > 0`
-* **Parameter** – `l`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `m`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SkyPlaneHeight`
-
-Height of the sky, if it has a planar shape
-
-* **Range of parameters** – `l > 0`
-* **Parameter** – `l`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `m`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/MomentumMin`
-
-Minimum momentum of the generated muon
-
-* **Range of parameters** – `p >= 0 && p < 1000`
-* **Parameter** – `p`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `GeV/c`
-  * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/MomentumMax`
-
-Maximum momentum of the generated muon
-
-* **Range of parameters** – `p > 0 && p <= 1000`
-* **Parameter** – `p`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `GeV/c`
-  * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/ThetaMin`
-
-Minimum azimutal angle of the generated muon momentum
-
-* **Range of parameters** – `a >= 0 && a < 90`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/ThetaMax`
-
-Maximum azimutal angle of the generated muon momentum
-
-* **Range of parameters** – `a > 0 && a <= 90`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/PhiMin`
-
-Minimum zenith angle of the generated muon momentum
-
-* **Range of parameters** – `a >= 0 && a < 360`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/PhiMax`
-
-Maximum zenith angle of the generated muon momentum
-
-* **Range of parameters** – `a > 0 && a <= 360`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SpherePositionThetaMin`
-
-Minimum azimutal angle of the generated muon position on the sphere
-
-* **Range of parameters** – `a >= 0 && a < 90`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SpherePositionThetaMax`
-
-Maximum azimutal angle of the generated muon position on the sphere
-
-* **Range of parameters** – `a > 0 && a <= 90`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SpherePositionPhiMin`
-
-Minimum zenith angle of the generated muon position on the sphere
-
-* **Range of parameters** – `a >= 0 && a < 360`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/CosmicMuons/SpherePositionPhiMax`
-
-Maximum zenith angle of the generated muon position on the sphere
-
-* **Range of parameters** – `a > 0 && a <= 360`
-* **Parameter** – `a`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `deg`
-  * **Candidates** – `rad mrad deg radian milliradian degree`
-* **Allowed states** – `PreInit Idle`
-
-## `/RMG/Generator/FromFile/`
-
-Commands for controlling reading event data from file
-
-
-**Commands:**
-
-* `FileName` – Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
-* `NtupleDirectory` – Change the default input directory/group for ntuples.
-
-### `/RMG/Generator/FromFile/FileName`
-
-Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
-
-* **Parameter** – `filename`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Generator/FromFile/NtupleDirectory`
-
-Change the default input directory/group for ntuples.
-
-:::{note}
-this option only has an effect for LH5 or HDF5 input files.
-:::
-
-* **Parameter** – `nt_directory`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Default value** – `vtx`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/`
@@ -1824,6 +1563,309 @@ Set name of the file containing vertex positions for the next run. See the docum
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/FromFile/NtupleDirectory`
+
+Change the default input directory/group for ntuples.
+
+:::{note}
+this option only has an effect for LH5 or HDF5 input files.
+:::
+
+* **Parameter** – `nt_directory`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/MUSUNCosmicMuons/`
+
+Commands for controlling the MUSUN µ generator
+
+
+**Commands:**
+
+* `MUSUNFile` – Set the MUSUN input file
+
+### `/RMG/Generator/MUSUNCosmicMuons/MUSUNFile`
+
+Set the MUSUN input file
+
+* **Parameter** – `MUSUNFileName`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/CosmicMuons/`
+
+Commands for controlling the µ generator
+
+
+**Commands:**
+
+* `SkyShape` – Geometrical shape of the µ generation surface
+* `SkyPlaneSize` – Length of the side of the sky, if it has a planar shape
+* `SkyPlaneHeight` – Height of the sky, if it has a planar shape
+* `MomentumMin` – Minimum momentum of the generated muon
+* `MomentumMax` – Maximum momentum of the generated muon
+* `ThetaMin` – Minimum azimutal angle of the generated muon momentum
+* `ThetaMax` – Maximum azimutal angle of the generated muon momentum
+* `PhiMin` – Minimum zenith angle of the generated muon momentum
+* `PhiMax` – Maximum zenith angle of the generated muon momentum
+* `SpherePositionThetaMin` – Minimum azimutal angle of the generated muon position on the sphere
+* `SpherePositionThetaMax` – Maximum azimutal angle of the generated muon position on the sphere
+* `SpherePositionPhiMin` – Minimum zenith angle of the generated muon position on the sphere
+* `SpherePositionPhiMax` – Maximum zenith angle of the generated muon position on the sphere
+
+### `/RMG/Generator/CosmicMuons/SkyShape`
+
+Geometrical shape of the µ generation surface
+
+* **Parameter** – `shape`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Plane Sphere`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SkyPlaneSize`
+
+Length of the side of the sky, if it has a planar shape
+
+* **Range of parameters** – `l > 0`
+* **Parameter** – `l`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `m`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SkyPlaneHeight`
+
+Height of the sky, if it has a planar shape
+
+* **Range of parameters** – `l > 0`
+* **Parameter** – `l`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `m`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/MomentumMin`
+
+Minimum momentum of the generated muon
+
+* **Range of parameters** – `p >= 0 && p < 1000`
+* **Parameter** – `p`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `GeV/c`
+  * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/MomentumMax`
+
+Maximum momentum of the generated muon
+
+* **Range of parameters** – `p > 0 && p <= 1000`
+* **Parameter** – `p`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `GeV/c`
+  * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/ThetaMin`
+
+Minimum azimutal angle of the generated muon momentum
+
+* **Range of parameters** – `a >= 0 && a < 90`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/ThetaMax`
+
+Maximum azimutal angle of the generated muon momentum
+
+* **Range of parameters** – `a > 0 && a <= 90`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/PhiMin`
+
+Minimum zenith angle of the generated muon momentum
+
+* **Range of parameters** – `a >= 0 && a < 360`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/PhiMax`
+
+Maximum zenith angle of the generated muon momentum
+
+* **Range of parameters** – `a > 0 && a <= 360`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SpherePositionThetaMin`
+
+Minimum azimutal angle of the generated muon position on the sphere
+
+* **Range of parameters** – `a >= 0 && a < 90`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SpherePositionThetaMax`
+
+Maximum azimutal angle of the generated muon position on the sphere
+
+* **Range of parameters** – `a > 0 && a <= 90`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SpherePositionPhiMin`
+
+Minimum zenith angle of the generated muon position on the sphere
+
+* **Range of parameters** – `a >= 0 && a < 360`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SpherePositionPhiMax`
+
+Maximum zenith angle of the generated muon position on the sphere
+
+* **Range of parameters** – `a > 0 && a <= 360`
+* **Parameter** – `a`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `deg`
+  * **Candidates** – `rad mrad deg radian milliradian degree`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/BxDecay0/`
+
+Commands for controlling the BxDecay0 generator
+
+
+**Commands:**
+
+* `background` – Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'
+* `dbd` – Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator
+
+### `/RMG/Generator/BxDecay0/background`
+
+Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'
+
+* **Parameter** – `isotope`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/BxDecay0/dbd`
+
+Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator
+
+* **Parameter** – `isotope`
+    – Set the isotope for the double beta decay
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `Bi214 Ca40 Ca46 Ca48 Cd106 Cd108 Cd114 Cd116 Ce136 Ce138 Ce142 Dy156 Dy158 Er162 Er164 Er170 Ge76 Mo100 Mo92 Nd148 Nd150 Ni58 Os184 Os192 Pb214 Po218 Pt190 Pt198 Rn222 Ru104 Ru96 Se74 Se82 Sm144 Sm154 Sn112 Sn122 Sn124 Sr84 Te120 Te128 Te130 W180 W186 Xe136 Yb168 Yb176 Zn64 Zn70 Zr94 Zr96`
+* **Parameter** – `process`
+    – Name the decay process you want to simulate
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `0vbb 0vbb_lambda_0 0vbb_lambda_02 2vbb 0vbb_M1 0vbb_M2 0vbb_M3 0vbb_M7 0vbb_lambda_2 2vbb_2 0vkb 2vkb 0v2k 2v2k 2vbb_bos0 2vbb_bos2 0vbb_eta_s 0vbb_eta_nmes 2vbb_lv 0v4b`
+* **Parameter** – `level`
+    – Energy level of the daughter nucleus
+  * **Parameter type** – `i`
+  * **Omittable** – `True`
+  * **Default value** – `0`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/FromFile/`
+
+Commands for controlling reading event data from file
+
+
+**Commands:**
+
+* `FileName` – Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
+* `NtupleDirectory` – Change the default input directory/group for ntuples.
+
+### `/RMG/Generator/FromFile/FileName`
+
+Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
+
+* **Parameter** – `filename`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/FromFile/NtupleDirectory`
 
 Change the default input directory/group for ntuples.
 
