@@ -197,8 +197,8 @@ void RMGOutputTools::redistribute_gamma_energy(
       if (hit->energy_deposition == 0) continue;
 
       // extract a threshold
-      double threshold = (not has_distance_to_surface
-                         ) or ((hit->distance_to_surface_prestep) > cluster_pars.surface_thickness)
+      double threshold = (not has_distance_to_surface) or ((hit->distance_to_surface_prestep) >
+                                                           cluster_pars.surface_thickness)
                              ? cluster_pars.cluster_distance
                              : cluster_pars.cluster_distance_surface;
 

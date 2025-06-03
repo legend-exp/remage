@@ -72,8 +72,7 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
   this->surface = solid->GetSurfaceArea();
 }
 
-const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand(
-) const {
+const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() const {
 
   if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
 
@@ -94,8 +93,7 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return this->data.back();
 }
 
-const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand(
-) const {
+const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand() const {
 
   if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
 
@@ -195,11 +193,10 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir, G4
     );
 
   // Get the center and radius of a bounding sphere around the shape
-  G4double bounding_radius = physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius(
-  );
+  G4double bounding_radius = physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentRadius();
 
-  G4ThreeVector barycenter = physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentCenter(
-  );
+  G4ThreeVector
+      barycenter = physical_volume->GetLogicalVolume()->GetSolid()->GetExtent().GetExtentCenter();
 
   // start on z-axis, pointing down.
   pos = G4ThreeVector(0.0, 0.0, bounding_radius);
