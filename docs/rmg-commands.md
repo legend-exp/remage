@@ -281,9 +281,10 @@ Use float32 (instead of float64) for position output.
 
 Use float32 (instead of float64) for energy output.
 
-* **Parameter** – `value`
+* **Parameter** – `boolean`
   * **Parameter type** – `b`
-  * **Omittable** – `False`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
