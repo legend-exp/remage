@@ -206,10 +206,16 @@ The second macro command is used to generate background physics with _bxdecay0_.
 The command <project:../rmg-commands.md#rmggeneratorbxdecay0background> takes
 only a single string as parameter, which should be the name of the isotope.
 Again all isotope candidates are listed
-[here](project:../rmg-commands.md#rmggeneratorbxdecay0background).
+[here](project:../rmg-commands.md#rmggeneratorbxdecay0background). Using these
+we can for example simulate a $^{60}$Co background source:
 
-_remage_ will forward the current seed of Geant4 to _bxdecay0_. This means that
-if any seed is specified using the
+```
+/RMG/Generator/Select BxDecay0
+/RMG/Generator/BxDecay0/background Co60
+```
+
+The current seed of Geant4 will be forwarded to _bxdecay0_. This means that if
+any seed is specified using the
 <project:../rmg-commands.md#rmgmanagerrandomization> commands, that seed will be
 forwarded to _bxdecay0_.
 
