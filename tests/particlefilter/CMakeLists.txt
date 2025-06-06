@@ -17,3 +17,9 @@ set_tests_properties(particlefilter/killvolume PROPERTIES LABELS extra)
 
 add_test(NAME particlefilter/keepvolume COMMAND ${PYTHONPATH} run-test-keepvolume.py)
 set_tests_properties(particlefilter/keepvolume PROPERTIES LABELS extra)
+
+add_test(NAME particlefilter/killprocess COMMAND ${PYTHONPATH} run-test-killprocess.py)
+set_tests_properties(particlefilter/killprocess PROPERTIES LABELS extra)
+
+add_test(NAME particlefilter/keepprocess COMMAND ${PYTHONPATH} run-test-keepprocess.py)
+set_tests_properties(particlefilter/keepprocess PROPERTIES LABELS extra)

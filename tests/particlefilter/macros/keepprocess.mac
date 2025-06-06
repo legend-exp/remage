@@ -1,0 +1,22 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme ParticleFilter
+
+/run/initialize
+
+/RMG/Output/ParticleFilter/AddParticle -12
+/RMG/Output/ParticleFilter/AddKeepProcess Radioactivation # G4 until 11.2
+/RMG/Output/ParticleFilter/AddKeepProcess RadioactiveDecay # G4 11.3+
+
+/RMG/Generator/Confine Volume
+
+/RMG/Generator/Confinement/Physical/AddVolume scint1
+
+/RMG/Generator/Select GPS
+/gps/particle     ion
+/gps/ion          90 228
+/gps/energy       0 keV
+/gps/ang/type     iso
+
+/run/beamOn 10

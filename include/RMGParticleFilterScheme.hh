@@ -68,6 +68,22 @@ class RMGParticleFilterScheme : public RMGVOutputScheme {
      */
     void AddKillVolume(std::string name);
 
+    /** @brief Add a physics process by name. This will only keep the specified particles
+     *  when they were created by this process, all other particles will not be kept.
+     *  @details This means that specified particles that are not created by these processes
+     *  will not be affected by the filter. It is therefore not possible to specify
+     *  keep-processes and kill-processes at the same time.
+     */
+    void AddKeepProcess(std::string name);
+
+    /** @brief Add a physics process by name. This will apply the filter only to particles
+     *  created by this process.
+     *  @details This means that specified particles that are not created by these processes
+     *  will be filtered. It is therefore not possible to specify keep-processes and
+     *  kill-processes at the same time.
+     */
+    void AddKillProcess(std::string name);
+
   private:
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
@@ -76,6 +92,8 @@ class RMGParticleFilterScheme : public RMGVOutputScheme {
     std::set<int> fParticles;
     std::set<std::string> fKeepVolumes;
     std::set<std::string> fKillVolumes;
+    std::set<std::string> fKeepProcesses;
+    std::set<std::string> fKillProcesses;
 };
 
 #endif

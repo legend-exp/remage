@@ -48,6 +48,30 @@ void RMGParticleFilterScheme::AddKillVolume(std::string name) {
   fKillVolumes.insert(name);
 }
 
+void RMGParticleFilterScheme::AddKillProcess(std::string name) {
+  if (!fKeepProcesses.empty()) {
+    RMGLog::OutDev(
+        RMGLog::fatal,
+        "Conflicting requests for kill/keep process in ParticleFilter. "
+        "Trying to assign kill process but a keep process already exists."
+    );
+  }
+
+  fKillProcesses.insert(name);
+}
+
+void RMGParticleFilterScheme::AddKeepProcess(std::string name) {
+  if (!fKillProcesses.empty()) {
+    RMGLog::OutDev(
+        RMGLog::fatal,
+        "Conflicting requests for kill/keep process in ParticleFilter. "
+        "Trying to assign keep process but a kill process already exists."
+    );
+  }
+
+  fKeepProcesses.insert(name);
+}
+
 std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActionClassify(
     const G4Track* aTrack,
     int
@@ -77,11 +101,25 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
     return std::nullopt;
   }
 
+  if (!fKillProcesses.empty() || !fKeepProcesses.empty()) {
+    auto proc = aTrack->GetCreatorProcess();
+    if (proc) {
+      // If a kill process is specified only kill if created by this process.
+      if (!fKillProcesses.empty() &&
+          fKillProcesses.find(proc->GetProcessName()) == fKillProcesses.end())
+        return std::nullopt;
+      // If a keep process is specified only keep if created by this process.
+      if (fKeepProcesses.find(proc->GetProcessName()) != fKeepProcesses.end()) return std::nullopt;
+    }
+  }
+
   // We land here if
   // i) Particle is marked to kill.
   // ii) No Kill volume specified or the particle is in the kill volume.
   // iii) Particle is not in the keep volume.
   // iiii) Particle is not the primary particle.
+  // iv) No kill processes specified or particle created by a kill process.
+  // v) Particle is not created by a keep process.
   RMGLog::OutDev(
       RMGLog::debug,
       "Filtering out particle with PDG code ",
@@ -121,6 +159,23 @@ void RMGParticleFilterScheme::DefineCommands() {
           "They will only be killed in this volume. Can NOT be mixed with KeepVolumes."
       )
       .SetParameterName(0, "PhysicalVolumeName", false, false)
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareMethod("AddKillProcess", &RMGParticleFilterScheme::AddKillProcess)
+      .SetGuidance(
+          "Add a physics process by name. This will only kill the specified particles "
+          "when they were created by this process. Can NOT be mixed with KeepProcess."
+      )
+      .SetParameterName(0, "proc", false, false)
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareMethod("AddKeepProcess", &RMGParticleFilterScheme::AddKeepProcess)
+      .SetGuidance(
+          "Add a physics process by name. This will only keep the specified particles "
+          "when they were created by this process, all other particles will not be kept. "
+          "Can NOT be mixed with KillProcess."
+      )
+      .SetParameterName(0, "proc", false, false)
       .SetStates(G4State_Idle);
 }
 
