@@ -58,10 +58,10 @@ processing_groups:
       max_z_post: ak.fill_none(1000*ak.max(HITS.zloc_post,axis=-1),np.nan)+20
       max_z_avg: ak.fill_none(1000*ak.max(HITS.zloc,axis=-1),np.nan)+20
 
-  - name: vertices
+  - name: vtx
 
     detector_mapping:
-      - output: vertices
+      - output: vtx
 
     outputs:
       - xloc

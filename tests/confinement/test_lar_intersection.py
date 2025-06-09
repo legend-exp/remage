@@ -84,7 +84,7 @@ total_inside = 5 * vol_tot - sum(det_vol)
 # read the output
 outfile = "test-confine-lar-in.lh5"
 
-vertices = lh5.read_as("stp/vertices", outfile, "ak")
+vertices = lh5.read_as("stp/vtx", outfile, "ak")
 
 # append which string the vertices are in
 

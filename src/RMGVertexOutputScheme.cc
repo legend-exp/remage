@@ -31,10 +31,10 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
   auto vid = RMGManager::Instance()->RegisterNtuple(
-      "vertices",
-      ana_man->CreateNtuple("vertices", "Primary vertex data")
+      "vtx",
+      ana_man->CreateNtuple("vtx", "Primary vertex data")
   );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evertices"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evtx"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -74,7 +74,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();
-    auto vntupleid = rmg_man->GetNtupleID("vertices");
+    auto vntupleid = rmg_man->GetNtupleID("vtx");
     auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetNtupleID("particles") : -1;
 
     for (int i = 0; i < n_vertex; i++) {

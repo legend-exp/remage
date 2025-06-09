@@ -36,7 +36,7 @@ det_map = {
 }
 
 # append with the uint and the local positions
-vertices = lh5.read_as("stp/vertices", outfile, "ak")
+vertices = lh5.read_as("stp/vtx", outfile, "ak")
 
 uint = np.array(np.full_like(vertices.time, -1), dtype=int)
 xlocal = np.array(1000 * vertices.xloc.to_numpy())

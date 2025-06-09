@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 outfile = args.outfile
 
-vertices = lh5.read_as("stp/vertices", outfile, "ak")
+vertices = lh5.read_as("stp/vtx", outfile, "ak")
 
 # x-y
 fig, ax = plt.subplots(figsize=(8, 6))
