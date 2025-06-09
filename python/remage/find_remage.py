@@ -8,7 +8,7 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 
-def _find_remage_from_config() -> Path | None:
+def _find_remage_from_config() -> tuple[Path, str] | None:
     try:
         from .cpp_config import REMAGE_CPP_EXE_PATH
 
@@ -28,8 +28,9 @@ def find_remage_cpp() -> Path:
         path = (Path(path), "path") if path is not None else None
 
     if path is None or not path[0].exists():
+        missing = path[0] if path is not None else "None"
         msg = (
-            f"remage-cpp executable '{path}' not found. Ensure to use the right python "
+            f"remage-cpp executable '{missing}' not found. Ensure to use the right python "
             + "installation and/or set-up your PATH correctly."
         )
         raise RuntimeError(msg)
