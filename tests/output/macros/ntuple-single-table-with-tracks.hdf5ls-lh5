@@ -1,4 +1,4 @@
-stp : {'datatype': 'struct{germanium,scintillator,vtx}'}
+stp : {'datatype': 'struct{germanium,scintillator}'}
 stp/germanium : {'datatype': 'table{evtid,det_uid,particle,trackid,parent_trackid,edep,time,xloc,yloc,zloc,dist_to_surf}'}
 stp/germanium/det_uid : {'datatype': 'array<1>{real}'}
 stp/germanium/dist_to_surf : {'datatype': 'array<1>{real}', 'units': 'm'}
@@ -20,10 +20,10 @@ stp/scintillator/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
 stp/scintillator/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
 stp/scintillator/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
 stp/scintillator/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vtx : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
-stp/vtx/evtid : {'datatype': 'array<1>{real}'}
-stp/vtx/n_part : {'datatype': 'array<1>{real}'}
-stp/vtx/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
-stp/vtx/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vtx/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vtx/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
+vtx/evtid : {'datatype': 'array<1>{real}'}
+vtx/n_part : {'datatype': 'array<1>{real}'}
+vtx/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+vtx/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
