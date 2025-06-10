@@ -17,6 +17,7 @@ output_exp="macros/${4/.mac/.hdf5ls}"
 output_exp_lh5="macros/${4/.mac/.hdf5ls-lh5}"
 output_exp_lh5_jag="macros/${4/.mac/-jag.hdf5ls-lh5}"
 
+set -vx
 
 # -----------------------
 # TEST remage HDF5 output
@@ -58,9 +59,11 @@ diff "$output_dump_lh5" "$output_exp_lh5"
 "$python_path" ./visit-hdf5.py "$output_lh5" --dump-attrs > "$output_dump_lh5"
 diff "$output_dump_lh5" "$output_exp_lh5"
 
-# run remage, produce *jagaped* lh5 output.
+# run remage, produce *jagged* lh5 output.
 "$rmg" -g gdml/geometry.gdml -o "$output_lh5_jag" -w -- "$macro"
 
 # extract written lh5 structure & compare with expectation.
 "$python_path" ./visit-hdf5.py "$output_lh5_jag" --dump-attrs > "$output_dump_lh5_jag"
 diff "$output_dump_lh5_jag" "$output_exp_lh5_jag"
+
+set +vx
