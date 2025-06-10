@@ -188,10 +188,11 @@ generator macro commands are still available to the user, the _remage_ commands
 offer a simpler and more intuitive alternative.
 
 The macro command to generate double beta decay physics
-<project:../rmg-commands.md#rmggeneratorbxdecay0dbd> expects the isotope name,
-the name of the process you want to simulate (like `2vbb` or `0vbb`) and an
-optional level for the daughter nucleus. All available isotopes and processes
-are listed [here](project:../rmg-commands.md#rmggeneratorbxdecay0dbd). The
+<project:../rmg-commands.md#rmggeneratorbxdecay0doublebetadecay> expects the
+isotope name, the name of the process you want to simulate (like `2vbb` or
+`0vbb`) and an optional level for the daughter nucleus. All available isotopes
+and processes are listed
+[here](project:../rmg-commands.md#rmggeneratorbxdecay0doublebetadecay). The
 nuclear level defaults to ground state and can therefore be omitted in most
 cases.
 
@@ -200,7 +201,7 @@ state of $^{76}$Ge with:
 
 ```
 /RMG/Generator/Select BxDecay0
-/RMG/Generator/BxDecay0/dbd Ge76 2vbb
+/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 2vbb
 ```
 
 The second macro command is used to generate other radioactive decay physics
@@ -213,7 +214,7 @@ we can for example simulate a $^{60}$Co background source:
 
 ```
 /RMG/Generator/Select BxDecay0
-/RMG/Generator/BxDecay0/background Co60
+/RMG/Generator/BxDecay0/Background Co60
 ```
 
 The current seed of Geant4 will be forwarded to _bxdecay0_. This means that if

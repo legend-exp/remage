@@ -113,10 +113,10 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
      */
     bool fUpdateSeeds = false;
 
-    /** @brief Nested messenger class to handle the more complex dbd command for the BxDecay0
-     * generator. This class allows setting the isotope, process, and energy level for the double
-     * beta decay mode. The energy level is optional and the process is specified from a predefined
-     * set of processes instead as an integer.
+    /** @brief Nested messenger class to handle the more complex double beta decay command for the
+     * BxDecay0 generator. This class allows setting the isotope, process, and energy level for the
+     * double beta decay mode. The energy level is optional and the process is specified from a
+     * predefined set of processes instead as an integer.
      */
     class BxMessenger : public G4UImessenger {
       public:
