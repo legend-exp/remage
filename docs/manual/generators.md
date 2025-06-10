@@ -180,7 +180,7 @@ The macro [command](project:../rmg-commands.md#rmggeneratorselect):
 
 `/RMG/Generator/Select BxDecay0`
 
-can be used to select the Decay0 generator.
+can be used to select the BxDecay0 generator.
 
 _remage_ adds two macro commands to control the generator, which should cover
 all required use cases. While the original _bxdecay0_ double beta decay
@@ -189,10 +189,11 @@ offer a simpler and more intuitive alternative.
 
 The macro command to generate double beta decay physics
 <project:../rmg-commands.md#rmggeneratorbxdecay0dbd> expects the isotope name,
-the name of the process you want to simulate (like 2vbb or 0vbb) and an optional
-energy level for the daughter nucleus. All available isotopes and processes are
-listed [here](project:../rmg-commands.md#rmggeneratorbxdecay0dbd). The energy
-level defaults to zero and can therefore be omitted in most cases.
+the name of the process you want to simulate (like `2vbb` or `0vbb`) and an
+optional level for the daughter nucleus. All available isotopes and processes
+are listed [here](project:../rmg-commands.md#rmggeneratorbxdecay0dbd). The
+nuclear level defaults to ground state and can therefore be omitted in most
+cases.
 
 For example we can generate two-neutrino double beta decay to the $0^+$ ground
 state of $^{76}$Ge with:
@@ -202,10 +203,11 @@ state of $^{76}$Ge with:
 /RMG/Generator/BxDecay0/dbd Ge76 2vbb
 ```
 
-The second macro command is used to generate background physics with _bxdecay0_.
-The command <project:../rmg-commands.md#rmggeneratorbxdecay0background> takes
-only a single string as parameter, which should be the name of the isotope.
-Again all isotope candidates are listed
+The second macro command is used to generate other radioactive decay physics
+with _bxdecay0_. The command
+<project:../rmg-commands.md#rmggeneratorbxdecay0background> takes only a single
+string as parameter, which should be the name of the isotope. Again all isotope
+candidates are listed
 [here](project:../rmg-commands.md#rmggeneratorbxdecay0background). Using these
 we can for example simulate a $^{60}$Co background source:
 
@@ -219,7 +221,7 @@ any seed is specified using the
 <project:../rmg-commands.md#rmgmanagerrandomization> commands, that seed will be
 forwarded to _bxdecay0_.
 
-:::{note}
+:::{warning}
 
 _bxdecay0_ accepts only `int` seed values, while Geant4 accepts `long` values.
 In case a Geant4 seed happens to be above the numerical limit of `int`, the

@@ -11,15 +11,6 @@ find_package(remage REQUIRED)
 target_link_libraries(myapp PRIVATE RMG::remage)
 ```
 
-:::{note}
-
-When updating from older _remage_ versions you might encounter some issues with
-remnants of old dependencies. In this case fully delete your current _remage_
-installation and re-install into a clean folder, as the install process itself
-will not remove any files that are not on the list of to-be-installed files.
-
-:::
-
 ## Forwarding arguments
 
 The {cpp:class}`RMGManager` is crucial for any of your code to extend _remage_.
