@@ -53,6 +53,15 @@ $ cmake -DCMAKE_INSTALL_PREFIX=<unique prefix> ..
 $ make install
 ```
 
+:::{tip}
+
+When encountering any unexpected issues the first step should always be to
+remove the build folder and compile from scratch. The second step should be to
+additionally also remove the install folder and any traces of _remage_ to try
+the installation on a fresh system.
+
+:::
+
 ## Setting up Jupyter
 
 To set up a _remage_-aware Jupyter kernel, you only have to provide the correct

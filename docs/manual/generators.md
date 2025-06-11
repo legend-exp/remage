@@ -173,48 +173,68 @@ This mechanism can be used to select arbitrary sections of decay chains!
 
 To generate double beta decay physics we interface with the _bxdecay0_ package.
 This requires _remage_ to be build with _bxdecay0_ support see {ref}`install`.
-The only documentation for this extension is available
+The main documentation for this extension is available
 [here](https://github.com/BxCppDev/bxdecay0).
 
 The macro [command](project:../rmg-commands.md#rmggeneratorselect):
 
 `/RMG/Generator/Select BxDecay0`
 
-can be used to select the Decay0 generators.
+can be used to select the BxDecay0 generator.
 
-We can then use the _bxdecay0_ double beta decay generator macro commands to
-generate double beta decay physics. The macro command to generate double beta
-decay physics is:
+_remage_ adds two macro commands to control the generator, which should cover
+all required use cases. While the original _bxdecay0_ double beta decay
+generator macro commands are still available to the user, the _remage_ commands
+offer a simpler and more intuitive alternative.
 
-```
-/bxdecay0/generator/dbd ISOTOPE SEED MODE LEVEL
-```
-
-Where:
-
-- `ISOTOPE` (string): is the decaying nuclei,
-- `SEED` (int): is a random seed,
-- `MODE` (int): is an index the double beta decay mode labelling the decay type,
-  a table of implemented decay modes can be found in
-  [link](https://github.com/BxCppDev/bxdecay0/tree/develop?tab=readme-ov-file#list-of-supported-double-beta-decay-modes).
-- `LEVEL` (int): is a index of the energy level of the daughter nuclei, the list
-  of available levels are
-  [documented here](https://github.com/BxCppDev/bxdecay0/tree/develop?tab=readme-ov-file#list-of-daughter-nucleus-excited-states-in-double-beta-decay).
+The macro command to generate double beta decay physics
+<project:../rmg-commands.md#rmggeneratorbxdecay0doublebetadecay> expects the
+isotope name, the name of the process you want to simulate (like `2vbb` or
+`0vbb`) and an optional level for the daughter nucleus. All available isotopes
+and processes are listed
+[here](project:../rmg-commands.md#rmggeneratorbxdecay0doublebetadecay). The
+nuclear level defaults to ground state and can therefore be omitted in most
+cases.
 
 For example we can generate two-neutrino double beta decay to the $0^+$ ground
 state of $^{76}$Ge with:
 
 ```
 /RMG/Generator/Select BxDecay0
-/bxdecay0/generator/dbd Ge76 1234 4 0
+/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 2vbb
 ```
+
+The second macro command is used to generate other radioactive decay physics
+with _bxdecay0_. The command
+<project:../rmg-commands.md#rmggeneratorbxdecay0background> takes only a single
+string as parameter, which should be the name of the isotope. Again all isotope
+candidates are listed
+[here](project:../rmg-commands.md#rmggeneratorbxdecay0background). Using these
+we can for example simulate a $^{60}$Co background source:
+
+```
+/RMG/Generator/Select BxDecay0
+/RMG/Generator/BxDecay0/Background Co60
+```
+
+The current seed of Geant4 will be forwarded to _bxdecay0_. This means that if
+any seed is specified using the
+<project:../rmg-commands.md#rmgmanagerrandomization> commands, that seed will be
+forwarded to _bxdecay0_.
+
+:::{warning}
+
+_bxdecay0_ accepts only `int` seed values, while Geant4 accepts `long` values.
+In case a Geant4 seed happens to be above the numerical limit of `int`, the
+forwarded seed will be reduced to `old_seed - std::numeric_limits<int>::max()`.
+
+:::
 
 :::{tip}
 
-- More information on the double beta decay commands can be obtained with
-  `/control/manual /bxdecay0/generator/dbd`
 - The verbosity of _bxdecay0_ can be increased with
-  `/bxdecay0/generator/verbosity LEVEL` where `LEVEL` is 0, 1, 2 and 3.
+  `/bxdecay0/generator/verbosity LEVEL` where `LEVEL` is 0, 1, 2 and 3. This
+  should work in combination with the _remage_ macro commands.
 
 :::
 

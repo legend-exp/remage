@@ -1833,12 +1833,12 @@ Commands for controlling the BxDecay0 generator
 
 **Commands:**
 
-* `background` – Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'
-* `dbd` – Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator
+* `Background` – Set the isotope for the Background mode of the BxDecay0 generator. E.g. 'Co60'
+* `DoubleBetaDecay` – Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator
 
-### `/RMG/Generator/BxDecay0/background`
+### `/RMG/Generator/BxDecay0/Background`
 
-Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'
+Set the isotope for the Background mode of the BxDecay0 generator. E.g. 'Co60'
 
 * **Parameter** – `isotope`
   * **Parameter type** – `s`
@@ -1846,7 +1846,7 @@ Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'
   * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
 * **Allowed states** – `PreInit Idle`
 
-### `/RMG/Generator/BxDecay0/dbd`
+### `/RMG/Generator/BxDecay0/DoubleBetaDecay`
 
 Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator
 

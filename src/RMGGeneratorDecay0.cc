@@ -110,21 +110,21 @@ void RMGGeneratorDecay0::DefineCommands() {
   std::string isot_cand;
   for (const auto& isot : bxdecay0::background_isotopes()) { isot_cand += std::string(isot) + ' '; }
   // Need an additional command because both modes expect different parameters.
-  fMessenger->DeclareMethod("background", &RMGGeneratorDecay0::SetBackground)
-      .SetGuidance("Set the isotope for the background mode of the BxDecay0 generator. E.g. 'Co60'")
+  fMessenger->DeclareMethod("Background", &RMGGeneratorDecay0::SetBackground)
+      .SetGuidance("Set the isotope for the Background mode of the BxDecay0 generator. E.g. 'Co60'")
       .SetParameterName("isotope", false)
       .SetCandidates(isot_cand)
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 
-  // Make one macro command for the dbd mode.
+  // Make one macro command for the double beta decay mode.
   fUIMessenger = std::make_unique<BxMessenger>(this);
 }
 
 RMGGeneratorDecay0::BxMessenger::BxMessenger(RMGGeneratorDecay0* gen) : fGen(gen) {
 
 
-  fGeneratorCmd = new G4UIcommand("/RMG/Generator/BxDecay0/dbd", this);
+  fGeneratorCmd = new G4UIcommand("/RMG/Generator/BxDecay0/DoubleBetaDecay", this);
   fGeneratorCmd
       ->SetGuidance("Set the isotope, process and energy level for the double beta decay mode of the BxDecay0 generator");
 
