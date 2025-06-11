@@ -35,7 +35,7 @@ dependencies = [
   "legend-pydataobj >=1.11.12,<1.12",
   "colorlog",
   "tol_colors",
-  "reboost >=0.2.7, <0.3",
+  "reboost ==0.4.*",
 ]
 
 [project.optional-dependencies]
