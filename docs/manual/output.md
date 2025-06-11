@@ -1,4 +1,4 @@
-(manual-output)=
+(output)=
 
 # Output
 

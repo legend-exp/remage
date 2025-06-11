@@ -84,7 +84,7 @@ class RMGManager {
     void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
     void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
-    void IncludeMacroFile(std::string filename) { fMacroFileNames.emplace_back(filename); }
+    void IncludeMacroFile(std::string filename) { fMacroFilesOrContents.emplace_back(filename); }
     void RegisterG4Alias(std::string alias, std::string value) { fG4Aliases.emplace(alias, value); }
     void Initialize();
     void Run();
@@ -158,7 +158,7 @@ class RMGManager {
     int fArgc;
     char** fArgv;
     std::map<std::string, std::string> fG4Aliases;
-    std::vector<std::string> fMacroFileNames;
+    std::vector<std::string> fMacroFilesOrContents;
     bool fInteractive = false;
     bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;

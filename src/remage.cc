@@ -99,8 +99,11 @@ int main(int argc, char** argv) {
          "Pipe file descriptor for inter-process communication (internal)"
   )
       ->group(""); // group("") hides the option from help output.
-  app.add_option("macros", macros, "One or more remage/Geant4 macro command listings to execute")
-      ->type_name("FILE");
+  app.add_option(
+      "command_listings",
+      macros,
+      "One or more remage/Geant4 macro command listings to execute"
+  );
 
   CLI11_PARSE(app, argc, argv);
 
