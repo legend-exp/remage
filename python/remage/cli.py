@@ -128,7 +128,7 @@ def remage_run(
     macros: Sequence[str] | str = (),
     *,
     gdml_files: Sequence[str] | str = (),
-    output: str | None = None,
+    output: str | Path | None = None,
     threads: int = 1,
     overwrite_output: bool = False,
     merge_output_files: bool = False,
@@ -190,7 +190,7 @@ def remage_run(
         args.append(f"--gdml-files={gdml_files}")
 
     if output is not None:
-        args.append(f"--output-file={output}")
+        args.append(f"--output-file={output!s}")
 
     args.append(f"--threads={threads}")
 
