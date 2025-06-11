@@ -70,12 +70,10 @@ def post_proc(
         )
 
         with tmp_renamed_files(remage_files) as original_files:
-            # get the additional tables to copy
-            extra_tables = get_extra_tables(original_files[0], registered_detectors)
-
+            # also get the additional tables to forward
             config = get_rebooost_config(
                 registered_detectors,
-                extra_tables,
+                get_extra_tables(original_files[0], registered_detectors),
                 time_window=time_window_in_us,
             )
 
@@ -131,26 +129,19 @@ def get_rebooost_config(
     -------
     config file as a dictionary.
     """
-
-    config = {"processing_groups": []}
+    config = {}
 
     # get the config for tables to be reshaped
-    reshape_tables = {
-        "name": "all",
-        "detector_mapping": [{"output": table} for table in reshape_table_list],
-        "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
-    }
-    config["processing_groups"].append(reshape_tables)
+    config["processing_groups"] = [
+        {
+            "name": "all",
+            "detector_mapping": [{"output": table} for table in reshape_table_list],
+            "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
+        }
+    ]
 
-    for other in other_table_list:
-        config["processing_groups"].append(
-            {
-                "name": other,
-                "detector_mapping": [
-                    {"output": other},
-                ],
-            }
-        )
+    # forward other tables as they are
+    config["forward"] = other_table_list
 
     return config
 
@@ -158,9 +149,15 @@ def get_rebooost_config(
 def get_extra_tables(file: str, detectors: list[str]) -> list[str]:
     """Extract the additional tables in the output file (not detectors)."""
 
-    tables = lh5.ls(file, lh5_group="stp/")
+    extra_detectors = []
+    for table in lh5.ls(file, lh5_group="stp/"):
+        name = table.split("/")[1]
+        if name not in detectors:
+            extra_detectors.append(table)
 
-    return [tab.split("/")[1] for tab in tables if tab.split("/")[1] not in detectors]
+    other_tables = ["vtx"]
+
+    return extra_detectors + other_tables
 
 
 def make_tmp(files: list[str] | str) -> list[str]:

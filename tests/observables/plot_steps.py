@@ -9,7 +9,6 @@ from lgdo import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
 from reboost.shape.cluster import apply_cluster, cluster_by_step_length, step_lengths
-from reboost.shape.group import group_by_evtid
 
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12
@@ -30,6 +29,13 @@ cmap = plt.get_cmap("cividis")
 
 def plot_tracks(data, idx, savename=None):
     fig, ax = plt.subplots(figsize=(6, 6))
+
+    data = ak.Array(
+        {
+            name: ak.flatten(data[name])
+            for name in ["xloc", "yloc", "zloc", "trackid", "evtid"]
+        }
+    )
 
     data_tmp = data[data.evtid == idx]
     x0, z0 = data_tmp[0].xloc, data_tmp[0].zloc
@@ -108,13 +114,11 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
 
 path = sys.argv[1]
 name = sys.argv[2]
-data = lh5.read("stp/germanium", path).view_as("ak")
+shaped = lh5.read("stp/germanium", path).view_as("ak")
 
-plot_tracks(data, 0, f"{name}.tracks.out0.png")
-plot_tracks(data, 1, f"{name}.tracks.out1.png")
-plot_tracks(data, 2, f"{name}.tracks.out2.png")
-
-shaped = group_by_evtid(data).view_as("ak")
+plot_tracks(shaped, 0, f"{name}.tracks.out0.png")
+plot_tracks(shaped, 1, f"{name}.tracks.out1.png")
+plot_tracks(shaped, 2, f"{name}.tracks.out2.png")
 
 
 cluster_idx = cluster_by_step_length(
