@@ -15,8 +15,15 @@ Typical invocations supply one or more GDML geometry files and a list of macros
 to execute:
 
 ```console
-$ remage -g setup.gdml run.mac
+$ remage -g setup.gdml -- run.mac
 ```
+
+:::{note}
+
+The `--` is required here to disambiguate since `-g` can be supplied with
+multiple arguments.
+
+:::
 
 The most useful options include:
 
@@ -51,7 +58,7 @@ then exits. When `-i` is given, or the
 command prompt is opened after macro execution:
 
 ```console
-$ remage -i -g setup.gdml run.mac
+$ remage -i -g setup.gdml -- run.mac
 remage>
 ```
 
@@ -62,14 +69,14 @@ useful feature when generating macros on the fly (in e.g. a Python script).
 Multiple commands may be separated by newline, semicolon, or comma:
 
 ```console
-$ remage -i -g setup.gdml "/run/initialize;/run/beamOn 100"
+$ remage -i -g setup.gdml -- "/run/initialize;/run/beamOn 100"
 ```
 
 Macro substitutions also work with inline commands. Values are expanded where
 `{name}` placeholders appear in the command string:
 
 ```console
-$ remage -s EVENTS=100 "/run/initialize;/run/beamOn {EVENTS}"
+$ remage -s EVENTS=100 -- "/run/initialize;/run/beamOn {EVENTS}"
 ```
 
 ## Running from Python
