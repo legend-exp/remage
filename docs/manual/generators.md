@@ -2,13 +2,6 @@
 
 # Event generators
 
-:::{todo}
-
-- list of built-in generators and documentation
-- muon generators
-
-:::
-
 We generate particles of interest using Geant4 macro commands (see
 [link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#macro-commands)
 for some background).

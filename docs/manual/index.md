@@ -4,6 +4,7 @@
 :maxdepth: 1
 
 install.md
+containers.md
 running.md
 geometry.md
 physicslist.md

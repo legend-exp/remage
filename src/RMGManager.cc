@@ -15,9 +15,12 @@
 
 #include "RMGManager.hh"
 
+#include <algorithm>
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -143,7 +146,7 @@ void RMGManager::Run() {
 
   // FIXME: logic here does not work. There is no way to do interactive visualization
 
-  if (!fInteractive and fMacroFileNames.empty()) {
+  if (!fInteractive and fMacroFilesOrContents.empty()) {
     RMGLog::Out(RMGLog::fatal, "Batch mode has been requested but no macro file has been set");
   }
 
@@ -159,9 +162,21 @@ void RMGManager::Run() {
   }
 
   // eventually execute macros
-  for (const auto& macro : fMacroFileNames) {
-    RMGLog::Out(RMGLog::summary, "Loading macro file: ", macro);
-    UI->ApplyCommand("/control/execute " + macro);
+  for (const auto& macro : fMacroFilesOrContents) {
+    if (std::filesystem::exists(macro)) {
+      RMGLog::Out(RMGLog::summary, "Loading macro file: ", macro);
+      UI->ApplyCommand("/control/execute " + macro);
+    } else {
+      std::string expanded = macro;
+      std::replace(expanded.begin(), expanded.end(), ';', '\n');
+      std::replace(expanded.begin(), expanded.end(), ',', '\n');
+      std::istringstream ss(expanded);
+      std::string line;
+      while (std::getline(ss, line, '\n')) {
+        if (!line.empty()) UI->ApplyCommand(line);
+      }
+      continue;
+    }
   }
 
   // if interactive mode is requested, do not quit and start a session
