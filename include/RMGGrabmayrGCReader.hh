@@ -1,4 +1,5 @@
-// Copyright (C) 2022 Luigi Pertoldi <gipert@pm.me>
+// Copyright (C) 2024 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
+// Copyright (C) 2024 Eric Esch <https://orcid.org/0009-0000-4920-9313>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
