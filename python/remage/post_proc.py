@@ -23,11 +23,14 @@ def post_proc(
     remage_files = ipc_info.get("output")
     main_output_file = ipc_info.get_single("output_main", None)
     overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
+    det_tables_path = ipc_info.get_single("ntuple_output_directory", None)
 
     ipc_info.remove("output_main")
 
     if main_output_file is None:
         return
+
+    assert det_tables_path is not None
 
     output_file_exts = {
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
@@ -76,11 +79,21 @@ def post_proc(
             }
         )
 
+        # extract the additional tables in the output file (not detectors)
+        extra_detectors = []
+        for table in lh5.ls(remage_files[0], lh5_group=f"{det_tables_path}//"):
+            name = table.split("/")[1]
+            if name not in registered_detectors:
+                extra_detectors.append(table)
+
+        # add the vertex table, if it was stored
+        extra_tables = extra_detectors + ipc_info.get("vtx_table_path")
+
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward
             config = get_rebooost_config(
                 registered_detectors,
-                get_extra_tables(original_files[0], registered_detectors),
+                extra_tables,
                 time_window=time_window_in_us,
             )
 
@@ -91,7 +104,7 @@ def post_proc(
                 stp_files=original_files,
                 glm_files=None,
                 hit_files=output_files,
-                out_field="stp",
+                out_field=det_tables_path,
             )
 
         # set the merged output file for downstream consumers.
@@ -151,20 +164,6 @@ def get_rebooost_config(
     config["forward"] = other_table_list
 
     return config
-
-
-def get_extra_tables(file: str, detectors: list[str]) -> list[str]:
-    """Extract the additional tables in the output file (not detectors)."""
-
-    extra_detectors = []
-    for table in lh5.ls(file, lh5_group="stp/"):
-        name = table.split("/")[1]
-        if name not in detectors:
-            extra_detectors.append(table)
-
-    other_tables = ["vtx"]
-
-    return extra_detectors + other_tables
 
 
 def make_tmp(files: list[str] | str) -> list[str]:
