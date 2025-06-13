@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +305,10 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     det_group.close();
 
     // grab the "vtx" table and move it one level up
-    if (ntuple == "vtx") { hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple); }
+    if (ntuple == "vtx") {
+      hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple);
+      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("vtx_table_path", "/vtx"));
+    }
     ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), "vtx"), ntuples.end());
   }
   // make the root HDF5 group an LH5 struct.
