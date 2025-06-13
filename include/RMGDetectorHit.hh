@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Toby Dixon <toby.dixon.23@ucl.ac.uk>
+// Copyright (C) 2025 Toby Dixon <https://orcid.org/0000-0001-8787-6336>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
