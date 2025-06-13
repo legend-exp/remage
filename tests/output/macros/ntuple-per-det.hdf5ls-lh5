@@ -1,4 +1,4 @@
-stp : {'datatype': 'struct{det001,det002,det011,det012,vertices}'}
+stp : {'datatype': 'struct{det001,det002,det011,det012}'}
 stp/det001 : {'datatype': 'table{evtid,particle,edep,time,xloc,yloc,zloc}'}
 stp/det001/edep : {'datatype': 'array<1>{real}', 'units': 'keV'}
 stp/det001/evtid : {'datatype': 'array<1>{real}'}
@@ -33,10 +33,10 @@ stp/det012/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
 stp/det012/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
 stp/det012/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
 stp/det012/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vertices : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
-stp/vertices/evtid : {'datatype': 'array<1>{real}'}
-stp/vertices/n_part : {'datatype': 'array<1>{real}'}
-stp/vertices/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
-stp/vertices/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vertices/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
-stp/vertices/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx : {'datatype': 'table{evtid,time,xloc,yloc,zloc,n_part}'}
+vtx/evtid : {'datatype': 'array<1>{real}'}
+vtx/n_part : {'datatype': 'array<1>{real}'}
+vtx/time : {'datatype': 'array<1>{real}', 'units': 'ns'}
+vtx/xloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx/yloc : {'datatype': 'array<1>{real}', 'units': 'm'}
+vtx/zloc : {'datatype': 'array<1>{real}', 'units': 'm'}

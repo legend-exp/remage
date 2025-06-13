@@ -301,6 +301,11 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   for (auto& ntuple : ntuples) {
     auto det_group = ntuples_group.openGroup(ntuple);
     ntuple_success &= ConvertNTupleToTable(det_group);
+    det_group.close();
+
+    // grab the "vtx" table and move it one level up
+    if (ntuple == "vtx") { hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple); }
+    ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), "vtx"), ntuples.end());
   }
   // make the root HDF5 group an LH5 struct.
   if (!ntuples_group.attrExists("datatype")) {

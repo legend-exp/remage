@@ -48,7 +48,7 @@ if len(files) == 1:
 if "pos" in macro:
     pos_input_file = pos_input_file.replace(".hdf5", ".lh5")
     input_pos = lh5.read("vtx/pos", lh5_file=pos_input_file).view_as("pd")
-    output_pos = lh5.read("stp/vertices", lh5_file=files).view_as("pd")
+    output_pos = lh5.read("vtx", lh5_file=files).view_as("pd")
 
     output_pos = output_pos.sort_values("xloc")  # sort by linear column.
     output_pos = output_pos[["xloc", "yloc", "zloc"]]

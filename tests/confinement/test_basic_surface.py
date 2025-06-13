@@ -186,7 +186,7 @@ pos = reg.physicalVolumeDict[dtype].position.eval()
 
 # read vertices and hits
 outfile = f"test-confine-surface-{dtype}-out.lh5"
-vertices = lh5.read_as("stp/vertices", outfile, "ak")
+vertices = lh5.read_as("vtx", outfile, "ak")
 hits = lh5.read_as("stp/germanium", outfile, "ak")
 
 hits = add_local_pos(hits, pos)
