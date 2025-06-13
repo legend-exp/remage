@@ -16,9 +16,8 @@ from scipy.stats import beta, norm, poisson
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 14
-vib = tc.tol_cset("vibrant")
-vset = tc.tol_cset("vibrant")
-mset = tc.tol_cset("muted")
+vset = tc.colorsets["vibrant"]
+mset = tc.colorsets["muted"]
 
 style = {
     "yerr": False,
@@ -46,16 +45,14 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     hit_directory = Path(f"out/{path}/hit/")
 
     data = lh5.read_as("hit/germanium", f"{hit_directory}/out.lh5", "ak")
-    verts = lh5.read_as("vtx", f"{hit_directory}/out.lh5", "ak")
+    verts = lh5.read_as("hit/vtx", f"{hit_directory}/out.lh5", "ak")
     verts["dist_to_surf"] = get_cylinder_dist(
         1000 * verts.rloc, 1000 * verts.zloc, radius, height
     )
 
     if dist_low is not None:
         n_sel = ak.sum(
-            ak.flatten(
-                (verts["dist_to_surf"] > dist_low) & (verts["dist_to_surf"] < dist_high)
-            )
+            (verts["dist_to_surf"] > dist_low) & (verts["dist_to_surf"] < dist_high)
         )
     else:
         n_sel = len(verts)
@@ -63,8 +60,8 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     hit_ids = np.searchsorted(verts.first_evtid, data.first_evtid)
     verts = verts[hit_ids]
 
-    data["vert_rloc"] = 1000 * ak.flatten(verts.rloc)
-    data["vert_zloc"] = 1000 * ak.flatten(verts.zloc)
+    data["vert_rloc"] = 1000 * verts.rloc
+    data["vert_zloc"] = 1000 * verts.zloc
 
     data["vert_dist_to_surf"] = get_cylinder_dist(
         data.vert_rloc, data.vert_zloc, radius, height
@@ -172,7 +169,7 @@ def plot(
     steps = {}
     eff_def = {}
     n_sels = {}
-    colors = [vib.blue, vib.orange, vib.magenta, vib.teal, vib.grey, vib.cyan]
+    colors = [vset.blue, vset.orange, vset.magenta, vset.teal, vset.grey, vset.cyan]
 
     # get default
     for field in fields:
@@ -227,7 +224,7 @@ def plot(
                     flow=None,
                     fill=True,
                     alpha=0.2,
-                    color=vib.blue,
+                    color=vset.blue,
                     label="No limits",
                 )
 

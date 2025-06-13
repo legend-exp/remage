@@ -112,7 +112,7 @@ def run_sim(
     subprocess.run(
         (
             f"{rmg} {macro_directory / macro_file} -g "
-            "gdml/geometry.gdml -o {stp_directory}/out.lh5 "
+            f"gdml/geometry.gdml -o {stp_directory}/out.lh5 "
             "-w -t 1 "
         ),
         shell=True,
