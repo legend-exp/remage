@@ -7,7 +7,6 @@ from pathlib import Path
 
 import colorlog
 import dbetto
-from reboost.build_glm import build_glm
 from reboost.build_hit import build_hit
 
 log = logging.getLogger(__name__)
@@ -54,29 +53,20 @@ def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yam
 
     # directories
     stp_directory = Path(f"out/{path}/stp/")
-    glm_directory = Path(f"out/{path}/glm/")
     hit_directory = Path(f"out/{path}/hit/")
 
     # make the directories
     hit_directory.mkdir(parents=True, exist_ok=True)
-    glm_directory.mkdir(parents=True, exist_ok=True)
 
-    glm_files = [f"{glm_directory}/out.lh5"]
     stp_files = [f"{stp_directory}/out.lh5"]
     hit_files = [f"{hit_directory}/out.lh5"]
-
-    build_glm(
-        glm_files=glm_files,
-        stp_files=stp_files,
-        id_name="evtid",
-    )
 
     args = dbetto.AttrsDict({"gdml": "gdml/geometry.gdml"})
     _, _ = build_hit(
         reboost_config,
         args=args,
         stp_files=stp_files,
-        glm_files=glm_files,
+        glm_files=None,
         hit_files=hit_files,
         buffer=10_000_000,
         overwrite=True,
@@ -120,7 +110,11 @@ def run_sim(
         "macros/template.mac", macro_directory / Path(macro_file), replacements
     )
     subprocess.run(
-        f"{rmg} {macro_directory / macro_file} -g gdml/geometry.gdml -o {stp_directory}/out.lh5 --flat-output -w -t 1  ",
+        (
+            f"{rmg} {macro_directory / macro_file} -g "
+            "gdml/geometry.gdml -o {stp_directory}/out.lh5 "
+            "-w -t 1 "
+        ),
         shell=True,
         check=False,
     )
