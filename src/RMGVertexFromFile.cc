@@ -1,5 +1,5 @@
-// Copyright (C) 2024 Manuel Huber
-// Copyright (C) 2022 Luigi Pertoldi <gipert@pm.me>
+// Copyright (C) 2024 Manuel Huber <https://orcid.org/0009-0000-5212-2999>
+// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
