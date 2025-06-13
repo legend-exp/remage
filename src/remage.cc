@@ -166,6 +166,11 @@ int main(int argc, char** argv) {
   if (!output.empty()) manager.SetOutputFileName(output);
 
   manager.Initialize();
+
+  RMGIpc::SendIpcNonBlocking(
+      RMGIpc::CreateMessage("ntuple_output_directory", manager.GetOutputNtupleDirectory())
+  );
+
   manager.Run();
 
   if (manager.HadError()) return 1;
