@@ -1,17 +1,60 @@
 from __future__ import annotations
 
 import logging
+import shutil
 import time
 from contextlib import contextmanager
 from pathlib import Path
 
 from lgdo import lh5
 from lgdo.lh5.concat import lh5concat
+from pygama import evt
 from reboost.build_hit import build_hit
 
 from .ipc import IpcResult
 
 log = logging.getLogger(__name__)
+
+
+def copy_files_to_tmp(files: list[str]):
+    """Copy files to a temporary location"""
+    new_paths = []
+
+    for file in files:
+        path = Path(file)
+        new_path = shutil.copy(file, path.with_name(".tmp" + path.name))
+        new_paths.append(str(new_path))
+    return new_paths
+
+
+def add_tcm(files: list | str, det_tables_path: str):
+    """Add a time-coincidence map to the files."""
+
+    if isinstance(files, str):
+        files = [files]
+
+    tables = lh5.ls(files[0], lh5_group=f"{det_tables_path}/")
+
+    tmp_files = copy_files_to_tmp(files)
+
+    for file_orig, file in zip(tmp_files, files):
+        table_name_patterns = [(file_orig, tab) for tab in tables]
+
+        # build the tcm
+        evt.build_tcm(
+            table_name_patterns,
+            coin_cols=["t0", "first_evtid"],
+            hash_func=None,
+            coin_windows=[10, 0.0],
+            out_file=file,
+            wo_mode="append",
+        )
+        lh5.show(file)
+    for file_tmp in tmp_files:
+        Path(file_tmp).unlink()
+
+    msg = "finished adding tcm"
+    log.info(msg)
 
 
 def post_proc(
@@ -81,7 +124,7 @@ def post_proc(
 
         # extract the additional tables in the output file (not detectors)
         extra_detectors = []
-        for table in lh5.ls(remage_files[0], lh5_group=f"{det_tables_path}//"):
+        for table in lh5.ls(remage_files[0], lh5_group=f"{det_tables_path}/"):
             name = table.split("/")[1]
             if name not in registered_detectors:
                 extra_detectors.append(table)
@@ -106,6 +149,9 @@ def post_proc(
                 hit_files=output_files,
                 out_field=det_tables_path,
             )
+
+            # make the tcm
+            add_tcm(output_files, det_tables_path=det_tables_path)
 
         # set the merged output file for downstream consumers.
         ipc_info.set("output", output_files)
@@ -157,6 +203,10 @@ def get_rebooost_config(
             "name": "all",
             "detector_mapping": [{"output": table} for table in reshape_table_list],
             "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
+            "operations": {
+                "t0": "ak.fill_none(ak.firsts(HITS.time,axis=-1),0)",
+                "first_evtid": "ak.fill_none(ak.firsts(HITS.evtid,axis=-1),0)",
+            },
         }
     ]
 

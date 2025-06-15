@@ -36,6 +36,7 @@ dependencies = [
   "colorlog",
   "tol_colors",
   "reboost ==0.5.*",
+  "pygama==2.2.*"
 ]
 
 [project.optional-dependencies]
