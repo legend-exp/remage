@@ -45,7 +45,7 @@ def add_tcm(files: list | str, det_tables_path: str):
             table_name_patterns,
             coin_cols=["t0", "first_evtid"],
             hash_func=None,
-            coin_windows=[10, 0.0],
+            coin_windows=[10/1000., 0.0],
             out_file=file,
             wo_mode="append",
         )
