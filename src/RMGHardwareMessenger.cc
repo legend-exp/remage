@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <gipert@pm.me>
+// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
