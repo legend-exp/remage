@@ -11,7 +11,7 @@ from reboost.build_hit import build_hit
 
 from .ipc import IpcResult
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("remage")
 
 
 def post_proc(
@@ -40,7 +40,7 @@ def post_proc(
     if output_file_exts != {".lh5"}:
         if not flat_output or merge_output_files:
             log.error(
-                "merging or reshaping is not supported for output format %s",
+                "Merging or reshaping is not supported for output format %s",
                 next(iter(output_file_exts)).lstrip("."),
             )
 

@@ -12,8 +12,7 @@ import threading
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-import colorlog
-
+from . import utils
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 from .post_proc import post_proc
@@ -24,6 +23,7 @@ def _run_remage_cpp(
     is_cli: bool = False,
 ) -> tuple[int, signal.Signals, IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
+    logger = logging.getLogger("remage")
 
     remage_exe = find_remage_cpp()
 
@@ -48,8 +48,12 @@ def _run_remage_cpp(
         msg = "cannot pass internal argument --pipe-fd"
         raise RuntimeError(msg)
 
+    full_args = [str(argv[0]), f"--pipe-fd={pipe_w}", *argv[1:]]
+    msg = "Running command: " + " ".join(full_args)
+    logger.debug(msg)
+
     proc = subprocess.Popen(
-        [argv[0], f"--pipe-fd={pipe_w}", *argv[1:]],
+        full_args,
         executable=remage_exe,
         pass_fds=(pipe_w,),
     )
@@ -96,23 +100,6 @@ def _run_remage_cpp(
     ec = 128 - proc.returncode if proc.returncode < 0 else proc.returncode
     termsig = signal.Signals(-proc.returncode) if proc.returncode < 0 else None
     return ec, termsig, IpcResult(unhandled_ipc_messages)
-
-
-def _setup_log() -> logging.Logger:
-    """Setup a colored logger for this package."""
-
-    logger = logging.getLogger("remage")
-
-    if sys.stderr.isatty():
-        fmt = "%(log_color)s[%(levelname)-7s ->%(reset)s %(message)s"
-
-        handler = colorlog.StreamHandler()
-        handler.setFormatter(colorlog.ColoredFormatter(fmt))
-        logger.addHandler(handler)
-
-    logger.setLevel(logging.DEBUG)
-
-    return logger
 
 
 def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
@@ -242,7 +229,7 @@ def remage_run_from_args(
     raise_on_warning
         see :meth:`remage_run`
     """
-    logger = _setup_log()
+    logger = utils._setup_log()
 
     parser = argparse.ArgumentParser(allow_abbrev=False, add_help=False)
 
