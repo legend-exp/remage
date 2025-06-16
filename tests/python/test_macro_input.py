@@ -21,7 +21,6 @@ def test_macro_input():
 
     inline_cmds = ["/run/initialize", "/RMG/Generator/Select GPS", "/run/beamOn 1"]
     _remage_run(inline_cmds)
-    for char in ("\n", ";", ","):
-        _remage_run(char.join(inline_cmds))
+    _remage_run("\n".join(inline_cmds))
 
     _remage_run(["macros/run-a.mac", "/RMG/Generator/Select GPS", "/run/beamOn 1"])

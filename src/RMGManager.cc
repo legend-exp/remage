@@ -175,8 +175,6 @@ void RMGManager::Run() {
       UI->ApplyCommand("/control/execute " + macro);
     } else {
       std::string expanded = macro;
-      std::replace(expanded.begin(), expanded.end(), ';', '\n');
-      std::replace(expanded.begin(), expanded.end(), ',', '\n');
       std::istringstream ss(expanded);
       std::string line;
       while (std::getline(ss, line, '\n')) {
