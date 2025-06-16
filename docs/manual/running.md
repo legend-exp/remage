@@ -2,8 +2,8 @@
 
 # Running simulations
 
-The :program:`remage` executable drives the simulation from the command line. A
-short overview of all available options can be obtained with `remage --help`.
+The `remage` executable drives the simulation from the command line. A short
+overview of all available options can be obtained with `remage --help`.
 
 ```console
 $ remage [OPTIONS] [macros or command string...]
@@ -52,8 +52,8 @@ The most useful options include:
 
 ## Batch versus interactive mode
 
-By default :program:`remage` runs all specified macro commands in batch mode and
-then exits. When `-i` is given, or the
+By default `remage` runs all specified macro commands in batch mode and then
+exits. When `-i` is given, or the
 <project:../rmg-commands.md#rmgmanagerinteractive> command is used in a macro, a
 command prompt is opened after macro execution:
 
