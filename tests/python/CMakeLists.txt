@@ -12,7 +12,6 @@ endforeach()
 add_test(NAME python/cli COMMAND "${REMAGE_PYEXE}" -q --help)
 
 # run python tests using pytest
-add_test(NAME python/pytest-wrapper COMMAND ${PYTHONPATH} -m pytest -vvv
-                                            ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME python/pytest-wrapper COMMAND ${PYTHONPATH} -m pytest -vvv)
 
 set_tests_properties(python/pytest-wrapper PROPERTIES LABELS "mt;extra")
