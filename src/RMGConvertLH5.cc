@@ -307,7 +307,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     // grab the "vtx" table and move it one level up
     if (ntuple == "vtx") {
       hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple);
-      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("vtx_table_path", "/vtx"));
+      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("vtx_table_path", "/" + ntuple));
     }
     ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), "vtx"), ntuples.end());
   }
