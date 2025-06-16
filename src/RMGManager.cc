@@ -158,7 +158,14 @@ void RMGManager::Run() {
   // register aliases
   for (const auto& kv : fG4Aliases) {
     RMGLog::Out(RMGLog::summary, "Setting G4 alias: ", kv.first, "=", kv.second);
-    UI->ApplyCommand("/control/alias " + kv.first + " " + kv.second);
+    auto return_code = UI->ApplyCommand("/control/alias " + kv.first + " " + kv.second);
+    if (return_code != 0)
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "G4 alias creation failed: /control/alias {} {}",
+          kv.first,
+          kv.second
+      );
   }
 
   // eventually execute macros
@@ -173,7 +180,10 @@ void RMGManager::Run() {
       std::istringstream ss(expanded);
       std::string line;
       while (std::getline(ss, line, '\n')) {
-        if (!line.empty()) UI->ApplyCommand(line);
+        if (!line.empty()) {
+          auto return_code = UI->ApplyCommand(line);
+          if (return_code != 0) { RMGLog::OutFormat(RMGLog::fatal, "Illegal command: '{}'", line); }
+        }
       }
       continue;
     }
