@@ -84,7 +84,7 @@ def ipc_thread_fn(
     each complete IPC message to :func:`handle_ipc_message` for parsing and
     handling of the associated action. Any message parts will be decoded as
     UTF-8 before parsing.
-    
+
     Blocking messages are acknowledged by sending the POSIX signal ``SIGUSR2``
     to the child  process, while fatal messages trigger ``SIGTERM``. Any
     messages that are not handled by :func:`handle_ipc_message` are appended
