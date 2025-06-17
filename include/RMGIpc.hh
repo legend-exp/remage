@@ -19,23 +19,45 @@
 #include <atomic>
 #include <string>
 
+/** @brief IPC message sender implementation.
+ *  @details \verbatim embed:rst:leading-asterisk
+ *  .. note ::
+ *      The receiver implementation and message format documentation can be found in
+ *      :py:mod:`remage.ipc`.
+ *  \endverbatim
+ */
 class RMGIpc final {
 
   public:
 
     RMGIpc() = delete;
 
+    /** @brief Set the IPC pipe (write end) file descriptor.
+     */
     static void Setup(int ipc_pipe_fd);
 
+    /** @brief Create an IPC message with a key and a single value.
+     */
     static std::string CreateMessage(const std::string& command, const std::string& param) {
       // \x1e (record separator = end of entry)
       // TODO: also implement a CreateMessage variant with \x1f (unit separator = key/value delimiter)
       return command + "\x1e" + param;
     }
 
+    /** @brief Send a non-blocking IPC message.
+     *  @details The message is a UTF-8 encoded buffer that already contains the message
+     *  structure, such as \ref CreateMessage.
+     */
     static bool SendIpcNonBlocking(std::string msg);
+    /** @brief Send a blocking IPC message.
+     *  @details The message is a UTF-8 encoded buffer that already contains the message
+     *  structure, such as \ref CreateMessage.
+     */
     static bool SendIpcBlocking(std::string msg);
 
+    /** @brief Flag for waiting for the SIGUSR2 signal for blocking messages.
+     *  @details Should not be used by the user and only be set by the signal handler.
+     */
     inline static std::atomic<bool> fWaitForIpc = false;
 
   private:

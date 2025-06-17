@@ -1,3 +1,54 @@
+"""
+IPC message receiver implementation for ``remage-cpp``.
+
+.. note ::
+
+    The C++ IPC *sender* implementation can be found in :cpp:class:`RMGIpc`.
+
+
+Binary message format
+---------------------
+
+Messages are encoded as UTF-8 strings; transmitting binary (non-string) data with
+this IPC mechanism is not possible.
+
+Message parts are separated using ASCII control characters. Each message ends with
+``GS`` (group separator, 0x1D) which may be optionally preceded by ``ENQ`` (enquiry,
+0x05) to indicate that the C++ process expects an acknowledgement with a POSIX signal
+before continuing.
+
+Records within a message are delimited by ``RS`` (record separator, 0x1E). Each
+message must contain at least two records. The first is treated as the message's
+*key*, whereas the second one is the associated *value*:
+
++-------+--------+---------+-----------+--------+
+| *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
++-------+--------+---------+-----------+--------+
+
+More values can follow afterwards, again delimited by ``RS``.
+
+Each record may contain multiple units split by ``US`` (unit separator, 0x1F). Records
+with more then one unit are returned as tuples on the python side.
+
+Example: A message
+
++-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+| *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
++-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+
+would be decoded to :code:`["value0", ("value1", "value2")]`.
+
+
+Blocking messages
+-----------------
+
+Blocking messages need to be acknowledged by sending the POSIX signal ``SIGUSR2`` to
+the ``remage-cpp`` process, after performing the associated action (example: checking
+version equality of python and C++ IPC sides, pre-processing files).
+
+Transmitting additional response data with the acknowledgement is not possible.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -10,8 +61,25 @@ from ._version import __version__
 log = logging.getLogger("remage")
 
 
-def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
-    # parse the IPC message structure.
+def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
+    """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
+
+    This function should directly handle all known blocking IPC messages, which
+    will not be returned for subsequent processing.
+
+    Parameters
+    ----------
+    msg
+        The raw message bytes decoded to UTF-8, still including the trailing separator(s).
+
+    Returns
+    -------
+    tuple[bool, list, bool]
+        ``(is_blocking, parsed_message, is_fatal)`` where ``is_blocking`` is
+        ``True`` when the sender waits for a reply, ``parsed_message`` is the
+        decoded message or ``None`` if it was consumed internally, and
+        ``is_fatal`` signals that the application should terminate.
+    """
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
     if msg[-1] == "\x05":  # ASCII ENQ ("enquiry")
@@ -42,6 +110,35 @@ def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
 def ipc_thread_fn(
     pipe_r: int, proc: subprocess.Popen, unhandled_ipc_messages: list
 ) -> None:
+    """Read and handle IPC messages coming from ``remage-cpp``.
+
+    .. important ::
+        This function runs in a dedicated thread in
+        :func:`remage.cli._run_remage_cpp` and should not be called directly by
+        the user. The parameter ``unhandled_ipc_messages`` acts as a return
+        value, as thread functions cannot directly return.
+
+
+    The function reads from the pipe file descriptor ``pipe_r`` and dispatches
+    each complete IPC message to :func:`handle_ipc_message` for parsing and
+    handling of the associated action. Any message parts will be decoded as
+    UTF-8 before parsing.
+
+    Blocking messages are acknowledged by sending the POSIX signal ``SIGUSR2``
+    to the child  process, while fatal messages trigger ``SIGTERM``. Any
+    messages that are not handled by :func:`handle_ipc_message` are appended
+    to the list ``unhandled_ipc_messages`` for later processing.
+
+    Parameters
+    ----------
+    pipe_r
+        File descriptor for the read end of the IPC pipe.
+    proc
+        The subprocess running ``remage-cpp``.
+    unhandled_ipc_messages
+        List that will receive messages which were not directly handled (i.e.,
+        for further processing)
+    """
     try:
         msg_buf = b""
         with os.fdopen(pipe_r, "br", 0) as pipe_file:
@@ -79,9 +176,18 @@ def ipc_thread_fn(
 
 class IpcResult:
     def __init__(self, ipc_info):
+        """Storage structure for the IPC messages returned by ``remage-cpp``."""
         self.ipc_info = ipc_info
 
     def get(self, name: str, expected_len: int = 1) -> list[str]:
+        """Return all messages of a given key ``name`` from the IPC message list.
+
+        Parameters
+        ----------
+        expected_len
+            only return messages that have the expected number of records. Other messages are
+            silently skipped.
+        """
         msgs = [
             msg[1:]
             for msg in self.ipc_info
@@ -92,6 +198,11 @@ class IpcResult:
         return msgs
 
     def get_single(self, name: str, default: str) -> str:
+        """Return the single single value for the key ``name`` or ``default`` if not present.
+
+        .. note ::
+            if more then one value for the key had been submitted, this function will throw.
+        """
         gen = self.get(name)
         if len(gen) > 1:
             msg = f"ipc returned key {name} more than once"
@@ -99,9 +210,16 @@ class IpcResult:
         return gen[0] if len(gen) == 1 else default
 
     def set(self, name: str, values: list[str]) -> None:
+        """Replace existing stored messages for they key ``name`` with ``values``.
+
+        .. note ::
+            This will create a single-record message for each value in `values`. Setting more
+            complex messages is not implemented yet.
+        """
         self.remove(name)
         for v in values:
             self.ipc_info.append([name, v])
 
     def remove(self, name: str) -> None:
+        """Remove all messages with the given key ``name`` from the IPC info."""
         self.ipc_info = [msg for msg in self.ipc_info if msg[0] != name]
