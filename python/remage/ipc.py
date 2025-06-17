@@ -1,3 +1,38 @@
+"""
+IPC message receiver implementation for ``remage-cpp``.
+
+.. note ::
+
+    The C++ IPC *sender* implementation can be found in {cpp}`RMGIpc`.
+
+
+Binary message format
+---------------------
+
+Messages are encoded as UTF-8 strings; transmitting binary (non-string) data with
+this IPC mechanism is not possible.
+
+Message parts are separated using ASCII control characters. Each message ends with
+``GS`` (group separator) which may be optionally preceded by ``ENQ`` (enquiry) to
+indicate that the C++ process expects an acknowledgement with a POSIX signal before
+continuing.
+
+Records within a message are delimited by ``RS`` (record separator) and each record
+may contain multiple units split by ``US`` (unit separator). Records with more then
+one unit are returned as tuples on the python side.
+
+Each message must contain at least one record, it is treated as the message's *key*.
+
+Blocking messages
+-----------------
+
+Blocking messages need to be acknowledged by sending the POSIX signal ``SIGUSR2`` to
+the ``remage-cpp`` process, after performing the associated action (example: checking
+version equality of python and C++ IPC sides, pre-processing files).
+
+Transmitting additional response data with the acknowledgement is not possible.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -11,19 +46,7 @@ log = logging.getLogger("remage")
 
 
 def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
-    """Parse a raw IPC message from ``remage-cpp``.
-
-    Messages are decoded as UTF-8 strings; transmitting binary (non-string) data
-    with this IPC mechanism is not possible.
-
-    Message parts are separated using ASCII control characters. Each message ends
-    with ``GS`` (group separator) which may be additionally followed by ``ENQ``
-    (enquiry) to indicate that the C++ process expects an acknowledgement with a
-    POSIX signal before continuing.
-
-    Records within a message are delimited by ``RS`` (record separator) and each
-    record may contain multiple units split by ``US`` (unit separator). Records
-    with more then one unit are returned as tuples.
+    """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
 
     This function should directly handle all known blocking IPC messages, which
     will not be returned for subsequent processing.
@@ -31,7 +54,7 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
     Parameters
     ----------
     msg
-        The raw message bytes decoded to UTF-8, still including the trailing separator.
+        The raw message bytes decoded to UTF-8, still including the trailing separator(s).
 
     Returns
     -------
@@ -138,14 +161,13 @@ def ipc_thread_fn(
 class IpcResult:
     def __init__(self, ipc_info):
         """Storage structure for the IPC messages returned by ``remage-cpp``."""
-
         self.ipc_info = ipc_info
 
     def get(self, name: str, expected_len: int = 1) -> list[str]:
         """Return all messages of a given key ``name`` from the IPC message list.
 
-        Params
-        ------
+        Parameters
+        ----------
         expected_len
             only return messages that have the expected number of records. Other messages are
             silently skipped.
