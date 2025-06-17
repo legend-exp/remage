@@ -17,11 +17,28 @@ Message parts are separated using ASCII control characters. Each message ends wi
 indicate that the C++ process expects an acknowledgement with a POSIX signal before
 continuing.
 
+Each message must contain at least two records. The first is treated as the
+message's *key*, whereas the second one is the associated value:
+
++-------+--------+---------+-----------+--------+
+| *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
++-------+--------+---------+-----------+--------+
+
 Records within a message are delimited by ``RS`` (record separator) and each record
 may contain multiple units split by ``US`` (unit separator). Records with more then
 one unit are returned as tuples on the python side.
 
-Each message must contain at least one record, it is treated as the message's *key*.
+Example: A message
+
++-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+| *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
++-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+
+would be decoded to
+
+```python
+["value0", ("value1", "value2")]
+```
 
 Blocking messages
 -----------------
