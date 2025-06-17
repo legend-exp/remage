@@ -3,7 +3,7 @@ IPC message receiver implementation for ``remage-cpp``.
 
 .. note ::
 
-    The C++ IPC *sender* implementation can be found in {cpp}`RMGIpc`.
+    The C++ IPC *sender* implementation can be found in {cpp:class}`RMGIpc`.
 
 
 Binary message format
