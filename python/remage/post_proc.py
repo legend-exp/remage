@@ -11,7 +11,7 @@ from reboost.build_hit import build_hit
 
 from .ipc import IpcResult
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("remage")
 
 
 def post_proc(
@@ -40,7 +40,7 @@ def post_proc(
     if output_file_exts != {".lh5"}:
         if not flat_output or merge_output_files:
             log.error(
-                "merging or reshaping is not supported for output format %s",
+                "Merging or reshaping is not supported for output format %s",
                 next(iter(output_file_exts)).lstrip("."),
             )
 
@@ -57,7 +57,14 @@ def post_proc(
     time_start = time.time()
 
     if not flat_output:
-        msg = "Reshaping output files"
+        # if merging is on, write everything to a single file
+        output_files = remage_files if not merge_output_files else main_output_file
+
+        msg = (
+            "Reshaping "
+            + ("and merging " if merge_output_files else "")
+            + "output files"
+        )
         log.info(msg)
 
         # registered scintillator or germanium detectors
@@ -83,14 +90,14 @@ def post_proc(
                 {},
                 stp_files=original_files,
                 glm_files=None,
-                hit_files=remage_files,
+                hit_files=output_files,
                 out_field="stp",
             )
 
         # set the merged output file for downstream consumers.
-        ipc_info.set("output", remage_files)
+        ipc_info.set("output", output_files)
 
-    if merge_output_files:
+    if flat_output and merge_output_files:
         msg = "Merging output files"
         log.info(msg)
 

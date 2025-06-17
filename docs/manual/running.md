@@ -2,8 +2,8 @@
 
 # Running simulations
 
-The :program:`remage` executable drives the simulation from the command line. A
-short overview of all available options can be obtained with `remage --help`.
+The `remage` executable drives the simulation from the command line. A short
+overview of all available options can be obtained with `remage --help`.
 
 ```console
 $ remage [OPTIONS] [macros or command string...]
@@ -28,8 +28,7 @@ multiple arguments.
 The most useful options include:
 
 - `macros` – macro files or inline command strings. If the given argument is not
-  an existing file it is interpreted as a newline, semicolon, or comma separated
-  list of commands.
+  an existing file it is interpreted as a newline-separated list of commands.
 - `-g, --gdml-files` – include one or more GDML geometry files (see
   {ref}`geometry`).
 - `-o, --output-file` – sensitive detector hits output file (see {ref}`output`).
@@ -52,8 +51,8 @@ The most useful options include:
 
 ## Batch versus interactive mode
 
-By default :program:`remage` runs all specified macro commands in batch mode and
-then exits. When `-i` is given, or the
+By default `remage` runs all specified macro commands in batch mode and then
+exits. When `-i` is given, or the
 <project:../rmg-commands.md#rmgmanagerinteractive> command is used in a macro, a
 command prompt is opened after macro execution:
 
@@ -66,22 +65,23 @@ remage>
 
 Inline macro commands can also be executed directly from the command line,
 useful feature when generating macros on the fly (in e.g. a Python script).
-Multiple commands may be separated by newline, semicolon, or comma:
+Multiple commands may be separated by a newline or passed in multiple arguments:
 
 ```console
-$ remage -i -g setup.gdml -- "/run/initialize;/run/beamOn 100"
+$ remage -i -g setup.gdml -- "/run/initialize \n /run/beamOn 100"
+$ remage -i -g setup.gdml -- "/run/initialize" "/run/beamOn 100"
 ```
 
 Macro substitutions also work with inline commands. Values are expanded where
 `{name}` placeholders appear in the command string:
 
 ```console
-$ remage -s EVENTS=100 -- "/run/initialize;/run/beamOn {EVENTS}"
+$ remage -s EVENTS=100 -- "/run/initialize \n /run/beamOn {EVENTS}"
 ```
 
 ## Running from Python
 
-The :mod:`remage` Python package provides the :func:`remage.remage_run`
+The {mod}`remage` Python package provides the {func}`remage.remage_run`
 function, which accepts the same options as the command line interface. This
 lets you drive the simulation directly from a Python script:
 

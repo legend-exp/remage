@@ -7,7 +7,7 @@ import subprocess
 
 from ._version import __version__
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("remage")
 
 
 def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
@@ -34,7 +34,7 @@ def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
             is_fatal = True
         msg_ret = None
     elif is_blocking:
-        log.warning("unhandled blocking IPC message %s", str(msg))
+        log.warning("Unhandled blocking IPC message %s", str(msg))
 
     return is_blocking, msg_ret, is_fatal
 

@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import logging
 import os
 import shutil
 from pathlib import Path
-
-log = logging.getLogger(__name__)
 
 
 def _find_remage_from_config() -> tuple[Path, str] | None:
