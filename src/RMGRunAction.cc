@@ -72,6 +72,13 @@ void RMGRunAction::SetupAnalysisManager() {
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
   ana_man->SetNtupleDirectoryName(rmg_man->GetOutputNtupleDirectory());
 
+  // inform downstream consumers about the ntuples directory
+  if (this->IsMaster()) {
+    RMGIpc::SendIpcNonBlocking(
+        RMGIpc::CreateMessage("ntuple_output_directory", rmg_man->GetOutputNtupleDirectory())
+    );
+  }
+
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
