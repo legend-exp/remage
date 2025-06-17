@@ -11,7 +11,28 @@ log = logging.getLogger("remage")
 
 
 def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
-    # parse the IPC message structure.
+    """Parse a raw IPC message from ``remage-cpp``.
+
+    Messages are separated using ASCII control characters.  Each message ends
+    with ``GS`` (group separator) and may additionally end in ``ENQ`` (enquiry)
+    to indicate that the C++ process expects a response before continuing.
+    Records within a message are delimited by ``RS`` (record separator) and each
+    record may contain multiple units split by ``US`` (unit separator).  Units
+    beyond the first are returned as tuples.
+
+    Parameters
+    ----------
+    msg
+        The raw message bytes including the trailing separator.
+
+    Returns
+    -------
+    tuple[bool, list, bool]
+        ``(is_blocking, parsed_message, is_fatal)`` where ``is_blocking`` is
+        ``True`` when the sender waits for a reply, ``parsed_message`` is the
+        decoded message or ``None`` if it was consumed internally, and
+        ``is_fatal`` signals that the application should terminate.
+    """
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
     if msg[-1] == "\x05":  # ASCII ENQ ("enquiry")
@@ -42,6 +63,24 @@ def handle_ipc_message(msg: bytes) -> tuple[bool, list, bool]:
 def ipc_thread_fn(
     pipe_r: int, proc: subprocess.Popen, unhandled_ipc_messages: list
 ) -> None:
+    """Read and handle IPC messages coming from ``remage-cpp``.
+
+    This function runs in a dedicated thread.  It reads from ``pipe_r`` and
+    dispatches each complete IPC message to :func:`handle_ipc_message`.  Blocking
+    messages are acknowledged by sending ``SIGUSR2`` to the child process, while
+    fatal messages trigger ``SIGTERM``.  Any messages that are not handled by
+    :func:`handle_ipc_message` are appended to ``unhandled_ipc_messages`` for
+    later processing.
+
+    Parameters
+    ----------
+    pipe_r
+        File descriptor for the read end of the IPC pipe.
+    proc
+        The subprocess running ``remage-cpp``.
+    unhandled_ipc_messages
+        List that receives messages which were not interpreted here.
+    """
     try:
         msg_buf = b""
         with os.fdopen(pipe_r, "br", 0) as pipe_file:
@@ -79,9 +118,12 @@ def ipc_thread_fn(
 
 class IpcResult:
     def __init__(self, ipc_info):
+        """Wrapper around the raw IPC information returned by ``remage-cpp``."""
+
         self.ipc_info = ipc_info
 
     def get(self, name: str, expected_len: int = 1) -> list[str]:
+        """Return all values of a given key from the IPC message list."""
         msgs = [
             msg[1:]
             for msg in self.ipc_info
@@ -92,6 +134,7 @@ class IpcResult:
         return msgs
 
     def get_single(self, name: str, default: str) -> str:
+        """Return a single value for ``name`` or ``default`` if not present."""
         gen = self.get(name)
         if len(gen) > 1:
             msg = f"ipc returned key {name} more than once"
@@ -99,9 +142,12 @@ class IpcResult:
         return gen[0] if len(gen) == 1 else default
 
     def set(self, name: str, values: list[str]) -> None:
+        """Replace existing entries for ``name`` with ``values``."""
         self.remove(name)
         for v in values:
             self.ipc_info.append([name, v])
 
     def remove(self, name: str) -> None:
+        """Remove all records with the given ``name`` from the IPC info."""
+
         self.ipc_info = [msg for msg in self.ipc_info if msg[0] != name]
