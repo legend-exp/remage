@@ -3,7 +3,7 @@ IPC message receiver implementation for ``remage-cpp``.
 
 .. note ::
 
-    The C++ IPC *sender* implementation can be found in {cpp:class}`RMGIpc`.
+    The C++ IPC *sender* implementation can be found in :cpp:class:`RMGIpc`.
 
 
 Binary message format
@@ -13,20 +13,22 @@ Messages are encoded as UTF-8 strings; transmitting binary (non-string) data wit
 this IPC mechanism is not possible.
 
 Message parts are separated using ASCII control characters. Each message ends with
-``GS`` (group separator) which may be optionally preceded by ``ENQ`` (enquiry) to
-indicate that the C++ process expects an acknowledgement with a POSIX signal before
-continuing.
+``GS`` (group separator, 0x1D) which may be optionally preceded by ``ENQ`` (enquiry,
+0x05) to indicate that the C++ process expects an acknowledgement with a POSIX signal
+before continuing.
 
-Each message must contain at least two records. The first is treated as the
-message's *key*, whereas the second one is the associated value:
+Records within a message are delimited by ``RS`` (record separator, 0x1E). Each
+message must contain at least two records. The first is treated as the message's
+*key*, whereas the second one is the associated *value*:
 
 +-------+--------+---------+-----------+--------+
 | *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
 +-------+--------+---------+-----------+--------+
 
-Records within a message are delimited by ``RS`` (record separator) and each record
-may contain multiple units split by ``US`` (unit separator). Records with more then
-one unit are returned as tuples on the python side.
+More values can follow afterwards, again delimited by ``RS``.
+
+Each record may contain multiple units split by ``US`` (unit separator, 0x1F). Records
+with more then one unit are returned as tuples on the python side.
 
 Example: A message
 
@@ -34,11 +36,8 @@ Example: A message
 | *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
 +-------+--------+--------+--------+--------+--------+--------+-----------+--------+
 
-would be decoded to
+would be decoded to :code:`["value0", ("value1", "value2")]`.
 
-```python
-["value0", ("value1", "value2")]
-```
 
 Blocking messages
 -----------------
