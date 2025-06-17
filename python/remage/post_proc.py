@@ -1,60 +1,19 @@
 from __future__ import annotations
 
 import logging
-import shutil
 import time
+from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path
 
+import pygama.evt
+import reboost
 from lgdo import lh5
 from lgdo.lh5.concat import lh5concat
-from pygama import evt
-from reboost.build_hit import build_hit
 
 from .ipc import IpcResult
 
 log = logging.getLogger("remage")
-
-
-def copy_files_to_tmp(files: list[str]):
-    """Copy files to a temporary location"""
-    new_paths = []
-
-    for file in files:
-        path = Path(file)
-        new_path = shutil.copy(file, path.with_name(".tmp" + path.name))
-        new_paths.append(str(new_path))
-    return new_paths
-
-
-def add_tcm(files: list | str, det_tables_path: str):
-    """Add a time-coincidence map to the files."""
-
-    if isinstance(files, str):
-        files = [files]
-
-    tables = lh5.ls(files[0], lh5_group=f"{det_tables_path}/")
-
-    tmp_files = copy_files_to_tmp(files)
-
-    for file_orig, file in zip(tmp_files, files):
-        table_name_patterns = [(file_orig, tab) for tab in tables]
-
-        # build the tcm
-        evt.build_tcm(
-            table_name_patterns,
-            coin_cols=["t0", "first_evtid"],
-            hash_func=None,
-            coin_windows=[10 / 1000.0, 0.0],
-            out_file=file,
-            wo_mode="append",
-        )
-        lh5.show(file)
-    for file_tmp in tmp_files:
-        Path(file_tmp).unlink()
-
-    msg = "finished adding tcm"
-    log.info(msg)
 
 
 def post_proc(
@@ -130,18 +89,18 @@ def post_proc(
                 extra_detectors.append(table)
 
         # add the vertex table, if it was stored
-        extra_tables = extra_detectors + ipc_info.get("vtx_table_path")
+        extra_tables = list(set(extra_detectors + ipc_info.get("vtx_table_path")))
 
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward
-            config = get_rebooost_config(
+            config = get_reboost_config(
                 registered_detectors,
                 extra_tables,
                 time_window=time_window_in_us,
             )
 
             # use reboost to post-process outputs
-            build_hit(
+            reboost.build_hit(
                 config,
                 {},
                 stp_files=original_files,
@@ -151,9 +110,27 @@ def post_proc(
             )
 
             # make the tcm
-            add_tcm(output_files, det_tables_path=det_tables_path)
+            msg = "Computing and storing the TCM as /tcm"
+            log.info(msg)
 
-        # set the merged output file for downstream consumers.
+        # add a time-coincidence map to the output file(s)
+        _tcm_infiles = output_files
+        if not isinstance(output_files, list | tuple):
+            _tcm_infiles = [output_files]
+
+        tables = lh5.ls(_tcm_infiles[0], lh5_group=f"{det_tables_path}/")
+
+        for file in _tcm_infiles:
+            pygama.evt.build_tcm(
+                [(file, tab) for tab in tables],  # input_tables
+                ["evtid", "t0"],  # coin_cols
+                hash_func=None,
+                coin_windows=[0, time_window_in_us * 1000],
+                out_file=file,
+                wo_mode="write_safe",
+            )
+
+        # set the output file(s) for downstream consumers.
         ipc_info.set("output", output_files)
 
     if flat_output and merge_output_files:
@@ -173,9 +150,9 @@ def post_proc(
     log.info(msg)
 
 
-def get_rebooost_config(
-    reshape_table_list: list[str],
-    other_table_list: list[str],
+def get_reboost_config(
+    reshape_table_list: Sequence[str],
+    other_table_list: Sequence[str],
     *,
     time_window: float = 10,
 ) -> dict:
@@ -204,8 +181,11 @@ def get_rebooost_config(
             "detector_mapping": [{"output": table} for table in reshape_table_list],
             "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
             "operations": {
-                "t0": "ak.fill_none(ak.firsts(HITS.time,axis=-1),0)",
-                "first_evtid": "ak.fill_none(ak.firsts(HITS.evtid,axis=-1),0)",
+                "t0": {
+                    "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
+                    "units": "ns",
+                },
+                "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
             },
         }
     ]
