@@ -36,6 +36,7 @@ dependencies = [
   "reboost >=0.5.3, <0.6",
   "pygama >=2.2.2, <2.3",
   "colorlog",
+  "rich",
   "tol_colors",
 ]
 

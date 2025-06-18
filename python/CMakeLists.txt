@@ -12,7 +12,7 @@ set(PYTHON_SOURCES
     ${_r}/python/remage/find_remage.py
     ${_r}/python/remage/cli.py
     ${_r}/python/remage/ipc.py
-    ${_r}/python/remage/utils.py
+    ${_r}/python/remage/logging.py
     ${_r}/python/remage/post_proc.py)
 # cmake-format: on
 
