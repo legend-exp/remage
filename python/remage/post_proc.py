@@ -107,7 +107,7 @@ def post_proc(
                 glm_files=None,
                 hit_files=output_files,
                 out_field=det_tables_path,
-                overwrite = overwrite_output
+                overwrite=overwrite_output,
             )
 
             # make the tcm
