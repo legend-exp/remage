@@ -122,7 +122,7 @@ def post_proc(
 
         for file in _tcm_infiles:
             pygama.evt.build_tcm(
-                [(file, tab) for tab in tables],  # input_tables
+                [(file, tables)],  # input_tables
                 ["evtid", "t0"],  # coin_cols
                 hash_func=None,
                 coin_windows=[0, time_window_in_us * 1000],
