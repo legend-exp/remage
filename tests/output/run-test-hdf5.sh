@@ -5,6 +5,7 @@ set -euo pipefail
 rmg="$1"
 python_path="$2"
 remage_to_lh5="$3"
+lh5ls="$(dirname "$python_path")/lh5ls"
 macro="macros/$4"
 
 output_h5="${4/.mac/.hdf5}"
@@ -47,7 +48,7 @@ cp "$output_h5" "$output_lh5"
 "$remage_to_lh5" "$output_lh5"
 
 # extract written lh5 structure & compare with expectation.
-lh5ls -a "$output_lh5" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5"
+"$lh5ls" -a "$output_lh5" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5"
 diff "$output_dump_lh5" "$output_exp_lh5"
 
 
@@ -59,7 +60,7 @@ diff "$output_dump_lh5" "$output_exp_lh5"
 "$rmg" -g gdml/geometry.gdml -o "$output_lh5" --flat-output -w -- "$macro"
 
 # extract written lh5 structure & compare with expectation.
-lh5ls -a "$output_lh5" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5"
+"$lh5ls" -a "$output_lh5" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5"
 diff "$output_dump_lh5" "$output_exp_lh5"
 
 # -------------------------------------
@@ -70,7 +71,7 @@ diff "$output_dump_lh5" "$output_exp_lh5"
 "$rmg" -g gdml/geometry.gdml -o "$output_lh5_jag" -w -- "$macro"
 
 # extract written lh5 structure & compare with expectation.
-lh5ls -a "$output_lh5_jag" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5_jag"
+"$lh5ls" -a "$output_lh5_jag" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5_jag"
 diff "$output_dump_lh5_jag" "$output_exp_lh5_jag"
 
 set +vx
