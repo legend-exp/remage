@@ -32,11 +32,16 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "legend-pydataobj >=1.11.12",
+  "legend-pydataobj ==1.14.*",
+  "reboost >=0.5.3, <0.6",
+  "pygama >=2.2.3, <2.3",
   "colorlog",
+  "rich",
   "tol_colors",
-  "reboost >=0.5.1, <0.6",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [project.optional-dependencies]
 test = [

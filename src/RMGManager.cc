@@ -41,6 +41,7 @@
 #include "RMGConfig.hh"
 #include "RMGExceptionHandler.hh"
 #include "RMGHardware.hh"
+#include "RMGIpc.hh"
 #include "RMGPhysics.hh"
 #include "RMGTools.hh"
 #include "RMGUserAction.hh"
@@ -270,6 +271,9 @@ G4VUserPhysicsList* RMGManager::GetProcessesList() {
 void RMGManager::SetLogLevel(std::string level) {
   try {
     RMGLog::SetLogLevel(RMGTools::ToEnum<RMGLog::LogLevel>(level, "logging level"));
+    RMGIpc::SendIpcNonBlocking(
+        RMGIpc::CreateMessage("loglevel", std::string(magic_enum::enum_name(RMGLog::GetLogLevel())))
+    );
   } catch (const std::bad_cast&) { return; }
 }
 

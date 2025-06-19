@@ -27,6 +27,11 @@ def check_exists_and_remove(file):
 def test_file_merging():
     output = Path("output.lh5")
 
+    # remove all lh5 files (precaution)
+    for p in Path().iterdir():
+        if p.is_file() and re.match(r".*\.lh5$", p.name):
+            p.unlink()
+
     remage_run(
         "macros/run.mac",
         gdml_files="gdml/geometry.gdml",

@@ -12,7 +12,7 @@ import threading
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from . import utils
+from . import logging as rmg_logging
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 from .post_proc import post_proc
@@ -229,7 +229,7 @@ def remage_run_from_args(
     raise_on_warning
         see :meth:`remage_run`
     """
-    logger = utils._setup_log()
+    logger = rmg_logging.setup_log()
 
     parser = argparse.ArgumentParser(allow_abbrev=False, add_help=False)
 
@@ -292,17 +292,8 @@ def remage_run_from_args(
     assert termsig is None  # now we should only have had a graceful exit.
 
     # setup logging based on log level from C++.
-    log_level = ipc_info.get_single("loglevel", "summary")
-    levels_rmg_to_py = {
-        "debug": logging.DEBUG,
-        "detail": logging.INFO,
-        "summary": logging.INFO,
-        "warning": logging.WARNING,
-        "error": logging.ERROR,
-        "fatal": logging.CRITICAL,
-        "nothing": logging.CRITICAL,
-    }
-    logger.setLevel(levels_rmg_to_py[log_level])
+    log_level = ["summary", *ipc_info.get("loglevel")]
+    rmg_logging.set_logging_level(logger, log_level[-1])
 
     # apply python-based post-processing.
     post_proc(

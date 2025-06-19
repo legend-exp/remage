@@ -8,7 +8,6 @@ foreach(_file ${_file_list})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-# test the executable
 add_test(NAME python/cli COMMAND "${REMAGE_PYEXE}" -q --help)
 
 # run python tests using pytest

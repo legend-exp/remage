@@ -12,7 +12,7 @@ processing_groups:
 
     outputs:
       - t0
-      - first_evtid
+      - evtid
       - truth_energy
       - active_energy_pre
       - active_energy_post
@@ -28,10 +28,6 @@ processing_groups:
       - max_z_pre
 
     operations:
-      t0: ak.fill_none(ak.firsts(HITS.time, axis=-1), np.nan)
-
-      first_evtid: ak.fill_none(ak.firsts(HITS.evtid, axis=-1), np.nan)
-
       truth_energy: ak.sum(HITS.edep, axis=-1)
 
       activeness_pre:
@@ -68,8 +64,7 @@ processing_groups:
       - yloc
       - zloc
       - rloc
-      - first_evtid
+      - evtid
 
     operations:
       rloc: np.sqrt(HITS.xloc**2+HITS.yloc**2)
-      first_evtid: ak.fill_none(HITS.evtid, np.nan)

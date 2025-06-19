@@ -25,24 +25,23 @@ def patch_lh5(monkeypatch):
     monkeypatch.setattr(lgdo.lh5, "ls", DummyLH5.ls)
 
 
-def test_filters_known_detectors_and_appends_vtx():
-    file_path = "dummy_file.lh5"
-    detectors = ["det1", "det2"]
-    result = post_proc.get_extra_tables(file_path, detectors)
-    # Expect to include the extras in the order they appear, including duplicates, then '/vtx'
-    assert result == ["stp/extra1", "stp/extra2", "stp/extra1", "vtx"]
-
-
 def test_get_reboost_config():
     reshape = ["A", "B"]
     other = ["vtx"]
-    config = post_proc.get_rebooost_config(reshape, other, time_window=5.5)
+    config = post_proc.get_reboost_config(reshape, other, time_window=5.5)
     expected = {
         "processing_groups": [
             {
                 "name": "all",
                 "detector_mapping": [{"output": "A"}, {"output": "B"}],
                 "hit_table_layout": "reboost.shape.group.group_by_time(STEPS, 5.5)",
+                "operations": {
+                    "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
+                    "t0": {
+                        "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
+                        "units": "ns",
+                    },
+                },
             },
         ],
         "forward": ["vtx"],

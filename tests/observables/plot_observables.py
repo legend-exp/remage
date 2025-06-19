@@ -57,7 +57,7 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     else:
         n_sel = len(verts)
 
-    hit_ids = np.searchsorted(verts.first_evtid, data.first_evtid)
+    hit_ids = np.searchsorted(verts.evtid, data.evtid)
     verts = verts[hit_ids]
 
     data["vert_rloc"] = 1000 * verts.rloc

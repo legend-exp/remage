@@ -27,17 +27,15 @@ mset = tc.tol_cset("muted")
 cmap = plt.get_cmap("cividis")
 
 
-def plot_tracks(data, idx, savename=None):
+def plot_tracks(_data, idx, savename=None):
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    data = ak.Array(
-        {
-            name: ak.flatten(data[name])
-            for name in ["xloc", "yloc", "zloc", "trackid", "evtid"]
-        }
+    data = _data[_data.evtid == idx]
+
+    data_tmp = ak.Array(
+        {name: ak.flatten(data[name]) for name in ["xloc", "yloc", "zloc", "trackid"]}
     )
 
-    data_tmp = data[data.evtid == idx]
     x0, z0 = data_tmp[0].xloc, data_tmp[0].zloc
 
     for _id, track in enumerate(data_tmp.trackid):
