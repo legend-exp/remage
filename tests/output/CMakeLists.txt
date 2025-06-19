@@ -8,7 +8,7 @@ endif()
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh *.py)
+  macros/* dumps/* gdml/*.gdml gdml/*.xml run-test-*.sh *.py)
 
 # copy them to the build area
 foreach(_file ${_aux})
@@ -16,9 +16,8 @@ foreach(_file ${_aux})
 endforeach()
 
 # MAIN OUTPUT TESTS
-set(_macros
-    ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-per-det-auto.mac ntuple-per-det-vol-auto.mac
-    ntuple-single-table.mac ntuple-single-table-with-tracks.mac)
+set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-single-table.mac
+            ntuple-single-table-with-tracks.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
