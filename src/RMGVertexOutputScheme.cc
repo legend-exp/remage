@@ -34,7 +34,7 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       "vtx",
       ana_man->CreateNtuple("vtx", "Primary vertex data")
   );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evtx"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "RMGVertexOutputScheme\x1evtx"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -50,7 +50,9 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
         "particles",
         ana_man->CreateNtuple("particles", "Primary particle data")
     );
-    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1eparticles"));
+    RMGIpc::SendIpcNonBlocking(
+        RMGIpc::CreateMessage("output_table", "RMGVertexOutputScheme\x1eparticles")
+    );
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");

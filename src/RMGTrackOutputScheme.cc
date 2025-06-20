@@ -34,7 +34,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       "tracks",
       ana_man->CreateNtuple("tracks", "Track vertex data")
   );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1etracks"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "RMGTrackOutputScheme\x1etracks"));
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleIColumn(vid, "trackid");
@@ -56,7 +56,9 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       "processes",
       ana_man->CreateNtuple("processes", "process name mapping")
   );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "track\x1eprocesses"));
+  RMGIpc::SendIpcNonBlocking(
+      RMGIpc::CreateMessage("output_table", "RMGTrackOutputScheme\x1eprocesses")
+  );
   ana_man->CreateNtupleIColumn(pid, "procid");
   ana_man->CreateNtupleSColumn(pid, "name");
   ana_man->FinishNtuple(pid);

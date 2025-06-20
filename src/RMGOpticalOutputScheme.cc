@@ -59,7 +59,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
     registered_ntuples.emplace(ntuple_name, id);
     RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("optical\x1e") + ntuple_name)
+        RMGIpc::CreateMessage("output_table", std::string("RMGOpticalOutputScheme\x1e") + ntuple_name)
     );
 
     ana_man->CreateNtupleIColumn(id, "evtid");
