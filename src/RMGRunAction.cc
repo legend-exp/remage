@@ -82,9 +82,8 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  // do it only for activated detectors (have to ask to the manager)
+  // do it only for activated detectors (karen wants to speak to the manager)
   for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
-
     fOutputDataFields.emplace_back(oscheme);
 
     oscheme->SetNtuplePerDetector(rmg_man->GetOutputNtuplePerDetector());
@@ -97,12 +96,12 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
 
   RMGLog::OutDev(RMGLog::debug, "Start of run action");
 
-  auto manager = RMGManager::Instance();
+  auto rmg_man = RMGManager::Instance();
 
   if (fIsPersistencyEnabled) this->SetupAnalysisManager();
 
-  if (!manager->HasOutputFileName()) {
-    manager->EnablePersistency(false);
+  if (!rmg_man->HasOutputFileName()) {
+    rmg_man->EnablePersistency(false);
     fIsPersistencyEnabled = false;
   }
 
@@ -130,7 +129,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     auto file_type = fCurrentOutputFile.first.extension();
     if (file_type != ".csv" && file_type != ".CSV" && file_type != ".xml" && file_type != ".XML" &&
         file_type != ".hdf5" && file_type != ".HDF5") {
-      ana_man->SetNtupleMerging(!manager->IsExecSequential());
+      ana_man->SetNtupleMerging(!rmg_man->IsExecSequential());
     }
 
     if (this->IsMaster()) {
@@ -162,8 +161,8 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   if (!fIsPersistencyEnabled && this->IsMaster()) {
     // Warn user if persistency is disabled if there are detectors defined.
     auto level = RMGLog::summary;
-    if (!manager->GetDetectorConstruction()->GetAllActiveOutputSchemes().empty() &&
-        !manager->HasOutputFileNameNone()) {
+    if (!rmg_man->GetDetectorConstruction()->GetAllActiveOutputSchemes().empty() &&
+        !rmg_man->HasOutputFileNameNone()) {
       level = RMGLog::warning;
     }
     RMGLog::Out(level, "Object persistency disabled");
@@ -200,7 +199,7 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   auto g4manager = G4RunManager::GetRunManager();
   auto tot_events = g4manager->GetNumberOfEventsToBeProcessed();
 
-  fCurrentPrintModulo = manager->GetPrintModulo();
+  fCurrentPrintModulo = rmg_man->GetPrintModulo();
   if (fCurrentPrintModulo <= 0 and tot_events >= 100) fCurrentPrintModulo = tot_events / 10;
   else if (tot_events < 100) fCurrentPrintModulo = 100;
 }
@@ -292,16 +291,16 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 // with a hdf5 extensions. Later, we will rename it.
 
 std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
-  auto manager = RMGManager::Instance();
+  auto rmg_man = RMGManager::Instance();
 
-  if (!manager->HasOutputFileName()) { RMGLog::OutDev(RMGLog::fatal, "tried to open file 'none'"); }
+  if (!rmg_man->HasOutputFileName()) { RMGLog::OutDev(RMGLog::fatal, "tried to open file 'none'"); }
 
   // TODO: realpath
-  auto path = fs::path(manager->GetOutputFileName());
+  auto path = fs::path(rmg_man->GetOutputFileName());
   auto path_for_overwrite = fs::path(
       G4Analysis::GetTnFileName(path.string(), path.extension().string())
   );
-  if (fs::exists(path_for_overwrite) && !manager->GetOutputOverwriteFiles()) {
+  if (fs::exists(path_for_overwrite) && !rmg_man->GetOutputOverwriteFiles()) {
     RMGLog::Out(RMGLog::fatal, "Output file ", path_for_overwrite.string(), " does already exists.");
   }
 
@@ -351,8 +350,10 @@ void RMGRunAction::PostprocessOutputFile() const {
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", worker_lh5));
   }
 
+  auto rmg_man = RMGManager::Instance();
+
   if (!fs::exists(worker_tmp)) {
-    if (!this->IsMaster() || RMGManager::Instance()->IsExecSequential()) {
+    if (!this->IsMaster() || rmg_man->IsExecSequential()) {
       RMGLog::Out(
           RMGLog::error,
           "Temporary output file ",
@@ -364,9 +365,14 @@ void RMGRunAction::PostprocessOutputFile() const {
   }
 
 #if RMG_HAS_HDF5
-  auto nt_dir = RMGManager::Instance()->GetOutputNtupleDirectory();
   // note: do not do a dry-run here, as it takes a lot of memory.
-  if (!RMGConvertLH5::ConvertToLH5(worker_tmp.string(), nt_dir, false)) {
+  auto result = RMGConvertLH5::ConvertToLH5(
+      worker_tmp.string(),
+      rmg_man->GetOutputNtupleDirectory(),
+      rmg_man->GetAuxNtupleNames(),
+      false
+  );
+  if (!result) {
     RMGLog::Out(
         RMGLog::error,
         "Conversion of output file ",

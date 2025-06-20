@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <memory>
+#include <set>
 #include <vector>
 
 #include "G4RunManager.hh"
@@ -71,6 +72,17 @@ class RMGManager {
     [[nodiscard]] bool GetOutputNtuplePerDetector() const { return fOutputNtuplePerDetector; }
     [[nodiscard]] bool GetOutputNtupleUseVolumeName() const { return fOutputNtupleUseVolumeName; }
 
+    std::set<int> GetNtupleNames() {
+      std::set<int> nt_names;
+      for (auto const& [k, v] : fNtupleIDs) nt_names.insert(k);
+      return nt_names;
+    }
+    std::set<std::string> GetAuxNtupleNames() {
+      std::set<std::string> nt_names;
+      for (auto const& [k, v] : fNtupleIDsS) nt_names.insert(k);
+      return nt_names;
+    }
+
     // setters
     void SetUserInit(G4RunManager* g4_manager) {
       fG4RunManager = std::unique_ptr<G4RunManager>(g4_manager);
@@ -102,6 +114,7 @@ class RMGManager {
     void SetOutputFileName(std::string filename) { fOutputFile = filename; }
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
+
     int RegisterNtuple(int det_uid, int ntuple_id) {
       auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
       if (!res.second)
@@ -112,7 +125,7 @@ class RMGManager {
         );
       return this->GetNtupleID(det_uid);
     }
-    int RegisterNtuple(std::string det_uid, int ntuple_id) {
+    int RegisterAuxNtuple(std::string det_uid, int ntuple_id) {
       auto res = fNtupleIDsS.emplace(det_uid, ntuple_id);
       if (!res.second)
         RMGLog::OutFormatDev(
@@ -120,10 +133,10 @@ class RMGManager {
             "Ntuple for detector with UID {} is already registered",
             det_uid
         );
-      return this->GetNtupleID(det_uid);
+      return this->GetAuxNtupleID(det_uid);
     }
-    int GetNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
     int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
+    int GetAuxNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
 
     [[nodiscard]] bool HadWarning() const {
       return fExceptionHandler->HadWarning() || RMGLog::HadWarning();

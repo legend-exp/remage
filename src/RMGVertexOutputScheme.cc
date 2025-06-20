@@ -30,7 +30,7 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->RegisterNtuple(
+  auto vid = RMGManager::Instance()->RegisterAuxNtuple(
       "vtx",
       ana_man->CreateNtuple("vtx", "Primary vertex data")
   );
@@ -46,7 +46,7 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()->RegisterNtuple(
+    auto pid = RMGManager::Instance()->RegisterAuxNtuple(
         "particles",
         ana_man->CreateNtuple("particles", "Primary particle data")
     );
@@ -74,8 +74,8 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();
-    auto vntupleid = rmg_man->GetNtupleID("vtx");
-    auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetNtupleID("particles") : -1;
+    auto vntupleid = rmg_man->GetAuxNtupleID("vtx");
+    auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetAuxNtupleID("particles") : -1;
 
     for (int i = 0; i < n_vertex; i++) {
       auto primary_vertex = event->GetPrimaryVertex(i);

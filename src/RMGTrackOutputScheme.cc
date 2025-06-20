@@ -30,7 +30,7 @@ RMGTrackOutputScheme::RMGTrackOutputScheme() { this->DefineCommands(); }
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  auto vid = RMGManager::Instance()->RegisterNtuple(
+  auto vid = RMGManager::Instance()->RegisterAuxNtuple(
       "tracks",
       ana_man->CreateNtuple("tracks", "Track vertex data")
   );
@@ -52,7 +52,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   ana_man->FinishNtuple(vid);
 
-  auto pid = RMGManager::Instance()->RegisterNtuple(
+  auto pid = RMGManager::Instance()->RegisterAuxNtuple(
       "processes",
       ana_man->CreateNtuple("processes", "process name mapping")
   );
@@ -104,7 +104,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  auto ntupleid = rmg_man->GetNtupleID("tracks");
+  auto ntupleid = rmg_man->GetAuxNtupleID("tracks");
   int col_id = 0;
   ana_man->FillNtupleIColumn(
       ntupleid,
@@ -156,7 +156,7 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   if (!rmg_man->IsPersistencyEnabled()) return;
 
   const auto ana_man = G4AnalysisManager::Instance();
-  auto ntupleid = rmg_man->GetNtupleID("processes");
+  auto ntupleid = rmg_man->GetAuxNtupleID("processes");
 
   std::set<uint32_t> proc_ids; // to check for duplicates.
 
