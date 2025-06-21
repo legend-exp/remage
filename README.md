@@ -2,7 +2,7 @@
 
 # remage
 
-Simulation framework for germanium detector experiments
+Simulation framework for low background physics experiments
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/legend-exp/remage?logo=git)
 [![GitHub Workflow Status](https://img.shields.io/github/checks-status/legend-exp/remage/main?label=main%20branch&logo=github)](https://github.com/legend-exp/remage/actions)
@@ -17,8 +17,8 @@ Simulation framework for germanium detector experiments
 <br/>
 
 The _remage_ project aims to deliver a modern Geant4-based C++ library designed
-for efficient simulation of particle physics processes in typical germanium
-detector experiments. The library is setup-agnostic, requiring users only to
+for efficient simulation of particle physics processes in typical low background
+physics experiments. The library is setup-agnostic, requiring users only to
 define the experimental setup's geometry. Supported specification languages
 include C++, GDML, and others. Once the geometry is provided, users can access a
 comprehensive suite of tools for common tasks, such as physics generation and
