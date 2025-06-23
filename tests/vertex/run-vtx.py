@@ -69,7 +69,7 @@ if "pos" in macro:
 if "kin" in macro:
     kin_input_file = kin_input_file.replace(".hdf5", ".lh5")
     input_kin = lh5.read("vtx/kin", lh5_file=kin_input_file).view_as("pd")
-    output_kin = lh5.read("stp/particles", lh5_file=files).view_as("pd")
+    output_kin = lh5.read("particles", lh5_file=files).view_as("pd")
 
     output_kin = output_kin.sort_values("ekin")  # sort by linear column.
     output_kin = output_kin[["px", "py", "pz", "ekin", "particle"]]

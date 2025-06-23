@@ -18,7 +18,7 @@ remage_run(
 )
 
 # If we are outside of the keep volume we expect similar results to being inside the kill volume.
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert particle_numbers[1000902280] == 10  # primaries.
 # In this test we also kill the radium, to make sure all alphas are contained in the first volume.
@@ -39,7 +39,7 @@ remage_run(
 )
 
 # If we are inside the keepvolume, we expect similar results to being outside the kill volume.
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert particle_numbers[1000902280] == 10  # primaries.
 assert particle_numbers[1000822080] == 10  # we should always get to Pb208.

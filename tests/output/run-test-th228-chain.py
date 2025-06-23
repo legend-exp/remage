@@ -18,13 +18,13 @@ remage_run(
 )
 
 # check that we get to stable isotopes.
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert particle_numbers[1000902280] == 1000  # primaries.
 assert particle_numbers[1000822080] == 1000  # we should always get to Pb208.
 
 # check that we had some common processes.
-processes = lh5.read("stp/processes", output_lh5)["name"].view_as("np")
+processes = lh5.read("processes", output_lh5)["name"].view_as("np")
 assert b"Radioactivation" in processes or b"RadioactiveDecay" in processes
 assert b"eBrem" in processes
 assert b"eIoni" in processes
