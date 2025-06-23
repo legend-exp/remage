@@ -82,7 +82,7 @@ void RMGRunAction::SetupAnalysisManager() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
 
-  // do it only for activated detectors (karen wants to speak to the manager)
+  // do it only for activated detectors
   for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
     fOutputDataFields.emplace_back(oscheme);
 

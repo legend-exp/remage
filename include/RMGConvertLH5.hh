@@ -44,7 +44,6 @@ class RMGConvertLH5 {
     static bool ConvertFromLH5(
         std::string,
         std::string,
-        std::set<std::string>,
         bool,
         bool part_of_batch,
         std::map<std::string, std::map<std::string, std::string>>&

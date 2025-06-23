@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,9 +298,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   auto ntuples_group = hfile.openGroup(ntuple_group_name);
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
-  std::cout << std::endl;
   for (auto& ntuple : ntuples) {
-    if (ntuple.size() == 0) LH5Log(RMGLog::fatal, "empty ntuple name, how is this possible?");
+    if (ntuple.empty()) LH5Log(RMGLog::fatal, "empty ntuple name, how is this possible?");
 
     auto det_group = ntuples_group.openGroup(ntuple);
     ntuple_success &= ConvertNTupleToTable(det_group);
@@ -309,8 +307,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
 
     // if this is an auxiliary table, move it one level up out of the group
     if (fAuxNtuples.find(ntuple) != fAuxNtuples.end()) {
-      LH5Log(RMGLog::debug, "moving ntuple " + ntuple_group_name + "/" + ntuple + " one group back");
-      hfile.moveLink(ntuple_group_name + "/" + ntuple, ntuple);
+      LH5Log(RMGLog::debug, "moving ntuple ", ntuple_group_name, "/", ntuple, " one group back");
+      hfile.moveLink(std::string(ntuple_group_name).append("/").append(ntuple), ntuple);
     }
   }
 
@@ -480,6 +478,10 @@ bool RMGConvertLH5::ConvertTableToNTuple(
 bool RMGConvertLH5::ConvertFromLH5Internal(
     std::map<std::string, std::map<std::string, std::string>>& units_map
 ) {
+  if (!fAuxNtuples.empty()) {
+    LH5Log(RMGLog::fatal, "Handling of auxiliary ntuples is not implemented yet");
+  }
+
   // using the core driver with no backing storage will allow to change the file purely in-memory.
   // warning: this will internally allocate approx. the full file size!
   H5::FileAccPropList fapl;
@@ -518,12 +520,11 @@ bool RMGConvertLH5::ConvertFromLH5Internal(
 bool RMGConvertLH5::ConvertFromLH5(
     std::string lh5_file_name,
     std::string ntuple_group_name,
-    std::set<std::string> aux_ntuples,
     bool dry_run,
     bool part_of_batch,
     std::map<std::string, std::map<std::string, std::string>>& units_map
 ) {
-  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, aux_ntuples, dry_run, part_of_batch);
+  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, {}, dry_run, part_of_batch);
   try {
     return conv.ConvertFromLH5Internal(units_map);
   } catch (const H5::Exception& e) {

@@ -121,7 +121,7 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(
     }
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", new_fn));
 
-    auto result = RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, {}, false, false, units_map);
+    auto result = RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map);
     if (!result) {
       RMGLog::Out(
           RMGLog::error,
