@@ -79,7 +79,7 @@ class RMGManager {
     }
     std::set<std::string> GetAuxNtupleNames() {
       std::set<std::string> nt_names;
-      for (auto const& [k, v] : fNtupleIDsS) nt_names.insert(k);
+      for (auto const& [k, v] : fNtupleAuxIDs) nt_names.insert(k);
       return nt_names;
     }
 
@@ -115,28 +115,20 @@ class RMGManager {
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
 
-    int RegisterNtuple(int det_uid, int ntuple_id) {
-      auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
-      if (!res.second)
-        RMGLog::OutFormatDev(
-            RMGLog::fatal,
-            "Ntuple for detector with UID {} is already registered",
-            det_uid
-        );
-      return this->GetNtupleID(det_uid);
-    }
-    int RegisterAuxNtuple(std::string det_uid, int ntuple_id) {
-      auto res = fNtupleIDsS.emplace(det_uid, ntuple_id);
-      if (!res.second)
-        RMGLog::OutFormatDev(
-            RMGLog::fatal,
-            "Ntuple for detector with UID {} is already registered",
-            det_uid
-        );
-      return this->GetAuxNtupleID(det_uid);
-    }
+    int RegisterNtuple(int det_uid, int ntuple_id);
+    int CreateAndRegisterNtuple(
+        int det_uid,
+        std::string table_name,
+        std::string oscheme,
+        G4AnalysisManager* ana_man
+    );
+    int CreateAndRegisterAuxNtuple(
+        std::string table_name,
+        std::string oscheme,
+        G4AnalysisManager* ana_man
+    );
     int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
-    int GetAuxNtupleID(std::string det_uid) { return fNtupleIDsS[det_uid]; }
+    int GetAuxNtupleID(std::string det_uid) { return fNtupleAuxIDs[det_uid]; }
 
     [[nodiscard]] bool HadWarning() const {
       return fExceptionHandler->HadWarning() || RMGLog::HadWarning();
@@ -189,7 +181,7 @@ class RMGManager {
     std::string fOutputNtupleDirectory = "stp";
     // track internal id of detector NTuples
     static G4ThreadLocal std::map<int, int> fNtupleIDs;
-    static G4ThreadLocal std::map<std::string, int> fNtupleIDsS;
+    static G4ThreadLocal std::map<std::string, int> fNtupleAuxIDs;
 
 
     static RMGManager* fRMGManager;

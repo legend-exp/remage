@@ -18,7 +18,6 @@
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
 
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 
@@ -30,11 +29,7 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->RegisterAuxNtuple(
-      "vtx",
-      ana_man->CreateNtuple("vtx", "Primary vertex data")
-  );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "RMGVertexOutputScheme\x1evtx"));
+  auto vid = RMGManager::Instance()->CreateAndRegisterAuxNtuple("vtx", "RMGVertexOutputScheme", ana_man);
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -46,13 +41,8 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()->RegisterAuxNtuple(
-        "particles",
-        ana_man->CreateNtuple("particles", "Primary particle data")
-    );
-    RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", "RMGVertexOutputScheme\x1eparticles")
-    );
+    auto pid = RMGManager::Instance()
+                   ->CreateAndRegisterAuxNtuple("particles", "RMGVertexOutputScheme", ana_man);
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");

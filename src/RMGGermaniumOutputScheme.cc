@@ -26,7 +26,6 @@
 
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGOutputTools.hh"
@@ -72,11 +71,13 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       continue;
     }
 
-    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
-    registered_ntuples.emplace(ntuple_name, id);
-    RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("RMGGermaniumOutputScheme\x1e") + ntuple_name)
+    auto id = rmg_man->CreateAndRegisterNtuple(
+        det.second.uid,
+        ntuple_name,
+        "RMGGermaniumOutputScheme",
+        ana_man
     );
+    registered_ntuples.emplace(ntuple_name, id);
 
     // store the indices
     ana_man->CreateNtupleIColumn(id, "evtid");
