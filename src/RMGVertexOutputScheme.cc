@@ -19,7 +19,7 @@
 #include "G4Event.hh"
 
 #include "RMGLog.hh"
-#include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 
 namespace u = CLHEP;
 
@@ -29,7 +29,8 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->CreateAndRegisterAuxNtuple("vtx", "RMGVertexOutputScheme", ana_man);
+  auto vid = RMGOutputManager::Instance()
+                 ->CreateAndRegisterAuxNtuple("vtx", "RMGVertexOutputScheme", ana_man);
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -41,7 +42,7 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()
+    auto pid = RMGOutputManager::Instance()
                    ->CreateAndRegisterAuxNtuple("particles", "RMGVertexOutputScheme", ana_man);
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
@@ -62,7 +63,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
   int n_vertex = event->GetNumberOfPrimaryVertex();
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();

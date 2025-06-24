@@ -23,6 +23,7 @@
 
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 #include "RMGRun.hh"
 #include "RMGRunAction.hh"
 
@@ -71,7 +72,7 @@ void RMGEventAction::BeginOfEventAction(const G4Event* event) {
     );
   }
 
-  if (RMGManager::Instance()->IsPersistencyEnabled()) { fRunAction->ClearOutputDataFields(); }
+  if (RMGOutputManager::Instance()->IsPersistencyEnabled()) { fRunAction->ClearOutputDataFields(); }
 }
 
 void RMGEventAction::EndOfEventAction(const G4Event* event) {

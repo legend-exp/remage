@@ -28,6 +28,7 @@
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 #include "RMGOutputTools.hh"
 #include "RMGTools.hh"
 
@@ -50,8 +51,8 @@ RMGGermaniumOutputScheme::RMGGermaniumOutputScheme() {
 
 void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
-  auto rmg_man = RMGManager::Instance();
-  const auto det_cons = rmg_man->GetDetectorConstruction();
+  auto rmg_man = RMGOutputManager::Instance();
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
@@ -189,7 +190,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
     hit_coll = _clustered_hits.get(); // get an unmanaged ptr for use in this function
   }
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();

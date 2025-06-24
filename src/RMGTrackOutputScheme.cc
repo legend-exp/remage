@@ -21,7 +21,7 @@
 #include "G4OpticalPhoton.hh"
 
 #include "RMGLog.hh"
-#include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 
 namespace u = CLHEP;
 
@@ -29,7 +29,8 @@ RMGTrackOutputScheme::RMGTrackOutputScheme() { this->DefineCommands(); }
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  auto vid = RMGManager::Instance()->CreateAndRegisterAuxNtuple("tracks", "RMGTrackOutputScheme", ana_man);
+  auto vid = RMGOutputManager::Instance()
+                 ->CreateAndRegisterAuxNtuple("tracks", "RMGTrackOutputScheme", ana_man);
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleIColumn(vid, "trackid");
@@ -47,7 +48,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   ana_man->FinishNtuple(vid);
 
-  auto pid = RMGManager::Instance()
+  auto pid = RMGOutputManager::Instance()
                  ->CreateAndRegisterAuxNtuple("processes", "RMGTrackOutputScheme", ana_man);
   ana_man->CreateNtupleIColumn(pid, "procid");
   ana_man->CreateNtupleSColumn(pid, "name");
@@ -55,7 +56,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 }
 
 void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled()) return;
 
   const auto ana_man = G4AnalysisManager::Instance();
@@ -144,7 +145,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
 }
 
 void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled()) return;
 
   const auto ana_man = G4AnalysisManager::Instance();

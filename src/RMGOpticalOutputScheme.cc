@@ -26,6 +26,7 @@
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGOpticalDetector.hh"
+#include "RMGOutputManager.hh"
 
 namespace u = CLHEP;
 
@@ -34,8 +35,8 @@ RMGOpticalOutputScheme::RMGOpticalOutputScheme() { this->DefineCommands(); }
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
-  auto rmg_man = RMGManager::Instance();
-  const auto det_cons = rmg_man->GetDetectorConstruction();
+  auto rmg_man = RMGOutputManager::Instance();
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
@@ -98,7 +99,7 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();

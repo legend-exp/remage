@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);
-  manager.SetOutputOverwriteFiles(overwrite_output);
+  manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
   manager.SetNumberOfThreads(nthreads);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
   }
 
   for (const auto& m : macros) manager.IncludeMacroFile(m);
-  if (!output.empty()) manager.SetOutputFileName(output);
+  if (!output.empty()) manager.GetOutputManager()->SetOutputFileName(output);
 
   manager.Initialize();
   manager.Run();

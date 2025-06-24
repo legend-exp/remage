@@ -29,6 +29,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
     ${_root}/include/RMGParticleFilterScheme.hh
+    ${_root}/include/RMGOutputManager.hh
     ${_root}/include/RMGOutputTools.hh
     ${_root}/include/RMGPhysics.hh
     ${_root}/include/RMGRunAction.hh
@@ -75,6 +76,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGOpticalOutputScheme.cc
     ${_root}/src/RMGOpWLSProcess.cc
     ${_root}/src/RMGParticleFilterScheme.cc
+    ${_root}/src/RMGOutputManager.cc
     ${_root}/src/RMGOutputTools.cc
     ${_root}/src/RMGPhysics.cc
     ${_root}/src/RMGRunAction.cc

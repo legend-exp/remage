@@ -29,6 +29,7 @@
 
 #include "RMGExceptionHandler.hh"
 #include "RMGLog.hh"
+#include "RMGOutputManager.hh"
 #include "RMGUserInit.hh"
 
 class G4VUserPhysicsList;
@@ -56,31 +57,11 @@ class RMGManager {
     RMGHardware* GetDetectorConstruction();
     G4VUserPhysicsList* GetProcessesList();
     [[nodiscard]] auto GetUserInit() const { return fUserInit; }
+    [[nodiscard]] auto GetOutputManager() const { return RMGOutputManager::Instance(); }
     [[nodiscard]] int GetPrintModulo() const { return fPrintModulo; }
 
     [[nodiscard]] bool IsExecSequential() {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
-    }
-    [[nodiscard]] bool IsPersistencyEnabled() const { return fIsPersistencyEnabled; }
-    const std::string& GetOutputFileName() { return fOutputFile; }
-    [[nodiscard]] bool HasOutputFileNameNone() const { return fOutputFile == OUTPUT_FILE_NONE; }
-    [[nodiscard]] bool HasOutputFileName() const {
-      return !fOutputFile.empty() && fOutputFile != OUTPUT_FILE_NONE;
-    }
-    [[nodiscard]] bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
-    const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
-    [[nodiscard]] bool GetOutputNtuplePerDetector() const { return fOutputNtuplePerDetector; }
-    [[nodiscard]] bool GetOutputNtupleUseVolumeName() const { return fOutputNtupleUseVolumeName; }
-
-    std::set<int> GetNtupleNames() {
-      std::set<int> nt_names;
-      for (auto const& [k, v] : fNtupleIDs) nt_names.insert(k);
-      return nt_names;
-    }
-    std::set<std::string> GetAuxNtupleNames() {
-      std::set<std::string> nt_names;
-      for (auto const& [k, v] : fNtupleAuxIDs) nt_names.insert(k);
-      return nt_names;
     }
 
     // setters
@@ -95,7 +76,6 @@ class RMGManager {
     void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
     void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
-    void EnablePersistency(bool flag = true) { fIsPersistencyEnabled = flag; }
     void IncludeMacroFile(std::string filename) { fMacroFilesOrContents.emplace_back(filename); }
     void RegisterG4Alias(std::string alias, std::string value) { fG4Aliases.emplace(alias, value); }
     void Initialize();
@@ -110,25 +90,6 @@ class RMGManager {
     [[nodiscard]] bool GetRandEngineSelected() const { return !fRandEngineName.empty(); }
 
     void SetLogLevel(std::string level);
-
-    void SetOutputFileName(std::string filename) { fOutputFile = filename; }
-    void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
-    void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
-
-    int RegisterNtuple(int det_uid, int ntuple_id);
-    int CreateAndRegisterNtuple(
-        int det_uid,
-        std::string table_name,
-        std::string oscheme,
-        G4AnalysisManager* ana_man
-    );
-    int CreateAndRegisterAuxNtuple(
-        std::string table_name,
-        std::string oscheme,
-        G4AnalysisManager* ana_man
-    );
-    int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
-    int GetAuxNtupleID(std::string det_uid) { return fNtupleAuxIDs[det_uid]; }
 
     [[nodiscard]] bool HadWarning() const {
       return fExceptionHandler->HadWarning() || RMGLog::HadWarning();
@@ -165,24 +126,12 @@ class RMGManager {
     std::map<std::string, std::string> fG4Aliases;
     std::vector<std::string> fMacroFilesOrContents;
     bool fInteractive = false;
-    bool fIsPersistencyEnabled = true;
     int fPrintModulo = -1;
     int fNThreads = 1;
 
     bool fIsRandControlled = false;
     bool fIsRandControlledAtEngineChange = false;
     std::string fRandEngineName;
-
-    static inline const std::string OUTPUT_FILE_NONE = "none";
-    std::string fOutputFile;
-    bool fOutputOverwriteFiles = false;
-    bool fOutputNtuplePerDetector = true;
-    bool fOutputNtupleUseVolumeName = false;
-    std::string fOutputNtupleDirectory = "stp";
-    // track internal id of detector NTuples
-    static G4ThreadLocal std::map<int, int> fNtupleIDs;
-    static G4ThreadLocal std::map<std::string, int> fNtupleAuxIDs;
-
 
     static RMGManager* fRMGManager;
     static std::atomic<bool> fAbortRun;
@@ -202,7 +151,6 @@ class RMGManager {
     std::unique_ptr<G4GenericMessenger> fMessenger;
     std::unique_ptr<G4GenericMessenger> fLogMessenger;
     std::unique_ptr<G4GenericMessenger> fRandMessenger;
-    std::unique_ptr<G4GenericMessenger> fOutputMessenger;
     void DefineCommands();
 };
 

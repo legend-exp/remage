@@ -12,10 +12,10 @@ Macro commands
 **Sub-directories:**
 
 * `/RMG/Manager/` – General commands for controlling the application
-* `/RMG/Output/` – Commands for controlling the simulation output
 * `/RMG/Processes/` – Commands for controlling physics processes
 * `/RMG/Geometry/` – Commands for controlling geometry definitions
 * `/RMG/Generator/` – Commands for controlling generators
+* `/RMG/Output/` – Commands for controlling the simulation output
 * `/RMG/GrabmayrGammaCascades/` – Control Peters gamma cascade model
 
 ## `/RMG/Manager/`
@@ -119,729 +119,6 @@ Select the initial seed for randomization by using the internal CLHEP table
 Select a random initial seed from system entropy
 
 * **Allowed states** – `PreInit Idle`
-
-## `/RMG/Output/`
-
-Commands for controlling the simulation output
-
-
-**Sub-directories:**
-
-* `/RMG/Output/Germanium/` – Commands for controlling output from hits in germanium detectors.
-* `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
-* `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
-* `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
-* `/RMG/Output/Track/` – Commands for controlling output of track vertices.
-* `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
-
-**Commands:**
-
-* `FileName` – Set output file name for object persistency
-* `NtuplePerDetector` – Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
-* `NtupleUseVolumeName` – Use the sensitive volume name to name output ntuples.
-* `ActivateOutputScheme` – Activates the output scheme that had been registered under the given name.
-* `NtupleDirectory` – Change the default output directory/group for ntuples in output files.
-
-### `/RMG/Output/FileName`
-
-Set output file name for object persistency
-
-* **Parameter** – `filename`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Output/NtuplePerDetector`
-
-Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
-
-* **Parameter** – `nt_per_det`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Output/NtupleUseVolumeName`
-
-Use the sensitive volume name to name output ntuples.
-
-:::{note}
-this only works if `NtuplePerDetector` is set to true.
-:::
-
-* **Parameter** – `nt_vol_name`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-### `/RMG/Output/ActivateOutputScheme`
-
-Activates the output scheme that had been registered under the given name.
-
-* **Parameter** – `oscheme`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit`
-
-### `/RMG/Output/NtupleDirectory`
-
-Change the default output directory/group for ntuples in output files.
-
-:::{note}
-This setting is not respected by all output formats.
-:::
-
-* **Parameter** – `nt_directory`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `PreInit Idle`
-
-## `/RMG/Output/Germanium/`
-
-Commands for controlling output from hits in germanium detectors.
-
-
-**Sub-directories:**
-
-* `/RMG/Output/Germanium/Cluster/` – Commands for controlling clustering of hits in germanium detectors.
-
-**Commands:**
-
-* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
-* `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
-* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
-* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
-* `DiscardZeroEnergyHits` – Discard hits with zero energy.
-* `StoreTrackID` – Store Track IDs for hits in the output file.
-* `StepPositionMode` – Select which position of the step to store
-
-### `/RMG/Output/Germanium/EdepCutLow`
-
-Set a lower energy cut that has to be met for this event to be stored.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/EdepCutHigh`
-
-Set an upper energy cut that has to be met for this event to be stored.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
-
-Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
-
-* **Parameter** – `det_uid`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
-
-Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
-
-:::{note}
-If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
-:::
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
-
-Discard hits with zero energy.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StoreTrackID`
-
-Store Track IDs for hits in the output file.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/StepPositionMode`
-
-Select which position of the step to store
-
-* **Parameter** – `mode`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `PreStep PostStep Average Both`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/Germanium/Cluster/`
-
-Commands for controlling clustering of hits in germanium detectors.
-
-
-**Commands:**
-
-* `PreClusterOutputs` – Pre-Cluster output hits before saving
-* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
-* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
-* `SurfaceThickness` – Set a surface thickness for the Germanium detector.
-* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
-
-### `/RMG/Output/Germanium/Cluster/PreClusterOutputs`
-
-Pre-Cluster output hits before saving
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks`
-
-Merge low energy electron tracks.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/RedistributeGammaEnergy`
-
-Redistribute energy deposited by gamma tracks to nearby electron tracks.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/PreClusterDistance`
-
-Set a distance threshold for the bulk pre-clustering.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `um`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface`
-
-Set a distance threshold for the surface pre-clustering.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `um`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold`
-
-Set a time threshold for  pre-clustering.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `us`
-  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/SurfaceThickness`
-
-Set a surface thickness for the Germanium detector.
-
-* **Parameter** – `thickness`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `mm`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Germanium/Cluster/ElectronTrackEnergyThreshold`
-
-Set a energy threshold for tracks to be merged.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/Vertex/`
-
-Commands for controlling output of primary vertices.
-
-
-**Commands:**
-
-* `StorePrimaryParticleInformation` – Store information on primary particle details (not only vertex data).
-* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data.
-* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
-* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
-
-### `/RMG/Output/Vertex/StorePrimaryParticleInformation`
-
-Store information on primary particle details (not only vertex data).
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
-
-Do not store vertex/primary particle data.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Vertex/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/Scintillator/`
-
-Commands for controlling output from hits in scintillator detectors.
-
-
-**Sub-directories:**
-
-* `/RMG/Output/Scintillator/Cluster/` – Commands for controlling clustering of hits in scintillator detectors.
-
-**Commands:**
-
-* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
-* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
-* `DiscardZeroEnergyHits` – Discard hits with zero energy.
-* `StoreParticleVelocities` – Store velocities of particle in the output file.
-* `StoreTrackID` – Store Track IDs for hits in the output file.
-* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
-* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
-* `StepPositionMode` – Select which position of the step to store
-
-### `/RMG/Output/Scintillator/EdepCutLow`
-
-Set a lower energy cut that has to be met for this event to be stored.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/EdepCutHigh`
-
-Set an upper energy cut that has to be met for this event to be stored.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
-
-Take this detector into account for the filtering by /EdepThreshold.
-
-* **Parameter** – `det_uid`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/DiscardZeroEnergyHits`
-
-Discard hits with zero energy.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreParticleVelocities`
-
-Store velocities of particle in the output file.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreTrackID`
-
-Store Track IDs for hits in the output file.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/StepPositionMode`
-
-Select which position of the step to store
-
-* **Parameter** – `mode`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-  * **Candidates** – `PreStep PostStep Average Both`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/Scintillator/Cluster/`
-
-Commands for controlling clustering of hits in scintillator detectors.
-
-
-**Commands:**
-
-* `PreClusterOutputs` – Pre-Cluster output hits before saving
-* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
-* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
-* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
-* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
-
-### `/RMG/Output/Scintillator/Cluster/PreClusterOutputs`
-
-Pre-Cluster output hits before saving
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/Cluster/CombineLowEnergyElectronTracks`
-
-Merge low energy electron tracks.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/Cluster/RedistributeGammaEnergy`
-
-Redistribute energy deposited by gamma tracks to nearby electron tracks.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/Cluster/PreClusterDistance`
-
-Set a distance threshold for the bulk pre-clustering.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `um`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/Cluster/PreClusterTimeThreshold`
-
-Set a time threshold for  pre-clustering.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `us`
-  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Scintillator/Cluster/ElectronTrackEnergyThreshold`
-
-Set a energy threshold for tracks to be merged.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `keV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/IsotopeFilter/`
-
-Commands for filtering event out by created isotopes.
-
-
-**Commands:**
-
-* `AddIsotope` – Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
-* `DiscardPhotonsIfIsotopeNotProduced` – Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
-
-### `/RMG/Output/IsotopeFilter/AddIsotope`
-
-Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
-
-* **Parameter** – `A`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Parameter** – `Z`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced`
-
-Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
-
-:::{note}
-If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
-:::
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/Track/`
-
-Commands for controlling output of track vertices.
-
-
-**Commands:**
-
-* `AddProcessFilter` – Only include tracks created by this process.
-* `AddParticleFilter` – Only include tracks with this particle.
-* `EnergyFilter` – Only include tracks with kinetic energy above this threshold.
-* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
-* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
-
-### `/RMG/Output/Track/AddProcessFilter`
-
-Only include tracks created by this process.
-
-* **Parameter** – `process`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Track/AddParticleFilter`
-
-Only include tracks with this particle.
-
-* **Parameter** – `pdgid`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Track/EnergyFilter`
-
-Only include tracks with kinetic energy above this threshold.
-
-* **Parameter** – `energy`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Track/StoreSinglePrecisionPosition`
-
-Use float32 (instead of float64) for position output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/Track/StoreSinglePrecisionEnergy`
-
-Use float32 (instead of float64) for energy output.
-
-* **Parameter** – `boolean`
-  * **Parameter type** – `b`
-  * **Omittable** – `True`
-  * **Default value** – `true`
-* **Allowed states** – `Idle`
-
-## `/RMG/Output/ParticleFilter/`
-
-Commands for filtering particles out by PDG encoding.
-
-
-**Commands:**
-
-* `AddParticle` – Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
-* `AddKeepVolume` – Add a physical volume by name in which all specified Particles will be kept. They will be killed everywhere else. Can NOT be mixed with KillVolumes.
-* `AddKillVolume` – Add a physical volume by name in which all specified Particles will be killed. They will only be killed in this volume. Can NOT be mixed with KeepVolumes.
-* `AddKillProcess` – Add a physics process by name. This will only kill the specified particles when they were created by this process. Can NOT be mixed with KeepProcess.
-* `AddKeepProcess` – Add a physics process by name. This will only keep the specified particles when they were created by this process, all other particles will not be kept. Can NOT be mixed with KillProcess.
-
-### `/RMG/Output/ParticleFilter/AddParticle`
-
-Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
-
-* **Parameter** – `PDGcode`
-  * **Parameter type** – `i`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/ParticleFilter/AddKeepVolume`
-
-Add a physical volume by name in which all specified Particles will be kept. They will be killed everywhere else. Can NOT be mixed with KillVolumes.
-
-* **Parameter** – `PhysicalVolumeName`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/ParticleFilter/AddKillVolume`
-
-Add a physical volume by name in which all specified Particles will be killed. They will only be killed in this volume. Can NOT be mixed with KeepVolumes.
-
-* **Parameter** – `PhysicalVolumeName`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/ParticleFilter/AddKillProcess`
-
-Add a physics process by name. This will only kill the specified particles when they were created by this process. Can NOT be mixed with KeepProcess.
-
-* **Parameter** – `proc`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/ParticleFilter/AddKeepProcess`
-
-Add a physics process by name. This will only keep the specified particles when they were created by this process, all other particles will not be kept. Can NOT be mixed with KillProcess.
-
-* **Parameter** – `proc`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
 
 ## `/RMG/Processes/`
 
@@ -1899,6 +1176,729 @@ this option only has an effect for LH5 or HDF5 input files.
   * **Omittable** – `False`
   * **Default value** – `vtx`
 * **Allowed states** – `PreInit Idle`
+
+## `/RMG/Output/`
+
+Commands for controlling the simulation output
+
+
+**Sub-directories:**
+
+* `/RMG/Output/Germanium/` – Commands for controlling output from hits in germanium detectors.
+* `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
+* `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
+* `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
+* `/RMG/Output/Track/` – Commands for controlling output of track vertices.
+* `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
+
+**Commands:**
+
+* `FileName` – Set output file name for object persistency
+* `NtuplePerDetector` – Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
+* `NtupleUseVolumeName` – Use the sensitive volume name to name output ntuples.
+* `ActivateOutputScheme` – Activates the output scheme that had been registered under the given name.
+* `NtupleDirectory` – Change the default output directory/group for ntuples in output files.
+
+### `/RMG/Output/FileName`
+
+Set output file name for object persistency
+
+* **Parameter** – `filename`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Output/NtuplePerDetector`
+
+Create a ntuple for each sensitive detector to store hits. Otherwise, store all hits of one detector type in one ntuple.
+
+* **Parameter** – `nt_per_det`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Output/NtupleUseVolumeName`
+
+Use the sensitive volume name to name output ntuples.
+
+:::{note}
+this only works if `NtuplePerDetector` is set to true.
+:::
+
+* **Parameter** – `nt_vol_name`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Output/ActivateOutputScheme`
+
+Activates the output scheme that had been registered under the given name.
+
+* **Parameter** – `oscheme`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Output/NtupleDirectory`
+
+Change the default output directory/group for ntuples in output files.
+
+:::{note}
+This setting is not respected by all output formats.
+:::
+
+* **Parameter** – `nt_directory`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Output/Germanium/`
+
+Commands for controlling output from hits in germanium detectors.
+
+
+**Sub-directories:**
+
+* `/RMG/Output/Germanium/Cluster/` – Commands for controlling clustering of hits in germanium detectors.
+
+**Commands:**
+
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
+* `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreTrackID` – Store Track IDs for hits in the output file.
+* `StepPositionMode` – Select which position of the step to store
+
+### `/RMG/Output/Germanium/EdepCutLow`
+
+Set a lower energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/EdepCutHigh`
+
+Set an upper energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/AddDetectorForEdepThreshold`
+
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
+
+* **Parameter** – `det_uid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
+
+Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+
+:::{note}
+If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
+:::
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreTrackID`
+
+Store Track IDs for hits in the output file.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Germanium/Cluster/`
+
+Commands for controlling clustering of hits in germanium detectors.
+
+
+**Commands:**
+
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `SurfaceThickness` – Set a surface thickness for the Germanium detector.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+
+### `/RMG/Output/Germanium/Cluster/PreClusterOutputs`
+
+Pre-Cluster output hits before saving
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks`
+
+Merge low energy electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/RedistributeGammaEnergy`
+
+Redistribute energy deposited by gamma tracks to nearby electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/PreClusterDistance`
+
+Set a distance threshold for the bulk pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `um`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface`
+
+Set a distance threshold for the surface pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `um`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold`
+
+Set a time threshold for  pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `us`
+  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/SurfaceThickness`
+
+Set a surface thickness for the Germanium detector.
+
+* **Parameter** – `thickness`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/Cluster/ElectronTrackEnergyThreshold`
+
+Set a energy threshold for tracks to be merged.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Vertex/`
+
+Commands for controlling output of primary vertices.
+
+
+**Commands:**
+
+* `StorePrimaryParticleInformation` – Store information on primary particle details (not only vertex data).
+* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+
+### `/RMG/Output/Vertex/StorePrimaryParticleInformation`
+
+Store information on primary particle details (not only vertex data).
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
+
+Do not store vertex/primary particle data.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Vertex/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Scintillator/`
+
+Commands for controlling output from hits in scintillator detectors.
+
+
+**Sub-directories:**
+
+* `/RMG/Output/Scintillator/Cluster/` – Commands for controlling clustering of hits in scintillator detectors.
+
+**Commands:**
+
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreParticleVelocities` – Store velocities of particle in the output file.
+* `StoreTrackID` – Store Track IDs for hits in the output file.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `StepPositionMode` – Select which position of the step to store
+
+### `/RMG/Output/Scintillator/EdepCutLow`
+
+Set a lower energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/EdepCutHigh`
+
+Set an upper energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
+
+Take this detector into account for the filtering by /EdepThreshold.
+
+* **Parameter** – `det_uid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreParticleVelocities`
+
+Store velocities of particle in the output file.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreTrackID`
+
+Store Track IDs for hits in the output file.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Scintillator/Cluster/`
+
+Commands for controlling clustering of hits in scintillator detectors.
+
+
+**Commands:**
+
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+
+### `/RMG/Output/Scintillator/Cluster/PreClusterOutputs`
+
+Pre-Cluster output hits before saving
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/Cluster/CombineLowEnergyElectronTracks`
+
+Merge low energy electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/Cluster/RedistributeGammaEnergy`
+
+Redistribute energy deposited by gamma tracks to nearby electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/Cluster/PreClusterDistance`
+
+Set a distance threshold for the bulk pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `um`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/Cluster/PreClusterTimeThreshold`
+
+Set a time threshold for  pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `us`
+  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Scintillator/Cluster/ElectronTrackEnergyThreshold`
+
+Set a energy threshold for tracks to be merged.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/IsotopeFilter/`
+
+Commands for filtering event out by created isotopes.
+
+
+**Commands:**
+
+* `AddIsotope` – Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
+* `DiscardPhotonsIfIsotopeNotProduced` – Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
+
+### `/RMG/Output/IsotopeFilter/AddIsotope`
+
+Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
+
+* **Parameter** – `A`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Parameter** – `Z`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced`
+
+Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
+
+:::{note}
+If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
+:::
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Track/`
+
+Commands for controlling output of track vertices.
+
+
+**Commands:**
+
+* `AddProcessFilter` – Only include tracks created by this process.
+* `AddParticleFilter` – Only include tracks with this particle.
+* `EnergyFilter` – Only include tracks with kinetic energy above this threshold.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+
+### `/RMG/Output/Track/AddProcessFilter`
+
+Only include tracks created by this process.
+
+* **Parameter** – `process`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/AddParticleFilter`
+
+Only include tracks with this particle.
+
+* **Parameter** – `pdgid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/EnergyFilter`
+
+Only include tracks with kinetic energy above this threshold.
+
+* **Parameter** – `energy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/ParticleFilter/`
+
+Commands for filtering particles out by PDG encoding.
+
+
+**Commands:**
+
+* `AddParticle` – Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
+* `AddKeepVolume` – Add a physical volume by name in which all specified Particles will be kept. They will be killed everywhere else. Can NOT be mixed with KillVolumes.
+* `AddKillVolume` – Add a physical volume by name in which all specified Particles will be killed. They will only be killed in this volume. Can NOT be mixed with KeepVolumes.
+* `AddKillProcess` – Add a physics process by name. This will only kill the specified particles when they were created by this process. Can NOT be mixed with KeepProcess.
+* `AddKeepProcess` – Add a physics process by name. This will only keep the specified particles when they were created by this process, all other particles will not be kept. Can NOT be mixed with KillProcess.
+
+### `/RMG/Output/ParticleFilter/AddParticle`
+
+Add a particle to be filtered out by its PDG code. User is responsible for correct PDG code.
+
+* **Parameter** – `PDGcode`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/ParticleFilter/AddKeepVolume`
+
+Add a physical volume by name in which all specified Particles will be kept. They will be killed everywhere else. Can NOT be mixed with KillVolumes.
+
+* **Parameter** – `PhysicalVolumeName`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/ParticleFilter/AddKillVolume`
+
+Add a physical volume by name in which all specified Particles will be killed. They will only be killed in this volume. Can NOT be mixed with KeepVolumes.
+
+* **Parameter** – `PhysicalVolumeName`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/ParticleFilter/AddKillProcess`
+
+Add a physics process by name. This will only kill the specified particles when they were created by this process. Can NOT be mixed with KeepProcess.
+
+* **Parameter** – `proc`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/ParticleFilter/AddKeepProcess`
+
+Add a physics process by name. This will only keep the specified particles when they were created by this process, all other particles will not be kept. Can NOT be mixed with KillProcess.
+
+* **Parameter** – `proc`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/GrabmayrGammaCascades/`
 
