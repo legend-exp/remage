@@ -13,5 +13,6 @@ generators.md
 input.md
 output.md
 visualization.md
+analysis.md
 extend.md
 ```
