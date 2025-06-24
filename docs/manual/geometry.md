@@ -57,7 +57,8 @@ The simplest method is to use the
 
 This registers the physical volumes `B00000B` and `C000RG1` as `Germanium`
 detectors with `uid`s 1 and 2. If the copy number is not specified, `0` is used
-by default. See {ref}`output` for details on how detector types affect output.
+by default. See {ref}`manual-output` for details on how detector types affect
+output.
 
 Alternatively, detectors can be imported from a GDML file that includes
 metadata, using the

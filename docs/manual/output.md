@@ -1,11 +1,9 @@
-(output)=
+(manual-output)=
 
 # Output
 
 :::{todo}
 
-- one-table versus multi-table configurations
-- vertex table
 - track output scheme
 - isotope, energy filtering
 
@@ -28,7 +26,7 @@ support for the HDF5 or ROOT libraries, respectively.
 The contents of the output files is determined by _output schemes_. An output
 scheme does not only contain functionality for the actual output description,
 but also might have parts of Geant4's stacking action functionality. Output
-schemes, in general, are remage's way to implement pluggable event selection,
+schemes, in general, are _remage_'s way to implement pluggable event selection,
 persistency and track stacking.
 
 ## Selection of output schemes
@@ -45,7 +43,7 @@ output schemes can be enabled with the
 :::{note}
 
 Adding output schemes with C++ code is possible using the `RMGUserInit` system
-of remage (access it with
+of _remage_ (access it with
 `auto user_init = RMGManager::Instance()->GetUserInit()`:
 
 - `user_init->AddOutputScheme<T>(...);` adds and enables the output scheme
@@ -65,12 +63,14 @@ At present, it is not possible to register detector types at runtime.
 
 The selection of the output file type depends on the file extension of the
 specified output file. Possible output file types include `lh5`, `hdf5`, or
-`root`—or any other file format that `G4AnlasisManager` can write; but these are
-not tested regularly.
+`root`—or any other file format that `G4AnalysisManager` can write; but these
+are not tested regularly. In general, we recommend choosing the
+[LH5](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/) format
+(more below).
 
 :::{note}
 
-remage will not produce an output file, if no output file name is provided by
+_remage_ will not produce an output file, if no output file name is provided by
 the user. Specify `-o none` to acknowledge the warning that is emitted when
 output schemes are registered, but no file will be created.
 
@@ -92,7 +92,7 @@ will result in output files `OUTPUT_t0.lh5,..., OUTPUT_t7.lh5`.
 Geant4 automatically merges these files into a single one at the end of a run
 for all supported formats, except for HDF5. For the LH5 output format, _remage_
 can merge the output files before saving to disk. This feature can be enabled
-with the `--merge-output-files` (or `-m`) option.
+with the `--merge-output-files` (or `-m`) command line option.
 
 :::{warning}
 
@@ -101,86 +101,6 @@ increase run time! _remage_ will report the amount of time spent merging the
 files.
 
 :::
-
-## LH5 output
-
-It is possible to directly write a LH5 file from _remage_, to facilitate reading
-output ntuples as a
-[LH5 Table](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Table).
-To use this feature, simply specify an output file with a `.lh5` extension, and
-remage will perform the file conversion automatically.
-
-:::{note}
-
-Additionally, the standalone tool `remage-to-lh5` is provided to convert a
-default Geant4 HDF5 file to a LH5 file. With this, executing
-`remage -o output.lh5 [...]` is roughly equivalent to the combination of
-commands:
-
-```console
-$ remage -o output.hdf5 [...]
-$ remage-to-lh5 output.hdf5
-$ mv output.{hdf5,lh5}
-```
-
-:::
-
-### Reshaping output tables
-
-For the LH5 output and _Germanium_ or _Scintillator_ output we implemented a
-"reshaping" of the output tables. This groups together rows in the same output
-table that have the same simulated Geant4 evtid and also with times with the
-user defined time window (more later). In this way the rows of the output table
-represent physical interactions in each output table.
-
-The means the columns of the output table are converted from
-[LH5 Array's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Array)
-objects to
-[LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors).
-However, this grouping is lossless.
-
-Without reshaping, the output table is flat: each column (`evtid`, `edep`, ...)
-is a one-dimensional array:
-
-```
-[{evtid: 0, particle: 11, edep: 20.1, time: 0.158, xloc: -0.0222, ...},
- {evtid: 0, particle: 11, edep: 50.1, time: 0.251, xloc: -0.0178, ...},
- {evtid: 0, particle: 11, edep: 74.9, time: 0.522, xloc: -0.0767, ...},
- {evtid: 2, particle: 11, edep: 0.431, time: 0.344, xloc: -0.0335, ...},
- {evtid: 2, particle: 11, edep: 109, time: 0.423, xloc: -0.0542, ...},
- {evtid: 3, particle: 11, edep: 70.2, time: 0.0545, xloc: -0.0128, ...},
- ...,
- {evtid: 44, particle: 11, edep: 88.4, time: 0.484, xloc: -0.0313, ...},
- {evtid: 49, particle: 11, edep: 33.1, time: 0.848, xloc: -0.126, ...},
- {evtid: 49, particle: 11, edep: 115, time: 0.85, xloc: -0.125, yloc: ..., ...}]
-```
-
-With reshaping, columns acquire one additional dimension:
-
-```
-[{edep: [20.1, 50.1, ..., 74.9], evtid: [0, ..., 0], particle: ..., ...},
- {edep: [0.431, 109], evtid: [2, 2], particle: [11, 11], ...},
- {edep: [70.2], evtid: [3], particle: [11], time: [...], ...},
- ...,
- {edep: [88.4], evtid: [44], particle: [...], ...},
- {edep: [33.1, 115], evtid: [49, 49], particle: ..., ...}]
-```
-
-This behavior is enabled by default for `.lh5` file outputs, it can be
-suppressed with the `--flat-output` flag to the _remage_ executable. The time
-window used to group together rows can be set with the `--time-window-in-us`
-flag, the units are $\mu$s and by default a window of 10$\mu$s is used.
-
-:::{warning}
-
-Reshaping involves some additional I/O operations so for some simulations may
-increase run time! _remage_ will report the amount of time spent reshaping the
-files.
-
-:::
-
-It is possible to supply both the `-m` and `-r` flags to simultaneously merge
-and reshape the output files.
 
 ## Physical units
 
@@ -215,7 +135,7 @@ HPGe detectors. The following properties of each hit are recorded (by default):
 - `time`: The global time of the hit,
 - `particle`: the PDG code of the particle,
 - `xloc`, `yloc`, `zloc`: the global position,
-- `evtid_`: the index of the Geant4 event,
+- `evtid`: the index of the Geant4 event,
 - `edep`: the deposited energy,
 - `dist_to_surf`: the distance of the hit from the detector surface.
 
@@ -301,6 +221,16 @@ _Germanium_ output scheme with a few exceptions.
 - The velocity of the particles can be saved using the
   <project:../rmg-commands.md#rmgoutputscintillatorstoreparticlevelocities>
   command.
+
+## Single- versus multi-detector table layout
+
+_remage_ will store sensitive volume hits in separate output tables by default,
+one per detector. While this layout is useful if analyzing data from each
+detector independently, sometimes having all hits stored in the same output
+table can be more beneficial. The multi-table layout can be disabled by setting
+<project:../rmg-commands.md#rmgoutputntupleperdetector> to false. In this
+scenario, _remage_ will create a table for each detector category (`Germanium`,
+`Scintillator`, ...).
 
 ## Data reduction methods
 
@@ -443,3 +373,135 @@ In this way the output still represents a step, just with a longer effective
 step length.
 
 :::
+
+## LH5 output
+
+[LH5 (LEGEND-HDF5)](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/)
+is a simple, open-source HDF5-based data format specification initially
+developed by the LEGEND collaboration. Good support for reading and writing LH5
+files is available in Python (through
+[_legend-pydataobj_](https://legend-pydataobj.readthedocs.io)) and in Julia
+(through [_LegendHDF5IO.jl_](...)). Alternatively, since the data is stored in
+HDF5, it can be read by any other HDF5 I/O tool. Given the advantages of the LH5
+format over the others, _remage_ adopts it as primary output format and
+recommends it to all users.
+
+It is possible to directly write a LH5 file from _remage_, to facilitate reading
+output ntuples as a
+[LH5 Table](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Table).
+To use this feature, simply specify an output file with a `.lh5` extension, and
+_remage_ will perform the file conversion automatically.
+
+:::{note}
+
+Additionally, the standalone tool `remage-to-lh5` is provided to convert a
+default Geant4 HDF5 file to a LH5 file. With this, executing
+`remage -o output.lh5 [...]` is roughly equivalent to the combination of
+commands:
+
+```console
+$ remage -o output.hdf5 [...]
+$ remage-to-lh5 output.hdf5
+$ mv output.{hdf5,lh5}
+```
+
+If the LH5 output is selected, _remage_ performs some post-processing steps at
+the end of a simulation run such as re-organizing data into more meaningful
+structures or adding useful information.
+
+:::
+
+### Reshaping output tables
+
+For the LH5 format and _Germanium_ or _Scintillator_ outputs we implemented a
+"reshaping" of the output tables. This groups together rows in the same output
+table that have the same simulated Geant4 evtid and also with times with the
+user defined time window (more later). In this way the resulting rows of the
+output table represent physical interactions in a sensitive volume occurring in
+a window compatible with the time resolution of the detector. In the following,
+we will often refer to these as "hits".
+
+The means the columns of the output table are converted from
+[LH5 Array's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Array)
+objects to
+[LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors).
+However, this grouping is lossless.
+
+Without reshaping, the output table is flat: each column (`evtid`, `edep`, ...)
+is a one-dimensional array:
+
+```
+[{evtid: 0, particle: 11, edep: 20.1, time: 0.158, xloc: -0.0222, ...},
+ {evtid: 0, particle: 11, edep: 50.1, time: 0.251, xloc: -0.0178, ...},
+ {evtid: 0, particle: 11, edep: 74.9, time: 0.522, xloc: -0.0767, ...},
+ {evtid: 2, particle: 11, edep: 0.431, time: 0.344, xloc: -0.0335, ...},
+ {evtid: 2, particle: 11, edep: 109, time: 0.423, xloc: -0.0542, ...},
+ {evtid: 3, particle: 11, edep: 70.2, time: 0.0545, xloc: -0.0128, ...},
+ ...,
+ {evtid: 44, particle: 11, edep: 88.4, time: 0.484, xloc: -0.0313, ...},
+ {evtid: 49, particle: 11, edep: 33.1, time: 0.848, xloc: -0.126, ...},
+ {evtid: 49, particle: 11, edep: 115, time: 0.85, xloc: -0.125, yloc: ..., ...}]
+```
+
+With reshaping, columns acquire one additional dimension:
+
+```
+[{edep: [20.1, 50.1, ..., 74.9], evtid: [0, ..., 0], particle: ..., ...},
+ {edep: [0.431, 109], evtid: [2, 2], particle: [11, 11], ...},
+ {edep: [70.2], evtid: [3], particle: [11], time: [...], ...},
+ ...,
+ {edep: [88.4], evtid: [44], particle: [...], ...},
+ {edep: [33.1, 115], evtid: [49, 49], particle: ..., ...}]
+```
+
+This behavior is enabled by default for `.lh5` file outputs, it can be
+suppressed with the `--flat-output` flag to the _remage_ executable. The time
+window used to group together rows can be set with the `--time-window-in-us`
+flag, the units are $\mu$s and by default a window of 10$\mu$s is used.
+
+:::{warning}
+
+Reshaping involves some additional I/O operations so for some simulations may
+increase run time! _remage_ will report the amount of time spent reshaping the
+files.
+
+:::
+
+It is possible to supply both the `-m` and `-r` flags to simultaneously merge
+and reshape the output files.
+
+### Time-coincidence map
+
+In the presence of multiple sensitive detectors written out as separate output
+tables, reconstructing event information can be a tedious operation when
+analyzing the simulation output. To simplify the task, _remage_ computes a
+so-called "time-coincidence map" (TCM) table at the end of a simulation run with
+{func}`pygama.evt.tcm.build_tcm` and stores it in the output file as `/tcm`.
+
+Every row of the TCM corresponds to a simulated event, defined by the same time
+window used for reshaping the output tables. For each event, the `table_key`
+column specifies the list of detectors that had hits, while the `row_in_table`
+column specifies which rows (through the row index) need to be read from the
+respective output tables. The detectors are labeled in `row_in_table` by their
+index in the `tables` HDF5 attribute.
+
+More information on how to use the TCM is provided in {ref}`manual-analysis`,
+while more documentation about how the TCM is generated is available at
+{func}`pygama.evt.tcm.generate_tcm_cols`.
+
+## The vertex table
+
+_remage_ stores data about the simulated event vertex in a table named `vtx`. In
+the LH5 output, it can be found in the HDF5 root group (`/vtx`). Each row in the
+table corresponds to a vertex. The columns are:
+
+- `evtid`: Geant4 event identifier
+- `time`: time relative to the start of the event (zero, most of the times)
+- `n_part`: number of generated particles
+- `xloc`, `yloc`, `zloc`: global coordinates of the vertex position.
+
+The table always lists data from all vertices, i.e. the length of the table is
+always equal to the number of simulated events.
+
+The vertex table is useful to reconstruct the event vertex of hits recorded in
+sensitive detectors by matching the information stored in the `evtid` column.
