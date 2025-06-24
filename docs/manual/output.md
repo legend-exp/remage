@@ -77,8 +77,8 @@ output schemes are registered, but no file will be created.
 :::
 
 In case a multithreaded simulation is requested with the `-t` or `--threads`
-option (see {ref}`running`), the output file names will be appended with the
-thread number. _remage_ will produce one output file per thread appending
+option (see {ref}`manual-running`), the output file names will be appended with
+the thread number. _remage_ will produce one output file per thread appending
 `_t$id`, where `$id` is the thread number, before the file extension.
 
 For example running _remage_ with:

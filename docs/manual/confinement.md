@@ -1,4 +1,4 @@
-(manual-confine)=
+(manual-confinement)=
 
 # Vertex confinement
 

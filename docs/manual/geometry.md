@@ -1,4 +1,4 @@
-(geometry)=
+(manual-geometry)=
 
 # Experimental geometry
 
