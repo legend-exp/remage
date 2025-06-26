@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
   bool verbosity = false;
   bool dry_run = false;
   std::vector<std::string> file_names;
-  std::set<std::string> aux_ntuples = {"vtx", "processes", "particles"};
+  std::set<std::string> aux_ntuples = {"vtx", "processes", "particles", "tracks"};
   std::string ntuple_group_name = "stp";
 
   CLI::App app{"remage-to-lh5: convert HDF5 file output files in-place to LH5"};
