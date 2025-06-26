@@ -3,10 +3,14 @@
 /RMG/Geometry/RegisterDetector Germanium det1 11
 /RMG/Geometry/RegisterDetector Germanium det2 12
 
+/RMG/Output/ActivateOutputScheme Track
+
 /control/execute macros/_init.mac
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true
+/RMG/Output/Vertex/StorePrimaryParticleInformation
+/RMG/Output/Scintillator/StoreParticleVelocities
 
 /RMG/Generator/Confine UnConfined
 

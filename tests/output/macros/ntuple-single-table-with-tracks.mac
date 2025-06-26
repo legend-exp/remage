@@ -1,13 +1,12 @@
-/RMG/Output/NtuplePerDetector false
-
 /RMG/Geometry/RegisterDetector Scintillator scint1 1
 /RMG/Geometry/RegisterDetector Scintillator scint2 2
 /RMG/Geometry/RegisterDetector Germanium det1 11
 /RMG/Geometry/RegisterDetector Germanium det2 12
 
 /control/execute macros/_init.mac
-/RMG/Output/Germanium/StoreTrackID
 
+/RMG/Output/NtuplePerDetector false
+/RMG/Output/Germanium/StoreTrackID
 
 /RMG/Generator/Confine UnConfined
 
