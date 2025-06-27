@@ -111,7 +111,7 @@ class RMGOutputManager {
       return nt_names;
     }
     /**
-     * @brief Retrieves the set of auxiliary ntuple identifiers.
+     * @brief Retrieves the set of registered auxiliary ntuple identifiers.
      * @return Set of auxiliary ntuple names.
      */
     std::set<std::string> GetAuxNtupleNames() {
@@ -139,12 +139,13 @@ class RMGOutputManager {
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
     /**
      * @brief Sets the directory for output ntuples.
+     * @details this might not be used by all output file formats.
      * @param dir The directory name for ntuple output.
      */
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
 
     /**
-     * @brief Registers a ntuple for a given detector.
+     * @brief Registers an alreaday created ntuple for a given detector.
      * @param det_uid Unique identifier for the detector.
      * @param ntuple_id Identifier for the ntuple.
      * @return The registered ntuple identifier.
@@ -159,7 +160,7 @@ class RMGOutputManager {
      *
      * @param det_uid Unique identifier for the detector.
      * @param table_name Name of the table.
-     * @param oscheme Output scheme to use.
+     * @param oscheme Type name of the output scheme registering this ntuple.
      * @param ana_man Pointer to the analysis manager.
      * @return The created ntuple identifier.
      */
@@ -173,11 +174,11 @@ class RMGOutputManager {
      * @brief Creates and registers an auxiliary ntuple.
      *
      * @details An auxiliary ntuple stores information not strictly related to
-     * stepping data. An IPC message keyed as "output_table" is automatically
+     * stepping data. An IPC message keyed as "output_table_aux" is automatically
      * sent to communicate the output scheme name and the output table name.
      *
      * @param table_name Name of the output table.
-     * @param oscheme Output scheme to use.
+     * @param oscheme Type name of the output scheme registering this ntuple.
      * @param ana_man Pointer to the analysis manager.
      * @return The created auxiliary ntuple identifier.
      */
