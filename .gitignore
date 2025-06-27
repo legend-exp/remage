@@ -101,3 +101,4 @@ python/*/_version.py
 .Trashes
 ehthumbs.db
 Thumbs.db
+.aider*

@@ -39,6 +39,7 @@ def post_proc(
     }
 
     detector_info = ipc_info.get("output_table", 2)
+    detector_info_aux = ipc_info.get("output_table_aux", 2)
 
     assert len(output_file_exts) == 1
 
@@ -77,19 +78,12 @@ def post_proc(
             {
                 det[1]
                 for det in detector_info
-                if det[0] == "germanium" or det[0] == "scintillator"
+                if det[0] in ("RMGGermaniumOutputScheme", "RMGScintillatorOutputScheme")
             }
         )
 
         # extract the additional tables in the output file (not detectors)
-        extra_detectors = []
-        for table in lh5.ls(remage_files[0], lh5_group=f"{det_tables_path}/"):
-            name = table.split("/")[1]
-            if name not in registered_detectors:
-                extra_detectors.append(table)
-
-        # add the vertex table, if it was stored
-        extra_tables = list(set(extra_detectors + ipc_info.get("vtx_table_path")))
+        extra_tables = list({det[1] for det in detector_info_aux})
 
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward

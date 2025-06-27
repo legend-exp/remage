@@ -18,6 +18,6 @@ remage_run(
 )
 
 # check that we get all antineutrinos.
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert -12 not in particle_numbers

@@ -23,10 +23,10 @@
 #include "G4SDManager.hh"
 
 #include "RMGHardware.hh"
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGOpticalDetector.hh"
+#include "RMGOutputManager.hh"
 
 namespace u = CLHEP;
 
@@ -35,8 +35,8 @@ RMGOpticalOutputScheme::RMGOpticalOutputScheme() { this->DefineCommands(); }
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
-  auto rmg_man = RMGManager::Instance();
-  const auto det_cons = rmg_man->GetDetectorConstruction();
+  auto rmg_man = RMGOutputManager::Instance();
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
@@ -56,11 +56,13 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       continue;
     }
 
-    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
-    registered_ntuples.emplace(ntuple_name, id);
-    RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("optical\x1e") + ntuple_name)
+    auto id = rmg_man->CreateAndRegisterNtuple(
+        det.second.uid,
+        ntuple_name,
+        "RMGOpticalOutputScheme",
+        ana_man
     );
+    registered_ntuples.emplace(ntuple_name, id);
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
@@ -97,7 +99,7 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
     RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();

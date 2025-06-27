@@ -27,6 +27,7 @@
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #endif
+#include "G4AnalysisManager.hh"
 #include "G4Backtrace.hh"
 #include "G4GenericMessenger.hh"
 #include "G4StateManager.hh"
@@ -55,9 +56,6 @@
 RMGManager* RMGManager::fRMGManager = nullptr;
 
 std::atomic<bool> RMGManager::fAbortRun = false;
-
-G4ThreadLocal std::map<int, int> RMGManager::fNtupleIDs = {};
-G4ThreadLocal std::map<std::string, int> RMGManager::fNtupleIDsS = {};
 
 RMGManager::RMGManager(std::string app_name, int argc, char** argv)
     : fApplicationName(app_name), fArgc(argc), fArgv(argv) {
@@ -417,42 +415,6 @@ void RMGManager::DefineCommands() {
 
   fRandMessenger->DeclareMethod("UseSystemEntropy", &RMGManager::SetRandSystemEntropySeed)
       .SetGuidance("Select a random initial seed from system entropy")
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fOutputMessenger = std::make_unique<G4GenericMessenger>(
-      this,
-      "/RMG/Output/",
-      "Commands for controlling the simulation output"
-  );
-
-  fOutputMessenger->DeclareMethod("FileName", &RMGManager::SetOutputFileName)
-      .SetGuidance("Set output file name for object persistency")
-      .SetParameterName("filename", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fOutputMessenger->DeclareProperty("NtuplePerDetector", fOutputNtuplePerDetector)
-      .SetGuidance(
-          "Create a ntuple for each sensitive detector to store hits. Otherwise, store "
-          "all hits of one detector type in one ntuple."
-      )
-      .SetParameterName("nt_per_det", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fOutputMessenger->DeclareProperty("NtupleUseVolumeName", fOutputNtupleUseVolumeName)
-      .SetGuidance("Use the sensitive volume name to name output ntuples.")
-      .SetGuidance("note: this only works if `NtuplePerDetector` is set to true.")
-      .SetParameterName("nt_vol_name", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
-
-  fOutputMessenger->DeclareMethod("ActivateOutputScheme", &RMGManager::ActivateOptionalOutputScheme)
-      .SetGuidance("Activates the output scheme that had been registered under the given name.")
-      .SetParameterName("oscheme", false)
-      .SetStates(G4State_PreInit);
-
-  fOutputMessenger->DeclareMethod("NtupleDirectory", &RMGManager::SetOutputNtupleDirectory)
-      .SetGuidance("Change the default output directory/group for ntuples in output files.")
-      .SetGuidance("note: This setting is not respected by all output formats.")
-      .SetParameterName("nt_directory", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 }
 

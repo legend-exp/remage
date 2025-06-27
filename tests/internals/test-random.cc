@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
   if (argc > 1) setenv("G4RUN_MANAGER_TYPE", argv[1], 1);
 
   RMGManager manager("test-random", argc, argv);
-  manager.EnablePersistency(false);
+  manager.GetOutputManager()->EnablePersistency(false);
   manager.SetUserInit(new TestGeometry());
   manager.GetUserInit()->AddTrackingAction<BremsTrackingAction>();
 

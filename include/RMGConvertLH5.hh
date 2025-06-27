@@ -22,6 +22,7 @@
 #include <memory>
 #include <optional>
 #include <regex>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,13 @@ class RMGConvertLH5 {
 
   public:
 
-    static bool ConvertToLH5(std::string, std::string, bool, bool part_of_batch = false);
+    static bool ConvertToLH5(
+        std::string,
+        std::string,
+        std::set<std::string>,
+        bool,
+        bool part_of_batch = false
+    );
     static bool ConvertFromLH5(
         std::string,
         std::string,
@@ -46,9 +53,15 @@ class RMGConvertLH5 {
 
   private:
 
-    RMGConvertLH5(std::string filename, std::string ntuple_group, bool dry_run, bool part_of_batch)
-        : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fDryRun(dry_run),
-          fIsPartOfBatch(part_of_batch) {};
+    RMGConvertLH5(
+        std::string filename,
+        std::string ntuple_group,
+        std::set<std::string> aux_ntuples,
+        bool dry_run,
+        bool part_of_batch
+    )
+        : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fAuxNtuples(aux_ntuples),
+          fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,6 +124,7 @@ class RMGConvertLH5 {
 
     std::string fHdf5FileName;
     std::string fNtupleGroupName;
+    std::set<std::string> fAuxNtuples;
     bool fDryRun;
     bool fIsPartOfBatch;
 };

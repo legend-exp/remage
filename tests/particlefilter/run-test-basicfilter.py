@@ -18,7 +18,7 @@ remage_run(
 )
 
 # check that no gammas are in the output
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert particle_numbers[11] != 0  # primaries.
 assert particle_numbers.get(22, 0) == 0  # gammas
@@ -37,7 +37,7 @@ remage_run(
 )
 
 # check that no alphas are in the output, but still we end where expected.
-tracks = lh5.read("stp/tracks", output_lh5).view_as("pd")
+tracks = lh5.read("tracks", output_lh5).view_as("pd")
 particle_numbers = tracks["particle"].value_counts()
 assert particle_numbers[1000902280] == 10  # primaries.
 assert particle_numbers[1000822080] == 10  # we should always get to Pb208.

@@ -17,7 +17,7 @@ endforeach()
 
 # MAIN OUTPUT TESTS
 set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-single-table.mac
-            ntuple-single-table-with-tracks.mac)
+            ntuple-single-table-with-tracks.mac ntuple-optionals.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}

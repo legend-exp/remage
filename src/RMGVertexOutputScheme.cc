@@ -18,9 +18,8 @@
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
 
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
-#include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 
 namespace u = CLHEP;
 
@@ -30,11 +29,8 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   if (fSkipPrimaryVertexOutput) return;
 
-  auto vid = RMGManager::Instance()->RegisterNtuple(
-      "vtx",
-      ana_man->CreateNtuple("vtx", "Primary vertex data")
-  );
-  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1evtx"));
+  auto vid = RMGOutputManager::Instance()
+                 ->CreateAndRegisterAuxNtuple("vtx", "RMGVertexOutputScheme", ana_man);
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
   ana_man->CreateNtupleDColumn(vid, "time_in_ns");
@@ -46,11 +42,8 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->FinishNtuple(vid);
 
   if (fStorePrimaryParticleInformation) {
-    auto pid = RMGManager::Instance()->RegisterNtuple(
-        "particles",
-        ana_man->CreateNtuple("particles", "Primary particle data")
-    );
-    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_table", "vertex\x1eparticles"));
+    auto pid = RMGOutputManager::Instance()
+                   ->CreateAndRegisterAuxNtuple("particles", "RMGVertexOutputScheme", ana_man);
 
     ana_man->CreateNtupleIColumn(pid, "evtid");
     ana_man->CreateNtupleIColumn(pid, "vertexid");
@@ -70,12 +63,12 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
   int n_vertex = event->GetNumberOfPrimaryVertex();
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();
-    auto vntupleid = rmg_man->GetNtupleID("vtx");
-    auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetNtupleID("particles") : -1;
+    auto vntupleid = rmg_man->GetAuxNtupleID("vtx");
+    auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetAuxNtupleID("particles") : -1;
 
     for (int i = 0; i < n_vertex; i++) {
       auto primary_vertex = event->GetPrimaryVertex(i);

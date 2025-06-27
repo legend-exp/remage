@@ -25,9 +25,9 @@
 #include "G4SDManager.hh"
 
 #include "RMGHardware.hh"
-#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGOutputManager.hh"
 #include "RMGScintillatorDetector.hh"
 #include "RMGTools.hh"
 
@@ -49,8 +49,8 @@ RMGScintillatorOutputScheme::RMGScintillatorOutputScheme() {
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
-  auto rmg_man = RMGManager::Instance();
-  const auto det_cons = rmg_man->GetDetectorConstruction();
+  auto rmg_man = RMGOutputManager::Instance();
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
   std::set<int> registered_uids;
@@ -70,11 +70,13 @@ void RMGScintillatorOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) 
       continue;
     }
 
-    auto id = rmg_man->RegisterNtuple(det.second.uid, ana_man->CreateNtuple(ntuple_name, "Event data"));
-    registered_ntuples.emplace(ntuple_name, id);
-    RMGIpc::SendIpcNonBlocking(
-        RMGIpc::CreateMessage("output_table", std::string("scintillator\x1e") + ntuple_name)
+    auto id = rmg_man->CreateAndRegisterNtuple(
+        det.second.uid,
+        ntuple_name,
+        "RMGScintillatorOutputScheme",
+        ana_man
     );
+    registered_ntuples.emplace(ntuple_name, id);
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
@@ -182,7 +184,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
     hit_coll = _clustered_hits.get(); // get an unmanaged ptr for use in this function
   }
 
-  auto rmg_man = RMGManager::Instance();
+  auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
     RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();

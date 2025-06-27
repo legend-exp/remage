@@ -10,8 +10,8 @@ int main(int argc, char** argv) {
   RMGManager manager("05-MUSUN", argc, argv);
   manager.SetUserInit(new HPGeTestStand());
   manager.SetNumberOfThreads(2);
-  manager.EnablePersistency();
-  manager.SetOutputOverwriteFiles(true);
+  manager.GetOutputManager()->EnablePersistency();
+  manager.GetOutputManager()->SetOutputOverwriteFiles(true);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe1", 0);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe2", 1);
   manager.GetDetectorConstruction()->RegisterDetector(kGermanium, "HPGe3", 2);
