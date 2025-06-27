@@ -33,11 +33,24 @@
 #include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
 
+/**
+ * @brief User initialization class.
+ *
+ * This class manages user-defined actions, output schemes, and generator configuration
+ * for the remage simulation. It provides methods to add stepping actions, tracking actions,
+ * output schemes, and to configure the user generator.
+ */
 class RMGUserInit {
 
   public:
 
+    /**
+     * @brief Default constructor.
+     */
     RMGUserInit() = default;
+    /**
+     * @brief Default destructor.
+     */
     ~RMGUserInit() = default;
 
     RMGUserInit(RMGUserInit const&) = delete;
@@ -46,41 +59,104 @@ class RMGUserInit {
     RMGUserInit& operator=(RMGUserInit&&) = delete;
 
     // getters
+    /**
+     * @brief Retrieves the collection of stepping actions.
+     * @return A vector of functions generating G4UserSteppingAction objects.
+     */
     [[nodiscard]] auto GetSteppingActions() const { return fSteppingActions; }
+    /**
+     * @brief Retrieves the collection of tracking actions.
+     * @return A vector of functions generating G4UserTrackingAction objects.
+     */
     [[nodiscard]] auto GetTrackingActions() const { return fTrackingActions; }
+    /**
+     * @brief Retrieves the registered output schemes.
+     * @return A vector of functions generating RMGVOutputScheme objects.
+     */
     [[nodiscard]] auto GetOutputSchemes() const { return fOutputSchemes; }
+    /**
+     * @brief Retrieves the optional output schemes.
+     * @return A map of functions generating RMGVOutputScheme objects, keyed by scheme name.
+     */
     [[nodiscard]] auto GetOptionalOutputSchemes() const { return fOptionalOutputSchemes; }
+    /**
+     * @brief Retrieves the user generator.
+     * @return A function generating an RMGVGenerator object.
+     */
     [[nodiscard]] auto GetUserGenerator() const { return fUserGenerator; }
 
     // setters
+    /**
+     * @brief Adds a stepping action of type T.
+     *
+     * @tparam T Derived type of G4UserSteppingAction.
+     * @param args Arguments to forward to T's constructor.
+     */
     template<typename T, typename... Args> void AddSteppingAction(Args&&... args) {
       Add<T>(&fSteppingActions, std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Adds a tracking action of type T.
+     *
+     * @tparam T Derived type of G4UserTrackingAction.
+     * @param args Arguments to forward to T's constructor.
+     */
     template<typename T, typename... Args> void AddTrackingAction(Args&&... args) {
       Add<T>(&fTrackingActions, std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Adds an output scheme of type T.
+     *
+     * @tparam T Derived type of RMGVOutputScheme.
+     * @param args Arguments to forward to T's constructor.
+     */
     template<typename T, typename... Args> void AddOutputScheme(Args&&... args) {
       Add<T>(&fOutputSchemes, std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Adds an optional output scheme of type T with a given name.
+     *
+     * @tparam T Derived type of RMGVOutputScheme.
+     * @param name The key under which the scheme will be stored.
+     * @param args Arguments to forward to T's constructor.
+     */
     template<typename T, typename... Args>
     void AddOptionalOutputScheme(std::string name, Args&&... args) {
       Add<T>(&fOptionalOutputSchemes, name, std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Sets the user generator to an instance of type T.
+     *
+     * @tparam T Derived type of RMGVGenerator.
+     * @param args Arguments to forward to T's constructor.
+     */
     template<typename T, typename... Args> void SetUserGenerator(Args&&... args) {
       Set<T>(fUserGenerator, std::forward<Args>(args)...);
     }
 
     // default output schemes
+    /**
+     * @brief Registers the default optional output schemes.
+     *
+     * This includes schemes for isotope filtering, particle filtering, and track output.
+     */
     void RegisterDefaultOptionalOutputSchemes() {
       AddOptionalOutputScheme<RMGIsotopeFilterScheme>("IsotopeFilter");
       AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
       AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
     }
 
+    /**
+     * @brief Activates an optional output scheme by its name.
+     *
+     * If the scheme is not found, a fatal error is logged.
+     *
+     * @param name The name of the optional output scheme to activate.
+     */
     void ActivateOptionalOutputScheme(std::string name) {
       auto it = fOptionalOutputSchemes.find(name);
       if (it == fOptionalOutputSchemes.end()) {
