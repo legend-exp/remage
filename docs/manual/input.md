@@ -1,4 +1,4 @@
-(input)=
+(manual-input)=
 
 # Input event vertices and kinematics
 

@@ -1,4 +1,4 @@
-(running)=
+(manual-running)=
 
 # Running simulations
 
@@ -30,8 +30,9 @@ The most useful options include:
 - `macros` – macro files or inline command strings. If the given argument is not
   an existing file it is interpreted as a newline-separated list of commands.
 - `-g, --gdml-files` – include one or more GDML geometry files (see
-  {ref}`geometry`).
-- `-o, --output-file` – sensitive detector hits output file (see {ref}`output`).
+  {ref}`manual-geometry`).
+- `-o, --output-file` – sensitive detector hits output file (see
+  {ref}`manual-output`).
 - `-i, --interactive` – keep the application open after executing macros and
   present a Geant4 prompt.
 - `-t, --threads` – number of worker threads to use.
@@ -41,11 +42,11 @@ The most useful options include:
   and `nothing` (e.g. `-l debug`).
 - `--version`/`--version-rich` – print version information and exit.
 - `-m, --merge-output-files` – merge thread-specific output files at the end of
-  execution (see {ref}`output`).
+  execution (see {ref}`manual-output`).
 - `--flat-output` – store each Geant4 step as its own row in the output (see
-  {ref}`output`).
+  {ref}`manual-output`).
 - `--time-window-in-us` – time window used when reshaping hits (see
-  {ref}`output`).
+  {ref}`manual-output`).
 - `-s, --macro-substitutions` – provide `key=value` pairs that will be expanded
   as Geant4 aliases in macros.
 
