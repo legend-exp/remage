@@ -40,7 +40,7 @@ class G4UIExecutive;
 /**
  * @brief Main manager class for the remage simulation.
  *
- * This class initializes and manages the Geant4 run manager, visualization,
+ * This singleton class initializes and manages the Geant4 run manager, visualization,
  * detector construction, physics list, and user actions. It also handles global
  * configurations such as random engine settings and logging.
  */
@@ -51,6 +51,7 @@ class RMGManager {
     RMGManager() = delete;
     /**
      * @brief Constructs a new RMGManager object.
+     * @details This constructor has to be called by the user, but can only be called once.
      * @param app_name The application name.
      * @param argc Argument count.
      * @param argv Argument vector.
@@ -157,22 +158,28 @@ class RMGManager {
     void SetPrintModulo(int n_ev) { fPrintModulo = n_ev > 0 ? n_ev : -1; }
 
     /**
-     * @brief Includes a macro file for execution.
+     * @brief Includes a macro or single macro command file for execution.
      * @param filename The name of the macro file.
      */
     void IncludeMacroFile(std::string filename) { fMacroFilesOrContents.emplace_back(filename); }
     /**
-     * @brief Registers a Geant4 alias.
+     * @brief Registers a Geant4 alias for use in macro commands.
      * @param alias The alias name.
      * @param value The corresponding value.
      */
     void RegisterG4Alias(std::string alias, std::string value) { fG4Aliases.emplace(alias, value); }
     /**
-     * @brief Initializes the simulation components.
+     * @brief Initialize the simulation components (run manager, visualization, random engine,
+     * detector construction, physics list, ...).
+     * @details This does not call \ref G4RunManager::Initialize which remains the user's
+     * responsibility (i.e., by using the macro command @c /run/initialize)
      */
     void Initialize();
     /**
-     * @brief Executes the simulation run.
+     * @brief Executes the supplied macro files and commands and switch to interactive session if
+     * requested.
+     * @details This does not actually start the simulation runs; that has to be done with macro
+     * commands or by calling int \ref G4RunManager.
      */
     void Run();
 
@@ -206,7 +213,7 @@ class RMGManager {
      */
     [[nodiscard]] bool GetRandIsControlled() const { return fIsRandControlled; }
     /**
-     * @brief Checks if a random engine has been selected.
+     * @brief Checks if a random engine has been selected by the user.
      * @return True if a random engine is selected.
      */
     [[nodiscard]] bool GetRandEngineSelected() const { return !fRandEngineName.empty(); }
@@ -242,7 +249,7 @@ class RMGManager {
     }
 
     /**
-     * @brief Gracefully aborts the simulation run.
+     * @brief Set a flag to gracefully aborts the simulation run at the next possible time.
      */
     static void AbortRunGracefully() {
       if (!fAbortRun.is_lock_free()) return;
