@@ -208,7 +208,7 @@ class RMGManager {
      */
     bool ApplyRandEngineForCurrentThread();
     /**
-     * @brief Checks if the random engine is under controlled seeding.
+     * @brief Checks if the random engine is under user controlled seeding.
      * @return True if controlled.
      */
     [[nodiscard]] bool GetRandIsControlled() const { return fIsRandControlled; }
