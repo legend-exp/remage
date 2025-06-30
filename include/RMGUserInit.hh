@@ -39,6 +39,9 @@
  * This class manages user-defined actions, output schemes, and generator configuration
  * for the remage simulation. It provides methods to add stepping actions, tracking actions,
  * output schemes, and to configure the user generator.
+ *
+ * @details This class does not manage instances, but stores arguments that will be forwarded
+ * several times to initialize the user-defined actions on all worker threads.
  */
 class RMGUserInit {
 

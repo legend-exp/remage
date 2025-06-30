@@ -251,9 +251,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         size_t max_num_intersections = 0;
     };
 
-    /** A collection of @c SampleableObjects . Can be used
-     * to sample from by selecting a volume weighted by surface area
-     * or volume.
+    /** @brief A collection of \c SampleableObject objects. It can be used
+     * to sample from by selecting a volume weighted by surface area or volume.
      */
     struct SampleableObjectCollection {
 
@@ -271,7 +270,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
-        // emulate std::vector
+        // emulate \c std::vector
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         template<typename... Args> void emplace_back(Args&&... args);
