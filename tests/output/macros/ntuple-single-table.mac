@@ -2,6 +2,10 @@
 /RMG/Geometry/RegisterDetector Scintillator scint2 2
 /RMG/Geometry/RegisterDetector Germanium det1 11
 /RMG/Geometry/RegisterDetector Germanium det2 12
+/RMG/Geometry/RegisterDetector Optical optdet1 101
+/RMG/Geometry/RegisterDetector Optical optdet2 102
+
+/RMG/Processes/OpticalPhysics true
 
 /control/execute macros/_init.mac
 
@@ -15,4 +19,4 @@
 /gps/particle gamma
 /gps/energy 200 keV
 
-/run/beamOn 50
+/run/beamOn 1000
