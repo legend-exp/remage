@@ -1,5 +1,5 @@
 /
-├── stp · struct{germanium,scintillator} 
+├── stp · struct{germanium,optical,scintillator} 
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -27,6 +27,18 @@
 │   │   └── zloc · array<1>{array<1>{real}} 
 │   │       ├── cumulative_length · array<1>{real} 
 │   │       └── flattened_data · array<1>{real} ── {'units': 'm'}
+│   ├── optical · table{det_uid,evtid,t0,time,wavelength} 
+│   │   ├── det_uid · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} 
+│   │   ├── evtid · array<1>{real} 
+│   │   ├── t0 · array<1>{real} ── {'units': 'ns'}
+│   │   ├── time · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'ns'}
+│   │   └── wavelength · array<1>{array<1>{real}} 
+│   │       ├── cumulative_length · array<1>{real} 
+│   │       └── flattened_data · array<1>{real} ── {'units': 'nm'}
 │   └── scintillator · table{det_uid,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │       ├── det_uid · array<1>{array<1>{real}} 
 │       │   ├── cumulative_length · array<1>{real} 
@@ -51,7 +63,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': 'None', 'tables': "['stp/germanium', 'stp/scintillator']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': 'None', 'tables': "['stp/germanium', 'stp/optical', 'stp/scintillator']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 
