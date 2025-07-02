@@ -74,13 +74,7 @@ def post_proc(
         log.info(msg)
 
         # registered scintillator or germanium detectors
-        registered_detectors = list(
-            {
-                det[1]
-                for det in detector_info
-                if det[0] in ("RMGGermaniumOutputScheme", "RMGScintillatorOutputScheme")
-            }
-        )
+        registered_detectors = list({det[1] for det in detector_info})
 
         # extract the additional tables in the output file (not detectors)
         extra_tables = list({det[1] for det in detector_info_aux})
