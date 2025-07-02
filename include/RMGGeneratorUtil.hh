@@ -51,46 +51,46 @@ namespace RMGGeneratorUtil {
   G4ThreeVector rand(const G4VSolid* solid, bool on_surface = false);
 
   /**
-   * @brief Generate a random point in or on the surface of a \c G4Box.
+   * @brief Generate a random point in or on the surface of a @c G4Box.
    *
    * Calculates a random 3D point either inside the box or on one of its surfaces.
    *
-   * @param box Pointer to the \c G4Box.
+   * @param box Pointer to the @c G4Box.
    * @param on_surface If true, the point lies on the box's surface; if false, it lies within the volume.
-   * @return A random point as \c G4ThreeVector.
+   * @return A random point as @c G4ThreeVector.
    */
   G4ThreeVector rand(const G4Box*, bool on_surface = false);
 
   /**
-   * @brief Generate a random point in or on the surface of a \c G4Sphere.
+   * @brief Generate a random point in or on the surface of a @c G4Sphere.
    *
    * Uses spherical coordinate sampling to generate a point either inside the sphere or exactly on its surface.
    *
-   * @param sphere Pointer to the \c G4Sphere.
+   * @param sphere Pointer to the @c G4Sphere.
    * @param on_surface If true, sample on the sphere's surface; otherwise, inside it.
-   * @return A random point as \c G4ThreeVector.
+   * @return A random point as @c G4ThreeVector.
    */
   G4ThreeVector rand(const G4Sphere*, bool on_surface = false);
 
   /**
-   * @brief Generate a random point in or on the surface of a \c G4Orb.
+   * @brief Generate a random point in or on the surface of a @c G4Orb.
    *
    * Uses appropriate methods to sample a point within or on the outer surface of the orb.
    *
-   * @param orb Pointer to the \c G4Orb.
+   * @param orb Pointer to the @c G4Orb.
    * @param on_surface If true, sample a point on the surface; otherwise, inside the volume.
-   * @return A random point as \c G4ThreeVector.
+   * @return A random point as @c G4ThreeVector.
    */
   G4ThreeVector rand(const G4Orb*, bool on_surface = false);
 
   /**
-   * @brief Generate a random point in or on the surface of a \c G4Tubs (cylindrical tube).
+   * @brief Generate a random point in or on the surface of a @c G4Tubs (cylindrical tube).
    *
    * Handles random point generation for cylindrical shapes, accounting for inner and outer radii.
    *
-   * @param tub Pointer to the \c G4Tubs.
+   * @param tub Pointer to the @c G4Tubs.
    * @param on_surface If true, sample on the surface; if false, sample within the volume.
-   * @return A random point as \c G4ThreeVector.
+   * @return A random point as @c G4ThreeVector.
    */
   G4ThreeVector rand(const G4Tubs*, bool on_surface = false);
 } // namespace RMGGeneratorUtil

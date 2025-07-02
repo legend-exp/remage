@@ -74,13 +74,13 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     /**
      * @brief Get the current primary generator.
      *
-     * @return Pointer to the configured \ref RMGVGenerator instance.
+     * @return Pointer to the configured @ref RMGVGenerator instance.
      */
     RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
     /**
      * @brief Get the current vertex generator.
      *
-     * @return Pointer to the configured \ref RMGVVertexGenerator instance.
+     * @return Pointer to the configured @ref RMGVVertexGenerator instance.
      */
     RMGVVertexGenerator* GetVertexGenerator() { return fVertexGeneratorObj.get(); }
     /**
@@ -114,7 +114,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
      * This method allows the registration of a custom generator.
      * The user-defined generator pointer is owned by the manager.
      *
-     * @param gen Pointer to an instance of a custom \ref RMGVGenerator.
+     * @param gen Pointer to an instance of a custom @ref RMGVGenerator.
      */
     void SetUserGenerator(RMGVGenerator* gen);
     /**

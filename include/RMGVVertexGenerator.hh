@@ -61,7 +61,7 @@ class RMGVVertexGenerator {
      * If vertex generation is not implemented, @p v is set to a dummy position (0,0,0)
      * and the function returns false.
      *
-     * @param v Reference to the \c G4ThreeVector to hold the generated vertex.
+     * @param v Reference to the @c G4ThreeVector to hold the generated vertex.
      * @return True if a valid vertex was generated, false otherwise.
      */
     virtual bool GenerateVertex(G4ThreeVector& v) {

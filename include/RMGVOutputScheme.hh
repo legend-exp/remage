@@ -50,10 +50,8 @@ class RMGVOutputScheme {
      *
      * This function is called during run initialization to create and assign
      * output column names for the analysis manager.
-     *
-     * @param ana_man Pointer to the @c G4AnalysisManager.
      */
-    virtual void AssignOutputNames(G4AnalysisManager* ana_man) {}
+    virtual void AssignOutputNames(G4AnalysisManager*) {}
 
     // functions for individual events.
     /**
@@ -69,10 +67,9 @@ class RMGVOutputScheme {
      * This function is called at the end of each event. It can be used to filter out events
      * that do not meet specified criteria.
      *
-     * @param event Pointer to the \c G4Event.
      * @return True if the event should be discarded, false otherwise.
      */
-    virtual bool ShouldDiscardEvent(const G4Event* event) { return false; }
+    virtual bool ShouldDiscardEvent(const G4Event*) { return false; }
     /**
      * @brief Indicates whether the output scheme always stores event data.
      *
@@ -88,10 +85,8 @@ class RMGVOutputScheme {
      *
      * This function is invoked at the end of an event to store the output data in the persistent
      * file. Derived classes should implement how event data is recorded.
-     *
-     * @param event Pointer to the \c G4Event.
      */
-    virtual void StoreEvent(const G4Event* event) {}
+    virtual void StoreEvent(const G4Event*) {}
 
     // hook into RMGStackingAction.
     /**
@@ -100,14 +95,12 @@ class RMGVOutputScheme {
      * This method allows the output scheme to classify tracks in the stacking action,
      * e.g. to discard or temporarily hold them.
      *
-     * @param aTrack Pointer to the \c G4Track being classified.
-     * @param stage The current stage index in the stacking process.
+     * @c aTrack is the pointer to the @c G4Track being classified.  @c stage
+     * is the current stage index in the stacking process.
+     *
      * @return An optional classification value; if empty, no classification is applied.
      */
-    virtual std::optional<G4ClassificationOfNewTrack> StackingActionClassify(
-        const G4Track* aTrack,
-        const int stage
-    ) {
+    virtual std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, const int) {
       return std::nullopt;
     }
     /**
@@ -116,29 +109,26 @@ class RMGVOutputScheme {
      * Output schemes can use this method to determine whether waiting tracks should be cleared
      * as the stacking process advances to a new stage.
      *
-     * @param stage The new stacking stage index.
+     * @c stage is the new stacking stage index.
+     *
      * @return An optional boolean decision; if empty, no action is taken.
      */
-    virtual std::optional<bool> StackingActionNewStage(const int stage) { return std::nullopt; }
+    virtual std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
 
     // hook into G4TrackingAction.
     /**
      * @brief Hook called before tracking a new particle.
      *
      * Output schemes may use this to record any track-specific information required for output.
-     *
-     * @param aTrack Pointer to the \c G4Track that is about to be tracked.
      */
-    virtual void TrackingActionPre(const G4Track* aTrack) {};
+    virtual void TrackingActionPre(const G4Track*) {};
 
     /**
      * @brief Perform final actions at the end of a run.
      *
      * This function can be used by derived output schemes to finalize or write remaining data.
-     *
-     * @param run Pointer to the \c G4Run.
      */
-    virtual void EndOfRunAction(const G4Run* run) {};
+    virtual void EndOfRunAction(const G4Run*) {};
 
     // only to be called by the manager, before calling @ref AssignOutputNames.
     /**

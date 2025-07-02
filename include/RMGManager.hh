@@ -172,7 +172,7 @@ class RMGManager {
      * @brief Initialize the simulation components (run manager, visualization,
      * random engine, detector construction, physics list, ...).
      *
-     * @details This does not call@c Initialize() of \ref G4RunManager which
+     * @details This does not call @c Initialize() of @ref G4RunManager which
      * remains the user's responsibility (i.e., by using the macro command @c
      * /run/initialize)
      */
@@ -181,7 +181,7 @@ class RMGManager {
      * @brief Executes the supplied macro files and commands and switch to interactive session if
      * requested.
      * @details This does not actually start the simulation runs; that has to be done with macro
-     * commands or by calling int \ref G4RunManager.
+     * commands or by calling int @ref G4RunManager.
      */
     void Run();
 

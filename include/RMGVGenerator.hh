@@ -49,18 +49,14 @@ class RMGVGenerator {
      * @brief Called at the beginning of a run.
      *
      * Derived generators can perform any necessary initialization in this method.
-     *
-     * @param run Pointer to the \c G4Run.
      */
-    virtual void BeginOfRunAction(const G4Run* run) {};
+    virtual void BeginOfRunAction(const G4Run*) {};
     /**
      * @brief Called at the end of a run.
      *
      * Derived generators can perform any necessary finalization in this method.
-     *
-     * @param run Pointer to the \c G4Run.
      */
-    virtual void EndOfRunAction(const G4Run* run) {};
+    virtual void EndOfRunAction(const G4Run*) {};
 
     /**
      * @brief Set the primary vertex position.
@@ -75,9 +71,9 @@ class RMGVGenerator {
      * @brief Generate primary particles for an event.
      *
      * Derived generators must implement this method to create primary particles
-     * and add them to the given \c G4Event.
+     * and add them to the given @c G4Event.
      *
-     * @param event Pointer to the \c G4Event.
+     * @param event Pointer to the @c G4Event.
      */
     virtual void GeneratePrimaries(G4Event* event) = 0;
 

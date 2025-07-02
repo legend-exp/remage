@@ -122,7 +122,7 @@ class RMGUserInit {
     /**
      * @brief Adds an optional output scheme of type T with a given name.
      * @details These additional output schemes can be activated with
-     * \ref RMGManager::ActivateOptionalOutputScheme.
+     * @ref RMGManager::ActivateOptionalOutputScheme.
      *
      * @tparam T Derived type of RMGVOutputScheme.
      * @param name The key under which the scheme will be stored.

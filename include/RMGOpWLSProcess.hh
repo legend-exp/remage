@@ -20,10 +20,10 @@
 /**
  * @brief A wrapper for the Geant4 optical wavelength shifting (WLS) process.
  *
- * This class extends \c G4WrapperProcess to customize the behavior of the standard
- * \c G4OpWLS process. It uses a material property \c RMG_WLSMEANNUMBERPHOTONS to control
+ * This class extends @c G4WrapperProcess to customize the behavior of the standard
+ * @c G4OpWLS process. It uses a material property @c RMG_WLSMEANNUMBERPHOTONS to control
  * the mean number of emitted photons and prevents the default Poissonian sampling by
- * replacing the original \c WLSMEANNUMBERPHOTONS property.
+ * replacing the original @c WLSMEANNUMBERPHOTONS property.
  */
 
 #include "G4ParticleDefinition.hh"
