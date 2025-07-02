@@ -53,7 +53,7 @@ class RMGVOutputScheme {
      *
      * @param ana_man Pointer to the @c G4AnalysisManager.
      */
-    virtual void AssignOutputNames(G4AnalysisManager*) {}
+    virtual void AssignOutputNames(G4AnalysisManager* ana_man) {}
 
     // functions for individual events.
     /**
@@ -72,7 +72,7 @@ class RMGVOutputScheme {
      * @param event Pointer to the \c G4Event.
      * @return True if the event should be discarded, false otherwise.
      */
-    virtual bool ShouldDiscardEvent(const G4Event*) { return false; }
+    virtual bool ShouldDiscardEvent(const G4Event* event) { return false; }
     /**
      * @brief Indicates whether the output scheme always stores event data.
      *
@@ -91,7 +91,7 @@ class RMGVOutputScheme {
      *
      * @param event Pointer to the \c G4Event.
      */
-    virtual void StoreEvent(const G4Event*) {}
+    virtual void StoreEvent(const G4Event* event) {}
 
     // hook into RMGStackingAction.
     /**
@@ -104,7 +104,10 @@ class RMGVOutputScheme {
      * @param stage The current stage index in the stacking process.
      * @return An optional classification value; if empty, no classification is applied.
      */
-    virtual std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, const int) {
+    virtual std::optional<G4ClassificationOfNewTrack> StackingActionClassify(
+        const G4Track* aTrack,
+        const int stage
+    ) {
       return std::nullopt;
     }
     /**
@@ -116,7 +119,7 @@ class RMGVOutputScheme {
      * @param stage The new stacking stage index.
      * @return An optional boolean decision; if empty, no action is taken.
      */
-    virtual std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
+    virtual std::optional<bool> StackingActionNewStage(const int stage) { return std::nullopt; }
 
     // hook into G4TrackingAction.
     /**
@@ -126,7 +129,7 @@ class RMGVOutputScheme {
      *
      * @param aTrack Pointer to the \c G4Track that is about to be tracked.
      */
-    virtual void TrackingActionPre(const G4Track*) {};
+    virtual void TrackingActionPre(const G4Track* aTrack) {};
 
     /**
      * @brief Perform final actions at the end of a run.
@@ -135,7 +138,7 @@ class RMGVOutputScheme {
      *
      * @param run Pointer to the \c G4Run.
      */
-    virtual void EndOfRunAction(const G4Run*) {};
+    virtual void EndOfRunAction(const G4Run* run) {};
 
     // only to be called by the manager, before calling @ref AssignOutputNames.
     /**

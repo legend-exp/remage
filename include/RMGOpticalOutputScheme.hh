@@ -30,7 +30,7 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
     RMGOpticalOutputScheme();
 
-    void AssignOutputNames(G4AnalysisManager* ana_man) override;
+    void AssignOutputNames(G4AnalysisManager*) override;
     void StoreEvent(const G4Event*) override;
 
   protected:

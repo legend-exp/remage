@@ -33,7 +33,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
 
     RMGTrackOutputScheme();
 
-    void AssignOutputNames(G4AnalysisManager* ana_man) override;
+    void AssignOutputNames(G4AnalysisManager*) override;
     void TrackingActionPre(const G4Track*) override;
     void EndOfRunAction(const G4Run*) override;
 

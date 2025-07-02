@@ -169,10 +169,12 @@ class RMGManager {
      */
     void RegisterG4Alias(std::string alias, std::string value) { fG4Aliases.emplace(alias, value); }
     /**
-     * @brief Initialize the simulation components (run manager, visualization, random engine,
-     * detector construction, physics list, ...).
-     * @details This does not call \ref G4RunManager::Initialize which remains the user's
-     * responsibility (i.e., by using the macro command @c /run/initialize)
+     * @brief Initialize the simulation components (run manager, visualization,
+     * random engine, detector construction, physics list, ...).
+     *
+     * @details This does not call@c Initialize() of \ref G4RunManager which
+     * remains the user's responsibility (i.e., by using the macro command @c
+     * /run/initialize)
      */
     void Initialize();
     /**

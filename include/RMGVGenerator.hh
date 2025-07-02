@@ -52,7 +52,7 @@ class RMGVGenerator {
      *
      * @param run Pointer to the \c G4Run.
      */
-    virtual void BeginOfRunAction(const G4Run*) {};
+    virtual void BeginOfRunAction(const G4Run* run) {};
     /**
      * @brief Called at the end of a run.
      *
@@ -60,7 +60,7 @@ class RMGVGenerator {
      *
      * @param run Pointer to the \c G4Run.
      */
-    virtual void EndOfRunAction(const G4Run*) {};
+    virtual void EndOfRunAction(const G4Run* run) {};
 
     /**
      * @brief Set the primary vertex position.
@@ -79,7 +79,7 @@ class RMGVGenerator {
      *
      * @param event Pointer to the \c G4Event.
      */
-    virtual void GeneratePrimaries(G4Event*) = 0;
+    virtual void GeneratePrimaries(G4Event* event) = 0;
 
     void SetReportingFrequency(int freq) { fReportingFrequency = freq; }
     std::string GetGeneratorName() { return fGeneratorName; }

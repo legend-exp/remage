@@ -48,7 +48,7 @@ namespace RMGGeneratorUtil {
    * @param on_surface If true, sample a point on the surface; otherwise, inside the solid.
    * @return A random point as @c G4ThreeVector.
    */
-  G4ThreeVector rand(const G4VSolid*, bool on_surface = false);
+  G4ThreeVector rand(const G4VSolid* solid, bool on_surface = false);
 
   /**
    * @brief Generate a random point in or on the surface of a \c G4Box.

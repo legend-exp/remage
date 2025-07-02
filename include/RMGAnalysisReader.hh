@@ -67,13 +67,13 @@ class RMGAnalysisReader final {
         }
 
         /**
-         * @brief wraps @ref G4VAnalysisReader::GetNtupleRow. */
+         * @brief wraps @c GetNtupleRow() of @ref G4VAnalysisReader. */
         [[nodiscard]] auto GetNtupleRow() {
           AssertSetup(false);
           return fReader->GetNtupleRow(fNtupleId);
         }
         /**
-         * @brief wraps @ref G4VAnalysisReader::SetNtupleDColumn. */
+         * @brief wraps @c SetNtupleDColumn() of @ref G4VAnalysisReader. */
         auto SetNtupleDColumn(
             const std::string& name,
             G4double& value,
@@ -84,7 +84,7 @@ class RMGAnalysisReader final {
           return fReader->SetNtupleDColumn(fNtupleId, name, value);
         }
         /**
-         * @brief wraps @ref G4VAnalysisReader::SetNtupleFColumn. */
+         * @brief wraps @c SetNtupleFColumn() of @ref G4VAnalysisReader. */
         auto SetNtupleFColumn(
             const std::string& name,
             G4float& value,
@@ -95,7 +95,7 @@ class RMGAnalysisReader final {
           return fReader->SetNtupleFColumn(fNtupleId, name, value);
         }
         /**
-         * @brief wraps @ref G4VAnalysisReader::SetNtupleIColumn. */
+         * @brief wraps @c SetNtupleIColumn() of @ref G4VAnalysisReader. */
         auto SetNtupleIColumn(
             const std::string& name,
             G4int& value,

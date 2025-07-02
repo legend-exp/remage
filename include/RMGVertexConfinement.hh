@@ -100,9 +100,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * volume(s) to the list of volumes to consider for sampling.
      *
      * @param name The name of the physical volume or a regular expression
-     * supported by \ref std::regex
+     * supported by @c std::regex
      * @param copy_nr The copy number of the physical volume or a regular
-     * expression supported by \ref std::regex
+     * expression supported by @c std::regex
      */
     void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr = ".*");
 

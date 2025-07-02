@@ -53,7 +53,7 @@ class RMGOpWLSProcess : public G4WrapperProcess {
     /**
      * @brief Applies the custom optical WLS process in the post-step of a track.
      *
-     * This method overrides \ref G4WrapperProcess::PostStepDoIt. It first calls the registered
+     * This method overrides @c PostStepDoIt() of @ref G4WrapperProcess. It first calls the registered
      * process's @c PostStepDoIt() to obtain the default particle change. If the returned result
      * indicates that no secondary photon has been produced and the track is stopped, the result
      * is returned unchanged. Otherwise, the method samples a random number compared to the material
