@@ -1,3 +1,5 @@
+(manual-containers)=
+
 # Software containers
 
 _remage_ is distributed via pre-built Docker container images. The images are

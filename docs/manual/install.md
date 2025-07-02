@@ -1,4 +1,4 @@
-(install)=
+(manual-install)=
 
 # Installation
 
@@ -21,8 +21,9 @@ $ apptainer build remage_latest.sif docker://legendexp/remage:latest
 $ apptainer run remage_latest.sif --help
 ```
 
-If containers do not work for you, see the next section to learn how to build
-and install from source.
+More information is available in {ref}`manual-containers`. If containers do not
+work for you, see the next section to learn how to build and install from
+source.
 
 ## Building from source
 

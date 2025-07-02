@@ -30,7 +30,7 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
 
     RMGVertexOutputScheme();
 
-    void AssignOutputNames(G4AnalysisManager* ana_man) override;
+    void AssignOutputNames(G4AnalysisManager*) override;
     void StoreEvent(const G4Event*) override;
 
     // always store vertex data, so that results are not skewed if events are discarded.

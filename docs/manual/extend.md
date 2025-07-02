@@ -1,3 +1,5 @@
+(manual-extending)=
+
 # Extending _remage_
 
 Advanced applications can extend _remage_ and link against `libremage` with the

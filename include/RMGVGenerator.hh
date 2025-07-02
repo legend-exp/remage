@@ -24,6 +24,12 @@
 
 class G4Event;
 class G4Run;
+/**
+ * @brief Abstract base class for primary generators.
+ *
+ * This class defines the interface for generators that create the primary
+ * particle(s) and set their vertex position(s) for a simulation event.
+ */
 class RMGVGenerator {
 
   public:
@@ -39,11 +45,37 @@ class RMGVGenerator {
     RMGVGenerator(RMGVGenerator&&) = delete;
     RMGVGenerator& operator=(RMGVGenerator&&) = delete;
 
+    /**
+     * @brief Called at the beginning of a run.
+     *
+     * Derived generators can perform any necessary initialization in this method.
+     */
     virtual void BeginOfRunAction(const G4Run*) {};
+    /**
+     * @brief Called at the end of a run.
+     *
+     * Derived generators can perform any necessary finalization in this method.
+     */
     virtual void EndOfRunAction(const G4Run*) {};
 
+    /**
+     * @brief Set the primary vertex position.
+     *
+     * This pure virtual method must be implemented by derived classes to set the
+     * primary vertex position for the generator.
+     *
+     * @param vec The desired primary vertex position.
+     */
     virtual void SetParticlePosition(G4ThreeVector vec) = 0;
-    virtual void GeneratePrimaries(G4Event*) = 0;
+    /**
+     * @brief Generate primary particles for an event.
+     *
+     * Derived generators must implement this method to create primary particles
+     * and add them to the given @c G4Event.
+     *
+     * @param event Pointer to the @c G4Event.
+     */
+    virtual void GeneratePrimaries(G4Event* event) = 0;
 
     void SetReportingFrequency(int freq) { fReportingFrequency = freq; }
     std::string GetGeneratorName() { return fGeneratorName; }

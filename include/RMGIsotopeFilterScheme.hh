@@ -41,9 +41,9 @@ class RMGIsotopeFilterScheme : public RMGVOutputScheme {
     RMGIsotopeFilterScheme();
 
     bool ShouldDiscardEvent(const G4Event*) override;
-    std::optional<bool> StackingActionNewStage(int) override;
-    std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
-    void TrackingActionPre(const G4Track* aTrack) override;
+    std::optional<bool> StackingActionNewStage(int stage) override;
+    std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int stage) override;
+    void TrackingActionPre(const G4Track*) override;
 
     void AddIsotope(int a, int z) { fIsotopes.insert({a, z}); }
 

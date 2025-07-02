@@ -352,9 +352,6 @@ void RMGManager::SetRandSystemEntropySeed() {
   auto rand_seed = dist(rd);
   CLHEP::HepRandom::setTheSeed(rand_seed);
   RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
-
-  // TODO: does this make sense?
-  fIsRandControlled = true;
 }
 
 void RMGManager::DefineCommands() {

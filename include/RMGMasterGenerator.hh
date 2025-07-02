@@ -29,21 +29,27 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
   public:
 
+    /**
+     * @brief Enumeration for specifying the primary vertex confinement strategy.
+     */
     enum class Confinement {
-      kUnConfined,
-      kVolume,
-      kFromFile,
+      kUnConfined, ///< No confinement is applied here; the generator has the duty to sample a primary vertex.
+      kVolume,  ///< The primary vertex is confined to a specific detector volume.
+      kFromFile ///< The primary vertex is read from an external file.
     };
 
+    /**
+     * @brief Enumeration for selecting the primary generator mode.
+     */
     enum class Generator {
-      kG4gun,
-      kGPS,
-      kBxDecay0,
-      kFromFile,
-      kCosmicMuons,
-      kMUSUNCosmicMuons,
-      kUserDefined,
-      kUndefined
+      kG4gun,            ///< The standard Geant4 particle gun.
+      kGPS,              ///< The Geant4 General Particle Source.
+      kBxDecay0,         ///< The BxDecay0 generator for double beta decay processes.
+      kFromFile,         ///< A generator that reads primary vertex data from an external file.
+      kCosmicMuons,      ///< A simple cosmic muon generator.
+      kMUSUNCosmicMuons, ///< The MUSUN-based cosmic muon generator.
+      kUserDefined,      ///< A user-specified custom generator.
+      kUndefined         ///< Undefined generator mode.
     };
 
     RMGMasterGenerator();
@@ -54,16 +60,81 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
     RMGMasterGenerator(RMGMasterGenerator&&) = delete;
     RMGMasterGenerator& operator=(RMGMasterGenerator&&) = delete;
 
+    /**
+     * @brief Generate primary vertices for the event.
+     *
+     * This method delegates the creation of primary vertices to the configured generator.
+     * Depending on the selected generator mode (e.g. G4gun, GPS, BxDecay0, CosmicMuons, etc.),
+     * it produces one or more primary vertices for the event.
+     *
+     * @param event Pointer to the @c G4Event to which the primary vertices will be added.
+     */
     void GeneratePrimaries(G4Event* event) override;
 
+    /**
+     * @brief Get the current primary generator.
+     *
+     * @return Pointer to the configured @ref RMGVGenerator instance.
+     */
     RMGVGenerator* GetGenerator() { return fGeneratorObj.get(); }
+    /**
+     * @brief Get the current vertex generator.
+     *
+     * @return Pointer to the configured @ref RMGVVertexGenerator instance.
+     */
     RMGVVertexGenerator* GetVertexGenerator() { return fVertexGeneratorObj.get(); }
+    /**
+     * @brief Retrieve the current vertex confinement strategy.
+     *
+     * @return The currently selected Confinement mode (@c kUnConfined, @c
+     * kVolume, or @c kFromFile).
+     */
     [[nodiscard]] Confinement GetConfinement() const { return fConfinement; }
 
+    /**
+     * @brief Set the primary vertex confinement strategy.
+     *
+     * The confinement strategy determines how the primary vertex is generated, for example
+     * whether to generate it from a detector volume or to load it from an input file.
+     *
+     * @param code The Confinement mode to set.
+     */
     void SetConfinement(Confinement code);
+    /**
+     * @brief Set the vertex confinement strategy using a string.
+     *
+     * The provided string is converted to a Confinement enum value.
+     *
+     * @param code The string specifying the confinement mode (e.g., "kUnConfined", "kVolume", "kFromFile").
+     */
     void SetConfinementString(std::string code);
+    /**
+     * @brief Set a user-defined primary generator.
+     *
+     * This method allows the registration of a custom generator.
+     * The user-defined generator pointer is owned by the manager.
+     *
+     * @param gen Pointer to an instance of a custom @ref RMGVGenerator.
+     */
     void SetUserGenerator(RMGVGenerator* gen);
+    /**
+     * @brief Select one of the built-in primary generator modes.
+     *
+     * This method sets the generator mode (e.g., @c kG4gun, @c kGPS, @c
+     * kBxDecay0, @c kCosmicMuons, etc.)
+     * to be used when generating primary vertices.
+     *
+     * @param gen The generator mode to use.
+     */
     void SetGenerator(Generator gen);
+    /**
+     * @brief Set the primary generator mode using a string.
+     *
+     * The method converts the provided string into a Generator enum value.
+     *
+     * @param gen The string representing the generator type (e.g., "kG4gun", "kGPS",
+     *            "kBxDecay0", "kCosmicMuons", "kMUSUNCosmicMuons", etc.).
+     */
     void SetGeneratorString(std::string gen);
 
   private:

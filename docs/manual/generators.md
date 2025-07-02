@@ -48,7 +48,7 @@ Particle Source (`G4GeneralParticleSource`, GPS).
 
 These commands allow to generate the position's and kinematics of primary
 particles. In most cases we will use in-built _remage_ commands for the
-positions (see {ref}`manual-confine`).
+positions (see {ref}`manual-confinement`).
 
 However, for the kinematics the GPS commands are often sufficient, for example
 to generate electrons with a fixed energy and isotropic direction we can use the
@@ -165,8 +165,8 @@ This mechanism can be used to select arbitrary sections of decay chains!
 ## Double-beta decay physics
 
 To generate double beta decay physics we interface with the _bxdecay0_ package.
-This requires _remage_ to be build with _bxdecay0_ support see {ref}`install`.
-The main documentation for this extension is available
+This requires _remage_ to be build with _bxdecay0_ support see
+{ref}`manual-install`. The main documentation for this extension is available
 [here](https://github.com/BxCppDev/bxdecay0).
 
 The macro [command](project:../rmg-commands.md#rmggeneratorselect):

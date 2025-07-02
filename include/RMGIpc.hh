@@ -46,12 +46,12 @@ class RMGIpc final {
 
     /** @brief Send a non-blocking IPC message.
      *  @details The message is a UTF-8 encoded buffer that already contains the message
-     *  structure, such as \ref CreateMessage.
+     *  structure, such as @ref CreateMessage.
      */
     static bool SendIpcNonBlocking(std::string msg);
     /** @brief Send a blocking IPC message.
      *  @details The message is a UTF-8 encoded buffer that already contains the message
-     *  structure, such as \ref CreateMessage.
+     *  structure, such as @ref CreateMessage.
      */
     static bool SendIpcBlocking(std::string msg);
 

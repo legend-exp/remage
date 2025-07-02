@@ -27,6 +27,13 @@
 #include "G4UImessenger.hh"
 
 class G4Run;
+/**
+ * @brief Abstract base class for vertex generators.
+ *
+ * This class defines the interface for generating primary vertex positions in a simulation run.
+ * It provides hooks for run initialization (begin/end) and for generating a vertex.
+ * When BxDecay0 is available, it implements the @c bxdecay0::VertexGeneratorInterface.
+ */
 #if RMG_HAS_BXDECAY0
 class RMGVVertexGenerator : public bxdecay0_g4::VertexGeneratorInterface {
 #else
@@ -47,11 +54,33 @@ class RMGVVertexGenerator {
     virtual void BeginOfRunAction(const G4Run*) {};
     virtual void EndOfRunAction(const G4Run*) {};
 
+    /**
+     * @brief Generate a primary vertex position.
+     *
+     * Fills the provided vector @p v with the generated primary vertex position.
+     * If vertex generation is not implemented, @p v is set to a dummy position (0,0,0)
+     * and the function returns false.
+     *
+     * @param v Reference to the @c G4ThreeVector to hold the generated vertex.
+     * @return True if a valid vertex was generated, false otherwise.
+     */
     virtual bool GenerateVertex(G4ThreeVector& v) {
       v = kDummyPrimaryPosition;
       return false;
     }
+    /**
+     * @brief Set the maximum number of attempts for vertex generation.
+     *
+     * This controls how many iterations the generator will perform before giving up.
+     *
+     * @param val The maximum number of attempts.
+     */
     void SetMaxAttempts(int val) { fMaxAttempts = val; }
+    /**
+     * @brief Get the maximum number of attempts for vertex generation.
+     *
+     * @return The maximum number of attempts.
+     */
     [[nodiscard]] int GetMaxAttempts() const { return fMaxAttempts; }
 
 #if RMG_HAS_BXDECAY0

@@ -100,9 +100,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * volume(s) to the list of volumes to consider for sampling.
      *
      * @param name The name of the physical volume or a regular expression
-     * supported by \ref std::regex
+     * supported by @c std::regex
      * @param copy_nr The copy number of the physical volume or a regular
-     * expression supported by \ref std::regex
+     * expression supported by @c std::regex
      */
     void AddPhysicalVolumeNameRegex(std::string name, std::string copy_nr = ".*");
 
@@ -170,9 +170,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * or using rejection sampling. Either samples the volume or the surface depending
          * on the @c surface_sample member.
          * - For surface sampling mode the solid is either natively sampled (if this is
-         * implemented), or is sampled with \ref SampleableObject::GenerateSurfacePoint
+         * implemented), or is sampled with @ref SampleableObject::GenerateSurfacePoint
          * - For volume sampling, if the solid is not natively sampleable, points are generated in a
-         * bounding box and then rejection sampling is used using \ref SampleableObject::IsInside.
+         * bounding box and then rejection sampling is used using @ref SampleableObject::IsInside.
          *
          * @param vertex The sampled vertex.
          * @param max_attempts The maximum number of candidate vertices for rejection sampling.
@@ -251,9 +251,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         size_t max_num_intersections = 0;
     };
 
-    /** A collection of @c SampleableObjects . Can be used
-     * to sample from by selecting a volume weighted by surface area
-     * or volume.
+    /** @brief A collection of @c SampleableObject objects. It can be used
+     * to sample from by selecting a volume weighted by surface area or volume.
      */
     struct SampleableObjectCollection {
 
@@ -271,7 +270,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
-        // emulate std::vector
+        // emulate @c std::vector
         [[nodiscard]] size_t size() const { return data.size(); }
         SampleableObject& at(size_t i) { return data.at(i); }
         template<typename... Args> void emplace_back(Args&&... args);
