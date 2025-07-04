@@ -35,7 +35,7 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
   protected:
 
-    [[nodiscard]] std::string GetNtuplenameFlat() const override { return "optical"; }
+    [[nodiscard]] std::string GetNtupleNameFlat() const override { return "optical"; }
 
   private:
 
