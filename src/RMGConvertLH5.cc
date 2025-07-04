@@ -238,28 +238,33 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
 
     out_column_count++;
   }
-  
+
   // Check fNtupleMeta object for an entry whose second field matches the current ntuple name.
   for (const auto& item : fNtupleMeta) {
-      // item is a pair: item.first is an int, item.second is a std::pair<int, std::string>
-      if (item.second.second == ntuple_name) {
-          // form soft link name "detUID" where UID is item.second.first.
-          std::string soft_link_name = "det" + std::to_string(item.second.first);
-          // do not create if the soft link already exists.
-          if (!det_group.nameExists(soft_link_name)) {
-              // create a soft link to the current group itself.
-              herr_t err = H5Lcreate_soft(det_group.getObjName().c_str(), det_group.getId(),
-                                            soft_link_name.c_str(), H5P_DEFAULT, H5P_DEFAULT);
-              if (err < 0) {
-                  LH5Log(RMGLog::error, ntuple_log_prefix, "Failed to create soft link ", soft_link_name);
-              } else {
-                  LH5Log(RMGLog::detail, ntuple_log_prefix, "Created soft link ", soft_link_name);
-              }
-          }
-          break;
+    // item is a pair: item.first is an int, item.second is a std::pair<int, std::string>
+    if (item.second.second == ntuple_name) {
+      // form soft link name "detUID" where UID is item.second.first.
+      std::string soft_link_name = "det" + std::to_string(item.second.first);
+      // do not create if the soft link already exists.
+      if (!det_group.nameExists(soft_link_name)) {
+        // create a soft link to the current group itself.
+        herr_t err = H5Lcreate_soft(
+            det_group.getObjName().c_str(),
+            det_group.getId(),
+            soft_link_name.c_str(),
+            H5P_DEFAULT,
+            H5P_DEFAULT
+        );
+        if (err < 0) {
+          LH5Log(RMGLog::error, ntuple_log_prefix, "Failed to create soft link ", soft_link_name);
+        } else {
+          LH5Log(RMGLog::detail, ntuple_log_prefix, "Created soft link ", soft_link_name);
+        }
       }
+      break;
+    }
   }
-  
+
   if (out_column_count != expected_column_count || out_column_count != names_parts.size()) {
     LH5Log(RMGLog::error, ntuple_log_prefix, "column count mismatch");
     return false;
