@@ -392,19 +392,6 @@ output ntuples as a
 To use this feature, simply specify an output file with a `.lh5` extension, and
 _remage_ will perform the file conversion automatically.
 
-:::{note}
-
-Additionally, the standalone tool `remage-to-lh5` is provided to convert a
-default Geant4 HDF5 file to a LH5 file. With this, executing
-`remage -o output.lh5 [...]` is roughly equivalent to the combination of
-commands:
-
-```console
-$ remage -o output.hdf5 [...]
-$ remage-to-lh5 output.hdf5
-$ mv output.{hdf5,lh5}
-```
-
 If the LH5 output is selected, _remage_ performs some post-processing steps at
 the end of a simulation run such as re-organizing data into more meaningful
 structures or adding useful information.
