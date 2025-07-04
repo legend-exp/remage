@@ -105,11 +105,7 @@ class RMGOutputManager {
      * @brief Retrieves the set of registered ntuple detector identifiers.
      * @return Set of detector identifiers.
      */
-    std::set<int> GetNtupleNames() {
-      std::set<int> nt_names;
-      for (auto const& [k, v] : fNtupleIDs) nt_names.insert(k);
-      return nt_names;
-    }
+    const std::map<int, std::pair<int, std::string>>& GetNtupleIDs() { return fNtupleIDs; }
     /**
      * @brief Retrieves the set of registered auxiliary ntuple identifiers.
      * @return Set of auxiliary ntuple names.
@@ -222,7 +218,7 @@ class RMGOutputManager {
     /** @brief Mapping of detector UIDs assigned by remage to the Geant4 ntuple
      * IDs and the ntuple names (written to disk).
      *
-     * @detail Used for output tables that log stepping data in a certain
+     * @details Used for output tables that log stepping data in a certain
      * detector.
      *
      * @detail @code
@@ -234,7 +230,7 @@ class RMGOutputManager {
     /** @brief Mapping of auxiliary ntuple names to the corresponding Geant4
      * ntuple IDs.
      *
-     * @detail This is used to keep track of "auxiliary" tables that do not
+     * @details This is used to keep track of "auxiliary" tables that do not
      * refer to stepping data from a detector (see usage in @ref
      * RMGVertexOutputScheme or @c RMGTrackOutputScheme).
      *

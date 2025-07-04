@@ -305,6 +305,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     ntuple_success &= ConvertNTupleToTable(det_group);
     det_group.close();
 
+    // make a soft link
+
     // if this is an auxiliary table, move it one level up out of the group
     if (fAuxNtuples.find(ntuple) != fAuxNtuples.end()) {
       LH5Log(RMGLog::debug, "moving ntuple ", ntuple_group_name, "/", ntuple, " one group back");
@@ -353,10 +355,18 @@ bool RMGConvertLH5::ConvertToLH5(
     std::string hdf5_file_name,
     std::string ntuple_group_name,
     std::set<std::string> aux_ntuples,
+    const std::map<int, std::pair<int, std::string>>& ntuple_meta,
     bool dry_run,
     bool part_of_batch
 ) {
-  auto conv = RMGConvertLH5(hdf5_file_name, ntuple_group_name, aux_ntuples, dry_run, part_of_batch);
+  auto conv = RMGConvertLH5(
+      hdf5_file_name,
+      ntuple_group_name,
+      aux_ntuples,
+      ntuple_meta,
+      dry_run,
+      part_of_batch
+  );
   try {
     return conv.ConvertToLH5Internal();
   } catch (const H5::Exception& e) {
@@ -524,7 +534,7 @@ bool RMGConvertLH5::ConvertFromLH5(
     bool part_of_batch,
     std::map<std::string, std::map<std::string, std::string>>& units_map
 ) {
-  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, {}, dry_run, part_of_batch);
+  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, {}, {}, dry_run, part_of_batch);
   try {
     return conv.ConvertFromLH5Internal(units_map);
   } catch (const H5::Exception& e) {

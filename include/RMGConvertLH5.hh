@@ -38,6 +38,7 @@ class RMGConvertLH5 {
         std::string,
         std::string,
         std::set<std::string>,
+        const std::map<int, std::pair<int, std::string>>&,
         bool,
         bool part_of_batch = false
     );
@@ -57,11 +58,12 @@ class RMGConvertLH5 {
         std::string filename,
         std::string ntuple_group,
         std::set<std::string> aux_ntuples,
+        const std::map<int, std::pair<int, std::string>>& ntuple_meta,
         bool dry_run,
         bool part_of_batch
     )
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fAuxNtuples(aux_ntuples),
-          fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
+          fNtupleMeta(ntuple_meta), fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,6 +127,7 @@ class RMGConvertLH5 {
     std::string fHdf5FileName;
     std::string fNtupleGroupName;
     std::set<std::string> fAuxNtuples;
+    std::map<int, std::pair<int, std::string>> fNtupleMeta;
     bool fDryRun;
     bool fIsPartOfBatch;
 };
