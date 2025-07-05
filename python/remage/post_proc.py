@@ -79,6 +79,9 @@ def post_proc(
         # extract the additional tables in the output file (not detectors)
         extra_tables = list({det[1] for det in detector_info_aux})
 
+        # also forward links group
+        extra_tables.append(f"{det_tables_path}/__links__")
+
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward
             config = get_reboost_config(

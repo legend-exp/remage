@@ -239,32 +239,6 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
     out_column_count++;
   }
 
-  // Check fNtupleMeta object for an entry whose second field matches the current ntuple name.
-  for (const auto& item : fNtupleMeta) {
-    // item is a pair: item.first is an int, item.second is a std::pair<int, std::string>
-    if (item.second.second == ntuple_name) {
-      // form soft link name "detUID" where UID is item.second.first.
-      std::string soft_link_name = "det" + std::to_string(item.second.first);
-      // do not create if the soft link already exists.
-      if (!det_group.nameExists(soft_link_name)) {
-        // create a soft link to the current group itself.
-        herr_t err = H5Lcreate_soft(
-            det_group.getObjName().c_str(),
-            det_group.getId(),
-            soft_link_name.c_str(),
-            H5P_DEFAULT,
-            H5P_DEFAULT
-        );
-        if (err < 0) {
-          LH5Log(RMGLog::error, ntuple_log_prefix, "Failed to create soft link ", soft_link_name);
-        } else {
-          LH5Log(RMGLog::detail, ntuple_log_prefix, "Created soft link ", soft_link_name);
-        }
-      }
-      break;
-    }
-  }
-
   if (out_column_count != expected_column_count || out_column_count != names_parts.size()) {
     LH5Log(RMGLog::error, ntuple_log_prefix, "column count mismatch");
     return false;
@@ -318,12 +292,14 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     LH5Log(RMGLog::error, "not a remage HDF5 output file (invalid header)?");
     return false;
   }
-  LH5Log(RMGLog::detail, "Opened Geant4 HDF5 file ", fHdf5FileName);
+  LH5Log(RMGLog::detail, "opened Geant4 HDF5 file ", fHdf5FileName);
 
   // rework the ntuples to LGDO tables.
   auto ntuples_group = hfile.openGroup(ntuple_group_name);
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
+  std::string links_group_name = "__links__";
+  std::set<std::string> links;
   for (auto& ntuple : ntuples) {
     if (ntuple.empty()) LH5Log(RMGLog::fatal, "empty ntuple name, how is this possible?");
 
@@ -331,7 +307,39 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     ntuple_success &= ConvertNTupleToTable(det_group);
     det_group.close();
 
-    // make a soft link
+    // Check fNtupleMeta object for an entry whose second field matches the current ntuple name.
+    for (const auto& item : fNtupleMeta) {
+      // item is a pair: item.first is an int, item.second is a std::pair<int, std::string>
+      if (item.second.second == ntuple) {
+        // create group named "links"
+        if (!ExistsByType(ntuples_group, links_group_name, H5O_TYPE_GROUP)) {
+          auto links_group = ntuples_group.createGroup(links_group_name);
+          links_group.close();
+        }
+
+        // form soft link name "detUID" where UID is item.second.first.
+        auto soft_link_name = "uid" + std::to_string(item.second.first);
+        auto soft_link_name_full = ntuple_group_name + "/" + links_group_name + "/" + soft_link_name;
+        // do not create if the soft link already exists.
+        if (!ntuples_group.nameExists(soft_link_name)) {
+          // create a soft link to the current group itself.
+          herr_t err = H5Lcreate_soft(
+              ("/" + ntuple_group_name + "/" + ntuple).c_str(),
+              ntuples_group.getId(),
+              (links_group_name + "/" + soft_link_name).c_str(),
+              H5P_DEFAULT,
+              H5P_DEFAULT
+          );
+          links.insert(soft_link_name);
+          if (err < 0) {
+            LH5Log(RMGLog::error, "failed to create soft link ", soft_link_name_full);
+          } else {
+            LH5Log(RMGLog::detail, "created soft link ", soft_link_name_full);
+          }
+        }
+        break;
+      }
+    }
 
     // if this is an auxiliary table, move it one level up out of the group
     if (fAuxNtuples.find(ntuple) != fAuxNtuples.end()) {
@@ -352,6 +360,18 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
         "datatype",
         "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}"
     );
+  }
+
+  // make links group an LH5 struct
+  if (ExistsByType(ntuples_group, links_group_name, H5O_TYPE_GROUP)) {
+    auto links_group = ntuples_group.openGroup(links_group_name);
+    LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
+    SetStringAttribute(
+        links_group,
+        "datatype",
+        "struct{" + fmt::format("{}", fmt::join(links, ",")) + "}"
+    );
+    links_group.close();
   }
 
   if (ntuples_group.attrExists("type")) ntuples_group.removeAttr("type");
