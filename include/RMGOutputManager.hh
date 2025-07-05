@@ -221,7 +221,7 @@ class RMGOutputManager {
      * @details Used for output tables that log stepping data in a certain
      * detector.
      *
-     * @detail @code
+     * @code
      *   {uid, {ntuple_id, ntuple_name}}
      * @endcode
      */

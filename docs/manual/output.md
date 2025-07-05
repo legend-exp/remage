@@ -392,6 +392,8 @@ output ntuples as a
 To use this feature, simply specify an output file with a `.lh5` extension, and
 _remage_ will perform the file conversion automatically.
 
+:::{note}
+
 If the LH5 output is selected, _remage_ performs some post-processing steps at
 the end of a simulation run such as re-organizing data into more meaningful
 structures or adding useful information.
