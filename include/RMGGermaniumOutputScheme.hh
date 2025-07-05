@@ -113,7 +113,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
   protected:
 
-    [[nodiscard]] std::string GetNtuplenameFlat() const override { return "germanium"; }
+    [[nodiscard]] std::string GetNtupleNameFlat() const override { return "germanium"; }
 
   private:
 
