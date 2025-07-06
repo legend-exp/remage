@@ -125,6 +125,15 @@ def post_proc(
                         expand_refs=False,  # likewise for object-reference datasets
                     )
 
+                    # remove broken symlinks
+                    links_group = ouf[lh5_links_group_name]
+                    for link_name in links_group:
+                        link = links_group.get(link_name, getlink=True)
+                        if isinstance(link, h5py.SoftLink) and link.path not in ouf:
+                            msg = f"removing broken symlink {link_name} -> {link.path}"
+                            log.debug(msg)
+                            del links_group[link_name]
+
         # add a time-coincidence map to the output file(s)
         msg = "Computing and storing the TCM as /tcm"
         log.info(msg)
