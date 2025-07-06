@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,8 +299,11 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   auto ntuples_group = hfile.openGroup(ntuple_group_name);
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
+
   std::string links_group_name = "__links__";
   std::set<std::string> links;
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_links_group_name", links_group_name));
+
   for (auto& ntuple : ntuples) {
     if (ntuple.empty()) LH5Log(RMGLog::fatal, "empty ntuple name, how is this possible?");
 

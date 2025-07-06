@@ -6,11 +6,12 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path
 
+import h5py
 import pygama.evt
 import reboost
-from lgdo import lh5
 from lgdo.lh5.concat import lh5concat
 
+from . import utils
 from .ipc import IpcResult
 
 log = logging.getLogger("remage")
@@ -22,10 +23,10 @@ def post_proc(
     merge_output_files: bool,
     time_window_in_us: float,
 ) -> None:
-    remage_files = ipc_info.get("output")
-    main_output_file = ipc_info.get_single("output_main", None)
-    overwrite_output = ipc_info.get_single("overwrite_output", "0") == "1"
-    det_tables_path = ipc_info.get_single("ntuple_output_directory", None)
+    remage_files: list[str] = ipc_info.get("output")
+    main_output_file: str = ipc_info.get_single("output_main", None)
+    overwrite_output: bool = ipc_info.get_single("overwrite_output", "0") == "1"
+    det_tables_path: str = ipc_info.get_single("ntuple_output_directory", None)
 
     ipc_info.remove("output_main")
 
@@ -38,8 +39,8 @@ def post_proc(
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
     }
 
-    detector_info = ipc_info.get("output_table", 2)
-    detector_info_aux = ipc_info.get("output_table_aux", 2)
+    detector_info: list[str] = ipc_info.get("output_table", 2)
+    detector_info_aux: list[str] = ipc_info.get("output_table_aux", 2)
 
     assert len(output_file_exts) == 1
 
@@ -60,11 +61,19 @@ def post_proc(
     if flat_output and not merge_output_files:
         return
 
+    # RMGConvertLH5 informs up about where the soft links to output tables are stored
+    # we are going to use them to build the TCM
+    lh5_links_group_name: str = (
+        det_tables_path + "/" + ipc_info.get("lh5_links_group_name")[0]
+    )
+
     time_start = time.time()
 
     if not flat_output:
         # if merging is on, write everything to a single file
-        output_files = remage_files if not merge_output_files else main_output_file
+        output_files: list[str] | str = (
+            remage_files if not merge_output_files else main_output_file
+        )
 
         msg = (
             "Reshaping "
@@ -78,9 +87,6 @@ def post_proc(
 
         # extract the additional tables in the output file (not detectors)
         extra_tables = list({det[1] for det in detector_info_aux})
-
-        # also forward links group
-        extra_tables.append(f"{det_tables_path}/__links__")
 
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward
@@ -101,22 +107,35 @@ def post_proc(
                 overwrite=overwrite_output,
             )
 
-            # make the tcm
-            msg = "Computing and storing the TCM as /tcm"
-            log.info(msg)
+            # also copy __links__ group to the output files
+            # we do this here and not in reboost, as the links require special syntax
+            # NOTE: using just the first original file since the links are always the same
+            with (
+                h5py.File(original_files[0], "r") as inf,
+                h5py.File(utils._to_list(output_files)[0], "a") as ouf,
+            ):
+                inf.copy(
+                    lh5_links_group_name,
+                    ouf,
+                    lh5_links_group_name,
+                    expand_soft=False,  # do _not_ follow soft-links; preserve them
+                    expand_external=False,  # likewise for external links
+                    expand_refs=False,  # likewise for object-reference datasets
+                )
 
         # add a time-coincidence map to the output file(s)
-        _tcm_infiles = output_files
-        if not isinstance(output_files, list | tuple):
-            _tcm_infiles = [output_files]
+        msg = "Computing and storing the TCM as /tcm"
+        log.info(msg)
 
-        tables = lh5.ls(_tcm_infiles[0], lh5_group=f"{det_tables_path}/")
-
-        for file in _tcm_infiles:
+        for file in utils._to_list(output_files):
+            # use tables keyed by UID in the __links__ group.  in this way, the
+            # TCM will index tables by UID.  the coincidence criterium is based
+            # on Geant4 event identifier and time of the hits
+            # NOTE: uses the same time window as in build_hit() reshaping
             pygama.evt.build_tcm(
-                [(file, tables)],  # input_tables
+                [(file, rf"{lh5_links_group_name}/*")],  # input_tables
                 ["evtid", "t0"],  # coin_cols
-                hash_func=None,
+                hash_func=r"\d+",
                 coin_windows=[0, time_window_in_us * 1000],
                 out_file=file,
                 wo_mode="write_safe",
@@ -193,10 +212,7 @@ def make_tmp(files: list[str] | str) -> list[str]:
 
     Prepend a `.` to their name and rename them on disk.
     """
-
-    if isinstance(files, str):
-        files = [files]
-
+    files = utils._to_list(files)
     renamed_files = []
 
     for f in files:
@@ -213,9 +229,7 @@ def un_make_tmp(files: list[str] | str) -> list[str]:
 
     Remove `.` from name and rename on disk.
     """
-    if isinstance(files, str):
-        files = [files]
-
+    files = utils._to_list(files)
     renamed_files = []
 
     for f in files:

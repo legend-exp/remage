@@ -1,5 +1,12 @@
 /
 ├── stp · struct{det001,det002,det011,det012,det101,det102} 
+│   ├── __links__ · struct{uid0,uid1,uid2,uid3,uid4,uid5} 
+│   │   ├── uid0 -> /stp/det011
+│   │   ├── uid1 -> /stp/det012
+│   │   ├── uid2 -> /stp/det101
+│   │   ├── uid3 -> /stp/det102
+│   │   ├── uid4 -> /stp/det001
+│   │   └── uid5 -> /stp/det002
 │   ├── det001 · table{edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── edep · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -108,7 +115,7 @@
 │       └── wavelength · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'nm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': 'None', 'tables': "['stp/det001', 'stp/det002', 'stp/det011', 'stp/det012', 'stp/det101', 'stp/det102']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '\\d+', 'tables': "['stp/__links__/uid0', 'stp/__links__/uid1', 'stp/__links__/uid2', 'stp/__links__/uid3', 'stp/__links__/uid4', 'stp/__links__/uid5']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 
