@@ -1,9 +1,9 @@
 /
 ├── stp · struct{germanium,optical,scintillator} 
-│   ├── __links__ · struct{uid0,uid1,uid2} 
-│   │   ├── uid0 -> /stp/germanium
-│   │   ├── uid1 -> /stp/optical
-│   │   └── uid2 -> /stp/scintillator
+│   ├── __links__ · struct{det001,det011,det101} 
+│   │   ├── det001 -> /stp/scintillator
+│   │   ├── det011 -> /stp/germanium
+│   │   └── det101 -> /stp/optical
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -67,7 +67,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': '\\d+', 'tables': "['stp/__links__/uid0', 'stp/__links__/uid1', 'stp/__links__/uid2']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__links__/det)\\d+', 'tables': "['stp/__links__/det001', 'stp/__links__/det011', 'stp/__links__/det101']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

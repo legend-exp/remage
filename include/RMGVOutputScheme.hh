@@ -151,7 +151,7 @@ class RMGVOutputScheme {
     [[nodiscard]] virtual std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
         if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
-        return fmt::format("det{:03}", det.uid);
+        return fmt::format(fUIDKeyFormatString, det.uid);
       }
       return GetNtupleNameFlat();
     }
@@ -173,6 +173,7 @@ class RMGVOutputScheme {
     // global options injected by manager.
     bool fNtuplePerDetector = true;
     bool fNtupleUseVolumeName = false;
+    std::string fUIDKeyFormatString = "det{:03}";
 };
 
 #endif

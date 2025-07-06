@@ -1,12 +1,12 @@
 /
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
-│   ├── __links__ · struct{uid0,uid1,uid2,uid3,uid4,uid5} 
-│   │   ├── uid0 -> /stp/det1
-│   │   ├── uid1 -> /stp/det2
-│   │   ├── uid2 -> /stp/optdet1
-│   │   ├── uid3 -> /stp/optdet2
-│   │   ├── uid4 -> /stp/scint1
-│   │   └── uid5 -> /stp/scint2
+│   ├── __links__ · struct{det001,det002,det011,det012,det101,det102} 
+│   │   ├── det001 -> /stp/scint1
+│   │   ├── det002 -> /stp/scint2
+│   │   ├── det011 -> /stp/det1
+│   │   ├── det012 -> /stp/det2
+│   │   ├── det101 -> /stp/optdet1
+│   │   └── det102 -> /stp/optdet2
 │   ├── det1 · table{dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── dist_to_surf · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -115,7 +115,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': '\\d+', 'tables': "['stp/__links__/uid0', 'stp/__links__/uid1', 'stp/__links__/uid2', 'stp/__links__/uid3', 'stp/__links__/uid4', 'stp/__links__/uid5']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__links__/det)\\d+', 'tables': "['stp/__links__/det001', 'stp/__links__/det002', 'stp/__links__/det011', 'stp/__links__/det012', 'stp/__links__/det101', 'stp/__links__/det102']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

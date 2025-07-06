@@ -322,24 +322,18 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
         }
 
         // form soft link name "detUID" where UID is item.second.first.
-        auto soft_link_name = "uid" + std::to_string(item.second.first);
-        auto soft_link_name_full = ntuple_group_name + "/" + links_group_name + "/" + soft_link_name;
+        auto soft_link_name = fmt::format(fUIDKeyFormatString, item.first);
+        auto soft_link_name_rel = std::string(links_group_name).append("/").append(soft_link_name);
         // do not create if the soft link already exists.
-        if (!ntuples_group.nameExists(soft_link_name)) {
+        if (!ntuples_group.nameExists(soft_link_name_rel)) {
           // create a soft link to the current group itself.
-          herr_t err = H5Lcreate_soft(
-              ("/" + ntuple_group_name + "/" + ntuple).c_str(),
-              ntuples_group.getId(),
-              (links_group_name + "/" + soft_link_name).c_str(),
-              H5P_DEFAULT,
-              H5P_DEFAULT
+          ntuples_group.link(
+              H5L_TYPE_SOFT,
+              std::string("/").append(ntuple_group_name).append("/").append(ntuple),
+              soft_link_name_rel
           );
           links.insert(soft_link_name);
-          if (err < 0) {
-            LH5Log(RMGLog::error, "failed to create soft link ", soft_link_name_full);
-          } else {
-            LH5Log(RMGLog::detail, "created soft link ", soft_link_name_full);
-          }
+          LH5Log(RMGLog::detail, "created soft link ", ntuple_group_name, "/", soft_link_name_rel);
         }
         break;
       }
@@ -356,20 +350,24 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   for (auto& ntuple : fAuxNtuples)
     ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), ntuple), ntuples.end());
 
-  // make the root HDF5 group an LH5 struct.
-  if (!ntuples_group.attrExists("datatype")) {
-    LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
-    SetStringAttribute(
-        ntuples_group,
-        "datatype",
-        "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}"
-    );
+  // if the stp group is empty, remove it
+  if (ntuples.size() == 0) hfile.unlink(ntuple_group_name);
+  else {
+    // make the root HDF5 group an LH5 struct.
+    if (!ntuples_group.attrExists("datatype")) {
+      LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
+      SetStringAttribute(
+          ntuples_group,
+          "datatype",
+          "struct{" + fmt::format("{}", fmt::join(ntuples, ",")) + "}"
+      );
+    }
   }
 
   // make links group an LH5 struct
   if (ExistsByType(ntuples_group, links_group_name, H5O_TYPE_GROUP)) {
     auto links_group = ntuples_group.openGroup(links_group_name);
-    LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
+    LH5Log(RMGLog::debug, "making the links HDF5 group an LH5 struct");
     SetStringAttribute(
         links_group,
         "datatype",

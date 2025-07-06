@@ -9,6 +9,7 @@ from pathlib import Path
 import h5py
 import pygama.evt
 import reboost
+from lgdo import lh5
 from lgdo.lh5.concat import lh5concat
 
 from . import utils
@@ -110,36 +111,39 @@ def post_proc(
             # also copy __links__ group to the output files
             # we do this here and not in reboost, as the links require special syntax
             # NOTE: using just the first original file since the links are always the same
-            with (
-                h5py.File(original_files[0], "r") as inf,
-                h5py.File(utils._to_list(output_files)[0], "a") as ouf,
-            ):
-                inf.copy(
-                    lh5_links_group_name,
-                    ouf,
-                    lh5_links_group_name,
-                    expand_soft=False,  # do _not_ follow soft-links; preserve them
-                    expand_external=False,  # likewise for external links
-                    expand_refs=False,  # likewise for object-reference datasets
-                )
+            if lh5.ls(original_files[0], rf"{lh5_links_group_name}") != []:
+                with (
+                    h5py.File(original_files[0], "r") as inf,
+                    h5py.File(utils._to_list(output_files)[0], "a") as ouf,
+                ):
+                    inf.copy(
+                        lh5_links_group_name,
+                        ouf,
+                        lh5_links_group_name,
+                        expand_soft=False,  # do _not_ follow soft-links; preserve them
+                        expand_external=False,  # likewise for external links
+                        expand_refs=False,  # likewise for object-reference datasets
+                    )
 
         # add a time-coincidence map to the output file(s)
         msg = "Computing and storing the TCM as /tcm"
         log.info(msg)
 
         for file in utils._to_list(output_files):
-            # use tables keyed by UID in the __links__ group.  in this way, the
-            # TCM will index tables by UID.  the coincidence criterium is based
-            # on Geant4 event identifier and time of the hits
-            # NOTE: uses the same time window as in build_hit() reshaping
-            pygama.evt.build_tcm(
-                [(file, rf"{lh5_links_group_name}/*")],  # input_tables
-                ["evtid", "t0"],  # coin_cols
-                hash_func=r"\d+",
-                coin_windows=[0, time_window_in_us * 1000],
-                out_file=file,
-                wo_mode="write_safe",
-            )
+            # do not compute the TCM if there are no stepping tables
+            if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
+                # use tables keyed by UID in the __links__ group.  in this way, the
+                # TCM will index tables by UID.  the coincidence criterium is based
+                # on Geant4 event identifier and time of the hits
+                # NOTE: uses the same time window as in build_hit() reshaping
+                pygama.evt.build_tcm(
+                    [(file, rf"{lh5_links_group_name}/*")],  # input_tables
+                    ["evtid", "t0"],  # coin_cols
+                    hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
+                    coin_windows=[0, time_window_in_us * 1000],
+                    out_file=file,
+                    wo_mode="write_safe",
+                )
 
         # set the output file(s) for downstream consumers.
         ipc_info.set("output", output_files)

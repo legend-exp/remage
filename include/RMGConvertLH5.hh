@@ -128,6 +128,7 @@ class RMGConvertLH5 {
     std::string fNtupleGroupName;
     std::set<std::string> fAuxNtuples;
     std::map<int, std::pair<int, std::string>> fNtupleMeta;
+    std::string fUIDKeyFormatString = "det{:03}";
     bool fDryRun;
     bool fIsPartOfBatch;
 };
