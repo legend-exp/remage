@@ -34,12 +34,15 @@ Full geometry implementations based on these tools:
 
 :::
 
+(manual-geometry-register-sens-det)=
+
 ## Registering sensitive detectors
 
 Sensitive detector volumes must be registered so that particle interactions are
 recorded in the output. In _remage_, this can be done in several ways. Each
-detector has a unique id (`uid`) and a _type_, which determines how hits are
-processed and stored.
+detector has a unique id (UID) and a _type_, which determines how hits are
+processed and stored. Detector of type `Germanium`, `Scintillator` and `Optical`
+are currently supported.
 
 :::{note}
 
@@ -56,8 +59,8 @@ The simplest method is to use the
 ```
 
 This registers the physical volumes `B00000B` and `C000RG1` as `Germanium`
-detectors with `uid`s 1 and 2. If the copy number is not specified, `0` is used
-by default. See {ref}`manual-output` for details on how detector types affect
+detectors with UIDs 1 and 2. If the copy number is not specified, `0` is used by
+default. See {ref}`manual-output` for details on how detector types affect
 output.
 
 Alternatively, detectors can be imported from a GDML file that includes

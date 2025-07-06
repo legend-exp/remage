@@ -4,6 +4,7 @@
 
 :::{todo}
 
+- optical output scheme
 - track output scheme
 - isotope, energy filtering
 
@@ -31,7 +32,8 @@ persistency and track stacking.
 
 ## Selection of output schemes
 
-Adding a sensitive detector of any type will add the corresponding main output
+Adding a sensitive detector of any type (see
+{ref}`manual-geometry-register-sens-det`) will add the corresponding main output
 scheme to the list of active output schemes.
 
 Additional output schemes might be used for **filtering output**. Optional
@@ -52,10 +54,6 @@ of _remage_ (access it with
   output scheme, that will not be enabled right away, and
 - `user_init->ActivateOptionalOutputScheme("name")` enables such a registered
   output scheme.
-
-Output schemes are often coupled to
-[sensitive detector types](project:./geometry.md#registering-sensitive-detectors).
-At present, it is not possible to register detector types at runtime.
 
 :::
 
@@ -117,7 +115,12 @@ cannot contain forward slashes, so units like `m/s` cannot be represent
 directly. Instead, a backslash (`\`) is used to encode the division symbol (for
 example: `velocity_in_m\s`).
 
-## Germanium (HPGe) detectors
+## Built-in output schemes
+
+_remage_ currently implements schemes to read out `Germanium`, `Scintillator`
+and `Optical` detector types.
+
+### `Germanium`: Germanium (HPGe) detectors
 
 The _Germanium_ output scheme handles the output from germanium (HPGe)
 detectors, but would also work for other solid state detectors (calorimeters).
@@ -161,16 +164,16 @@ occur. The macro commands
 <project:../rmg-commands.md#rmgoutputgermaniumedepcuthigh>:
 
 ```remage
-/RMG/Output/Germanium/AddDetectorForEdepThreshold {DET_UID}
+/RMG/Output/Germanium/AddDetectorForEdepThreshold {UID}
 /RMG/Output/Germanium/EdepCutLow {ELOW}
 /RMG/Output/Germanium/EdepCutHigh {EHIGH}
 ```
 
 implement this functionality, for every event the total energy deposited is
-computed. This is based on summing the energy deposited in each `{DET_UID}`
-added, or across all registered sensitive _Germanium_ detectors (if this macro
-command is not used). The event is then discarded if the energy is less than or
-equal to `ELOW` or less than `EHIGH`.
+computed. This is based on summing the energy deposited in each `{UID}` added,
+or across all registered sensitive _Germanium_ detectors (if this macro command
+is not used). The event is then discarded if the energy is less than or equal to
+`ELOW` or less than `EHIGH`.
 
 :::{note}
 
@@ -207,20 +210,29 @@ the surface region of a HPGe detector has different properties to the bulk this
 clustering can be performed differently for surface and bulk hits (see
 [data-reduction](#data-reduction-methods) for more details).
 
-## Scintillator detectors
+### `Scintillator`: calorimeters
 
-This output scheme is used to record the steps in scintillation detectors
-(typically liquid argon), this is a calometric approach recording the energy
-deposited and steps. While the _Optical_ output scheme is instead used for
-recording the detected optical photons. Most functionality is similar to the
-_Germanium_ output scheme with a few exceptions.
+This output scheme records stepping data in scintillating materials (e.g. liquid
+argon), following a calometric approach. This scheme is useful for applications
+where an optical detector response is applied on the simulated particle
+interactions. Detection of optical photons is handled by the _Optical_ output
+scheme (see later). Most functionality is similar to the _Germanium_ output
+scheme with a few exceptions:
 
 - Unlike for germanium detectors the distance to the detector surface is not
   calculated,
-- The stacking possibility for optical tracks is not implemented,
+- Stacking of optical tracks is not implemented,
 - The velocity of the particles can be saved using the
   <project:../rmg-commands.md#rmgoutputscintillatorstoreparticlevelocities>
   command.
+
+### `Optical`: optical photon detectors
+
+:::{todo}
+
+coming soon...
+
+:::
 
 ## Single- versus multi-detector table layout
 
@@ -229,8 +241,75 @@ one per detector. While this layout is useful if analyzing data from each
 detector independently, sometimes having all hits stored in the same output
 table can be more beneficial. The multi-table layout can be disabled by setting
 <project:../rmg-commands.md#rmgoutputntupleperdetector> to false. In this
-scenario, _remage_ will create a table for each detector category (`Germanium`,
-`Scintillator`, ...).
+scenario, _remage_ will organize hits by detector type in separate tables (a
+table named `germanium` for the `Germanium` detectors, `scintillator` for
+`Scintillator`s, etc.).
+
+(manual-output-table-naming)=
+
+## Table naming
+
+By default, _remage_ will name output tables by their internal unique identifier
+(UID), prefixed with `det` (i.e. the table for a detector with UID 39 will be
+saved as `det039`). These tables are located in a directory named `stp` (as for
+"stepping data"). For example, an output LH5 file will look like:
+
+```
+/
+└── stp · struct{det1104005,det1105600,...}
+    ├── det1104005 · table{...}
+    │   └── ...
+    ├── det1105600 · table{...}
+    │   └── ...
+    └── ...
+```
+
+:::{note}
+
+The directory name can be customized with the
+<project:../rmg-commands.md#rmgoutputntupledirectory> command.
+
+:::
+
+Non-stepping-data (auxiliary) tablers are stored in the same directory, due to
+limitations of the Geant4 analysis manager, except for the LH5 output (see
+later).
+
+_remage_ offers the possibility to name stepping data tables after their Geant4
+logical volume name, instead of the UID. This feature can be enabled with the
+<project:../rmg-commands.md#rmgoutputntupleusevolumename> command. In this case,
+for example, an output LH5 file will look like:
+
+```
+/
+└── stp · struct{B00000C,B00000D,...}
+    ├── B00000C · table{...}
+    │   └── ...
+    ├── B00000D · table{...}
+    │   └── ...
+    └── ...
+```
+
+:::{note}
+
+If the LH5 output format is selected, detector tables can be still accessed by
+UID through the symbolic stored in the `/stp/__links__` group.
+
+```
+/
+└── stp · struct{B00000C,B00000D,...}
+    ├── __links__ · struct{det1104005,det1105600,...}
+    │   ├── det1104005 -> /stp/B00000C
+    │   ├── det1105600 -> /stp/B00000D
+    │   └── ...
+    ├── B00000C · table{...}
+    │   └── ...
+    ├── B00000D · table{...}
+    │   └── ...
+    └── ...
+```
+
+:::
 
 ## Data reduction methods
 
@@ -467,12 +546,26 @@ analyzing the simulation output. To simplify the task, _remage_ computes a
 so-called "time-coincidence map" (TCM) table at the end of a simulation run with
 {func}`pygama.evt.tcm.build_tcm` and stores it in the output file as `/tcm`.
 
+```
+/
+├── stp · struct{B00000C,B00000D,...}
+│   └── ...
+└── tcm · table{row_in_table,table_key}
+    ├── row_in_table · array<1>{array<1>{real}}
+    └── table_key · array<1>{array<1>{real}}
+```
+
 Every row of the TCM corresponds to a simulated event, defined by the same time
 window used for reshaping the output tables. For each event, the `table_key`
 column specifies the list of detectors that had hits, while the `row_in_table`
 column specifies which rows (through the row index) need to be read from the
 respective output tables. The detectors are labeled in `row_in_table` by their
-index in the `tables` HDF5 attribute.
+UID assigned at registration time (see
+{ref}`manual-geometry-register-sens-det`). If output tables are keyed by UID,
+querying them based on the TCM data is straightforward. In case Geant4 logical
+volume names are used (see {ref}`manual-output-table-naming`), It's still
+possible to query data by UID with the symbolic links stored in
+`/stp/__links__`, keyed by UID as in the default _remage_ convention.
 
 More information on how to use the TCM is provided in {ref}`manual-analysis`,
 while more documentation about how the TCM is generated is available at
@@ -481,8 +574,24 @@ while more documentation about how the TCM is generated is available at
 ## The vertex table
 
 _remage_ stores data about the simulated event vertex in a table named `vtx`. In
-the LH5 output, it can be found in the HDF5 root group (`/vtx`). Each row in the
-table corresponds to a vertex. The columns are:
+the LH5 output, it can be found in the HDF5 root group (`/vtx`).
+
+```
+/
+├── stp · struct{B00000C,B00000D,...}
+│   └── ...
+├── tcm · table{row_in_table,table_key}
+│   └── ...
+└── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
+    ├── evtid · array<1>{real}
+    ├── n_part · array<1>{real}
+    ├── time · array<1>{real} ── {'units': 'ns'}
+    ├── xloc · array<1>{real} ── {'units': 'm'}
+    ├── yloc · array<1>{real} ── {'units': 'm'}
+    └── zloc · array<1>{real} ── {'units': 'm'}
+```
+
+Each row in the table corresponds to a vertex. The columns are:
 
 - `evtid`: Geant4 event identifier
 - `time`: time relative to the start of the event (zero, most of the times)
