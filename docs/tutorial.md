@@ -89,7 +89,7 @@ lar_l = pg4.geant4.LogicalVolume(lar_s, "G4_lAr", "LAr_l", registry=reg)
 pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], lar_l, "LAr", world_l, registry=reg)
 
 # now place the two HPGe detectors in the argon
-bege_pv = g4.geant4.PhysicalVolume(
+bege_pv = pg4.geant4.PhysicalVolume(
     [0, 0, 0], [5, 0, -3, "cm"], bege_l, "BEGe", lar_l, registry=reg
 )
 coax_pv = pg4.geant4.PhysicalVolume(
@@ -345,64 +345,67 @@ Now we only need to tell `remage` which file name to use for the output.
 going to select the latter by supplying a file name with `.lh5` extension:
 
 ```console
-$ remage --threads 8 --gdml-files geometry.gdml --output-file output.lh5 -- gammas.mac
+$ remage --threads 8 --gdml-files geometry.gdml --output-file output.lh5 --merge-output-files -- gammas.mac
 ```
-
-Geant4 does not support merging LH5 files created by different threads, so we're
-left with 8 output files: `output_t0.lh5 ... output_t7.lh5`. This seems a bit
-annoying, but it's easy to chain them when reading data into memory.
 
 We'll use the [legend-pydataobj](https://legend-pydataobj.readthedocs.io) Python
 package to read the data from disk. Let's first have a look at the data layout
 with the `lh5ls` utility:
 
 ```console
-$ lh5ls output_t0.lh5
+$ lh5ls -d3 -a output.lh5
 /
-└── stp · struct{det001,det002,det003,vertices}
-    ├── det001 · table{evtid,particle,edep,time,xloc,yloc,zloc}
-    │   ├── edep · array<1>{real} ── {'units': 'keV'}
-    │   ├── evtid · array<1>{real}
-    │   ├── particle · array<1>{real}
-    │   ├── time · array<1>{real} ── {'units': 'ns'}
-    │   ├── xloc · array<1>{real} ── {'units': 'm'}
-    │   ├── yloc · array<1>{real} ── {'units': 'm'}
-    │   └── zloc · array<1>{real} ── {'units': 'm'}
-    ├── det002 · table{evtid,particle,edep,time,xloc,yloc,zloc}
-    │   ├── edep · array<1>{real} ── {'units': 'keV'}
-    │   ├── evtid · array<1>{real}
-    │   ├── particle · array<1>{real}
-    │   ├── time · array<1>{real} ── {'units': 'ns'}
-    │   ├── xloc · array<1>{real} ── {'units': 'm'}
-    │   ├── yloc · array<1>{real} ── {'units': 'm'}
-    │   └── zloc · array<1>{real} ── {'units': 'm'}
-    ├── det003 · table{evtid,particle,edep,time,xloc_pre,yloc_pre,zloc_pre,xloc_post,yloc_post,zloc_post,v_pre,v_post}
-    │   ├── edep · array<1>{real} ── {'units': 'keV'}
-    │   ├── evtid · array<1>{real}
-    │   ├── particle · array<1>{real}
-    │   ├── time · array<1>{real} ── {'units': 'ns'}
-    │   ├── v_post · array<1>{real} ── {'units': 'm/ns'}
-    │   ├── v_pre · array<1>{real} ── {'units': 'm/ns'}
-    │   ├── xloc_post · array<1>{real} ── {'units': 'm'}
-    │   ├── xloc_pre · array<1>{real} ── {'units': 'm'}
-    │   ├── yloc_post · array<1>{real} ── {'units': 'm'}
-    │   ├── yloc_pre · array<1>{real} ── {'units': 'm'}
-    │   ├── zloc_post · array<1>{real} ── {'units': 'm'}
-    │   └── zloc_pre · array<1>{real} ── {'units': 'm'}
-    └── vertices · table{evtid,time,xloc,yloc,zloc,n_part}
-        ├── evtid · array<1>{real}
-        ├── n_part · array<1>{real}
-        ├── time · array<1>{real} ── {'units': 'ns'}
-        ├── xloc · array<1>{real} ── {'units': 'm'}
-        ├── yloc · array<1>{real} ── {'units': 'm'}
-        └── zloc · array<1>{real} ── {'units': 'm'}
+├── stp · struct{BEGe,Coax,LAr}
+│   ├── BEGe · table{dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc}
+│   │   ├── dist_to_surf · array<1>{array<1>{real}}
+│   │   ├── edep · array<1>{array<1>{real}}
+│   │   ├── evtid · array<1>{real}
+│   │   ├── particle · array<1>{array<1>{real}}
+│   │   ├── t0 · array<1>{real} ── {'units': 'ns'}
+│   │   ├── time · array<1>{array<1>{real}}
+│   │   ├── xloc · array<1>{array<1>{real}}
+│   │   ├── yloc · array<1>{array<1>{real}}
+│   │   └── zloc · array<1>{array<1>{real}}
+│   ├── Coax · table{dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc}
+│   │   ├── dist_to_surf · array<1>{array<1>{real}}
+│   │   ├── edep · array<1>{array<1>{real}}
+│   │   ├── evtid · array<1>{real}
+│   │   ├── particle · array<1>{array<1>{real}}
+│   │   ├── t0 · array<1>{real} ── {'units': 'ns'}
+│   │   ├── time · array<1>{array<1>{real}}
+│   │   ├── xloc · array<1>{array<1>{real}}
+│   │   ├── yloc · array<1>{array<1>{real}}
+│   │   └── zloc · array<1>{array<1>{real}}
+│   ├── LAr · table{edep,evtid,particle,t0,time,xloc,yloc,zloc}
+│   │   ├── edep · array<1>{array<1>{real}}
+│   │   ├── evtid · array<1>{real}
+│   │   ├── particle · array<1>{array<1>{real}}
+│   │   ├── t0 · array<1>{real} ── {'units': 'ns'}
+│   │   ├── time · array<1>{array<1>{real}}
+│   │   ├── xloc · array<1>{array<1>{real}}
+│   │   ├── yloc · array<1>{array<1>{real}}
+│   │   └── zloc · array<1>{array<1>{real}}
+│   └── __links__ · struct{det001,det002,det003}
+│       ├── det001 -> /stp/BEGe
+│       ├── det002 -> /stp/Coax
+│       └── det003 -> /stp/LAr
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__links__/det)\\d+', 'tables': "['stp/__links__/det001', 'stp/__links__/det002', 'stp/__links__/det003']"}
+│   ├── row_in_table · array<1>{array<1>{real}}
+│   └── table_key · array<1>{array<1>{real}}
+└── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
+    ├── evtid · array<1>{real}
+    ├── n_part · array<1>{real}
+    ├── time · array<1>{real} ── {'units': 'ns'}
+    ├── xloc · array<1>{real} ── {'units': 'm'}
+    ├── yloc · array<1>{real} ── {'units': 'm'}
+    └── zloc · array<1>{real} ── {'units': 'm'}
 ```
 
 The step information is organized into data tables, one per sensitive detector.
 The table format is specified by the detector type (`Germanium` or
-`Scintillator`). Event vertex information is stored in a separate table,
-`vertices`. Note the physical units specified as attributes, as per LH5
-specification.
+`Scintillator` in this example). Event vertex information is stored in a
+separate table, `vtx`. Note the physical units specified as attributes, as per
+LH5 specification.
 
 Let's make an histogram of the total energy deposited in the HPGe detectors in
 each event. Check out the
@@ -422,19 +425,16 @@ plt.rcParams["figure.figsize"] = (10, 3)
 def plot_edep(detid):
     # read the data from detector "detid". pass all 8 files to concatenate them
     # in addition, view it as and Awkward Array
-    data = lh5.read_as(f"stp/{detid}", glob.glob("output_t*.lh5"), "ak")
-
-    # with awkward arrays, we can easily "build events" by grouping by the event identifier
-    evt = ak.unflatten(data, ak.run_lengths(data.evtid))
+    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")
 
     # make and plot an histogram
     hist.new.Reg(551, 0, 1005, name="energy [keV]").Double().fill(
-        ak.sum(evt.edep, axis=-1)
+        ak.sum(data.edep, axis=-1)
     ).plot(yerr=False, label=detid)
 
 
-plot_edep("det001")
-plot_edep("det002")
+plot_edep("BEGe")
+plot_edep("Coax")
 plt.ylabel("counts / 5 keV")
 plt.yscale("log")
 plt.legend()
@@ -447,12 +447,14 @@ shoulder. We can also plot the interaction points:
 
 ```python
 def plot_hits(detid):
-    data = lh5.read_as(f"stp/{detid}", glob.glob("output_t*.lh5"), "ak")[:20_000]
-    plt.scatter(data.xloc, data.yloc, marker="o", s=1, label=detid)
+    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")[:20_000]
+    plt.scatter(
+        ak.flatten(data.xloc), ak.flatten(data.yloc), marker="o", s=1, label=detid
+    )
 
 
-plot_hits("det001")
-plot_hits("det002")
+plot_hits("BEGe")
+plot_hits("Coax")
 plt.xlabel("[mm]")
 plt.ylabel("[mm]")
 plt.legend()
