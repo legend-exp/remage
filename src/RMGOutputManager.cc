@@ -62,7 +62,7 @@ int RMGOutputManager::CreateAndRegisterNtuple(
   auto ntuple_id = ana_man->CreateNtuple(table_name, oscheme);
   ntuple_id = this->RegisterNtuple(det_uid, ntuple_id, table_name);
   RMGIpc::SendIpcNonBlocking(
-      RMGIpc::CreateMessage("output_table", std::string(oscheme).append("\x1e").append(table_name))
+      RMGIpc::CreateMessage("output_ntuple", std::string(oscheme).append("\x1e").append(table_name))
   );
   return ntuple_id;
 }
@@ -77,7 +77,7 @@ int RMGOutputManager::CreateAndRegisterAuxNtuple(
   if (!res.second)
     RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for table with UID {} is already registered", table_name);
   RMGIpc::SendIpcNonBlocking(
-      RMGIpc::CreateMessage("output_table_aux", std::string(oscheme).append("\x1e").append(table_name))
+      RMGIpc::CreateMessage("output_ntuple_aux", std::string(oscheme).append("\x1e").append(table_name))
   );
   return this->GetAuxNtupleID(table_name);
 }

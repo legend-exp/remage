@@ -153,7 +153,7 @@ class RMGOutputManager {
      * @brief Creates and registers a ntuple for a given detector.
      *
      * @details An ordinary ntuple that stores information related to stepping
-     * data. An IPC message keyed as "output_table" is automatically sent to
+     * data. An IPC message keyed as "output_ntuple" is automatically sent to
      * communicate the output scheme name and the output table name.
      *
      * @param det_uid Unique identifier for the detector.
@@ -172,7 +172,7 @@ class RMGOutputManager {
      * @brief Creates and registers an auxiliary ntuple.
      *
      * @details An auxiliary ntuple stores information not strictly related to
-     * stepping data. An IPC message keyed as "output_table_aux" is automatically
+     * stepping data. An IPC message keyed as "output_ntuple_aux" is automatically
      * sent to communicate the output scheme name and the output table name.
      *
      * @param table_name Name of the output table.

@@ -39,8 +39,8 @@ def post_proc(
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
     }
 
-    detector_info: list[str] = ipc_info.get("output_table", 2)
-    detector_info_aux: list[str] = ipc_info.get("output_table_aux", 2)
+    detector_info: list[str] = ipc_info.get("output_ntuple", 2)
+    detector_info_aux: list[str] = ipc_info.get("output_ntuple_aux", 2)
 
     assert len(output_file_exts) == 1
 
