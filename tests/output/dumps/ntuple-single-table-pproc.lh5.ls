@@ -1,5 +1,9 @@
 /
 ├── stp · struct{germanium,optical,scintillator} 
+│   ├── __by_uid__ · struct{det001,det011,det101} 
+│   │   ├── det001 -> /stp/scintillator
+│   │   ├── det011 -> /stp/germanium
+│   │   └── det101 -> /stp/optical
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -63,7 +67,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': 'None', 'tables': "['stp/germanium', 'stp/optical', 'stp/scintillator']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det011', 'stp/__by_uid__/det101']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

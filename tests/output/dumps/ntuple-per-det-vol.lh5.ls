@@ -1,5 +1,12 @@
 /
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
+│   │   ├── det001 -> /stp/scint1
+│   │   ├── det002 -> /stp/scint2
+│   │   ├── det011 -> /stp/det1
+│   │   ├── det012 -> /stp/det2
+│   │   ├── det101 -> /stp/optdet1
+│   │   └── det102 -> /stp/optdet2
 │   ├── det1 · table{evtid,particle,edep,time,xloc,yloc,zloc,dist_to_surf} 
 │   │   ├── dist_to_surf · array<1>{real} ── {'units': 'm'}
 │   │   ├── edep · array<1>{real} ── {'units': 'keV'}

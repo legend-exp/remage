@@ -5,4 +5,4 @@
 
 /run/initialize
 
-/RMG/Manager/Logging/LogLevel debug
+/RMG/Manager/Logging/LogLevel summary

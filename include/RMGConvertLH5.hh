@@ -30,17 +30,53 @@
 
 #include "H5Cpp.h"
 
+/**
+ * @brief Converter class for converting between HDF5 and LH5 file formats.
+ *
+ * This class provides methods to convert Geant4 HDF5 output files into the LH5 format
+ * and also to convert LH5 input files back to HDF5. It supports conversion of ntuple data.
+ */
 class RMGConvertLH5 {
 
   public:
 
+    /**
+     * @brief Convert a Geant4 HDF5 output file to LH5 format.
+     *
+     * This function converts the specified HDF5 file to the LH5 format, reformatting
+     * the ntuple data into table format.
+     *
+     * @param hdf5_file_name The input HDF5 file name.
+     * @param ntuple_group_name The name of the ntuple group in the HDF5 file.
+     * @param aux_ntuples A set of auxiliary ntuple names.
+     * @param ntuple_meta A mapping of detector uids to a pair of ntuple id and ntuple name.
+     * @param dry_run If true, the conversion is performed in-memory without writing to disk.
+     * @param part_of_batch Indicates if this conversion is part of a batch operation.
+     *
+     * @return True if the conversion is successful, false otherwise.
+     */
     static bool ConvertToLH5(
         std::string,
         std::string,
         std::set<std::string>,
+        const std::map<int, std::pair<int, std::string>>&,
         bool,
         bool part_of_batch = false
     );
+    /**
+     * @brief Convert an LH5 input file to HDF5 format.
+     *
+     * This function converts the specified LH5 file to HDF5 format suitable for reading
+     * by Geant4, reformatting ntuple tables into ntuple datasets.
+     *
+     * @param lh5_file_name The input LH5 file name.
+     * @param ntuple_group_name The name of the ntuple group in the LH5 file.
+     * @param dry_run If true, the conversion is performed in-memory without writing to disk.
+     * @param part_of_batch Indicates if this conversion is part of a batch operation.
+     * @param units_map Output parameter: a mapping from ntuple names to their unit dictionaries.
+     *
+     * @return True if the conversion is successful, false otherwise.
+     */
     static bool ConvertFromLH5(
         std::string,
         std::string,
@@ -57,11 +93,12 @@ class RMGConvertLH5 {
         std::string filename,
         std::string ntuple_group,
         std::set<std::string> aux_ntuples,
+        const std::map<int, std::pair<int, std::string>>& ntuple_meta,
         bool dry_run,
         bool part_of_batch
     )
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fAuxNtuples(aux_ntuples),
-          fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
+          fNtupleMeta(ntuple_meta), fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,6 +162,8 @@ class RMGConvertLH5 {
     std::string fHdf5FileName;
     std::string fNtupleGroupName;
     std::set<std::string> fAuxNtuples;
+    std::map<int, std::pair<int, std::string>> fNtupleMeta;
+    std::string fUIDKeyFormatString = "det{:03}";
     bool fDryRun;
     bool fIsPartOfBatch;
 };

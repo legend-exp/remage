@@ -16,6 +16,24 @@ application, the user can simulate particle interactions in an existing
 configuration file. Macro files can use all available upstream Geant4 macro
 commands, as well as the [remage macro interface](./rmg-commands).
 
+(related-projects)=
+
+## Related projects
+
+- [legend-pygeom-hpges](https://github.com/legend-exp/legend-pygeom-hpges):
+  high-purity germanium detector geometries for radiation transport simulations.
+- [legend-pygeom-optics](https://github.com/legend-exp/legend-pygeom-optics):
+  optical properties of low-background experiments for Geant4 optical
+  simulations.
+- [legend-pygeom-tools](https://github.com/legend-exp/legend-pygeom-tools):
+  general-purpose tools for implementing and visualizing geometries.
+- [legend-pygeom-l200](https://github.com/legend-exp/legend-pygeom-l200) and
+  [legend-pygeom-l1000](https://github.com/legend-exp/legend-pygeom-l1000): the
+  LEGEND-200 and LEGEND-1000 geometries for radiation transport simulations,
+  useful examples of complex experimental setup implementations.
+- [reboost](https://github.com/legend-exp/reboost): post-processing and analysis
+  of remage output.
+
 ## Next steps
 
 ```{toctree}

@@ -370,6 +370,7 @@ void RMGRunAction::PostprocessOutputFile() const {
       worker_tmp.string(),
       rmg_man->GetOutputNtupleDirectory(),
       rmg_man->GetAuxNtupleNames(),
+      rmg_man->GetNtupleIDs(),
       false
   );
   if (!result) {

@@ -92,7 +92,7 @@ class RMGScintillatorOutputScheme : public RMGVOutputScheme {
 
   protected:
 
-    [[nodiscard]] std::string GetNtuplenameFlat() const override { return "scintillator"; }
+    [[nodiscard]] std::string GetNtupleNameFlat() const override { return "scintillator"; }
 
   private:
 

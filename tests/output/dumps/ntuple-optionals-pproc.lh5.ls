@@ -11,6 +11,13 @@
 │   ├── name · array<1>{string} 
 │   └── procid · array<1>{real} 
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
+│   │   ├── det001 -> /stp/scint1
+│   │   ├── det002 -> /stp/scint2
+│   │   ├── det011 -> /stp/det1
+│   │   ├── det012 -> /stp/det2
+│   │   ├── det101 -> /stp/optdet1
+│   │   └── det102 -> /stp/optdet2
 │   ├── det1 · table{dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
 │   │   ├── dist_to_surf · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -131,7 +138,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': 'None', 'tables': "['stp/det1', 'stp/det2', 'stp/optdet1', 'stp/optdet2', 'stp/scint1', 'stp/scint2']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det002', 'stp/__by_uid__/det011', 'stp/__by_uid__/det012', 'stp/__by_uid__/det101', 'stp/__by_uid__/det102']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

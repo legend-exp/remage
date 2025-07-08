@@ -35,7 +35,7 @@
 
 RMGOutputManager* RMGOutputManager::fRMGOutputManager = nullptr;
 
-G4ThreadLocal std::map<int, int> RMGOutputManager::fNtupleIDs = {};
+G4ThreadLocal std::map<int, std::pair<int, std::string>> RMGOutputManager::fNtupleIDs = {};
 G4ThreadLocal std::map<std::string, int> RMGOutputManager::fNtupleAuxIDs = {};
 
 RMGOutputManager::RMGOutputManager() {
@@ -46,8 +46,8 @@ RMGOutputManager::RMGOutputManager() {
   this->DefineCommands();
 }
 
-int RMGOutputManager::RegisterNtuple(int det_uid, int ntuple_id) {
-  auto res = fNtupleIDs.emplace(det_uid, ntuple_id);
+int RMGOutputManager::RegisterNtuple(int det_uid, int ntuple_id, std::string table_name) {
+  auto res = fNtupleIDs.emplace(det_uid, std::make_pair(ntuple_id, table_name));
   if (!res.second)
     RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for detector with UID {} is already registered", det_uid);
   return this->GetNtupleID(det_uid);
@@ -60,9 +60,9 @@ int RMGOutputManager::CreateAndRegisterNtuple(
     G4AnalysisManager* ana_man
 ) {
   auto ntuple_id = ana_man->CreateNtuple(table_name, oscheme);
-  ntuple_id = this->RegisterNtuple(det_uid, ntuple_id);
+  ntuple_id = this->RegisterNtuple(det_uid, ntuple_id, table_name);
   RMGIpc::SendIpcNonBlocking(
-      RMGIpc::CreateMessage("output_table", std::string(oscheme).append("\x1e").append(table_name))
+      RMGIpc::CreateMessage("output_ntuple", std::string(oscheme).append("\x1e").append(table_name))
   );
   return ntuple_id;
 }
@@ -77,7 +77,7 @@ int RMGOutputManager::CreateAndRegisterAuxNtuple(
   if (!res.second)
     RMGLog::OutFormatDev(RMGLog::fatal, "Ntuple for table with UID {} is already registered", table_name);
   RMGIpc::SendIpcNonBlocking(
-      RMGIpc::CreateMessage("output_table_aux", std::string(oscheme).append("\x1e").append(table_name))
+      RMGIpc::CreateMessage("output_ntuple_aux", std::string(oscheme).append("\x1e").append(table_name))
   );
   return this->GetAuxNtupleID(table_name);
 }

@@ -105,11 +105,7 @@ class RMGOutputManager {
      * @brief Retrieves the set of registered ntuple detector identifiers.
      * @return Set of detector identifiers.
      */
-    std::set<int> GetNtupleNames() {
-      std::set<int> nt_names;
-      for (auto const& [k, v] : fNtupleIDs) nt_names.insert(k);
-      return nt_names;
-    }
+    const std::map<int, std::pair<int, std::string>>& GetNtupleIDs() { return fNtupleIDs; }
     /**
      * @brief Retrieves the set of registered auxiliary ntuple identifiers.
      * @return Set of auxiliary ntuple names.
@@ -148,14 +144,16 @@ class RMGOutputManager {
      * @brief Registers an alreaday created ntuple for a given detector.
      * @param det_uid Unique identifier for the detector.
      * @param ntuple_id Identifier for the ntuple.
+     * @param table_name name of the the ntuple on disk.
+     *
      * @return The registered ntuple identifier.
      */
-    int RegisterNtuple(int det_uid, int ntuple_id);
+    int RegisterNtuple(int det_uid, int ntuple_id, std::string table_name);
     /**
      * @brief Creates and registers a ntuple for a given detector.
      *
      * @details An ordinary ntuple that stores information related to stepping
-     * data. An IPC message keyed as "output_table" is automatically sent to
+     * data. An IPC message keyed as "output_ntuple" is automatically sent to
      * communicate the output scheme name and the output table name.
      *
      * @param det_uid Unique identifier for the detector.
@@ -174,7 +172,7 @@ class RMGOutputManager {
      * @brief Creates and registers an auxiliary ntuple.
      *
      * @details An auxiliary ntuple stores information not strictly related to
-     * stepping data. An IPC message keyed as "output_table_aux" is automatically
+     * stepping data. An IPC message keyed as "output_ntuple_aux" is automatically
      * sent to communicate the output scheme name and the output table name.
      *
      * @param table_name Name of the output table.
@@ -192,7 +190,7 @@ class RMGOutputManager {
      * @param det_uid Unique identifier for the detector.
      * @return The ntuple identifier.
      */
-    int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid]; }
+    int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid].first; }
     /**
      * @brief Gets the auxiliary ntuple identifier for a given key.
      * @param det_uid Key for the auxiliary ntuple.
@@ -216,8 +214,30 @@ class RMGOutputManager {
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
-    // track internal id of detector NTuples
-    static G4ThreadLocal std::map<int, int> fNtupleIDs;
+
+    /** @brief Mapping of detector UIDs assigned by remage to the Geant4 ntuple
+     * IDs and the ntuple names (written to disk).
+     *
+     * @details Used for output tables that log stepping data in a certain
+     * detector.
+     *
+     * @code
+     *   {uid, {ntuple_id, ntuple_name}}
+     * @endcode
+     */
+    static G4ThreadLocal std::map<int, std::pair<int, std::string>> fNtupleIDs;
+
+    /** @brief Mapping of auxiliary ntuple names to the corresponding Geant4
+     * ntuple IDs.
+     *
+     * @details This is used to keep track of "auxiliary" tables that do not
+     * refer to stepping data from a detector (see usage in @ref
+     * RMGVertexOutputScheme or @c RMGTrackOutputScheme).
+     *
+     * @code
+     *   {ntuple_name, ntuple_id}
+     * @endcode
+     */
     static G4ThreadLocal std::map<std::string, int> fNtupleAuxIDs;
 
     static RMGOutputManager* fRMGOutputManager;

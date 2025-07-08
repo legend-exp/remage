@@ -52,7 +52,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     auto ntuple_reg = registered_ntuples.find(ntuple_name);
     if (ntuple_reg != registered_ntuples.end()) {
       // ntuple already exists, but also store the ntuple id for the other uid(s).
-      rmg_man->RegisterNtuple(det.second.uid, ntuple_reg->second);
+      rmg_man->RegisterNtuple(det.second.uid, ntuple_reg->second, ntuple_name);
       continue;
     }
 

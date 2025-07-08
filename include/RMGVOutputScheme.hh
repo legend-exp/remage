@@ -151,12 +151,12 @@ class RMGVOutputScheme {
     [[nodiscard]] virtual std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
         if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
-        return fmt::format("det{:03}", det.uid);
+        return fmt::format(fUIDKeyFormatString, det.uid);
       }
-      return GetNtuplenameFlat();
+      return GetNtupleNameFlat();
     }
-    [[nodiscard]] virtual std::string GetNtuplenameFlat() const {
-      throw new std::logic_error("GetNtuplenameFlat not implemented");
+    [[nodiscard]] virtual std::string GetNtupleNameFlat() const {
+      throw new std::logic_error("GetNtupleNameFlat not implemented");
     }
 
     // helper functions for output schemes.
@@ -173,6 +173,7 @@ class RMGVOutputScheme {
     // global options injected by manager.
     bool fNtuplePerDetector = true;
     bool fNtupleUseVolumeName = false;
+    std::string fUIDKeyFormatString = "det{:03}";
 };
 
 #endif

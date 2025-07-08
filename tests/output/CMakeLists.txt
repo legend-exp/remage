@@ -1,9 +1,3 @@
-# executable for converting remage output HDF5 with ntuples to LH5 tables
-set(_remage_to_lh5 "false")
-if(RMG_HAS_HDF5)
-  set(_remage_to_lh5 $<TARGET_FILE:remage-to-lh5>)
-endif()
-
 # collect auxiliary files
 file(
   GLOB _aux
@@ -17,11 +11,11 @@ endforeach()
 
 # MAIN OUTPUT TESTS
 set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-single-table.mac
-            ntuple-single-table-with-tracks.mac ntuple-optionals.mac)
+            ntuple-single-table-with-tracks.mac ntuple-optionals.mac ntuple-no-stp.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
-                                            ${_remage_to_lh5} ${_mac})
+                                            ${_mac})
   add_test(NAME output/root-${_mac} COMMAND ./run-test-root.sh ${REMAGE_PYEXE} ${_mac})
 endforeach()
 

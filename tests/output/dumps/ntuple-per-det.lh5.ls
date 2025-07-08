@@ -1,5 +1,12 @@
 /
 ├── stp · struct{det001,det002,det011,det012,det101,det102} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
+│   │   ├── det001 -> /stp/det001
+│   │   ├── det002 -> /stp/det002
+│   │   ├── det011 -> /stp/det011
+│   │   ├── det012 -> /stp/det012
+│   │   ├── det101 -> /stp/det101
+│   │   └── det102 -> /stp/det102
 │   ├── det001 · table{evtid,particle,edep,time,xloc,yloc,zloc} 
 │   │   ├── edep · array<1>{real} ── {'units': 'keV'}
 │   │   ├── evtid · array<1>{real} 

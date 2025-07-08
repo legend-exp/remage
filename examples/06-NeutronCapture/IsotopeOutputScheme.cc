@@ -22,7 +22,8 @@ void IsotopeOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto id = rmg_man->RegisterNtuple(
       OutputRegisterID,
-      ana_man->CreateNtuple("IsotopeOutput", "Event data")
+      ana_man->CreateNtuple("IsotopeOutput", "Event data"),
+      "IsotopeOutput"
   );
 
   ana_man->CreateNtupleIColumn(id, "evtid");

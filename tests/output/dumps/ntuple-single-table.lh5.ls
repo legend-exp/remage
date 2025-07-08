@@ -1,5 +1,9 @@
 /
 ├── stp · struct{germanium,optical,scintillator} 
+│   ├── __by_uid__ · struct{det001,det011,det101} 
+│   │   ├── det001 -> /stp/scintillator
+│   │   ├── det011 -> /stp/germanium
+│   │   └── det101 -> /stp/optical
 │   ├── germanium · table{evtid,det_uid,particle,edep,time,xloc,yloc,zloc,dist_to_surf} 
 │   │   ├── det_uid · array<1>{real} 
 │   │   ├── dist_to_surf · array<1>{real} ── {'units': 'm'}
