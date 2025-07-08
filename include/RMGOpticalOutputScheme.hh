@@ -41,6 +41,8 @@ class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
+
+    bool fStoreSinglePrecisionEnergy = true;
 };
 
 #endif
