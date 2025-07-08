@@ -37,8 +37,10 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* solid, bool on_surface) {
   auto entity = solid->GetEntityType();
   if (entity == "G4Sphere")
     return RMGGeneratorUtil::rand(dynamic_cast<const G4Sphere*>(solid), on_surface);
-  if (entity == "G4Orb") return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(solid), on_surface);
-  if (entity == "G4Box") return RMGGeneratorUtil::rand(dynamic_cast<const G4Box*>(solid), on_surface);
+  if (entity == "G4Orb")
+    return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(solid), on_surface);
+  if (entity == "G4Box")
+    return RMGGeneratorUtil::rand(dynamic_cast<const G4Box*>(solid), on_surface);
   if (entity == "G4Tubs")
     return RMGGeneratorUtil::rand(dynamic_cast<const G4Tubs*>(solid), on_surface);
   else {
