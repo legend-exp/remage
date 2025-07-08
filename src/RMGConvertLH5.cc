@@ -351,7 +351,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), ntuple), ntuples.end());
 
   // if the stp group is empty, remove it
-  if (ntuples.size() == 0) hfile.unlink(ntuple_group_name);
+  if (ntuples.empty()) hfile.unlink(ntuple_group_name);
   else {
     // make the root HDF5 group an LH5 struct.
     if (!ntuples_group.attrExists("datatype")) {
