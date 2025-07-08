@@ -11,7 +11,7 @@
 │   ├── name · array<1>{string} 
 │   └── procid · array<1>{real} 
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
-│   ├── __links__ · struct{det001,det002,det011,det012,det101,det102} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/scint1
 │   │   ├── det002 -> /stp/scint2
 │   │   ├── det011 -> /stp/det1

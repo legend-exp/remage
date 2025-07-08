@@ -1,6 +1,6 @@
 /
 ├── stp · struct{germanium,optical,scintillator} 
-│   ├── __links__ · struct{det001,det011,det101} 
+│   ├── __by_uid__ · struct{det001,det011,det101} 
 │   │   ├── det001 -> /stp/scintillator
 │   │   ├── det011 -> /stp/germanium
 │   │   └── det101 -> /stp/optical

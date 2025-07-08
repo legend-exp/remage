@@ -1,3 +1,5 @@
+(basic-tutorial)=
+
 # Basic Tutorial
 
 In this tutorial we are going to demonstrate the basic functionality of _remage_
@@ -385,11 +387,11 @@ $ lh5ls -d3 -a output.lh5
 │   │   ├── xloc · array<1>{array<1>{real}}
 │   │   ├── yloc · array<1>{array<1>{real}}
 │   │   └── zloc · array<1>{array<1>{real}}
-│   └── __links__ · struct{det001,det002,det003}
+│   └── __by_uid__ · struct{det001,det002,det003}
 │       ├── det001 -> /stp/BEGe
 │       ├── det002 -> /stp/Coax
 │       └── det003 -> /stp/LAr
-├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__links__/det)\\d+', 'tables': "['stp/__links__/det001', 'stp/__links__/det002', 'stp/__links__/det003']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det002', 'stp/__by_uid__/det003']"}
 │   ├── row_in_table · array<1>{array<1>{real}}
 │   └── table_key · array<1>{array<1>{real}}
 └── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
@@ -478,5 +480,11 @@ aware that a lot of the simulation and the output can be customized:
 - vertex coordinates can be read from an input file
 - the simulation of optical physics can be optimized
 
-Have a look at the [API reference](./api/index) and the
+And much more! Have a look at the [API reference](./api/index) and the
 [macro command reference](./rmg-commands).
+
+For advanced simulation output analysis, refer to {ref}`manual-analysis`.
+
+Finally, Don't miss _remage_'s {ref}`related-projects` and in particular
+[_reboost_](https://legend-exp.org/legend-exp/reboost) for advanced _remage_
+output analysis and post-processing.

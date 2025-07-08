@@ -293,12 +293,12 @@ for example, an output LH5 file will look like:
 :::{note}
 
 If the LH5 output format is selected, detector tables can be still accessed by
-UID through the symbolic stored in the `/stp/__links__` group.
+UID through the symbolic stored in the `/stp/__by_uid__` group.
 
 ```
 /
 └── stp · struct{B00000C,B00000D,...}
-    ├── __links__ · struct{det1104005,det1105600,...}
+    ├── __by_uid__ · struct{det1104005,det1105600,...}
     │   ├── det1104005 -> /stp/B00000C
     │   ├── det1105600 -> /stp/B00000D
     │   └── ...
@@ -565,7 +565,7 @@ UID assigned at registration time (see
 querying them based on the TCM data is straightforward. In case Geant4 logical
 volume names are used (see {ref}`manual-output-table-naming`), It's still
 possible to query data by UID with the symbolic links stored in
-`/stp/__links__`, keyed by UID as in the default _remage_ convention.
+`/stp/__by_uid__`, keyed by UID as in the default _remage_ convention.
 
 More information on how to use the TCM is provided in {ref}`manual-analysis`,
 while more documentation about how the TCM is generated is available at

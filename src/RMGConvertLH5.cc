@@ -300,7 +300,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
 
-  std::string links_group_name = "__links__";
+  std::string links_group_name = "__by_uid__";
   std::set<std::string> links;
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_links_group_name", links_group_name));
 

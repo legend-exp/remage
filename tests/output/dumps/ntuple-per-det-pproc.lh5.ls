@@ -1,6 +1,6 @@
 /
 ├── stp · struct{det001,det002,det011,det012,det101,det102} 
-│   ├── __links__ · struct{det001,det002,det011,det012,det101,det102} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/det001
 │   │   ├── det002 -> /stp/det002
 │   │   ├── det011 -> /stp/det011
@@ -115,7 +115,7 @@
 │       └── wavelength · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'nm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__links__/det)\\d+', 'tables': "['stp/__links__/det001', 'stp/__links__/det002', 'stp/__links__/det011', 'stp/__links__/det012', 'stp/__links__/det101', 'stp/__links__/det102']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det002', 'stp/__by_uid__/det011', 'stp/__by_uid__/det012', 'stp/__by_uid__/det101', 'stp/__by_uid__/det102']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

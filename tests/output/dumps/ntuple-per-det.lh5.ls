@@ -1,6 +1,6 @@
 /
 ├── stp · struct{det001,det002,det011,det012,det101,det102} 
-│   ├── __links__ · struct{det001,det002,det011,det012,det101,det102} 
+│   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/det001
 │   │   ├── det002 -> /stp/det002
 │   │   ├── det011 -> /stp/det011

@@ -108,7 +108,7 @@ def post_proc(
                 overwrite=overwrite_output,
             )
 
-            # also copy __links__ group to the output files
+            # also copy __by_uid__ group to the output files
             # we do this here and not in reboost, as the links require special syntax
             # NOTE: using just the first original file since the links are always the same
             if lh5.ls(original_files[0], rf"{lh5_links_group_name}") != []:
@@ -141,7 +141,7 @@ def post_proc(
         for file in utils._to_list(output_files):
             # do not compute the TCM if there are no stepping tables
             if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
-                # use tables keyed by UID in the __links__ group.  in this way, the
+                # use tables keyed by UID in the __by_uid__ group.  in this way, the
                 # TCM will index tables by UID.  the coincidence criterium is based
                 # on Geant4 event identifier and time of the hits
                 # NOTE: uses the same time window as in build_hit() reshaping
