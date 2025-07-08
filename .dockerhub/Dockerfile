@@ -11,6 +11,11 @@ ARG CMAKE_BUILD_TYPE="Release"
 USER root
 WORKDIR /root
 
+ENV PATH="/opt/remage/bin:$PATH" \
+    LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH" \
+    NUMBA_CPU_NAME="generic" \
+    NUMBA_DEBUG_CACHE=1
+
 RUN mkdir -p src build /opt/remage && \
     if [ "${REMAGE_VERSION}" = "dev" ]; then \
         rm -rf src && \
@@ -38,10 +43,7 @@ RUN mkdir -p src build /opt/remage && \
     # also install the package into the container-provided main venv
     uv --no-cache pip install --upgrade ./src && \
     rm -rf build src && \
-    LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH" /opt/remage/bin/remage --version # populate numba cache
-
-ENV PATH="/opt/remage/bin:$PATH" \
-    LD_LIBRARY_PATH="/opt/remage/lib:$LD_LIBRARY_PATH"
+    /opt/remage/bin/remage --version # populate numba cache
 
 ENTRYPOINT ["/opt/remage/bin/remage"]
 
