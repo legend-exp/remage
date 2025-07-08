@@ -57,7 +57,7 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
     RMGLog::OutFormat(RMGLog::fatal, "Isotope Z: {} A: {} does not exist.", z, a);
   // read next line from file
   std::string line;
-  do {
+  do { // NOLINT(cppcoreguidelines-avoid-do-while)
     if (!std::getline(*(it->second), line)) {
       // if end-of-file is reached, reset file and read first line
       RMGLog::Out(RMGLog::detail, "Gamma cascade file EOF reached, re-opening the file");
@@ -94,7 +94,7 @@ void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
   // Skip Header
   std::string line;
   int header_length = 0;
-  do {
+  do { // NOLINT(cppcoreguidelines-avoid-do-while)
     std::getline(file, line);
     header_length++;
   } while (line[0] == '%' || (line.find("version") != std::string::npos));
