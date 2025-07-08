@@ -66,7 +66,7 @@ void RMGOpticalOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
-    ana_man->CreateNtupleDColumn(id, "wavelength_in_nm");
+    CreateNtupleFOrDColumn(ana_man, id, "wavelength_in_nm", fStoreSinglePrecisionEnergy);
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
 
     ana_man->FinishNtuple(id);
@@ -115,7 +115,13 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
       if (!fNtuplePerDetector) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->photon_wavelength / u::nm);
+      FillNtupleFOrDColumn(
+          ana_man,
+          ntupleid,
+          col_id++,
+          hit->photon_wavelength / u::nm,
+          fStoreSinglePrecisionEnergy
+      );
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
       // NOTE: must be called here for hit-oriented output
@@ -124,6 +130,19 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
   }
 }
 
-void RMGOpticalOutputScheme::DefineCommands() {}
+void RMGOpticalOutputScheme::DefineCommands() {
+
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Output/Optical/",
+      "Commands for controlling output from hits in optical detectors."
+  );
+
+  fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
+      .SetGuidance("Use float32 (instead of float64) for wavelength output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+}
 
 // vim: tabstop=2 shiftwidth=2 expandtab
