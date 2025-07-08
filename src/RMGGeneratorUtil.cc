@@ -32,15 +32,15 @@ bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
          g4_solid_type == "G4Tubs";
 }
 
-G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* vol, bool on_surface) {
-  if (!vol) RMGLog::OutDev(RMGLog::fatal, "Input G4VSolid* is nullptr");
-  auto entity = vol->GetEntityType();
+G4ThreeVector RMGGeneratorUtil::rand(const G4VSolid* solid, bool on_surface) {
+  if (!solid) RMGLog::OutDev(RMGLog::fatal, "Input G4VSolid* is nullptr");
+  auto entity = solid->GetEntityType();
   if (entity == "G4Sphere")
-    return RMGGeneratorUtil::rand(dynamic_cast<const G4Sphere*>(vol), on_surface);
-  if (entity == "G4Orb") return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(vol), on_surface);
-  if (entity == "G4Box") return RMGGeneratorUtil::rand(dynamic_cast<const G4Box*>(vol), on_surface);
+    return RMGGeneratorUtil::rand(dynamic_cast<const G4Sphere*>(solid), on_surface);
+  if (entity == "G4Orb") return RMGGeneratorUtil::rand(dynamic_cast<const G4Orb*>(solid), on_surface);
+  if (entity == "G4Box") return RMGGeneratorUtil::rand(dynamic_cast<const G4Box*>(solid), on_surface);
   if (entity == "G4Tubs")
-    return RMGGeneratorUtil::rand(dynamic_cast<const G4Tubs*>(vol), on_surface);
+    return RMGGeneratorUtil::rand(dynamic_cast<const G4Tubs*>(solid), on_surface);
   else {
     RMGLog::OutDev(RMGLog::fatal, "'", entity, "' is not supported (implement me)");
     return {};
