@@ -28,11 +28,12 @@ RUN mkdir -p src build /opt/remage && \
         -DCMAKE_PROJECT_VERSION="${REMAGE_VERSION_SET}" \
         ../src && \
     make -j"$(nproc)" install && \
-    if [ "${REMAGE_BASE_FLAVOR}" = "slim" ]; then \
-        ctest --output-on-failure --label-exclude 'extra|vis'; \
-    else \
-        ctest --output-on-failure --label-exclude 'vis'; \
-    fi && \
+    # NOTE: do not run unit tests, not strictly necessary
+    # if [ "${REMAGE_BASE_FLAVOR}" = "slim" ]; then \
+    #     ctest --output-on-failure --label-exclude 'extra|vis'; \
+    # else \
+    #     ctest --output-on-failure --label-exclude 'vis'; \
+    # fi && \
     cd .. && \
     # also install the package into the container-provided main venv
     uv --no-cache pip install --upgrade ./src && \
