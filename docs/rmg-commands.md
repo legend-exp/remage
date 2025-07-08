@@ -1185,6 +1185,7 @@ Commands for controlling the simulation output
 **Sub-directories:**
 
 * `/RMG/Output/Germanium/` – Commands for controlling output from hits in germanium detectors.
+* `/RMG/Output/Optical/` – Commands for controlling output from hits in optical detectors.
 * `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
 * `/RMG/Output/Scintillator/` – Commands for controlling output from hits in scintillator detectors.
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
@@ -1488,6 +1489,25 @@ Set a energy threshold for tracks to be merged.
   * **Omittable** – `True`
   * **Default value** – `keV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/Optical/`
+
+Commands for controlling output from hits in optical detectors.
+
+
+**Commands:**
+
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for wavelength output.
+
+### `/RMG/Output/Optical/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for wavelength output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/Vertex/`
