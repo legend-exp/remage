@@ -21,7 +21,8 @@ foreach(_mac ${_macros} ${_macros_extra} ${_macros_vis})
 endforeach()
 
 foreach(_mac ${_macros})
-  add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES} macros/${_mac})
+  add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES}
+                                         macros/${_mac})
   set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS mt PROCESSORS ${NUM_CORES})
 endforeach()
 
@@ -32,7 +33,8 @@ endif()
 
 if(BxDecay0_THREADSAFE)
   foreach(_mac ${_macros_extra})
-    add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES} macros/${_mac})
+    add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES}
+                                           macros/${_mac})
     set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS "mt;extra" PROCESSORS ${NUM_CORES})
   endforeach()
 endif()
