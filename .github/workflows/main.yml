@@ -46,7 +46,7 @@ jobs:
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
-          make | tee -a build.log
+          make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
       - name: check version equality
@@ -167,7 +167,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
-          make
+          make -j$(nproc)
           make install
 
       - name: Run full test suite
