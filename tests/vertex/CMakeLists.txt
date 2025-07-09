@@ -1,3 +1,6 @@
+include(ProcessorCount)
+ProcessorCount(NUM_CORES)
+
 # collect auxiliary files
 file(
   GLOB _aux
@@ -25,7 +28,7 @@ foreach(_mac ${_macros})
                                                  vertex-input-fixture)
 
   # note: only 4 threads available on GitHub actions.
-  add_test(NAME vertex-mt/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${_mac} 4)
+  add_test(NAME vertex-mt/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${_mac} ${NUM_CORES})
   set_tests_properties(vertex-mt/${_mac} PROPERTIES LABELS "mt;extra" FIXTURES_REQUIRED
-                                                    vertex-input-fixture)
+                                                    vertex-input-fixture PROCESSORS ${NUM_CORES})
 endforeach()
