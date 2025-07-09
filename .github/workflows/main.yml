@@ -41,6 +41,7 @@ jobs:
       - name: Build project
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
+          echo $(nproc)
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
           mkdir build
@@ -87,7 +88,8 @@ jobs:
           DISPLAY: :99
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --label-exclude mt -j1 --output-on-failure
+          ctest --label-regex mt -j$(nproc) --output-on-failure
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
@@ -103,7 +105,8 @@ jobs:
           DISPLAY: :99
         run: |
           cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
+          ctest --label-exclude 'extra|vis|mt' -j1 --output-on-failure
+          ctest --label-regex mt --label-exclude 'extra|vis' -j$(nproc) --output-on-failure
 
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
@@ -171,7 +174,8 @@ jobs:
       - name: Run full test suite
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --label-exclude mt -j1 --output-on-failure
+          ctest --label-regex mt -j$(nproc) --output-on-failure
 
       - name: Minimally test installed executable
         run: |
