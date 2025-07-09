@@ -46,7 +46,7 @@ jobs:
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
-          make | tee -a build.log
+          make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
       - name: check version equality
@@ -87,7 +87,8 @@ jobs:
           DISPLAY: :99
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-regex mt -j1 --output-on-failure
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
@@ -103,7 +104,8 @@ jobs:
           DISPLAY: :99
         run: |
           cd build
-          ctest --output-on-failure --label-exclude 'extra|vis'
+          ctest --label-exclude 'extra|vis|mt' -j$(nproc) --output-on-failure
+          ctest --label-regex mt --label-exclude 'extra|vis' -j --output-on-failure
 
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
@@ -165,13 +167,14 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
-          make
+          make -j$(nproc)
           make install
 
       - name: Run full test suite
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-regex mt -j1 --output-on-failure
 
       - name: Minimally test installed executable
         run: |

@@ -1,3 +1,6 @@
+include(ProcessorCount)
+ProcessorCount(NUM_CORES)
+
 # collect auxiliary files
 file(
   GLOB _aux
@@ -22,9 +25,9 @@ foreach(_mac ${_macros})
   add_test(NAME confinement/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root
                                             -- macros/${_mac})
 
-  add_test(NAME confinement-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t 2 -o
-                                               test-out.root -- macros/${_mac})
-  set_tests_properties(confinement-mt/${_mac} PROPERTIES LABELS mt)
+  add_test(NAME confinement-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t
+                                               ${NUM_CORES} -o test-out.root -- macros/${_mac})
+  set_tests_properties(confinement-mt/${_mac} PROPERTIES LABELS mt PROCESSORS ${NUM_CORES})
 
   add_test(NAME confinement-vis/${_mac}
            COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
