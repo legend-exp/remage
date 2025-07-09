@@ -41,7 +41,7 @@ jobs:
       - name: Build project
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
-          echo $(nproc)
+          echo $(nproc) $(nproc --all) $(taskset -p $$)
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
           mkdir build
