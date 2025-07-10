@@ -163,10 +163,16 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
     return false;
   }
 
-  names_string = std::regex_replace(names_string, names_split_re, ",");
-  names_string = std::regex_replace(names_string, names_split_re_end, "");
+  std::sregex_token_iterator it(names_string.begin(), names_string.end(), names_it_re, -1);
+  std::vector<std::string> table_columns;
+  std::copy(it, std::sregex_token_iterator(), std::back_inserter(table_columns));
+  std::sort(table_columns.begin(), table_columns.end());
   // set the table lgdo datatype.
-  SetStringAttribute(det_group, "datatype", "table{" + names_string + "}");
+  SetStringAttribute(
+      det_group,
+      "datatype",
+      "table{" + fmt::format("{}", fmt::join(table_columns, ",")) + "}"
+  );
 
   // unlink the ntuple definition datasets and attributes.
   det_group.unlink("names");
@@ -301,7 +307,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   bool ntuple_success = true;
 
   std::string links_group_name = "__by_uid__";
-  std::set<std::string> links;
+  std::vector<std::string> links;
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_links_group_name", links_group_name));
 
   for (auto& ntuple : ntuples) {
@@ -332,7 +338,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
               std::string("/").append(ntuple_group_name).append("/").append(ntuple),
               soft_link_name_rel
           );
-          links.insert(soft_link_name);
+          links.push_back(soft_link_name);
           LH5Log(RMGLog::detail, "created soft link ", ntuple_group_name, "/", soft_link_name_rel);
         }
         break;
@@ -356,6 +362,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     // make the root HDF5 group an LH5 struct.
     if (!ntuples_group.attrExists("datatype")) {
       LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
+      std::sort(ntuples.begin(), ntuples.end());
       SetStringAttribute(
           ntuples_group,
           "datatype",
@@ -368,6 +375,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   if (ExistsByType(ntuples_group, links_group_name, H5O_TYPE_GROUP)) {
     auto links_group = ntuples_group.openGroup(links_group_name);
     LH5Log(RMGLog::debug, "making the links HDF5 group an LH5 struct");
+    std::sort(links.begin(), links.end());
     SetStringAttribute(
         links_group,
         "datatype",

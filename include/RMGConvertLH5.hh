@@ -124,8 +124,7 @@ class RMGConvertLH5 {
         std::string
     );
 
-    static inline const std::regex names_split_re = std::regex("(_in_.+?)?\\0");
-    static inline const std::regex names_split_re_end = std::regex("(_in_.+?)$");
+    static inline const std::regex names_it_re = std::regex("(_in_.+?)?\\0|(_in_.+?)$");
 
     std::unique_ptr<H5::DataType> FormToHDFDataType(std::string);
     std::string DataTypeToLGDO(H5::DataType);

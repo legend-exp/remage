@@ -1,4 +1,7 @@
 /
+├── processes · table{name,procid} 
+│   ├── name · array<1>{string} 
+│   └── procid · array<1>{real} 
 ├── stp · struct{germanium,optical,scintillator} 
 │   ├── __by_uid__ · struct{det001,det011,det101} 
 │   │   ├── det001 -> /stp/scintillator
@@ -80,6 +83,20 @@
 │   └── table_key · array<1>{array<1>{real}} 
 │       ├── cumulative_length · array<1>{real} 
 │       └── flattened_data · array<1>{real} 
+├── tracks · table{ekin,evtid,parent_trackid,particle,procid,px,py,pz,time,trackid,xloc,yloc,zloc} 
+│   ├── ekin · array<1>{real} ── {'units': 'MeV'}
+│   ├── evtid · array<1>{real} 
+│   ├── parent_trackid · array<1>{real} 
+│   ├── particle · array<1>{real} 
+│   ├── procid · array<1>{real} 
+│   ├── px · array<1>{real} ── {'units': 'MeV'}
+│   ├── py · array<1>{real} ── {'units': 'MeV'}
+│   ├── pz · array<1>{real} ── {'units': 'MeV'}
+│   ├── time · array<1>{real} ── {'units': 'ns'}
+│   ├── trackid · array<1>{real} 
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
 └── vtx · table{evtid,n_part,time,xloc,yloc,zloc} 
     ├── evtid · array<1>{real} 
     ├── n_part · array<1>{real} 

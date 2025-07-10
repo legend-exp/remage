@@ -7,6 +7,8 @@
 
 /RMG/Processes/OpticalPhysics true
 
+/RMG/Output/ActivateOutputScheme Track
+
 /control/execute macros/_init.mac
 
 /RMG/Output/NtuplePerDetector false
