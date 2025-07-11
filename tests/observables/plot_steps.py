@@ -18,9 +18,9 @@ plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 12
 
-vib = tc.tol_cset("vibrant")
-vset = tc.tol_cset("vibrant")
-mset = tc.tol_cset("muted")
+vib = tc.colorsets["vibrant"]
+vset = tc.colorsets["vibrant"]
+mset = tc.colorsets["muted"]
 
 
 # Get the BuPu colormap
@@ -63,7 +63,6 @@ def plot_tracks(_data, idx, savename=None):
     ax.set_ylabel(f"z -z0 [{prefix}m]")
 
     ax.legend(fontsize=14)
-    plt.tight_layout()
 
     if savename is not None:
         plt.savefig(savename)
@@ -89,8 +88,6 @@ def plot_hist2d(
     ax.set_xlabel("Distance to Surface [um]")
     ax.set_ylabel("Step length [um]")
 
-    plt.tight_layout()
-
     if savename is not None:
         plt.savefig(savename)
 
@@ -103,8 +100,6 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
     ax.set_xlabel("Step size [um]")
     ax.set_xlim(range[0], range[1])
     ax.set_yscale("linear")
-
-    plt.tight_layout()
 
     if savename is not None:
         plt.savefig(savename)
