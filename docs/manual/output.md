@@ -173,12 +173,14 @@ implement this functionality, for every event the total energy deposited is
 computed. This is based on summing the energy deposited in each `{UID}` added,
 or across all registered sensitive _Germanium_ detectors (if this macro command
 is not used). The event is then discarded if the energy is less than or equal to
-`ELOW` or less than `EHIGH`.
+`ELOW` or more than `EHIGH`.
 
 :::{note}
 
 This mechanism will remove the data from the event across all output schemes,
-not only the _Germanium_!
+not only the _Germanium_! However, `OutputSchemes` with their `StoreAlways()`
+function returning `true`, like the `TrackOutputScheme` or the
+`VertexOutputScheme` will always store their output.
 
 :::
 
@@ -356,13 +358,13 @@ schemes, it can be disabled with the command
 similarly for the _Scintillator_ output scheme:
 <project:../rmg-commands.md#rmgoutputscintillatorclusterpreclusteroutputs>.
 
-This clustering works by by first organise the hits by track id (the index of
-the `G4Track` within the event). Some processes in Geant4 produce a large number
-of secondary tracks due to atomic de-excitation, these tracks typically have a
-very low energy and range (however they are still produced since production cuts
-are not applied for most gamma interactions). Thus they are not expected to
-impact observables of interest. In many cases, after pre-clustering of high
-energy electrons, these tracks could form the majority of the output.
+This clustering works by first organizing the hits by track id (the index of the
+`G4Track` within the event). Some processes in Geant4 produce a large number of
+secondary tracks due to atomic de-excitation, these tracks typically have a very
+low energy and range (however they are still produced since production cuts are
+not applied for most gamma interactions). Thus they are not expected to impact
+observables of interest. In many cases, after pre-clustering of high energy
+electrons, these tracks could form the majority of the output.
 
 We implemented the possibility to merge these tracks prior to pre-clustering
 which can be enabled with
@@ -489,7 +491,7 @@ output table represent physical interactions in a sensitive volume occurring in
 a window compatible with the time resolution of the detector. In the following,
 we will often refer to these as "hits".
 
-The means the columns of the output table are converted from
+This means the columns of the output table are converted from
 [LH5 Array's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Array)
 objects to
 [LH5 VectorOfVectors's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Vector-of-vectors).
@@ -514,7 +516,7 @@ is a one-dimensional array:
 With reshaping, columns acquire one additional dimension:
 
 ```
-[{edep: [20.1, 50.1, ..., 74.9], evtid: [0, ..., 0], particle: ..., ...},
+[{edep: [20.1, ..., 74.9], evtid: [0, ..., 0], particle: ..., ...},
  {edep: [0.431, 109], evtid: [2, 2], particle: [11, 11], ...},
  {edep: [70.2], evtid: [3], particle: [11], time: [...], ...},
  ...,
