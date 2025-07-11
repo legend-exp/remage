@@ -179,8 +179,8 @@ is not used). The event is then discarded if the energy is less than or equal to
 
 This mechanism will remove the data from the event across all output schemes,
 not only the _Germanium_! However, `OutputSchemes` with their `StoreAlways()`
-function returning `true`, like the `TrackOutputScheme` or the
-`VertexOutputScheme` will always store their output.
+function returning `true`, like the `RMGTrackOutputScheme` or the
+`RMGVertexOutputScheme` will always store their output.
 
 :::
 
