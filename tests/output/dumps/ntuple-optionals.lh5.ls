@@ -1,4 +1,9 @@
 /
+├── detector_origins · table{name,xloc,yloc,zloc} 
+│   ├── name · array<1>{string} 
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
 ├── particles · table{ekin,evtid,particle,px,py,pz,vertexid} 
 │   ├── ekin · array<1>{real} ── {'units': 'MeV'}
 │   ├── evtid · array<1>{real} 

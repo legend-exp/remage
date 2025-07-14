@@ -1,4 +1,9 @@
 /
+├── detector_origins · table{name,xloc,yloc,zloc} 
+│   ├── name · array<1>{string} 
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
 ├── processes · table{name,procid} 
 │   ├── name · array<1>{string} 
 │   └── procid · array<1>{real} 
