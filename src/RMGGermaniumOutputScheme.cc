@@ -26,8 +26,10 @@
 
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGNavigationTools.hh"
 #include "RMGOutputManager.hh"
 #include "RMGOutputTools.hh"
 #include "RMGTools.hh"
@@ -55,6 +57,18 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   const auto detectors = det_cons->GetDetectorMetadataMap();
 
+  auto detector_origins_id = rmg_man->CreateAndRegisterAuxNtuple(
+      "detector_origins",
+      "RMGGermaniumOutputScheme",
+      ana_man
+  );
+  ana_man->CreateNtupleSColumn(detector_origins_id, "name");
+  CreateNtupleFOrDColumn(ana_man, detector_origins_id, "xloc_in_m", fStoreSinglePrecisionPosition);
+  CreateNtupleFOrDColumn(ana_man, detector_origins_id, "yloc_in_m", fStoreSinglePrecisionPosition);
+  CreateNtupleFOrDColumn(ana_man, detector_origins_id, "zloc_in_m", fStoreSinglePrecisionPosition);
+  ana_man->FinishNtuple(detector_origins_id);
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_ntuple_deduplicate", "detector_origins"));
+
   std::set<int> registered_uids;
   std::map<std::string, int> registered_ntuples;
   for (auto&& det : detectors) {
@@ -63,6 +77,17 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     // do not register the ntuple twice if two detectors share their uid.
     auto had_uid = registered_uids.emplace(det.second.uid);
     if (!had_uid.second) continue;
+
+    auto pv = RMGNavigationTools::FindPhysicalVolume(det.second.name, det.second.copy_nr);
+    auto trees = RMGNavigationTools::FindGlobalPositions(pv);
+    if (trees.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "more than one way to reach world volume from detector ",
+          det.second.name
+      );
+    }
+    fDetectorOrigins.insert({det.second.name, trees[0].vol_global_translation});
 
     auto ntuple_name = this->GetNtupleName(det.second);
     auto ntuple_reg = registered_ntuples.find(ntuple_name);
@@ -338,6 +363,25 @@ std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int s
   const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
   // discard all waiting events, if there was no energy deposition in Germanium.
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
+}
+
+void RMGGermaniumOutputScheme::EndOfRunAction(const G4Run*) {
+  auto rmg_man = RMGOutputManager::Instance();
+  if (!rmg_man->IsPersistencyEnabled() ||
+      (G4Threading::IsMasterThread() && !RMGManager::Instance()->IsExecSequential()))
+    return;
+
+  const auto ana_man = G4AnalysisManager::Instance();
+  auto ntuple_id = rmg_man->GetAuxNtupleID("detector_origins");
+
+  for (const auto& [det, v] : fDetectorOrigins) {
+    int col_id = 0;
+    ana_man->FillNtupleSColumn(ntuple_id, col_id++, det);
+    FillNtupleFOrDColumn(ana_man, ntuple_id, col_id++, v.getX() / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntuple_id, col_id++, v.getY() / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntuple_id, col_id++, v.getZ() / u::m, fStoreSinglePrecisionPosition);
+    ana_man->AddNtupleRow(ntuple_id);
+  }
 }
 
 void RMGGermaniumOutputScheme::SetPositionModeString(std::string mode) {
