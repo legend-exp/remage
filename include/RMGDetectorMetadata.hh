@@ -27,7 +27,9 @@ enum RMGDetectorType {
 struct RMGDetectorMetadata {
     RMGDetectorType type;
     int uid;
+    /** @brief name of the referenced physical volume */
     std::string name;
+    int copy_nr;
 };
 
 #endif

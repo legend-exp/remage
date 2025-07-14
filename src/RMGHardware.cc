@@ -300,7 +300,7 @@ void RMGHardware::RegisterDetector(
   fActiveDetectors.insert(type);
 
   // FIXME: can this be done with emplace?
-  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name}});
+  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name, copy_nr}});
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
         RMGLog::warning,
