@@ -1,4 +1,9 @@
 /
+├── detector_origins · table{name,xloc,yloc,zloc} 
+│   ├── name · array<1>{string} 
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
 ├── stp · struct{det001,det002,det011,det012,det101,det102} 
 │   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/det001

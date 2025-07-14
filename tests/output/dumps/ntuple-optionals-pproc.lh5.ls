@@ -1,4 +1,13 @@
 /
+├── detector_origins · struct{det1,det2} 
+│   ├── det1 · struct{xloc,yloc,zloc} 
+│   │   ├── xloc · real 
+│   │   ├── yloc · real 
+│   │   └── zloc · real 
+│   └── det2 · struct{xloc,yloc,zloc} 
+│       ├── xloc · real 
+│       ├── yloc · real 
+│       └── zloc · real 
 ├── particles · table{ekin,evtid,particle,px,py,pz,vertexid} 
 │   ├── ekin · array<1>{real} ── {'units': 'MeV'}
 │   ├── evtid · array<1>{real} 
@@ -7,9 +16,10 @@
 │   ├── py · array<1>{real} ── {'units': 'MeV'}
 │   ├── pz · array<1>{real} ── {'units': 'MeV'}
 │   └── vertexid · array<1>{real} 
-├── processes · table{name,procid} 
-│   ├── name · array<1>{string} 
-│   └── procid · array<1>{real} 
+├── processes · struct{compt,eBrem,phot} 
+│   ├── compt · real 
+│   ├── eBrem · real 
+│   └── phot · real 
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
 │   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/scint1
