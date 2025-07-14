@@ -7,9 +7,10 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import h5py
+import numpy as np
 import pygama.evt
 import reboost
-from lgdo import lh5
+from lgdo import Array, Scalar, Struct, lh5
 from lgdo.lh5.concat import lh5concat
 
 from . import utils
@@ -70,12 +71,12 @@ def post_proc(
 
     time_start = time.time()
 
-    if not flat_output:
-        # if merging is on, write everything to a single file
-        output_files: list[str] | str = (
-            remage_files if not merge_output_files else main_output_file
-        )
+    # if merging is on, write everything to a single file
+    output_files: list[str] | str = (
+        remage_files if not merge_output_files else main_output_file
+    )
 
+    if not flat_output:
         msg = (
             "Reshaping "
             + ("and merging " if merge_output_files else "")
@@ -154,6 +155,12 @@ def post_proc(
 
         ipc_info.set("output", main_output_file)
 
+    # deduplicate entries of the process table.
+    ntuples_to_deduplicate = set(ipc_info.get("output_ntuple_deduplicate"))
+    for file in utils._to_list(output_files):
+        for table in ntuples_to_deduplicate:
+            deduplicate_table(file, table, "name", not flat_output)
+
     msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
     log.info(msg)
 
@@ -184,6 +191,34 @@ def copy_links(
                         msg = f"removing broken symlink {link_name} -> {link.path}"
                         log.debug(msg)
                         del links_group[link_name]
+
+
+def deduplicate_table(
+    file: str, table_name: str, unique_col: str, to_struct: bool
+) -> None:
+    table = lh5.read(table_name, file)
+    table_old = {
+        col: (table[col].view_as("np").copy(), table[col].attrs) for col in table
+    }
+    _, uniq_idx = np.unique(table_old[unique_col][0], return_index=True)
+    table.resize(len(uniq_idx))
+    for col, (nda, attrs) in table_old.items():
+        table[col] = Array(nda[uniq_idx], attrs=attrs)
+
+    if to_struct:
+        keys = list(set(table.keys()) - {unique_col})
+        d = {}
+        for idx in range(table.size):
+            obj = (
+                Struct({col: Scalar(table[col].nda[idx]) for col in keys})
+                if len(keys) > 1
+                else Scalar(table[keys[0]].nda[idx])
+            )
+            d[table[unique_col].nda[idx].decode("utf-8")] = obj
+
+        lh5.write(Struct(d), table_name, file, wo_mode="overwrite")
+    else:
+        lh5.write(table, table_name, file, wo_mode="overwrite")
 
 
 def get_reboost_config(
