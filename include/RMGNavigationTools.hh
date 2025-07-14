@@ -18,8 +18,11 @@
 
 #include <set>
 #include <string>
+#include <vector>
 
 #include "G4LogicalVolume.hh"
+#include "G4RotationMatrix.hh"
+#include "G4ThreeVector.hh"
 #include "G4VPhysicalVolume.hh"
 
 // TODO: write function that locates points in global coordinates by using an
@@ -85,6 +88,26 @@ namespace RMGNavigationTools {
    * number, and logs their names, copy numbers, and the names of their logical parent volumes.
    */
   void PrintListOfPhysicalVolumes();
+
+  struct VolumeTreeEntry {
+      VolumeTreeEntry() = delete;
+      VolumeTreeEntry(const VolumeTreeEntry&) = default;
+      VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
+
+      G4VPhysicalVolume* physvol;
+
+      G4ThreeVector vol_global_translation; // origin
+      G4RotationMatrix vol_global_rotation; // identity
+      std::vector<G4RotationMatrix> partial_rotations;
+      std::vector<G4ThreeVector> partial_translations;
+  };
+
+  /**
+   * @brief find all ways to reach the world volume from a given physical volume.
+   * @param pv the physical volume to start with.
+   */
+  std::vector<VolumeTreeEntry> FindGlobalPositions(G4VPhysicalVolume* pv);
+
 } // namespace RMGNavigationTools
 
 #endif

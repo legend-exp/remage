@@ -288,19 +288,6 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
   private:
 
-    struct VolumeTreeEntry {
-        VolumeTreeEntry() = delete;
-        VolumeTreeEntry(const VolumeTreeEntry&) = default;
-        VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
-
-        G4VPhysicalVolume* physvol;
-
-        G4ThreeVector vol_global_translation; // origin
-        G4RotationMatrix vol_global_rotation; // identity
-        std::vector<G4RotationMatrix> partial_rotations;
-        std::vector<G4ThreeVector> partial_translations;
-    };
-
     void InitializePhysicalVolumes();
     void InitializeGeometricalVolumes(bool use_excluded_volumes);
     bool ActualGenerateVertex(G4ThreeVector& v);
