@@ -111,28 +111,7 @@ def post_proc(
             # also copy __by_uid__ group to the output files
             # we do this here and not in reboost, as the links require special syntax
             # NOTE: using just the first original file since the links are always the same
-            if lh5.ls(original_files[0], rf"{lh5_links_group_name}") != []:
-                with (
-                    h5py.File(original_files[0], "r") as inf,
-                    h5py.File(utils._to_list(output_files)[0], "a") as ouf,
-                ):
-                    inf.copy(
-                        lh5_links_group_name,
-                        ouf,
-                        lh5_links_group_name,
-                        expand_soft=False,  # do _not_ follow soft-links; preserve them
-                        expand_external=False,  # likewise for external links
-                        expand_refs=False,  # likewise for object-reference datasets
-                    )
-
-                    # remove broken symlinks
-                    links_group = ouf[lh5_links_group_name]
-                    for link_name in links_group:
-                        link = links_group.get(link_name, getlink=True)
-                        if isinstance(link, h5py.SoftLink) and link.path not in ouf:
-                            msg = f"removing broken symlink {link_name} -> {link.path}"
-                            log.debug(msg)
-                            del links_group[link_name]
+            copy_links(original_files[0], output_files, lh5_links_group_name)
 
         # add a time-coincidence map to the output file(s)
         msg = "Computing and storing the TCM as /tcm"
@@ -166,12 +145,45 @@ def post_proc(
                 lh5_files=original_files,
                 output=main_output_file,
                 overwrite=overwrite_output,
+                exclude_list=[f"{lh5_links_group_name}/*"],
             )
+            # also copy __by_uid__ group to the output files
+            # we do this here and not in reboost, as lh5concat does not copy links correctly.
+            # NOTE: using just the first original file since the links are always the same
+            copy_links(original_files[0], main_output_file, lh5_links_group_name)
 
         ipc_info.set("output", main_output_file)
 
     msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
     log.info(msg)
+
+
+def copy_links(
+    original_file: str, output_files: str | list[str], lh5_links_group_name: str
+) -> None:
+    if lh5.ls(original_file, lh5_links_group_name) == []:
+        return
+
+    with h5py.File(original_file, "r") as inf:
+        for file in utils._to_list(output_files):
+            with h5py.File(file, "a") as ouf:
+                inf.copy(
+                    lh5_links_group_name,
+                    ouf,
+                    lh5_links_group_name,
+                    expand_soft=False,  # do _not_ follow soft-links; preserve them
+                    expand_external=False,  # likewise for external links
+                    expand_refs=False,  # likewise for object-reference datasets
+                )
+
+                # remove broken symlinks
+                links_group = ouf[lh5_links_group_name]
+                for link_name in links_group:
+                    link = links_group.get(link_name, getlink=True)
+                    if isinstance(link, h5py.SoftLink) and link.path not in ouf:
+                        msg = f"removing broken symlink {link_name} -> {link.path}"
+                        log.debug(msg)
+                        del links_group[link_name]
 
 
 def get_reboost_config(
