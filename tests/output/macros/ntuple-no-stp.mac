@@ -10,4 +10,4 @@
 /gps/particle gamma
 /gps/energy 200 keV
 
-/run/beamOn 10
+/run/beamOn 1000
