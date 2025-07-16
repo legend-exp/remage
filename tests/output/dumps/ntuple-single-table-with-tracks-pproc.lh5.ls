@@ -1,7 +1,17 @@
 /
-├── processes · table{name,procid} 
-│   ├── name · array<1>{string} 
-│   └── procid · array<1>{real} 
+├── detector_origins · struct{det1,det2} 
+│   ├── det1 · struct{xloc,yloc,zloc} 
+│   │   ├── xloc · real 
+│   │   ├── yloc · real 
+│   │   └── zloc · real 
+│   └── det2 · struct{xloc,yloc,zloc} 
+│       ├── xloc · real 
+│       ├── yloc · real 
+│       └── zloc · real 
+├── processes · struct{compt,eBrem,phot} 
+│   ├── compt · real 
+│   ├── eBrem · real 
+│   └── phot · real 
 ├── stp · struct{germanium,optical,scintillator} 
 │   ├── __by_uid__ · struct{det001,det011,det101} 
 │   │   ├── det001 -> /stp/scintillator

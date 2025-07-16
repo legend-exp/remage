@@ -20,6 +20,7 @@
 #include "G4EventManager.hh"
 #include "G4OpticalPhoton.hh"
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
 
@@ -53,6 +54,7 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   ana_man->CreateNtupleIColumn(pid, "procid");
   ana_man->CreateNtupleSColumn(pid, "name");
   ana_man->FinishNtuple(pid);
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_ntuple_deduplicate", "processes"));
 }
 
 void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
