@@ -59,8 +59,6 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled()) return;
 
-  const auto ana_man = G4AnalysisManager::Instance();
-
   // do never write tracks of optical photons (there will be many).
   if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { return; }
 
@@ -97,51 +95,57 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  auto ntupleid = rmg_man->GetAuxNtupleID("tracks");
-  int col_id = 0;
-  ana_man->FillNtupleIColumn(
-      ntupleid,
-      col_id++,
-      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID()
+  fTrackEntries.emplace_back(
+      RMGTrackEntry{
+          G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
+          track->GetTrackID(),
+          track->GetParentID(),
+          proc_id,
+          primary->GetPDGcode(),
+          track->GetGlobalTime(),
+          pos.getX(),
+          pos.getY(),
+          pos.getZ(),
+          primary->GetMomentum().getX(),
+          primary->GetMomentum().getY(),
+          primary->GetMomentum().getZ(),
+          track->GetKineticEnergy()
+      }
   );
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetTrackID());
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetParentID());
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, proc_id);
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, primary->GetPDGcode());
-  ana_man->FillNtupleDColumn(ntupleid, col_id++, track->GetGlobalTime() / u::ns);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getX() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getY() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getZ() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getX() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getY() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getZ() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      track->GetKineticEnergy() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
+}
 
-  ana_man->AddNtupleRow(ntupleid);
+void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
+  auto rmg_man = RMGOutputManager::Instance();
+  if (!rmg_man->IsPersistencyEnabled()) return;
+
+  const auto ana_man = G4AnalysisManager::Instance();
+
+  auto ntupleid = rmg_man->GetAuxNtupleID("tracks");
+
+  for (const auto& entry : fTrackEntries) {
+    int col_id = 0;
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.eventId);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.trackId);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.parentId);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.procId);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.particlePdg);
+    ana_man->FillNtupleDColumn(ntupleid, col_id++, entry.globalTime / u::ns);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.xPosition / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.yPosition / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.zPosition / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.px / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.py / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.pz / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(
+        ana_man,
+        ntupleid,
+        col_id++,
+        entry.kineticEnergy / u::MeV,
+        fStoreSinglePrecisionEnergy
+    );
+
+    ana_man->AddNtupleRow(ntupleid);
+  }
 }
 
 void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
@@ -198,6 +202,11 @@ void RMGTrackOutputScheme::DefineCommands() {
       .SetGuidance("Use float32 (instead of float64) for energy output.")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+  fMessenger->DeclareProperty("StoreAlways", fStoreAlways)
+      .SetGuidance("Always store track data, even if event should be discarded.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("false")
       .SetStates(G4State_Idle);
 }
 
