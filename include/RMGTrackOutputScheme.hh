@@ -56,7 +56,6 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     void ClearBeforeEvent() override { fTrackEntries.clear(); }
     void StoreEvent(const G4Event*) override;
 
-    // always store vertex data, so that results are not skewed if events are discarded.
     [[nodiscard]] bool StoreAlways() const override { return fStoreAlways; }
 
   protected:
