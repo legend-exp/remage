@@ -1814,6 +1814,7 @@ Commands for controlling output of track vertices.
 * `EnergyFilter` – Only include tracks with kinetic energy above this threshold.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `StoreAlways` – Always store track data, even if event should be discarded.
 
 ### `/RMG/Output/Track/AddProcessFilter`
 
@@ -1860,6 +1861,16 @@ Use float32 (instead of float64) for energy output.
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreAlways`
+
+Always store track data, even if event should be discarded.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `false`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/ParticleFilter/`
