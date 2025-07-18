@@ -26,7 +26,7 @@
 
 #include "RMGDetectorMetadata.hh"
 
-#include "fmt/format.h"
+#include "fmt/core.h"
 
 class G4Event;
 /**
@@ -146,12 +146,14 @@ class RMGVOutputScheme {
      */
     void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
 
+    static inline std::string fUIDKeyFormatString = "det{:03}";
+
   protected:
 
     [[nodiscard]] virtual std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
         if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
-        return fmt::format(fUIDKeyFormatString, det.uid);
+        return fmt::format(fmt::runtime(fUIDKeyFormatString), det.uid);
       }
       return GetNtupleNameFlat();
     }
@@ -173,7 +175,6 @@ class RMGVOutputScheme {
     // global options injected by manager.
     bool fNtuplePerDetector = true;
     bool fNtupleUseVolumeName = false;
-    std::string fUIDKeyFormatString = "det{:03}";
 };
 
 #endif

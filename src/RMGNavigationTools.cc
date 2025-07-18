@@ -15,6 +15,7 @@
 
 #include "RMGNavigationTools.hh"
 
+#include <format>
 #include <map>
 #include <queue>
 #include <set>
@@ -28,8 +29,6 @@
 
 #include "RMGLog.hh"
 
-#include "fmt/core.h"
-
 std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
     std::string name,
     std::string copy_nr
@@ -42,8 +41,8 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
   RMGLog::OutFormat(
       RMGLog::detail,
       "Scanning for Physical volumes matching pattern '{}'['{}']",
-      name.c_str(),
-      copy_nr.c_str()
+      name,
+      copy_nr
   );
 
   bool found = false;
@@ -58,7 +57,7 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
       RMGLog::OutFormat(
           RMGLog::detail,
           "Found '{}[{}]' matching the pattern",
-          (*it)->GetName().c_str(),
+          (*it)->GetName(),
           (*it)->GetCopyNo()
       );
 
@@ -69,9 +68,9 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
     RMGLog::Out(
         RMGLog::warning,
         "No physical volumes names found matching pattern '",
-        name.c_str(),
+        name,
         "' and copy numbers matching pattern '",
-        copy_nr.c_str(),
+        copy_nr,
         "'"
     );
   }
@@ -151,7 +150,7 @@ void RMGNavigationTools::PrintListOfLogicalVolumes() {
 
     volumes.insert(
         {v->GetName(),
-         fmt::format(
+         std::format(
              "{} daugh. // {} // {} // {} // {} // {}",
              v->GetNoDaughters(),
              std::string(G4BestUnit(v->GetMaterial()->GetDensity(), "Volumic Mass")),
