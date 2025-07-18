@@ -16,7 +16,6 @@
 #include "RMGEventAction.hh"
 
 #include <chrono>
-#include <sstream>
 
 #include "G4AnalysisManager.hh"
 #include "G4RunManager.hh"
@@ -26,9 +25,6 @@
 #include "RMGOutputManager.hh"
 #include "RMGRun.hh"
 #include "RMGRunAction.hh"
-
-#include "fmt/chrono.h"
-#include "magic_enum/magic_enum.hpp"
 
 RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action) {}
 

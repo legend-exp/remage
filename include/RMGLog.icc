@@ -82,7 +82,7 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... ar
 template <typename... Args>
 inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
     try {
-        RMGLog::Out(loglevel, fmt::format(fmt, args...));
+        RMGLog::Out(loglevel, fmt::format(fmt::runtime(fmt), args...));
     }
     catch (fmt::format_error& e) {
         RMGLog::Out(RMGLog::error, "fmt library exception caught: ", e.what());

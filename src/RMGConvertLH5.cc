@@ -23,6 +23,7 @@
 
 #include "RMGIpc.hh"
 #include "RMGLog.hh"
+#include "RMGVOutputScheme.hh"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -328,7 +329,10 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
         }
 
         // form soft link name "detUID" where UID is item.second.first.
-        auto soft_link_name = fmt::format(fUIDKeyFormatString, item.first);
+        auto soft_link_name = fmt::format(
+            fmt::runtime(RMGVOutputScheme::fUIDKeyFormatString),
+            item.first
+        );
         auto soft_link_name_rel = std::string(links_group_name).append("/").append(soft_link_name);
         // do not create if the soft link already exists.
         if (!ntuples_group.nameExists(soft_link_name_rel)) {
