@@ -36,11 +36,19 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGene
     RMGLog::Out(RMGLog::fatal, "BxDecay0 is not thread-safe (yet). Re-run in sequential mode.");
 #endif
 
-  if (!prim_gen) RMGLog::OutDev(RMGLog::fatal, "Primary position generator is nullptr");
-
   fDecay0G4Generator = std::make_unique<bxdecay0_g4::PrimaryGeneratorAction>();
-  // NOTE: BxDecay0's primary generator action will own the pointer
-  fDecay0G4Generator->SetVertexGenerator(prim_gen);
+  if (!prim_gen) {
+    RMGLog::OutDev(
+        RMGLog::debug,
+        "Primary position generator is nullptr upon Decay0 initialization. "
+        "Make sure to set it later."
+    );
+    fLateVertexInit = true; // BxDecay0 will need a working vertex generator later
+  } else {
+    // NOTE: BxDecay0's primary generator action will own the pointer
+    fDecay0G4Generator->SetVertexGenerator(prim_gen);
+  }
+
   this->DefineCommands();
 }
 
@@ -48,7 +56,23 @@ RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGene
 RMGGeneratorDecay0::~RMGGeneratorDecay0() = default; // NOLINT
 
 void RMGGeneratorDecay0::GeneratePrimaries(G4Event* event) {
+  if (fLateVertexInit) {
+    RMGLog::OutDev(
+        RMGLog::error,
+        "Primary vertex generator needs to be set before generating primaries."
+    );
+  }
   fDecay0G4Generator->GeneratePrimaries(event);
+}
+
+void RMGGeneratorDecay0::SetLateVertexGenerator(RMGVVertexGenerator* prim_gen) {
+  if (fLateVertexInit) {
+    RMGLog::OutDev(RMGLog::debug, "Setting primary vertex generator for BxDecay0.");
+    fDecay0G4Generator->SetVertexGenerator(prim_gen);
+    fLateVertexInit = false; // No longer needed
+  } else {
+    RMGLog::Out(RMGLog::error, "Primary vertex generator for BxDecay0 was already set.");
+  }
 }
 
 void RMGGeneratorDecay0::BeginOfRunAction(const G4Run*) {

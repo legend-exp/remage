@@ -89,6 +89,8 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     void GeneratePrimaries(G4Event*) override;
     void SetParticlePosition(G4ThreeVector) override{};
 
+    void SetLateVertexGenerator(RMGVVertexGenerator* prim_gen);
+
     /** @brief Updates the seed and configuration at the beginning of each run.
      *  @details Only does something if any remage set up command was used ( @c fUpdateSeeds is true).
      */
@@ -112,6 +114,8 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
      *  Should only be true if the user has used a remage command to set the generator mode.
      */
     bool fUpdateSeeds = false;
+
+    bool fLateVertexInit = false; // Whether the primary vertex generator was null at the time of initialization.
 
     /** @brief Nested messenger class to handle the more complex double beta decay command for the
      * BxDecay0 generator. This class allows setting the isotope, process, and energy level for the

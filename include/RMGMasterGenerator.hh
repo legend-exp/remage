@@ -147,6 +147,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
+    bool fLateDecay0VertexInit = false;
 };
 
 #endif
