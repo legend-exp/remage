@@ -20,6 +20,7 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 
+#include "RMGConfig.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
 
@@ -147,7 +148,9 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
 
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
+#if RMG_HAS_BXDECAY0
     bool fLateDecay0VertexInit = false;
+#endif
 };
 
 #endif
