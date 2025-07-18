@@ -37,8 +37,10 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     void TrackingActionPre(const G4Track*) override;
     void EndOfRunAction(const G4Run*) override;
 
-    // always store vertex data, so that results are not skewed if events are discarded.
-    [[nodiscard]] bool StoreAlways() const override { return true; }
+    void ClearBeforeEvent() override { fTrackEntries.clear(); }
+    void StoreEvent(const G4Event*) override;
+
+    [[nodiscard]] bool StoreAlways() const override { return fStoreAlways; }
 
   protected:
 
@@ -57,12 +59,31 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+    bool fStoreAlways = false;
 
     std::map<std::string, uint32_t> fProcessMap;
 
     std::set<std::string> fFilterProcess;
     std::set<int> fFilterParticle;
     double fFilterEnergy = -1;
+
+    struct RMGTrackEntry {
+        int eventId;
+        int trackId;
+        int parentId;
+        int procId;
+        int particlePdg;
+        double globalTime;
+        double xPosition;
+        double yPosition;
+        double zPosition;
+        double px;
+        double py;
+        double pz;
+        double kineticEnergy;
+    };
+
+    std::vector<RMGTrackEntry> fTrackEntries;
 };
 
 #endif

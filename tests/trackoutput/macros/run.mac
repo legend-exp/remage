@@ -1,0 +1,22 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Geometry/RegisterDetector Germanium germanium 001
+
+/RMG/Output/ActivateOutputScheme Track
+
+/run/initialize
+
+/RMG/Output/Germanium/EdepCutLow 1 keV
+
+/RMG/Output/Track/StoreAlways {STORE}
+
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/energy 0 eV
+/gps/ion 86 222
+/process/had/rdm/nucleusLimits 214 222 82 86
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Source
+/RMG/Generator/Confinement/MaxSamplingTrials 10000
+
+/run/beamOn 500
