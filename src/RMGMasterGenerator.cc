@@ -98,6 +98,22 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       "Primary vertex confinement strategy set to {}",
       magic_enum::enum_name<RMGMasterGenerator::Confinement>(code)
   );
+#if RMG_HAS_BXDECAY0
+  if (fLateDecay0VertexInit) {
+    // BxDecay0 did not get a working vertex generator, so we set it now
+    if (auto* decayGen = dynamic_cast<RMGGeneratorDecay0*>(fGeneratorObj.get())) {
+      // decayGen is a valid pointer to RMGGeneratorDecay0
+      decayGen->SetLateVertexGenerator(fVertexGeneratorObj.release());
+      fLateDecay0VertexInit = false; // No longer late
+    } else {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Late vertex generator initialization failed: "
+          "fGeneratorObj is not a RMGGeneratorDecay0 instance."
+      );
+    }
+  }
+#endif
 }
 
 void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
@@ -111,6 +127,8 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
 #if RMG_HAS_BXDECAY0
       // NOTE: release ownership here, BxDecay0 will own the pointer (sigh...)
       // fVertexGeneratorObj will hold nullptr after a call to release()
+      if (fVertexGeneratorObj == nullptr)
+        fLateDecay0VertexInit = true; // BxDecay0 will need a working vertex generator later
       fGeneratorObj = std::make_unique<RMGGeneratorDecay0>(fVertexGeneratorObj.release());
 #else
       RMGLog::OutFormat(
