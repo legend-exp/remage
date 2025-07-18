@@ -26,7 +26,7 @@ bool RMGExceptionHandler::Notify(
 
   auto code = std::string(exceptionCode);
   // the UI manager aborts batch mode, but only emits warnings. Mark them as errors accordingly.
-  if (code.find("UIMAN") == 0) { severity = FatalException; }
+  if (code.starts_with("UIMAN")) { severity = FatalException; }
 
   // do our remage-internal bookkeeping after changing severities.
   if (severity == JustWarning) {
