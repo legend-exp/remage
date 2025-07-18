@@ -16,6 +16,7 @@
 #include "RMGHardware.hh"
 
 #include <filesystem>
+#include <format>
 namespace fs = std::filesystem;
 
 #include "G4GenericMessenger.hh"
@@ -432,7 +433,7 @@ void RMGHardware::RegisterDetector(
     RMGIpc::SendIpcNonBlocking(
         RMGIpc::CreateMessage(
             "detector",
-            fmt::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)
+            std::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)
         )
     );
   }
