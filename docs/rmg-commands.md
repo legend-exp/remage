@@ -1870,7 +1870,7 @@ Always store track data, even if event should be discarded.
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
-  * **Default value** – `false`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Output/ParticleFilter/`
