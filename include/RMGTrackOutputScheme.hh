@@ -25,22 +25,6 @@
 
 #include "RMGVOutputScheme.hh"
 
-struct RMGTrackEntry {
-    int eventId;
-    int trackId;
-    int parentId;
-    int procId;
-    int particlePdg;
-    double globalTime;
-    double xPosition;
-    double yPosition;
-    double zPosition;
-    double px;
-    double py;
-    double pz;
-    double kineticEnergy;
-};
-
 class G4Event;
 class G4Track;
 class RMGTrackOutputScheme : public RMGVOutputScheme {
@@ -82,6 +66,22 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     std::set<std::string> fFilterProcess;
     std::set<int> fFilterParticle;
     double fFilterEnergy = -1;
+
+    struct RMGTrackEntry {
+        int eventId;
+        int trackId;
+        int parentId;
+        int procId;
+        int particlePdg;
+        double globalTime;
+        double xPosition;
+        double yPosition;
+        double zPosition;
+        double px;
+        double py;
+        double pz;
+        double kineticEnergy;
+    };
 
     std::vector<RMGTrackEntry> fTrackEntries;
 };

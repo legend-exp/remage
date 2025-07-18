@@ -206,7 +206,7 @@ void RMGTrackOutputScheme::DefineCommands() {
   fMessenger->DeclareProperty("StoreAlways", fStoreAlways)
       .SetGuidance("Always store track data, even if event should be discarded.")
       .SetParameterName("boolean", true)
-      .SetDefaultValue("false")
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 }
 
