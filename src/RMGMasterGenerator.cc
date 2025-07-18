@@ -98,7 +98,7 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       "Primary vertex confinement strategy set to {}",
       magic_enum::enum_name<RMGMasterGenerator::Confinement>(code)
   );
-
+#if RMG_HAS_BXDECAY0
   if (fLateDecay0VertexInit) {
     // BxDecay0 did not get a working vertex generator, so we set it now
     if (auto* decayGen = dynamic_cast<RMGGeneratorDecay0*>(fGeneratorObj.get())) {
@@ -113,6 +113,7 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       );
     }
   }
+#endif
 }
 
 void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
