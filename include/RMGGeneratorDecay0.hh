@@ -73,7 +73,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
     };
 
     /** @brief Constructor that links the BxDecay0 generator action to remage.
-     *  @param prim_gen Pointer to the remage primary vertex generator.
+     *  @param master_gen Pointer to the remage master generator.
      *  @details  BxDecay0's primary generator action will own the pointer
      */
     RMGGeneratorDecay0(RMGMasterGenerator* master_gen);
