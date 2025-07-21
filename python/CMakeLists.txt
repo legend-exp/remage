@@ -81,8 +81,8 @@ add_custom_command(
   COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python
           -m uv pip -q install --upgrade -- "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
   COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND printf -- "-- Installed python wrapper "
-  COMMAND sh -c '${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version'
+  COMMAND sh -c 'echo \"-- Installed python wrapper\"\\
+    `${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version`'
   DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
           "${VENV_DIR}/remage-pkg"
   COMMENT "Installing remage Python wrapper into the virtual environment")
