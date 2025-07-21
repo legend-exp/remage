@@ -34,6 +34,7 @@
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGMasterGenerator.hh"
 #include "RMGOpticalOutputScheme.hh"
 #include "RMGParticleFilterScheme.hh"
 #include "RMGScintillatorOutputScheme.hh"
@@ -61,17 +62,13 @@ void init_extra() {
 
   // confinments
   new RMGVertexConfinement();
-#if RMG_HAS_BXDECAY0
-  auto vertex_gen = new RMGVertexFromFile();
-#else
-  new RMGVertexFromFile(); // So the compiler does not complain about unused variable.
-#endif
-
+  new RMGVertexFromFile();
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
 #if RMG_HAS_BXDECAY0
-  new RMGGeneratorDecay0(vertex_gen); // needs a vertex generator
+  auto master_gen = new RMGMasterGenerator();
+  new RMGGeneratorDecay0(master_gen); // needs a vertex generator
 #endif
   new RMGGeneratorFromFile();
 }
