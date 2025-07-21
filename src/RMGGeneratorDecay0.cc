@@ -29,18 +29,17 @@
 #include "bxdecay0_g4/primary_generator_action.hh"
 #endif
 
-RMGGeneratorDecay0::RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen) : RMGVGenerator("Decay0") {
+RMGGeneratorDecay0::RMGGeneratorDecay0(RMGMasterGenerator* master_gen)
+    : RMGVGenerator("Decay0"), fMasterGen(master_gen) {
 
 #if !RMG_HAS_BXDECAY0_THREADSAFE
   if (!RMGManager::Instance()->IsExecSequential())
     RMGLog::Out(RMGLog::fatal, "BxDecay0 is not thread-safe (yet). Re-run in sequential mode.");
 #endif
 
-  if (!prim_gen) RMGLog::OutDev(RMGLog::fatal, "Primary position generator is nullptr");
+  if (!master_gen) RMGLog::OutDev(RMGLog::fatal, "Master generator is nullptr");
 
   fDecay0G4Generator = std::make_unique<bxdecay0_g4::PrimaryGeneratorAction>();
-  // NOTE: BxDecay0's primary generator action will own the pointer
-  fDecay0G4Generator->SetVertexGenerator(prim_gen);
   this->DefineCommands();
 }
 
@@ -52,6 +51,14 @@ void RMGGeneratorDecay0::GeneratePrimaries(G4Event* event) {
 }
 
 void RMGGeneratorDecay0::BeginOfRunAction(const G4Run*) {
+
+  RMGVVertexGenerator* prim_gen = fMasterGen->GetVertexGenerator();
+  if (!prim_gen) {
+    RMGLog::Out(RMGLog::fatal, "No primary vertex generator specified at runtime for BxDecay0!");
+  }
+  // Set the vertex generator by reference to not lose ownership.
+  fDecay0G4Generator->SetVertexGenerator(*prim_gen);
+
   // Technically the user can change the seed at any time, so we have to always update.
   // But only actually update the seed once the user used a RMGGeneratorDecay0 command.
   if (fUpdateSeeds) {
@@ -87,6 +94,11 @@ void RMGGeneratorDecay0::BeginOfRunAction(const G4Run*) {
     RMGLog::Out(RMGLog::debug, "BxDecay0 generator: seed set to ", seed);
     fDecay0G4Generator->SetConfigHasChanged(true);
   }
+}
+
+void RMGGeneratorDecay0::EndOfRunAction(const G4Run*) {
+  // Reset the vertex generator to avoid using stale objects
+  fDecay0G4Generator->SetVertexGenerator(nullptr);
 }
 
 void RMGGeneratorDecay0::SetBackground(std::string isotope) {

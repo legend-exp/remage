@@ -21,6 +21,7 @@
 #include "G4GenericMessenger.hh"
 #include "G4ThreeVector.hh"
 
+#include "RMGMasterGenerator.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVVertexGenerator.hh"
 
@@ -75,7 +76,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
      *  @param prim_gen Pointer to the remage primary vertex generator.
      *  @details  BxDecay0's primary generator action will own the pointer
      */
-    RMGGeneratorDecay0(RMGVVertexGenerator* prim_gen);
+    RMGGeneratorDecay0(RMGMasterGenerator* master_gen);
     RMGGeneratorDecay0() = delete;
     ~RMGGeneratorDecay0();
 
@@ -93,7 +94,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
      *  @details Only does something if any remage set up command was used ( @c fUpdateSeeds is true).
      */
     void BeginOfRunAction(const G4Run*) override;
-    void EndOfRunAction(const G4Run*) override {}
+    void EndOfRunAction(const G4Run*) override;
 
     /** @brief Sets BxDecay0 to run in background mode and sets the specific isotope.
      *  @param isotope The isotope to set (e.g. "Co60").
@@ -104,6 +105,7 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
   private:
 
     std::unique_ptr<bxdecay0_g4::PrimaryGeneratorAction> fDecay0G4Generator;
+    RMGMasterGenerator* fMasterGen = nullptr; // non-owning
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
