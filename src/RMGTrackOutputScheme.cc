@@ -95,7 +95,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  fTrackEntries.emplace_back(
+  fTrackEntries.push_back(
       RMGTrackEntry{
           G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
           track->GetTrackID(),
@@ -147,6 +147,8 @@ void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
     ana_man->AddNtupleRow(ntupleid);
   }
 }
+
+void RMGTrackOutputScheme::ClearBeforeEvent() { std::vector<RMGTrackEntry>().swap(fTrackEntries); }
 
 void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   auto rmg_man = RMGOutputManager::Instance();
