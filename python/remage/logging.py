@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 
 import colorlog
@@ -47,7 +48,7 @@ def setup_log() -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    if sys.stderr.isatty():
+    if supports_color():
         fmt = "%(log_color)s[%(levelname)-7s ->%(reset)s %(message)s"
 
         handler = colorlog.StreamHandler()
@@ -58,6 +59,27 @@ def setup_log() -> logging.Logger:
     set_logging_level(logger, "Summary")
 
     return logger
+
+
+def supports_color() -> bool:
+    term = os.environ.get("TERM", None)
+    terms = [
+        "ansi",
+        "color",
+        "console",
+        "cygwin",
+        "gnome",
+        "konsole",
+        "kterm",
+        "linux",
+        "msys",
+        "putty",
+        "rxvt",
+        "screen",
+        "vt100",
+        "xterm",
+    ]
+    return sys.stderr.isatty() and any(term in t for t in terms)
 
 
 def set_logging_level(logger, rmg_log_level):
