@@ -2,6 +2,8 @@
 
 /control/execute macros/_init.mac
 
+/RMG/Manager/Randomization/Seed 1403045745
+
 /RMG/Generator/Confine UnConfined
 
 /RMG/Generator/Select GPS

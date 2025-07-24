@@ -1,7 +1,8 @@
 /
-├── processes · table{name,procid} 
-│   ├── name · array<1>{string} 
-│   └── procid · array<1>{real} 
+├── processes · struct{compt,eBrem,phot} 
+│   ├── compt · real 
+│   ├── eBrem · real 
+│   └── phot · real 
 └── tracks · table{ekin,evtid,parent_trackid,particle,procid,px,py,pz,time,trackid,xloc,yloc,zloc} 
     ├── ekin · array<1>{real} ── {'units': 'MeV'}
     ├── evtid · array<1>{real} 

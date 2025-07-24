@@ -111,6 +111,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
       fPreClusterPars.track_energy_threshold = threshold;
     }
 
+    void EndOfRunAction(const G4Run*) override;
+
   protected:
 
     [[nodiscard]] std::string GetNtupleNameFlat() const override { return "germanium"; }
@@ -141,6 +143,8 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     // mode of position to store
     RMGOutputTools::PositionMode fPositionMode = RMGOutputTools::PositionMode::kAverage;
+
+    std::map<std::string, G4ThreeVector> fDetectorOrigins;
 };
 
 #endif
