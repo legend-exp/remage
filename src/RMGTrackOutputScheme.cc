@@ -144,10 +144,12 @@ void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
         fStoreSinglePrecisionEnergy
     );
 
+    fStoredProcessIDs.insert(entry.procId);
     ana_man->AddNtupleRow(ntupleid);
   }
 }
 
+// free the memory of the track entries.
 void RMGTrackOutputScheme::ClearBeforeEvent() { std::vector<RMGTrackEntry>().swap(fTrackEntries); }
 
 void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
@@ -159,13 +161,19 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
 
   std::set<uint32_t> proc_ids; // to check for duplicates.
 
-  for (auto& [proc_name, proc_id] : fProcessMap) {
-    ana_man->FillNtupleIColumn(ntupleid, 0, static_cast<int>(proc_id));
+  for (auto& [proc_name, proc_id_map] : fProcessMap) {
+    int proc_id = static_cast<int>(proc_id_map);
+
+    if (!fStoredProcessIDs.count(proc_id)) continue;
+
+    // Fill ntuple
+    ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
     ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
     ana_man->AddNtupleRow(ntupleid);
 
-    if (!proc_ids.insert(proc_id).second) {
-      RMGLog::OutDev(RMGLog::error, "duplicate process name hash ", proc_id);
+    // Check for duplicate process IDs
+    if (!proc_ids.insert(proc_id_map).second) {
+      RMGLog::OutDev(RMGLog::error, "Duplicate process name hash ", proc_id_map);
     }
   }
 }

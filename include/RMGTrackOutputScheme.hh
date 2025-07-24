@@ -95,6 +95,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     bool fStoreAlways = false;
 
     std::map<std::string, uint32_t> fProcessMap;
+    std::set<int> fStoredProcessIDs; // This set keeps track of the process IDs that have not been discarded.
 
     std::set<std::string> fFilterProcess;
     std::set<int> fFilterParticle;
