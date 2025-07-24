@@ -16,6 +16,7 @@
 #ifndef _RMG_NAVIGATION_TOOLS_HH_
 #define _RMG_NAVIGATION_TOOLS_HH_
 
+#include <regex>
 #include <set>
 #include <string>
 #include <vector>
@@ -52,6 +53,8 @@ namespace RMGNavigationTools {
    * @return Pointer to the physical volume, or @c nullptr if not found.
    */
   G4VPhysicalVolume* FindPhysicalVolume(std::string name, int copy_nr = 0);
+
+  std::set<G4VPhysicalVolume*> FindPhysicalVolumesFromRegex(std::string name, std::string copy_nr = ".*");
   /**
    * @brief Finds the direct mother volume of a given physical volume.
    *

@@ -412,49 +412,24 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
 
   if (!fPhysicalVolumes.empty() or fPhysicalVolumeNameRegexes.empty()) return;
 
-  auto volume_store = G4PhysicalVolumeStore::GetInstance();
-
   // scan all search patterns provided by the user
   for (size_t i = 0; i < fPhysicalVolumeNameRegexes.size(); ++i) {
-    RMGLog::OutFormat(
-        RMGLog::detail,
-        "Physical volumes matching pattern '{}'['{}']",
-        fPhysicalVolumeNameRegexes.at(i).c_str(),
-        fPhysicalVolumeCopyNrRegexes.at(i).c_str()
-    );
-
-    bool found = false;
     // scan the volume store for matches
-    for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
-      if (std::regex_match((*it)->GetName(), std::regex(fPhysicalVolumeNameRegexes.at(i))) and
-          std::regex_match(
-              std::to_string((*it)->GetCopyNo()),
-              std::regex(fPhysicalVolumeCopyNrRegexes.at(i))
-          )) {
+    auto matchingVolumes = RMGNavigationTools::FindPhysicalVolumesFromRegex(
+        fPhysicalVolumeNameRegexes.at(i),
+        fPhysicalVolumeCopyNrRegexes.at(i)
+    );
+    // insert all matches in our collection
+    for (auto volume : matchingVolumes) {
+      // do not specify a bounding solid at this stage
+      fPhysicalVolumes.emplace_back(volume, G4RotationMatrix(), G4ThreeVector(), nullptr);
 
-        // insert it in our collection
-        // do not specify a bounding solid at this stage
-        fPhysicalVolumes.emplace_back(*it, G4RotationMatrix(), G4ThreeVector(), nullptr);
-
-        RMGLog::OutFormat(
-            RMGLog::detail,
-            " · '{}[{}]', volume = {}",
-            (*it)->GetName().c_str(),
-            (*it)->GetCopyNo(),
-            std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Volume"))
-        );
-
-        found = true;
-      }
-    }
-    if (!found) {
-      RMGLog::Out(
-          RMGLog::warning,
-          "No physical volumes names found matching pattern '",
-          fPhysicalVolumeNameRegexes.at(i),
-          "' and copy numbers matching pattern '",
-          fPhysicalVolumeCopyNrRegexes.at(i),
-          "'"
+      RMGLog::OutFormat(
+          RMGLog::detail,
+          " · '{}[{}]', volume = {}",
+          volume->GetName().c_str(),
+          volume->GetCopyNo(),
+          std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Volume"))
       );
     }
   }
