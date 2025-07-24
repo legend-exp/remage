@@ -164,12 +164,11 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   for (auto& [proc_name, proc_id_map] : fProcessMap) {
     int proc_id = static_cast<int>(proc_id_map);
 
-    if (!fStoredProcessIDs.count(proc_id)) continue;
-
-    // Fill ntuple
-    ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
-    ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
-    ana_man->AddNtupleRow(ntupleid);
+    if (fStoredProcessIDs.count(proc_id)) {
+      ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
+      ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
+      ana_man->AddNtupleRow(ntupleid);
+    }
 
     // Check for duplicate process IDs
     if (!proc_ids.insert(proc_id_map).second) {
