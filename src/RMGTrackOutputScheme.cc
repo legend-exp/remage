@@ -59,8 +59,6 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled()) return;
 
-  const auto ana_man = G4AnalysisManager::Instance();
-
   // do never write tracks of optical photons (there will be many).
   if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { return; }
 
@@ -97,52 +95,62 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  auto ntupleid = rmg_man->GetAuxNtupleID("tracks");
-  int col_id = 0;
-  ana_man->FillNtupleIColumn(
-      ntupleid,
-      col_id++,
-      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID()
+  fTrackEntries.push_back(
+      RMGTrackEntry{
+          G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
+          track->GetTrackID(),
+          track->GetParentID(),
+          proc_id,
+          primary->GetPDGcode(),
+          track->GetGlobalTime(),
+          pos.getX(),
+          pos.getY(),
+          pos.getZ(),
+          primary->GetMomentum().getX(),
+          primary->GetMomentum().getY(),
+          primary->GetMomentum().getZ(),
+          track->GetKineticEnergy()
+      }
   );
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetTrackID());
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, track->GetParentID());
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, proc_id);
-  ana_man->FillNtupleIColumn(ntupleid, col_id++, primary->GetPDGcode());
-  ana_man->FillNtupleDColumn(ntupleid, col_id++, track->GetGlobalTime() / u::ns);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getX() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getY() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, pos.getZ() / u::m, fStoreSinglePrecisionPosition);
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getX() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getY() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      primary->GetMomentum().getZ() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-  FillNtupleFOrDColumn(
-      ana_man,
-      ntupleid,
-      col_id++,
-      track->GetKineticEnergy() / u::MeV,
-      fStoreSinglePrecisionEnergy
-  );
-
-  ana_man->AddNtupleRow(ntupleid);
 }
+
+void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
+  auto rmg_man = RMGOutputManager::Instance();
+  if (!rmg_man->IsPersistencyEnabled()) return;
+
+  const auto ana_man = G4AnalysisManager::Instance();
+
+  auto ntupleid = rmg_man->GetAuxNtupleID("tracks");
+
+  for (const auto& entry : fTrackEntries) {
+    int col_id = 0;
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.event_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.track_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.parent_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.proc_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.particle_pdg);
+    ana_man->FillNtupleDColumn(ntupleid, col_id++, entry.global_time / u::ns);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.x_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.y_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.z_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.x_momentum / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.y_momentum / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.z_momentum / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(
+        ana_man,
+        ntupleid,
+        col_id++,
+        entry.kinetic_energy / u::MeV,
+        fStoreSinglePrecisionEnergy
+    );
+
+    fStoredProcessIDs.insert(entry.proc_id);
+    ana_man->AddNtupleRow(ntupleid);
+  }
+}
+
+// free the memory of the track entries.
+void RMGTrackOutputScheme::ClearBeforeEvent() { std::vector<RMGTrackEntry>().swap(fTrackEntries); }
 
 void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
   auto rmg_man = RMGOutputManager::Instance();
@@ -153,13 +161,18 @@ void RMGTrackOutputScheme::EndOfRunAction(const G4Run*) {
 
   std::set<uint32_t> proc_ids; // to check for duplicates.
 
-  for (auto& [proc_name, proc_id] : fProcessMap) {
-    ana_man->FillNtupleIColumn(ntupleid, 0, static_cast<int>(proc_id));
-    ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
-    ana_man->AddNtupleRow(ntupleid);
+  for (auto& [proc_name, proc_id_map] : fProcessMap) {
+    int proc_id = static_cast<int>(proc_id_map);
 
-    if (!proc_ids.insert(proc_id).second) {
-      RMGLog::OutDev(RMGLog::error, "duplicate process name hash ", proc_id);
+    if (fStoredProcessIDs.count(proc_id)) {
+      ana_man->FillNtupleIColumn(ntupleid, 0, proc_id);
+      ana_man->FillNtupleSColumn(ntupleid, 1, proc_name);
+      ana_man->AddNtupleRow(ntupleid);
+    }
+
+    // Check for duplicate process IDs
+    if (!proc_ids.insert(proc_id_map).second) {
+      RMGLog::OutDev(RMGLog::error, "Duplicate process name hash ", proc_id_map);
     }
   }
 }
@@ -196,6 +209,11 @@ void RMGTrackOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+  fMessenger->DeclareProperty("StoreAlways", fStoreAlways)
+      .SetGuidance("Always store track data, even if event should be discarded.")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

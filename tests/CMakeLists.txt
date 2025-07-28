@@ -16,6 +16,7 @@ add_subdirectory(nist)
 add_subdirectory(output)
 add_subdirectory(particlefilter)
 add_subdirectory(python)
+add_subdirectory(trackoutput)
 add_subdirectory(observables)
 add_subdirectory(vertex)
 

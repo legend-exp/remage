@@ -27,18 +27,53 @@
 
 class G4Event;
 class G4Track;
+/** @brief Output scheme for track information.
+ *
+ *  @details This output scheme records the properties of each track generated.
+ *  The properties of each track recorded:
+ *  - event index,
+ *  - track ID,
+ *  - parent track ID,
+ *  - creator process,
+ *  - particle type,
+ *  - time,
+ *  - position,
+ *  - momentum,
+ *  - kinetic energy
+ *
+ *  The creator process is mapped to a unique integer value and additionally stored in the output.
+ *
+ *  It can be specified that the information is always stored, even if the
+ *  event would be discarded by other output schemes.
+ */
 class RMGTrackOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGTrackOutputScheme();
 
+    /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
     void AssignOutputNames(G4AnalysisManager*) override;
+
+    /** @brief Called in @c RMGTrackingAction::PreUserTrackingAction to collect information
+     *  about the track before it is processed.
+     */
     void TrackingActionPre(const G4Track*) override;
+
+    /** @brief handles the storage of the process map. */
     void EndOfRunAction(const G4Run*) override;
 
-    // always store vertex data, so that results are not skewed if events are discarded.
-    [[nodiscard]] bool StoreAlways() const override { return true; }
+    /** @brief Clears the event data and frees memory before the next event is processed. */
+    void ClearBeforeEvent() override;
+
+    /** @brief Store the information from the event, invoked in @c RMGEventAction::EndOfEventAction
+     * @details If @c fStoreAlways is true, the information is always stored, even if the event
+     * would be discarded by other output schemes.
+     */
+    void StoreEvent(const G4Event*) override;
+
+    /** @brief Invoked in @c RMGEventAction::EndOfEventAction and decides whether to always store this OutputScheme. */
+    [[nodiscard]] bool StoreAlways() const override { return fStoreAlways; }
 
   protected:
 
@@ -57,12 +92,32 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
 
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+    bool fStoreAlways = false;
 
     std::map<std::string, uint32_t> fProcessMap;
+    std::set<int> fStoredProcessIDs; // This set keeps track of the process IDs that have not been discarded.
 
     std::set<std::string> fFilterProcess;
     std::set<int> fFilterParticle;
     double fFilterEnergy = -1;
+
+    struct RMGTrackEntry {
+        int event_id;
+        int track_id;
+        int parent_id;
+        int proc_id;
+        int particle_pdg;
+        double global_time;
+        double x_position;
+        double y_position;
+        double z_position;
+        double x_momentum;
+        double y_momentum;
+        double z_momentum;
+        double kinetic_energy;
+    };
+
+    std::vector<RMGTrackEntry> fTrackEntries;
 };
 
 #endif
