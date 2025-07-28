@@ -72,7 +72,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
      */
     void StoreEvent(const G4Event*) override;
 
-    /** @brief Sets @c fStoreAlways variable to decide if the information is always stored. */
+    /** @brief Invoked in @c RMGEventAction::EndOfEventAction and decides whether to store the event. */
     [[nodiscard]] bool StoreAlways() const override { return fStoreAlways; }
 
   protected:
