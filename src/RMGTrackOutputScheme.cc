@@ -124,27 +124,27 @@ void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
 
   for (const auto& entry : fTrackEntries) {
     int col_id = 0;
-    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.eventId);
-    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.trackId);
-    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.parentId);
-    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.procId);
-    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.particlePdg);
-    ana_man->FillNtupleDColumn(ntupleid, col_id++, entry.globalTime / u::ns);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.xPosition / u::m, fStoreSinglePrecisionPosition);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.yPosition / u::m, fStoreSinglePrecisionPosition);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.zPosition / u::m, fStoreSinglePrecisionPosition);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.px / u::MeV, fStoreSinglePrecisionEnergy);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.py / u::MeV, fStoreSinglePrecisionEnergy);
-    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.pz / u::MeV, fStoreSinglePrecisionEnergy);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.event_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.track_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.parent_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.proc_id);
+    ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.particle_pdg);
+    ana_man->FillNtupleDColumn(ntupleid, col_id++, entry.global_time / u::ns);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.x_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.y_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.z_position / u::m, fStoreSinglePrecisionPosition);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.x_momentum / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.y_momentum / u::MeV, fStoreSinglePrecisionEnergy);
+    FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, entry.z_momentum / u::MeV, fStoreSinglePrecisionEnergy);
     FillNtupleFOrDColumn(
         ana_man,
         ntupleid,
         col_id++,
-        entry.kineticEnergy / u::MeV,
+        entry.kinetic_energy / u::MeV,
         fStoreSinglePrecisionEnergy
     );
 
-    fStoredProcessIDs.insert(entry.procId);
+    fStoredProcessIDs.insert(entry.proc_id);
     ana_man->AddNtupleRow(ntupleid);
   }
 }

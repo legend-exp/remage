@@ -72,7 +72,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
      */
     void StoreEvent(const G4Event*) override;
 
-    /** @brief Invoked in @c RMGEventAction::EndOfEventAction and decides whether to store the event. */
+    /** @brief Invoked in @c RMGEventAction::EndOfEventAction and decides whether to always store this OutputScheme. */
     [[nodiscard]] bool StoreAlways() const override { return fStoreAlways; }
 
   protected:
@@ -102,19 +102,19 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     double fFilterEnergy = -1;
 
     struct RMGTrackEntry {
-        int eventId;
-        int trackId;
-        int parentId;
-        int procId;
-        int particlePdg;
-        double globalTime;
-        double xPosition;
-        double yPosition;
-        double zPosition;
-        double px;
-        double py;
-        double pz;
-        double kineticEnergy;
+        int event_id;
+        int track_id;
+        int parent_id;
+        int proc_id;
+        int particle_pdg;
+        double global_time;
+        double x_position;
+        double y_position;
+        double z_position;
+        double x_momentum;
+        double y_momentum;
+        double z_momentum;
+        double kinetic_energy;
     };
 
     std::vector<RMGTrackEntry> fTrackEntries;
