@@ -573,6 +573,41 @@ More information on how to use the TCM is provided in {ref}`manual-analysis`,
 while more documentation about how the TCM is generated is available at
 {func}`pygama.evt.tcm.generate_tcm_cols`.
 
+## Detector origins
+
+_remage_ stores the global coordinates of each Germanium detectors in a LH5
+struct called `detector_origins` (or in a table if reshaping is off):
+
+```
+/
+├── detector_origins · struct{B00000C,B00000D,...}
+│   ├── B00000C · struct{xloc,yloc,zloc}
+│   │   ├── xloc · real
+│   │   ├── yloc · real
+│   │   └── zloc · real
+│   ├── B00000D · struct{xloc,yloc,zloc}
+│   │   ├── xloc · real
+│   │   ├── yloc · real
+│   │   └── zloc · real
+│   └── ...
+└── ...
+```
+
+:::{note}
+
+For most volume types, the origin is the center of the volume, with some notable
+exceptions:
+
+- generic polycones (as used for the detectors in _legend-pygeom-hpges_) have
+  their own origin defined which is not at the center.
+- for boolean solids, the origin is the same as for the first constituent. With
+  subtractions, the origin might even be outside the volume.
+- The
+  [list in the official documentation](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Detector/Geometry/geomSolids.html)
+  contains all rules.
+
+:::
+
 ## The vertex table
 
 _remage_ stores data about the simulated event vertex in a table named `vtx`. In
