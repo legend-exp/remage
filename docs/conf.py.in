@@ -76,6 +76,7 @@ intersphinx_mapping = {
     "pygama": ("https://pygama.readthedocs.io/en/stable", None),
     "pyg4ometry": ("https://pyg4ometry.readthedocs.io/en/stable", None),
     "dbetto": ("https://dbetto.readthedocs.io/en/stable/", None),
+    "pygeomtools": ("https://legend-pygeom-tools.readthedocs.io/en/stable/", None),
 }
 
 # sphinx-autodoc
