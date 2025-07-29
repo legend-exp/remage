@@ -294,15 +294,14 @@ Here:
 - `ekin` (double) is the kinetic energy,
 - `g4_pid` (int) is the particle code (see
   [link](https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf)),
-- `px, py, pz` (double) are the x, y and z momenta.
+- `px`, `py`, `pz` (double) are the x, y and z momenta.
 
 :::{tip}
 
 - It is supported to supply units for the energy with the LH5 attributes. It is
   then assumed the momenta have the same units!
-- The python package _revertex_
-  [docs](https://revertex.readthedocs.io/en/latest/) contains functionality for
-  generating input files in the correct format.
+- The python package [_revertex_](https://revertex.readthedocs.io/en/latest/)
+  contains functionality for generating input files in the correct format.
 
 :::
 
