@@ -264,6 +264,8 @@ _remage_ with the following commands:
 /RMG/Generator/MUSUNCosmicMuons/MUSUNFile filename
 ```
 
+(manual-generators-extfiles)=
+
 ## Simulating event vertices and kinematics from external files
 
 For more complicated or custom event generators _remage_ supports the
@@ -276,7 +278,7 @@ format.
 
 ```
 /
-└── vtx · HDF5 group
+└── vtx
     └── kin · table{px,py,pz,ekin,g4_pid}
         ├── ekin · array<1>{real} ── {'units': 'keV'}
         ├── g4_pid · array<1>{real}
