@@ -1,19 +1,22 @@
-import re
-import sys
+from __future__ import annotations
+
 import os
+import re
 import subprocess
+import sys
+from pathlib import Path
+from typing import ClassVar
 
-from pygments.lexers.shell import BashSessionLexer
-from pygments.token import Comment, Text, Name
 from pygments.lexer import RegexLexer
-
+from pygments.lexers.shell import BashSessionLexer
+from pygments.token import Comment, Name, Text
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
     import setuptools_scm
 
-sys.path.append(os.path.abspath("_extensions"))
+sys.path.append(Path("_extensions").resolve().as_posix())
 
 project = "remage"
 copyright = "2020, the LEGEND Collaboration"
@@ -146,7 +149,7 @@ ultimate_replacements = {
 }
 
 
-def _replace(app, docname, source):
+def _replace(app, docname, source):  # noqa: ARG001
     result = source[0]
     for key in app.config.ultimate_replacements:
         result = result.replace(key, app.config.ultimate_replacements[key])
@@ -158,19 +161,19 @@ class RemageSessionLexer(BashSessionLexer):
     Like BashSessionLexer, but treats "remage> " as the prompt.
     """
     name = "Remage shell session"
-    aliases = ["remage"]
-    # Primary‐prompt regex: match lines that start with “remage> ”
+    aliases: ClassVar[list[str]] = ["remage"]
+    # Primary-prompt regex: match lines that start with “remage> ”
     _ps1rgx = re.compile(r'^(remage> )(.*\n?)')
-    # Continuation prompt (if you don’t want any special one, just empty)
+    # Continuation prompt (if you don't want any special one, just empty)
     _ps2 = ''
 
 
 class Geant4MacroLexer(RegexLexer):
-    name = "Geant4Macro"
-    aliases = ["geant4", "g4mac"]
-    filenames = ["*.mac"]
+    name: str = "Geant4Macro"
+    aliases: ClassVar[list[str]] = ["geant4", "g4mac"]
+    filenames: ClassVar[list[str]] = ["*.mac"]
 
-    tokens = {
+    tokens: ClassVar[dict] = {
         "root": [
             # comments
             (r"#.*$", Comment),

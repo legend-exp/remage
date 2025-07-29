@@ -3,7 +3,7 @@ ci:
   autoupdate_schedule: "monthly"
   autofix_commit_msg: "style: pre-commit fixes"
 
-exclude: ^include/(fmt|magic_enum|CLI11|EcoMug)/|^docs/rmg-commands.md
+exclude: ^include/(EcoMug)/|^docs/rmg-commands.md
 repos:
   - repo: https://github.com/adamchainz/blacken-docs
     rev: "1.19.1"
@@ -49,6 +49,8 @@ repos:
     rev: "v0.12.2"
     hooks:
       - id: ruff
+        types_or: [file]
+        files: '\.py(?:\.in)?$'
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
