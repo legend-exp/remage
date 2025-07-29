@@ -53,6 +53,8 @@ repos:
         files: '\.py(?:\.in)?$'
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
+        types_or: [file]
+        files: '\.py(?:\.in)?$'
 
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13

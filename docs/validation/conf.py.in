@@ -37,5 +37,5 @@ myst_substitutions = {
     "today": datetime.now(timezone.utc).strftime("%d %B %Y"),
     "remage_version": f"`v{version}`",
     "geant4_version": "`v@Geant4_VERSION@`",
-    "bxdecay0_version": "`v@BxDecay0_VERSION@`"
+    "bxdecay0_version": "`v@BxDecay0_VERSION@`",
 }

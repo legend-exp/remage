@@ -577,8 +577,8 @@ while more documentation about how the TCM is generated is available at
 
 ## Detector origins
 
-_remage_ stores the global coordinates of each Germanium detectors in a LH5
-struct called `detector_origins` (or in a table if reshaping is off):
+_remage_ stores the global coordinates of each germanium detector in an LH5
+struct (or in a table if reshaping is off) called `detector_origins`:
 
 ```
 /
