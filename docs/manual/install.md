@@ -2,10 +2,12 @@
 
 # Installation
 
+The recommended and fastest way of running _remage_ is through pre-built
+software containers. Alternatively, the project can be built from source.
+
 ## Pre-built binaries
 
-The recommended and fastest way of running _remage_ is through pre-built
-software containers. Stable releases are regularly made available
+Stable releases are regularly made available
 [on Docker Hub](https://hub.docker.com/r/legendexp/remage). To obtain and run
 the latest just do:
 
