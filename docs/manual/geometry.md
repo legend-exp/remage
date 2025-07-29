@@ -53,7 +53,7 @@ Custom detector types cannot currently be registered at runtime.
 The simplest method is to use the
 <project:../rmg-commands.md#rmggeometryregisterdetector> macro command:
 
-```
+```geant4
 /RMG/Geometry/RegisterDetector Germanium B00000B 1
 /RMG/Geometry/RegisterDetector Germanium C000RG1 2
 ```

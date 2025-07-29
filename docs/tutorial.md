@@ -156,7 +156,7 @@ At the beginning of the file, we can set some global application options, like
 the verbosity. Let's increase it a bit (compared to the default `summary`) to be
 more informed on what's going on by _remage_:
 
-```text
+```geant4
 /RMG/Manager/Logging/LogLevel detail
 ```
 
@@ -169,7 +169,7 @@ inspecting it. As per specification of the `/RMG/Geometry/RegisterDetector`
 command, we need to provide a unique numeric identifier that will be used to
 label the detector data in the simulation output:
 
-```text
+```geant4
 /RMG/Geometry/RegisterDetector Germanium BEGe 001
 /RMG/Geometry/RegisterDetector Germanium Coax 002
 /RMG/Geometry/RegisterDetector Scintillator LAr 003
@@ -178,7 +178,7 @@ label the detector data in the simulation output:
 Now we can initialize the simulation. Additionally, let's setup some Geant4
 visualization to look at the tracks:
 
-```text
+```geant4
 /run/initialize
 
 # create a scene
@@ -202,7 +202,7 @@ visualization to look at the tracks:
 Now with the actual physics. We want to start ten 1 MeV gammas from the
 radioactive source:
 
-```text
+```geant4
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume Source
 
@@ -221,7 +221,7 @@ with the `.mac` suffix). For example the complete macro file is shown below.
 
 :class: dropdown
 
-```text
+```geant4
 /RMG/Manager/Logging/LogLevel detail
 
 /RMG/Geometry/RegisterDetector Germanium BEGe 001
@@ -316,7 +316,7 @@ Let's now simulate more events in batch mode and store Geant4 step information
 in an output file. Using the same macro as before, without the visualization
 commands:
 
-```text
+```geant4
 /RMG/Manager/Logging/LogLevel detail
 
 /RMG/Geometry/RegisterDetector Germanium BEGe 001

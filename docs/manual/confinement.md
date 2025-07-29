@@ -16,7 +16,7 @@ radioactive isotopes in detector components.
 To enable vertex confinement, activate the corresponding generator using
 <project:../rmg-commands.md#rmggeneratorconfine> (see {ref}`manual-generators`):
 
-```
+```geant4
 /RMG/Generator/Confine Volume
 ```
 
@@ -34,7 +34,7 @@ These can be added via
 <project:../rmg-commands.md#rmggeneratorconfinementphysicaladdvolume>. To add a
 physical volume named e.g. `C000RG1`, do:
 
-```
+```geant4
 /RMG/Generator/Confinement/Physical/AddVolume C000RG1
 ```
 
@@ -43,7 +43,7 @@ second argument sets the copy number. You can also use regular expressions (via
 [`std::regex`](https://en.cppreference.com/w/cpp/regex)) to match multiple
 volumes:
 
-```
+```geant4
 /RMG/Generator/Confinement/Physical/AddVolume C\w+
 ```
 
@@ -53,7 +53,7 @@ Virtual user-defined geometrical solids can be defined with commands in the
 <project:../rmg-commands.md#rmggeneratorconfinementgeometrical> folder. For
 example, to add a sphere of radius 15 cm centered in (-1, 2, 5) cm:
 
-```
+```geant4
 /RMG/Generator/Confinement/Geometrical/AddSolid Sphere
 /RMG/Generator/Confinement/Geometrical/CenterPositionX -1 cm
 /RMG/Generator/Confinement/Geometrical/CenterPositionY 2 cm

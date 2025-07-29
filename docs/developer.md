@@ -230,7 +230,11 @@ $ cmake .. -DRMG_BUILD_DOCS=ON
 $ make sphinx
 ```
 
-:::{tip}
+You'll need a Doxygen installation and Python software dependencies specified in
+`docs/environment.yml`. The generated documentation can be viewed by pointing
+your browser to `docs/_build/index.html`.
+
+### Cross referencing
 
 Implicit cross-references are automatically generated for all headers until
 level 3 (i.e. `###` headers in markdown). The level can be adjusted through the
@@ -242,6 +246,10 @@ To reference a remage macro command auto-generated documentation section type
 
 Further reading on the
 [myst-parser documentation](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors).
+
+:::{note}
+
+For robust results, explicit cross-reference targets must be preferred.
 
 :::
 
@@ -260,9 +268,46 @@ A full list of domain roles can be found
 
 :::
 
-You'll need a Doxygen installation and Python software dependencies specified in
-`docs/environment.yml`. The generated documentation can be viewed by pointing
-your browser to `docs/_build/index.html`.
+### Code highlighting
+
+Code blocks can be highlighted in myst with the usual markdown syntax. Two
+custom lexers are additionally available for the _remage_ documentation. The
+first is called `remage` and can be used to highlight _remage_ interactive
+prompt text:
+
+:::{code-block}
+
+```remage
+remage> /RMG/Geometry/IncludeGDMLFile geometry.gdml
+remage> /run/initialize
+[Summary -> Checking for overlaps in GDML geometry...
+remage> /RMG/Geometry/PrintListOfPhysicalVolumes
+[Summary ->  · B00000A  // 0 daugh. // 5.54635 g/cm3  // 488.951 g  // 8.81573 cL  // 1 atm // 293.15 K
+[Summary ->  · B00000B  // 0 daugh. // 5.54635 g/cm3  // 700.096 g  // 1.26227 dL  // 1 atm // 293.15 K
+...
+[Summary ->  · wlsr_ttx // 1 daugh. // 350 mg/cm3 // 1.15983 kg // 3.3138 L   // 1 atm // 293.15 K
+[Summary ->  · world    // 1 daugh. // 1e-22 mg/cm3 // 154028 kg // 1.54028e+18 km3 // 3e-18 Pa  // 2.73 K
+[Summary ->
+[Summary -> Total: 171 volumes
+```
+
+:::
+
+The second is called `geant4` and can be used to highlight Geant4 macro command
+listings:
+
+:::{code-block}
+
+```geant4
+/run/initialize
+
+# create a scene
+/vis/open OI
+/vis/scene/create
+/vis/sceneHandler/attach
+```
+
+:::
 
 ### Automatic command reference generation
 

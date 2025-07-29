@@ -10,6 +10,19 @@ organized in two layers:
 - The **remage image** that installs the actual _remage_ executable and Python
   package on top of the base image.
 
+:::{note}
+
+Apptainer images can be easily generated with, e.g.:
+
+```console
+ $ apptainer build remage.sif docker://legendexp/remage:latest
+```
+
+For more details, have a look at
+[the documentation](https://apptainer.org/docs/user/main/build_a_container.html).
+
+:::
+
 ## Base image
 
 The Dockerfiles defining the base image are maintained in the

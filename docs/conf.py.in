@@ -4,6 +4,8 @@ import os
 import subprocess
 
 from pygments.lexers.shell import BashSessionLexer
+from pygments.token import Comment, Text, Name
+from pygments.lexer import RegexLexer
 
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
@@ -163,8 +165,26 @@ class RemageSessionLexer(BashSessionLexer):
     _ps2 = ''
 
 
+class Geant4MacroLexer(RegexLexer):
+    name = "Geant4Macro"
+    aliases = ["geant4", "g4mac"]
+    filenames = ["*.mac"]
+
+    tokens = {
+        "root": [
+            # comments
+            (r"#.*$", Comment),
+            # command name at start of line
+            (r"^(/\S+)", Name.Function),
+            # any other text
+            (r".", Text),
+        ],
+    }
+
+
 def setup(app):
     app.add_lexer('remage', RemageSessionLexer)
+    app.add_lexer('geant4', Geant4MacroLexer)
 
     app.add_config_value("ultimate_replacements", {}, True)
     app.connect("source-read", _replace)
