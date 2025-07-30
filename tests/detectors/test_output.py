@@ -10,6 +10,11 @@ def strip_ansi(text: str) -> str:
     return re.sub(r"\x1B\[[0-9;]*[mK]", "", text)
 
 
+def normalize_lines(s):
+    # Remove trailing whitespace from each line
+    return [line.rstrip() for line in s.strip().splitlines()]
+
+
 output_files = [
     "det-from-gdml.lh5",
     "det-from-regex.lh5",
@@ -28,13 +33,14 @@ for output_file, dump_file in zip(output_files, dump_files):
     result = subprocess.run(
         ["lh5ls", str(output_file)], capture_output=True, text=True, check=True
     )
-    actual_output = strip_ansi(result.stdout).strip()
-    expected_output = Path(dump_file).read_text().strip()
+    actual_output = normalize_lines(strip_ansi(result.stdout))
+    expected_output = normalize_lines(Path(dump_file).read_text())
+
     if actual_output != expected_output:
         diff = "\n".join(
             difflib.unified_diff(
-                expected_output.splitlines(),
-                actual_output.splitlines(),
+                expected_output,
+                actual_output,
                 fromfile=dump_file,
                 tofile=output_file,
                 lineterm="",
