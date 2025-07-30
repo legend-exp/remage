@@ -32,7 +32,7 @@
 #include "RMGNavigationTools.hh"
 #include "RMGVOutputScheme.hh"
 
-/** @brief Class to handle the detector geometry hardware, extends @c G4VUserDetectorConstruction . */
+/** @brief Class to handle the detector geometry hardware, extends @c G4VUserDetectorConstruction. */
 class G4VPhysicalVolume;
 class RMGHardware : public G4VUserDetectorConstruction {
 
@@ -67,13 +67,18 @@ class RMGHardware : public G4VUserDetectorConstruction {
      */
     void ConstructSDandField() override;
 
-    /** @brief Register a detector as being a remage sensitive detector.
+    /** @brief Register a physical volume as sensitive detector.
+     *
+     * @details The @c uid is a unique identifier for the detector. It is
+     * mostly used to label the detector in the simulation output. This
+     * function also informs the run action to automatically activate output
+     * schemes for all registered detector types.
      *
      * @param type The type of detector.
-     * @param pv_name The name of the physical volume.
+     * @param pv_name The name of the physical volume to be registered.
      * @param uid A unique integer identifier for the sensitive volume.
-     * @param copy_nr The copy number for the physical volume.
-     * @param allow_uid_reuse Flag to allow a uid to be reused
+     * @param copy_nr The copy number of the physical volume.
+     * @param allow_uid_reuse Flag to allow assigning the same @c uid to different detectors.
      */
     void RegisterDetector(
         RMGDetectorType type,

@@ -17,20 +17,8 @@
 :::{note}
 
 Pre-built Docker container images with all necessary dependencies are available
-[on Docker Hub](https://hub.docker.com/r/legendexp/remage-base).
-
-:::
-
-:::{note}
-
-Apptainer images can be easily generated with, e.g.:
-
-```console
- $ apptainer build remage-base_latest.sif docker://legendexp/remage-base:latest
-```
-
-For more details, have a look at
-[the documentation](https://apptainer.org/docs/user/main/build_a_container.html).
+[on Docker Hub](https://hub.docker.com/r/legendexp/remage-base) (see
+{ref}`manual-containers`).
 
 :::
 

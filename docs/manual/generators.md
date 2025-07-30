@@ -35,7 +35,7 @@ The latter registers the user-defined generator `new MyCustomGenerator(...)`,
 which must inherit from {cpp:class}`RMGVGenerator`. You can then activate your
 generator at runtime with:
 
-```
+```geant4
 /RMG/Generator/Select UserDefined
 ```
 
@@ -54,7 +54,7 @@ However, for the kinematics the GPS commands are often sufficient, for example
 to generate electrons with a fixed energy and isotropic direction we can use the
 macro commands (see [docs](project:../rmg-commands.md#rmggeneratorselect)):
 
-```
+```geant4
 /RMG/Generator/Select GPS
 /gps/particle e-
 /gps/ang/type iso
@@ -92,7 +92,7 @@ with the command `/gps/ion Z A`
 
 For example we can generate decays of $^{40}$K with:
 
-```
+```geant4
 /RMG/Generator/Select GPS
 
 /gps/particle ion
@@ -137,7 +137,7 @@ $Z$ outside of `[zMin, zMax]` being killed (before having a chance to decay).
 For example to generate decays of $^{222}$Rn until $^{210}$Pb we can use the
 commands:
 
-```
+```geant4
 /RMG/Generator/Select GPS
 
 /gps/particle ion
@@ -171,7 +171,9 @@ This requires _remage_ to be build with _bxdecay0_ support see
 
 The macro [command](project:../rmg-commands.md#rmggeneratorselect):
 
-`/RMG/Generator/Select BxDecay0`
+```geant4
+/RMG/Generator/Select BxDecay0
+```
 
 can be used to select the BxDecay0 generator.
 
@@ -192,7 +194,7 @@ cases.
 For example we can generate two-neutrino double beta decay to the $0^+$ ground
 state of $^{76}$Ge with:
 
-```
+```geant4
 /RMG/Generator/Select BxDecay0
 /RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 2vbb
 ```
@@ -205,7 +207,7 @@ candidates are listed
 [here](project:../rmg-commands.md#rmggeneratorbxdecay0background). Using these
 we can for example simulate a $^{60}$Co background source:
 
-```
+```geant4
 /RMG/Generator/Select BxDecay0
 /RMG/Generator/BxDecay0/Background Co60
 ```
@@ -244,7 +246,7 @@ muon tomography and radiography applications. It is capable of generating muons
 from different surfaces (plane, cylinder and half-sphere), while keeping the
 correct angular and momentum distribution of generated tracks.
 
-```
+```geant4
 /RMG/Generator/Select CosmicMuons
 ```
 
@@ -259,10 +261,12 @@ simulate cosmic muons at different underground sites (e.g. Laboratori Nazionali
 del Gran Sasso). Output files produced by MUSUN can be fed in directly to
 _remage_ with the following commands:
 
-```
+```geant4
 /RMG/Generator/Select MUSUNCosmicMuons
 /RMG/Generator/MUSUNCosmicMuons/MUSUNFile filename
 ```
+
+(manual-generators-extfiles)=
 
 ## Simulating event vertices and kinematics from external files
 
@@ -276,7 +280,7 @@ format.
 
 ```
 /
-└── vtx · HDF5 group
+└── vtx
     └── kin · table{px,py,pz,ekin,g4_pid}
         ├── ekin · array<1>{real} ── {'units': 'keV'}
         ├── g4_pid · array<1>{real}
@@ -290,15 +294,14 @@ Here:
 - `ekin` (double) is the kinetic energy,
 - `g4_pid` (int) is the particle code (see
   [link](https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf)),
-- `px, py, pz` (double) are the x, y and z momenta.
+- `px`, `py`, `pz` (double) are the x, y and z momenta.
 
 :::{tip}
 
 - It is supported to supply units for the energy with the LH5 attributes. It is
   then assumed the momenta have the same units!
-- The python package _revertex_
-  [docs](https://revertex.readthedocs.io/en/latest/) contains functionality for
-  generating input files in the correct format.
+- The python package [_revertex_](https://revertex.readthedocs.io/en/latest/)
+  contains functionality for generating input files in the correct format.
 
 :::
 
@@ -306,7 +309,7 @@ Once this input file is created it can be read into _remage_ as an event
 generator using the macro command
 <project:../rmg-commands.md#rmggeneratorfromfilefilename>:
 
-```
+```geant4
 /RMG/Generator/Select FromFile
 /RMG/Generator/FromFile/FileName {FILE_PATH}
 ```

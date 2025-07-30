@@ -40,38 +40,48 @@ Full geometry implementations based on these tools:
 
 Sensitive detector volumes must be registered so that particle interactions are
 recorded in the output. In _remage_, this can be done in several ways. Each
-detector has a unique id (UID) and a _type_, which determines how hits are
-processed and stored. Detector of type `Germanium`, `Scintillator` and `Optical`
-are currently supported.
+detector has a unique id (UID) and a _type_, which determines how hits in a
+physical volume (or in a group of them) are processed and stored. Detector of
+type `Germanium`, `Scintillator` and `Optical` are currently supported.
 
 :::{note}
 
-Custom detector types cannot currently be registered at runtime.
+User-defined detector types cannot currently be registered at runtime.
 
 :::
 
 The simplest method is to use the
 <project:../rmg-commands.md#rmggeometryregisterdetector> macro command:
 
-```
+```geant4
 /RMG/Geometry/RegisterDetector Germanium B00000B 1
 /RMG/Geometry/RegisterDetector Germanium C000RG1 2
 ```
 
 This registers the physical volumes `B00000B` and `C000RG1` as `Germanium`
-detectors with UIDs 1 and 2. If the copy number is not specified, `0` is used by
-default. See {ref}`manual-output` for details on how detector types affect
-output.
+detectors with UIDs 1 and 2 respectively. If the copy number is not specified,
+`0` is assumed. The detector type determines the detector hit readout strategy
+(and how the data is stored on disk), see {ref}`manual-output` for more details.
 
-Alternatively, detectors can be imported from a GDML file that includes
+Alternatively, one might want to assign the same UID to multiple physical
+volumes, i.e. as if they constitute a single detector unit. In such a scenario,
+there would be no way to distinguish hits from different volumes in the
+simulation output. In this application, the fourth argument (`allow_uid_reuse`)
+has to be set to `true`:
+
+```geant4
+/RMG/Geometry/RegisterDetector Germanium B00000B 1 true
+/RMG/Geometry/RegisterDetector Germanium C000RG1 1 true
+```
+
+Last but not least, detectors can be imported from a GDML file that includes
 metadata, using the
 <project:../rmg-commands.md#rmggeometryregisterdetectorsfromgdml> command.
 
 :::{tip}
 
 The `legend-pygeom-tools` package automatically includes such metadata when
-writing GDML with
-[`write_pygeom()`](https://legend-pygeom-tools.readthedocs.io/en/stable/api/pygeomtools.html#pygeomtools.write.write_pygeom).
+writing GDML with {func}`pygeomtools.write.write_pygeom`.
 
 :::
 

@@ -16,7 +16,7 @@ radioactive isotopes in detector components.
 To enable vertex confinement, activate the corresponding generator using
 <project:../rmg-commands.md#rmggeneratorconfine> (see {ref}`manual-generators`):
 
-```
+```geant4
 /RMG/Generator/Confine Volume
 ```
 
@@ -34,7 +34,7 @@ These can be added via
 <project:../rmg-commands.md#rmggeneratorconfinementphysicaladdvolume>. To add a
 physical volume named e.g. `C000RG1`, do:
 
-```
+```geant4
 /RMG/Generator/Confinement/Physical/AddVolume C000RG1
 ```
 
@@ -43,7 +43,7 @@ second argument sets the copy number. You can also use regular expressions (via
 [`std::regex`](https://en.cppreference.com/w/cpp/regex)) to match multiple
 volumes:
 
-```
+```geant4
 /RMG/Generator/Confinement/Physical/AddVolume C\w+
 ```
 
@@ -53,7 +53,7 @@ Virtual user-defined geometrical solids can be defined with commands in the
 <project:../rmg-commands.md#rmggeneratorconfinementgeometrical> folder. For
 example, to add a sphere of radius 15 cm centered in (-1, 2, 5) cm:
 
-```
+```geant4
 /RMG/Generator/Confinement/Geometrical/AddSolid Sphere
 /RMG/Generator/Confinement/Geometrical/CenterPositionX -1 cm
 /RMG/Generator/Confinement/Geometrical/CenterPositionY 2 cm
@@ -166,43 +166,11 @@ All sampling modes described above are available, with few notes/limitations:
   <project:../rmg-commands.md#rmggeneratorconfinementfirstsamplingvolume>. This
   is not optional.
 
-## Vertices from an input file
+## Vertices from external files
 
 For more complicated vertex confinement _remage_ supports the possibility to
-read in directly event primary positions from input files.
-
-The functionality for reading input files is described in <project:./input.md>.
-For generating vertices we support reading `lh5` files with the following
-format.
-
-```console
-/
-└── vtx · HDF5 group
-    └── pos · table{xloc,yloc,zloc}
-        ├── xloc · array<1>{real} ── {'units': 'mm'}
-        ├── yloc · array<1>{real} ── {'units': 'mm'}
-        └── zloc · array<1>{real} ── {'units': 'mm'}
-```
-
-:::{note}
-
-- The `lh5` attributes allow to specify the units,
-- The positions should be the _global_ coordinates.
-- The python package _revertex_
-  [docs](https://revertex.readthedocs.io/en/latest/) contains functionality for
-  generating input files in the correct format.
-
-:::
-
-These vertices can then be read into _remage_ with the macro commands
-[docs](project:../rmg-commands.md#rmggeneratorconfinementfromfilefilename):
-
-```console
-/RMG/Generator/Confine FromFile
-/RMG/Generator/Confinement/FromFile/FileName {FILE_PATH}
-```
-
-Where {FILE_PATH} is the path to the input file.
+read in directly event primary positions from input files, as described in
+{ref}`manual-generators-extfiles`.
 
 [^1]:
     J. A. Detwiler, R. Henning, R. A. Johnson and M. G. Marino, in IEEE

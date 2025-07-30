@@ -4,9 +4,7 @@
 
 :::{todo}
 
-- optical output scheme
-- track output scheme
-- isotope, energy filtering
+- isotope filtering
 
 :::
 
@@ -40,7 +38,11 @@ Additional output schemes might be used for **filtering output**. Optional
 output schemes can be enabled with the
 <project:../rmg-commands.md#rmgoutputactivateoutputscheme> macro command:
 
-`/RMG/Output/ActivateOutputScheme [name]`.
+```geant4
+/RMG/Output/ActivateOutputScheme {NAME}
+```
+
+where `{NAME}` is the name of the output scheme.
 
 :::{note}
 
@@ -575,8 +577,8 @@ while more documentation about how the TCM is generated is available at
 
 ## Detector origins
 
-_remage_ stores the global coordinates of each Germanium detectors in a LH5
-struct called `detector_origins` (or in a table if reshaping is off):
+_remage_ stores the global coordinates of each germanium detector in an LH5
+struct (or in a table if reshaping is off) called `detector_origins`:
 
 ```
 /
@@ -640,3 +642,63 @@ always equal to the number of simulated events.
 
 The vertex table is useful to reconstruct the event vertex of hits recorded in
 sensitive detectors by matching the information stored in the `evtid` column.
+
+## The track output scheme
+
+Information about tracks simulated by Geant4 can be often beneficial to
+interpret the simulation output. _remage_ is able to store on disk information
+about the _initial state_ of all simulated tracks, if instructed to do so with
+the command:
+
+```geant4
+/RMG/Output/ActivateOutputScheme Track
+```
+
+A new table named `tracks` is created in the output file, with columns:
+
+- `evtid`: Geant4 event identifier,
+- `time`: track start time relative to the start of the event (zero, most of the
+  times),
+- `xloc`, `yloc`, `zloc`: global coordinates of the track starting position,
+- `px`, `py`, `pz`: momentum of the particle corresponding to the track,
+- `ekin`: kinetic energy of the particle corresponding to the track,
+- `trackid`: Geant4 numeric identifier of the track,
+- `parent_trackid`: Geant4 numeric identifier of the parent track,
+- `procid`: numeric identifier of the physical process responsible for the
+  creation of the track. A mapping of process names (strings) to these
+  identifiers is stored in the `processes` struct,
+- `particle`:
+  [PDG identifiers](https://pdg.lbl.gov/2025/pdgid/PDGIdentifiers.html) of the
+  particle corresponding to the track.
+
+:::{tip}
+
+Use [scikit-hep/particle](https://github.com/scikit-hep/particle) to identify
+particles based on their PDG ID.
+
+:::
+
+This is how the data is formatted with LH5 output format enabled:
+
+```text
+/
+├── tracks · table{ekin,evtid,parent_trackid,particle,procid,px,py,pz,time,trackid,xloc,yloc,zloc}
+│   ├── ekin · array<1>{real} ── {'units': 'MeV'}
+│   ├── evtid · array<1>{real}
+│   ├── parent_trackid · array<1>{real}
+│   ├── particle · array<1>{real}
+│   ├── procid · array<1>{real}
+│   ├── px · array<1>{real} ── {'units': 'MeV'}
+│   ├── py · array<1>{real} ── {'units': 'MeV'}
+│   ├── pz · array<1>{real} ── {'units': 'MeV'}
+│   ├── time · array<1>{real} ── {'units': 'ns'}
+│   ├── trackid · array<1>{real}
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
+└── processes · struct{compt,eBrem,phot}
+    ├── compt · real
+    ├── eBrem · real
+    ├── ...
+    └── phot · real
+```

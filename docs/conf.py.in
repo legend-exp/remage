@@ -1,17 +1,22 @@
-import re
-import sys
+from __future__ import annotations
+
 import os
+import re
 import subprocess
+import sys
+from pathlib import Path
+from typing import ClassVar
 
+from pygments.lexer import RegexLexer
 from pygments.lexers.shell import BashSessionLexer
-
+from pygments.token import Comment, Name, Text
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if on_rtd:
     import setuptools_scm
 
-sys.path.append(os.path.abspath("_extensions"))
+sys.path.append(Path("_extensions").resolve().as_posix())
 
 project = "remage"
 copyright = "2020, the LEGEND Collaboration"
@@ -45,7 +50,13 @@ exhale_args = {
 
 breathe_projects = {}
 
-myst_enable_extensions = ["colon_fence", "substitution", "attrs_block", "deflist", "dollarmath"]
+myst_enable_extensions = [
+    "colon_fence",
+    "substitution",
+    "attrs_block",
+    "deflist",
+    "dollarmath",
+]
 myst_heading_anchors = 3
 
 # sphinx-napoleon
@@ -65,6 +76,7 @@ intersphinx_mapping = {
     "pygama": ("https://pygama.readthedocs.io/en/stable", None),
     "pyg4ometry": ("https://pyg4ometry.readthedocs.io/en/stable", None),
     "dbetto": ("https://dbetto.readthedocs.io/en/stable/", None),
+    "pygeomtools": ("https://legend-pygeom-tools.readthedocs.io/en/stable/", None),
 }
 
 # sphinx-autodoc
@@ -113,7 +125,11 @@ html_theme_options = {
 }
 html_title = f"{project} {version}"
 
-exclude_patterns = ["validation", "_build/_static/collapsible-lists/LICENSE.md", "_deps"]
+exclude_patterns = [
+    "validation",
+    "_build/_static/collapsible-lists/LICENSE.md",
+    "_deps",
+]
 
 # warnings filtering
 warnings_filter_silent = True
@@ -144,7 +160,7 @@ ultimate_replacements = {
 }
 
 
-def _replace(app, docname, source):
+def _replace(app, docname, source):  # noqa: ARG001
     result = source[0]
     for key in app.config.ultimate_replacements:
         result = result.replace(key, app.config.ultimate_replacements[key])
@@ -155,16 +171,35 @@ class RemageSessionLexer(BashSessionLexer):
     """
     Like BashSessionLexer, but treats "remage> " as the prompt.
     """
+
     name = "Remage shell session"
-    aliases = ["remage"]
-    # Primary‐prompt regex: match lines that start with “remage> ”
-    _ps1rgx = re.compile(r'^(remage> )(.*\n?)')
-    # Continuation prompt (if you don’t want any special one, just empty)
-    _ps2 = ''
+    aliases: ClassVar[list[str]] = ["remage"]
+    # Primary-prompt regex: match lines that start with “remage> ”
+    _ps1rgx = re.compile(r"^(remage> )(.*\n?)")
+    # Continuation prompt (if you don't want any special one, just empty)
+    _ps2 = ""
+
+
+class Geant4MacroLexer(RegexLexer):
+    name: str = "Geant4Macro"
+    aliases: ClassVar[list[str]] = ["geant4", "g4mac"]
+    filenames: ClassVar[list[str]] = ["*.mac"]
+
+    tokens: ClassVar[dict] = {
+        "root": [
+            # comments
+            (r"#.*$", Comment),
+            # command name at start of line
+            (r"^(/\S+)", Name.Function),
+            # any other text
+            (r".", Text),
+        ],
+    }
 
 
 def setup(app):
-    app.add_lexer('remage', RemageSessionLexer)
+    app.add_lexer("remage", RemageSessionLexer)
+    app.add_lexer("geant4", Geant4MacroLexer)
 
     app.add_config_value("ultimate_replacements", {}, True)
     app.connect("source-read", _replace)
