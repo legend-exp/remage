@@ -1,6 +1,6 @@
 #/RMG/Processes/OpticalPhysics true
 /RMG/Processes/HadronicPhysics Shielding
-/RMG/Processes/ThermalScattering 1
+/RMG/Processes/EnableNeutronThermalScattering 1
 /RMG/Output/ActivateOutputScheme IsotopeFilter
 /run/initialize
 /vis/open OGL

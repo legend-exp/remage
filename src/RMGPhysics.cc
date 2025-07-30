@@ -188,7 +188,6 @@ void RMGPhysics::ConstructProcess() {
   em_extra_physics->MuonNuclear(true);
   em_extra_physics->ConstructProcess();
 
-
   // G4EmExtraPhysics does not propagate the verbose level...
   auto synch_proc = G4ProcessTable::GetProcessTable()->FindProcesses("SynRad");
   for (size_t i = 0; i < synch_proc->size(); i++) {
@@ -223,7 +222,7 @@ void RMGPhysics::ConstructProcess() {
     );
     hElasticPhysics->ConstructProcess();
 
-    if (fUseThermalScattering) {
+    if (fUseNeutronThermalScattering) {
       RMGLog::Out(RMGLog::detail, "Adding neutron thermal scattering elastic physics");
       G4VPhysicsConstructor* hThermalScatteringPhysics = new G4ThermalNeutrons(
           G4VModularPhysicsList::verboseLevel
@@ -502,7 +501,7 @@ void RMGPhysics::DefineCommands() {
       .SetDefaultValue(RMGTools::GetCandidate(HadronicPhysicsListOption::kShielding))
       .SetStates(G4State_PreInit);
 
-  fMessenger->DeclareMethod("ThermalScattering", &RMGPhysics::SetUseThermalScattering)
+  fMessenger->DeclareProperty("EnableNeutronThermalScattering", fUseNeutronThermalScattering)
       .SetGuidance("Use thermal scattering cross sections for neutrons")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
