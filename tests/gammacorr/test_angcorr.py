@@ -64,8 +64,7 @@ def test_plot_gammacorr():
             tracks = lh5.read_as("tracks", remage_output, library="ak")
 
             # read in dictionary with process ids, to filter later
-            _p = lh5.read("processes", remage_output)
-            processes = {k.decode(): int(v) for k, v in zip(_p.name, _p.procid)}
+            processes = lh5.read("processes", remage_output)
 
             # group-by event id
             trk = ak.unflatten(tracks, ak.run_lengths(tracks.evtid))
@@ -77,7 +76,7 @@ def test_plot_gammacorr():
                     if "RadioactiveDecay" in processes
                     else "Radioactivation"
                 )
-            ]
+            ].value
             gtrk = trk[(trk.particle == 22) & (trk.procid == decay_procid)]
 
             # keep only events with two gammas
