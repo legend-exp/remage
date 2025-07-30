@@ -60,9 +60,7 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolumesFromRegex(
 
   bool found = false;
   // scan the volume store for matches
-  G4cout << "Scanning volume store for matches..." << G4endl;
   for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
-    G4cout << "Checking volume: " << (*it)->GetName() << "[" << (*it)->GetCopyNo() << "]" << G4endl;
     if (std::regex_match((*it)->GetName(), std::regex(name)) and
         std::regex_match(std::to_string((*it)->GetCopyNo()), std::regex(copy_nr))) {
 

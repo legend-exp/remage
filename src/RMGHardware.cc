@@ -135,6 +135,25 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     } else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
   }
 
+  // register staged detectors now
+  if (!fStagedDetectors.empty()) {
+    RMGLog::Out(RMGLog::debug, "Registering staged detectors");
+    for (const auto& [k, v] : fStagedDetectors) {
+      auto volumes = RMGNavigationTools::FindPhysicalVolumesFromRegex(k.first, std::to_string(k.second));
+
+      int uid = v.uid;
+
+      for (const auto& vol : volumes) {
+        this->RegisterDetector(v.type, vol->GetName(), uid, vol->GetCopyNo(), v.allow_uid_reuse);
+
+        if (!v.allow_uid_reuse) {
+          // if we do not allow uid reuse, we give the next detector a new uid
+          uid++;
+        }
+      }
+    }
+  }
+
   for (const auto& [k, v] : fDetectorMetadata) {
     const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
     if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
@@ -274,6 +293,42 @@ void RMGHardware::ConstructSDandField() {
   }
 }
 
+void RMGHardware::StageDetector(
+    RMGDetectorType type,
+    const std::string& name,
+    int uid,
+    int copy_nr,
+    bool allow_uid_reuse
+) {
+  if (fActiveDetectorsInitialized) {
+    RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
+    return;
+  }
+
+  // sanity check for duplicate uids.
+  // This would cause an error later, but we can catch it early.
+  if (!allow_uid_reuse) {
+    for (const auto& [k, v] : fStagedDetectors) {
+      if (v.uid == uid) {
+        RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
+        return;
+      }
+    }
+  }
+
+  auto r_value = fStagedDetectors.insert(
+      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse}}
+  );
+  if (!r_value.second) { // if insertion did not take place
+    RMGLog::OutFormat(
+        RMGLog::warning,
+        "Name '{}' (copy number {}) has already been staged as detector",
+        name,
+        copy_nr
+    );
+  }
+}
+
 void RMGHardware::RegisterDetector(
     RMGDetectorType type,
     const std::string& pv_name,
@@ -281,6 +336,7 @@ void RMGHardware::RegisterDetector(
     int copy_nr,
     bool allow_uid_reuse
 ) {
+  // This should not be possible to occur anymore
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
     return;

@@ -88,6 +88,14 @@ class RMGHardware : public G4VUserDetectorConstruction {
         bool allow_uid_reuse = false
     );
 
+    void StageDetector(
+        RMGDetectorType type,
+        const std::string& pv_name,
+        int uid,
+        int copy_nr = 0,
+        bool allow_uid_reuse = false
+    );
+
     /** @brief Extract a map of the detector metadata, one element for each sensitive detector physical volume and copy_nr. */
     const auto& GetDetectorMetadataMap() { return fDetectorMetadata; }
 
@@ -136,6 +144,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
 
     // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, RMGDetectorMetadata> fDetectorMetadata;
+
     std::set<RMGDetectorType> fActiveDetectors;
     static G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> fActiveOutputSchemes;
     static G4ThreadLocal bool fActiveDetectorsInitialized;
@@ -154,6 +163,17 @@ class RMGHardware : public G4VUserDetectorConstruction {
      *  for sensitive volumes. Logical volumes of sensitive volumes should be
      *  added to it. */
     G4Region* fSensitiveRegion = new G4Region("SensitiveRegion");
+
+    struct RMGStagedDetector {
+        RMGDetectorType type;
+        std::string name;
+        int uid;
+        int copy_nr;
+        bool allow_uid_reuse;
+    };
+
+    // Holds detector info before initialization
+    std::map<std::pair<std::string, int>, RMGStagedDetector> fStagedDetectors;
 };
 
 #endif

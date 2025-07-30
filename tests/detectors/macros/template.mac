@@ -1,0 +1,16 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+$REGISTER_DETS
+
+/run/initialize
+
+/RMG/Output/NtupleUseVolumeName true
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume .*det.*
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 MeV
+
+/run/beamOn 100

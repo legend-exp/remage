@@ -98,7 +98,7 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   auto allow_reuse_str = next();
   if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
 
-  fHardware->RegisterDetector(type, pv_name, uid, copy_nr, allow_reuse);
+  fHardware->StageDetector(type, pv_name, uid, copy_nr, allow_reuse);
 }
 
 void RMGHardwareMessenger::StepLimitsCmd(const std::string& parameters) {
