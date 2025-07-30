@@ -137,7 +137,7 @@ Commands for controlling physics processes
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
 * `HadronicPhysics` – Add hadronic processes to the physics list
-* `ThermalScattering` – Use thermal scattering cross sections for neutrons
+* `EnableNeutronThermalScattering` – Use thermal scattering cross sections for neutrons
 * `EnableGammaAngularCorrelation` – Set correlated gamma emission flag
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
@@ -213,7 +213,7 @@ Add hadronic processes to the physics list
   * **Candidates** – `QGSP_BIC_HP QGSP_BERT_HP FTFP_BERT_HP Shielding None`
 * **Allowed states** – `PreInit`
 
-### `/RMG/Processes/ThermalScattering`
+### `/RMG/Processes/EnableNeutronThermalScattering`
 
 Use thermal scattering cross sections for neutrons
 

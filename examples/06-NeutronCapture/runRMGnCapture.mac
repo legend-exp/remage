@@ -3,7 +3,7 @@
 #/tracking/verbose 1
 
 /RMG/Processes/HadronicPhysics Shielding
-/RMG/Processes/ThermalScattering 1
+/RMG/Processes/EnableNeutronThermalScattering 1
 /RMG/Processes/UseGrabmayrsGammaCascades true
 
 /RMG/Output/ActivateOutputScheme IsotopeOutputScheme
