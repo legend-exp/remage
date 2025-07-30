@@ -83,6 +83,12 @@ RMGPhysics::RMGPhysics() {
   // need to set this here for it to take effect...?
   G4HadronicParameters::Instance()->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
+// https://bugzilla-geant4.kek.jp/show_bug.cgi?id=2644
+#if G4VERSION_NUMBER >= 1130
+  // enable nuclear gamma angular correlation
+  this->SetUseGammaAngCorr(true);
+#endif
+
   // set default cut values, tuned to 100 keV in germanium
   float cut_val = 0.1 * u::mm;
   G4VUserPhysicsList::defaultCutValue = cut_val;
