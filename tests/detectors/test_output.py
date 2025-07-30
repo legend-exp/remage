@@ -23,10 +23,10 @@ output_files = [
 ]
 
 dump_files = [
-    "dumps/from-gdml.lh5.ls",
-    "dumps/from-regex.lh5.ls",
-    "dumps/from-name.lh5.ls",
-    "dumps/from-both.lh5.ls",
+    "dumps/register-germanium.lh5.ls",
+    "dumps/register-germanium.lh5.ls",
+    "dumps/register-germanium.lh5.ls",
+    "dumps/register-all.lh5.ls",
 ]
 
 for output_file, dump_file in zip(output_files, dump_files):
