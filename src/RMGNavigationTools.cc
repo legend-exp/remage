@@ -15,6 +15,7 @@
 
 #include "RMGNavigationTools.hh"
 
+#include <format>
 #include <map>
 #include <queue>
 #include <set>
@@ -27,8 +28,6 @@
 #include "G4UnitsTable.hh"
 
 #include "RMGLog.hh"
-
-#include "fmt/core.h"
 
 G4VPhysicalVolume* RMGNavigationTools::FindPhysicalVolume(std::string name, int copy_nr) {
   auto const& store = *G4PhysicalVolumeStore::GetInstance();
@@ -114,7 +113,7 @@ void RMGNavigationTools::PrintListOfLogicalVolumes() {
 
     volumes.insert(
         {v->GetName(),
-         fmt::format(
+         std::format(
              "{} daugh. // {} // {} // {} // {} // {}",
              v->GetNoDaughters(),
              std::string(G4BestUnit(v->GetMaterial()->GetDensity(), "Volumic Mass")),
