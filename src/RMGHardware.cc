@@ -129,17 +129,25 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         el.first,
         el.second
     );
-    auto vol = RMGNavigationTools::FindPhysicalVolume(el.first);
-    if (!vol) {
-      RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
-    } else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(el.first);
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::error,
+          "No matching volumes for '{}' found, skipping user step limit setting",
+          el.first
+      );
+    } else {
+      for (const auto& vol : volumes) {
+        vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+      }
+    }
   }
 
   // register staged detectors now
   if (!fStagedDetectors.empty()) {
     RMGLog::Out(RMGLog::debug, "Registering staged detectors");
     for (const auto& [k, v] : fStagedDetectors) {
-      auto volumes = RMGNavigationTools::FindPhysicalVolumesFromRegex(k.first, std::to_string(k.second));
+      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
 
       int uid = v.uid;
 
@@ -155,7 +163,25 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   }
 
   for (const auto& [k, v] : fDetectorMetadata) {
-    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Could not find detector physical volume for name '{}' (copy number {})",
+          k.first,
+          k.second
+      );
+    }
+    if (volumes.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Found multiple physical volumes for detector Name '{}' (copy number {}) - this is not "
+          "allowed",
+          k.first,
+          k.second
+      );
+    }
+    const auto& pv = *volumes.begin();
     if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
     const auto lv = pv->GetLogicalVolume();
     // only set to sensitive region if not already done
@@ -241,8 +267,25 @@ void RMGHardware::ConstructSDandField() {
     }
 
     // now assign logical volumes to the sensitive detector
-    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
-    if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Could not find detector physical volume for name '{}' (copy number {})",
+          k.first,
+          k.second
+      );
+    }
+    if (volumes.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Found multiple physical volumes for detector Name '{}' (copy number {}) - this is not "
+          "allowed",
+          k.first,
+          k.second
+      );
+    }
+    const auto& pv = *volumes.begin();
     const auto lv = pv->GetLogicalVolume();
     // only add the SD to the LV if not already present.
     if (lv->GetSensitiveDetector() != active_dets[v.type]) {

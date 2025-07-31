@@ -52,9 +52,8 @@ namespace RMGNavigationTools {
    * @param copy_nr The copy number (default is 0).
    * @return Pointer to the physical volume, or @c nullptr if not found.
    */
-  G4VPhysicalVolume* FindPhysicalVolume(std::string name, int copy_nr = 0);
 
-  std::set<G4VPhysicalVolume*> FindPhysicalVolumesFromRegex(std::string name, std::string copy_nr = ".*");
+  std::set<G4VPhysicalVolume*> FindPhysicalVolume(std::string name, std::string copy_nr = ".*");
   /**
    * @brief Finds the direct mother volume of a given physical volume.
    *

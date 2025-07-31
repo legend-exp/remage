@@ -78,7 +78,26 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     auto had_uid = registered_uids.emplace(det.second.uid);
     if (!had_uid.second) continue;
 
-    auto pv = RMGNavigationTools::FindPhysicalVolume(det.second.name, det.second.copy_nr);
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(
+        det.second.name,
+        std::to_string(det.second.copy_nr)
+    );
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Could not find detector physical volume in RMGGermaniumOutputScheme::AssignOutputNames"
+      );
+    }
+    if (volumes.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Found multiple physical volumes for detector Name '{}' (copy number {}) - this is not "
+          "allowed",
+          det.second.name,
+          det.second.copy_nr
+      );
+    }
+    auto pv = *volumes.begin();
     auto trees = RMGNavigationTools::FindGlobalPositions(pv);
     if (trees.size() > 1) {
       RMGLog::Out(

@@ -415,7 +415,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   // scan all search patterns provided by the user
   for (size_t i = 0; i < fPhysicalVolumeNameRegexes.size(); ++i) {
     // scan the volume store for matches
-    auto matchingVolumes = RMGNavigationTools::FindPhysicalVolumesFromRegex(
+    auto matchingVolumes = RMGNavigationTools::FindPhysicalVolume(
         fPhysicalVolumeNameRegexes.at(i),
         fPhysicalVolumeCopyNrRegexes.at(i)
     );

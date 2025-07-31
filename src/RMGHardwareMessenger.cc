@@ -46,7 +46,7 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
   fRegisterCmd->SetParameter(p_type);
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume");
+  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
   fRegisterCmd->SetParameter(p_pv);
 
   auto p_uid = new G4UIparameter("uid", 'i', false);
@@ -78,7 +78,7 @@ void RMGHardwareMessenger::DefineStepLimits() {
   fStepLimitsCmd->SetUnitCategory("Length");
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume");
+  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
   fStepLimitsCmd->SetParameter(p_pv);
 
   fStepLimitsCmd->AvailableForStates(G4State_PreInit);
