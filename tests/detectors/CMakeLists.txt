@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/* dumps/* gdml/*.gdml gdml/*.xml run-test-*.sh *.py)
+  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh *.py)
 
 # copy them to the build area
 foreach(_file ${_aux})
