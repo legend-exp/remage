@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
-from remage import remage_run_from_args
-
-rmg = sys.argv[1]
+from remage import remage_run
 
 
 def replace_lines(
@@ -32,18 +29,12 @@ def run_sim(run_name: str, register_dets_command: str):
 
     replace_lines("macros/template.mac", "macros/run.mac", replacements)
 
-    base_args = [
-        "--gdml-files",
-        "gdml/geometry.gdml",
-        "--output-file",
-        "{run_name}.lh5",
-        "--overwrite",
-        "--quiet",
+    remage_run(
         "macros/run.mac",
-    ]
-    formatted_args = [arg.format(run_name=run_name) for arg in base_args]
-
-    remage_run_from_args(formatted_args, raise_on_error=True)
+        gdml_files="gdml/geometry.gdml",
+        output=f"{run_name}.lh5",
+        overwrite_output=True,
+    )
 
 
 # Define the different detector registration commands to test
