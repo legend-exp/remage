@@ -46,7 +46,7 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
   fRegisterCmd->SetParameter(p_type);
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume");
+  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
   fRegisterCmd->SetParameter(p_pv);
 
   auto p_uid = new G4UIparameter("uid", 'i', false);
@@ -78,7 +78,7 @@ void RMGHardwareMessenger::DefineStepLimits() {
   fStepLimitsCmd->SetUnitCategory("Length");
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume");
+  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
   fStepLimitsCmd->SetParameter(p_pv);
 
   fStepLimitsCmd->AvailableForStates(G4State_PreInit);
@@ -98,7 +98,7 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   auto allow_reuse_str = next();
   if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
 
-  fHardware->RegisterDetector(type, pv_name, uid, copy_nr, allow_reuse);
+  fHardware->StageDetector(type, pv_name, uid, copy_nr, allow_reuse);
 }
 
 void RMGHardwareMessenger::StepLimitsCmd(const std::string& parameters) {
