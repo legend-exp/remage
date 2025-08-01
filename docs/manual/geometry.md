@@ -80,7 +80,7 @@ Alternatively, one might want to assign the same UID to multiple physical
 volumes, i.e. as if they constitute a single detector unit. In such a scenario,
 there would be no way to distinguish hits from different volumes in the
 simulation output (except from the coordinates in post-processing). In this
-case, the fourth argument (`allow_uid_reuse`) has to be set to `true`:
+case, the fifth argument (`allow_uid_reuse`) has to be set to `true`:
 
 ```geant4
 /RMG/Geometry/RegisterDetector Germanium .*_cu_.* 1 .* true
