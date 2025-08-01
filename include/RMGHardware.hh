@@ -73,6 +73,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
      * mostly used to label the detector in the simulation output. This
      * function also informs the run action to automatically activate output
      * schemes for all registered detector types.
+     * This function is called during @c Construct() method to register detectors
+     * from the GDML and to register detectors staged with @c StageDetector() method.
      *
      * @param type The type of detector.
      * @param pv_name The name of the physical volume to be registered.
@@ -88,6 +90,20 @@ class RMGHardware : public G4VUserDetectorConstruction {
         bool allow_uid_reuse = false
     );
 
+    /** @brief Stage a detector for later registration.
+     *
+     * @details This function is used to stage detectors following a regex name pattern, which will
+     * be registered later during the @c Construct() method. This function will be called by the @c
+     * /RegisterDetector macro command instead of the @c RegisterDetector() function directly. If
+     * multiple volumes match a regex by given uid, depending on the @c allow_uid_reuse flag, the
+     * uid will be reused or incremented for each detector.
+     *
+     * @param type The type of detector.
+     * @param pv_name The name of the physical volume to be registered.
+     * @param uid A unique integer identifier for the sensitive volume.
+     * @param copy_nr The copy number of the physical volume.
+     * @param allow_uid_reuse Flag to allow assigning the same @c uid to different detectors.
+     */
     void StageDetector(
         RMGDetectorType type,
         const std::string& pv_name,
