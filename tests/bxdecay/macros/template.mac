@@ -1,0 +1,12 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Geometry/RegisterDetector Germanium det1 001
+/RMG/Geometry/RegisterDetector Germanium det2 002
+
+/run/initialize
+
+/RMG/Output/Vertex/StorePrimaryParticleInformation
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume det1
+
+/RMG/Generator/Select BxDecay0
