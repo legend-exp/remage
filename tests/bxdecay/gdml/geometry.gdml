@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="world" x="0.1" y="0.1" z="0.1" lunit="m"/>
+		<orb name="basic_orb" r="0.04" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="germanium_det1">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="basic_orb"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="germanium_det1">
+				<volumeref ref="germanium_det1"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue=""/>
+		<auxiliary auxtype="RMG_detector" auxvalue="germanium">
+			<auxiliary auxtype="germanium_det1" auxvalue="101"/>
+		</auxiliary>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
