@@ -1,6 +1,5 @@
 /RMG/Geometry/GDMLDisableOverlapCheck true
 /RMG/Geometry/RegisterDetector Germanium det1 001
-/RMG/Geometry/RegisterDetector Germanium det2 002
 
 /run/initialize
 
