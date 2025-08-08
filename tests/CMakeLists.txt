@@ -8,7 +8,6 @@ get_target_property(REMAGE_PYEXE remage-cli PYEXE_PATH)
 get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
 
 add_subdirectory(basics)
-add_subdirectory(bxdecay)
 add_subdirectory(confinement)
 add_subdirectory(detectors)
 add_subdirectory(distances)
@@ -24,4 +23,8 @@ add_subdirectory(vertex)
 
 if(RMG_BUILD_EXAMPLES)
   add_subdirectory(examples)
+endif()
+
+if(BxDecay0_FOUND)
+  add_subdirectory(bxdecay)
 endif()
