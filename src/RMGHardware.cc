@@ -149,9 +149,21 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     for (const auto& [k, v] : fStagedDetectors) {
       auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
 
+      // Sort alphabetically by name
+      std::vector<G4VPhysicalVolume*> sortedVolumes(volumes.begin(), volumes.end());
+      // Sorts by name and copy number in ascending order
+      std::sort(
+          sortedVolumes.begin(),
+          sortedVolumes.end(),
+          [](G4VPhysicalVolume* a, G4VPhysicalVolume* b) {
+            if (a->GetName() == b->GetName()) return a->GetCopyNo() < b->GetCopyNo();
+            return a->GetName() < b->GetName();
+          }
+      );
+
       int uid = v.uid;
 
-      for (const auto& vol : volumes) {
+      for (const auto& vol : sortedVolumes) {
         this->RegisterDetector(v.type, vol->GetName(), uid, vol->GetCopyNo(), v.allow_uid_reuse);
 
         if (!v.allow_uid_reuse) {

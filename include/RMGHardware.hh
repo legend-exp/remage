@@ -52,9 +52,14 @@ class RMGHardware : public G4VUserDetectorConstruction {
      *  @details Detector geometry can be based on GDML files, parsed with @c G4GDMLParser .
      *  Alternatively geometry can be defined directly by overriding the @c DefineGeometry() method.
      *
-     *  This function defines the geometry and checks for overlaps, if using GDML defined geometry and check
-     *  are not disabled. It also assigns physical volumes to Geant4 regions and sets user step limits.
-     *  This must not modify thread-local state, because it is only called once globally.
+     *  This function defines the geometry and checks for overlaps, if using GDML defined geometry
+     * and check are not disabled. It also assigns physical volumes to Geant4 regions and sets user
+     * step limits. This must not modify thread-local state, because it is only called once
+     * globally.
+     *
+     * This function will call @c RegisterDetector() to register detectors staged with @c
+     * StageDetector() and register all detector types specified with the
+     * `RegisterDetectorsFromGDML` macro command from the GDML.
      *
      * @returns The physical volume of the world.
      */

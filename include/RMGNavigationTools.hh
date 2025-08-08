@@ -46,7 +46,7 @@ namespace RMGNavigationTools {
    * @brief Finds physical volumes matching the given regex name and copy number.
    *
    * Searches the global @c G4PhysicalVolumeStore for physical volumes whose names and copy numbers
-   * match the given regex.
+   * match the given regex using @c std::regex_match with default options.
    * If an exact name and copy number is provided, it will return a set only consisting of the one matching physical volume.
    *
    * @param name regular expression for the physical volume name.

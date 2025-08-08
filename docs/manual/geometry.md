@@ -63,18 +63,19 @@ This registers the physical volume `B00000B`, and the `C000RG1` volume with copy
 number `1` as `Germanium` detectors with UIDs 1 and 2 respectively. Because for
 `B00000B` no copy number was specified, this will register all `B00000B` named
 volumes if there are multiple with different copy numbers. This command now also
-accepts regex patterns:
+accepts regex patterns (respecting the
+[default `std::regex_match` grammar](https://en.cppreference.com/w/cpp/regex/ecmascript.html)):
 
 ```geant4
 /RMG/Geometry/RegisterDetector Germanium B.* 1
 ```
 
 registers all physical volumes starting with `B`. If there are multiple volumes
-matching the pattern, they will all be registered under incrementing UIDs. This
-means the first `B.*` match will be registered under UID 1, the second match
-will be registered with UID 2 and so on. It is therefore the responsibility of
-the user to make sure that no UID will be duplicated, which is detected by
-_remage_ and results in an error.
+matching the pattern, they will all be registered alphabetically under
+incrementing UIDs. This means the first alphabetical `B.*` match will be
+registered under UID 1, the second match will be registered with UID 2 and so
+on. It is therefore the responsibility of the user to make sure that no UID will
+be duplicated, which is detected by _remage_ and results in an error.
 
 Alternatively, one might want to assign the same UID to multiple physical
 volumes, i.e. as if they constitute a single detector unit. In such a scenario,
