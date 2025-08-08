@@ -20,7 +20,7 @@ def get_summed_primary_ekin(filename):
 def plot_energy():
     fig, ax = plt.subplots()
 
-    ekin_0vbb = get_summed_primary_ekin("0vbb.lh5")[:100]
+    ekin_0vbb = get_summed_primary_ekin("0vbb.lh5")[:10000]
     ekin_2vbb = get_summed_primary_ekin("2vbb.lh5")
 
     modes = ["0vbb", "2vbb"]

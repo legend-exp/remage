@@ -5,13 +5,13 @@ from remage import remage_run
 bbv0_commands = [
     "macros/template.mac",
     "/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 0vbb",
-    "/run/beamOn 10000",
+    "/run/beamOn 1000000",
 ]
 # the two template macros are just to incorporate a test that makes sure the order of vertex macros does not matter
 bbv2_commands = [
     "macros/template2.mac",
     "/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 2vbb",
-    "/run/beamOn 10000",
+    "/run/beamOn 1000000",
 ]
 
 runs = [
