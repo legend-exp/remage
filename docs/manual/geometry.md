@@ -42,7 +42,8 @@ Sensitive detector volumes must be registered so that particle interactions are
 recorded in the output. In _remage_, this can be done in several ways. Each
 detector has a unique id (UID) and a _type_, which determines how hits in a
 physical volume (or in a group of them) are processed and stored. Detector of
-type `Germanium`, `Scintillator` and `Optical` are currently supported.
+type `Germanium`, `Scintillator` and `Optical` are currently supported, see
+{ref}`manual-output` for more details.
 
 :::{note}
 
@@ -55,24 +56,40 @@ The simplest method is to use the
 
 ```geant4
 /RMG/Geometry/RegisterDetector Germanium B00000B 1
-/RMG/Geometry/RegisterDetector Germanium C000RG1 2
+/RMG/Geometry/RegisterDetector Germanium C000RG1 2 1
 ```
 
-This registers the physical volumes `B00000B` and `C000RG1` as `Germanium`
-detectors with UIDs 1 and 2 respectively. If the copy number is not specified,
-`0` is assumed. The detector type determines the detector hit readout strategy
-(and how the data is stored on disk), see {ref}`manual-output` for more details.
+This registers the physical volume `B00000B`, and the `C000RG1` volume with copy
+number `1` as `Germanium` detectors with UIDs 1 and 2 respectively. Because for
+`B00000B` no copy number was specified, this will register all `B00000B` named
+volumes if there are multiple with different copy numbers. This command now also
+accepts regex patterns (respecting the
+[default `std::regex_match` grammar](https://en.cppreference.com/w/cpp/regex/ecmascript.html)):
+
+```geant4
+/RMG/Geometry/RegisterDetector Germanium B.* 1
+```
+
+registers all physical volumes starting with `B`. If there are multiple volumes
+matching the pattern, they will all be registered alphabetically under
+incrementing UIDs. This means the first alphabetical `B.*` match will be
+registered under UID 1, the second match will be registered with UID 2 and so
+on. It is therefore the responsibility of the user to make sure that no UID will
+be duplicated, which is detected by _remage_ and results in an error.
 
 Alternatively, one might want to assign the same UID to multiple physical
 volumes, i.e. as if they constitute a single detector unit. In such a scenario,
 there would be no way to distinguish hits from different volumes in the
-simulation output. In this application, the fourth argument (`allow_uid_reuse`)
-has to be set to `true`:
+simulation output (except from the coordinates in post-processing). In this
+case, the fifth argument (`allow_uid_reuse`) has to be set to `true`:
 
 ```geant4
-/RMG/Geometry/RegisterDetector Germanium B00000B 1 true
-/RMG/Geometry/RegisterDetector Germanium C000RG1 1 true
+/RMG/Geometry/RegisterDetector Germanium .*_cu_.* 1 .* true
 ```
+
+This would register any volume with name matching the regular expression
+`.*_cu_.*` under the UID 1. In this case the UIDs will **not** be incremented
+for multiple matches.
 
 Last but not least, detectors can be imported from a GDML file that includes
 metadata, using the

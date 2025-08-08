@@ -16,6 +16,7 @@
 #ifndef _RMG_NAVIGATION_TOOLS_HH_
 #define _RMG_NAVIGATION_TOOLS_HH_
 
+#include <regex>
 #include <set>
 #include <string>
 #include <vector>
@@ -42,16 +43,18 @@ namespace RMGNavigationTools {
    */
   G4LogicalVolume* FindLogicalVolume(std::string name);
   /**
-   * @brief Finds a physical volume by name and copy number.
+   * @brief Finds physical volumes matching the given regex name and copy number.
    *
-   * Searches the global @c G4PhysicalVolumeStore for a physical volume whose name matches the given
-   * @c std::string and whose copy number matches the specified value.
+   * Searches the global @c G4PhysicalVolumeStore for physical volumes whose names and copy numbers
+   * match the given regex using @c std::regex_match with default options.
+   * If an exact name and copy number is provided, it will return a set only consisting of the one matching physical volume.
    *
-   * @param name The name of the physical volume to search for.
-   * @param copy_nr The copy number (default is 0).
-   * @return Pointer to the physical volume, or @c nullptr if not found.
+   * @param name regular expression for the physical volume name.
+   * @param copy_nr regular expression for the copy number (default is ".*" to match any copy number).
+   * @return A set of pointers to the matching physical volumes, empty if no match is found.
    */
-  G4VPhysicalVolume* FindPhysicalVolume(std::string name, int copy_nr = 0);
+
+  std::set<G4VPhysicalVolume*> FindPhysicalVolume(std::string name, std::string copy_nr = ".*");
   /**
    * @brief Finds the direct mother volume of a given physical volume.
    *

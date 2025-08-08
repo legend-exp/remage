@@ -129,14 +129,71 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         el.first,
         el.second
     );
-    auto vol = RMGNavigationTools::FindPhysicalVolume(el.first);
-    if (!vol) {
-      RMGLog::Out(RMGLog::error, "Returned volume is null, skipping user step limit setting");
-    } else vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(el.first);
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::error,
+          "No matching volumes for '{}' found, skipping user step limit setting",
+          el.first
+      );
+    } else {
+      for (const auto& vol : volumes) {
+        vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+      }
+    }
+  }
+
+  // register staged detectors now
+  if (!fStagedDetectors.empty()) {
+    RMGLog::Out(RMGLog::debug, "Registering staged detectors");
+    for (const auto& [k, v] : fStagedDetectors) {
+      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+
+      // Sort alphabetically by name
+      std::vector<G4VPhysicalVolume*> sortedVolumes(volumes.begin(), volumes.end());
+      // Sorts by name and copy number in ascending order
+      std::sort(
+          sortedVolumes.begin(),
+          sortedVolumes.end(),
+          [](G4VPhysicalVolume* a, G4VPhysicalVolume* b) {
+            if (a->GetName() == b->GetName()) return a->GetCopyNo() < b->GetCopyNo();
+            return a->GetName() < b->GetName();
+          }
+      );
+
+      int uid = v.uid;
+
+      for (const auto& vol : sortedVolumes) {
+        this->RegisterDetector(v.type, vol->GetName(), uid, vol->GetCopyNo(), v.allow_uid_reuse);
+
+        if (!v.allow_uid_reuse) {
+          // if we do not allow uid reuse, we give the next detector a new uid
+          uid++;
+        }
+      }
+    }
   }
 
   for (const auto& [k, v] : fDetectorMetadata) {
-    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Could not find detector physical volume for name '{}' (copy number {})",
+          k.first,
+          k.second
+      );
+    }
+    if (volumes.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Found multiple physical volumes for detector Name '{}' (copy number {}) - this is not "
+          "allowed",
+          k.first,
+          k.second
+      );
+    }
+    const auto& pv = *volumes.begin();
     if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
     const auto lv = pv->GetLogicalVolume();
     // only set to sensitive region if not already done
@@ -222,8 +279,25 @@ void RMGHardware::ConstructSDandField() {
     }
 
     // now assign logical volumes to the sensitive detector
-    const auto& pv = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
-    if (!pv) RMGLog::Out(RMGLog::fatal, "Could not find detector physical volume");
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Could not find detector physical volume for name '{}' (copy number {})",
+          k.first,
+          k.second
+      );
+    }
+    if (volumes.size() > 1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Found multiple physical volumes for detector Name '{}' (copy number {}) - this is not "
+          "allowed",
+          k.first,
+          k.second
+      );
+    }
+    const auto& pv = *volumes.begin();
     const auto lv = pv->GetLogicalVolume();
     // only add the SD to the LV if not already present.
     if (lv->GetSensitiveDetector() != active_dets[v.type]) {
@@ -274,6 +348,42 @@ void RMGHardware::ConstructSDandField() {
   }
 }
 
+void RMGHardware::StageDetector(
+    RMGDetectorType type,
+    const std::string& name,
+    int uid,
+    int copy_nr,
+    bool allow_uid_reuse
+) {
+  if (fActiveDetectorsInitialized) {
+    RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
+    return;
+  }
+
+  // sanity check for duplicate uids.
+  // This would cause an error later, but we can catch it early.
+  if (!allow_uid_reuse) {
+    for (const auto& [k, v] : fStagedDetectors) {
+      if (v.uid == uid) {
+        RMGLog::OutFormat(RMGLog::error, "UID {} has already been assigned", uid);
+        return;
+      }
+    }
+  }
+
+  auto r_value = fStagedDetectors.insert(
+      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse}}
+  );
+  if (!r_value.second) { // if insertion did not take place
+    RMGLog::OutFormat(
+        RMGLog::warning,
+        "Name '{}' (copy number {}) has already been staged as detector",
+        name,
+        copy_nr
+    );
+  }
+}
+
 void RMGHardware::RegisterDetector(
     RMGDetectorType type,
     const std::string& pv_name,
@@ -281,6 +391,7 @@ void RMGHardware::RegisterDetector(
     int copy_nr,
     bool allow_uid_reuse
 ) {
+  // This should not be possible to occur anymore
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
     return;

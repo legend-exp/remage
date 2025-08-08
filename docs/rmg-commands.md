@@ -395,7 +395,7 @@ register a sensitive detector
   * **Omittable** – `False`
   * **Candidates** – `Germanium Optical Scintillator`
 * **Parameter** – `pv_name`
-    – Detector physical volume
+    – Detector physical volume, accepts regex patterns
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Parameter** – `uid`
@@ -427,7 +427,7 @@ Sets maximum step size for a certain detector
   * **Omittable** – `False`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Parameter** – `pv_name`
-    – Detector physical volume
+    – Detector physical volume, accepts regex patterns
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit`

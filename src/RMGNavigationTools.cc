@@ -30,16 +30,53 @@
 
 #include "fmt/core.h"
 
-G4VPhysicalVolume* RMGNavigationTools::FindPhysicalVolume(std::string name, int copy_nr) {
-  auto const& store = *G4PhysicalVolumeStore::GetInstance();
-  auto result = std::find_if(store.begin(), store.end(), [&name, &copy_nr](auto v) {
-    return (std::string(v->GetName()) == name && v->GetCopyNo() == copy_nr);
-  });
-  if (result == store.end()) {
-    RMGLog::Out(RMGLog::error, "Physical volume ", name, " not found in store. Returning nullptr");
-    return nullptr;
+std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
+    std::string name,
+    std::string copy_nr
+) {
+  if (copy_nr.empty()) copy_nr = ".*";
+  std::set<G4VPhysicalVolume*> result;
+  auto volume_store = G4PhysicalVolumeStore::GetInstance();
+
+  // scan all search patterns provided by the user
+  RMGLog::OutFormat(
+      RMGLog::detail,
+      "Scanning for Physical volumes matching pattern '{}'['{}']",
+      name.c_str(),
+      copy_nr.c_str()
+  );
+
+  bool found = false;
+  // scan the volume store for matches
+  for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
+    if (std::regex_match((*it)->GetName(), std::regex(name)) and
+        std::regex_match(std::to_string((*it)->GetCopyNo()), std::regex(copy_nr))) {
+
+      // insert it in our collection
+      result.insert(*it);
+
+      RMGLog::OutFormat(
+          RMGLog::detail,
+          "Found '{}[{}]' matching the pattern",
+          (*it)->GetName().c_str(),
+          (*it)->GetCopyNo()
+      );
+
+      found = true;
+    }
   }
-  return *result;
+  if (!found) {
+    RMGLog::Out(
+        RMGLog::warning,
+        "No physical volumes names found matching pattern '",
+        name.c_str(),
+        "' and copy numbers matching pattern '",
+        copy_nr.c_str(),
+        "'"
+    );
+  }
+
+  return result;
 }
 
 G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
