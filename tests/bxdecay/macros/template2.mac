@@ -1,11 +1,10 @@
 /RMG/Geometry/GDMLDisableOverlapCheck true
 /RMG/Geometry/RegisterDetector Germanium germanium_det1 001
 
-/RMG/Output/ActivateOutputScheme ParticleFilter
 
 /run/initialize
 
-/RMG/Output/ParticleFilter/AddParticle 22
+/RMG/Processes/Stepping/SkipTracking
 /RMG/Output/Vertex/StorePrimaryParticleInformation
 
 /RMG/Generator/Select BxDecay0
