@@ -30,6 +30,8 @@ endforeach()
 # TODO: add new images here
 # cmake-format: off
 set(TESTS_IMAGES
+    bxdecay/e-combined-primary-energy.output.png
+    bxdecay/e-primary-opening-angle.output.png
     confinement/native-surface.output.jpeg
     confinement/native-volume.output.jpeg
     confinement/complex-surface.output.jpeg
