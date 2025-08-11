@@ -10,3 +10,6 @@
 /RMG/Generator/Confinement/Physical/AddVolume germanium_det1
 
 /RMG/Generator/Select BxDecay0
+/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 {MODE}
+
+/run/beamOn 250000

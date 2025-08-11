@@ -26,5 +26,5 @@ if(RMG_BUILD_EXAMPLES)
 endif()
 
 if(BxDecay0_FOUND)
-  add_subdirectory(bxdecay)
+  add_subdirectory(bxdecay0)
 endif()

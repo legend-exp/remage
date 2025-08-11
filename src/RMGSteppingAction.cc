@@ -27,7 +27,10 @@ RMGSteppingAction::RMGSteppingAction(RMGEventAction*) { this->DefineCommands(); 
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
-  if (fSkipTracking) step->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+  if (fSkipTracking) {
+    step->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+    return;
+  }
 
   // Kill _daughter_ nuclei with a lifetime longer than a user-defined threshold. This applies to
   // the defined half-life of the particle, and not the sampled time to the decay of the secondary
@@ -96,9 +99,7 @@ void RMGSteppingAction::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipTracking", fSkipTracking)
-      .SetGuidance(
-          "Immediately discard any tracks after primary generation. To verify primary generator."
-      )
+      .SetGuidance("Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
