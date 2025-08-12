@@ -23,11 +23,11 @@ let's inspect the data with Awkward:
 
 ```
 >>> ak.with_field(tcm, ak.local_index(tcm, axis=0), "event").show()
-[{row_in_table: [0], table_key: [3], event: 0},
- {row_in_table: [1], table_key: [3], event: 1},
+[{row_in_table: [0], table_key: [2], event: 0},
+ {row_in_table: [0], table_key: [3], event: 1},
  ...,
- {row_in_table: [6, 0], table_key: [3, 2], event: 6},
- {row_in_table: [0, 7], table_key: [1, 3], event: 7},
+ {row_in_table: [1, 1], table_key: [3, 2], event: 6},
+ {row_in_table: [0, 2], table_key: [1, 3], event: 7},
  ...,
  {row_in_table: [1108, 6521], table_key: [2, 3], event: 6954}]
 ```
