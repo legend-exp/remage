@@ -19,6 +19,7 @@
 #include <string>
 
 enum RMGDetectorType {
+  kGeneral,
   kGermanium,
   kOptical,
   kScintillator,

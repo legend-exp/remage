@@ -27,6 +27,8 @@ namespace fs = std::filesystem;
 #include "G4VPhysicalVolume.hh"
 
 #include "RMGConfig.hh"
+#include "RMGGeneralDetector.hh"
+#include "RMGGeneralOutputScheme.hh"
 #include "RMGGermaniumDetector.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGHardwareMessenger.hh"
@@ -244,6 +246,10 @@ void RMGHardware::ConstructSDandField() {
       G4VSensitiveDetector* obj = nullptr;
       std::shared_ptr<RMGVOutputScheme> output;
       switch (v.type) {
+        case RMGDetectorType::kGeneral:
+          obj = new RMGGeneralDetector();
+          output = std::make_shared<RMGGeneralOutputScheme>();
+          break;
         case RMGDetectorType::kOptical:
           obj = new RMGOpticalDetector();
           output = std::make_shared<RMGOpticalOutputScheme>();
