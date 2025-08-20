@@ -24,6 +24,7 @@
 #include "G4UImanager.hh"
 
 #include "RMGConfig.hh"
+#include "RMGGeneralOutputScheme.hh"
 #include "RMGGeneratorCosmicMuons.hh"
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
@@ -52,6 +53,7 @@ void init_extra() {
   // add here other things in the future.
 
   // output schemes
+  new RMGGeneralOutputScheme();
   new RMGGermaniumOutputScheme();
   new RMGOpticalOutputScheme();
   new RMGVertexOutputScheme();

@@ -361,7 +361,7 @@ Register detectors as saved in the GDML auxval structure, as written by pygeomto
   * **Parameter type** – `s`
   * **Omittable** – `True`
   * **Default value** – `All`
-  * **Candidates** – `All Germanium Optical Scintillator`
+  * **Candidates** – `All General Germanium Optical Scintillator`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/IncludeGDMLFile`
@@ -393,7 +393,7 @@ register a sensitive detector
     – Detector type
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Germanium Optical Scintillator`
+  * **Candidates** – `General Germanium Optical Scintillator`
 * **Parameter** – `pv_name`
     – Detector physical volume, accepts regex patterns
   * **Parameter type** – `s`
@@ -1184,6 +1184,7 @@ Commands for controlling the simulation output
 
 **Sub-directories:**
 
+* `/RMG/Output/General/` – Commands for controlling output from hits in general detectors.
 * `/RMG/Output/Germanium/` – Commands for controlling output from hits in germanium detectors.
 * `/RMG/Output/Optical/` – Commands for controlling output from hits in optical detectors.
 * `/RMG/Output/Vertex/` – Commands for controlling output of primary vertices.
@@ -1252,6 +1253,244 @@ This setting is not respected by all output formats.
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
+
+## `/RMG/Output/General/`
+
+Commands for controlling output from hits in general detectors.
+
+
+**Sub-directories:**
+
+* `/RMG/Output/General/Cluster/` – Commands for controlling clustering of hits in general detectors.
+
+**Commands:**
+
+* `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
+* `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
+* `DiscardPhotonsIfNoGeneralEdep` – Discard optical photons (before simulating them), if no edep in general detectors occurred in the same event.
+* `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
+* `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreTrackID` – Store Track IDs for hits in the output file.
+* `StepPositionMode` – Select which position of the step to store
+
+### `/RMG/Output/General/EdepCutLow`
+
+Set a lower energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/EdepCutHigh`
+
+Set an upper energy cut that has to be met for this event to be stored.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/AddDetectorForEdepThreshold`
+
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
+
+* **Parameter** – `det_uid`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/DiscardPhotonsIfNoGeneralEdep`
+
+Discard optical photons (before simulating them), if no edep in general detectors occurred in the same event.
+
+:::{note}
+If another output scheme also requests the photons to be discarded, the general edep filter does not force the photons to be simulated.
+:::
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/StoreSinglePrecisionPosition`
+
+Use float32 (instead of float64) for position output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/StoreSinglePrecisionEnergy`
+
+Use float32 (instead of float64) for energy output.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/DiscardZeroEnergyHits`
+
+Discard hits with zero energy.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/StoreTrackID`
+
+Store Track IDs for hits in the output file.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/StepPositionMode`
+
+Select which position of the step to store
+
+* **Parameter** – `mode`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `PreStep PostStep Average Both`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/General/Cluster/`
+
+Commands for controlling clustering of hits in general detectors.
+
+
+**Commands:**
+
+* `PreClusterOutputs` – Pre-Cluster output hits before saving
+* `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
+* `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
+* `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
+* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
+* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `SurfaceThickness` – Set a surface thickness for the general detector.
+* `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
+
+### `/RMG/Output/General/Cluster/PreClusterOutputs`
+
+Pre-Cluster output hits before saving
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/CombineLowEnergyElectronTracks`
+
+Merge low energy electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/RedistributeGammaEnergy`
+
+Redistribute energy deposited by gamma tracks to nearby electron tracks.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/PreClusterDistance`
+
+Set a distance threshold for the bulk pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `um`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/PreClusterDistanceSurface`
+
+Set a distance threshold for the surface pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `um`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/PreClusterTimeThreshold`
+
+Set a time threshold for  pre-clustering.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `us`
+  * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/SurfaceThickness`
+
+Set a surface thickness for the general detector.
+
+* **Parameter** – `thickness`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/General/Cluster/ElectronTrackEnergyThreshold`
+
+Set a energy threshold for tracks to be merged.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `keV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Output/Germanium/`
 
