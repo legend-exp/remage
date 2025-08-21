@@ -7,7 +7,6 @@ from pathlib import Path
 import awkward as ak
 import hist
 import numpy as np
-import tol_colors as tc
 from lgdo import lh5
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -16,8 +15,6 @@ from scipy.stats import beta, norm, poisson
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 14
-vset = tc.colorsets["vibrant"]
-mset = tc.colorsets["muted"]
 
 style = {
     "yerr": False,
@@ -169,7 +166,14 @@ def plot(
     steps = {}
     eff_def = {}
     n_sels = {}
-    colors = [vset.blue, vset.orange, vset.magenta, vset.teal, vset.grey, vset.cyan]
+    colors = [
+        "tab:blue",
+        "tab:orange",
+        "tab:purple",
+        "tab:green",
+        "tab:grey",
+        "tab:cyan",
+    ]
 
     # get default
     for field in fields:
@@ -224,7 +228,7 @@ def plot(
                     flow=None,
                     fill=True,
                     alpha=0.2,
-                    color=vset.blue,
+                    color="tab:blue",
                     label="No limits",
                 )
 
