@@ -1,0 +1,16 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Geometry/RegisterDetector Germanium germanium_det1 001
+
+
+/run/initialize
+
+/RMG/Processes/Stepping/SkipTracking
+/RMG/Output/Vertex/StorePrimaryParticleInformation
+
+/RMG/Generator/Select BxDecay0
+/RMG/Generator/BxDecay0/DoubleBetaDecay Ge76 {MODE}
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume germanium_det1
+
+/run/beamOn 250000

@@ -271,6 +271,7 @@ Commands for controlling physics processes
 **Commands:**
 
 * `DaughterNucleusMaxLifetime` – Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
+* `SkipTracking` – Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
 * `ResetInitialDecayTime` – If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
 * `LargeGlobalTimeUncertaintyWarning` – Warn if the global times of tracks get too large to provide the requested time uncertainty.
 
@@ -291,6 +292,16 @@ Set to -1 to disable this feature.
   * **Omittable** – `True`
   * **Default value** – `us`
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
+* **Allowed states** – `Idle`
+
+### `/RMG/Processes/Stepping/SkipTracking`
+
+Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Processes/Stepping/ResetInitialDecayTime`

@@ -24,3 +24,7 @@ add_subdirectory(vertex)
 if(RMG_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+if(BxDecay0_FOUND)
+  add_subdirectory(bxdecay0)
+endif()

@@ -13,6 +13,7 @@ versioninfo
 :caption: Sections
 :maxdepth: 2
 
+bxdecay0
 confinement
 distances
 nist
