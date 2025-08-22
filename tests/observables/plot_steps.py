@@ -4,7 +4,6 @@ import sys
 
 import awkward as ak
 import hist
-import tol_colors as tc
 from lgdo import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
@@ -17,11 +16,6 @@ style = {"yerr": False, "flow": None, "fill": True, "lw": 0.6, "alpha": 0.5}
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 12
-
-vib = tc.colorsets["vibrant"]
-vset = tc.colorsets["vibrant"]
-mset = tc.colorsets["muted"]
-
 
 # Get the BuPu colormap
 cmap = plt.get_cmap("cividis")
@@ -47,7 +41,7 @@ def plot_tracks(_data, idx, savename=None):
             alpha=1,
             linewidth=2,
             label=label,
-            color=vset.blue,
+            color="tab:blue",
         )
 
     ax.scatter(
@@ -55,7 +49,7 @@ def plot_tracks(_data, idx, savename=None):
         1000 * data_tmp.zloc - 1000 * z0,
         s=20,
         label="steps",
-        color=vset.red,
+        color="tab:red",
     )
 
     prefix = "m"
