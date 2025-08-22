@@ -8,6 +8,8 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGDetectorHit.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
+    ${_root}/include/RMGGeneralDetector.hh
+    ${_root}/include/RMGGeneralOutputScheme.hh
     ${_root}/include/RMGEventAction.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh
     ${_root}/include/RMGGeneratorFromFile.hh
@@ -55,6 +57,8 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGAnalysisReader.cc
     ${_root}/src/RMGDetectorHit.cc
     ${_root}/src/RMGExceptionHandler.cc
+    ${_root}/src/RMGGeneralDetector.cc
+    ${_root}/src/RMGGeneralOutputScheme.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc

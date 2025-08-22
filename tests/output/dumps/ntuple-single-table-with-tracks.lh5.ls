@@ -7,11 +7,22 @@
 ├── processes · table{name,procid} 
 │   ├── name · array<1>{string} 
 │   └── procid · array<1>{real} 
-├── stp · struct{germanium,optical,scintillator} 
-│   ├── __by_uid__ · struct{det001,det011,det101} 
+├── stp · struct{general,germanium,optical,scintillator} 
+│   ├── __by_uid__ · struct{det001,det011,det012,det101} 
 │   │   ├── det001 -> /stp/scintillator
 │   │   ├── det011 -> /stp/germanium
+│   │   ├── det012 -> /stp/general
 │   │   └── det101 -> /stp/optical
+│   ├── general · table{det_uid,dist_to_surf,edep,evtid,particle,time,xloc,yloc,zloc} 
+│   │   ├── det_uid · array<1>{real} 
+│   │   ├── dist_to_surf · array<1>{real} ── {'units': 'm'}
+│   │   ├── edep · array<1>{real} ── {'units': 'keV'}
+│   │   ├── evtid · array<1>{real} 
+│   │   ├── particle · array<1>{real} 
+│   │   ├── time · array<1>{real} ── {'units': 'ns'}
+│   │   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   │   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   │   └── zloc · array<1>{real} ── {'units': 'm'}
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,parent_trackid,particle,time,trackid,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{real} 
 │   │   ├── dist_to_surf · array<1>{real} ── {'units': 'm'}

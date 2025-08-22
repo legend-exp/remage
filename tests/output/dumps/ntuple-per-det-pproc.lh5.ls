@@ -1,10 +1,6 @@
 /
-├── detector_origins · struct{det1,det2} 
-│   ├── det1 · struct{xloc,yloc,zloc} 
-│   │   ├── xloc · real 
-│   │   ├── yloc · real 
-│   │   └── zloc · real 
-│   └── det2 · struct{xloc,yloc,zloc} 
+├── detector_origins · struct{det1} 
+│   └── det1 · struct{xloc,yloc,zloc} 
 │       ├── xloc · real 
 │       ├── yloc · real 
 │       └── zloc · real 

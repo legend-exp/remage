@@ -1,10 +1,6 @@
 /
-├── detector_origins · struct{det1,det2} 
-│   ├── det1 · struct{xloc,yloc,zloc} 
-│   │   ├── xloc · real 
-│   │   ├── yloc · real 
-│   │   └── zloc · real 
-│   └── det2 · struct{xloc,yloc,zloc} 
+├── detector_origins · struct{det1} 
+│   └── det1 · struct{xloc,yloc,zloc} 
 │       ├── xloc · real 
 │       ├── yloc · real 
 │       └── zloc · real 
@@ -12,11 +8,39 @@
 │   ├── compt · real 
 │   ├── eBrem · real 
 │   └── phot · real 
-├── stp · struct{germanium,optical,scintillator} 
-│   ├── __by_uid__ · struct{det001,det011,det101} 
+├── stp · struct{general,germanium,optical,scintillator} 
+│   ├── __by_uid__ · struct{det001,det011,det012,det101} 
 │   │   ├── det001 -> /stp/scintillator
 │   │   ├── det011 -> /stp/germanium
+│   │   ├── det012 -> /stp/general
 │   │   └── det101 -> /stp/optical
+│   ├── general · table{det_uid,dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc} 
+│   │   ├── det_uid · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} 
+│   │   ├── dist_to_surf · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'm'}
+│   │   ├── edep · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'keV'}
+│   │   ├── evtid · array<1>{real} 
+│   │   ├── particle · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} 
+│   │   ├── t0 · array<1>{real} ── {'units': 'ns'}
+│   │   ├── time · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'ns'}
+│   │   ├── xloc · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'm'}
+│   │   ├── yloc · array<1>{array<1>{real}} 
+│   │   │   ├── cumulative_length · array<1>{real} 
+│   │   │   └── flattened_data · array<1>{real} ── {'units': 'm'}
+│   │   └── zloc · array<1>{array<1>{real}} 
+│   │       ├── cumulative_length · array<1>{real} 
+│   │       └── flattened_data · array<1>{real} ── {'units': 'm'}
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,parent_trackid,particle,t0,time,trackid,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{array<1>{real}} 
 │   │   │   ├── cumulative_length · array<1>{real} 
@@ -86,7 +110,7 @@
 │       └── zloc · array<1>{array<1>{real}} 
 │           ├── cumulative_length · array<1>{real} 
 │           └── flattened_data · array<1>{real} ── {'units': 'm'}
-├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det011', 'stp/__by_uid__/det101']"}
+├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det011', 'stp/__by_uid__/det012', 'stp/__by_uid__/det101']"}
 │   ├── row_in_table · array<1>{array<1>{real}} 
 │   │   ├── cumulative_length · array<1>{real} 
 │   │   └── flattened_data · array<1>{real} 

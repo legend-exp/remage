@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
+// Copyright (C) 2025 Eric Esch <https://orcid.org/0009-0000-4920-9313>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "RMGScintillatorDetector.hh"
+#include "RMGGeneralDetector.hh"
 
 #include <map>
 #include <stdexcept>
@@ -30,14 +30,14 @@
 #include "RMGOutputTools.hh"
 
 
-RMGScintillatorDetector::RMGScintillatorDetector() : G4VSensitiveDetector("Scintillator") {
+RMGGeneralDetector::RMGGeneralDetector() : G4VSensitiveDetector("General") {
 
   // declare only one hit collection.
   // NOTE: names in the respective output scheme class must match this
   G4VSensitiveDetector::collectionName.insert("Hits");
 }
 
-void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
+void RMGGeneralDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
@@ -53,55 +53,61 @@ void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
-bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
+bool RMGGeneralDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing scintillator detector hits");
+  RMGLog::OutDev(RMGLog::debug, "Processing general detector hits");
 
   // return if no energy is deposited
-  if (step->GetTotalEnergyDeposit() == 0) return false;
   // ignore optical photons
   if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
   // we're going to use info from the pre-step point
   const auto prestep = step->GetPreStepPoint();
+  const auto position_prestep = prestep->GetPosition();
+
   const auto poststep = step->GetPostStepPoint();
+  const auto position_poststep = poststep->GetPosition();
+  const auto position_average = (position_prestep + position_poststep) / 2.;
 
-  // locate us
-  const auto pv_name = prestep->GetTouchableHandle()->GetVolume()->GetName();
-  const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
-
-  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   // check containment of prestep point
-  auto prestep_inside = RMGOutputTools::check_step_point_containment(
-      prestep,
-      RMGDetectorType::kScintillator
-  );
+  auto prestep_inside = RMGOutputTools::check_step_point_containment(prestep, RMGDetectorType::kGeneral);
 
   if (not prestep_inside) return false;
 
-  // retrieve unique id for persistency
+  // retrieve unique id for persistency, take from the prestep
+  const auto pv = prestep->GetTouchableHandle()->GetVolume();
+
+  auto pv_name = pv->GetName();
+  const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
+
+  const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in scintillator detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug, "Hit in general detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
   auto* hit = new RMGDetectorHit();
+
+  // pointer to the physical volume
+  hit->physical_volume = pv;
+
   hit->detector_uid = det_uid;
   hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
   hit->energy_deposition = step->GetTotalEnergyDeposit();
-  hit->global_position_prestep = prestep->GetPosition();
-  hit->global_position_poststep = poststep->GetPosition();
-  hit->global_position_average = (poststep->GetPosition() + prestep->GetPosition()) / 2.;
+
+  // positions
+  hit->global_position_prestep = position_prestep;
+  hit->global_position_poststep = position_poststep;
+  hit->global_position_average = position_average;
+
   hit->global_time = prestep->GetGlobalTime();
-
-  hit->physical_volume = prestep->GetTouchableHandle()->GetVolume();
-
-  // track ids
   hit->track_id = step->GetTrack()->GetTrackID();
   hit->parent_track_id = step->GetTrack()->GetParentID();
 
-  hit->velocity_pre = prestep->GetVelocity();
-  hit->velocity_post = poststep->GetVelocity();
+  // get various distances
+  hit->distance_to_surface_prestep = RMGOutputTools::distance_to_surface(pv, position_prestep);
+  hit->distance_to_surface_poststep = RMGOutputTools::distance_to_surface(pv, position_poststep);
+  hit->distance_to_surface_average = RMGOutputTools::distance_to_surface(pv, position_average);
 
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
@@ -109,6 +115,6 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   return true;
 }
 
-void RMGScintillatorDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
+void RMGGeneralDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

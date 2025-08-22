@@ -149,7 +149,7 @@ bool RMGOutputTools::check_step_point_containment(
   auto pv_name = pv->GetName();
   const auto pv_copynr = step_point->GetTouchableHandle()->GetCopyNumber();
 
-  // check if physical volume is registered as germanium detector
+  // check if physical volume is registered as requested detector type
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   try {
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
