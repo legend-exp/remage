@@ -121,6 +121,37 @@ jobs:
           export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
+  run_validation:
+    name: Run validation suite
+    runs-on: self-hosted
+
+    container: docker://legendexp/remage-base:stable
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
+
+      - name: Build project
+        shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
+        run: |
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
+
+          mkdir build
+          cd build
+          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          make -j$(nproc) | tee -a build.log
+          make install | tee -a build.log
+
+      - name: Run full test suite
+        if: ${{ matrix.container_version != 'slim' }}
+        run: |
+          cd build
+          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-regex mt -j1 --output-on-failure
+
   test_on_mac:
     name: Test on macOS
     runs-on: macos-latest
