@@ -9,4 +9,4 @@
 /RMG/Generator/Select BxDecay0
 /bxdecay0/generator/dbd Ge76 2345 1 0
 
-/run/beamOn 100
+/run/beamOn 1000
