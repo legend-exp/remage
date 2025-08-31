@@ -113,7 +113,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
         RMGDetectorType type,
         const std::string& pv_name,
         int uid,
-        int copy_nr = 0,
+        const std::string& copy_nr = "0",
         bool allow_uid_reuse = false
     );
 
@@ -189,12 +189,12 @@ class RMGHardware : public G4VUserDetectorConstruction {
         RMGDetectorType type;
         std::string name;
         int uid;
-        int copy_nr;
+        std::string copy_nr;
         bool allow_uid_reuse;
     };
 
     // Holds detector info before initialization
-    std::map<std::pair<std::string, int>, RMGStagedDetector> fStagedDetectors;
+    std::map<std::pair<std::string, std::string>, RMGStagedDetector> fStagedDetectors;
 };
 
 #endif

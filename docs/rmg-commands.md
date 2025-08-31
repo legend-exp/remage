@@ -414,8 +414,8 @@ register a sensitive detector
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Parameter** – `copy_nr`
-    – copy nr (default 0)
-  * **Parameter type** – `i`
+    – copy nr, accepts regex patterns (default 0)
+  * **Parameter type** – `s`
   * **Omittable** – `True`
   * **Default value** – `0`
 * **Parameter** – `allow_id_reuse`

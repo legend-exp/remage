@@ -42,6 +42,10 @@ runs = [
     ("det-from-gdml", "/RMG/Geometry/RegisterDetectorsFromGDML Germanium"),
     ("det-from-regex", "/RMG/Geometry/RegisterDetector Germanium germanium.* 101"),
     (
+        "det-from-regex-copynr",
+        "/RMG/Geometry/RegisterDetector Germanium germanium.* 101 .*",
+    ),
+    (
         "det-from-name",
         "/RMG/Geometry/RegisterDetector Germanium germanium_det1 101\n/RMG/Geometry/RegisterDetector Germanium germanium_det2 102",
     ),

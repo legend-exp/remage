@@ -5,6 +5,7 @@ from lgdo import lh5
 output_files = [
     ("gdml", "det-from-gdml.lh5"),
     ("regex", "det-from-regex.lh5"),
+    ("regex-copynr", "det-from-regex-copynr.lh5"),
     ("name", "det-from-name.lh5"),
 ]
 
