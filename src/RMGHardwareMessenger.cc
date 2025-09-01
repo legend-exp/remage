@@ -92,7 +92,7 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   auto pv_name = next();
   const int uid = std::stoi(next());
   auto copy_nr_str = next();
-  if (!copy_nr_str.empty()) copy_nr_str = "0";
+  if (copy_nr_str.empty()) copy_nr_str = "0";
   bool allow_reuse = false;
   auto allow_reuse_str = next();
   if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
