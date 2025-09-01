@@ -148,7 +148,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   if (!fStagedDetectors.empty()) {
     RMGLog::Out(RMGLog::debug, "Registering staged detectors");
     for (const auto& [k, v] : fStagedDetectors) {
-      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
 
       // Sort alphabetically by name
       std::vector<G4VPhysicalVolume*> sortedVolumes(volumes.begin(), volumes.end());
@@ -353,7 +353,7 @@ void RMGHardware::StageDetector(
     RMGDetectorType type,
     const std::string& name,
     int uid,
-    int copy_nr,
+    const std::string& copy_nr,
     bool allow_uid_reuse
 ) {
   if (fActiveDetectorsInitialized) {

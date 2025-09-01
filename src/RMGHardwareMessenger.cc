@@ -53,8 +53,8 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
   p_uid->SetGuidance("unique detector id");
   fRegisterCmd->SetParameter(p_uid);
 
-  auto p_copy = new G4UIparameter("copy_nr", 'i', true);
-  p_copy->SetGuidance("copy nr (default 0)");
+  auto p_copy = new G4UIparameter("copy_nr", 's', true);
+  p_copy->SetGuidance("copy nr, accepts regex patterns (default 0)");
   p_copy->SetDefaultValue("0");
   fRegisterCmd->SetParameter(p_copy);
 
@@ -91,14 +91,13 @@ void RMGHardwareMessenger::RegisterDetectorCmd(const std::string& parameters) {
   auto type = RMGTools::ToEnum<RMGDetectorType>(std::string(type_str), "detector type");
   auto pv_name = next();
   const int uid = std::stoi(next());
-  int copy_nr = 0;
   auto copy_nr_str = next();
-  if (!copy_nr_str.empty()) copy_nr = std::stoi(copy_nr_str);
+  if (copy_nr_str.empty()) copy_nr_str = "0";
   bool allow_reuse = false;
   auto allow_reuse_str = next();
   if (!allow_reuse_str.empty()) allow_reuse = G4UIcommand::ConvertToBool(allow_reuse_str);
 
-  fHardware->StageDetector(type, pv_name, uid, copy_nr, allow_reuse);
+  fHardware->StageDetector(type, pv_name, uid, copy_nr_str, allow_reuse);
 }
 
 void RMGHardwareMessenger::StepLimitsCmd(const std::string& parameters) {
