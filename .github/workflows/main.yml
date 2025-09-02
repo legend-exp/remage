@@ -31,7 +31,7 @@ jobs:
     container: docker://legendexp/remage-base:${{ matrix.container_version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # we need a fully checked-out repo to get version from setuptools-scm.
           fetch-depth: 0
@@ -128,7 +128,7 @@ jobs:
     container: docker://legendexp/remage-base:stable
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -160,7 +160,7 @@ jobs:
         shell: bash -el {0}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # we need a fully checked-out repo to get version from setuptools-scm.
           fetch-depth: 0
