@@ -2,13 +2,13 @@
 #define RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
 
 #include "G4ParticleDefinition.hh"
+#include "G4Positron.hh"
 #include "G4Step.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4Track.hh"
 #include "G4VParticleChange.hh"
 #include "G4WrapperProcess.hh"
-#include "G4SystemOfUnits.hh"
 #include "globals.hh"
-#include "G4Positron.hh"
 
 class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
 
@@ -20,8 +20,10 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param aNamePrefix Prefix for naming the process (default "RMG_IB").
      * @param aType Process type (default @c fDecay).
      */
-    explicit RMGInnerBremsstrahlungProcess(const G4String& aNamePrefix = "RMG_IB",
-                                          G4ProcessType aType = fDecay);
+    explicit RMGInnerBremsstrahlungProcess(
+        const G4String& aNamePrefix = "RMG_IB",
+        G4ProcessType aType = fDecay
+    );
 
     /**
      * @brief Virtual destructor.
@@ -105,9 +107,11 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param parentTrack The original decaying nucleus track.
      * @param aStep The current step.
      */
-    void GenerateInnerBremsstrahlungForSecondaries(G4VParticleChange* particleChange,
-                                                  const G4Track& parentTrack,
-                                                  const G4Step& aStep);
+    void GenerateInnerBremsstrahlungForSecondaries(
+        G4VParticleChange* particleChange,
+        const G4Track& parentTrack,
+        const G4Step& aStep
+    );
 
     /**
      * @brief Checks if a secondary track is a beta electron from decay.
@@ -118,7 +122,7 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
     G4bool IsBetaElectron(G4Track* track);
 
     // Physical constants
-    G4double fAlpha;                    ///< Fine structure constant (1/137)
+    G4double fAlpha; ///< Fine structure constant (1/137)
     G4double fElectronMass;
     G4bool fEnabled;
     G4double fIBProbabilityScale;

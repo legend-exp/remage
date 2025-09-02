@@ -137,7 +137,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     virtual void ConstructOptical();
 
   private:
-    
+
     G4bool fUseInnerBremsstrahlung = false;
     ProdCutStore fProdCuts = {};
     ProdCutStore fProdCutsSensitive = {};

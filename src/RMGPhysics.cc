@@ -69,11 +69,11 @@
 #include "G4ThermalNeutrons.hh"
 
 #include "RMGConfig.hh"
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGLog.hh"
 #include "RMGNeutronCaptureProcess.hh"
 #include "RMGOpWLSProcess.hh"
 #include "RMGTools.hh"
-#include "RMGInnerBremsstrahlungProcess.hh"
 
 namespace u = CLHEP;
 
@@ -305,48 +305,48 @@ void RMGPhysics::ConstructProcess() {
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
-    
+
 
   // Add Inner Bremsstrahlung wrapper for radioactive decays
-  if (fUseInnerBremsstrahlung)
-  {
-        RMGLog::Out(RMGLog::detail, "Adding Inner Bremsstrahlung physics");
-        
-        // Get all ions from the particle table
-        auto particleIterator = GetParticleIterator();
-        particleIterator->reset();
-        while ((*particleIterator())()) {
-          auto particle = particleIterator->value();
-          auto processManager = particle->GetProcessManager();
-          
-          // Look for radioactive decay process in ions
-          if (particle->GetParticleType() == "nucleus" && particle->GetPDGLifeTime() < DBL_MAX) {
-            auto rdmDecayProcess = processManager->GetProcess("RadioactiveDecay");
-            
-            if (rdmDecayProcess) {
-              auto ibProcess = new RMGInnerBremsstrahlungProcess("RMG_IB_" +  particle->GetParticleName());
-              ibProcess->RegisterProcess(rdmDecayProcess);
-              ibProcess->SetEnabled(true);
-              
+  if (fUseInnerBremsstrahlung) {
+    RMGLog::Out(RMGLog::detail, "Adding Inner Bremsstrahlung physics");
 
-              processManager->RemoveProcess(rdmDecayProcess);
-              processManager->AddRestProcess(ibProcess, -1);
-              processManager->AddDiscreteProcess(ibProcess);
-              
-              RMGLog::OutFormat(RMGLog::debug, "Applied Inner Bremsstrahlung to {}", particle->GetParticleName());
-            }
-          }
+    // Get all ions from the particle table
+    auto particleIterator = GetParticleIterator();
+    particleIterator->reset();
+    while ((*particleIterator())()) {
+      auto particle = particleIterator->value();
+      auto processManager = particle->GetProcessManager();
+
+      // Look for radioactive decay process in ions
+      if (particle->GetParticleType() == "nucleus" && particle->GetPDGLifeTime() < DBL_MAX) {
+        auto rdmDecayProcess = processManager->GetProcess("RadioactiveDecay");
+
+        if (rdmDecayProcess) {
+          auto ibProcess = new RMGInnerBremsstrahlungProcess("RMG_IB_" + particle->GetParticleName());
+          ibProcess->RegisterProcess(rdmDecayProcess);
+          ibProcess->SetEnabled(true);
+
+
+          processManager->RemoveProcess(rdmDecayProcess);
+          processManager->AddRestProcess(ibProcess, -1);
+          processManager->AddDiscreteProcess(ibProcess);
+
+          RMGLog::OutFormat(
+              RMGLog::debug,
+              "Applied Inner Bremsstrahlung to {}",
+              particle->GetParticleName()
+          );
         }
-      } else {
-        RMGLog::Out(RMGLog::detail, "Inner Bremsstrahlung is disabled");
       }
+    }
+  } else {
+    RMGLog::Out(RMGLog::detail, "Inner Bremsstrahlung is disabled");
+  }
 
   // add step limits
   auto step_limits = new G4StepLimiterPhysics();
   step_limits->ConstructProcess();
-    
-    
-    
 }
 
 void RMGPhysics::ConstructOptical() {
@@ -575,9 +575,8 @@ void RMGPhysics::DefineCommands() {
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
-    
-    
-    
+
+
   fMessenger->DeclareProperty("EnableInnerBremsstrahlung", fUseInnerBremsstrahlung)
       .SetGuidance("Enable Inner Bremsstrahlung generation for beta decays")
       .SetParameterName("boolean", true)
