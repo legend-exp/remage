@@ -217,7 +217,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/_deps/.clang-tidy
      "---\nChecks: \"-*,cppcoreguidelines-avoid-goto\"")
 
 # set minimum C++ standard
-if(NOT CMAKE_CXX_STANDARD)
+if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 20)
   set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
