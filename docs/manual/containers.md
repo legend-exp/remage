@@ -46,7 +46,7 @@ image.
 
 Images are automatically built by Docker Hub for every commit to the main branch
 and for each tagged release. They are pushed to
-[Docker Hub](https://hub.docker.com/repository/docker/legendexp/remage).
+[Docker Hub](https://hub.docker.com/r/legendexp/remage).
 
 There is a tag for every _remage_ release. `latest` points to the most recent
 stable release, whereas `dev` tracks the current state of the `main` branch. If
