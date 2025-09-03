@@ -4,21 +4,23 @@
 #include "G4ParticleDefinition.hh"
 <<<<<<< HEAD
 #include "G4Step.hh"
-    =======
+    == == ==
+    =
 #include "G4Positron.hh"
 #include "G4Step.hh"
 #include "G4SystemOfUnits.hh"
-    >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
+        >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
 #include "G4Track.hh"
 #include "G4VParticleChange.hh"
 #include "G4WrapperProcess.hh"
 #include "globals.hh"
-    <<<<<<< HEAD
+            < < < < < < < HEAD
 #include "G4Positron.hh"
-    =======
+        == == ==
+    =
 >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
 
-    class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
+        class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
 
   public:
 

@@ -13,7 +13,8 @@
 #include "G4Track.hh"
 #include "G4TrackingManager.hh"
 #include "G4VParticleChange.hh"
-    =======
+    == == ==
+    =
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -29,20 +30,20 @@
 #include "G4Track.hh"
 #include "G4TrackingManager.hh"
 #include "G4VParticleChange.hh"
-    >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
+        >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
 #include "Randomize.hh"
 
 #include "RMGLog.hh"
 
-    <<<<<<< HEAD
+        < < < < < < < HEAD
 #include <algorithm>
 #include <cmath>
 #include <vector>
 
-    RMGInnerBremsstrahlungProcess::RMGInnerBremsstrahlungProcess(
-        const G4String& aNamePrefix,
-        G4ProcessType aType
-    )
+                      RMGInnerBremsstrahlungProcess::RMGInnerBremsstrahlungProcess(
+                          const G4String& aNamePrefix,
+                          G4ProcessType aType
+                      )
     : G4WrapperProcess(aNamePrefix, aType) {
   fAlpha = CLHEP::fine_structure_const;
   fElectronMass = CLHEP::electron_mass_c2;
