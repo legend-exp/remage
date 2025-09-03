@@ -18,6 +18,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGermaniumDetector.hh
     ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGGrabmayrGCReader.hh
+    ${_root}/include/RMGInnerBremsstrahlungProcess.hh
     ${_root}/include/RMGIsotopeFilterScheme.hh
     ${_root}/include/RMGIpc.hh
     ${_root}/include/RMGLog.hh
@@ -65,6 +66,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
+    ${_root}/include/RMGInnerBremsstrahlungProcess.cc
     ${_root}/src/RMGIpc.cc
     ${_root}/src/RMGIsotopeFilterScheme.cc
     ${_root}/src/RMGLog.cc
@@ -120,9 +122,6 @@ endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
-
-# for initial C++20 compatibility with a C++17 compiled ROOT image. TODO: remove later
-target_compile_options(remage PRIVATE -Wno-cpp)
 
 target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
                                          $<INSTALL_INTERFACE:include/remage>)
