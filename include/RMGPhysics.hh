@@ -138,10 +138,11 @@ class RMGPhysics : public G4VModularPhysicsList {
 
   private:
 <<<<<<< HEAD
-    
+
 =======
 
 >>>>>>> fc59aa2a8cb05581992f54f59b411f9705c1ddc8
+
     G4bool fUseInnerBremsstrahlung = false;
     ProdCutStore fProdCuts = {};
     ProdCutStore fProdCutsSensitive = {};
