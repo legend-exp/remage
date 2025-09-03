@@ -66,7 +66,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
-    ${_root}/include/RMGInnerBremsstrahlungProcess.cc
+    ${_root}/src/RMGInnerBremsstrahlungProcess.cc
     ${_root}/src/RMGIpc.cc
     ${_root}/src/RMGIsotopeFilterScheme.cc
     ${_root}/src/RMGLog.cc
