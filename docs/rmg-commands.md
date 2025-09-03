@@ -142,6 +142,7 @@ Commands for controlling physics processes
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+* `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -256,6 +257,16 @@ Store e- internal conversion data
 ### `/RMG/Processes/UseGrabmayrsGammaCascades`
 
 Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Processes/EnableInnerBremsstrahlung`
+
+Enable Inner Bremsstrahlung generation for beta decays
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
