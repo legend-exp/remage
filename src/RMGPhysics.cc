@@ -70,6 +70,7 @@
 #include "G4Version.hh"
 
 #include "RMGConfig.hh"
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGLog.hh"
 #include "RMGNeutronCaptureProcess.hh"
 #include "RMGOpWLSProcess.hh"
@@ -305,6 +306,38 @@ void RMGPhysics::ConstructProcess() {
   rad_decay_physics->ConstructProcess();
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
+
+  if (fUseInnerBremsstrahlung) {
+    RMGLog::Out(RMGLog::detail, "Adding Inner Bremsstrahlung physics");
+
+    auto particleIterator = GetParticleIterator();
+    particleIterator->reset();
+    while ((*particleIterator)()) {
+      auto particle = particleIterator->value();
+      auto processManager = particle->GetProcessManager();
+
+      // Look for radioactive decay process in ions
+      if (particle->GetParticleType() == "nucleus" && particle->GetPDGLifeTime() < DBL_MAX) {
+        auto rdmDecayProcess = processManager->GetProcess("RadioactiveDecay");
+
+        if (rdmDecayProcess) {
+          // Create wrapper process
+          auto ibProcess = new RMGInnerBremsstrahlungProcess(
+              G4String("RMG_IB_") + particle->GetParticleName()
+          );
+          ibProcess->RegisterProcess(rdmDecayProcess);
+          ibProcess->SetEnabled(true);
+
+          processManager->RemoveProcess(rdmDecayProcess);
+          processManager->AddProcess(ibProcess);
+          processManager->SetProcessOrderingToLast(ibProcess, idxAtRest);
+          processManager->SetProcessOrderingToLast(ibProcess, idxPostStep);
+        }
+      }
+    }
+  } else {
+    RMGLog::Out(RMGLog::detail, "Inner Bremsstrahlung is disabled");
+  }
 
   // add step limits
   auto step_limits = new G4StepLimiterPhysics();
@@ -559,6 +592,12 @@ void RMGPhysics::DefineCommands() {
       .SetGuidance(
           std::string("This is ") + (fUseGrabmayrGammaCascades ? "enabled" : "disabled") + " by default"
       )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("EnableInnerBremsstrahlung", fUseInnerBremsstrahlung)
+      .SetGuidance("Enable Inner Bremsstrahlung generation for beta decays")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
