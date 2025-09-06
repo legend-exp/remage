@@ -21,6 +21,7 @@
 #include "G4Electron.hh"
 #include "G4Gamma.hh"
 #include "G4LogicalVolume.hh"
+#include "G4MultiUnion.hh"
 #include "G4TransportationManager.hh"
 #include "G4VSolid.hh"
 
@@ -423,8 +424,15 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
     sample_tf.Invert();
     const auto sample_point = sample_tf.TransformPoint(position);
     const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+
+    // MultiUnions have a flag to calculate accurate safeties, instead of just using the outer bounding box.
+    auto mu = dynamic_cast<G4MultiUnion*>(sample_solid);
+    if (mu != nullptr) mu->SetAccurateSafety(true);
+
     const double sample_dist = sample_solid->DistanceToIn(sample_point);
     if (sample_dist < dist) { dist = sample_dist; }
+
+    if (mu != nullptr) mu->SetAccurateSafety(false);
   }
   return dist;
 }
