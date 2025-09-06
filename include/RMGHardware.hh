@@ -145,6 +145,9 @@ class RMGHardware : public G4VUserDetectorConstruction {
     /** @brief Get the instance of the world volume, after @ref Construct had been called once. */
     [[nodiscard]] const G4VPhysicalVolume* GetDefinedWorldVolume() const { return fWorld; }
 
+    /** @brief Get the instance of the world volume, after @ref Construct had been called once. */
+    G4VPhysicalVolume* GetDefinedWorldVolume() { return fWorld; }
+
     /** @brief Set the maximum step size.
      *
      * @details This is used as a @c G4UserLimit to limit step sizes to being no larger than the
