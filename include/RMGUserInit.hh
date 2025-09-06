@@ -32,6 +32,7 @@
 #include "RMGTrackOutputScheme.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
+#include "RMGVolumeDistanceStacker.hh"
 
 /**
  * @brief User initialization class.
@@ -153,6 +154,7 @@ class RMGUserInit {
       AddOptionalOutputScheme<RMGIsotopeFilterScheme>("IsotopeFilter");
       AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
       AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
+      AddOptionalOutputScheme<RMGVolumeDistanceStacker>("VolumeStacker");
     }
 
     /**
