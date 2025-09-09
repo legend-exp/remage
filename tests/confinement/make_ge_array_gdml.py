@@ -102,7 +102,7 @@ for string in det_info:
     angle = string["angle"]
     radius = string["radius"]
     z = offset
-    for d, o in zip(string["detectors"], string["offsets"]):
+    for d, o in zip(string["detectors"], string["offsets"], strict=True):
         z -= heights[d]
         n = add_hpge(lar_l, reg, angle, radius, z, n, d)
         z -= o

@@ -90,7 +90,7 @@ vertices = lh5.read_as("vtx", outfile, "ak")
 
 strings = np.array(np.full_like(vertices.evtid, -1))
 
-for idx, (xt, yt) in enumerate(zip(x, y)):
+for idx, (xt, yt) in enumerate(zip(x, y, strict=True)):
     is_in = (
         np.sqrt((1000 * vertices.xloc - xt) ** 2 + (1000 * vertices.yloc - yt) ** 2)
         < cylinder_radius

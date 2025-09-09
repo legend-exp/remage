@@ -37,7 +37,7 @@ def plot_energy():
     ]
     ekins = [ekin_0vbb, ekin_2vbb, ekin_0vbb_M1, ekin_0vbb_lambda_0]
 
-    for decay_mode, energies in zip(modes, ekins):  # in keV
+    for decay_mode, energies in zip(modes, ekins, strict=True):  # in keV
         h = hist.new.Reg(80, 0, 2200, name="Summed electron energy [keV]").Double()
         h.fill(energies)
         h.plot(ax=ax, yerr=False, label=f"{decay_mode}")
@@ -89,7 +89,7 @@ def plot_angles():
     ]
     angles = [angles_0vbb, angles_2vbb, angles_0vbb_M1, angles_0vbb_lambda_0]
 
-    for decay_mode, angle in zip(modes, angles):
+    for decay_mode, angle in zip(modes, angles, strict=True):
         # convert to degree
         h = hist.new.Reg(
             80, 0, 182, name="Angle between primary electrons [°]"

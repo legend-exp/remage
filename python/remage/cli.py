@@ -91,7 +91,7 @@ def _run_remage_cpp(
     proc.wait()
 
     # restore signal handlers again, before running more python code.
-    for sig, handler in zip(signals, old_signal_handlers):
+    for sig, handler in zip(signals, old_signal_handlers, strict=True):
         signal.signal(sig, handler)
 
     # close the IPC pipe and end IPC handling.

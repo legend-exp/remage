@@ -76,7 +76,7 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
 def get_bins(list_range, list_binning, e_max=1000):
     # Define bin ranges
     bin_list = []
-    for r, b in zip(list_range, list_binning):
+    for r, b in zip(list_range, list_binning, strict=True):
         bin_list.append(np.arange(r[0] * e_max / 1000, r[1] * e_max / 1000, b))
 
     return np.unique(np.concatenate(bin_list))
@@ -289,7 +289,7 @@ def plot(
         resid = np.array(
             [
                 normalized_poisson_residual(mu, obs)
-                for mu, obs in zip(def_counts, low_counts)
+                for mu, obs in zip(def_counts, low_counts, strict=True)
             ]
         )
         axs[1].axhspan(-3, 3, color="red", alpha=0.2)
@@ -340,11 +340,11 @@ def plot(
             s = steps[field][name]
             err_low = [
                 get_binomial_interval(et, nt)[0] * 100
-                for et, nt in zip(e, n_sels[field][name])
+                for et, nt in zip(e, n_sels[field][name], strict=True)
             ]
             err_high = [
                 get_binomial_interval(et, nt)[1] * 100
-                for et, nt in zip(e, n_sels[field][name])
+                for et, nt in zip(e, n_sels[field][name], strict=True)
             ]
 
             ax.errorbar(
