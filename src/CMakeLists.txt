@@ -6,6 +6,8 @@ set(_root ${PROJECT_SOURCE_DIR})
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGAnalysisReader.hh
     ${_root}/include/RMGGeomBenchOutputScheme.hh
+    ${_root}/include/RMGCalorimeterDetector.hh
+    ${_root}/include/RMGCalorimeterOutputScheme.hh
     ${_root}/include/RMGDetectorHit.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
@@ -59,6 +61,8 @@ set(PROJECT_PUBLIC_HEADERS
 set(PROJECT_SOURCES
     ${_root}/src/RMGAnalysisReader.cc
     ${_root}/src/RMGGeomBenchOutputScheme.cc
+    ${_root}/src/RMGCalorimeterDetector.cc
+    ${_root}/src/RMGCalorimeterOutputScheme.cc
     ${_root}/src/RMGDetectorHit.cc
     ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
