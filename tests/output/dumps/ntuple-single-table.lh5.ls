@@ -5,11 +5,17 @@
 │   ├── yloc · array<1>{real} ── {'units': 'm'}
 │   └── zloc · array<1>{real} ── {'units': 'm'}
 ├── number_of_simulated_events · real 
-├── stp · struct{germanium,optical,scintillator} 
-│   ├── __by_uid__ · struct{det001,det011,det101} 
+├── stp · struct{calorimeter,germanium,optical,scintillator} 
+│   ├── __by_uid__ · struct{det001,det011,det1001,det101} 
 │   │   ├── det001 -> /stp/scintillator
 │   │   ├── det011 -> /stp/germanium
+│   │   ├── det1001 -> /stp/calorimeter
 │   │   └── det101 -> /stp/optical
+│   ├── calorimeter · table{det_uid,edep,evtid,time} 
+│   │   ├── det_uid · array<1>{real} 
+│   │   ├── edep · array<1>{real} ── {'units': 'keV'}
+│   │   ├── evtid · array<1>{real} 
+│   │   └── time · array<1>{real} ── {'units': 'ns'}
 │   ├── germanium · table{det_uid,dist_to_surf,edep,evtid,particle,time,xloc,yloc,zloc} 
 │   │   ├── det_uid · array<1>{real} 
 │   │   ├── dist_to_surf · array<1>{real} ── {'units': 'm'}

@@ -93,6 +93,16 @@ g4.PhysicalVolume(
     [0, 0, 0], [0, 0, 0], det, "det2", scint2, registry
 ).set_pygeom_active_detector(RemageDetectorInfo("germanium", 12))
 
+# ...and calorimeters
+calo = g4.solid.Box("calo", 0.005, 0.3, 0.3, registry, "m")
+calo = g4.LogicalVolume(calo, g4.MaterialPredefined("G4_Pb"), "calo", registry)
+g4.PhysicalVolume(
+    [0, 0, 0], [+100, 0, 0], calo, "calo1", scint1, registry
+).set_pygeom_active_detector(RemageDetectorInfo("calorimeter", 111))
+g4.PhysicalVolume(
+    [0, 0, 0], [-100, 0, 0], calo, "calo2", scint2, registry
+).set_pygeom_active_detector(RemageDetectorInfo("calorimeter", 112))
+
 # from pyg4ometry import visualisation as vis
 # v = vis.VtkViewer()
 # v.addLogicalVolume(registry.getWorldVolume())

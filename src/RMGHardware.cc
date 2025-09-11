@@ -28,6 +28,8 @@ namespace fs = std::filesystem;
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
 
+#include "RMGCalorimeterDetector.hh"
+#include "RMGCalorimeterOutputScheme.hh"
 #include "RMGConfig.hh"
 #include "RMGGermaniumDetector.hh"
 #include "RMGGermaniumOutputScheme.hh"
@@ -349,6 +351,10 @@ void RMGHardware::ConstructSDandField() {
         case RMGDetectorType::kScintillator:
           obj = new RMGScintillatorDetector();
           output = std::make_shared<RMGScintillatorOutputScheme>();
+          break;
+        case RMGDetectorType::kCalorimeter:
+          obj = new RMGCalorimeterDetector();
+          output = std::make_shared<RMGCalorimeterOutputScheme>();
           break;
         default:
           RMGLog::OutDev(

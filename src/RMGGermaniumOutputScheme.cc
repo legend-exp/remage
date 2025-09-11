@@ -239,6 +239,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
     for (auto hit : *hit_coll->GetVector()) {
 
+      // skip hits with no energy deposit (only when discarding zero-energy hits is enabled)
       if (!hit or (hit->energy_deposition == 0 and this->fDiscardZeroEnergyHits)) continue;
 
       hit->Print();

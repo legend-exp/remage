@@ -23,6 +23,7 @@ enum RMGDetectorType {
   kGermanium,
   kOptical,
   kScintillator,
+  kCalorimeter,
 };
 
 /**
