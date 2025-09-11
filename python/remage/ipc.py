@@ -72,6 +72,8 @@ import logging
 import os
 import signal
 import subprocess
+from collections import defaultdict
+from typing import Literal, overload
 
 from ._version import __version__
 
@@ -240,7 +242,15 @@ class IpcResult:
         """Storage structure for the IPC messages returned by ``remage-cpp``."""
         self.ipc_info = ipc_info
 
-    def get(self, name: str, expected_len: int = 1) -> list[str]:
+    # the Literal[1] default overlaps with the general int overload below, but
+    # the ordering guarantees the single-record case returns list[str].
+    @overload
+    def get(self, name: str, expected_len: Literal[1] = 1) -> list[str]: ...  # type: ignore[overload-overlap]
+
+    @overload
+    def get(self, name: str, expected_len: int) -> list[list[str]]: ...
+
+    def get(self, name: str, expected_len: int = 1) -> list[str] | list[list[str]]:
         """Return all messages of a given key ``name`` from the IPC message list.
 
         Parameters
@@ -255,8 +265,21 @@ class IpcResult:
             if len(msg) == expected_len + 1 and msg[0] == name
         ]
         if expected_len == 1:
+            # remove the unneeded extra dimension
             return [msg[0] for msg in msgs]
         return msgs
+
+    def get_as_dict(self, name: str) -> dict[str, list[str]]:
+        """Same as :meth:`.get` but return a dictionary keyed by record key.
+
+        Operates on two-record messages: the first record is used as the key and the second as a
+        value appended to that key's list.
+        """
+        d: defaultdict[str, list[str]] = defaultdict(list)
+        for k, v in self.get(name, 2):
+            d[k].append(v)
+
+        return dict(d)
 
     def get_single(self, name: str, default: str | None = None) -> str | None:
         """Return the single single value for the key ``name`` or ``default`` if not present.

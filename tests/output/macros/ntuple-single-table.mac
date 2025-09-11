@@ -4,6 +4,8 @@
 /RMG/Geometry/RegisterDetector Germanium det2 12
 /RMG/Geometry/RegisterDetector Optical optdet1 101
 /RMG/Geometry/RegisterDetector Optical optdet2 102
+/RMG/Geometry/RegisterDetector Calorimeter calo1 1001
+/RMG/Geometry/RegisterDetector Calorimeter calo2 1002
 
 /RMG/Processes/OpticalPhysics true
 

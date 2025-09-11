@@ -121,9 +121,9 @@ example: `velocity_in_m\s`).
 
 ## Built-in output schemes
 
-_remage_ currently implements schemes to read out `Germanium`, `Scintillator`
-and `Optical` detector types. The columns recorded by each scheme are described
-below.
+_remage_ currently implements schemes to read out `Germanium`, `Scintillator`,
+`Optical` and `Calorimeter` detector types. The columns recorded by each scheme
+are described below.
 
 For all detector output schemes, an additional integer `det_uid` column, holding
 the unique identifier of the detector each hit belongs to, is added to the
@@ -262,6 +262,32 @@ useful:
   refractive indices set).
 
 :::
+
+### `Calorimeter`: total-energy (calorimetric) detectors
+
+This output scheme provides a minimal, purely calorimetric readout. For each
+registered _Calorimeter_ detector it records a single hit per event, holding the
+**total energy deposited** in that detector (summed over all steps of the event)
+together with the global time of the first energy deposit. Unlike the
+_Germanium_ and _Scintillator_ schemes it does not store any per-step
+information, so it is the right choice when only the integrated energy of a
+volume is of interest (for example a simple veto or absorber). Optical photons
+are ignored, and only events depositing a non-zero energy in the detector
+produce an entry.
+
+The following properties of each hit are recorded:
+
+- `evtid`: the index of the Geant4 event,
+- `edep`: the total deposited energy,
+- `time`: the global time of the first energy deposit.
+
+Since there is already exactly one hit per detector per event, the output table
+is in its final, flat form and is _not_ run through the step-grouping
+[reshaping](#reshaping-output-tables) applied to the other schemes (which would,
+in the single-table layout, merge hits of different detectors that share an
+event id). The only post-processing applied is renaming the `time` column to
+`t0`, so that calorimeters can take part in the time-coincidence map like the
+other detector types.
 
 (manual-output-table-layout)=
 
