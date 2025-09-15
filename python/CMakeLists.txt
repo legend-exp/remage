@@ -16,6 +16,9 @@ set(PYTHON_SOURCES
     ${_r}/python/remage/post_proc.py)
 # cmake-format: on
 
+option(RMG_PYTHON_SKIP_MAKE
+       "skip installing the python wrapper when just running make (not make install)" OFF)
+
 # get the output name of the remage-cli target (set in src/CMakeLists.txt)
 get_target_property(REMAGE_CPP_OUTPUT_NAME remage-cli-cpp OUTPUT_NAME)
 
@@ -40,13 +43,19 @@ configure_file(
 # create the virtual environment with python-venv
 # also install the uv package manager
 set(VENV_DIR ${CMAKE_BINARY_DIR}/python_venv)
-
-add_custom_command(
-  OUTPUT ${VENV_DIR}/bin/uv
-  COMMAND ${Python3_EXECUTABLE} -m venv ${VENV_DIR}
-  COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade pip
-  COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade uv
-  COMMENT "Configuring Python virtual environment")
+if(NOT RMG_PYTHON_SKIP_MAKE)
+  add_custom_command(
+    OUTPUT ${VENV_DIR}/bin/uv
+    COMMAND ${Python3_EXECUTABLE} -m venv ${VENV_DIR}
+    COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade pip
+    COMMAND ${VENV_DIR}/bin/python -m pip -q install --no-warn-script-location --upgrade uv
+    COMMENT "Configuring Python virtual environment")
+else()
+  add_custom_command(
+    OUTPUT ${VENV_DIR}/bin/uv
+    COMMAND true
+    COMMENT "Configuring dummy Python virtual environment")
+endif()
 
 add_custom_target(python-virtualenv DEPENDS ${VENV_DIR}/bin/uv)
 
@@ -74,19 +83,27 @@ string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/remage-pkg.in" "${VENV_DIR}/remage-pkg")
 
 # now we want to use the cpp_config for the build area
-add_custom_command(
-  OUTPUT ${VENV_DIR}/bin/remage
-  COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
-          ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python
-          -m uv pip -q install --upgrade -- "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
-  COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
-  COMMAND sh -c 'echo \"-- Installed python wrapper\"\\
-    `${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version`'
-  DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
-          "${VENV_DIR}/remage-pkg"
-  COMMENT "Installing remage Python wrapper into the virtual environment")
-
+if(NOT RMG_PYTHON_SKIP_MAKE)
+  add_custom_command(
+    OUTPUT ${VENV_DIR}/bin/remage
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
+    COMMAND
+      SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python -m
+      uv pip -q install --upgrade -- "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
+    COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
+    COMMAND sh -c 'echo \"-- Installed python wrapper\"\\
+        `${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version`'
+    DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
+            "${VENV_DIR}/remage-pkg"
+    COMMENT "Installing remage Python wrapper into the virtual environment")
+else()
+  add_custom_command(
+    OUTPUT ${VENV_DIR}/bin/remage
+    COMMAND true
+    DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
+    COMMENT "Installing remage Python wrapper into the virtual environment")
+endif()
 add_custom_target(remage-cli ALL DEPENDS ${VENV_DIR}/bin/remage)
 
 # store the path to the remage executable, needed later in tests (that must work in the build area)
