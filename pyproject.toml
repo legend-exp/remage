@@ -32,7 +32,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "legend-pydataobj >=1.14.3, <1.15",
+  "legend-pydataobj >=1.15.1, <1.16",
   "reboost ==0.6.*",
   "pygama >=2.2.3, <2.3",
   "colorlog",
