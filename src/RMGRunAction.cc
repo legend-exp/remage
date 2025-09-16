@@ -17,6 +17,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <fmt/chrono.h>
 #include <limits>
 #include <random>
 #include <unistd.h>
@@ -31,8 +32,6 @@
 #if RMG_HAS_HDF5
 #include "RMGConvertLH5.hh"
 #endif
-#include <fmt/chrono.h>
-
 #include "RMGEventAction.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGIpc.hh"
