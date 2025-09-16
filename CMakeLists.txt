@@ -193,7 +193,10 @@ FetchContent_Declare(
   GIT_TAG 1239137) # 11.1.4
 FetchContent_MakeAvailable(fmt)
 # fmt is a static lib, make it linkable into libremage.
-set_target_properties(fmt PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+# it might also be provided by a system installation, so skip this call in that case.
+if(TARGET fmt)
+  set_target_properties(fmt PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+endif()
 
 # obtain CLI11
 FetchContent_Declare(
