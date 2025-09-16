@@ -200,7 +200,7 @@ endif()
 
 # obtain CLI11
 FetchContent_Declare(
-  cli11
+  CLI11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_TAG 4160d25) # 2.5.0
 FetchContent_MakeAvailable(cli11)
