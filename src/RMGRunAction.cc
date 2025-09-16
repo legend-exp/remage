@@ -31,6 +31,8 @@
 #if RMG_HAS_HDF5
 #include "RMGConvertLH5.hh"
 #endif
+#include <fmt/chrono.h>
+
 #include "RMGEventAction.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGIpc.hh"
@@ -41,8 +43,6 @@
 #include "RMGOutputManager.hh"
 #include "RMGRun.hh"
 #include "RMGVGenerator.hh"
-
-#include "fmt/chrono.h"
 
 G4Run* RMGRunAction::GenerateRun() {
   fRMGRun = new RMGRun();
@@ -182,13 +182,11 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   fRMGRun->SetStartTime(std::chrono::system_clock::now());
 
   if (this->IsMaster()) {
-    auto tt = fmt::localtime(std::chrono::system_clock::to_time_t(fRMGRun->GetStartTime()));
-
     RMGLog::OutFormat(
         RMGLog::summary,
-        "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S}",
+        "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S %Z}",
         fRMGRun->GetRunID(),
-        tt
+        std::chrono::floor<std::chrono::seconds>(fRMGRun->GetStartTime())
     );
     RMGLog::OutFormat(
         RMGLog::summary,
@@ -218,10 +216,11 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
 
     RMGLog::OutFormat(
         RMGLog::summary,
-        "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S}",
+        "Run nr. {:d} completed. {:d} events simulated. Current local time is {:%d-%m-%Y %H:%M:%S "
+        "%Z}",
         fRMGRun->GetRunID(),
         n_ev,
-        fmt::localtime(std::chrono::system_clock::to_time_t(time_now))
+        std::chrono::floor<std::chrono::seconds>(time_now)
     );
     if (n_ev != n_ev_requested) {
       RMGLog::OutFormat(
