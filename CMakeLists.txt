@@ -190,7 +190,7 @@ include(FetchContent)
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG 1239137) # 11.1.4
+  GIT_TAG 40626af88bd7df9a5fb80be7b25ac85b122d6c21) # 11.2.0
 FetchContent_MakeAvailable(fmt)
 # fmt is a static lib, make it linkable into libremage.
 # it might also be provided by a system installation, so skip this call in that case.
