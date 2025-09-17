@@ -213,7 +213,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   // report some stats
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
-    const time_t end_time = std::chrono::system_clock::to_time_t(fRMGRun->GetStartTime());
+    const time_t end_time = std::chrono::system_clock::to_time_t(time_now);
     tm local_end_time{};
 
     int n_ev = fRMGRun->GetNumberOfEvent();
