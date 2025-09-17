@@ -181,12 +181,16 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   fRMGRun->SetStartTime(std::chrono::system_clock::now());
 
   if (this->IsMaster()) {
+    const time_t start_time = std::chrono::system_clock::to_time_t(fRMGRun->GetStartTime());
+    tm local_start_time{};
+
     RMGLog::OutFormat(
         RMGLog::summary,
         "Starting run nr. {:d}. Current local time is {:%d-%m-%Y %H:%M:%S %Z}",
         fRMGRun->GetRunID(),
-        std::chrono::floor<std::chrono::seconds>(fRMGRun->GetStartTime())
+        *::localtime_r(&start_time, &local_start_time)
     );
+
     RMGLog::OutFormat(
         RMGLog::summary,
         "Number of events to be processed: {:d}",
@@ -209,6 +213,8 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   // report some stats
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
+    const time_t end_time = std::chrono::system_clock::to_time_t(time_now);
+    tm local_end_time{};
 
     int n_ev = fRMGRun->GetNumberOfEvent();
     int n_ev_requested = fRMGRun->GetNumberOfEventToBeProcessed();
@@ -219,7 +225,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
         "%Z}",
         fRMGRun->GetRunID(),
         n_ev,
-        std::chrono::floor<std::chrono::seconds>(time_now)
+        *::localtime_r(&end_time, &local_end_time)
     );
     if (n_ev != n_ev_requested) {
       RMGLog::OutFormat(
