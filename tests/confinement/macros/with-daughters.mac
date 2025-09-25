@@ -1,0 +1,15 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/ForceContainmentCheck true
+/RMG/Generator/Confinement/MaxSamplingTrials 10000
+
+/RMG/Generator/Confinement/Physical/AddVolume Box.*
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 10000
+
+/control/alias export-fn with-daughters.output
