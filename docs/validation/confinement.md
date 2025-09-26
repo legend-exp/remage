@@ -98,11 +98,29 @@ Checks on sampling for intersections and unions.
 - In the first case, you should see points sampled in three user defined
   volumes, a section of a cylinder (far left), a box (center back) and a sphere
   (center front - overlapping with a box).
-- In the second plot, the primaries are generated eithert in the sphere (from
-  the previous section), or a box (back right), or the small section of a
-  cylinder (front center).
+- In the second plot, the primaries are generated either in the sphere (from the
+  previous section), or a box (back right), or the small section of a cylinder
+  (front center).
 - Finally in the last case primaries should be generated in the intersection of
   the sphere (front right) with a user defined smaller sphere.
+
+## Volumes with daughters
+
+```{subfigure} A
+:subcaptions: above
+
+:::{image} ./_img/confinement/with-daughters.output.jpeg
+:height: 200px
+:alt: Two cubes, one with daughters.
+:::
+
+Checks on sampling for daughters with solids.
+```
+
+The left cube consists of two nested cubes, from both is sampled from.
+
+- The two cubes should have the same apparent point density; they should not be
+  concentrated on the outer layer on the left cube.
 
 ## Generic surface sampling
 

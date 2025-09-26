@@ -48,6 +48,7 @@ set(TESTS_IMAGES
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
     confinement/vis-surface-trd.output.jpeg
+    confinement/with-daughters.output.jpeg
     confinement/confinement.simple-solids-surface-box-3d.output.png
     confinement/confinement.simple-solids-surface-con-3d.output.png
     confinement/confinement.simple-solids-surface-sub-3d.output.png
