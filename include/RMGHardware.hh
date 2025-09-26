@@ -141,6 +141,9 @@ class RMGHardware : public G4VUserDetectorConstruction {
     /** @brief Method to define geometry directly, the user must reimplement the base class method. */
     virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
 
+    /** @brief Get the instance of the world volume, after @ref Construct had been called once. */
+    G4VPhysicalVolume* GetDefinedWorldVolume() { return fWorld; }
+
     /** @brief Set the maximum step size.
      *
      * @details This is used as a @c G4UserLimit to limit step sizes to being no larger than the
