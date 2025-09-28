@@ -64,9 +64,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     G4GDMLParser parser;
     parser.SetOverlapCheck(false); // overlap check is performed below.
     for (const auto& file : fGDMLFiles) {
-      RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
-      // TODO: decide here
+      RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
+      RMGIpc::SendIpcBlocking(RMGIpc::CreateMessage("gdml", file));
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
