@@ -37,6 +37,17 @@ foreach(_mac ${_macros})
                                                           "couldn't open display")
 endforeach()
 
+# this test needs another geometry.
+add_test(NAME confinement/with-daughters.mac COMMAND ${REMAGE_PYEXE} -g gdml/geometry_boxes.gdml
+                                                     -o test-out.root -- macros/with-daughters.mac)
+
+add_test(NAME confinement-vis/with-daughters.mac
+         COMMAND ${REMAGE_PYEXE} -g gdml/geometry_boxes.gdml -o test-out.root -- macros/_vis.mac
+                 macros/with-daughters.mac macros/_vis-export.mac)
+set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES LABELS vis)
+set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES SKIP_REGULAR_EXPRESSION
+                                                                   "couldn't open display")
+
 # generate the GDML file
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
 

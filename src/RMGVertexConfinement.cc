@@ -66,7 +66,17 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
 
   // NOTE: these functions use Monte Carlo methods when the solid is complex. Also note, that
   // they are not thread-safe in all cases!
-  this->volume = solid->GetCubicVolume();
+  auto cubic_volume = solid->GetCubicVolume();
+  if (physvol) {
+    auto no_daughters = physvol->GetLogicalVolume()->GetNoDaughters();
+
+    // increase by one to keep positive in reverse loop.
+    for (auto sample_no = no_daughters; sample_no >= 1; sample_no--) {
+      const auto daughter_pv = physvol->GetLogicalVolume()->GetDaughter(sample_no - 1);
+      cubic_volume -= daughter_pv->GetLogicalVolume()->GetSolid()->GetCubicVolume();
+    }
+  }
+  this->volume = cubic_volume;
   this->surface = solid->GetSurfaceArea();
 }
 

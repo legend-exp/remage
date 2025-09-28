@@ -159,6 +159,8 @@ All sampling modes described above are available, with few notes/limitations:
   uniform vertex surface density.
 - Sampling on the surface of volumes that contain daughters will result in
   vertices being distributed on the outer surface of the mother volume _only_.
+- volumes that have daughters coincinding with the mothers's surface will be
+  weighted by the surface area including the daughter volume.
 - Sampling on intersections/subtractions of surfaces is not possible. _remage_
   will instead sample vertices in intersections/subtractions between surfaces
   and volumes. Because of this, the group of volumes (geometrical or physical)
