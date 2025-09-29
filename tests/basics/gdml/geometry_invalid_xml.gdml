@@ -47,6 +47,6 @@
 		</volume>
 	</structure>
 	<setup name="Default" version="1.0">
-		<world ref="world"><!-- NOTE: this is missign a / before the closing angle bracket -->
+		<world ref="world"><!-- NOTE: this is missing a / before the closing angle bracket -->
 	</setup>
 </gdml>
