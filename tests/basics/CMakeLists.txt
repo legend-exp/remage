@@ -17,3 +17,9 @@ add_test(NAME basics/macro-substitution
 add_test(NAME basics/macro-substitution-missing COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -s
                                                         ENERGY=1000 -o none -- macros/run.mac)
 set_tests_properties(basics/macro-substitution-missing PROPERTIES WILL_FAIL TRUE)
+
+# this will fail because the xml file is broken
+add_test(NAME basics/invalid-xml
+         COMMAND ${REMAGE_PYEXE} -g gdml/geometry_invalid_xml.gdml -o none --macro-substitutions
+                 ENERGY=1000 GENERATOR=GPS -- macros/run.mac)
+set_tests_properties(basics/invalid-xml PROPERTIES WILL_FAIL TRUE)

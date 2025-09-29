@@ -101,6 +101,15 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
             )
             is_fatal = True
         msg_ret = None
+    elif msg[0] == "gdml":
+        from xml.dom.minidom import parse as minidom_parse
+
+        try:
+            minidom_parse(msg[1])
+        except BaseException as pe:
+            log.error("invalid GDML file %s: %s", msg[1], pe)
+            is_fatal = True
+        msg_ret = None
     elif is_blocking:
         log.warning("Unhandled blocking IPC message %s", str(msg))
 
