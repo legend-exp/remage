@@ -102,6 +102,12 @@ class RMGOutputManager {
     [[nodiscard]] bool GetOutputNtupleUseVolumeName() const { return fOutputNtupleUseVolumeName; }
 
     /**
+     * @brief Gets the directory where temporary output files (e.g. .hdf5 for .lh5) are written.
+     * @return Reference to the temp directory name (empty string means use output file directory).
+     */
+    const std::string& GetOutputTempDirectory() { return fOutputTempDirectory; }
+
+    /**
      * @brief Retrieves the set of registered ntuple detector identifiers.
      * @return Set of detector identifiers.
      */
@@ -139,6 +145,13 @@ class RMGOutputManager {
      * @param dir The directory name for ntuple output.
      */
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
+
+    /**
+     * @brief Sets a custom directory for temporary output files.
+     * @details If empty, temporary files are created next to the final output file.
+     * @param dir The directory path for temporary output.
+     */
+    void SetOutputTempDirectory(std::string dir) { fOutputTempDirectory = dir; }
 
     /**
      * @brief Registers an alreaday created ntuple for a given detector.
@@ -214,6 +227,7 @@ class RMGOutputManager {
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
+    std::string fOutputTempDirectory; // optional override for temporary files location
 
     /** @brief Mapping of detector UIDs assigned by remage to the Geant4 ntuple
      * IDs and the ntuple names (written to disk).

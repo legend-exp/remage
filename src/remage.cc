@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> macros;
   std::vector<std::string> macro_substitutions;
   std::string output;
+  std::string tmpdir;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
@@ -93,6 +94,7 @@ int main(int argc, char** argv) {
       ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
+  app.add_option("--tmpdir", tmpdir, "Directory to store temporary output files")->type_name("DIR");
   app.add_option(
          "--pipe-fd",
          pipe_fd,
@@ -147,6 +149,7 @@ int main(int argc, char** argv) {
   manager.SetInteractive(interactive);
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
   manager.SetNumberOfThreads(nthreads);
+  manager.GetOutputManager()->SetOutputTempDirectory(tmpdir);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
 

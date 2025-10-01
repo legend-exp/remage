@@ -319,7 +319,9 @@ std::pair<fs::path, fs::path> RMGRunAction::BuildOutputFile() const {
 
     std::string new_fn = ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() +
                          ".hdf5";
-    auto new_path = path.parent_path() / new_fn;
+    auto tmpdir = rmg_man->GetOutputTempDirectory();
+    auto base_dir = tmpdir.empty() ? path.parent_path() : fs::path(tmpdir);
+    auto new_path = base_dir / new_fn;
     return {new_path, path};
   }
   return {path, path};
