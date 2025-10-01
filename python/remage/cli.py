@@ -259,6 +259,11 @@ def remage_run_from_args(
             "(see remage docs). Default is 10 microseconds."
         ),
     )
+    parser.add_argument(
+        "--ignore-warnings",
+        action="store_true",
+        help="Do not exit with exit code 2 when warnings occurred.",
+    )
     py_args, cpp_args = parser.parse_known_args(args)
 
     ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
@@ -288,6 +293,9 @@ def remage_run_from_args(
     if ec == 2 and raise_on_warning:
         msg = "warning while running remage-cpp"
         raise RuntimeError(msg)
+
+    if ec == 2 and py_args.ignore_warnings:
+        ec = 0
 
     assert termsig is None  # now we should only have had a graceful exit.
 
