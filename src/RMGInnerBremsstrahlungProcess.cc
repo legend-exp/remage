@@ -33,22 +33,13 @@ RMGInnerBremsstrahlungProcess::RMGInnerBremsstrahlungProcess(
   );
 }
 
-G4VParticleChange* RMGInnerBremsstrahlungProcess::AtRestDoIt(
-    const G4Track& aTrack,
-    const G4Step& aStep
-) {
+G4VParticleChange* RMGInnerBremsstrahlungProcess::AtRestDoIt(const G4Track& aTrack, const G4Step& aStep) {
   auto particleChange = pRegProcess->AtRestDoIt(aTrack, aStep);
 
   // If IB is disabled or no secondaries produced, return unchanged
-  if (!fEnabled || particleChange->GetNumberOfSecondaries() == 0) {
-    return particleChange;
-  }
+  if (!fEnabled || particleChange->GetNumberOfSecondaries() == 0) { return particleChange; }
 
-  RMGLog::OutFormat(
-      RMGLog::debug,
-      "{}: Processing decay at rest",
-      GetProcessName()
-  );
+  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay at rest", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particleChange, aTrack, aStep);
@@ -67,11 +58,7 @@ G4VParticleChange* RMGInnerBremsstrahlungProcess::PostStepDoIt(
   // If IB is disabled or no secondaries produced, return unchanged
   if (!fEnabled || particleChange->GetNumberOfSecondaries() == 0) { return particleChange; }
 
-  RMGLog::OutFormat(
-      RMGLog::debug,
-      "{}: Processing decay",
-      GetProcessName()
-  );
+  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particleChange, aTrack, aStep);

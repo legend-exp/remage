@@ -58,60 +58,60 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 }
 
 void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
-    auto rmg_man = RMGOutputManager::Instance();
-    if (!rmg_man->IsPersistencyEnabled()) return;
-    
-    // do never write tracks of optical photons (there will be many).
-    if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { return; }
-    
-    auto pos = track->GetPosition();
-    auto primary = track->GetDynamicParticle();
-    auto proc = track->GetCreatorProcess();
-    
-    std::string proc_name;
-    if (proc) proc_name = proc->GetProcessName();
-    
-    auto write = true;
-    write &= (fFilterProcess.empty() || fFilterProcess.find(proc_name) != fFilterProcess.end());
-    write &=
-    (fFilterParticle.empty() ||
-     fFilterParticle.find(primary->GetPDGcode()) != fFilterParticle.end());
-    write &= (fFilterEnergy == -1 || track->GetKineticEnergy() >= fFilterEnergy);
-    if (!write) return;
-    
-    int proc_id = -1;
-    if (proc) {
-        if (fProcessMap.find(proc_name) == fProcessMap.end()) {
-            // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
-            // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-            // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
-            uint32_t proc_name_hash = 0x811c9dc5;
-            for (char& b : proc_name) {
-                proc_name_hash ^= (uint32_t)b;
-                proc_name_hash *= 0x01000193;
-            }
-            // xor-fold down to 16 bit.
-            proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
-            fProcessMap.emplace(proc_name, proc_name_hash);
-        }
-        proc_id = static_cast<int>(fProcessMap[proc_name]);
+  auto rmg_man = RMGOutputManager::Instance();
+  if (!rmg_man->IsPersistencyEnabled()) return;
+
+  // do never write tracks of optical photons (there will be many).
+  if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { return; }
+
+  auto pos = track->GetPosition();
+  auto primary = track->GetDynamicParticle();
+  auto proc = track->GetCreatorProcess();
+
+  std::string proc_name;
+  if (proc) proc_name = proc->GetProcessName();
+
+  auto write = true;
+  write &= (fFilterProcess.empty() || fFilterProcess.find(proc_name) != fFilterProcess.end());
+  write &=
+      (fFilterParticle.empty() ||
+       fFilterParticle.find(primary->GetPDGcode()) != fFilterParticle.end());
+  write &= (fFilterEnergy == -1 || track->GetKineticEnergy() >= fFilterEnergy);
+  if (!write) return;
+
+  int proc_id = -1;
+  if (proc) {
+    if (fProcessMap.find(proc_name) == fProcessMap.end()) {
+      // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
+      // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+      // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
+      uint32_t proc_name_hash = 0x811c9dc5;
+      for (char& b : proc_name) {
+        proc_name_hash ^= (uint32_t)b;
+        proc_name_hash *= 0x01000193;
+      }
+      // xor-fold down to 16 bit.
+      proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
+      fProcessMap.emplace(proc_name, proc_name_hash);
     }
-    
-    fTrackEntries.push_back({
-        G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
-        track->GetTrackID(),
-        track->GetParentID(),
-        proc_id,
-        primary->GetPDGcode(),
-        track->GetGlobalTime(),
-        pos.getX(),
-        pos.getY(),
-        pos.getZ(),
-        primary->GetMomentum().getX(),
-        primary->GetMomentum().getY(),
-        primary->GetMomentum().getZ(),
-        track->GetKineticEnergy()
-    });
+    proc_id = static_cast<int>(fProcessMap[proc_name]);
+  }
+
+  fTrackEntries.push_back(
+      {G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
+       track->GetTrackID(),
+       track->GetParentID(),
+       proc_id,
+       primary->GetPDGcode(),
+       track->GetGlobalTime(),
+       pos.getX(),
+       pos.getY(),
+       pos.getZ(),
+       primary->GetMomentum().getX(),
+       primary->GetMomentum().getY(),
+       primary->GetMomentum().getZ(),
+       track->GetKineticEnergy()}
+  );
 }
 
 void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
