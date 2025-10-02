@@ -42,6 +42,22 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param aStep The current step.
      * @return Pointer to the particle change with added IB photons.
      */
+    G4VParticleChange* AtRestDoIt(const G4Track& aTrack, const G4Step& aStep) override;
+
+        /**
+         * @brief Applies Inner Bremsstrahlung generation after radioactive decay during step.
+         *
+         * This method overrides @c PostStepDoIt() of @ref G4WrapperProcess. It first calls the
+         * wrapped decay process's @c PostStepDoIt() to obtain the decay products. Then it examines
+         * all secondary particles, identifies beta electrons, calculates the Inner Bremsstrahlung
+         * probability based on the electron energy, and generates IB photons accordingly. The IB
+         * photons are created with proper kinematic properties and added to the secondary stack.
+         *
+         * @param aTrack The current track undergoing decay.
+         * @param aStep The current step.
+         * @return Pointer to the particle change with added IB photons.
+         */
+    
     G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep) override;
 
     /**
