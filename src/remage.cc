@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
   bool version = false;
   bool version_rich = false;
   int nthreads = 1;
+  int rand_seed = -1;
   bool interactive = false;
   bool overwrite_output = false;
   int pipe_fd = -1;
@@ -85,6 +86,7 @@ int main(int argc, char** argv) {
   );
   app.add_flag("-i,--interactive", interactive, "Open an interactive macro command prompt");
   app.add_option("-t,--threads", nthreads, "Set the number of threads used by remage");
+  app.add_option("--rand-seed", rand_seed, "Set the random engine seed")->type_name("INT");
   app.add_option(
          "-g,--gdml-files",
          gdmls,
@@ -147,6 +149,7 @@ int main(int argc, char** argv) {
   manager.SetInteractive(interactive);
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
   manager.SetNumberOfThreads(nthreads);
+  if (rand_seed >= 0) manager.SetRandEngineSeed(rand_seed);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
 
