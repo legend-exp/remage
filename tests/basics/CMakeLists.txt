@@ -23,3 +23,10 @@ add_test(NAME basics/invalid-xml
          COMMAND ${REMAGE_PYEXE} -g gdml/geometry_invalid_xml.gdml -o none --macro-substitutions
                  ENERGY=1000 GENERATOR=GPS -- macros/run.mac)
 set_tests_properties(basics/invalid-xml PROPERTIES WILL_FAIL TRUE)
+
+# verify passing a seed via CLI is handled and logged
+add_test(NAME basics/rand-seed
+         COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o none --rand-seed 123
+                 --macro-substitutions ENERGY=1000 GENERATOR=GPS -- macros/run.mac)
+set_tests_properties(basics/rand-seed PROPERTIES PASS_REGULAR_EXPRESSION
+                                                 "CLHEP::HepRandom seed set to: 123")
