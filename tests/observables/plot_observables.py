@@ -180,7 +180,7 @@ def plot(
         effs[field] = {}
         steps[field] = {}
         n_sels[field] = {}
-        fig, axs = plt.subplots(
+        _fig, axs = plt.subplots(
             2,
             1,
             gridspec_kw={"height_ratios": [4, 1], "hspace": 0},
@@ -308,7 +308,7 @@ def plot(
             return
 
     # plot the efficiency
-    fig, ax = plt.subplots()
+    _fig, ax = plt.subplots()
     for idx, field in enumerate(effs.keys()):
         eff_def_low = (
             100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[0]
