@@ -22,7 +22,7 @@ cmap = plt.get_cmap("cividis")
 
 
 def plot_tracks(_data, idx, savename=None):
-    fig, ax = plt.subplots(figsize=(6, 6))
+    _fig, ax = plt.subplots(figsize=(6, 6))
 
     data = _data[_data.evtid == idx]
 
@@ -65,7 +65,7 @@ def plot_tracks(_data, idx, savename=None):
 def plot_hist2d(
     dist, step_len, n=-1, high_stp=300, high_dist=5000, bins=500, savename=None
 ):
-    fig, ax = plt.subplots(1, 1, figsize=(12, 4))
+    _fig, ax = plt.subplots(1, 1, figsize=(12, 4))
 
     # Create a 2D histogram
     h = ax.hist2d(
@@ -87,7 +87,7 @@ def plot_hist2d(
 
 
 def plot_steps(steps, bins=100, range=(0, 100), savename=None):
-    fig, ax = plt.subplots(figsize=(12, 4))
+    _fig, ax = plt.subplots(figsize=(12, 4))
     h = hist.new.Reg(bins, range[0], range[1], name="steps").Double().fill(steps)
     h.plot(ax=ax, **style)
     ax.set_ylabel("Counts")
