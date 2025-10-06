@@ -180,7 +180,7 @@ def plot(
         effs[field] = {}
         steps[field] = {}
         n_sels[field] = {}
-        fig, axs = plt.subplots(
+        _fig, axs = plt.subplots(
             2,
             1,
             gridspec_kw={"height_ratios": [4, 1], "hspace": 0},
