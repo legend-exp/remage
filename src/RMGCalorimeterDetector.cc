@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "RMGGermaniumDetector.hh"
+#include "RMGCalorimeterDetector.hh"
 
 #include <map>
 #include <stdexcept>
@@ -30,14 +30,14 @@
 #include "RMGOutputTools.hh"
 
 
-RMGGermaniumDetector::RMGGermaniumDetector() : G4VSensitiveDetector("Germanium") {
+RMGCalorimeterDetector::RMGCalorimeterDetector() : G4VSensitiveDetector("Calorimeter") {
 
   // declare only one hit collection.
   // NOTE: names in the respective output scheme class must match this
   G4VSensitiveDetector::collectionName.insert("Hits");
 }
 
-void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
+void RMGCalorimeterDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
   // create hits collection object
   // NOTE: assumes there is only one collection name (see constructor)
@@ -53,25 +53,20 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
   hit_coll->AddHitsCollection(hc_id, fHitsCollection);
 }
 
-bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
+bool RMGCalorimeterDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
+  RMGLog::OutDev(RMGLog::debug, "Processing calorimeter hits");
 
   // ignore optical photons
   if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
   // we're going to use info from the pre-step point
   const auto prestep = step->GetPreStepPoint();
-  const auto position_prestep = prestep->GetPosition();
-
-  const auto poststep = step->GetPostStepPoint();
-  const auto position_poststep = poststep->GetPosition();
-  const auto position_average = (position_prestep + position_poststep) / 2.;
 
   // check containment of prestep point
   auto prestep_inside = RMGOutputTools::check_step_point_containment(
       prestep,
-      RMGDetectorType::kGermanium
+      RMGDetectorType::kCalorimeter
   );
 
   if (not prestep_inside) return false;
@@ -85,38 +80,24 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug, "Hit in calorimeter nr. ", det_uid, " detected");
 
   // create a new hit and fill it
-  auto* hit = new RMGDetectorHit();
+  if (fHitsCollection->entries() == 0) {
+    auto _hit = new RMGDetectorHit();
+    _hit->energy_deposition = 0;
+    fHitsCollection->insert(_hit);
+  }
+  auto* hit = static_cast<RMGDetectorHit*>(fHitsCollection->GetHit(0));
 
-  // pointer to the physical volume
   hit->physical_volume = pv;
-
   hit->detector_uid = det_uid;
-  hit->particle_type = step->GetTrack()->GetDefinition()->GetPDGEncoding();
-  hit->energy_deposition = step->GetTotalEnergyDeposit();
-
-  // positions
-  hit->global_position_prestep = position_prestep;
-  hit->global_position_poststep = position_poststep;
-  hit->global_position_average = position_average;
-
+  hit->energy_deposition += step->GetTotalEnergyDeposit();
   hit->global_time = prestep->GetGlobalTime();
-  hit->track_id = step->GetTrack()->GetTrackID();
-  hit->parent_track_id = step->GetTrack()->GetParentID();
-
-  // get various distances
-  hit->distance_to_surface_prestep = RMGOutputTools::distance_to_surface(pv, position_prestep);
-  hit->distance_to_surface_poststep = RMGOutputTools::distance_to_surface(pv, position_poststep);
-  hit->distance_to_surface_average = RMGOutputTools::distance_to_surface(pv, position_average);
-
-  // register the hit in the hit collection for the event
-  fHitsCollection->insert(hit);
 
   return true;
 }
 
-void RMGGermaniumDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
+void RMGCalorimeterDetector::EndOfEvent(G4HCofThisEvent* /*hit_coll*/) {}
 
 // vim: tabstop=2 shiftwidth=2 expandtab

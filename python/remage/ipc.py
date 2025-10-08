@@ -55,6 +55,7 @@ import logging
 import os
 import signal
 import subprocess
+from collections import defaultdict
 
 from ._version import __version__
 
@@ -188,7 +189,7 @@ class IpcResult:
         """Storage structure for the IPC messages returned by ``remage-cpp``."""
         self.ipc_info = ipc_info
 
-    def get(self, name: str, expected_len: int = 1) -> list[str]:
+    def get(self, name: str, expected_len: int = 1) -> list[str | list[str | tuple]]:
         """Return all messages of a given key ``name`` from the IPC message list.
 
         Parameters
@@ -203,8 +204,19 @@ class IpcResult:
             if len(msg) == expected_len + 1 and msg[0] == name
         ]
         if expected_len == 1:
+            # remove the unneeded extra dimension
             return [msg[0] for msg in msgs]
         return msgs
+
+    def get_as_dict(self, *args, **kwargs) -> dict[str, list[str | tuple]]:
+        """Same as :meth:`.get` but return a dictionary keyed by record key."""
+        msgs = self.get(*args, **kwargs)
+
+        d = defaultdict(list)
+        for k, v in msgs:
+            d[k].append(v)
+
+        return dict(d)
 
     def get_single(self, name: str, default: str) -> str:
         """Return the single single value for the key ``name`` or ``default`` if not present.

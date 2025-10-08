@@ -372,7 +372,7 @@ Register detectors as saved in the GDML auxval structure, as written by pygeomto
   * **Parameter type** – `s`
   * **Omittable** – `True`
   * **Default value** – `All`
-  * **Candidates** – `All Germanium Optical Scintillator`
+  * **Candidates** – `All Germanium Optical Scintillator Calorimeter`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/IncludeGDMLFile`
@@ -404,7 +404,7 @@ register a sensitive detector
     – Detector type
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Germanium Optical Scintillator`
+  * **Candidates** – `Germanium Optical Scintillator Calorimeter`
 * **Parameter** – `pv_name`
     – Detector physical volume, accepts regex patterns
   * **Parameter type** – `s`
