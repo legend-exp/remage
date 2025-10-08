@@ -15,6 +15,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGGeneratorG4Gun.hh
     ${_root}/include/RMGGeneratorGPS.hh
     ${_root}/include/RMGGeneratorUtil.hh
+    ${_root}/include/RMGGeometryCheckOutputScheme.hh
     ${_root}/include/RMGGermaniumDetector.hh
     ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGGrabmayrGCReader.hh
@@ -62,6 +63,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGGeneratorFromFile.cc
     ${_root}/src/RMGGeneratorMUSUNCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc
+    ${_root}/src/RMGGeometryCheckOutputScheme.cc
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
