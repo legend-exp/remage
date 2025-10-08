@@ -138,8 +138,8 @@ class RMGHardware : public G4VUserDetectorConstruction {
      */
     void IncludeGDMLFile(std::string filename) { fGDMLFiles.emplace_back(filename); }
 
-    /** @brief Method to define geometry directly, the user must reimplement the base class method. */
-    virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
+    /** @brief Get the instance of the world volume, after @ref Construct had been called once. */
+    [[nodiscard]] const G4VPhysicalVolume* GetDefinedWorldVolume() const { return fWorld; }
 
     /** @brief Set the maximum step size.
      *
@@ -153,6 +153,11 @@ class RMGHardware : public G4VUserDetectorConstruction {
 
     void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
+
+  protected:
+
+    /** @brief Method to define geometry directly, the user must reimplement the base class method. */
+    virtual G4VPhysicalVolume* DefineGeometry() { return nullptr; }
 
   private:
 

@@ -37,6 +37,8 @@ void RMGTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 
 void RMGTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 
+  for (auto& el : fRunAction->GetAllOutputDataFields()) { el->TrackingActionPost(aTrack); }
+
   bool check_global_time = true;
   if (fResetInitialDecayTime) { check_global_time = !ResetInitialDecayTime(aTrack); }
 
