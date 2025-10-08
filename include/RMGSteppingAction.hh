@@ -22,12 +22,12 @@
 #include "G4UserSteppingAction.hh"
 
 class G4Step;
-class RMGEventAction;
+class RMGRunAction;
 class RMGSteppingAction : public G4UserSteppingAction {
 
   public:
 
-    RMGSteppingAction(RMGEventAction*);
+    RMGSteppingAction(RMGRunAction*);
     ~RMGSteppingAction() = default;
 
     RMGSteppingAction(RMGSteppingAction const&) = delete;
@@ -40,6 +40,8 @@ class RMGSteppingAction : public G4UserSteppingAction {
     void SetDaughterKillLifetime(double max_lifetime);
 
   private:
+
+    RMGRunAction* fRunAction;
 
     bool fSkipTracking = false;
     double fDaughterKillLifetime = -1;
