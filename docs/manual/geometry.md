@@ -141,3 +141,39 @@ provided. It can be disabled with the
 <project:../rmg-commands.md#rmggeometrygdmldisableoverlapcheck> command.
 
 :::
+
+## Checking geometry
+
+_remage_ provides a means to perform additional geometry checks that go beyond
+the default overlap checks, by checking the integraity of the volume hierarchy
+along a random geantino path. The user has to initialize this test in a
+specialized macro:
+
+```geant4
+/RMG/Output/ActivateOutputScheme GeometryCheck
+
+/run/initialize
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface
+/RMG/Generator/Confinement/FirstSamplingVolume Geometrical
+
+/RMG/Generator/Confinement/Geometrical/AddSolid Box
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0 m
+/RMG/Generator/Confinement/Geometrical/Box/XLength 10 m
+/RMG/Generator/Confinement/Geometrical/Box/YLength 10 m
+/RMG/Generator/Confinement/Geometrical/Box/ZLength 10 m
+
+/RMG/Generator/Select GPS
+/gps/particle     geantino
+/gps/energy       1 MeV
+/gps/ang/type     iso
+
+/run/beamOn {n}
+```
+
+The box length has to adjusted so that the box lies fully within in the world
+volume, but also fully contains all daughter volumes of the world volume,
+otherwise the check will not be correctly performed.
