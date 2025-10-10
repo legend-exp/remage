@@ -63,7 +63,7 @@ void RMGUserAction::Build() const {
 
   // Add the remage-internal stepping action and optional user-specified custom stepping actions.
   const auto user_stepping_actions = user_init->GetSteppingActions();
-  G4UserSteppingAction* stepping_action = new RMGSteppingAction(event_action);
+  G4UserSteppingAction* stepping_action = new RMGSteppingAction(run_action);
   if (!user_stepping_actions.empty()) {
     auto multi_stepping_action = new G4MultiSteppingAction();
     multi_stepping_action->push_back(std::unique_ptr<G4UserSteppingAction>(stepping_action));

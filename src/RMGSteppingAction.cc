@@ -20,10 +20,14 @@
 #include "G4Step.hh"
 #include "G4Threading.hh"
 
-#include "RMGEventAction.hh"
+#include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
+#include "RMGRunAction.hh"
 
-RMGSteppingAction::RMGSteppingAction(RMGEventAction*) { this->DefineCommands(); }
+RMGSteppingAction::RMGSteppingAction(RMGRunAction* run_action) : fRunAction(run_action) {
+  this->DefineCommands();
+}
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
@@ -31,6 +35,8 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
     step->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
+
+  for (auto& el : fRunAction->GetAllOutputDataFields()) { el->SteppingAction(step); }
 
   // Kill _daughter_ nuclei with a lifetime longer than a user-defined threshold. This applies to
   // the defined half-life of the particle, and not the sampled time to the decay of the secondary

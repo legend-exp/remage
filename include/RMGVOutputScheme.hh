@@ -124,6 +124,21 @@ class RMGVOutputScheme {
     virtual void TrackingActionPre(const G4Track*) {};
 
     /**
+     * @brief Hook called after tracking a new particle.
+     *
+     * Output schemes may use this to record any track-specific information required for output.
+     */
+    virtual void TrackingActionPost(const G4Track*) {};
+
+    // hook into G4SteppingAction.
+    /**
+     * @brief Hook called after each step.
+     *
+     * Output schemes may use this to record any step-specific information required for output.
+     */
+    virtual void SteppingAction(const G4Step*) {};
+
+    /**
      * @brief Perform final actions at the end of a run.
      *
      * This function can be used by derived output schemes to finalize or write remaining data.
