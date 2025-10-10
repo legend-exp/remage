@@ -1,6 +1,7 @@
 # remage
 
-_remage_ is a modern C++ simulation framework for germanium experiments.
+_remage_ is a modern simulation framework for low-background physics
+experiments.
 
 ```{warning}
 We are working on a proper user guide ({doc}`manual/index`). In the meanwhile,
