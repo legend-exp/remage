@@ -16,6 +16,7 @@
 #include "RMGGeometryCheckOutputScheme.hh"
 
 #include "G4AnalysisManager.hh"
+#include "G4EventManager.hh"
 #include "G4Geantino.hh"
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -36,9 +37,12 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
 
   const auto last = info->fVolumeStack.back();
   if (last != prestep) {
+    const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
     RMGLog::Out(
         RMGLog::error,
-        "last post-step",
+        "[",
+        event->GetEventID(),
+        "] last post-step",
         VolName(last),
         " != pre-step ",
         VolName(prestep),
@@ -66,9 +70,12 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
           return;
         }
 
+        const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
         RMGLog::Out(
             RMGLog::error,
-            "post-step ",
+            "[",
+            event->GetEventID(),
+            "] post-step ",
             VolName(poststep),
             " is no daughter of pre-step ",
             VolName(last),
@@ -97,9 +104,12 @@ void RMGGeometryCheckOutputScheme::TrackingActionPost(const G4Track* aTrack) {
 
   auto info = dynamic_cast<GeantinoUserTrackInformation*>(aTrack->GetUserInformation());
   if (!info->fVolumeStack.empty() && info->fVolumeStack.back() != nullptr) {
+    auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
     RMGLog::Out(
         RMGLog::error,
-        "volume stack not empty (count: ",
+        "[",
+        event->GetEventID(),
+        "] volume stack not empty (count: ",
         info->fVolumeStack.size(),
         ", ",
         VolString(info->fVolumeStack),
