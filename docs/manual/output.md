@@ -8,12 +8,16 @@
 
 :::
 
-_remage_ supports all output formats supported by
+_remage_ mainly supports the
+[LH5](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5) output
+format. This is the only format we can provide the convenient output reshaping
+for.
+
+Additionally, _remage_ supports—with limited functionality—all formats supported
+by
 [`G4AnalysisManager`](https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Analysis/managers.html)
-(HDF5, ROOT, CSV, XML), plus
-[LH5](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5). The file
-type to use is selected by the specified output file name (`.h5`, `.root`,
-`.csv`, `.xml`, `.lh5`).
+(HDF5, ROOT, CSV, XML). The file type to use is selected by the specified output
+file name (`.hdf5`, `.root`, `.csv`, `.xml`, `.lh5`).
 
 :::{note}
 
