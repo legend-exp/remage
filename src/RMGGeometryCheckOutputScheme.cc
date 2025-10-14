@@ -32,6 +32,8 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
   const auto prestep = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   const auto poststep = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
   auto info = dynamic_cast<GeantinoUserTrackInformation*>(step->GetTrack()->GetUserInformation());
+  if (info->fIsOutside) return;
+
   const auto last = info->fVolumeStack.back();
   if (last != prestep) {
     RMGLog::Out(
@@ -55,14 +57,15 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
       info->fVolumeStack.pop_back();
     } else {
       // check if the new volume is a daughter.
-      bool is_daughter = false;
-      const auto lv = last->GetLogicalVolume();
-      auto local_no_daughters = lv->GetNoDaughters();
-      for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
-        const auto daughter_pv = lv->GetDaughter(sample_no - 1);
-        if (daughter_pv == poststep) is_daughter = true;
-      }
-      if (!is_daughter) {
+      if (!last->GetLogicalVolume()->IsDaughter(poststep)) {
+
+        // we can still leave this volume for the parent, and will not track this particle further.
+        if (last == info->fVolumeStack[0] && poststep->GetLogicalVolume()->IsDaughter(last)) {
+          info->fVolumeStack.pop_back();
+          info->fIsOutside = true;
+          return;
+        }
+
         RMGLog::Out(
             RMGLog::error,
             "post-step ",
@@ -85,12 +88,8 @@ void RMGGeometryCheckOutputScheme::TrackingActionPre(const G4Track* aTrack) {
   aTrack->SetUserInformation(info);
   info->fVolumeStack.push_back(aTrack->GetVolume());
 
-  const auto hw = RMGManager::Instance()->GetDetectorConstruction();
   if (aTrack->GetDefinition() != G4Geantino::GeantinoDefinition()) {
     RMGLog::Out(RMGLog::warning, "did not use geantino as primary, geometry check will not work.");
-  }
-  if (aTrack->GetVolume() != hw->GetDefinedWorldVolume()) {
-    RMGLog::Out(RMGLog::warning, "geantino not started in world volume, geometry check will not work.");
   }
 }
 

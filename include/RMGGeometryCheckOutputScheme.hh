@@ -59,6 +59,7 @@ class RMGGeometryCheckOutputScheme : public RMGVOutputScheme {
 
         std::vector<G4VPhysicalVolume*> fVolumeStack;
         std::vector<G4VPhysicalVolume*> fSteps;
+        bool fIsOutside = false;
     };
 };
 
