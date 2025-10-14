@@ -134,6 +134,8 @@ remage> /RMG/Geometry/PrintListOfPhysicalVolumes
 [Summary -> Total: 171 volumes
 ```
 
+## Checking geometry
+
 :::{tip}
 
 As seen above, the Geant4 overlap checker is enabled by default if GDML input is
@@ -142,12 +144,14 @@ provided. It can be disabled with the
 
 :::
 
-## Checking geometry
+Apart from the on-by-default builtin overlap checking, _remage_ provides a means
+to perform additional geometry checks that go beyond. For this it will be
+checking the integraity of the volume hierarchy along random geantino paths, and
+verify that the geometry navigator is always never mis-navigating the
+implemented hierarchy.
 
-_remage_ provides a means to perform additional geometry checks that go beyond
-the default overlap checks, by checking the integraity of the volume hierarchy
-along a random geantino path. The user has to initialize this test in a
-specialized macro:
+The user has to initialize this test in a specialized macro, that needs to be
+adapted to the geometry dimensions:
 
 ```geant4
 /RMG/Output/ActivateOutputScheme GeometryCheck
@@ -174,6 +178,6 @@ specialized macro:
 /run/beamOn {n}
 ```
 
-The box length has to adjusted so that the box lies fully within in the world
-volume, but also fully contains all daughter volumes of the world volume,
-otherwise the check will not be correctly performed.
+The sampling surface has to be adjusted so that it lies fully within a single
+volume and also fully contains all daughter volumes of that volume, otherwise
+the check will not be correctly performed.
