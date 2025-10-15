@@ -103,7 +103,8 @@ if(NOT RMG_CONDA_BUILD)
             "${VENV_DIR}/remage-pkg"
     COMMENT "Installing remage Python wrapper into the virtual environment")
 
-  # store the path to the remage executable, needed later in tests (that must work in the build area)
+  # store the path to the remage executable, needed later in tests (this executable must work in
+  # the build area)
   set_property(TARGET remage-cli PROPERTY PYEXE_PATH ${VENV_DIR}/bin/remage)
 else()
   add_custom_command(
@@ -117,7 +118,9 @@ else()
     COMMENT "Installing remage Python wrapper into the system environment")
 
   # store the path to the remage executable, needed later in tests
-  # note that for the RMG_CONDA_BUILD, we have to give up the isolation for build and install areas for the python package; the final install step will overwrite the python wrapper useful for testing :-(
+  # note that for the RMG_CONDA_BUILD, we have to give up the isolation for build and install
+  # areas for the python package; the final install step will overwrite the python wrapper useful
+  # for testing :-(
   set_property(TARGET remage-cli PROPERTY PYEXE_PATH remage)
 endif()
 
