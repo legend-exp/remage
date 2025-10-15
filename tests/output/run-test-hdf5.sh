@@ -4,7 +4,11 @@ set -euo pipefail
 
 rmg="$1"
 python_path="$2"
-lh5ls="$(dirname "$python_path")/lh5ls"
+bindir="$(dirname "$python_path")/"
+if [[ "$bindir" == "./" ]]; then
+    bindir=""
+fi
+lh5ls="${bindir}lh5ls"
 macro="macros/$3"
 
 is_mt="${4-}"
