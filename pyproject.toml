@@ -52,9 +52,7 @@ test = [
   "legend-pygeom-hpges",
   "legend-pygeom-tools",
   "matplotlib",
-  "mplhep",
   "numpy",
-  "pandas",
   "pyg4ometry",
   "numba", # without this, uv somehow fails to pick a good numba version
 ]
