@@ -236,9 +236,23 @@ scheme with a few exceptions:
 
 ### `Optical`: optical photon detectors
 
-:::{todo}
+This output scheme records photon hits data in detectors registered as optical
+detectors. This scheme is useful for applications where an optical detector
+response should be directly recorded and not produced in post-processing. It
+records the time stamp and the wavelength of the detected photons.
 
-coming soon...
+:::{note}
+
+Unlike the other detector types that work without geometry changes, the optical
+detectors must fulfill other constraints in the user-defined geometry to be
+useful:
+
+- They need to have a optical surface set, with `REFLECTIVITY` < 1 and
+  `EFFICIENCY` > 0
+- The geometry must follow best practices for optixal geometry development. The
+  most basic requirement is that the detector volumes must be reachable by
+  optical paths (i.e., _all_ materials involved in the photon propagation have
+  refractive indices set).
 
 :::
 
