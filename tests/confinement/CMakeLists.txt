@@ -234,7 +234,7 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinement-surface/relative-fractions-${det}
-    PROPERTIES LABELS extra FIXTURES_REQUIRED confine-surface-${det} ENVIRONMENT
+    PROPERTIES LABELS "extra;flaky" FIXTURES_REQUIRED confine-surface-${det} ENVIRONMENT
                MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 endforeach()
