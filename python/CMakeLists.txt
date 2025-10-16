@@ -82,8 +82,8 @@ if(RMG_BUILD_DOCS)
 endif()
 string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
 # do not try to install extras below, if we don't want any.
-if (NOT _pkg_install STREQUAL "")
-    set(_pkg_install "[${_pkg_install}]")
+if(NOT _pkg_install STREQUAL "")
+  set(_pkg_install "[${_pkg_install}]")
 endif()
 
 # store this so the dependency installation step below is repeated whenever this changes.
