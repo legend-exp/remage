@@ -63,7 +63,7 @@ else()
     COMMENT "Skipping configuring Python virtual environment")
 
   # store the path to the python executable, needed later in tests
-  set_target_properties(python-virtualenv PROPERTIES PYTHONPATH ${VENV_DIR}/bin/python)
+  set_target_properties(python-virtualenv PROPERTIES PYTHONPATH python)
 endif()
 
 # install the remage wrapper package into the virtual environment with uv
@@ -81,6 +81,10 @@ if(RMG_BUILD_DOCS)
   list(APPEND _pkg_install_extras "docs")
 endif()
 string(REPLACE ";" "," _pkg_install "${_pkg_install_extras}")
+# do not try to install extras below, if we don't want any.
+if (NOT _pkg_install STREQUAL "")
+    set(_pkg_install "[${_pkg_install}]")
+endif()
 
 # store this so the dependency installation step below is repeated whenever this changes.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/remage-pkg.in" "${VENV_DIR}/remage-pkg")
@@ -95,7 +99,7 @@ if(NOT RMG_CONDA_BUILD)
             ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
     COMMAND
       SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} ${VENV_DIR}/bin/python -m
-      uv pip -q install --upgrade -- "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
+      uv pip -q install --upgrade -- "${CMAKE_SOURCE_DIR}${_pkg_install}"
     COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
     COMMAND sh -c 'echo \"-- Installed python wrapper\"\\
         `${VENV_DIR}/bin/python -m uv pip show remage 2>&1 | grep Version`'
@@ -112,7 +116,7 @@ else()
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
             ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
     COMMAND SETUPTOOLS_SCM_PRETEND_VERSION_FOR_REMAGE=${RMG_GIT_VERSION_FULL} pip install --upgrade
-            -vv --no-deps --no-build-isolation -- "${CMAKE_SOURCE_DIR}[${_pkg_install}]"
+            -vv --no-deps --no-build-isolation -- "${CMAKE_SOURCE_DIR}${_pkg_install}"
     COMMAND rm ${CMAKE_CURRENT_SOURCE_DIR}/remage/cpp_config.py
     DEPENDS python-virtualenv ${PYTHON_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/cpp_config.build.py
     COMMENT "Installing remage Python wrapper into the system environment")
