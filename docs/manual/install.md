@@ -37,8 +37,12 @@ systems. To install the latest version use:
 conda install conda-forge::remage
 ```
 
+:::{note}
+
 The conda-forge provided binaries does not support the ROOT output format, but
 fully supports LH5/HDF5.
+
+:::
 
 ## Building from source
 
