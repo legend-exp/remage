@@ -578,7 +578,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           RMGLog::fatal,
           "for generic surface sampling SurfaceSampleMaxIntersections, the maximum number of "
           "lines a line can intersect with the surface must be set with "
-          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections",
+          "/RMG/Generator/Confinement/SurfaceSampleMaxIntersections. ",
           "Note: this can be an overestimate."
       );
     }
