@@ -77,6 +77,9 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
     }
   }
   this->volume = cubic_volume;
+  if (physvol) {
+    this->mass = cubic_volume * physvol->GetLogicalVolume()->GetMaterial()->GetDensity();
+  }
   this->surface = solid->GetSurfaceArea();
 }
 
@@ -101,16 +104,31 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   return this->data.back();
 }
 
-const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand() const {
+const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::VolumeWeightedRand(
+    bool weight_by_mass
+) const {
 
-  if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
+  if (data.empty()) [[unlikely]]
+    RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
 
-  auto choice = this->total_volume * G4UniformRand();
+  if (weight_by_mass && !this->total_mass_all) [[unlikely]] {
+    RMGLog::Out(
+        RMGLog::fatal,
+        "One of the sampled solids has no mass attribute, ",
+        "will not add it to the total mass of the collection. ",
+        "this will affect sampling from multiple solids."
+    );
+  }
+
+  const auto total_weight = weight_by_mass ? this->total_mass : this->total_volume;
+
+  auto choice = total_weight * G4UniformRand();
   double w = 0;
   for (const auto& o : this->data) {
-    if (choice > w and choice <= w + o.volume) return o;
-    w += o.volume;
-    if (w >= this->total_volume) {
+    const auto weight = weight_by_mass ? o.mass : o.volume;
+    if (choice > w and choice <= w + weight) return o;
+    w += weight;
+    if (w >= total_weight) [[unlikely]] {
       RMGLog::Out(
           RMGLog::error,
           "Sampling from collection of sampleables failed unexpectedly ",
@@ -393,25 +411,32 @@ void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... ar
   this->data.emplace_back(std::forward<Args>(args)...);
 
   const auto& _v = this->data.back().volume;
+  const auto& _m = this->data.back().mass;
   const auto& _s = this->data.back().surface;
 
   if (_v > 0) this->total_volume += _v;
-  else
+  else {
+    this->total_volume_all = false;
     RMGLog::Out(
         RMGLog::error,
         "One of the sampled solids has no volume attribute, ",
         "will not add it to the total volume of the collection. ",
         "this will affect sampling from multiple solids."
     );
+  }
+  if (_m > 0) this->total_mass += _m;
+  else this->total_mass_all = false;
 
   if (_s > 0) this->total_surface += _s;
-  else
+  else {
+    this->total_surface_all = false;
     RMGLog::Out(
         RMGLog::error,
         "One of the sampled solids has no surface attribute, ",
         "will not add it to the total surface of the collection. ",
         "this will affect sampling from multiple solids."
     );
+  }
 }
 
 /* ========================================================================================== */
@@ -804,8 +829,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
                                ? fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume
                                : fFirstSamplingVolumeType == VolumeType::kPhysical;
 
-          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
-                                           : fGeomVolumeSolids.VolumeWeightedRand();
+          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
+                                           : fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
         }
 
         const auto& choice = choice_nonconst;
@@ -893,8 +918,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           else if (has_geometrical && not has_physical) physical_first = false;
           else physical_first = (fFirstSamplingVolumeType == VolumeType::kPhysical);
 
-          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand()
-                                           : fGeomVolumeSolids.VolumeWeightedRand();
+          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
+                                           : fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
         }
 
         const auto& choice = choice_nonconst;
@@ -963,7 +988,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
       // chose a volume to sample from
       const auto choice = fOnSurface ? all_volumes.SurfaceWeightedRand()
-                                     : all_volumes.VolumeWeightedRand();
+                                     : all_volumes.VolumeWeightedRand(fWeightByMass);
 
       // do the sampling
       bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
@@ -1113,6 +1138,16 @@ void RMGVertexConfinement::DefineCommands() {
       ->DeclareProperty("SampleOnSurface", fOnSurface)
       .SetGuidance("If true (or omitted argument), sample on the surface of solids")
       .SetGuidance(std::string("This is ") + (fOnSurface ? "enabled" : "disabled") + " by default")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethod("SampleWeightByMass", &RMGVertexConfinement::SetWeightByMass)
+      .SetGuidance(
+          "If true (or omitted argument), weigh the different volumes by mass and not by volume"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle)

@@ -567,6 +567,7 @@ Commands for controlling primary confinement
 
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
+* `SampleWeightByMass` – If true (or omitted argument), weigh the different volumes by mass and not by volume
 * `SamplingMode` – Select sampling mode for volume confinement
 * `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
@@ -584,6 +585,16 @@ Reset all parameters of vertex confinement, so that it can be reconfigured.
 If true (or omitted argument), sample on the surface of solids
 
 This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/SampleWeightByMass`
+
+If true (or omitted argument), weigh the different volumes by mass and not by volume
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
