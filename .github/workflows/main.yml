@@ -189,7 +189,13 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
+          cmake \
+            -D CMAKE_INSTALL_PREFIX=../local \
+            -D Python3_EXECUTABLE="$(command -v python)" \
+            -D RMG_BUILD_EXAMPLES=1 \
+            -D BUILD_TESTING=ON \
+            -D RMG_BUILD_DOCS=OFF \
+            ..
           make -j$(nproc)
           make install
 
