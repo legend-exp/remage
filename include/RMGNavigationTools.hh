@@ -51,10 +51,15 @@ namespace RMGNavigationTools {
    *
    * @param name regular expression for the physical volume name.
    * @param copy_nr regular expression for the copy number (default is ".*" to match any copy number).
+   * @param use_regex if false, do not match as regex but by string comparison.
    * @return A set of pointers to the matching physical volumes, empty if no match is found.
    */
 
-  std::set<G4VPhysicalVolume*> FindPhysicalVolume(std::string name, std::string copy_nr = ".*");
+  std::set<G4VPhysicalVolume*> FindPhysicalVolume(
+      std::string name,
+      std::string copy_nr = ".*",
+      bool use_regex = true
+  );
   /**
    * @brief Finds the direct mother volume of a given physical volume.
    *

@@ -31,7 +31,8 @@
 
 std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
     std::string name,
-    std::string copy_nr
+    std::string copy_nr,
+    bool use_regex
 ) {
   if (copy_nr.empty()) copy_nr = ".*";
   std::set<G4VPhysicalVolume*> result;
@@ -40,16 +41,24 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
   // scan all search patterns provided by the user
   RMGLog::OutFormat(
       RMGLog::detail,
-      "Scanning for Physical volumes matching pattern '{}'['{}']",
+      "Scanning for Physical volumes matching ",
+      use_regex ? "pattern" : "name",
+      " '{}'['{}']",
       name,
       copy_nr
   );
 
+  const auto name_regex = std::regex(name);
+  const auto copy_nr_regex = std::regex(copy_nr);
+
   bool found = false;
   // scan the volume store for matches
   for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
-    if (std::regex_match((*it)->GetName(), std::regex(name)) and
-        std::regex_match(std::to_string((*it)->GetCopyNo()), std::regex(copy_nr))) {
+    const auto this_name = (*it)->GetName();
+    const auto this_copy_nr = std::to_string((*it)->GetCopyNo());
+    if (use_regex ? (std::regex_match(this_name, name_regex) and
+                     std::regex_match(this_copy_nr, copy_nr_regex))
+                  : (this_name == name and this_copy_nr == copy_nr)) {
 
       // insert it in our collection
       result.insert(*it);
