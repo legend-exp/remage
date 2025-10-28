@@ -18,6 +18,7 @@ jobs:
   test_on_linux:
     name: Test on remage image
     runs-on: ubuntu-latest
+    if: false
 
     strategy:
       fail-fast: false
@@ -124,6 +125,7 @@ jobs:
   run_validation:
     name: Run validation suite
     runs-on: self-hosted
+    if: false
 
     container: docker://legendexp/remage-base:stable
 
@@ -178,6 +180,7 @@ jobs:
 
       - name: Install Geant4 and native dependencies
         run: |
+          echo $PATH
           # native dependencies for pyg4ometry
           brew update
           brew install opencascade cgal gmp mpfr boost
@@ -187,6 +190,8 @@ jobs:
 
       - name: Build project
         run: |
+          echo $PATH
+          exit 1
           mkdir build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=../local -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF ..
