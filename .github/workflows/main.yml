@@ -18,7 +18,6 @@ jobs:
   test_on_linux:
     name: Test on remage image
     runs-on: ubuntu-latest
-    if: false
 
     strategy:
       fail-fast: false
@@ -125,7 +124,6 @@ jobs:
   run_validation:
     name: Run validation suite
     runs-on: self-hosted
-    if: false
 
     container: docker://legendexp/remage-base:stable
 
