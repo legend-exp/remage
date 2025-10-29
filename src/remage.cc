@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
   bool interactive = false;
   bool overwrite_output = false;
   int pipe_fd = -1;
+  int proc_num_offset = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
   std::vector<std::string> macro_substitutions;
@@ -99,6 +100,12 @@ int main(int argc, char** argv) {
          "--pipe-fd",
          pipe_fd,
          "Pipe file descriptor for inter-process communication (internal)"
+  )
+      ->group(""); // group("") hides the option from help output.
+  app.add_option(
+         "--proc-num-offset",
+         proc_num_offset,
+         "process number for offset calculations in pseudo-multithreading mode (internal)"
   )
       ->group(""); // group("") hides the option from help output.
   app.add_option(
@@ -141,14 +148,18 @@ int main(int argc, char** argv) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
 
-  RMGIpc::Setup(pipe_fd);
+  RMGIpc::Setup(pipe_fd, proc_num_offset > 0 ? proc_num_offset : 0);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
+  if (nthreads > 1 && proc_num_offset >= 0) {
+    RMGLog::Out(RMGLog::fatal, "invalid configuration for multi-threading or multi-processing.");
+  }
   manager.SetNumberOfThreads(nthreads);
+  if (proc_num_offset >= 0) manager.EnableMultiProcessing(proc_num_offset);
   if (rand_seed >= 0) manager.SetRandEngineSeed(rand_seed);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
