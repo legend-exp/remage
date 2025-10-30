@@ -57,16 +57,22 @@ class RMGRunAction : public G4UserRunAction {
 
   private:
 
-    [[nodiscard]] std::pair<fs::path, fs::path> BuildOutputFile() const;
+    /** @brief struct containing the actual Geant4 (temporary) file, and the original file name;
+     *  possibly being equal. */
+    struct OutputFilePaths {
+        fs::path tmp;
+        fs::path original;
+    };
+
+    [[nodiscard]] OutputFilePaths BuildOutputFile() const;
+    [[nodiscard]] fs::path GetWorkerTmpPath(fs::path path, std::string extension) const;
     void PostprocessOutputFile() const;
 
     RMGRun* fRMGRun = nullptr;
     bool fIsPersistencyEnabled = false;
     bool fIsAnaManInitialized = false;
     RMGMasterGenerator* fRMGMasterGenerator = nullptr;
-    // a pair containing the actual Geant4 (temporary) file, and the original file name;
-    // possibly being equal.
-    std::pair<fs::path, fs::path> fCurrentOutputFile;
+    OutputFilePaths fCurrentOutputFile;
 
     int fCurrentPrintModulo = -1;
 

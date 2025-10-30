@@ -32,12 +32,13 @@ namespace {
 } // namespace
 /// \endcond
 
-void RMGIpc::Setup(int ipc_pipe_fd) {
+void RMGIpc::Setup(int ipc_pipe_fd, int proc_num) {
   if (!G4Threading::IsMasterThread()) {
     RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
   }
 
   fIpcFd = ipc_pipe_fd;
+  fProcNum = proc_num;
   if (fIpcFd < 0) return;
 
   struct sigaction sig{};
@@ -87,6 +88,8 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
 
 bool RMGIpc::SendIpcNonBlocking(std::string msg) {
   if (fIpcFd < 0) return false;
+
+  msg = std::to_string(fProcNum) + "\x1e" + msg;
 
   msg += "\x1d"; // ASCII GS group separator = end of message.
   if (msg.size() > SSIZE_MAX) {

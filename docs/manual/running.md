@@ -35,7 +35,10 @@ The most useful options include:
   {ref}`manual-output`).
 - `-i, --interactive` – keep the application open after executing macros and
   present a Geant4 prompt.
-- `-t, --threads` – number of worker threads to use.
+- `-t, --threads` – number of worker threads to use (this cannot be combined
+  with `-P/--procs`).
+- `-P, --procs` – number of worker processes to use (this cannot be combined
+  with `-t/--threads`).
 - `-w, --overwrite` – overwrite an existing output file.
 - `-q, --quiet`/`-v, --verbose`/`-l, --log-level` – control the verbosity.
   Logging levels are `debug`, `detail`, `summary`, `warning`, `error`, `fatal`,

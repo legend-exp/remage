@@ -75,7 +75,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
       int n_primaries = primary_vertex->GetNumberOfParticle();
 
       int vcol_id = 0;
-      ana_man->FillNtupleIColumn(vntupleid, vcol_id++, event->GetEventID());
+      ana_man->FillNtupleIColumn(vntupleid, vcol_id++, GetEventIDForStorage(event));
       ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
       FillNtupleFOrDColumn(
           ana_man,
@@ -108,7 +108,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
           auto primary = primary_vertex->GetPrimary(j);
 
           int pcol_id = 0;
-          ana_man->FillNtupleIColumn(pntupleid, pcol_id++, event->GetEventID());
+          ana_man->FillNtupleIColumn(pntupleid, pcol_id++, GetEventIDForStorage(event));
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, j);
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, primary->GetPDGcode());
           FillNtupleFOrDColumn(

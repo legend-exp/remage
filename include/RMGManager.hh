@@ -113,9 +113,29 @@ class RMGManager {
      * @brief Checks if the execution is sequential (single-threaded).
      * @return True if the run manager is sequential.
      */
-    [[nodiscard]] bool IsExecSequential() {
+    [[nodiscard]] bool IsExecSequential() const {
       return fG4RunManager->GetRunManagerType() == G4RunManager::RMType::sequentialRM;
     }
+
+    /**
+     * @brief Gets the process number offset.
+     * @details In a process-parallelized run this might be larger than zero and is used, e.g., for
+     * determining an event id offset. For regular (single- or multi-threaded runs) it is always zero.
+     * @return the process number offset.
+     */
+    [[nodiscard]] int GetProcessNumberOffset() const {
+      if (fProcessNumber > 0 && (fG4RunManager && !IsExecSequential()))
+        RMGLog::OutDev(RMGLog::fatal, "wrong setup for process-based parallelization.");
+      return fProcessNumber;
+    }
+
+    /**
+     * @brief Checks if the execution is part of a process-parallelized run.
+     * @details In a process-parallelized run, this instance of remage is running single-threaded.
+     * Multiple instances are orchestrated by the python wrapper.
+     * @return True if this instance of remage is part of a process-parallelized run.
+     */
+    [[nodiscard]] bool IsMultiProcessing() const { return fMultiProcessing; }
 
     // setters
     /**
@@ -227,6 +247,15 @@ class RMGManager {
     void SetLogLevel(std::string level);
 
     /**
+     * @brief Sets the process number for offset calculations in process-parallelized mode.
+     * @param proc_num process number of this instance (note: this is not the total number of processes!)
+     */
+    void EnableMultiProcessing(int proc_num) {
+      fProcessNumber = proc_num;
+      fMultiProcessing = true;
+    }
+
+    /**
      * @brief Checks if any warnings have been recorded.
      * @return True if warnings occurred.
      */
@@ -282,6 +311,8 @@ class RMGManager {
     bool fInteractive = false;
     int fPrintModulo = -1;
     int fNThreads = 1;
+    int fProcessNumber = 0;
+    bool fMultiProcessing = false;
 
     bool fIsRandControlled = false;
     bool fIsRandControlledAtEngineChange = false;

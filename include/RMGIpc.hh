@@ -34,7 +34,7 @@ class RMGIpc final {
 
     /** @brief Set the IPC pipe (write end) file descriptor.
      */
-    static void Setup(int ipc_pipe_fd);
+    static void Setup(int ipc_pipe_fd, int proc_num);
 
     /** @brief Create an IPC message with a key and a single value.
      */
@@ -63,6 +63,7 @@ class RMGIpc final {
   private:
 
     inline static int fIpcFd = -1;
+    inline static int fProcNum = -1;
 };
 
 #endif

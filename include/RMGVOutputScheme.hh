@@ -20,6 +20,7 @@
 #include <string>
 
 #include "G4AnalysisManager.hh"
+#include "G4Event.hh"
 #include "G4Run.hh"
 #include "G4Track.hh"
 #include "G4UserStackingAction.hh"
@@ -28,7 +29,6 @@
 
 #include "fmt/core.h"
 
-class G4Event;
 /**
  * @brief Virtual output scheme interface.
  *
@@ -161,6 +161,8 @@ class RMGVOutputScheme {
      */
     void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
 
+    void SetEventIDOffset(int offset) { fEventIDOffset = offset; }
+
     static inline std::string fUIDKeyFormatString = "det{:03}";
 
   protected:
@@ -187,9 +189,15 @@ class RMGVOutputScheme {
       else ana_man->FillNtupleDColumn(nt, col, val);
     }
 
+    [[nodiscard]] int GetEventIDForStorage(const G4Event* evt) const {
+      return fEventIDOffset + evt->GetEventID();
+    }
+
     // global options injected by manager.
     bool fNtuplePerDetector = true;
     bool fNtupleUseVolumeName = false;
+
+    int fEventIDOffset = 0;
 };
 
 #endif

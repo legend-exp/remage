@@ -98,7 +98,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   }
 
   fTrackEntries.emplace_back(
-      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
+      GetEventIDForStorage(G4EventManager::GetEventManager()->GetConstCurrentEvent()),
       track->GetTrackID(),
       track->GetParentID(),
       proc_id,
