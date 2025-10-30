@@ -176,7 +176,11 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   }
 
   for (const auto& [k, v] : fDetectorMetadata) {
-    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(
+        k.first,
+        std::to_string(k.second),
+        /* use_regex */ false
+    );
     if (volumes.empty()) {
       RMGLog::Out(
           RMGLog::fatal,
@@ -280,7 +284,11 @@ void RMGHardware::ConstructSDandField() {
     }
 
     // now assign logical volumes to the sensitive detector
-    auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(
+        k.first,
+        std::to_string(k.second),
+        /* use_regex */ false
+    );
     if (volumes.empty()) {
       RMGLog::Out(
           RMGLog::fatal,
