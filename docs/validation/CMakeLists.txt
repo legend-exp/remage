@@ -110,7 +110,10 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-active-energy.eff.output.png
     observables/beta-observables.surf-active-energy.spec.output.png
     observables/beta-observables.surf-max-z.eff.output.png
-    observables/beta-observables.surf-max-z.spec.output.png)
+    observables/beta-observables.surf-max-z.spec.output.png
+    processes/innerbrem-gamma-vertex-energy.output.png
+    processes/innerbrem-signal.output.png
+    processes/innerbrem-difference.output.png)
 
 # cmake-format: on
 
