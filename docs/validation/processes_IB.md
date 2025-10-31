@@ -13,8 +13,8 @@ emission), internal bremsstrahlung is emitted directly from the nucleus during
 the decay process itself.
 
 The IB photon energy spectrum is continuous, extending from zero up to the
-Q-value of the decay. For Ar-39 (Q = 565 keV), the IB photons are typically
-soft (low energy), with most photons below 0.5 MeV.
+Q-value of the decay. For Ar-39 (Q = 565 keV), the IB photons are typically soft
+(low energy), with most photons below 0.5 MeV.
 
 ## Validation test
 
@@ -27,6 +27,7 @@ quantify the impact of IB on detector observables.
 First, we extract the energy spectrum of photons emitted directly from Ar-39
 decays (i.e., the IB photons themselves). This is done by selecting photons
 whose parent track is an Ar-39 nucleus.
+
 ```{figure} ./_img/Inner-Bremsstrahlung-Gamma-vertex-energy.output.png
 :width: 800px
 *Energy spectrum of Internal Bremsstrahlung photons from Ar-39 decay. The
@@ -45,6 +46,7 @@ theoretical predictions for IB emission.
 Next, we compare the energy deposited in the HPGe detector for simulations with
 and without IB enabled. This demonstrates the observable effect of IB on
 detector response.
+
 ```{figure} ./_img/Detector_signal_comparison.output.png
 :width: 800px
 *Comparison of energy deposited in the HPGe detector for Ar-39 decays with and
@@ -53,6 +55,7 @@ clarity.*
 ```
 
 &nbsp; &nbsp;
+
 ```{figure} ./_img/IB_difference.output.png
 :width: 800px
 *Difference in detector energy spectra (With IB - Without IB). The positive
@@ -68,6 +71,7 @@ additional energy when they interact with the detector material. The effect is
 most pronounced below ~100 keV, consistent with the IB photon energy spectrum.
 
 These validation plots confirm that:
+
 - IB photons are being generated with the correct energy distribution
 - The detector response correctly accounts for IB contributions
 - The magnitude of the effect is consistent with the ~10^-3 branching ratio

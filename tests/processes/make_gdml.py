@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import legendhpges as hpges
-import numpy as np
 import pyg4ometry as pg4
 from pygeomtools import write_pygeom
 
@@ -36,14 +35,16 @@ reg.setWorld(world_l)
 bege_l = hpges.make_hpge(bege_meta, name="BEGe_L", registry=reg)
 
 # Place the BEGe detector at the center
-bege_pv = pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], bege_l, "BEGe", world_l, registry=reg)
+bege_pv = pg4.geant4.PhysicalVolume(
+    [0, 0, 0], [0, 0, 0], bege_l, "BEGe", world_l, registry=reg
+)
 
 # Register as sensitive detector (for Remage)
 bege_pv.pygeom_active_detector = pygeomtools.RemageDetectorInfo(
     "germanium", 1, bege_meta
 )
 
-bege_transform = [[0, 0, 0], [0,0,-0]]
+bege_transform = [[0, 0, 0], [0, 0, -0]]
 lar_radius = 6
 lar_s = pg4.geant4.solid.Orb("LAr_s", lar_radius, registry=reg, lunit="cm")
 lar_minus_bege_s = pg4.geant4.solid.Subtraction(
@@ -53,9 +54,13 @@ lar_minus_bege_s = pg4.geant4.solid.Subtraction(
 # Create the liquid Argon balloon (world-sized for convenience)
 lar_l = pg4.geant4.LogicalVolume(lar_minus_bege_s, "G4_lAr", "LAr_L", registry=reg)
 pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], lar_l, "LAr", world_l, registry=reg)
-source_l = pg4.geant4.LogicalVolume(lar_minus_bege_s, "G4_lAr", "Source_L", registry=reg)
+source_l = pg4.geant4.LogicalVolume(
+    lar_minus_bege_s, "G4_lAr", "Source_L", registry=reg
+)
 
 # Place it at the center of the world
-pg4.geant4.PhysicalVolume([0, 0, 0], [0, 0, 0], source_l, "Source", world_l, registry=reg)
+pg4.geant4.PhysicalVolume(
+    [0, 0, 0], [0, 0, 0], source_l, "Source", world_l, registry=reg
+)
 
 write_pygeom(reg, "gdml/geometry.gdml")

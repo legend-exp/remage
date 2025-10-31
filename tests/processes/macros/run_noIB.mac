@@ -6,7 +6,7 @@
 /run/initialize
 
 /RMG/Generator/Confine Volume
-/RMG/Generator/Confinement/Physical/AddVolume Source   
+/RMG/Generator/Confinement/Physical/AddVolume Source
 /RMG/Generator/Select GPS
 
 /gps/particle ion

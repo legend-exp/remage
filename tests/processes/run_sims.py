@@ -7,20 +7,20 @@ remage_run(
     macros="macros/run_IB.mac",
     gdml_files="gdml/geometry.gdml",
     output="output_IB.lh5",
-    overwrite_output=True
+    overwrite_output=True,
 )
 
 
 remage_run(
     macros="macros/run_noIB.mac",
     gdml_files="gdml/geometry.gdml",
-    output=f"output_noIB.lh5",
-    overwrite_output=True
+    output="output_noIB.lh5",
+    overwrite_output=True,
 )
 
 remage_run(
     macros="macros/run_track.mac",
     gdml_files="gdml/geometry.gdml",
-    output=f"track.lh5",
-    overwrite_output=True
+    output="track.lh5",
+    overwrite_output=True,
 )
