@@ -97,20 +97,20 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  fTrackEntries.emplace_back(
-      G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
-      track->GetTrackID(),
-      track->GetParentID(),
-      proc_id,
-      primary->GetPDGcode(),
-      track->GetGlobalTime(),
-      pos.getX(),
-      pos.getY(),
-      pos.getZ(),
-      primary->GetMomentum().getX(),
-      primary->GetMomentum().getY(),
-      primary->GetMomentum().getZ(),
-      track->GetKineticEnergy()
+  fTrackEntries.push_back(
+      {G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(),
+       track->GetTrackID(),
+       track->GetParentID(),
+       proc_id,
+       primary->GetPDGcode(),
+       track->GetGlobalTime(),
+       pos.getX(),
+       pos.getY(),
+       pos.getZ(),
+       primary->GetMomentum().getX(),
+       primary->GetMomentum().getY(),
+       primary->GetMomentum().getZ(),
+       track->GetKineticEnergy()}
   );
 }
 
