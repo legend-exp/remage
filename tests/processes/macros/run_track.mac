@@ -1,0 +1,23 @@
+
+/RMG/Manager/Logging/LogLevel detail
+
+/RMG/Geometry/RegisterDetector Germanium BEGe 001
+
+/RMG/Processes/EnableInnerBremsstrahlung true
+
+/run/initialize
+
+/RMG/Output/ActivateOutputScheme True
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Source   
+/RMG/Generator/Select GPS
+
+/gps/particle ion
+/gps/ion 18 39 0
+/gps/energy 0 keV
+
+/gps/ang/type iso
+/gps/source/intensity 1.0
+
+/run/beamOn 10000000
