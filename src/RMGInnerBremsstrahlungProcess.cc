@@ -200,6 +200,8 @@ G4double RMGInnerBremsstrahlungProcess::CalculateIBProbability(G4double electron
     G4double omega1 = 0.01 + i * deltaOmega;
     G4double omega2 = 0.01 + (i + 1) * deltaOmega;
 
+    if (omega1 < 0.01) omega1 = 0.01;
+
     G4double phi1 = PhiFunction(W_prime, omega1);
     G4double phi2 = PhiFunction(W_prime, omega2);
 
