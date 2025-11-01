@@ -223,7 +223,7 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: remage-validation-report-g4flavor-stable
           path: output/
