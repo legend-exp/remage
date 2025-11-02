@@ -10,7 +10,7 @@ foreach(_file ${_aux})
 endforeach()
 
 add_test(NAME particlefilter/basicfilter COMMAND ${PYTHONPATH} run-test-basicfilter.py)
-set_tests_properties(particlefilter/basicfilter PROPERTIES LABELS extra)
+set_tests_properties(particlefilter/basicfilter PROPERTIES LABELS "extra;flaky")
 
 add_test(NAME particlefilter/killvolume COMMAND ${PYTHONPATH} run-test-killvolume.py)
 set_tests_properties(particlefilter/killvolume PROPERTIES LABELS extra)
