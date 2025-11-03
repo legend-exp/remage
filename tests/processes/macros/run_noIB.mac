@@ -5,7 +5,7 @@
 /run/initialize
 
 /RMG/Generator/Confine Volume
-/RMG/Generator/Confinement/Physical/AddVolume Source
+/RMG/Generator/Confinement/Physical/AddVolume LAr
 /RMG/Generator/Select GPS
 
 /gps/particle ion
@@ -13,4 +13,4 @@
 /gps/energy 0 keV
 /gps/ang/type iso
 
-/run/beamOn 10000000
+/run/beamOn 500000

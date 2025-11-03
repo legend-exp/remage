@@ -1,6 +1,7 @@
-#ifndef RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
-#define RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
+#ifndef _RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
+#define _RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
 
+#include "G4GenericMessenger.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4Positron.hh"
 #include "G4Step.hh"
@@ -139,6 +140,10 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
     // Physical constants
     G4bool fEnabled;
     G4double fIBProbabilityScale;
+
+    // messenger stuff
+    std::unique_ptr<G4GenericMessenger> fMessenger;
+    void DefineCommands();
 };
 
 #endif

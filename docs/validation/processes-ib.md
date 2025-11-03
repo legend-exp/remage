@@ -22,6 +22,14 @@ We simulate Ar-39 decays in a liquid argon environment with an HPGe detector and
 compare simulations with and without IB enabled in Geant4. This allows us to
 quantify the impact of IB on detector observables.
 
+:::{important}
+
+In these plots, the probability to generate inner bremsstrahlung has been biased
+by a factor of 10 to make effects better visible even with a lower number of
+simulated events.
+
+:::
+
 ### IB gamma vertex energy spectrum
 
 First, we extract the energy spectrum of photons emitted directly from Ar-39

@@ -128,6 +128,7 @@ Commands for controlling physics processes
 **Sub-directories:**
 
 * `/RMG/Processes/Stepping/` – Commands for controlling physics processes
+* `/RMG/Processes/InnerBremsstrahlung/` – Commands for controlling the inner bremsstrahlung process
 
 **Commands:**
 
@@ -361,6 +362,24 @@ Uses 1 us by default
   * **Default value** – `us`
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
+
+## `/RMG/Processes/InnerBremsstrahlung/`
+
+Commands for controlling the inner bremsstrahlung process
+
+
+**Commands:**
+
+* `BiasingFactor` – Sets a scaling factor for IB probability
+
+### `/RMG/Processes/InnerBremsstrahlung/BiasingFactor`
+
+Sets a scaling factor for IB probability
+
+* **Parameter** – `factor`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Geometry/`
 

@@ -31,14 +31,14 @@ def plot_vertex_energy():
     parent_trkid = ak.to_numpy(tracks.trackid[mask_ar39])
 
     # Build a set of valid (event, track) pairs
-    ar39_pairs = set(zip(parent_evtid, parent_trkid, strict=False))
+    ar39_pairs = set(zip(parent_evtid, parent_trkid, strict=True))
 
     # Build mask for gamma whose parent is in that set
     gamma_evtid = ak.to_numpy(evtid[mask_gamma])
     gamma_parent = ak.to_numpy(parentid[mask_gamma])
 
     is_from_ar39 = [
-        (e, p) in ar39_pairs for e, p in zip(gamma_evtid, gamma_parent, strict=False)
+        (e, p) in ar39_pairs for e, p in zip(gamma_evtid, gamma_parent, strict=True)
     ]
 
     # Select the gamma energies
@@ -58,10 +58,10 @@ def plot_vertex_energy():
 
 def get_histogram(detid, filename):
     """Read data and return a filled histogram."""
-    data = lh5.read_as(f"stp/{detid}", filename, "ak")
+    data = lh5.read_as(f"hit/{detid}", filename, "ak")
 
-    h = hist.new.Reg(551, 0, 1005, name="energy [keV]").Double()
-    h.fill(ak.sum(data.edep, axis=-1))
+    h = hist.new.Reg(100, 0, 500, name="energy [keV]").Double()
+    h.fill(data.active_energy)
     return h
 
 
@@ -70,26 +70,26 @@ def plot_energy_comparison():
     h_noIB = get_histogram("det001", "output_noIB.lh5")
 
     h_IB_rebinned = h_IB.copy()
-    h_IB_rebinned = h_IB_rebinned[bh.rebin(16)]
+    h_IB_rebinned = h_IB_rebinned[bh.rebin(2)]
 
     h_noIB_rebinned = h_noIB.copy()
-    h_noIB_rebinned = h_noIB_rebinned[bh.rebin(16)]
+    h_noIB_rebinned = h_noIB_rebinned[bh.rebin(2)]
 
     diff_rebinned = h_IB - h_noIB
-    diff_rebinned = diff_rebinned[bh.rebin(16)]
+    diff_rebinned = diff_rebinned[bh.rebin(2)]
 
     # Plot the rebinned histograms
     plt.subplots(figsize=(10, 3))
-    h_IB_rebinned.plot(yerr=False, label="With IB (20 keV bins)")
-    h_noIB_rebinned.plot(yerr=False, label="Without IB (20 keV bins)")
+    h_IB_rebinned.plot(yerr=False, label="With IB")
+    h_noIB_rebinned.plot(yerr=False, label="Without IB")
 
-    plt.ylabel("counts / 20 keV")
+    plt.ylabel("counts / 10 keV")
     plt.legend()
     plt.savefig("innerbrem-signal.output.png")
 
     # Plot the rebinned difference
     plt.subplots(figsize=(10, 3))
-    diff_rebinned.plot(yerr=False, label="difference (20 keV bins)")
+    diff_rebinned.plot(yerr=False, label="difference")
     plt.axhline(0, color="k", linestyle="--", linewidth=1)
     plt.ylabel("counts difference / 20 keV")
     plt.legend()

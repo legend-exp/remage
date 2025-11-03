@@ -31,6 +31,8 @@ RMGInnerBremsstrahlungProcess::RMGInnerBremsstrahlungProcess(
       "{}: Inner Bremsstrahlung wrapper process initialized",
       GetProcessName()
   );
+
+  this->DefineCommands();
 }
 
 G4VParticleChange* RMGInnerBremsstrahlungProcess::AtRestDoIt(const G4Track& aTrack, const G4Step& aStep) {
@@ -256,4 +258,18 @@ G4double RMGInnerBremsstrahlungProcess::SamplePhotonEnergy(G4double electronEner
 
   // Fallback to the last value
   return omegas.back() * CLHEP::electron_mass_c2;
+}
+
+void RMGInnerBremsstrahlungProcess::DefineCommands() {
+
+  fMessenger = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Processes/InnerBremsstrahlung/",
+      "Commands for controlling the inner bremsstrahlung process"
+  );
+
+  fMessenger->DeclareMethod("BiasingFactor", &RMGInnerBremsstrahlungProcess::SetIBProbabilityScale)
+      .SetGuidance("Sets a scaling factor for IB probability")
+      .SetParameterName("factor", false)
+      .SetStates(G4State_PreInit, G4State_Idle);
 }

@@ -31,6 +31,7 @@
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
 #include "RMGGermaniumOutputScheme.hh"
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
@@ -50,6 +51,9 @@
 void init_extra() {
   // initialize non-default things that have messengers.
   // add here other things in the future.
+
+  // processes
+  new RMGInnerBremsstrahlungProcess();
 
   // output schemes
   new RMGGermaniumOutputScheme();
