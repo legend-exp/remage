@@ -1,0 +1,17 @@
+processing_groups:
+  - name: geds
+
+    detector_mapping:
+      - output: det001
+
+    outputs:
+      - t0
+      - evtid
+      - active_energy
+
+    operations:
+      activeness:
+        reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf*1000,
+        fccd=0.5, dlf=0.5)
+
+      active_energy: ak.sum(HITS.edep*HITS.activeness, axis=-1)
