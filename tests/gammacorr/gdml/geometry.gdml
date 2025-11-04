@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<orb name="world" r="20" lunit="cm"/>
+		<orb name="vacuum" r="15" lunit="cm"/>
+	</solids>
+	<structure>
+		<volume name="vacuum">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="vacuum"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="vacuum">
+				<volumeref ref="vacuum"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
