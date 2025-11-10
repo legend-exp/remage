@@ -49,6 +49,7 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
       kCosmicMuons,      ///< A simple cosmic muon generator.
       kMUSUNCosmicMuons, ///< The MUSUN-based cosmic muon generator.
       kUserDefined,      ///< A user-specified custom generator.
+      kBenchmark,        ///< The benchmark generator.
       kUndefined         ///< Undefined generator mode.
     };
 
