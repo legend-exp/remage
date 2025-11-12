@@ -18,12 +18,13 @@ Message parts are separated using ASCII control characters. Each message ends wi
 before continuing.
 
 Records within a message are delimited by ``RS`` (record separator, 0x1E). Each
-message must contain at least two records. The first is treated as the message's
-*key*, whereas the second one is the associated *value*:
+message must contain at least three records. The first is the process index, for
+typical (non-multiprocessing) uses, this is always ``0``. The second is treated as
+the message's *key*, whereas the second one is the associated *value*:
 
-+-------+--------+---------+-----------+--------+
-| *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
-+-------+--------+---------+-----------+--------+
++-----------+-------+--------+---------+-----------+--------+
+| *proc_id* | *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
++-----------+-------+--------+---------+-----------+--------+
 
 More values can follow afterwards, again delimited by ``RS``.
 
@@ -32,9 +33,9 @@ with more then one unit are returned as tuples on the python side.
 
 Example: A message
 
-+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
-| *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
-+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
++-----------+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+| *proc_id* | *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
++-----------+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
 
 would be decoded to :code:`["value0", ("value1", "value2")]`.
 
@@ -61,7 +62,7 @@ from ._version import __version__
 log = logging.getLogger("remage")
 
 
-def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
+def handle_ipc_message(msg: str) -> tuple[bool, list, bool, int]:
     """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
 
     This function should directly handle all known blocking IPC messages, which
@@ -74,11 +75,12 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
 
     Returns
     -------
-    tuple[bool, list, bool]
+    tuple[bool, list, bool, int]
         ``(is_blocking, parsed_message, is_fatal)`` where ``is_blocking`` is
         ``True`` when the sender waits for a reply, ``parsed_message`` is the
         decoded message or ``None`` if it was consumed internally, and
         ``is_fatal`` signals that the application should terminate.
+        ``proc_num`` is the index of the subprocess.
     """
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
@@ -88,6 +90,11 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
     msg = msg.split("\x1e")  # ASCII RS ("record separator")
     msg = [record.split("\x1f") for record in msg]  # ASCII US ("unit separator")
     msg = [tuple(record) if len(record) > 1 else record[0] for record in msg]
+
+    # first field is process number.
+    assert len(msg) > 1
+    proc_num = int(msg[0])
+    msg = msg[1:]
 
     msg_ret = msg
     is_fatal = False
@@ -113,11 +120,11 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
     elif is_blocking:
         log.warning("Unhandled blocking IPC message %s", str(msg))
 
-    return is_blocking, msg_ret, is_fatal
+    return is_blocking, msg_ret, is_fatal, proc_num
 
 
 def ipc_thread_fn(
-    pipe_r: int, proc: subprocess.Popen, unhandled_ipc_messages: list
+    pipe_r: int, proc: list[subprocess.Popen], unhandled_ipc_messages: list
 ) -> None:
     """Read and handle IPC messages coming from ``remage-cpp``.
 
@@ -143,7 +150,7 @@ def ipc_thread_fn(
     pipe_r
         File descriptor for the read end of the IPC pipe.
     proc
-        The subprocess running ``remage-cpp``.
+        The subprocess(es) running ``remage-cpp``.
     unhandled_ipc_messages
         List that will receive messages which were not directly handled (i.e.,
         for further processing)
@@ -170,13 +177,19 @@ def ipc_thread_fn(
                     msg = msg_buf[0:msg_end].decode("utf-8")
                     msg_buf = msg_buf[msg_end:]
 
-                    is_blocking, unhandled_msg, is_fatal = handle_ipc_message(msg)
+                    is_blocking, unhandled_msg, is_fatal, proc_id = handle_ipc_message(
+                        msg
+                    )
                     if unhandled_msg is not None:
                         unhandled_ipc_messages.append(unhandled_msg)
-                    if is_fatal:  # the handler wants to stop the app.
-                        proc.send_signal(signal.SIGTERM)
+                    if is_fatal:
+                        # the handler wants to stop the app.
+                        # send termination signal to _all_ processes.
+                        for p in proc:
+                            p.send_signal(signal.SIGTERM)
                     elif is_blocking:
-                        proc.send_signal(signal.SIGUSR2)  # send continuation signal.
+                        # send continuation signal, only to this process.
+                        proc[proc_id].send_signal(signal.SIGUSR2)
     except OSError as e:
         if e.errno == 9:  # bad file descriptor.
             return
@@ -212,11 +225,11 @@ class IpcResult:
         .. note ::
             if more then one value for the key had been submitted, this function will throw.
         """
-        gen = self.get(name)
+        gen = set(self.get(name))
         if len(gen) > 1:
             msg = f"ipc returned key {name} more than once"
             raise RuntimeError(msg)
-        return gen[0] if len(gen) == 1 else default
+        return next(iter(gen)) if len(gen) == 1 else default
 
     def set(self, name: str, values: list[str]) -> None:
         """Replace existing stored messages for they key ``name`` with ``values``.

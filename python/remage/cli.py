@@ -21,7 +21,8 @@ from .post_proc import post_proc
 def _run_remage_cpp(
     args: Sequence[str] | None = None,
     is_cli: bool = False,
-) -> tuple[int, signal.Signals, IpcResult]:
+    num_procs: int | None = 0,
+) -> tuple[list[int], list[signal.Signals], IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
     logger = logging.getLogger("remage")
 
@@ -48,22 +49,31 @@ def _run_remage_cpp(
         msg = "cannot pass internal argument --pipe-fd"
         raise RuntimeError(msg)
 
-    full_args = [str(argv[0]), f"--pipe-fd={pipe_w}", *argv[1:]]
-    msg = "Running command: " + " ".join(full_args)
-    logger.debug(msg)
+    proc = []
+    num_procs = num_procs or 1
+    for proc_num in range(num_procs):
+        extra_args = [f"--pipe-fd={pipe_w}"]
+        if num_procs > 1:
+            extra_args.append(f"--proc-num-offset={proc_num}")
+        full_args = [str(argv[0]), *extra_args, *argv[1:]]
+        msg = "Running command: " + " ".join(full_args)
+        logger.debug(msg)
 
-    proc = subprocess.Popen(
-        full_args,
-        executable=remage_exe,
-        pass_fds=(pipe_w,),
-    )
+        proc.append(
+            subprocess.Popen(
+                full_args,
+                executable=remage_exe,
+                pass_fds=(pipe_w,),
+            )
+        )
 
     # close _our_ writing end of the pipe.
     os.close(pipe_w)
 
     # propagate signals to the C++ executable.
     def new_signal_handler(sig: int, _):
-        proc.send_signal(sig)
+        for p in proc:
+            p.send_signal(sig)
 
     signals = [
         signal.SIGHUP,
@@ -88,7 +98,8 @@ def _run_remage_cpp(
     ipc_thread.start()
 
     # wait for C++ executable to finish.
-    proc.wait()
+    for p in proc:
+        p.wait()
 
     # restore signal handlers again, before running more python code.
     for sig, handler in zip(signals, old_signal_handlers, strict=True):
@@ -97,8 +108,10 @@ def _run_remage_cpp(
     # close the IPC pipe and end IPC handling.
     ipc_thread.join()
 
-    ec = 128 - proc.returncode if proc.returncode < 0 else proc.returncode
-    termsig = signal.Signals(-proc.returncode) if proc.returncode < 0 else None
+    ec = [128 - p.returncode if p.returncode < 0 else p.returncode for p in proc]
+    termsig = [
+        signal.Signals(-p.returncode) if p.returncode < 0 else None for p in proc
+    ]
     return ec, termsig, IpcResult(unhandled_ipc_messages)
 
 
@@ -117,6 +130,7 @@ def remage_run(
     gdml_files: Sequence[str] | str = (),
     output: str | Path | None = None,
     threads: int = 1,
+    procs: int = 1,
     overwrite_output: bool = False,
     merge_output_files: bool = False,
     flat_output: bool = False,
@@ -140,7 +154,10 @@ def remage_run(
     output
         output file for detector hits.
     threads
-        set the number of threads used by remage.
+        set the number of threads used by remage. This cannot be combined with `procs`.
+    procs
+        set the number of processes used by remage. This cannot be combined with
+        `threads`.
     overwrite_output
         overwrite existing output files.
     merge_output_files
@@ -179,7 +196,11 @@ def remage_run(
     if output is not None:
         args.append(f"--output-file={output!s}")
 
+    if threads > 1 and procs > 1:
+        msg = "Only one of threads or procs can be larger than one."
+        raise ValueError(msg)
     args.append(f"--threads={threads}")
+    args.append(f"--procs={procs}")
 
     if merge_output_files:
         args.append("--merge-output-files")
@@ -260,21 +281,35 @@ def remage_run_from_args(
         ),
     )
     parser.add_argument(
+        "--procs",
+        "-P",
+        type=int,
+        help=(
+            "Set the number of worker processes used by remage. Cannot be combined "
+            "with --threads/-t."
+        ),
+    )
+    parser.add_argument(
         "--ignore-warnings",
         action="store_true",
         help="Do not exit with exit code 2 when warnings occurred.",
     )
     py_args, cpp_args = parser.parse_known_args(args)
 
-    ec, termsig, ipc_info = _run_remage_cpp(cpp_args, is_cli=args is None)
+    ec, termsig, ipc_info = _run_remage_cpp(
+        cpp_args, is_cli=args is None, num_procs=py_args.procs
+    )
+    ec = 1 if 1 in ec else max(ec)
 
     # print an error message for the termination signal, similar to what bash does.
-    if termsig not in (None, signal.SIGINT, signal.SIGPIPE):
-        logger.error(
-            "remage-cpp exited with signal %s (%s)",
-            termsig.name,
-            signal.strsignal(termsig),
-        )
+    for proc_num, t in enumerate(termsig):
+        if t not in (None, signal.SIGINT, signal.SIGPIPE):
+            logger.error(
+                "remage-cpp%s exited with signal %s (%s)",
+                f"[{proc_num}]" if len(termsig) > 1 else "",
+                t.name,
+                signal.strsignal(t),
+            )
 
     # clean-up should run always, irrespective of exit code.
     _cleanup_tmp_files(ipc_info)
@@ -297,7 +332,9 @@ def remage_run_from_args(
     if ec == 2 and py_args.ignore_warnings:
         ec = 0
 
-    assert termsig is None  # now we should only have had a graceful exit.
+    assert all(
+        t is None for t in termsig
+    )  # now we should only have had a graceful exit.
 
     # setup logging based on log level from C++.
     log_level = ["summary", *ipc_info.get("loglevel")]

@@ -93,6 +93,9 @@ remage -o OUTPUT.lh5 -t 8
 
 will result in output files `OUTPUT_t0.lh5,..., OUTPUT_t7.lh5`.
 
+A similar naming scheme applies when using the multi-process based parallelism
+(requested by `-P` or `--procs`), which will append a suffix of `_p$id`.
+
 Geant4 automatically merges these files into a single one at the end of a run
 for all supported formats, except for HDF5. For the LH5 output format, _remage_
 can merge the output files before saving to disk. This feature can be enabled

@@ -41,7 +41,7 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
     RMGLog::Out(
         RMGLog::error,
         "[",
-        event->GetEventID(),
+        GetEventIDForStorage(event),
         "] last post-step",
         VolName(last),
         " != pre-step ",
@@ -74,7 +74,7 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
         RMGLog::Out(
             RMGLog::error,
             "[",
-            event->GetEventID(),
+            GetEventIDForStorage(event),
             "] post-step ",
             VolName(poststep),
             " is no daughter of pre-step ",
@@ -108,7 +108,7 @@ void RMGGeometryCheckOutputScheme::TrackingActionPost(const G4Track* aTrack) {
     RMGLog::Out(
         RMGLog::error,
         "[",
-        event->GetEventID(),
+        GetEventIDForStorage(event),
         "] volume stack not empty (count: ",
         info->fVolumeStack.size(),
         ", ",

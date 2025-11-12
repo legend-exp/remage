@@ -20,11 +20,15 @@ foreach(_mac ${_macros})
 
   add_test(NAME output-mt/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
                                                ${_mac} mt)
+  add_test(NAME output-mp/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
+                                               ${_mac} mp)
 endforeach()
 
 list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra)
 list(TRANSFORM _macros PREPEND "output-mt/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
+set_tests_properties(${_macros_hdf5} PROPERTIES LABELS "mt;extra" PROCESSORS 2)
+list(TRANSFORM _macros PREPEND "output-mp/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS "mt;extra" PROCESSORS 2)
 
 # SPECIAL TESTS

@@ -196,7 +196,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
-      ana_man->FillNtupleIColumn(ntupleid, col_id++, event->GetEventID());
+      ana_man->FillNtupleIColumn(ntupleid, col_id++, GetEventIDForStorage(event));
       if (!fNtuplePerDetector) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
