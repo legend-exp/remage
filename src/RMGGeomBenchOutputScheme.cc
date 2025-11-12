@@ -13,55 +13,43 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "RMGBenchmarkOutputScheme.hh"
+#include "RMGGeomBenchOutputScheme.hh"
 
 #include "G4AnalysisManager.hh"
 
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
 
-RMGBenchmarkOutputScheme::RMGBenchmarkOutputScheme() { this->DefineCommands(); }
+RMGGeomBenchOutputScheme::RMGGeomBenchOutputScheme() { this->DefineCommands(); }
 
 // invoked in RMGRunAction::SetupAnalysisManager()
-void RMGBenchmarkOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
+void RMGGeomBenchOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   auto rmg_man = RMGOutputManager::Instance();
 
   // Create auxiliary ntuple for XZ plane benchmark
-  fNtupleIDs[0] = rmg_man->CreateAndRegisterAuxNtuple(
-      "benchmark_xz",
-      "RMGBenchmarkOutputScheme",
-      ana_man
-  );
+  fNtupleIDs[0] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xz", "RMGGeomBenchOutputScheme", ana_man);
   ana_man->CreateNtupleDColumn(fNtupleIDs[0], "X");
   ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Z");
   ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Time");
   ana_man->FinishNtuple(fNtupleIDs[0]);
 
   // Create auxiliary ntuple for YZ plane benchmark
-  fNtupleIDs[1] = rmg_man->CreateAndRegisterAuxNtuple(
-      "benchmark_yz",
-      "RMGBenchmarkOutputScheme",
-      ana_man
-  );
+  fNtupleIDs[1] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_yz", "RMGGeomBenchOutputScheme", ana_man);
   ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Y");
   ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Z");
   ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Time");
   ana_man->FinishNtuple(fNtupleIDs[1]);
 
   // Create auxiliary ntuple for XY plane benchmark
-  fNtupleIDs[2] = rmg_man->CreateAndRegisterAuxNtuple(
-      "benchmark_xy",
-      "RMGBenchmarkOutputScheme",
-      ana_man
-  );
+  fNtupleIDs[2] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xy", "RMGGeomBenchOutputScheme", ana_man);
   ana_man->CreateNtupleDColumn(fNtupleIDs[2], "X");
   ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Y");
   ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Time");
   ana_man->FinishNtuple(fNtupleIDs[2]);
 }
 
-void RMGBenchmarkOutputScheme::SavePixel(int plane_id, double x, double y, double z, double time) {
+void RMGGeomBenchOutputScheme::SavePixel(int plane_id, double x, double y, double z, double time) {
 
   if (plane_id < 0 || plane_id > 2) {
     RMGLog::Out(RMGLog::warning, "Invalid plane_id (", plane_id, ") in SavePixel(); skipping");
@@ -85,15 +73,15 @@ void RMGBenchmarkOutputScheme::SavePixel(int plane_id, double x, double y, doubl
 
   int col_id = 0;
   switch (plane_id) {
-    case 0:  // XZ plane
+    case 0: // XZ plane
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, x);
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, z);
       break;
-    case 1:  // YZ plane
+    case 1: // YZ plane
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, y);
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, z);
       break;
-    case 2:  // XY plane
+    case 2: // XY plane
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, x);
       ana_man->FillNtupleDColumn(ntuple_id, col_id++, y);
       break;
@@ -103,7 +91,7 @@ void RMGBenchmarkOutputScheme::SavePixel(int plane_id, double x, double y, doubl
   ana_man->AddNtupleRow(ntuple_id);
 }
 
-void RMGBenchmarkOutputScheme::DefineCommands() {
+void RMGGeomBenchOutputScheme::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
       this,

@@ -71,6 +71,7 @@ docs = [
 
 [project.scripts]
 remage = "remage.cli:remage_cli"
+remage-geombench = "remage.geombench.cli:remage_geombench_cli"
 
 [project.urls]
 Homepage = "https://github.com/legend-exp/remage"

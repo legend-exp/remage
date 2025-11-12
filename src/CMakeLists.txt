@@ -5,12 +5,12 @@ set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGAnalysisReader.hh
-    ${_root}/include/RMGBenchmarkOutputScheme.hh
+    ${_root}/include/RMGGeomBenchOutputScheme.hh
     ${_root}/include/RMGDetectorHit.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
-    ${_root}/include/RMGGeneratorBenchmark.hh
+    ${_root}/include/RMGGeomBench.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh
     ${_root}/include/RMGGeneratorFromFile.hh
     ${_root}/include/RMGGeneratorMUSUNCosmicMuons.hh
@@ -57,13 +57,13 @@ set(PROJECT_PUBLIC_HEADERS
 
 set(PROJECT_SOURCES
     ${_root}/src/RMGAnalysisReader.cc
-    ${_root}/src/RMGBenchmarkOutputScheme.cc
+    ${_root}/src/RMGGeomBenchOutputScheme.cc
     ${_root}/src/RMGDetectorHit.cc
     ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc
-    ${_root}/src/RMGGeneratorBenchmark.cc
+    ${_root}/src/RMGGeomBench.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGGeneratorFromFile.cc
     ${_root}/src/RMGGeneratorMUSUNCosmicMuons.cc
