@@ -144,6 +144,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     bool fUseOpticalCustomWLS = false;
     bool fUseNeutronThermalScattering = false;
     bool fUseGrabmayrGammaCascades = false;
+    bool fUseInnerBremsstrahlung = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
     G4double fLowEnergyRange = 250 * CLHEP::eV;
