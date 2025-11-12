@@ -30,6 +30,7 @@ if [[ "$RMG_PYTHON_PKG_MANAGER" == "uv" ]]; then
     # install our package into this venv
     python -m uv -q pip install --reinstall "${CMAKE_SOURCE_DIR}"
     ln -fs "${INSTALL_VENV_DIR}/bin/remage" "${CMAKE_INSTALL_PREFIX}/bin/remage"
+    ln -fs "${INSTALL_VENV_DIR}/bin/remage-geometry-benchmark" "${CMAKE_INSTALL_PREFIX}/bin/remage-geometry-benchmark"
 
     # create and a user-installable wheel
     python -m uv build --wheel "${CMAKE_SOURCE_DIR}" -o "${CMAKE_INSTALL_PREFIX}/share"

@@ -70,6 +70,7 @@ docs = [
 
 [project.scripts]
 remage = "remage.cli:remage_cli"
+remage-geometry-benchmark = "remage.geometry_benchmark.cli:remage_geometry_benchmark_cli"
 
 [project.urls]
 Homepage = "https://github.com/legend-exp/remage"

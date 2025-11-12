@@ -23,6 +23,7 @@
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
 #endif
+#include "RMGGeneratorBenchmark.hh"
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
@@ -124,6 +125,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       fGeneratorObj = std::make_unique<RMGGeneratorMUSUNCosmicMuons>();
       break;
     case Generator::kFromFile: fGeneratorObj = std::make_unique<RMGGeneratorFromFile>(); break;
+    case Generator::kBenchmark: fGeneratorObj = std::make_unique<RMGGeneratorBenchmark>(); break;
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
