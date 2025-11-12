@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
+// Copyright (C) 2025 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_BENCHMARK_OUTPUT_SCHEME_HH_
-#define _RMG_BENCHMARK_OUTPUT_SCHEME_HH_
+#ifndef _RMG_GEOMBENCH_OUTPUT_SCHEME_HH_
+#define _RMG_GEOMBENCH_OUTPUT_SCHEME_HH_
 
 #include <memory>
 
@@ -35,11 +35,11 @@ class G4Event;
  *
  *  The benchmark data is stored in three separate auxiliary ntuples, one for each plane.
  */
-class RMGBenchmarkOutputScheme : public RMGVOutputScheme {
+class RMGGeomBenchOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    RMGBenchmarkOutputScheme();
+    RMGGeomBenchOutputScheme();
 
     /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
     void AssignOutputNames(G4AnalysisManager* ana_man) override;

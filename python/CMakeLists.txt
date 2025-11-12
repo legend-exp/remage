@@ -13,7 +13,8 @@ set(PYTHON_SOURCES
     ${_r}/python/remage/cli.py
     ${_r}/python/remage/ipc.py
     ${_r}/python/remage/logging.py
-    ${_r}/python/remage/post_proc.py)
+    ${_r}/python/remage/post_proc.py
+    ${_r}/python/remage/geombench/cli.py)
 # cmake-format: on
 
 option(RMG_CONDA_BUILD "Adapt for building on conda-forge." OFF)
