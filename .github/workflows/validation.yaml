@@ -1,0 +1,49 @@
+# NOTE: this workflow file is the only one allowed to be run on self-hosted
+#       runners. don't change its name!
+
+name: Validation
+
+on:
+  push:
+    branches:
+      - main
+      - "releases/**"
+    paths-ignore:
+      - "**.md"
+  pull_request:
+  release:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run_validation:
+    name: Run validation suite
+    runs-on: ubuntu-latest # self-hosted
+
+    container: docker://legendexp/remage-base:stable
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
+
+      - name: Build project
+        shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
+        run: |
+          git config --global --add safe.directory $(pwd)  # make git work inside container.
+
+          mkdir build
+          cd build
+          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          make -j$(nproc) | tee -a build.log
+          make install | tee -a build.log
+
+      - name: Run full test suite
+        run: |
+          cd build
+          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-regex mt -j1 --output-on-failure
