@@ -19,9 +19,11 @@
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4RunManager.hh"
 #include "G4ThreeVector.hh"
 
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 
 namespace u = CLHEP;
 
@@ -52,9 +54,15 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
 
-  if (!fReader->GetLockedReader()) {
+  auto reader = fReader->GetLockedReader();
+  if (!reader) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(), "' not found or in wrong format");
   }
+
+  // in the mzultiprocessing-mode we get here with an offset on the main thread.
+  size_t start_event = RMGManager::Instance()->GetProcessNumberOffset() *
+                       G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
+  reader.Seek(start_event);
 }
 
 void RMGGeneratorFromFile::EndOfRunAction(const G4Run*) {

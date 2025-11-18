@@ -10,4 +10,4 @@
 /gps/energy       0 keV
 /gps/ang/type     iso
 
-/run/beamOn 10000
+/run/beamOn {events}

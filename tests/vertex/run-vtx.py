@@ -12,8 +12,12 @@ from remage import remage_run
 
 macro = sys.argv[1]
 nthread = int(sys.argv[2])
+mode = sys.argv[3]
 
-output_stem = macro + ("-mt" if nthread > 1 else "")
+assert mode in ("mt", "mp", "st")
+assert mode != "st" or nthread == 1
+
+output_stem = macro + (f"-{mode}" if nthread > 1 else "")
 output_lh5 = f"{output_stem}.lh5"
 
 # clean up files from last run(s).
@@ -32,14 +36,23 @@ with Path(f"macros/{macro}.mac").open("r") as macro_file:
         if m:
             pos_input_file = m.group(1)
 
+extra_args = {}
+if mode in ("st", "mt"):
+    extra_args["threads"] = nthread
+    n_events = 10000
+else:
+    extra_args["procs"] = nthread
+    n_events = int(10000 / nthread)
+
 # run remage, produce lh5 output.
 files = remage_run(
     f"macros/{macro}.mac",
+    macro_substitutions={"events": n_events},
     gdml_files="gdml/geometry.gdml",
     output=output_lh5,
     flat_output=True,
-    threads=nthread,
     log_level="summary",
+    **extra_args,
 )[1].get("output")
 if len(files) == 1:
     files = files[0]

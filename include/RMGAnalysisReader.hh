@@ -67,6 +67,13 @@ class RMGAnalysisReader final {
         }
 
         /**
+         * @brief read and discard a number of rows at the current position. */
+        void Seek(size_t offset) {
+          AssertSetup(false);
+          for (size_t i = 0; i < offset; i++) fReader->GetNtupleRow(fNtupleId);
+        }
+
+        /**
          * @brief wraps @c GetNtupleRow() of @ref G4VAnalysisReader. */
         [[nodiscard]] auto GetNtupleRow() {
           AssertSetup(false);
