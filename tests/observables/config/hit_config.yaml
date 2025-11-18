@@ -54,7 +54,7 @@ processing_groups:
 
   - name: vtx
 
-    lh5_group: "/"
+    lh5_group: null
 
     detector_mapping:
       - output: vtx

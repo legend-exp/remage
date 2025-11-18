@@ -22,7 +22,6 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -32,9 +31,9 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "legend-pydataobj >=1.16,<1.17",
-  "reboost ==0.6.*",
-  "pygama >=2.2.3,<2.3",
+  "legend-pydataobj >=1.16",
+  "reboost >=0.6",
+  "pygama >=2.2.3",
   "colorlog",
   "rich",
 ]
