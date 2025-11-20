@@ -23,6 +23,7 @@
 #include "G4HCtable.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
+#include "G4UnitsTable.hh"
 
 #include "RMGGermaniumDetector.hh"
 #include "RMGHardware.hh"
@@ -447,6 +448,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
           "note: If another output scheme also requests the photons to be discarded, the "
           "germanium edep filter does not force the photons to be simulated."
       )
+      .SetGuidance(
+          std::string("This is ") + (fDiscardPhotonsIfNoGermaniumEdep ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -454,6 +459,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionPosition ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -461,6 +470,9 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -468,6 +480,9 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
       .SetGuidance("Discard hits with zero energy.")
+      .SetGuidance(
+          std::string("This is ") + (fDiscardZeroEnergyHits ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -475,6 +490,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetGuidance(std::string("This is ") + (fStoreTrackID ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -483,6 +499,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethod("StepPositionMode", &RMGGermaniumOutputScheme::SetPositionModeString)
       .SetGuidance("Select which position of the step to store")
+      .SetGuidance(std::string("Uses ") + RMGTools::GetCandidate(fPositionMode) + " by default")
       .SetParameterName("mode", false)
       .SetCandidates(RMGTools::GetCandidates<RMGOutputTools::PositionMode>())
       .SetStates(G4State_Idle)
@@ -501,6 +518,7 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
       .SetGuidance("Pre-Cluster output hits before saving")
+      .SetGuidance(std::string("This is ") + (fPreClusterHits ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -508,6 +526,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
+      .SetGuidance(
+          std::string("This is ") +
+          (fPreClusterPars.combine_low_energy_tracks ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -515,6 +537,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
+      .SetGuidance(
+          std::string("This is ") +
+          (fPreClusterPars.reassign_gamma_energy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -522,6 +548,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistance", "um", &RMGGermaniumOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.cluster_distance, "Length")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
@@ -530,6 +560,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
           "PreClusterDistanceSurface",
           "um",
           &RMGGermaniumOutputScheme::SetClusterDistanceSurface
+      )
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.cluster_distance_surface, "Length")) + " by default"
       )
       .SetGuidance("Set a distance threshold for the surface pre-clustering.")
       .SetParameterName("threshold", false)
@@ -541,13 +575,21 @@ void RMGGermaniumOutputScheme::DefineCommands() {
           "us",
           &RMGGermaniumOutputScheme::SetClusterTimeThreshold
       )
-      .SetGuidance("Set a time threshold for  pre-clustering.")
+      .SetGuidance("Set a time threshold for pre-clustering.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.cluster_time_threshold, "Time")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("SurfaceThickness", "mm", &RMGGermaniumOutputScheme::SetSurfaceThickness)
       .SetGuidance("Set a surface thickness for the Germanium detector.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.surface_thickness, "Length")) + " by default"
+      )
       .SetParameterName("thickness", false)
       .SetStates(G4State_Idle);
 
@@ -558,6 +600,10 @@ void RMGGermaniumOutputScheme::DefineCommands() {
           &RMGGermaniumOutputScheme::SetElectronTrackEnergyThreshold
       )
       .SetGuidance("Set a energy threshold for tracks to be merged.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.track_energy_threshold, "Energy")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 }

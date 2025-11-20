@@ -126,6 +126,7 @@ void RMGVertexFromFile::DefineCommands() {
   fMessenger->DeclareProperty("NtupleDirectory", fNtupleDirectoryName)
       .SetGuidance("Change the default input directory/group for ntuples.")
       .SetGuidance("note: this option only has an effect for LH5 or HDF5 input files.")
+      .SetGuidance(std::string("Uses \"") + fNtupleDirectoryName + "\" by default")
       .SetParameterName("nt_directory", false)
       .SetDefaultValue(fNtupleDirectoryName)
       .SetStates(G4State_PreInit, G4State_Idle);

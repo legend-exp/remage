@@ -1104,6 +1104,7 @@ void RMGVertexConfinement::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("SampleOnSurface", fOnSurface)
       .SetGuidance("If true (or omitted argument), sample on the surface of solids")
+      .SetGuidance(std::string("This is ") + (fOnSurface ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle)
@@ -1152,6 +1153,9 @@ void RMGVertexConfinement::DefineCommands() {
           "If true (or omitted argument), perform a containment check even after sampling "
           "from a natively sampleable object. This is only an extra sanity check that does"
           " not alter the behaviour."
+      )
+      .SetGuidance(
+          std::string("This is ") + (fForceContainmentCheck ? "enabled" : "disabled") + " by default"
       )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
