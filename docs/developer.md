@@ -1,3 +1,5 @@
+(dev-guide)=
+
 # Developer's guide
 
 The following rules and conventions have been established for the package
