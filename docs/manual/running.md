@@ -53,6 +53,41 @@ The most useful options include:
 - `-s, --macro-substitutions` – provide `key=value` pairs that will be expanded
   as Geant4 aliases in macros.
 
+## Parallel execution
+
+_remage_ supports two ways of parallelising simulations, each with its own
+advantages and limitations:
+
+### Geant4 multithreading
+
+This mode is enabled by passing `--threads INTEGER` to the command line.
+_remage_ does not implement its own multithreading but delegates it to Geant4.
+This approach is memory-efficient because shared objects (such as the geometry)
+are instantiated only once.
+
+:::{warning}
+
+The performance in multithreaded mode does not scale linearly with the number of
+threads (see [issue #287](https://github.com/legend-exp/remage/issues/287) for
+details).
+
+:::
+
+### Multiple processes
+
+This mode is enabled by passing `--procs INTEGER` to the command line. The
+Python wrapper (see the {ref}`dev-guide` for details) can launch several
+independent _remage_ instances, each running a single process. This usually
+provides near 1:1 performance scaling but is more resource-hungry because every
+process carries a full memory footprint.
+
+:::{admonition} In short
+
+If memory is the limiting factor, prefer `--threads`; otherwise, try `--procs`
+for better throughput.
+
+:::
+
 ## Batch versus interactive mode
 
 By default `remage` runs all specified macro commands in batch mode and then
