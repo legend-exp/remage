@@ -1,3 +1,10 @@
+/RMG/Geometry/RegisterDetector Scintillator Box 1
+/RMG/Geometry/RegisterDetector Scintillator Orb 2
+/RMG/Geometry/RegisterDetector Scintillator Sphere 3
+/RMG/Geometry/RegisterDetector Scintillator Tubs 4
+
+/RMG/Output/NtupleUseVolumeName true
+
 /run/initialize
 
 /RMG/Manager/Logging/LogLevel summary
