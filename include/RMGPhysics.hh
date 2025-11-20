@@ -141,7 +141,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     ProdCutStore fProdCuts = {};
     ProdCutStore fProdCutsSensitive = {};
     bool fConstructOptical = false;
-    bool fUseOpticalCustomWLS = false;
+    bool fUseOpticalCustomWLS = true;
     bool fUseNeutronThermalScattering = false;
     bool fUseGrabmayrGammaCascades = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;

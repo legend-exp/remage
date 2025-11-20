@@ -187,7 +187,7 @@ This is disabled by default
 
 Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 
-This is disabled by default
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
