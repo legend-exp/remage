@@ -158,24 +158,38 @@ void RMGVertexOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StorePrimaryParticleInformation", fStorePrimaryParticleInformation)
       .SetGuidance("Store information on primary particle details (not only vertex data).")
+      .SetGuidance(
+          std::string("This is ") + (fStorePrimaryParticleInformation ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipPrimaryVertexOutput", fSkipPrimaryVertexOutput)
       .SetGuidance("Do not store vertex/primary particle data.")
+      .SetGuidance(
+          std::string("This is ") + (fSkipPrimaryVertexOutput ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionPosition ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

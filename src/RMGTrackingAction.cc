@@ -26,8 +26,8 @@
 
 RMGTrackingAction::RMGTrackingAction(RMGRunAction* run_action) : fRunAction(run_action) {
 
-  this->DefineCommands();
   this->SetLongGlobalTimeUncertaintyWarning(1 * CLHEP::us);
+  this->DefineCommands();
 }
 
 void RMGTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
@@ -100,6 +100,9 @@ void RMGTrackingAction::DefineCommands() {
           "If the initial step is a radioactive decay, reset the global time of all its "
           "secondary tracks to 0."
       )
+      .SetGuidance(
+          std::string("This is ") + (fResetInitialDecayTime ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -114,6 +117,7 @@ void RMGTrackingAction::DefineCommands() {
           "Warn if the global times of tracks get too large to provide the requested time "
           "uncertainty."
       )
+      .SetGuidance("Uses 1 us by default")
       .SetDefaultValue("1")
       .SetStates(G4State_Idle);
 }

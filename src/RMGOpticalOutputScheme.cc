@@ -140,6 +140,9 @@ void RMGOpticalOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for wavelength output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

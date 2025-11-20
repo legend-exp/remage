@@ -19,6 +19,7 @@
 #include "G4Ions.hh"
 #include "G4Step.hh"
 #include "G4Threading.hh"
+#include "G4UnitsTable.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
@@ -100,12 +101,16 @@ void RMGSteppingAction::DefineCommands() {
           "actual halflife of the simulated particle."
       )
       .SetGuidance("Set to -1 to disable this feature.")
+      .SetGuidance(
+          std::string("Uses ") + std::string(G4BestUnit(fDaughterKillLifetime, "Time")) + " us by default"
+      )
       .SetParameterName("max_lifetime", false)
       .SetDefaultValue("-1")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipTracking", fSkipTracking)
       .SetGuidance("Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.")
+      .SetGuidance(std::string("This is ") + (fSkipTracking ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
