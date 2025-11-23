@@ -136,7 +136,7 @@ target_link_libraries(
   PRIVATE magic_enum::magic_enum)
 
 if(BxDecay0_FOUND)
-  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4 BxDecay0::BxDecay0)
 endif()
 
 if(ROOT_FOUND)
@@ -176,7 +176,7 @@ target_link_libraries(
   PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 set_target_properties(remage-doc-dump-cli PROPERTIES OUTPUT_NAME remage-doc-dump)
 if(BxDecay0_FOUND)
-  target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4 BxDecay0::BxDecay0)
 endif()
 add_custom_target(
   remage-doc-dump
