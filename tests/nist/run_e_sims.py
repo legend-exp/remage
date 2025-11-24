@@ -13,10 +13,8 @@ base_args = [
     "electrons-ge-{}-keV.lh5",
     "--flat-output",
     "--overwrite",
-    "--quiet",
     "macros/run.mac",
 ]
-print("remage", " ".join(base_args))
 
 energies = np.concatenate(
     [
@@ -28,4 +26,5 @@ energies = np.concatenate(
 
 for energy in energies:  # in keV
     args = [arg.format(energy) for arg in base_args]
+    print("remage", " ".join(args))
     remage_run_from_args(args, raise_on_error=True)
