@@ -56,6 +56,7 @@ int main(int argc, char** argv) {
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
+  bool no_banner = false;
   int nthreads = 1;
   int rand_seed = -1;
   bool interactive = false;
@@ -79,6 +80,7 @@ int main(int argc, char** argv) {
   app.add_flag("--version", version, "Print remage's version and exit");
   app.add_flag("--version-rich", version_rich, "Print versions of remage and its dependencies and exit");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
+  app.add_flag("--no-banner", no_banner, "Do not print the remage banner at application start");
 
   app.add_option(
       "-s,--macro-substitutions",
@@ -122,6 +124,8 @@ int main(int argc, char** argv) {
     std::cout << RMG_PROJECT_VERSION << std::endl;
     return 0;
   }
+
+  if (no_banner) RMGLog::SetInihibitStartupInfo(true);
 
   if (version_rich) {
     auto g4_version = std::regex_replace(G4Version, std::regex("\\$|Name:"), "");
