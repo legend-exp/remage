@@ -56,6 +56,7 @@ bool RMGLog::fHadWarning = false;
 bool RMGLog::fHadError = false;
 
 bool RMGLog::fUsePrefix = true;
+int RMGLog::fProcNum = -1;
 
 std::string RMGLog::fVersion = RMG_PROJECT_VERSION_FULL;
 
@@ -103,13 +104,16 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
 
   if (!fUsePrefix) return "";
 
+  std::string proc_prefix = "";
+  if (fProcNum >= 0) proc_prefix = "<p" + std::to_string(fProcNum) + "> ";
+
   switch (loglevel) {
-    case debug: return Colorize<RMGLog::Ansi::magenta>("[Debug ---> ", os);
-    case detail: return Colorize<RMGLog::Ansi::blue>("[Detail --> ", os);
-    case summary: return Colorize<RMGLog::Ansi::green>("[Summary -> ", os);
-    case warning: return Colorize<RMGLog::Ansi::yellow>("[Warning -> ", os);
-    case error: return Colorize<RMGLog::Ansi::red>("[Error ---> ", os);
-    case fatal: return Colorize<RMGLog::Ansi::red>("[Fatal ---> ", os, true);
+    case debug: return Colorize<RMGLog::Ansi::magenta>(proc_prefix + "[Debug ---> ", os);
+    case detail: return Colorize<RMGLog::Ansi::blue>(proc_prefix + "[Detail --> ", os);
+    case summary: return Colorize<RMGLog::Ansi::green>(proc_prefix + "[Summary -> ", os);
+    case warning: return Colorize<RMGLog::Ansi::yellow>(proc_prefix + "[Warning -> ", os);
+    case error: return Colorize<RMGLog::Ansi::red>(proc_prefix + "[Error ---> ", os);
+    case fatal: return Colorize<RMGLog::Ansi::red>(proc_prefix + "[Fatal ---> ", os, true);
     default: return "";
   }
 }

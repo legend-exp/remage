@@ -120,6 +120,10 @@ class RMGLog {
     static void SetPrefix(bool flag) { fUsePrefix = flag; }
 
     /**
+     * Set the process number. */
+    static void SetProcNum(int proc_num) { fProcNum = proc_num; }
+
+    /**
      * Toggle if a startup message is shown before the first log message. */
     static void SetInihibitStartupInfo(bool flag) { fFirstOutputDone = flag; }
 
@@ -194,6 +198,10 @@ class RMGLog {
     /**
      * Include a prefix before each message? */
     static bool fUsePrefix;
+
+    /**
+     * The numeric identifier for the remage process */
+    static int fProcNum;
 };
 
 #include "RMGLog.icc"
