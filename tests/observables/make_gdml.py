@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
+import pygeomhpges as hpges
 from pygeomtools import write_pygeom
 
 reg = pg4.geant4.Registry()

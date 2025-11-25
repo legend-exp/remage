@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import legendoptics.lar
 import pint
+import pygeomoptics.lar
 from pyg4ometry import geant4 as g4
 from pygeomtools import RemageDetectorInfo, write_pygeom
 
@@ -56,16 +56,16 @@ lar = g4.Material(
 )
 lar.add_element_natoms(g4.ElementSimple("argon", "Ar", 18, 39.95, registry), natoms=1)
 
-legendoptics.lar.pyg4_lar_attach_rindex(
+pygeomoptics.lar.pyg4_lar_attach_rindex(
     lar,
     registry,
 )
-legendoptics.lar.pyg4_lar_attach_attenuation(
+pygeomoptics.lar.pyg4_lar_attach_attenuation(
     lar,
     registry,
     88.8 * u.K,
 )
-legendoptics.lar.pyg4_lar_attach_scintillation(
+pygeomoptics.lar.pyg4_lar_attach_scintillation(
     lar,
     registry,
     flat_top_yield=1000 / u.MeV,  # lowered scintillation yield for performance

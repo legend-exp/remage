@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pyg4ometry as pg4
 import pygeomtools as pytools
-from legendhpges import make_hpge
+from pygeomhpges import make_hpge
 
 # read the configs
 out_gdml = "gdml/ge-array.gdml"
