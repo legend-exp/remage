@@ -151,7 +151,7 @@ jobs:
           brew update
           brew install opencascade cgal gmp mpfr boost
 
-          conda install conda-forge::geant4 "conda-forge::python<3.14"
+          conda install conda-forge::geant4 conda-forge::bxdecay0 "conda-forge::python<3.14"
           echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> $GITHUB_ENV
 
       - name: Build project
