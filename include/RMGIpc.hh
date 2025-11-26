@@ -16,7 +16,6 @@
 #ifndef _RMG_IPC_HH_
 #define _RMG_IPC_HH_
 
-#include <atomic>
 #include <string>
 
 /** @brief IPC message sender implementation.
@@ -32,9 +31,9 @@ class RMGIpc final {
 
     RMGIpc() = delete;
 
-    /** @brief Set the IPC pipe (write end) file descriptor.
+    /** @brief Set the IPC pipes file descriptors.
      */
-    static void Setup(int ipc_pipe_fd, int proc_num);
+    static void Setup(int ipc_pipe_fd_out, int ipc_pipe_fd_in, int proc_num);
 
     /** @brief Create an IPC message with a key and a single value.
      */
@@ -55,14 +54,10 @@ class RMGIpc final {
      */
     static bool SendIpcBlocking(std::string msg);
 
-    /** @brief Flag for waiting for the SIGUSR2 signal for blocking messages.
-     *  @details Should not be used by the user and only be set by the signal handler.
-     */
-    inline static std::atomic<bool> fWaitForIpc = false;
-
   private:
 
-    inline static int fIpcFd = -1;
+    inline static int fIpcFdOut = -1;
+    inline static int fIpcFdIn = -1;
     inline static int fProcNum = -1;
 };
 

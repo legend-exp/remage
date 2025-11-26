@@ -43,9 +43,10 @@ would be decoded to :code:`["value0", ("value1", "value2")]`.
 Blocking messages
 -----------------
 
-Blocking messages need to be acknowledged by sending the POSIX signal ``SIGUSR2`` to
-the ``remage-cpp`` process, after performing the associated action (example: checking
-version equality of python and C++ IPC sides, pre-processing files).
+Blocking messages need to be acknowledged by sending ASCII ACK over the second pipe
+(per-process file descriptor) to the ``remage-cpp`` process, after performing the
+associated action (example: checking version equality of python and C++ IPC sides,
+pre-processing files).
 
 Transmitting additional response data with the acknowledgement is not possible.
 """
@@ -124,7 +125,10 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool, int]:
 
 
 def ipc_thread_fn(
-    pipe_r: int, proc: list[subprocess.Popen], unhandled_ipc_messages: list
+    pipe_r: int,
+    pipes_o_w: list[int],
+    proc: list[subprocess.Popen],
+    unhandled_ipc_messages: list,
 ) -> None:
     """Read and handle IPC messages coming from ``remage-cpp``.
 
@@ -140,10 +144,8 @@ def ipc_thread_fn(
     handling of the associated action. Any message parts will be decoded as
     UTF-8 before parsing.
 
-    Blocking messages are acknowledged by sending the POSIX signal ``SIGUSR2``
-    to the child  process, while fatal messages trigger ``SIGTERM``. Any
-    messages that are not handled by :func:`handle_ipc_message` are appended
-    to the list ``unhandled_ipc_messages`` for later processing.
+    Blocking messages are acknowledged by sending ASCII ACK over the second pipe
+    (per-process file descriptor).
 
     Parameters
     ----------
@@ -151,6 +153,8 @@ def ipc_thread_fn(
         File descriptor for the read end of the IPC pipe.
     proc
         The subprocess(es) running ``remage-cpp``.
+    pipes_o_w
+        File descriptor(s) for the write end of the IPC pipe(s) to the subprocess(es).
     unhandled_ipc_messages
         List that will receive messages which were not directly handled (i.e.,
         for further processing)
@@ -188,8 +192,8 @@ def ipc_thread_fn(
                         for p in proc:
                             p.send_signal(signal.SIGTERM)
                     elif is_blocking:
-                        # send continuation signal, only to this process.
-                        proc[proc_id].send_signal(signal.SIGUSR2)
+                        # send continuation message, only to this process.
+                        os.write(pipes_o_w[proc_id], b"\x06")  # ASCII ACK
     except OSError as e:
         if e.errno == 9:  # bad file descriptor.
             return
