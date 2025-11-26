@@ -104,7 +104,7 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
 
   if (!fUsePrefix) return "";
 
-  std::string proc_prefix = "";
+  std::string proc_prefix;
   if (fProcNum >= 0) proc_prefix = "<p" + std::to_string(fProcNum) + "> ";
 
   switch (loglevel) {
