@@ -295,15 +295,19 @@ bool RMGVertexConfinement::SampleableObject::Sample(
 
   if (this->physical_volume) {
     RMGLog::OutFormatDev(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Chosen random volume: '{}[{}]'",
         this->physical_volume->GetName(),
         this->physical_volume->GetCopyNo()
     );
   } else {
-    RMGLog::OutFormatDev(RMGLog::debug, "Chosen random volume: '{}'", this->sampling_solid->GetName());
+    RMGLog::OutFormatDev(
+        RMGLog::debug_event,
+        "Chosen random volume: '{}'",
+        this->sampling_solid->GetName()
+    );
   }
-  RMGLog::OutDev(RMGLog::debug, "Maximum attempts to find a good vertex: ", max_attempts);
+  RMGLog::OutDev(RMGLog::debug_event, "Maximum attempts to find a good vertex: ", max_attempts);
 
   size_t calls = 0;
 
@@ -315,7 +319,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
   if (this->native_sample) {
     vertex = this->translation +
              this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, this->surface_sample);
-    RMGLog::OutDev(RMGLog::debug, "Generated vertex: ", vertex / CLHEP::cm, " cm");
+    RMGLog::OutDev(RMGLog::debug_event, "Generated vertex: ", vertex / CLHEP::cm, " cm");
     if (force_containment_check && !this->IsInside(vertex)) {
 
       RMGLog::OutDev(
@@ -349,7 +353,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
       n_trials++;
       vertex = this->translation +
                this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);
-      RMGLog::OutDev(RMGLog::debug, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm, " cm");
+      RMGLog::OutDev(RMGLog::debug_event, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm, " cm");
     }
     if (calls >= max_attempts) {
       RMGLog::Out(
@@ -365,7 +369,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
   }
 
   RMGLog::OutDev(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "Found good vertex ",
       vertex / CLHEP::cm,
       " cm",
@@ -754,7 +758,11 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
     }
   }
 
-  RMGLog::OutDev(RMGLog::debug, "Sampling mode: ", magic_enum::enum_name<SamplingMode>(fSamplingMode));
+  RMGLog::OutDev(
+      RMGLog::debug_event,
+      "Sampling mode: ",
+      magic_enum::enum_name<SamplingMode>(fSamplingMode)
+  );
 
   switch (fSamplingMode) {
     case SamplingMode::kIntersectPhysicalWithGeometrical: {
@@ -911,7 +919,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           accept = true;
         }
         RMGLog::Out(
-            RMGLog::debug,
+            RMGLog::debug_event,
             accept ? "Chosen vertex passes intersection criteria "
                    : "Chosen vertex fails intersection criteria. "
         );
@@ -919,7 +927,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         // now check for subtractions
         if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) return true;
 
-        RMGLog::Out(RMGLog::debug, "Chosen vertex fails intersection criteria.");
+        RMGLog::Out(RMGLog::debug_event, "Chosen vertex fails intersection criteria.");
       }
 
       if (calls >= RMGVVertexGenerator::fMaxAttempts) {

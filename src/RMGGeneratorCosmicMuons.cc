@@ -92,13 +92,13 @@ void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
 
   fEcoMug->Generate();
 
-  RMGLog::OutFormat(RMGLog::debug, "Generated µ has charge {:+}", fEcoMug->GetCharge());
+  RMGLog::OutFormat(RMGLog::debug_event, "Generated µ has charge {:+}", fEcoMug->GetCharge());
   fGun->SetNumberOfParticles(1);
   fEcoMug->GetCharge() < 0 ? fGun->SetParticleDefinition(G4MuonMinus::Definition())
                            : fGun->SetParticleDefinition(G4MuonPlus::Definition());
 
   const auto& pos = fEcoMug->GetGenerationPosition(); // no units, the user can decide. I use meters
-  RMGLog::OutFormat(RMGLog::debug, "...origin ({:.4g}, {:.4g}, {:.4g}) m", pos[0], pos[1], pos[2]);
+  RMGLog::OutFormat(RMGLog::debug_event, "...origin ({:.4g}, {:.4g}, {:.4g}) m", pos[0], pos[1], pos[2]);
   fGun->SetParticlePosition({pos[0] * u::m, pos[1] * u::m, pos[2] * u::m});
 
   G4ThreeVector d_cart(1, 1, 1);
@@ -108,13 +108,13 @@ void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
   fGun->SetParticleMomentumDirection(d_cart);
 
   RMGLog::OutFormat(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "...direction (θ,φ) = ({:.4g}, {:.4g}) deg",
       fEcoMug->GetGenerationTheta() / u::deg,
       fEcoMug->GetGenerationPhi() / u::deg
   );
   RMGLog::OutFormat(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "...direction (x,y,z) = ({:.4g}, {:.4g}, {:.4g}) m",
       d_cart.getX() / u::m,
       d_cart.getY() / u::m,
@@ -122,7 +122,7 @@ void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
   );
 
   const auto& p_tot = fEcoMug->GetGenerationMomentum() * u::GeV;
-  RMGLog::OutFormat(RMGLog::debug, "...momentum {:.4g} GeV/c", p_tot / u::GeV);
+  RMGLog::OutFormat(RMGLog::debug_event, "...momentum {:.4g} GeV/c", p_tot / u::GeV);
   const auto& mu_mass = G4MuonPlus::Definition()->GetPDGMass();
   fGun->SetParticleEnergy(std::sqrt(p_tot * p_tot + mu_mass * mu_mass) - mu_mass);
 

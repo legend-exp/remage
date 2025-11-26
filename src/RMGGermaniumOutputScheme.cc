@@ -202,7 +202,7 @@ bool RMGGermaniumOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   if ((fEdepCutLow >= 0 && event_edep <= fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
     RMGLog::Out(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Discarding event - energy threshold has not been met",
         event_edep,
         fEdepCutLow,
@@ -223,10 +223,10 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
   if (!hit_coll) return;
 
   if (hit_coll->entries() <= 0) {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection is empty");
     return;
   } else {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
   std::shared_ptr<RMGDetectorHitsCollection> _clustered_hits;
@@ -237,7 +237,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
   auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
-    RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
+    RMGLog::OutDev(RMGLog::debug_event, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();
 
     for (auto hit : *hit_coll->GetVector()) {

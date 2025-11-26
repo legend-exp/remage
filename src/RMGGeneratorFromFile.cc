@@ -107,7 +107,7 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
   }
 
   RMGLog::OutFormat(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV",
       row_data.fG4Pid,
       row_data.fPx,

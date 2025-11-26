@@ -63,7 +63,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
       );
       RMGManager::Instance()->GetG4RunManager()->AbortRun();
     }
-    RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
+    RMGLog::OutDev(RMGLog::debug_event, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
 
     // pass the generated vertex to the actual generator
     fGeneratorObj->SetParticlePosition(vertex);

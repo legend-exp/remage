@@ -174,8 +174,8 @@ def remage_run(
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
-        logging level. One of `debug`, `detail`, `summary`, `warning`, `error`,
-        `fatal`, `nothing`.
+        logging level. One of `debug_event`, `debug`, `detail`, `summary`, `warning`,
+        `error`, `fatal`, `nothing`.
     raise_on_error
         raise a :class:`RuntimeError` when an error in the C++ application occurs. This
         applies to non-fatal errors being logged as well as fatal errors. If false, the
