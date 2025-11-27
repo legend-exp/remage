@@ -76,6 +76,7 @@ add_compile_options(
   -Wextra # enable extra warnings
   -Wpedantic # enforce stricter standards compliance
   -Wshadow # warn if a variable declaration shadows another
+  -Wundef # warn if an undefined constant is used in preprocessor directives
   -Werror # turn warnings into errors
 )
 
