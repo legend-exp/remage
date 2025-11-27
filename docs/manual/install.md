@@ -34,7 +34,7 @@ Stable releases are made available
 systems. To install the latest version use:
 
 ```console
-conda install conda-forge::remage
+$ conda install conda-forge::remage
 ```
 
 :::{note}
