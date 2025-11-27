@@ -67,6 +67,7 @@
 #include "G4StepLimiterPhysics.hh"
 #include "G4StoppingPhysics.hh"
 #include "G4ThermalNeutrons.hh"
+#include "G4Version.hh"
 
 #include "RMGConfig.hh"
 #include "RMGLog.hh"

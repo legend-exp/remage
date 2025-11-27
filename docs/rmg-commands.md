@@ -237,7 +237,7 @@ This is disabled by default
 
 Set correlated gamma emission flag
 
-This is disabled by default
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`

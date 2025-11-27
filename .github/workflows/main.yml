@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: Compare checked-in doc dump with current result
-        if: ${{ matrix.container_version != 'slim' }}
+        if: ${{ matrix.container_version == 'latest' }}
         run: |
           cd build
           cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak
