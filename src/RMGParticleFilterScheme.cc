@@ -83,7 +83,9 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
 
   const auto pv = aTrack->GetTouchableHandle()->GetVolume();
   // I am not 100% sure the physical volume will exist at this point. Can remove after some tests
-  if (!pv) { RMGLog::OutDev(RMGLog::debug, "Physical volume does not exist in ParticleFilter!"); }
+  if (!pv) {
+    RMGLog::OutDev(RMGLog::debug_event, "Physical volume does not exist in ParticleFilter!");
+  }
   const auto pv_name = pv->GetName();
   // If a kill volume is specified only kill if in the kill volume.
   if (!fKillVolumes.empty() && fKillVolumes.find(pv_name) == fKillVolumes.end())
@@ -121,7 +123,7 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
   // iv) No kill processes specified or particle created by a kill process.
   // v) Particle is not created by a keep process.
   RMGLog::OutDev(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "Filtering out particle with PDG code ",
       pdg,
       " in RMGParticleFilterScheme"

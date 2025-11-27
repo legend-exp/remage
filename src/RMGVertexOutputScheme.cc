@@ -65,7 +65,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
   auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
-    RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
+    RMGLog::OutDev(RMGLog::debug_event, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();
     auto vntupleid = rmg_man->GetAuxNtupleID("vtx");
     auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetAuxNtupleID("particles") : -1;

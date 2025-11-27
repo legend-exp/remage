@@ -29,9 +29,9 @@ def _run_remage_cpp(
     remage_exe = find_remage_cpp()
 
     # open pipe for IPC C++ -> python.
-    pipe_r, pipe_w = os.pipe()
-    os.set_inheritable(pipe_r, False)
-    os.set_inheritable(pipe_w, True)
+    pipe_i_r, pipe_i_w = os.pipe()
+    os.set_inheritable(pipe_i_r, False)
+    os.set_inheritable(pipe_i_w, True)
 
     if args is None:
         argv = list(sys.argv)
@@ -50,9 +50,14 @@ def _run_remage_cpp(
         raise RuntimeError(msg)
 
     proc = []
+    pipes_o = []
     num_procs = num_procs or 1
     for proc_num in range(num_procs):
-        extra_args = [f"--pipe-fd={pipe_w}"]
+        pipe_o_r, pipe_o_w = os.pipe()
+        os.set_inheritable(pipe_o_r, True)
+        os.set_inheritable(pipe_o_w, False)
+
+        extra_args = [f"--pipe-o-fd={pipe_i_w}", f"--pipe-i-fd={pipe_o_r}"]
         if num_procs > 1:
             extra_args.append(f"--proc-num-offset={proc_num}")
         full_args = [str(argv[0]), *extra_args, *argv[1:]]
@@ -63,12 +68,15 @@ def _run_remage_cpp(
             subprocess.Popen(
                 full_args,
                 executable=remage_exe,
-                pass_fds=(pipe_w,),
+                pass_fds=(pipe_i_w, pipe_o_r),
             )
         )
+        pipes_o.append(pipe_o_w)
+
+        os.close(pipe_o_r)  # close _our_ reading end of this pipe
 
     # close _our_ writing end of the pipe.
-    os.close(pipe_w)
+    os.close(pipe_i_w)
 
     # propagate signals to the C++ executable.
     def new_signal_handler(sig: int, _):
@@ -83,7 +91,7 @@ def _run_remage_cpp(
         signal.SIGTSTP,  # SIGSTOP cannot be caught, and will do nothing...
         signal.SIGCONT,
         signal.SIGUSR1,
-        # signal.SIGUSR2 is for internal IPC communication.
+        signal.SIGUSR2,
         signal.SIGWINCH,
     ]
 
@@ -93,7 +101,7 @@ def _run_remage_cpp(
     # remage-cpp will only continue to do real work after we handled one sync message.
     unhandled_ipc_messages = []
     ipc_thread = threading.Thread(
-        target=ipc_thread_fn, args=(pipe_r, proc, unhandled_ipc_messages)
+        target=ipc_thread_fn, args=(pipe_i_r, pipes_o, proc, unhandled_ipc_messages)
     )
     ipc_thread.start()
 
@@ -174,8 +182,8 @@ def remage_run(
     macro_substitutions
         key-value-pairs that will be substituted in macros as Geant4 aliases.
     log_level
-        logging level. One of `debug`, `detail`, `summary`, `warning`, `error`,
-        `fatal`, `nothing`.
+        logging level. One of `debug_event`, `debug`, `detail`, `summary`, `warning`,
+        `error`, `fatal`, `nothing`.
     raise_on_error
         raise a :class:`RuntimeError` when an error in the C++ application occurs. This
         applies to non-fatal errors being logged as well as fatal errors. If false, the

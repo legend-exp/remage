@@ -55,7 +55,7 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
       // inspired by G4RadioactiveDecay::IsApplicable
       if (lifetime > fDaughterKillLifetime && excitation <= 0) {
         RMGLog::OutFormat(
-            RMGLog::debug,
+            RMGLog::debug_event,
             "Killing daughter nucleus {} (lifetime={} us)",
             ion->GetParticleName(),
             lifetime / CLHEP::us

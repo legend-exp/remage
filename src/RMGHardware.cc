@@ -74,6 +74,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // register detectors from the GDML file, as written by pygeomtools.
     // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
     if (!fRegisterDetectorsFromGDML.empty()) {
+      RMGLog::Out(RMGLog::debug, "Registering detectors from GDML");
       const auto aux_list = parser.GetAuxList();
       auto had_mapping = false;
       auto had_detector = false;

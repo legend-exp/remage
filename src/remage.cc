@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
   int rand_seed = -1;
   bool interactive = false;
   bool overwrite_output = false;
-  int pipe_fd = -1;
+  int pipe_fd_out = -1, pipe_fd_in = -1;
   int proc_num_offset = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
@@ -99,9 +99,15 @@ int main(int argc, char** argv) {
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option(
-         "--pipe-fd",
-         pipe_fd,
-         "Pipe file descriptor for inter-process communication (internal)"
+         "--pipe-o-fd",
+         pipe_fd_out,
+         "Pipe file descriptor for inter-process communication, output (internal)"
+  )
+      ->group(""); // group("") hides the option from help output.
+  app.add_option(
+         "--pipe-i-fd",
+         pipe_fd_in,
+         "Pipe file descriptor for inter-process communication, input (internal)"
   )
       ->group(""); // group("") hides the option from help output.
   app.add_option(
@@ -152,7 +158,7 @@ int main(int argc, char** argv) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
 
-  RMGIpc::Setup(pipe_fd, proc_num_offset > 0 ? proc_num_offset : 0);
+  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   if (proc_num_offset >= 0) RMGLog::SetProcNum(proc_num_offset);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));

@@ -54,7 +54,7 @@ void RMGScintillatorDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
 bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing scintillator detector hits");
+  RMGLog::OutDev(RMGLog::debug_event, "Processing scintillator detector hits");
 
   // return if no energy is deposited
   if (step->GetTotalEnergyDeposit() == 0) return false;
@@ -75,7 +75,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGDetectorType::kScintillator) {
       RMGLog::OutFormatDev(
-          RMGLog::debug,
+          RMGLog::debug_event,
           "Volume '{}' (copy nr. {} not registered as scintillator detector",
           pv_name,
           pv_copynr
@@ -84,7 +84,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
     }
   } catch (const std::out_of_range& e) {
     RMGLog::OutFormatDev(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Volume '{}' (copy nr. {}) not registered as detector",
         pv_name,
         pv_copynr
@@ -95,7 +95,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   // retrieve unique id for persistency
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in scintillator detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug_event, "Hit in scintillator detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
   auto* hit = new RMGDetectorHit();

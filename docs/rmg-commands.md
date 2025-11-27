@@ -69,7 +69,7 @@ Set verbosity level of application log
 * **Parameter** – `level`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `debug detail summary warning error fatal nothing`
+  * **Candidates** – `debug_event debug detail summary warning error fatal nothing`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Manager/Randomization/`
