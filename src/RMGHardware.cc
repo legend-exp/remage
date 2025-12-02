@@ -91,7 +91,22 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         }
 
         for (const auto& det_aux : *aux.auxList) {
-          RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
+          int uid = -1;
+          std::string ntuple_name;
+          bool allow_uid_reuse = false;
+
+          std::istringstream iss(det_aux.value);
+          std::string part;
+          size_t index = 0;
+          while (std::getline(iss, part, ',')) {
+            if (index == 0) uid = std::stoi(part);
+            else if (index == 1) allow_uid_reuse = part == "true";
+            else if (index == 2) ntuple_name = part;
+            else RMGLog::Out(RMGLog::fatal, "invalid detector metadata aux: ", det_aux.value);
+            index++;
+          }
+
+          RegisterDetector(det_type, det_aux.type, uid, 0, allow_uid_reuse, ntuple_name);
           had_detector = true;
         }
       }
