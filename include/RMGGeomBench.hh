@@ -65,8 +65,13 @@ class RMGGeomBench : public RMGVGenerator {
 =======
     void GeneratePrimaries(G4Event* event) override;
     void SetParticlePosition(G4ThreeVector) override {};
+<<<<<<< HEAD
     void SavePixel();
 >>>>>>> c4d67577 (style: pre-commit fixes)
+=======
+    void RecordBatchTime(size_t pixel_idx, double batch_time);
+    void SaveAllPixels();
+>>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
 
     void BeginOfRunAction(const G4Run* r) override;
     void EndOfRunAction(const G4Run* r) override;
@@ -96,26 +101,22 @@ class RMGGeomBench : public RMGVGenerator {
     size_t npixels_y;
     size_t npixels_z;
     size_t ID;
-    int whichntuple;
 
     double starttime;
     double currenttime;
     double bunchstarttime;
 
-    // For tracking 5% bunches and calculating median
-    std::vector<double> bunch_times;
+    // For tracking batches and calculating median
+    std::vector<std::vector<double>> pixel_batch_times; // One vector of batch times per pixel
     int events_per_bunch;
-    int current_event_in_pixel;
+    int total_batch_rounds;
+    int current_batch_event;
+    int current_pixel_index;
+    int current_batch_round;
 
     G4ThreeVector origin;
     G4ThreeVector limit;
-    G4ThreeVector current_position;
     G4ThreeVector increment;
-
-    // Current pixel indices
-    size_t pixel_x_index;
-    size_t pixel_y_index;
-    size_t pixel_z_index;
 };
 
 #endif
