@@ -223,6 +223,7 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
   origin = (max + min) / 2.;
   limit = origin - sampling_width / 2.;
 
+
   RMGLog::Out(RMGLog::summary, "Benchmark sampling configuration:");
   RMGLog::Out(
       RMGLog::summary,
@@ -254,6 +255,26 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
       increment.z(),
       " mm"
   );
+  RMGLog::Out(
+      RMGLog::summary,
+      "Sampling region origin at (X,Y,Z): (",
+      origin.x(),
+      ", ",
+      origin.y(),
+      ", ",
+      origin.z(),
+      ") mm"
+  );
+  RMGLog::Out(
+      RMGLog::summary,
+      "Sampling region lower limit at (X,Y,Z): (",
+      limit.x(),
+      ", ",
+      limit.y(),
+      ", ",
+      limit.z(),
+      ") mm"
+  );
 
   // Calculate the number of pixels to simulate, and number of primaries per pixel
   //  NOW that we know npixels_x, npixels_y, npixels_z
@@ -272,9 +293,11 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
 
   // Calculate events per bunch (1% of events per pixel)
   events_per_bunch = std::max(1, static_cast<int>(std::ceil(neventsperpixel * 0.01)));
-  
+
   // Calculate total number of batch rounds
-  total_batch_rounds = static_cast<int>(std::ceil(static_cast<double>(neventsperpixel) / events_per_bunch));
+  total_batch_rounds = static_cast<int>(
+      std::ceil(static_cast<double>(neventsperpixel) / events_per_bunch)
+  );
 
   RMGLog::Out(
       RMGLog::summary,
@@ -340,7 +363,7 @@ void RMGGeomBench::EndOfRunAction(const G4Run* /*r*/) {
     RMGLog::Out(RMGLog::debug, "Recorded final batch time in EndOfRunAction");
 >>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
   }
-  
+
   // Save all pixel data
   RMGLog::Out(RMGLog::debug, "Saving all pixel data in EndOfRunAction");
   SaveAllPixels();
@@ -352,14 +375,14 @@ void RMGGeomBench::RecordBatchTime(size_t pixel_idx, double batch_time) {
     RMGLog::Out(RMGLog::warning, "Invalid pixel index (", pixel_idx, ") in RecordBatchTime");
     return;
   }
-  
+
   // Ensure the vector is large enough
   if (static_cast<size_t>(pixel_batch_times.size()) <= pixel_idx) {
     pixel_batch_times.resize(pixel_idx + 1);
   }
-  
+
   pixel_batch_times[pixel_idx].push_back(batch_time);
-  
+
   RMGLog::Out(RMGLog::debug, "Recorded batch time ", batch_time, " s for pixel ", pixel_idx);
 } // RecordBatchTime
 
@@ -373,13 +396,13 @@ void RMGGeomBench::SaveAllPixels() {
     );
     return;
   }
-  
+
   // Iterate through all pixels and save their data
   int pixel_idx = 0;
-  
+
   for (int plane = 0; plane < 3; plane++) {
     int max_i = 0, max_j = 0;
-    
+
     switch (plane) {
       case 0: // XZ plane
         max_i = npixels_x;
@@ -394,12 +417,12 @@ void RMGGeomBench::SaveAllPixels() {
         max_j = npixels_y;
         break;
     }
-    
+
     for (int j = 0; j < max_j; j++) {
       for (int i = 0; i < max_i; i++) {
         // Calculate position for this pixel
         double x_pos, y_pos, z_pos;
-        
+
         switch (plane) {
           case 0: // XZ plane
             x_pos = limit.x() + i * increment.x();
@@ -417,14 +440,15 @@ void RMGGeomBench::SaveAllPixels() {
             z_pos = limit.z();
             break;
         }
-        
+
         // Calculate median time from batch times
         double median_time_per_event = 0.0;
-        
-        if (pixel_idx < static_cast<int>(pixel_batch_times.size()) && !pixel_batch_times[pixel_idx].empty()) {
+
+        if (pixel_idx < static_cast<int>(pixel_batch_times.size()) &&
+            !pixel_batch_times[pixel_idx].empty()) {
           std::vector<double> sorted_times = pixel_batch_times[pixel_idx];
           std::sort(sorted_times.begin(), sorted_times.end());
-          
+
           size_t n = sorted_times.size();
           double median_time;
           if (n % 2 == 0) {
@@ -432,11 +456,9 @@ void RMGGeomBench::SaveAllPixels() {
           } else {
             median_time = sorted_times[n / 2];
           }
-          
-          if (events_per_bunch > 0) {
-            median_time_per_event = median_time / events_per_bunch;
-          }
-          
+
+          if (events_per_bunch > 0) { median_time_per_event = median_time / events_per_bunch; }
+
           RMGLog::Out(
               RMGLog::debug,
               "Pixel ",
@@ -450,7 +472,7 @@ void RMGGeomBench::SaveAllPixels() {
               " s"
           );
         }
-        
+
         benchmark_scheme->SavePixel(plane, x_pos, y_pos, z_pos, median_time_per_event);
         pixel_idx++;
       }
@@ -521,7 +543,7 @@ void RMGGeomBench::SaveAllPixels() {
 } // SavePixel
 =======
   }
-  
+
   RMGLog::Out(RMGLog::summary, "Saved data for all ", pixel_idx, " pixels");
 } // SaveAllPixels
 >>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
@@ -571,7 +593,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
     current_batch_event = 0;
     current_pixel_index = 0;
     current_batch_round = 0;
-    
+
     // Initialize storage for batch times
     pixel_batch_times.clear();
     pixel_batch_times.resize(totalnpixels);
@@ -682,7 +704,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
   int remainder = events_so_far % (totalnpixels * events_per_bunch);
   current_pixel_index = remainder / events_per_bunch;
   current_batch_event = remainder % events_per_bunch;
-  
+
   // Check if we're starting a new batch
   if (ID == 0 || current_batch_event == 0) {
     // Save the previous batch time if this isn't the first event
@@ -701,23 +723,23 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
           " s"
       );
     }
-    
+
     // Start timing for new batch
     bunchstarttime = std::clock();
-    
+
     if (current_batch_event == 0 && current_pixel_index == 0) {
       RMGLog::Out(RMGLog::debug, "Starting batch round ", current_batch_round, " at event # ", ID);
 >>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
     }
   }
-  
+
   // Convert linear pixel index to plane and coordinates
   int pixels_xz = npixels_x * npixels_z;
   int pixels_yz = npixels_y * npixels_z;
-  
+
   int plane;
   int i_index, j_index;
-  
+
   if (current_pixel_index < pixels_xz) {
     // XZ plane
     plane = 0;
@@ -736,7 +758,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
     i_index = local_idx % npixels_x;
     j_index = local_idx / npixels_x;
   }
-  
+
   // Calculate position for this pixel
   G4ThreeVector current_position;
   switch (plane) {

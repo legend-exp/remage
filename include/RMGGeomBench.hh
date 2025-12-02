@@ -64,11 +64,15 @@ class RMGGeomBench : public RMGVGenerator {
   int current_event_in_pixel;
 =======
     void GeneratePrimaries(G4Event* event) override;
+<<<<<<< HEAD
     void SetParticlePosition(G4ThreeVector) override {};
 <<<<<<< HEAD
     void SavePixel();
 >>>>>>> c4d67577 (style: pre-commit fixes)
 =======
+=======
+    void SetParticlePosition(G4ThreeVector) override{};
+>>>>>>> 34c9dd85 (style: pre-commit fixes)
     void RecordBatchTime(size_t pixel_idx, double batch_time);
     void SaveAllPixels();
 >>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)

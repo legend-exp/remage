@@ -5,12 +5,19 @@ import ast
 import tempfile
 from pathlib import Path
 
-from ..cli import remage_run
-from .summary_generator import SummaryGenerator
 from .. import logging as rmg_logging
+from ..cli import remage_run
+from .gdml_handling import (
+    extract_component_from_gdml,
+    generate_tmp_gdml_geometry,
+    load_gdml_geometry,
+)
+from .summary_generator import SummaryGenerator
 
 
-def generate_output_file_path(geometry_path: Path, output_dir: Path) -> Path:
+def generate_output_file_path(
+    geometry_path: Path, output_dir: Path, args: argparse.Namespace
+) -> Path:
     """Generate the output file path based on the geometry file name.
 
     Parameters
@@ -25,7 +32,10 @@ def generate_output_file_path(geometry_path: Path, output_dir: Path) -> Path:
     Path
         Full path to the output file with .lh5 extension.
     """
-    filename = geometry_path.absolute()
+    if args.logical_volume != "":
+        filename = Path("part_" + args.logical_volume + geometry_path.stem)
+    else:
+        filename = geometry_path.absolute()
     output_file = output_dir / filename.with_suffix(".lh5").name
     return output_file
 
@@ -58,7 +68,7 @@ def generate_macro(args) -> str:
     geometry_path = Path(args.geometry)
     filename = geometry_path.absolute()
     output_dir = Path(args.output_dir)
-    output_file = generate_output_file_path(geometry_path, output_dir)
+    output_file = generate_output_file_path(geometry_path, output_dir, args)
     if issubclass(type(args.grid_increments), str) and args.grid_increments:
         grid_increments = ast.literal_eval(args.grid_increments)
         increment_x = grid_increments.get("x", args.grid_increment)
@@ -116,6 +126,18 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         help="Path to the geometry file to be used in the benchmark.",
     )
     parser.add_argument(
+        "--logical-volume",
+        type=str,
+        default="",
+        help="In case one is interested in a specific logical volume in a complex GDML geometry, only this volume will be benchmarked.",
+    )
+    parser.add_argument(
+        "--buffer-fraction",
+        type=float,
+        default=0.25,
+        help="Fractional buffer to add around the geometry. For example, 0.25 adds 12.5%% extra space on each side.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=str,
         default="./",
@@ -137,7 +159,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         "--grid-increments",
         type=str,
         default="",
-        help="Increment of individual grid point distances per dimension given in mm. Example: {'x': 1., 'y': 2., 'z': 3}",
+        help="Increment of individual grid point distances per dimension given in mm. Example: \"{'x': 1., 'y': 2., 'z': 3}\"",
     )
     parser.add_argument(
         "--dry-run",
@@ -151,8 +173,30 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     else:
         args = parser.parse_args(args=external_args)
 
-
     logger = rmg_logging.setup_log()
+
+    tmp_gdml_file = ""
+
+    original_gdml_dict = load_gdml_geometry(Path(args.geometry))
+
+    # Extract specific component if requested, otherwise use full geometry
+    if args.logical_volume != "":
+        geometry_to_benchmark = extract_component_from_gdml(
+            original_gdml_dict, args.logical_volume
+        )
+        object_name = f"{args.logical_volume}_extracted"
+    else:
+        geometry_to_benchmark = original_gdml_dict
+        object_name = "object_lv"
+
+    # Generate temporary GDML with buffered world volume
+    tmp_gdml_file = generate_tmp_gdml_geometry(
+        geometry_to_benchmark,
+        buffer_fraction=args.buffer_fraction,
+        object_name=object_name,
+    )
+    args.geometry = str(tmp_gdml_file)
+
     macro_file = generate_macro(args)
 
     if args.dry_run:
@@ -163,7 +207,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         ec, _ = remage_run(macros=macro_file)
 
         sim_output_file = generate_output_file_path(
-            Path(args.geometry), Path(args.output_dir)
+            Path(args.geometry), Path(args.output_dir), args
         )
 
         if ec != 0 and not sim_output_file.exists():
@@ -181,5 +225,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         return 1
     finally:
         Path(macro_file).unlink(missing_ok=True)
+        if tmp_gdml_file:
+            Path(tmp_gdml_file).unlink(missing_ok=True)
 
     return 0
