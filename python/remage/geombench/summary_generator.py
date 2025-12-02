@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import awkward as ak
+import histoprint
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 from lgdo import lh5
 from matplotlib.colors import LogNorm, Normalize
 
@@ -14,7 +16,9 @@ class SummaryGenerator:
     Class to generate summary analysis for remage geometry benchmark outputs.
     """
 
-    def __init__(self, sim_output_file: Path, args) -> None:
+    def __init__(
+        self, sim_output_file: Path, args: argparse.Namespace, output_file_stem: str
+    ) -> None:
         self.data_xy = lh5.read("benchmark_xy", sim_output_file).view_as("ak")
         self.data_xz = lh5.read("benchmark_xz", sim_output_file).view_as("ak")
         self.data_yz = lh5.read("benchmark_yz", sim_output_file).view_as("ak")
@@ -41,13 +45,7 @@ class SummaryGenerator:
 
         self.gdml_file = Path(args.geometry)
 
-        if args.logical_volume != "":
-            self.output_file_template = (
-                "part_"
-                + args.logical_volume
-            )
-        else:
-            self.output_file_template = str(self.gdml_file.name).replace(".gdml", "")
+        self.output_file_stem = output_file_stem
         self.output_dir = Path(args.output_dir)
 
         self.mult_map_3d = None
@@ -85,7 +83,9 @@ class SummaryGenerator:
 
         self.mult_map_3d = map_3d
 
-    def _calculate_extent(self, data_axis1: np.ndarray, data_axis2: np.ndarray) -> list[float]:
+    def _calculate_extent(
+        self, data_axis1: np.ndarray, data_axis2: np.ndarray
+    ) -> list[float]:
         min_1 = np.min(data_axis1)
         min_2 = np.min(data_axis2)
 
@@ -100,7 +100,9 @@ class SummaryGenerator:
 
         return [min_1, max_1, min_2, max_2]  # [x_min, x_max, y_min, y_max]
 
-    def draw_simulation_time_profiles(self, suffix: str = "simulation_time_profiles.pdf") -> None:
+    def draw_simulation_time_profiles(
+        self, suffix: str = "simulation_time_profiles.pdf"
+    ) -> None:
         """
         Draw the simulation times per event for the three projections.
         """
@@ -166,7 +168,7 @@ class SummaryGenerator:
                 norm_string = "log"
 
             output_path = (
-                self.output_dir / f"{self.output_file_template}_{norm_string}_{suffix}"
+                self.output_dir / f"{self.output_file_stem}_{norm_string}_{suffix}"
             )
             fig.savefig(output_path, bbox_inches="tight", dpi=300)
 
@@ -219,7 +221,7 @@ class SummaryGenerator:
                 norm_string = "log"
 
             output_path = (
-                self.output_dir / f"{self.output_file_template}_{norm_string}_{suffix}"
+                self.output_dir / f"{self.output_file_stem}_{norm_string}_{suffix}"
             )
             fig.savefig(output_path)
 
@@ -228,7 +230,9 @@ class SummaryGenerator:
         draw(self, norm=LogNorm())
         draw(self, norm=Normalize())
 
-    def _get_hotspot_locations(self, threshold: float = 0.8) -> list[tuple[float, float, float]]:
+    def _get_hotspot_locations(
+        self, threshold: float = 0.8
+    ) -> list[tuple[float, float, float]]:
         """
         Get hotspot locations from multiplicative reconstruction above a certain threshold.
         """
@@ -245,21 +249,18 @@ class SummaryGenerator:
 
         return hotspot_coords
 
-    def calculate_simulation_statistics(
-        self, suffix: str = "_stats.yaml", only_non_world_volumes: bool = True
-    ) -> dict:
-        """
-        Calculate simulation statistics.
-        These consist of:
-        - simulation time per event:
-            - mean
-            - std
-            - min/max
-        - simulation time per event and volume:
-            - mean
-            - std
-            - min/max
-        - locations of hotspots, defined by multiplicative reconstruction
+    def calculate_simulation_statistics(self, suffix: str = "_stats.yaml") -> dict:
+        """Calculate simulation statistics.
+
+        Args:
+            suffix (str): Suffix for the output statistics file.
+        Returns:
+            dict: Dictionary containing simulation statistics.
+
+        Details:
+            - Mean, standard deviation, minimum, and maximum simulation time per event.
+            - Hotspot locations identified from the multiplicative reconstruction.
+
         """
 
         stats = {
@@ -272,15 +273,41 @@ class SummaryGenerator:
             "hotspots": self._get_hotspot_locations(threshold=0.8),
         }
 
-        output_path = self.output_dir / f"{self.output_file_template}{suffix}"
-        import yaml
+        output_path = self.output_dir / f"{self.output_file_stem}{suffix}"
 
         with open(output_path, "w") as f:
             yaml.dump(stats, f)
 
         return stats
 
+    def print_histogram_of_simulation_times(self, n_bins: int = 101) -> None:
+        """
+        Print a histogram of simulation times per event using histoprint.
+        """
+
+        sim_times = (
+            np.concatenate(
+                [
+                    ak.to_numpy(self.data_xy["Time"]),
+                    ak.to_numpy(self.data_xz["Time"]),
+                    ak.to_numpy(self.data_yz["Time"]),
+                ]
+            )
+            * 1e6
+        )  # Convert to microseconds
+        bins = 10 ** np.linspace(
+            np.log10(np.min(sim_times)), np.log10(np.max(sim_times)), n_bins + 1
+        )
+        hist_data = np.histogram(sim_times, bins=bins)
+
+        histoprint.print_hist(
+            hist_data,
+            title="Median Simulation Times per Event [μs]",
+            summary=True,
+        )
+
     def perform_analysis(self) -> dict:
         self.draw_simulation_time_profiles()
-        self.draw_multiplicative()
+        self.print_histogram_of_simulation_times()
+        # self.draw_multiplicative()
         return self.calculate_simulation_statistics()

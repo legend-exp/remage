@@ -15,9 +15,7 @@ from .gdml_handling import (
 from .summary_generator import SummaryGenerator
 
 
-def generate_output_file_path(
-    geometry_path: Path, output_dir: Path, args: argparse.Namespace
-) -> Path:
+def generate_output_file_path(output_dir: Path, output_file_stem: str = "") -> Path:
     """Generate the output file path based on the geometry file name.
 
     Parameters
@@ -32,15 +30,11 @@ def generate_output_file_path(
     Path
         Full path to the output file with .lh5 extension.
     """
-    if args.logical_volume != "":
-        filename = Path("part_" + args.logical_volume + geometry_path.stem)
-    else:
-        filename = geometry_path.absolute()
-    output_file = output_dir / filename.with_suffix(".lh5").name
+    output_file = output_dir / (output_file_stem + ".lh5")
     return output_file
 
 
-def generate_macro(args) -> str:
+def generate_macro(args, output_file_stem: str = "") -> str:
     """Generate a macro file for the remage geometry benchmark.
 
     This function creates a macro file based on the provided command-line
@@ -68,7 +62,7 @@ def generate_macro(args) -> str:
     geometry_path = Path(args.geometry)
     filename = geometry_path.absolute()
     output_dir = Path(args.output_dir)
-    output_file = generate_output_file_path(geometry_path, output_dir, args)
+    output_file = generate_output_file_path(output_dir, output_file_stem)
     if issubclass(type(args.grid_increments), str) and args.grid_increments:
         grid_increments = ast.literal_eval(args.grid_increments)
         increment_x = grid_increments.get("x", args.grid_increment)
@@ -178,6 +172,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     tmp_gdml_file = ""
 
     original_gdml_dict = load_gdml_geometry(Path(args.geometry))
+    output_file_stem = Path(args.geometry).stem
 
     # Extract specific component if requested, otherwise use full geometry
     if args.logical_volume != "":
@@ -185,6 +180,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
             original_gdml_dict, args.logical_volume
         )
         object_name = f"{args.logical_volume}_extracted"
+        output_file_stem = f"part_{args.logical_volume}_{output_file_stem}"
     else:
         geometry_to_benchmark = original_gdml_dict
         object_name = "object_lv"
@@ -197,7 +193,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     )
     args.geometry = str(tmp_gdml_file)
 
-    macro_file = generate_macro(args)
+    macro_file = generate_macro(args, output_file_stem=output_file_stem)
 
     if args.dry_run:
         return 0
@@ -207,14 +203,18 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         ec, _ = remage_run(macros=macro_file)
 
         sim_output_file = generate_output_file_path(
-            Path(args.geometry), Path(args.output_dir), args
+            Path(args.output_dir), output_file_stem=output_file_stem
         )
 
         if ec != 0 and not sim_output_file.exists():
             logger.error("Remage simulation failed.")
             return int(ec)
 
-        sum_gen = SummaryGenerator(sim_output_file=sim_output_file, args=args)
+        sum_gen = SummaryGenerator(
+            sim_output_file=sim_output_file,
+            args=args,
+            output_file_stem=output_file_stem,
+        )
         analysis_results = sum_gen.perform_analysis()
         logger.info("Geometry Benchmark Analysis Results:")
         for key, value in analysis_results.items():

@@ -7,6 +7,7 @@ import pyg4ometry
 
 ## GDML Handling Functions - Helper utilities for copying registry resources
 
+
 def _ensure_dict_exists(registry: pyg4ometry.geant4.Registry, dict_name: str) -> dict:
     """Ensure a dictionary attribute exists on a registry object."""
     if not hasattr(registry, dict_name):
@@ -20,7 +21,11 @@ def _copy_to_dict_if_missing(src_dict: dict, dst_dict: dict, key: str) -> None:
         dst_dict[key] = src_dict[key]
 
 
-def _copy_position(position: pyg4ometry.geant4.Position, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_position(
+    position: pyg4ometry.geant4.Position,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy a position definition from source to destination registry."""
     if not (position and hasattr(position, "name")):
         return
@@ -30,7 +35,11 @@ def _copy_position(position: pyg4ometry.geant4.Position, src_reg: pyg4ometry.gea
         _copy_to_dict_if_missing(src_reg.positionDict, dst_pos_dict, position.name)
 
 
-def _copy_rotation(rotation: pyg4ometry.geant4.Rotation, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_rotation(
+    rotation: pyg4ometry.geant4.Rotation,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy a rotation definition from source to destination registry."""
     if not (rotation and hasattr(rotation, "name")):
         return
@@ -40,7 +49,11 @@ def _copy_rotation(rotation: pyg4ometry.geant4.Rotation, src_reg: pyg4ometry.gea
         _copy_to_dict_if_missing(src_reg.rotationDict, dst_rot_dict, rotation.name)
 
 
-def _copy_material_properties(material: pyg4ometry.geant4.Material, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_material_properties(
+    material: pyg4ometry.geant4.Material,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy material property definitions (e.g., RINDEX matrices)."""
     if not (hasattr(material, "properties") and material.properties):
         return
@@ -56,7 +69,11 @@ def _copy_material_properties(material: pyg4ometry.geant4.Material, src_reg: pyg
                 _copy_to_dict_if_missing(src_dict, dst_dict, prop_value.name)
 
 
-def _copy_material(material: pyg4ometry.geant4.Material, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_material(
+    material: pyg4ometry.geant4.Material,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy a material and its dependencies to the destination registry."""
     if not material or material.name in dst_reg.materialDict:
         return
@@ -66,7 +83,11 @@ def _copy_material(material: pyg4ometry.geant4.Material, src_reg: pyg4ometry.gea
     dst_reg.addMaterial(material)
 
 
-def _copy_solid_positions(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_solid_positions(
+    solid: pyg4ometry.geant4.Solid,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy position lists referenced by certain solid types."""
     # For GenericPolycone, Tessellated, etc that reference position lists
     if hasattr(solid, "pPositions") and solid.pPositions:
@@ -79,7 +100,11 @@ def _copy_solid_positions(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry.ge
             _copy_position(vertex, src_reg, dst_reg)
 
 
-def _copy_boolean_transforms(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_boolean_transforms(
+    solid: pyg4ometry.geant4.Solid,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy position and rotation transforms for boolean solid operations."""
     for tra_attr in ["tra1", "tra2"]:
         if not hasattr(solid, tra_attr):
@@ -96,7 +121,11 @@ def _copy_boolean_transforms(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry
             _copy_rotation(tra.rotation, src_reg, dst_reg)
 
 
-def _copy_solid_recursive(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_solid_recursive(
+    solid: pyg4ometry.geant4.Solid,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Recursively copy a solid and all its nested components."""
     if solid.name in dst_reg.solidDict:
         return
@@ -115,7 +144,11 @@ def _copy_solid_recursive(solid: pyg4ometry.geant4.Solid, src_reg: pyg4ometry.ge
     _copy_boolean_transforms(solid, src_reg, dst_reg)
 
 
-def _copy_defines_for_volume(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_defines_for_volume(
+    lv: pyg4ometry.geant4.LogicalVolume,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy define dictionary entries related to a logical volume."""
     if not hasattr(src_reg, "defineDict"):
         return
@@ -125,7 +158,9 @@ def _copy_defines_for_volume(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4o
             dst_reg.defineDict[key] = src_reg.defineDict[key]
 
 
-def _add_logical_volume_to_registry(lv: pyg4ometry.geant4.LogicalVolume, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _add_logical_volume_to_registry(
+    lv: pyg4ometry.geant4.LogicalVolume, dst_reg: pyg4ometry.geant4.Registry
+) -> None:
     """Add a logical volume to the registry if not already present."""
     if lv.name in dst_reg.logicalVolumeDict:
         return
@@ -136,7 +171,11 @@ def _add_logical_volume_to_registry(lv: pyg4ometry.geant4.LogicalVolume, dst_reg
     dst_reg.logicalVolumeDict[lv.name] = lv
 
 
-def _copy_daughter_volumes(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def _copy_daughter_volumes(
+    lv: pyg4ometry.geant4.LogicalVolume,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Recursively copy all daughter volumes and their resources."""
     if not hasattr(lv, "daughterVolumes"):
         return
@@ -150,7 +189,11 @@ def _copy_daughter_volumes(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4ome
         copy_referenced_resources(daughter_lv, src_reg, dst_reg)
 
 
-def copy_referenced_resources(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4ometry.geant4.Registry, dst_reg: pyg4ometry.geant4.Registry) -> None:
+def copy_referenced_resources(
+    lv: pyg4ometry.geant4.LogicalVolume,
+    src_reg: pyg4ometry.geant4.Registry,
+    dst_reg: pyg4ometry.geant4.Registry,
+) -> None:
     """Copy all resources referenced by a logical volume and its hierarchy.
 
     This function recursively copies materials, solids, positions, rotations,
@@ -158,11 +201,11 @@ def copy_referenced_resources(lv: pyg4ometry.geant4.LogicalVolume, src_reg: pyg4
 
     Parameters
     ----------
-    lv : 
+    lv :
         The logical volume whose resources are to be copied.
-    src_reg : 
+    src_reg :
         The source registry from which to copy resources.
-    dst_reg : 
+    dst_reg :
         The destination registry to which resources will be copied.
     """
     _copy_material(lv.material, src_reg, dst_reg)
@@ -208,6 +251,9 @@ def load_gdml_geometry(gdml_path: Path, object_name: str = "object_lv") -> dict:
     registry.logicalVolumeDict[object_name] = world_volume
     registry.logicalVolumeList.append(object_name)
 
+    # Update world reference in registry
+    registry.setWorld(object_name)
+
     return {"object_lv": world_volume, "registry": registry}
 
 
@@ -237,7 +283,9 @@ def _calculate_centering_offset(extent) -> list[float]:
     ]
 
 
-def _ensure_volume_in_registry(volume: pyg4ometry.geant4.LogicalVolume, registry: pyg4ometry.geant4.Registry) -> None:
+def _ensure_volume_in_registry(
+    volume: pyg4ometry.geant4.LogicalVolume, registry: pyg4ometry.geant4.Registry
+) -> None:
     """Ensure a volume and its hierarchy are properly registered."""
     registry.addLogicalVolume(volume)
     registry.addVolumeRecursive(volume)
@@ -251,51 +299,67 @@ def _ensure_volume_in_registry(volume: pyg4ometry.geant4.LogicalVolume, registry
 def position_object_in_world(
     geometry: dict, buffer_fraction: float = 0, object_name: str = "object_lv"
 ) -> dict:
-    """Position an object in a new world volume with optional buffer space.
+    """Expand the world volume to include buffer space around the geometry.
 
-    Creates a new world volume sized to fit the object with optional buffer,
-    and places the object centered within it.
+    Modifies the existing world volume solid to be larger, adding buffer space
+    around the current extent of the geometry.
 
     Parameters
     ----------
-    geometry: 
+    geometry:
         Dictionary with "object_lv" and "registry" keys containing the geometry.
     buffer_fraction : optional
         Fractional buffer to add around the object (0 = no buffer, 0.25 = 25% extra space).
     object_name : optional
-        Name for the object logical volume. Default is "object_lv".
+        Name for the world logical volume. Default is "object_lv".
 
     Returns
     -------
     dict
         Dictionary with keys:
-        - "object_lv": The new world logical volume
-        - "registry": New registry containing the positioned geometry
+        - "object_lv": The expanded world logical volume
+        - "registry": The original registry with expanded world volume
     """
-    object_lv = geometry["object_lv"]
-    object_lv.name = object_name
+    world_lv = geometry["object_lv"]
+    registry = geometry["registry"]
 
-    extent = object_lv.extent(True)
-    object_pv_name = object_name.rstrip("_lv") + "_pv"
+    # Rename world volume if needed
+    if world_lv.name != object_name:
+        old_name = world_lv.name
+        world_lv.name = object_name
 
-    # Create new registry with world volume
-    new_registry = pyg4ometry.geant4.Registry()
-    world_lv = _create_world_box(extent, buffer_fraction, new_registry)
-    new_registry.setWorld(world_lv.name)
+        # Update registry references
+        if old_name in registry.logicalVolumeDict:
+            registry.logicalVolumeDict.pop(old_name)
+        if old_name in registry.logicalVolumeList:
+            registry.logicalVolumeList.remove(old_name)
 
-    # Add object volume and its hierarchy
-    _ensure_volume_in_registry(object_lv, new_registry)
+        registry.logicalVolumeDict[object_name] = world_lv
+        if object_name not in registry.logicalVolumeList:
+            registry.logicalVolumeList.append(object_name)
 
-    # Place object centered in world
-    centering_offset = _calculate_centering_offset(extent)
-    pyg4ometry.geant4.PhysicalVolume(
-        [0, 0, 0], centering_offset, object_lv, object_pv_name, world_lv, new_registry
+    # Always ensure world is set correctly
+    registry.setWorld(world_lv.name)
+
+    # Calculate extent and create larger world box
+    extent = world_lv.extent(True)
+    width = (extent[1][0] - extent[0][0]) * (1 + buffer_fraction)
+    height = (extent[1][1] - extent[0][1]) * (1 + buffer_fraction)
+    depth = (extent[1][2] - extent[0][2]) * (1 + buffer_fraction)
+
+    # Remove old solid from registry and create new larger box
+    old_solid_name = world_lv.solid.name
+    if old_solid_name in registry.solidDict:
+        del registry.solidDict[old_solid_name]
+
+    new_box = pyg4ometry.geant4.solid.Box(
+        old_solid_name, width, height, depth, registry, "mm"
     )
 
-    # Copy all referenced resources
-    copy_referenced_resources(object_lv, geometry["registry"], new_registry)
+    # Update the logical volume to use the new solid
+    world_lv.solid = new_box
 
-    return {"object_lv": world_lv, "registry": new_registry}
+    return {"object_lv": world_lv, "registry": registry}
 
 
 def extract_component_from_gdml(geometry: dict, lv_name: str) -> dict:
@@ -308,7 +372,7 @@ def extract_component_from_gdml(geometry: dict, lv_name: str) -> dict:
     ----------
     geometry :
         Dictionary containing the loaded geometry with keys "object_lv" and "registry".
-    lv_name : 
+    lv_name :
         Name of the logical volume to extract.
 
     Returns
@@ -342,7 +406,7 @@ def generate_tmp_gdml_geometry(
 
     Parameters
     ----------
-    geometry : 
+    geometry :
         Dictionary containing the loaded geometry with keys "object_lv" and "registry".
     buffer_fraction : optional
         Fractional buffer to add around the geometry. For example, 0.25 adds
