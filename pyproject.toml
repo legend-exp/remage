@@ -38,6 +38,8 @@ dependencies = [
   "pygama >=2.2.3",
   "colorlog",
   "rich",
+  "mplhep",
+  "hist"
 ]
 
 [tool.hatch.metadata]

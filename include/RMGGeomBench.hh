@@ -1,6 +1,20 @@
 // Copyright (C) 2025 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
-#ifndef _RMG_GENERATOR_GEOMBENCH_HH_
-#define _RMG_GENERATOR_GEOMBENCH_HH_
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Lesser General Public License as published by the Free
+// Software Foundation, either version 3 of the License, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#ifndef _RMG_GEOMBENCH_HH_
+#define _RMG_GEOMBENCH_HH_
 
 #include <chrono>
 #include <memory>
@@ -31,51 +45,10 @@ class RMGGeomBench : public RMGVGenerator {
     RMGGeomBench(RMGGeomBench&&) = delete;
     RMGGeomBench& operator=(RMGGeomBench&&) = delete;
 
-<<<<<<< HEAD
-  long   totalnevents;
-  double totalnpixels;
-  int npixelsperrow;
-  double neventsperpixel;
-  double cubesize;
-  
-  // Configurable sampling parameters (user-specified increments)
-  double user_increment_x;
-  double user_increment_y;
-  double user_increment_z;
-  double sampling_width_x;
-  double sampling_width_y;
-  double sampling_width_z;
-  
-  // Calculated number of pixels based on increments and widths
-  int npixels_x;
-  int npixels_y;
-  int npixels_z;
-  int ID;
-  int whichntuple;
-  G4ThreeVector trs;
-
-  std::clock_t starttime;
-  std::clock_t currenttime;
-  std::clock_t bunchstarttime;
-
-  // For tracking bunches and calculating median (stores CPU time in seconds)
-  std::vector<double> bunch_times;
-  int events_per_bunch;
-  int current_event_in_pixel;
-=======
     void GeneratePrimaries(G4Event* event) override;
-<<<<<<< HEAD
-    void SetParticlePosition(G4ThreeVector) override {};
-<<<<<<< HEAD
-    void SavePixel();
->>>>>>> c4d67577 (style: pre-commit fixes)
-=======
-=======
     void SetParticlePosition(G4ThreeVector) override{};
->>>>>>> 34c9dd85 (style: pre-commit fixes)
-    void RecordBatchTime(size_t pixel_idx, double batch_time);
+    void RecordBatchTime(int pixel_idx, double batch_time);
     void SaveAllPixels();
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
 
     void BeginOfRunAction(const G4Run* r) override;
     void EndOfRunAction(const G4Run* r) override;
@@ -90,20 +63,18 @@ class RMGGeomBench : public RMGVGenerator {
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
 
-    long totalnevents;
-    size_t totalnpixels;
-    int npixelsperrow;
+    int totalnevents;
+    int totalnpixels;
     int neventsperpixel;
-    double cubesize;
 
     // Configurable sampling parameters (user-specified increments)
     G4ThreeVector user_increment;
     G4ThreeVector sampling_width;
 
     // Calculated number of pixels based on increments and widths
-    size_t npixels_x;
-    size_t npixels_y;
-    size_t npixels_z;
+    int npixels_x;
+    int npixels_y;
+    int npixels_z;
     size_t ID;
 
     double starttime;

@@ -58,9 +58,6 @@ class RMGGeomBenchOutputScheme : public RMGVOutputScheme {
 
   private:
 
-    std::unique_ptr<G4GenericMessenger> fMessenger;
-    void DefineCommands();
-
     // Ntuple IDs for the three benchmark planes (XZ, YZ, XY)
     int fNtupleIDs[3] = {-1, -1, -1};
 };

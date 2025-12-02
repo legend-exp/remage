@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
+// Copyright (C) 2025 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
 
-RMGGeomBenchOutputScheme::RMGGeomBenchOutputScheme() { this->DefineCommands(); }
+RMGGeomBenchOutputScheme::RMGGeomBenchOutputScheme() = default;
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGGeomBenchOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
@@ -29,23 +29,23 @@ void RMGGeomBenchOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   // Create auxiliary ntuple for XZ plane benchmark
   fNtupleIDs[0] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xz", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "X");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Z");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "x");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "z");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "time");
   ana_man->FinishNtuple(fNtupleIDs[0]);
 
   // Create auxiliary ntuple for YZ plane benchmark
   fNtupleIDs[1] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_yz", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Y");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Z");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "y");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "z");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "time");
   ana_man->FinishNtuple(fNtupleIDs[1]);
 
   // Create auxiliary ntuple for XY plane benchmark
   fNtupleIDs[2] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xy", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "X");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Y");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "x");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "y");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "time");
   ana_man->FinishNtuple(fNtupleIDs[2]);
 }
 
@@ -89,17 +89,6 @@ void RMGGeomBenchOutputScheme::SavePixel(int plane_id, double x, double y, doubl
 
   ana_man->FillNtupleDColumn(ntuple_id, col_id++, time);
   ana_man->AddNtupleRow(ntuple_id);
-}
-
-void RMGGeomBenchOutputScheme::DefineCommands() {
-
-  fMessenger = std::make_unique<G4GenericMessenger>(
-      this,
-      "/RMG/Output/Benchmark/",
-      "Commands for controlling geometry navigation benchmark output."
-  );
-
-  // Future commands for configuring benchmark output could go here
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
