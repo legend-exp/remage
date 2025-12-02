@@ -23,11 +23,11 @@
 #if RMG_HAS_BXDECAY0
 #include "RMGGeneratorDecay0.hh"
 #endif
-#include "RMGGeomBench.hh"
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBench.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"

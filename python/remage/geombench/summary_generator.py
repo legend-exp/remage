@@ -5,11 +5,8 @@ from pathlib import Path
 import awkward as ak
 import matplotlib.pyplot as plt
 import numpy as np
-import pyg4ometry
-import vtk
 from lgdo import lh5
 from matplotlib.colors import LogNorm, Normalize
-
 
 
 class SummaryGenerator:
@@ -17,7 +14,7 @@ class SummaryGenerator:
     Class to generate summary analysis for remage geometry benchmark outputs.
     """
 
-    def __init__(self, sim_output_file, args):
+    def __init__(self, sim_output_file: Path, args) -> None:
         self.data_xy = lh5.read("benchmark_xy", sim_output_file).view_as("ak")
         self.data_xz = lh5.read("benchmark_xz", sim_output_file).view_as("ak")
         self.data_yz = lh5.read("benchmark_yz", sim_output_file).view_as("ak")
@@ -43,12 +40,19 @@ class SummaryGenerator:
         )
 
         self.gdml_file = Path(args.geometry)
-        self.output_file_template = str(self.gdml_file.name).replace(".gdml", "")
+
+        if args.logical_volume != "":
+            self.output_file_template = (
+                "part_"
+                + args.logical_volume
+            )
+        else:
+            self.output_file_template = str(self.gdml_file.name).replace(".gdml", "")
         self.output_dir = Path(args.output_dir)
 
         self.mult_map_3d = None
 
-    def _multiplicative_reconstruction(self):
+    def _multiplicative_reconstruction(self) -> None:
         """
         Reconstruct 3D using multiplication of normalized projections.
         This assumes independence and that hotspots must appear in all views.
@@ -81,7 +85,22 @@ class SummaryGenerator:
 
         self.mult_map_3d = map_3d
 
-    def draw_simulation_time_profiles(self, suffix="simulation_time_profiles.pdf"):
+    def _calculate_extent(self, data_axis1: np.ndarray, data_axis2: np.ndarray) -> list[float]:
+        min_1 = np.min(data_axis1)
+        min_2 = np.min(data_axis2)
+
+        n_1 = len(np.unique(data_axis1))
+        n_2 = len(np.unique(data_axis2))
+
+        increment_1 = np.unique(data_axis1)[1] - np.unique(data_axis1)[0]
+        increment_2 = np.unique(data_axis2)[1] - np.unique(data_axis2)[0]
+
+        max_1 = min_1 + n_1 * increment_1
+        max_2 = min_2 + n_2 * increment_2
+
+        return [min_1, max_1, min_2, max_2]  # [x_min, x_max, y_min, y_max]
+
+    def draw_simulation_time_profiles(self, suffix: str = "simulation_time_profiles.pdf") -> None:
         """
         Draw the simulation times per event for the three projections.
         """
@@ -93,12 +112,7 @@ class SummaryGenerator:
                     self.n_y_gridpoint, self.n_x_gridpoint
                 )[::-1]
                 * 1e6,
-                extent=[
-                    np.min(self.data_xy["X"]),
-                    np.max(self.data_xy["X"]),
-                    np.min(self.data_xy["Y"]),
-                    np.max(self.data_xy["Y"]),
-                ],
+                extent=self._calculate_extent(self.data_xy["X"], self.data_xy["Y"]),
                 norm=norm,
             )
             ax[0].set_title("XY Plane")
@@ -116,12 +130,7 @@ class SummaryGenerator:
                     self.n_z_gridpoint, self.n_x_gridpoint
                 )[::-1]
                 * 1e6,
-                extent=[
-                    np.min(self.data_xz["X"]),
-                    np.max(self.data_xz["X"]),
-                    np.min(self.data_xz["Z"]),
-                    np.max(self.data_xz["Z"]),
-                ],
+                extent=self._calculate_extent(self.data_xz["X"], self.data_xz["Z"]),
                 norm=norm,
             )
             ax[1].set_title("XZ Plane")
@@ -139,12 +148,7 @@ class SummaryGenerator:
                     self.n_z_gridpoint, self.n_y_gridpoint
                 )[::-1]
                 * 1e6,
-                extent=[
-                    np.min(self.data_yz["Y"]),
-                    np.max(self.data_yz["Y"]),
-                    np.min(self.data_yz["Z"]),
-                    np.max(self.data_yz["Z"]),
-                ],
+                extent=self._calculate_extent(self.data_yz["Y"], self.data_yz["Z"]),
                 norm=norm,
             )
             ax[2].set_title("YZ Plane")
@@ -171,7 +175,7 @@ class SummaryGenerator:
         draw(self, norm=LogNorm())
         draw(self, norm=Normalize())
 
-    def draw_multiplicative(self, suffix="multiplicative.pdf"):
+    def draw_multiplicative(self, suffix: str = "multiplicative.pdf") -> None:
         if self.mult_map_3d is None:
             self._multiplicative_reconstruction()
 
@@ -180,12 +184,7 @@ class SummaryGenerator:
             img = ax[0].matshow(
                 np.sum(self.mult_map_3d, axis=2)[::-1].T
                 / np.max(np.sum(self.mult_map_3d, axis=2)),
-                extent=[
-                    np.min(self.data_xy["X"]),
-                    np.max(self.data_xy["X"]),
-                    np.min(self.data_xy["Y"]),
-                    np.max(self.data_xy["Y"]),
-                ],
+                extent=self._calculate_extent(self.data_xy["X"], self.data_xy["Y"]),
                 norm=norm,
             )
             ax[0].set_title("XY Plane")
@@ -196,12 +195,7 @@ class SummaryGenerator:
             img = ax[1].matshow(
                 np.sum(self.mult_map_3d, axis=1)[::-1].T
                 / np.max(np.sum(self.mult_map_3d, axis=1)),
-                extent=[
-                    np.min(self.data_xz["X"]),
-                    np.max(self.data_xz["X"]),
-                    np.min(self.data_xz["Z"]),
-                    np.max(self.data_xz["Z"]),
-                ],
+                extent=self._calculate_extent(self.data_xz["X"], self.data_xz["Z"]),
                 norm=norm,
             )
             ax[1].set_title("XZ Plane")
@@ -212,12 +206,7 @@ class SummaryGenerator:
             img = ax[2].matshow(
                 np.sum(self.mult_map_3d, axis=0)[::-1].T
                 / np.max(np.sum(self.mult_map_3d, axis=0)),
-                extent=[
-                    np.min(self.data_yz["Y"]),
-                    np.max(self.data_yz["Y"]),
-                    np.min(self.data_yz["Z"]),
-                    np.max(self.data_yz["Z"]),
-                ],
+                extent=self._calculate_extent(self.data_yz["Y"], self.data_yz["Z"]),
                 norm=norm,
             )
             ax[2].set_title("YZ Plane")
@@ -239,7 +228,7 @@ class SummaryGenerator:
         draw(self, norm=LogNorm())
         draw(self, norm=Normalize())
 
-    def _get_hotspot_locations(self, threshold=0.8):
+    def _get_hotspot_locations(self, threshold: float = 0.8) -> list[tuple[float, float, float]]:
         """
         Get hotspot locations from multiplicative reconstruction above a certain threshold.
         """
@@ -257,8 +246,8 @@ class SummaryGenerator:
         return hotspot_coords
 
     def calculate_simulation_statistics(
-        self, suffix="_stats.yaml", only_non_world_volumes=True
-    ):
+        self, suffix: str = "_stats.yaml", only_non_world_volumes: bool = True
+    ) -> dict:
         """
         Calculate simulation statistics.
         These consist of:
@@ -291,7 +280,7 @@ class SummaryGenerator:
 
         return stats
 
-    def perform_analysis(self):
+    def perform_analysis(self) -> dict:
         self.draw_simulation_time_profiles()
         self.draw_multiplicative()
         return self.calculate_simulation_statistics()
