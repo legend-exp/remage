@@ -153,7 +153,7 @@ def _copy_defines_for_volume(
     if not hasattr(src_reg, "defineDict"):
         return
 
-    for key in src_reg.defineDict.keys():
+    for key in src_reg.defineDict:
         if lv.name in key:
             dst_reg.defineDict[key] = src_reg.defineDict[key]
 
@@ -268,10 +268,9 @@ def _create_world_box(
     box_solid = pyg4ometry.geant4.solid.Box(
         "world_box", width, height, depth, registry, "mm"
     )
-    world_lv = pyg4ometry.geant4.LogicalVolume(
+    return pyg4ometry.geant4.LogicalVolume(
         box_solid, "G4_Galactic", "world_lv", registry
     )
-    return world_lv
 
 
 def _calculate_centering_offset(extent) -> list[float]:
@@ -291,7 +290,7 @@ def _ensure_volume_in_registry(
     registry.addVolumeRecursive(volume)
 
     # Ensure all volumes are in the list
-    for vol_name in registry.logicalVolumeDict.keys():
+    for vol_name in registry.logicalVolumeDict:
         if vol_name not in registry.logicalVolumeList:
             registry.logicalVolumeList.append(vol_name)
 
@@ -427,7 +426,7 @@ def generate_tmp_gdml_geometry(
     writer = pyg4ometry.gdml.Writer()
     writer.addDetector(positioned_geometry["registry"])
 
-    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".gdml")
+    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".gdml")  # noqa: SIM115
     tempfile_path = Path(temp_file.name)
     writer.write(tempfile_path)
 

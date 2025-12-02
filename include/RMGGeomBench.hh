@@ -31,51 +31,10 @@ class RMGGeomBench : public RMGVGenerator {
     RMGGeomBench(RMGGeomBench&&) = delete;
     RMGGeomBench& operator=(RMGGeomBench&&) = delete;
 
-<<<<<<< HEAD
-  long   totalnevents;
-  double totalnpixels;
-  int npixelsperrow;
-  double neventsperpixel;
-  double cubesize;
-  
-  // Configurable sampling parameters (user-specified increments)
-  double user_increment_x;
-  double user_increment_y;
-  double user_increment_z;
-  double sampling_width_x;
-  double sampling_width_y;
-  double sampling_width_z;
-  
-  // Calculated number of pixels based on increments and widths
-  int npixels_x;
-  int npixels_y;
-  int npixels_z;
-  int ID;
-  int whichntuple;
-  G4ThreeVector trs;
-
-  std::clock_t starttime;
-  std::clock_t currenttime;
-  std::clock_t bunchstarttime;
-
-  // For tracking bunches and calculating median (stores CPU time in seconds)
-  std::vector<double> bunch_times;
-  int events_per_bunch;
-  int current_event_in_pixel;
-=======
     void GeneratePrimaries(G4Event* event) override;
-<<<<<<< HEAD
-    void SetParticlePosition(G4ThreeVector) override {};
-<<<<<<< HEAD
-    void SavePixel();
->>>>>>> c4d67577 (style: pre-commit fixes)
-=======
-=======
     void SetParticlePosition(G4ThreeVector) override{};
->>>>>>> 34c9dd85 (style: pre-commit fixes)
     void RecordBatchTime(size_t pixel_idx, double batch_time);
     void SaveAllPixels();
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
 
     void BeginOfRunAction(const G4Run* r) override;
     void EndOfRunAction(const G4Run* r) override;

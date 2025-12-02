@@ -149,14 +149,18 @@ indicate geometry hotspots.
 **Standard deviation** : Variability in navigation time. High values suggest
 non-uniform complexity.
 
-:::{warning} Navigation times are relative and depend on the hardware. Focus on
-identifying spatial patterns and relative differences between geometric
-components rather than absolute timing values.
+:::{warning}
+
+Navigation times are relative and depend on the hardware. Focus on identifying
+spatial patterns and relative differences between geometric components rather
+than absolute timing values.
 
 In addition, these statistics also depend on the ratio of empty space to actual
 material. If one is not interested in potential slowdowns far away from the
 object, one should choose a small enough buffer to reduce the impact of the
-empty space. :::
+empty space.
+
+:::
 
 ## Workflow examples
 
@@ -196,7 +200,7 @@ Based on benchmark results, consider these optimization strategies:
 1. **Simplify boolean operations**: Multiple nested unions/subtractions are
    expensive. Consider alternative representations.
 
-2. **Reduce tesselated solid complexity**: Decrease facet count where possible
+2. **Reduce tessellated solid complexity**: Decrease facet count where possible
    without losing essential features.
 
 3. **Material boundaries**: Excessive material changes force more boundary
