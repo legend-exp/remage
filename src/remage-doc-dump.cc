@@ -30,6 +30,7 @@
 #endif
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBenchOutputScheme.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
@@ -59,6 +60,7 @@ void init_extra() {
   new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
+  new RMGGeomBenchOutputScheme();
 
   // confinments
   new RMGVertexConfinement();

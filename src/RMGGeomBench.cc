@@ -120,27 +120,11 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
   // It will be initialized by RMGRunAction::SetupAnalysisManager() if active.
 
   // whichntuple will be initialized to 0 on event 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-  //Start the timer
-  starttime   = std::clock();
-  currenttime = std::clock();
-  
-  //Store total number of events to be processed
-=======
-  // Start the timer
-  starttime = double(clock()) / 1000000.;
-  currenttime = double(clock()) / 1000000.;
-
-  // Store total number of events to be processed
->>>>>>> c4d67577 (style: pre-commit fixes)
-=======
   // Start the timer
   starttime = std::clock();
   currenttime = std::clock();
 
   // Store total number of events to be processed
->>>>>>> ed62e2c2 (style: pre-commit fixes)
   totalnevents = r->GetNumberOfEventToBeProcessed();
 
   // The benchmarker assumes the world volume is a cube when calculating bounds
@@ -163,36 +147,10 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
   worldsolid->BoundingLimits(min, max);
 
   // Set up sampling dimensions based on user configuration or world bounds
-<<<<<<< HEAD:src/RMGGeneratorBenchmark.cc
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if (sampling_width_x < 0) {
-    sampling_width_x = (max.x() - min.x());
-  }
-  if (sampling_width_y < 0) {
-    sampling_width_y = (max.y() - min.y());
-  }
-  if (sampling_width_z < 0) {
-    sampling_width_z = (max.z() - min.z());
-  }
-  
-=======
-  if (sampling_width_x < 0) { sampling_width_x = (max.x() - min.x()) * 1.25; }
-  if (sampling_width_y < 0) { sampling_width_y = (max.y() - min.y()) * 1.25; }
-  if (sampling_width_z < 0) { sampling_width_z = (max.z() - min.z()) * 1.25; }
-
->>>>>>> c4d67577 (style: pre-commit fixes)
-=======
-  if (sampling_width_x < 0) { sampling_width_x = (max.x() - min.x()); }
-  if (sampling_width_y < 0) { sampling_width_y = (max.y() - min.y()); }
-  if (sampling_width_z < 0) { sampling_width_z = (max.z() - min.z()); }
-=======
   if (sampling_width.x() < 0) { sampling_width.setX(max.x() - min.x()); }
   if (sampling_width.y() < 0) { sampling_width.setY(max.y() - min.y()); }
   if (sampling_width.z() < 0) { sampling_width.setZ(max.z() - min.z()); }
->>>>>>> b1e137ca (Implementing suggestions):src/RMGGeomBench.cc
 
->>>>>>> ed62e2c2 (style: pre-commit fixes)
   // Calculate increments and number of pixels
   // If user specified increment, use it; otherwise default to 30 pixels
   if (user_increment.x() > 0) {
@@ -340,28 +298,11 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
 
 
 void RMGGeomBench::EndOfRunAction(const G4Run* /*r*/) {
-<<<<<<< HEAD
-  // Save the last pixel if there's any data
-  if (!bunch_times.empty() || current_event_in_pixel > 0) {
-    // Save any remaining partial bunch
-    if (current_event_in_pixel % events_per_bunch != 0 && current_event_in_pixel > 0) {
-<<<<<<< HEAD
-      double bunch_time = static_cast<double>(std::clock() - bunchstarttime) / CLOCKS_PER_SEC;
-=======
-      double bunch_time = double(clock()) / 1000000. - bunchstarttime;
->>>>>>> c4d67577 (style: pre-commit fixes)
-      bunch_times.push_back(bunch_time);
-    }
-
-    RMGLog::Out(RMGLog::debug, "Saving final pixel data in EndOfRunAction");
-    SavePixel();
-=======
   // Save the last batch if there's any data
   if (current_batch_event > 0) {
     double bunch_time = static_cast<double>(std::clock() - bunchstarttime) / CLOCKS_PER_SEC;
     RecordBatchTime(current_pixel_index, bunch_time);
     RMGLog::Out(RMGLog::debug, "Recorded final batch time in EndOfRunAction");
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
   }
 
   // Save all pixel data
@@ -477,119 +418,24 @@ void RMGGeomBench::SaveAllPixels() {
         pixel_idx++;
       }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> ed62e2c2 (style: pre-commit fixes)
-    RMGLog::Out(RMGLog::debug, "Pixel complete with ", n, " bunches. Median CPU time: ", median_time, " s");
-  }
-
-  double median_time_per_event = 0.0;
-  if (events_per_bunch > 0) { median_time_per_event = median_time / events_per_bunch; }
-
-  RMGLog::Out(
-      RMGLog::debug,
-      "Saving pixel data: Ntuple ",
-      whichntuple,
-      ", X: ",
-      current_position.x(),
-      ", Y: ",
-      current_position.y(),
-      ", Z: ",
-      current_position.z(),
-      ", Median CPU time of bunch: ",
-      median_time,
-      " s, Median CPU time per event: ",
-      median_time_per_event,
-      " s"
-  );
-<<<<<<< HEAD:src/RMGGeneratorBenchmark.cc
-  benchmark_scheme->SavePixel(whichntuple, xcurrent, ycurrent, zcurrent, median_time_per_event);
-<<<<<<< HEAD
-  
-=======
-=======
-  benchmark_scheme->SavePixel(whichntuple, current_position.x(), current_position.y(), current_position.z(), median_time_per_event);
->>>>>>> b1e137ca (Implementing suggestions):src/RMGGeomBench.cc
-
-    RMGLog::Out(RMGLog::debug, "Pixel complete with ", n, " bunches. Median time: ", median_time, " s");
-  }
-  RMGLog::Out(
-      RMGLog::debug,
-      "Saving pixel data: Ntuple ",
-      whichntuple,
-      ", X: ",
-      xcurrent,
-      ", Y: ",
-      ycurrent,
-      ", Z: ",
-      zcurrent,
-      ", Median time: ",
-      median_time,
-      " s"
-  );
-  benchmark_scheme->SavePixel(whichntuple, xcurrent, ycurrent, zcurrent, median_time);
-
->>>>>>> c4d67577 (style: pre-commit fixes)
-=======
-
->>>>>>> ed62e2c2 (style: pre-commit fixes)
-  // Reset for next pixel
-  bunch_times.clear();
-  current_event_in_pixel = 0;
-} // SavePixel
-=======
   }
 
   RMGLog::Out(RMGLog::summary, "Saved data for all ", pixel_idx, " pixels");
 } // SaveAllPixels
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
 
 
 void RMGGeomBench::GeneratePrimaries(G4Event* event) {
 
   ID = event->GetEventID();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if(ID >= neventsperpixel * totalnpixels)
-    return;//Should only apply in situations where the nevents doesn't divide evenly into the npixels
-  
-  if(ID==0) {
-    //Originally initialized in BeginOfRunAction, but delay between that and evt 0 is non-trivial
-=======
   if (ID >= neventsperpixel * totalnpixels)
     return; // Should only apply in situations where the nevents doesn't divide evenly into the npixels
 
   if (ID == 0) {
     // Originally initialized in BeginOfRunAction, but delay between that and evt 0 is non-trivial
->>>>>>> ed62e2c2 (style: pre-commit fixes)
     currenttime = std::clock();
     bunchstarttime = std::clock();
-=======
-  if (ID >= neventsperpixel * totalnpixels)
-    return; // Should only apply in situations where the nevents doesn't divide evenly into the npixels
 
-<<<<<<< HEAD
-  if (ID == 0) {
-    // Originally initialized in BeginOfRunAction, but delay between that and evt 0 is non-trivial
-    currenttime = double(clock()) / 1000000.;
-    bunchstarttime = currenttime;
->>>>>>> c4d67577 (style: pre-commit fixes)
-    current_event_in_pixel = 0;
-    bunch_times.clear();
-
-    // Initialize pixel indices and position
-    whichntuple = 0;
-    pixel_x_index = 0;
-    pixel_y_index = 0;
-    pixel_z_index = 0;
-    // Initialize positions centered in the first pixel (consistent with later updates)
-    current_position = limit + 0.5 * increment;
-=======
     current_batch_event = 0;
     current_pixel_index = 0;
     current_batch_round = 0;
@@ -597,105 +443,8 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
     // Initialize storage for batch times
     pixel_batch_times.clear();
     pixel_batch_times.resize(totalnpixels);
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
-  }
-<<<<<<< HEAD
-<<<<<<< HEAD
-  
-=======
-
-<<<<<<< HEAD
->>>>>>> ed62e2c2 (style: pre-commit fixes)
-  // Check if we've completed a bunch
-  if (current_event_in_pixel > 0 && current_event_in_pixel % events_per_bunch == 0) {
-    double bunch_time = static_cast<double>(std::clock() - bunchstarttime) / CLOCKS_PER_SEC;
-    bunch_times.push_back(bunch_time);
-    bunchstarttime = std::clock();
-    RMGLog::Out(RMGLog::debug, "Bunch complete at event # ", ID, ", CPU time: ", bunch_time, " s");
-=======
-
-  // Check if we've completed a 5% bunch
-  if (current_event_in_pixel > 0 && current_event_in_pixel % events_per_bunch == 0) {
-    double bunch_time = double(clock()) / 1000000. - bunchstarttime;
-    bunch_times.push_back(bunch_time);
-    bunchstarttime = double(clock()) / 1000000.;
-    RMGLog::Out(RMGLog::debug, "Bunch complete at event # ", ID, ", time: ", bunch_time, " s");
->>>>>>> c4d67577 (style: pre-commit fixes)
   }
 
-  bool pixel_just_completed = false;
-  if ((ID + 1) % int(neventsperpixel) == 0) {
-    // We'll be changing pixels, so save current data
-    //  Save the last partial bunch if any events remain
-
-
-    if (current_event_in_pixel % events_per_bunch != 0) {
-<<<<<<< HEAD:src/RMGGeneratorBenchmark.cc
-<<<<<<< HEAD
-=======
-      //RMGLog::Out(RMGLog::warning, "Partial bunch at pixel completion, event # ", ID, " with current event in pixel ", current_event_in_pixel);
->>>>>>> b1e137ca (Implementing suggestions):src/RMGGeomBench.cc
-      double bunch_time = static_cast<double>(std::clock() - bunchstarttime) / CLOCKS_PER_SEC;
-=======
-      double bunch_time = double(clock()) / 1000000. - bunchstarttime;
->>>>>>> c4d67577 (style: pre-commit fixes)
-      bunch_times.push_back(bunch_time);
-    }
-
-    RMGLog::Out(RMGLog::debug, "Current pixel complete at event # ", ID);
-    SavePixel();
-    pixel_just_completed = true;
-
-    // Reset for next pixel and advance to next pixel
-<<<<<<< HEAD
-    bunchstarttime = std::clock();
-=======
-    bunchstarttime = double(clock()) / 1000000.;
->>>>>>> c4d67577 (style: pre-commit fixes)
-
-    // Advance to the next pixel based on current plane
-    if (whichntuple == 0) { // XZ plane
-      pixel_x_index++;
-      if (pixel_x_index >= npixels_x) {
-        pixel_x_index = 0;
-        pixel_z_index++;
-        if (pixel_z_index >= npixels_z) {
-          // Move to next plane
-          whichntuple = 1;
-          pixel_x_index = 0;
-          pixel_y_index = 0;
-          pixel_z_index = 0;
-          RMGLog::Out(RMGLog::debug, "Moving to YZ plane at event # ", ID + 1);
-        }
-      }
-    } else if (whichntuple == 1) { // YZ plane
-      pixel_y_index++;
-      if (pixel_y_index >= npixels_y) {
-        pixel_y_index = 0;
-        pixel_z_index++;
-        if (pixel_z_index >= npixels_z) {
-          // Move to next plane
-          whichntuple = 2;
-          pixel_x_index = 0;
-          pixel_y_index = 0;
-          pixel_z_index = 0;
-          RMGLog::Out(RMGLog::debug, "Moving to XY plane at event # ", ID + 1);
-        }
-      }
-    } else if (whichntuple == 2) { // XY plane
-      pixel_x_index++;
-      if (pixel_x_index >= npixels_x) {
-        pixel_x_index = 0;
-        pixel_y_index++;
-        if (pixel_y_index >= npixels_y) {
-          // All pixels complete - shouldn't happen during normal operation
-          // The run should end before this, but reset just in case
-          RMGLog::Out(RMGLog::warning, "All pixels sampled, resetting to prevent overflow");
-          pixel_x_index = 0;
-          pixel_y_index = 0;
-        }
-      }
-=======
   // Calculate which batch round and which pixel we're in
   // Structure: batch_round -> pixel -> events within batch
   // Total events = total_batch_rounds * totalnpixels * events_per_bunch (approximately)
@@ -729,7 +478,6 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
 
     if (current_batch_event == 0 && current_pixel_index == 0) {
       RMGLog::Out(RMGLog::debug, "Starting batch round ", current_batch_round, " at event # ", ID);
->>>>>>> f91278d3 (implemented better approach to be less suseptable for sudden spikes in calculation time)
     }
   }
 

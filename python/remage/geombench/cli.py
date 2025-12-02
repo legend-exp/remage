@@ -30,8 +30,7 @@ def generate_output_file_path(output_dir: Path, output_file_stem: str = "") -> P
     Path
         Full path to the output file with .lh5 extension.
     """
-    output_file = output_dir / (output_file_stem + ".lh5")
-    return output_file
+    return output_dir / (output_file_stem + ".lh5")
 
 
 def generate_macro(args, output_file_stem: str = "") -> str:
@@ -93,7 +92,7 @@ def generate_macro(args, output_file_stem: str = "") -> str:
         logger.info(macro_content)
         return ""
 
-    macro_file_path = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".mac")
+    macro_file_path = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".mac")  # noqa: SIM115
     macro_file_path.write(macro_content)
     macro_file_path.close()
     return str(macro_file_path.name)
@@ -218,10 +217,12 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         analysis_results = sum_gen.perform_analysis()
         logger.info("Geometry Benchmark Analysis Results:")
         for key, value in analysis_results.items():
-            logger.info(f"{key}: {value}")
+            msg = f"{key}: {value}"
+            logger.info(msg)
 
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        msg = f"An error occurred: {e}"
+        logger.error(msg)
         return 1
     finally:
         Path(macro_file).unlink(missing_ok=True)

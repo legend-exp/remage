@@ -500,7 +500,7 @@ Select event generator
 * **Parameter** – `generator`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
+  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined GeomBench Undefined`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/`
@@ -1230,6 +1230,7 @@ Commands for controlling the simulation output
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
 * `/RMG/Output/Track/` – Commands for controlling output of track vertices.
 * `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
+* `/RMG/Output/Benchmark/` – Commands for controlling geometry navigation benchmark output.
 
 **Commands:**
 
@@ -2035,6 +2036,10 @@ Add a physics process by name. This will only keep the specified particles when 
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
+
+## `/RMG/Output/Benchmark/`
+
+Commands for controlling geometry navigation benchmark output.
 
 ## `/RMG/GrabmayrGammaCascades/`
 

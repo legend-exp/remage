@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import awkward as ak
-import histoprint
+
+# import histoprint
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
@@ -275,39 +277,39 @@ class SummaryGenerator:
 
         output_path = self.output_dir / f"{self.output_file_stem}{suffix}"
 
-        with open(output_path, "w") as f:
+        with Path(output_path).open("w") as f:
             yaml.dump(stats, f)
 
         return stats
 
-    def print_histogram_of_simulation_times(self, n_bins: int = 101) -> None:
-        """
-        Print a histogram of simulation times per event using histoprint.
-        """
-
-        sim_times = (
-            np.concatenate(
-                [
-                    ak.to_numpy(self.data_xy["Time"]),
-                    ak.to_numpy(self.data_xz["Time"]),
-                    ak.to_numpy(self.data_yz["Time"]),
-                ]
-            )
-            * 1e6
-        )  # Convert to microseconds
-        bins = 10 ** np.linspace(
-            np.log10(np.min(sim_times)), np.log10(np.max(sim_times)), n_bins + 1
-        )
-        hist_data = np.histogram(sim_times, bins=bins)
-
-        histoprint.print_hist(
-            hist_data,
-            title="Median Simulation Times per Event [μs]",
-            summary=True,
-        )
+    #    def print_histogram_of_simulation_times(self, n_bins: int = 101) -> None:
+    #        """
+    #        Print a histogram of simulation times per event using histoprint.
+    #        """
+    #
+    #        sim_times = (
+    #            np.concatenate(
+    #                [
+    #                    ak.to_numpy(self.data_xy["Time"]),
+    #                    ak.to_numpy(self.data_xz["Time"]),
+    #                    ak.to_numpy(self.data_yz["Time"]),
+    #                ]
+    #            )
+    #            * 1e6
+    #        )  # Convert to microseconds
+    #        bins = 10 ** np.linspace(
+    #            np.log10(np.min(sim_times)), np.log10(np.max(sim_times)), n_bins + 1
+    #        )
+    #        hist_data = np.histogram(sim_times, bins=bins)
+    #
+    #        histoprint.print_hist(
+    #            hist_data,
+    #            title="Median Simulation Times per Event [μs]",
+    #            summary=True,
+    #        )
 
     def perform_analysis(self) -> dict:
         self.draw_simulation_time_profiles()
-        self.print_histogram_of_simulation_times()
+        # self.print_histogram_of_simulation_times()
         # self.draw_multiplicative()
         return self.calculate_simulation_statistics()
