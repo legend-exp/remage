@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import copy
 import logging
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -41,8 +42,9 @@ def post_proc(
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
     }
 
-    detector_info: list[str] = ipc_info.get("output_ntuple", 2)
-    detector_info_aux: list[str] = ipc_info.get("output_ntuple_aux", 2)
+    # these are mappings: <output scheme name> -> [<table name 1>, <table name 2>, ...]
+    detector_info = ipc_info.get_as_dict("output_ntuple", 2)
+    detector_info_aux = ipc_info.get_as_dict("output_ntuple_aux", 2)
 
     assert len(output_file_exts) == 1
 
@@ -84,19 +86,17 @@ def post_proc(
         )
         log.info(msg)
 
-        # registered scintillator or germanium detectors
-        registered_detectors = list({det[1] for det in detector_info})
-
         # extract the additional tables in the output file (not detectors)
-        extra_tables = list({det[1] for det in detector_info_aux})
 
         with tmp_renamed_files(remage_files) as original_files:
             # also get the additional tables to forward
             config = get_reboost_config(
-                registered_detectors,
-                extra_tables,
+                detector_info,
+                detector_info_aux,
                 time_window=time_window_in_us,
             )
+            msg = f"Reboost config: {config}"
+            log.debug(msg)
 
             # use reboost to post-process outputs
             reboost.build_hit(
@@ -222,8 +222,8 @@ def deduplicate_table(
 
 
 def get_reboost_config(
-    reshape_table_list: Sequence[str],
-    other_table_list: Sequence[str],
+    detector_info: Mapping[str, Sequence[str]],
+    detector_info_aux: Mapping[str, Sequence[str]],
     *,
     time_window: float = 10,
 ) -> dict:
@@ -231,11 +231,11 @@ def get_reboost_config(
 
     Parameters
     ----------
-    reshape_table_list
-        a list of the table in the remage file that need to be reshaped
-        (i.e. Germanium or Scintillator output)
-    other_table_list
-        other tables in the file.
+    detector_info
+        a mapping of tables in the remage file that need to be reshaped, keyed
+        by output scheme name (i.e. RMGGermaniumOutputScheme).
+    detector_info_aux
+        same as `detector_info`, but holds non-standard tables.
     time_window
         time window to use for building hits (in us).
 
@@ -245,24 +245,42 @@ def get_reboost_config(
     """
     config = {}
 
-    # get the config for tables to be reshaped
-    config["processing_groups"] = [
-        {
-            "name": "all",
-            "detector_mapping": [{"output": table} for table in reshape_table_list],
-            "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
-            "operations": {
-                "t0": {
-                    "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
-                    "units": "ns",
-                },
-                "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
-            },
-        }
+    # build a default config for all tables (exclude calorimeter tables)
+    table_list = [
+        v
+        for k, vals in detector_info.items()
+        if k != "RMGCalorimeterOutputScheme"
+        for v in vals
     ]
 
+    default_config = {
+        "name": "default",
+        "detector_mapping": [{"output": table} for table in table_list],
+        "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
+        "operations": {
+            "t0": {
+                "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
+                "units": "ns",
+            },
+            "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
+        },
+    }
+    config["processing_groups"] = [default_config]
+
+    if "RMGCalorimeterOutputScheme" in detector_info:
+        # special treatment for the calorimeter output scheme
+        tables = detector_info["RMGCalorimeterOutputScheme"]
+
+        calo_config = copy.deepcopy(default_config)
+        calo_config["name"] = "RMGCalorimeterOutputScheme"
+        calo_config["detector_mapping"] = [{"output": table} for table in tables]
+        # there is always one energy per event, then remove one dimension from the array
+        calo_config["operations"]["edep"] = "ak.ravel(HITS.edep)"
+
+        config["processing_groups"].append(calo_config)
+
     # forward other tables as they are
-    config["forward"] = other_table_list
+    config["forward"] = [v for vals in detector_info_aux.values() for v in vals]
 
     return config
 
