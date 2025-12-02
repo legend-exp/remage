@@ -445,6 +445,10 @@ register a sensitive detector
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Parameter** – `ntuple_name`
+    – Ntuple name (optional override)
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/SetMaxStepSize`
