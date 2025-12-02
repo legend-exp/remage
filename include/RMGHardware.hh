@@ -86,13 +86,15 @@ class RMGHardware : public G4VUserDetectorConstruction {
      * @param uid A unique integer identifier for the sensitive volume.
      * @param copy_nr The copy number of the physical volume.
      * @param allow_uid_reuse Flag to allow assigning the same @c uid to different detectors.
+     * @param ntuple_name Ntuple name override.
      */
     void RegisterDetector(
         RMGDetectorType type,
         const std::string& pv_name,
         int uid,
         int copy_nr = 0,
-        bool allow_uid_reuse = false
+        bool allow_uid_reuse = false,
+        const std::string& ntuple_name = ""
     );
 
     /** @brief Stage a detector for later registration.
@@ -108,13 +110,15 @@ class RMGHardware : public G4VUserDetectorConstruction {
      * @param uid A unique integer identifier for the sensitive volume.
      * @param copy_nr The copy number of the physical volume.
      * @param allow_uid_reuse Flag to allow assigning the same @c uid to different detectors.
+     * @param ntuple_name Ntuple name override.
      */
     void StageDetector(
         RMGDetectorType type,
         const std::string& pv_name,
         int uid,
         const std::string& copy_nr = "0",
-        bool allow_uid_reuse = false
+        bool allow_uid_reuse = false,
+        const std::string& ntuple_name = ""
     );
 
     /** @brief Extract a map of the detector metadata, one element for each sensitive detector physical volume and copy_nr. */
@@ -196,6 +200,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
         int uid;
         std::string copy_nr;
         bool allow_uid_reuse;
+        std::string ntuple_name;
     };
 
     // Holds detector info before initialization
