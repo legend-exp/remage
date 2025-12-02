@@ -26,7 +26,7 @@ def generate_output_file_path(geometry_path: Path, output_dir: Path) -> Path:
         Full path to the output file with .lh5 extension.
     """
     filename = geometry_path.absolute()
-    output_file = output_dir / filename.name.replace(".gdml", ".lh5")
+    output_file = output_dir / filename.with_suffix(".lh5").name
     return output_file
 
 
