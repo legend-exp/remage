@@ -73,7 +73,6 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param aStep The current step.
      * @return Pointer to the particle change with added IB photons.
      */
-
     G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep) override;
 
     /**
@@ -81,28 +80,28 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      *
      * @param enabled True to enable IB generation, false to disable.
      */
-    void SetEnabled(G4bool enabled) { fEnabled = enabled; }
+    void SetEnabled(bool enabled) { fEnabled = enabled; }
 
     /**
      * @brief Checks if Inner Bremsstrahlung generation is enabled.
      *
      * @return True if enabled, false otherwise.
      */
-    [[nodiscard]] G4bool IsEnabled() const { return fEnabled; }
+    [[nodiscard]] bool IsEnabled() const { return fEnabled; }
 
     /**
      * @brief Sets a scaling factor for IB probability (for systematic studies).
      *
-     * @param scale Probability scaling factor (default 1.0).
+     * @param factor Probability scaling factor (default 1.0).
      */
-    void SetIBProbabilityScale(G4double scale) { fIBProbabilityScale = scale; }
+    void SetBiasingFactor(double factor) { fBiasingFactor = factor; }
 
     /**
      * @brief Gets the current IB probability scaling factor.
      *
      * @return Probability scaling factor.
      */
-    [[nodiscard]] G4double GetIBProbabilityScale() const { return fIBProbabilityScale; }
+    [[nodiscard]] double GetBiasingFactor() const { return fBiasingFactor; }
 
   private:
 
@@ -113,35 +112,33 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param omega Dimensionless photon energy.
      * @return Value of the phi function.
      */
-    G4double PhiFunction(G4double W_prime, G4double omega);
+    double PhiFunction(double W_prime, double omega);
 
     /**
      * @brief Calculates the total Inner Bremsstrahlung probability for a given electron energy.
      *
-     * @param electronEnergy Kinetic energy of the beta electron.
+     * @param electron_energy Kinetic energy of the beta electron.
      * @return Total IB probability (0 to 1).
      */
-    G4double CalculateIBProbability(G4double electronEnergy);
+    double CalculateIBProbability(double electron_energy);
 
     /**
      * @brief Samples a photon energy from the Inner Bremsstrahlung spectrum.
      *
-     * @param electronEnergy Kinetic energy of the beta electron.
+     * @param electron_energy Kinetic energy of the beta electron.
      * @return Sampled IB photon energy.
      */
-    G4double SamplePhotonEnergy(G4double electronEnergy);
+    double SamplePhotonEnergy(double electron_energy);
 
     /**
      * @brief Generates IB photons for beta electrons in the decay secondaries.
      *
-     * @param particleChange Particle change object containing decay secondaries.
-     * @param parentTrack The original decaying nucleus track.
-     * @param aStep The current step.
+     * @param particle_change Particle change object containing decay secondaries.
+     * @param parent_track The original decaying nucleus track.
      */
     void GenerateInnerBremsstrahlungForSecondaries(
-        G4VParticleChange* particleChange,
-        const G4Track& parentTrack,
-        const G4Step& aStep
+        G4VParticleChange* particle_change,
+        const G4Track& parent_track
     );
 
     /**
@@ -150,11 +147,10 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      * @param track Secondary track to check.
      * @return True if it's a beta electron, false otherwise.
      */
-    G4bool IsBetaElectron(G4Track* track);
+    bool IsBetaElectron(G4Track* track);
 
-    // Physical constants
-    G4bool fEnabled;
-    G4double fIBProbabilityScale;
+    bool fEnabled = true;
+    double fBiasingFactor = 1.0;
 
     // messenger stuff
     std::unique_ptr<G4GenericMessenger> fMessenger;

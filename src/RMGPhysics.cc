@@ -310,28 +310,33 @@ void RMGPhysics::ConstructProcess() {
   if (fUseInnerBremsstrahlung) {
     RMGLog::Out(RMGLog::detail, "Adding Inner Bremsstrahlung physics");
 
-    auto particleIterator = GetParticleIterator();
-    particleIterator->reset();
-    while ((*particleIterator)()) {
-      auto particle = particleIterator->value();
-      auto processManager = particle->GetProcessManager();
+    GetParticleIterator()->reset();
+    while ((*GetParticleIterator())()) {
+      auto particle = GetParticleIterator()->value();
+      auto proc_manager = particle->GetProcessManager();
 
       // Look for radioactive decay process in ions
       if (particle->GetParticleType() == "nucleus" && particle->GetPDGLifeTime() < DBL_MAX) {
-        auto rdmDecayProcess = processManager->GetProcess("RadioactiveDecay");
+#if G4VERSION_NUMBER >= 1130
+        auto rdm_process = proc_manager->GetProcess("RadioactiveDecay");
+#else
+        auto rdm_process = proc_manager->GetProcess("Radioactivation");
+#endif
 
-        if (rdmDecayProcess) {
+        if (rdm_process) {
           // Create wrapper process
-          auto ibProcess = new RMGInnerBremsstrahlungProcess(
+          auto ib_process = new RMGInnerBremsstrahlungProcess(
               G4String("RMG_IB_") + particle->GetParticleName()
           );
-          ibProcess->RegisterProcess(rdmDecayProcess);
-          ibProcess->SetEnabled(true);
+          ib_process->RegisterProcess(rdm_process);
+          ib_process->SetEnabled(true);
 
-          processManager->RemoveProcess(rdmDecayProcess);
-          processManager->AddProcess(ibProcess);
-          processManager->SetProcessOrderingToLast(ibProcess, idxAtRest);
-          processManager->SetProcessOrderingToLast(ibProcess, idxPostStep);
+          proc_manager->RemoveProcess(rdm_process);
+          proc_manager->AddProcess(ib_process);
+          proc_manager->SetProcessOrderingToLast(ib_process, idxAtRest);
+          proc_manager->SetProcessOrderingToLast(ib_process, idxPostStep);
+        } else {
+          RMGLog::Out(RMGLog::fatal, "Inner Bremsstrahlung is disabled (no RDM process found)");
         }
       }
     }
@@ -598,6 +603,9 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("EnableInnerBremsstrahlung", fUseInnerBremsstrahlung)
       .SetGuidance("Enable Inner Bremsstrahlung generation for beta decays")
+      .SetGuidance(
+          std::string("This is ") + (fUseInnerBremsstrahlung ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);

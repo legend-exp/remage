@@ -283,6 +283,8 @@ This is disabled by default
 
 Enable Inner Bremsstrahlung generation for beta decays
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -370,11 +372,11 @@ Commands for controlling the inner bremsstrahlung process
 
 **Commands:**
 
-* `BiasingFactor` – Sets a scaling factor for IB probability
+* `BiasingFactor` – Sets a biasing factor for IB probability
 
 ### `/RMG/Processes/InnerBremsstrahlung/BiasingFactor`
 
-Sets a scaling factor for IB probability
+Sets a biasing factor for IB probability
 
 * **Parameter** – `factor`
   * **Parameter type** – `d`
