@@ -257,45 +257,7 @@ def load_gdml_geometry(gdml_path: Path, object_name: str = "object_lv") -> dict:
     return {"object_lv": world_volume, "registry": registry}
 
 
-def _create_world_box(
-    extent, buffer_fraction: float, registry
-) -> pyg4ometry.geant4.LogicalVolume:
-    """Create a world box volume with buffered dimensions."""
-    width = (extent[1][0] - extent[0][0]) * (1 + buffer_fraction)
-    height = (extent[1][1] - extent[0][1]) * (1 + buffer_fraction)
-    depth = (extent[1][2] - extent[0][2]) * (1 + buffer_fraction)
-
-    box_solid = pyg4ometry.geant4.solid.Box(
-        "world_box", width, height, depth, registry, "mm"
-    )
-    return pyg4ometry.geant4.LogicalVolume(
-        box_solid, "G4_Galactic", "world_lv", registry
-    )
-
-
-def _calculate_centering_offset(extent) -> list[float]:
-    """Calculate the offset needed to center an object at world origin."""
-    return [
-        -(extent[0][0] + extent[1][0]) / 2.0,
-        -(extent[0][1] + extent[1][1]) / 2.0,
-        -(extent[0][2] + extent[1][2]) / 2.0,
-    ]
-
-
-def _ensure_volume_in_registry(
-    volume: pyg4ometry.geant4.LogicalVolume, registry: pyg4ometry.geant4.Registry
-) -> None:
-    """Ensure a volume and its hierarchy are properly registered."""
-    registry.addLogicalVolume(volume)
-    registry.addVolumeRecursive(volume)
-
-    # Ensure all volumes are in the list
-    for vol_name in registry.logicalVolumeDict:
-        if vol_name not in registry.logicalVolumeList:
-            registry.logicalVolumeList.append(vol_name)
-
-
-def position_object_in_world(
+def change_extent_of_world_volume(
     geometry: dict, buffer_fraction: float = 0, object_name: str = "object_lv"
 ) -> dict:
     """Expand the world volume to include buffer space around the geometry.
@@ -419,7 +381,7 @@ def generate_tmp_gdml_geometry(
     Path
         Path to the temporary GDML file with the adjusted geometry.
     """
-    positioned_geometry = position_object_in_world(
+    positioned_geometry = change_extent_of_world_volume(
         geometry, buffer_fraction=buffer_fraction, object_name=object_name
     )
 

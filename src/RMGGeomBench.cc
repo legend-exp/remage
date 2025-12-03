@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Luigi Pertoldi <https://orcid.org/0000-0002-0467-2571>
+// Copyright (C) 2025 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
 #include "RMGGeomBench.hh"
 
 #include <algorithm>
