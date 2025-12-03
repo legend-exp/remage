@@ -18,6 +18,7 @@ confinement
 distances
 nist
 observables-ge
+gammacorr
 ```
 
 ```{toctree}
