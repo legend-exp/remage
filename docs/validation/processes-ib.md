@@ -4,18 +4,6 @@ This section validates the simulation of Internal Bremsstrahlung (IB) radiation
 in beta decay processes, specifically for Ar-39 which is a relevant background
 source in liquid argon-based rare event searches.
 
-## What is Internal Bremsstrahlung?
-
-Internal Bremsstrahlung is a radiative correction to beta decay where a photon
-is emitted along with the beta particle and neutrino. Unlike external
-bremsstrahlung (which occurs when the beta particle interacts with matter after
-emission), internal bremsstrahlung is emitted directly from the nucleus during
-the decay process itself.
-
-The IB photon energy spectrum is continuous, extending from zero up to the
-Q-value of the decay. For Ar-39 (Q = 565 keV), the IB photons are typically soft
-(low energy), with most photons below 0.5 MeV.
-
 ## Validation test
 
 We simulate Ar-39 decays in a liquid argon environment with an HPGe detector and
@@ -88,3 +76,9 @@ These validation plots confirm that:
 For precision background modeling in low-background experiments, it is important
 to enable IB in the simulation to accurately predict the detector response near
 the analysis threshold.
+
+## Reference
+
+The spectrum is calculated based on Hayen et al., Rev. Mod. Phys. 90, 015008
+(2018). https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.90.015008 The
+calculation is described in detail in Section V Radiative Correction.
