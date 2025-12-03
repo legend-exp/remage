@@ -325,9 +325,7 @@ void RMGPhysics::ConstructProcess() {
 
         if (rdm_process) {
           // Create wrapper process
-          auto ib_process = new RMGInnerBremsstrahlungProcess(
-              G4String("RMG_IB_") + particle->GetParticleName()
-          );
+          auto ib_process = new RMGInnerBremsstrahlungProcess();
           ib_process->RegisterProcess(rdm_process);
           ib_process->SetEnabled(true);
 
@@ -335,8 +333,18 @@ void RMGPhysics::ConstructProcess() {
           proc_manager->AddProcess(ib_process);
           proc_manager->SetProcessOrderingToLast(ib_process, idxAtRest);
           proc_manager->SetProcessOrderingToLast(ib_process, idxPostStep);
+          RMGLog::OutFormat(
+              RMGLog::debug,
+              "Inner Bremsstrahlung added for ",
+              particle->GetParticleName()
+          );
         } else {
-          RMGLog::Out(RMGLog::fatal, "Inner Bremsstrahlung is disabled (no RDM process found)");
+          RMGLog::Out(
+              RMGLog::debug,
+              "Inner Bremsstrahlung is disabled for ",
+              particle->GetParticleName(),
+              " (no RDM process found)"
+          );
         }
       }
     }

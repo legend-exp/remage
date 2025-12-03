@@ -39,12 +39,6 @@ RMGInnerBremsstrahlungProcess::RMGInnerBremsstrahlungProcess(
     G4ProcessType aType
 )
     : G4WrapperProcess(aNamePrefix, aType) {
-  RMGLog::OutFormat(
-      RMGLog::detail,
-      "{}: Inner Bremsstrahlung wrapper process initialized",
-      GetProcessName()
-  );
-
   this->DefineCommands();
 }
 
