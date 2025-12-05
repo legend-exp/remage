@@ -128,6 +128,7 @@ Commands for controlling physics processes
 **Sub-directories:**
 
 * `/RMG/Processes/Stepping/` – Commands for controlling physics processes
+* `/RMG/Processes/InnerBremsstrahlung/` – Commands for controlling the inner bremsstrahlung process
 
 **Commands:**
 
@@ -142,6 +143,7 @@ Commands for controlling physics processes
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+* `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -277,6 +279,18 @@ This is disabled by default
   * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
+### `/RMG/Processes/EnableInnerBremsstrahlung`
+
+Enable Inner Bremsstrahlung generation for beta decays
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit`
+
 ## `/RMG/Processes/Stepping/`
 
 Commands for controlling physics processes
@@ -350,6 +364,24 @@ Uses 1 us by default
   * **Default value** – `us`
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
+
+## `/RMG/Processes/InnerBremsstrahlung/`
+
+Commands for controlling the inner bremsstrahlung process
+
+
+**Commands:**
+
+* `BiasingFactor` – Sets a biasing factor for IB probability
+
+### `/RMG/Processes/InnerBremsstrahlung/BiasingFactor`
+
+Sets a biasing factor for IB probability
+
+* **Parameter** – `factor`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Geometry/`
 
