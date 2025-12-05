@@ -26,6 +26,7 @@
 #include "G4UserSteppingAction.hh"
 #include "G4UserTrackingAction.hh"
 
+#include "RMGGeomBenchOutputScheme.hh"
 #include "RMGGeometryCheckOutputScheme.hh"
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
@@ -155,6 +156,7 @@ class RMGUserInit {
       AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
       AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
       AddOptionalOutputScheme<RMGGeometryCheckOutputScheme>("GeometryCheck");
+      AddOptionalOutputScheme<RMGGeomBenchOutputScheme>("GeomBench");
     }
 
     /**
