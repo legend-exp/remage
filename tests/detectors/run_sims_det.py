@@ -22,7 +22,7 @@ def replace_lines(
             f.write(line_t)
 
 
-def run_sim(run_name: str, register_dets_command: str):
+def run_sim(run_name: str, register_dets_command: str, gdml: str):
     replacements = {
         "$REGISTER_DETS": register_dets_command,
     }
@@ -31,30 +31,47 @@ def run_sim(run_name: str, register_dets_command: str):
 
     remage_run(
         "macros/run.mac",
-        gdml_files="gdml/geometry.gdml",
+        gdml_files=gdml,
         output=f"{run_name}.lh5",
         overwrite_output=True,
     )
 
 
 # Define the different detector registration commands to test
+gdml_default = "gdml/geometry.gdml"
 runs = [
-    ("det-from-gdml", "/RMG/Geometry/RegisterDetectorsFromGDML Germanium"),
-    ("det-from-regex", "/RMG/Geometry/RegisterDetector Germanium germanium.* 101"),
+    (
+        "det-from-gdml",
+        "/RMG/Geometry/RegisterDetectorsFromGDML Germanium",
+        gdml_default,
+    ),
+    (
+        "det-from-gdml-reuse",
+        "/RMG/Geometry/RegisterDetectorsFromGDML Germanium",
+        "gdml/geometry2.gdml",
+    ),
+    (
+        "det-from-regex",
+        "/RMG/Geometry/RegisterDetector Germanium germanium.* 101",
+        gdml_default,
+    ),
     (
         "det-from-regex-copynr",
         "/RMG/Geometry/RegisterDetector Germanium germanium.* 101 .*",
+        gdml_default,
     ),
     (
         "det-from-name",
         "/RMG/Geometry/RegisterDetector Germanium germanium_det1 101\n/RMG/Geometry/RegisterDetector Germanium germanium_det2 102",
+        gdml_default,
     ),
     (
         "det-from-both",
         "/RMG/Geometry/RegisterDetectorsFromGDML Germanium\n/RMG/Geometry/RegisterDetector Scintillator dif.* 104",
+        gdml_default,
     ),
 ]
 
 # Run each simulation
-for run_name, register_command in runs:
-    run_sim(run_name, register_command)
+for run_name, register_command, gdml in runs:
+    run_sim(run_name, register_command, gdml)
