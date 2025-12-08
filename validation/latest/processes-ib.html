@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Comparison with NIST" href="nist.html"><link rel="prev" title="Vertex confinement" href="confinement.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="HPGe tracking and observables" href="observables-ge.html">
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
-        <title>HPGe detector distance to surface - remage 0.17.1.dev17+g21f16b2ca validation suite</title>
+        <title>Internal Bremsstrahlung in Ar-39 decay - remage 0.17.1.dev17+g21f16b2ca validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -208,10 +208,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">HPGe detector distance to surface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="observables-ge.html">HPGe tracking and observables</a></li>
-<li class="toctree-l1"><a class="reference internal" href="processes-ib.html">Internal Bremsstrahlung in Ar-39 decay</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Internal Bremsstrahlung in Ar-39 decay</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
@@ -236,12 +236,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/distances.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/processes-ib.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/distances.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/processes-ib.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -253,45 +253,93 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="hpge-detector-distance-to-surface">
-<h1>HPGe detector distance to surface<a class="headerlink" href="#hpge-detector-distance-to-surface" title="Link to this heading">¶</a></h1>
-<p>Geant4 has the possibility to compute the distance of points to the surface of a
-solid. This is saved in the remage germanium output scheme for use in detector
-post-processing. This section of the validation report validates this
-calculation by comparing to one from python.</p>
-<p>These tests fill fail if the difference is large, and we also produce some plots
-showing the computed distance compared to the profile of the detectors.</p>
-<p>In this output scheme it is possible to save the position of the step based on
-either the pre or post-step point or the average of the two. All three options
-are used.</p>
+          <section class="tex2jax_ignore mathjax_ignore" id="internal-bremsstrahlung-in-ar-39-decay">
+<h1>Internal Bremsstrahlung in Ar-39 decay<a class="headerlink" href="#internal-bremsstrahlung-in-ar-39-decay" title="Link to this heading">¶</a></h1>
+<p>This section validates the simulation of Internal Bremsstrahlung (IB) radiation
+in beta decay processes, specifically for Ar-39 which is a relevant background
+source in liquid argon-based rare event searches.</p>
+<section id="validation-test">
+<h2>Validation test<a class="headerlink" href="#validation-test" title="Link to this heading">¶</a></h2>
+<p>We simulate Ar-39 decays in a liquid argon environment with an HPGe detector and
+compare simulations with and without IB enabled in Geant4. This allows us to
+quantify the impact of IB on detector observables.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>In these plots, the probability to generate inner bremsstrahlung has been biased
+by a factor of 10 to make effects better visible even with a lower number of
+simulated events.</p>
+</div>
+<section id="ib-gamma-vertex-energy-spectrum">
+<h3>IB gamma vertex energy spectrum<a class="headerlink" href="#ib-gamma-vertex-energy-spectrum" title="Link to this heading">¶</a></h3>
+<p>First, we extract the energy spectrum of photons emitted directly from Ar-39
+decays (i.e., the IB photons themselves). This is done by selecting photons
+whose parent track is an Ar-39 nucleus.</p>
 <figure class="align-default" id="id1">
-<a class="reference internal image-reference" href="_images/distance-ge-average.output.png"><img alt="_images/distance-ge-average.output.png" src="_images/distance-ge-average.output.png" style="width: 800px;" />
+<a class="reference internal image-reference" href="_images/innerbrem-gamma-vertex-energy.output.png"><img alt="_images/innerbrem-gamma-vertex-energy.output.png" src="_images/innerbrem-gamma-vertex-energy.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text">For the average of pre and post-step point, used by default.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Energy spectrum of Internal Bremsstrahlung photons from Ar-39 decay. The
+spectrum shows the characteristic soft photon distribution, with most photons
+having energies below 0.5 MeV.</em></span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p> </p>
+<p>   </p>
+<p>The spectrum shows the expected behavior: a continuous distribution dominated by
+low-energy photons, with the rate decreasing at higher energies. This matches
+theoretical predictions for IB emission.</p>
+</section>
+<section id="detector-signal-comparison">
+<h3>Detector signal comparison<a class="headerlink" href="#detector-signal-comparison" title="Link to this heading">¶</a></h3>
+<p>Next, we compare the energy deposited in the HPGe detector for simulations with
+and without IB enabled. This demonstrates the observable effect of IB on
+detector response.</p>
 <figure class="align-default" id="id2">
-<a class="reference internal image-reference" href="_images/distance-ge-poststep.output.png"><img alt="_images/distance-ge-poststep.output.png" src="_images/distance-ge-poststep.output.png" style="width: 800px;" />
+<a class="reference internal image-reference" href="_images/innerbrem-signal.output.png"><img alt="_images/innerbrem-signal.output.png" src="_images/innerbrem-signal.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text">For the poststep point.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Comparison of energy deposited in the HPGe detector for Ar-39 decays with and
+without Internal Bremsstrahlung. The spectra are rebinned to 20 keV bins for
+clarity.</em></span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p> </p>
+<p>   </p>
 <figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="_images/distance-ge-prestep.output.png"><img alt="_images/distance-ge-prestep.output.png" src="_images/distance-ge-prestep.output.png" style="width: 800px;" />
+<a class="reference internal image-reference" href="_images/innerbrem-difference.output.png"><img alt="_images/innerbrem-difference.output.png" src="_images/innerbrem-difference.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text">For the pre-step point</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Difference in detector energy spectra (With IB - Without IB). The positive
+values at low energies indicate additional events from IB photon interactions in
+the detector.</em></span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
+<p>   </p>
+<p>The difference plot shows that including IB increases the number of low-energy
+events in the detector. This is expected as the soft IB photons deposit
+additional energy when they interact with the detector material. The effect is
+most pronounced below ~100 keV, consistent with the IB photon energy spectrum.</p>
+<p>These validation plots confirm that:</p>
+<ul class="simple">
+<li><p>IB photons are being generated with the correct energy distribution</p></li>
+<li><p>The detector response correctly accounts for IB contributions</p></li>
+<li><p>The magnitude of the effect is consistent with the <span class="math notranslate nohighlight">\(\sim10^{-3}\)</span> branching
+ratio</p></li>
+</ul>
+<p>For precision background modeling in low-background experiments, it is important
+to enable IB in the simulation to accurately predict the detector response near
+the analysis threshold.</p>
+</section>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">¶</a></h2>
+<p>The spectrum is calculated based on Hayen et al., Rev. Mod. Phys. 90, 015008
+(2018). https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.90.015008 The
+calculation is described in detail in Section V Radiative Correction.</p>
+</section>
 </section>
 
         </article>
@@ -299,23 +347,15 @@ are used.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="nist.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Comparison with NIST</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="confinement.html">
+          
+          <a class="prev-page" href="observables-ge.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Vertex confinement</div>
+                <div class="title">HPGe tracking and observables</div>
                 
               </div>
             </a>
@@ -337,8 +377,32 @@ are used.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Internal Bremsstrahlung in Ar-39 decay</a><ul>
+<li><a class="reference internal" href="#validation-test">Validation test</a><ul>
+<li><a class="reference internal" href="#ib-gamma-vertex-energy-spectrum">IB gamma vertex energy spectrum</a></li>
+<li><a class="reference internal" href="#detector-signal-comparison">Detector signal comparison</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -355,5 +419,7 @@ are used.</p>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
