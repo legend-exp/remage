@@ -33,6 +33,8 @@ struct RMGDetectorMetadata {
     std::string name;
     /** @brief copy number of the referenced physical volume */
     int copy_nr;
+    /** @brief ntuple name override or empty string */
+    std::string ntuple_name;
 };
 
 #endif

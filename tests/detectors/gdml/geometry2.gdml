@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="world" x="2" y="2" z="2" lunit="m"/>
+		<orb name="basic_orb" r="0.4" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="germanium_det1">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="basic_orb"/>
+		</volume>
+		<volume name="germanium_det2">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="basic_orb"/>
+		</volume>
+		<volume name="different_det">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="basic_orb"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="germanium_det1">
+				<volumeref ref="germanium_det1"/>
+				<position name="germanium_det1_pos" x="-500.000000000000000" y="-250.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+			<physvol name="germanium_det2">
+				<volumeref ref="germanium_det2"/>
+				<position name="germanium_det2_pos" x="500.000000000000000" y="-250.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+			<physvol name="different_det">
+				<volumeref ref="different_det"/>
+				<position name="different_det_pos" x="0.000000000000000" y="500.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue=""/>
+		<auxiliary auxtype="RMG_detector" auxvalue="germanium">
+			<auxiliary auxtype="germanium_det1" auxvalue=":1,true,germanium_dets"/>
+			<auxiliary auxtype="germanium_det2" auxvalue=":1,true,germanium_dets"/>
+		</auxiliary>
+		<auxiliary auxtype="RMG_detector" auxvalue="scintillator">
+			<auxiliary auxtype="different_det" auxvalue="103"/>
+		</auxiliary>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
