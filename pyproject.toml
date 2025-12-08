@@ -51,7 +51,7 @@ test = [
   "hist[plot]",
   "legend-pygeom-optics >=0.15.0",
   "legend-pygeom-hpges >=0.9.0",
-  "legend-pygeom-tools >=0.0.25",
+  "legend-pygeom-tools >=0.0.26",
   "matplotlib",
   "numpy",
   "pyg4ometry",
