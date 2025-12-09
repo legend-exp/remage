@@ -195,7 +195,7 @@ def ipc_thread_fn(
                         # send continuation message, only to this process.
                         os.write(pipes_o_w[proc_id], b"\x06")  # ASCII ACK
     except OSError as e:
-        if e.errno == 9:  # bad file descriptor.
+        if e.errno in (9, 32):  # bad file descriptor or broken pipe.
             return
         raise e
 
