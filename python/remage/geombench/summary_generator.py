@@ -93,6 +93,7 @@ class SummaryGenerator:
 
         def draw(self, norm):
             fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+            # No self.fig; pass fig explicitly to helpers
 
             # Create histogram for XY plane
             h_xy = hist.Hist(
@@ -109,15 +110,13 @@ class SummaryGenerator:
                 .T
                 * 1e6
             )
-            artists_xy = h_xy.plot2d(ax=ax[0], norm=norm, edgecolor="face", linewidth=0)
+            artists_xy = h_xy.plot2d(
+                ax=ax[0], norm=norm, edgecolor="face", linewidth=0, cbar=False
+            )
             ax[0].set_title("XY Plane")
             ax[0].set_box_aspect((self.y[-1] - self.y[0]) / (self.x[-1] - self.x[0]))
-            fig.colorbar(
-                artists_xy[0],
-                ax=ax[0],
-                orientation="horizontal",
-                label=r"Median sim time per event [$\mu$s]",
-            )
+            cbar_xy = fig.colorbar(artists_xy[0], ax=ax[0], orientation="horizontal")
+            cbar_xy.set_label(r"Median sim time per event [$\mu$s]")
 
             # Create histogram for XZ plane
             h_xz = hist.Hist(
@@ -134,15 +133,13 @@ class SummaryGenerator:
                 .T
                 * 1e6
             )
-            artists_xz = h_xz.plot2d(ax=ax[1], norm=norm, edgecolor="face", linewidth=0)
+            artists_xz = h_xz.plot2d(
+                ax=ax[1], norm=norm, edgecolor="face", linewidth=0, cbar=False
+            )
             ax[1].set_title("XZ Plane")
             ax[1].set_box_aspect((self.z[-1] - self.z[0]) / (self.x[-1] - self.x[0]))
-            fig.colorbar(
-                artists_xz[0],
-                ax=ax[1],
-                orientation="horizontal",
-                label=r"Median sim time per event [$\mu$s]",
-            )
+            cbar_xz = fig.colorbar(artists_xz[0], ax=ax[1], orientation="horizontal")
+            cbar_xz.set_label(r"Median sim time per event [$\mu$s]")
 
             # Create histogram for YZ plane
             h_yz = hist.Hist(
@@ -159,15 +156,17 @@ class SummaryGenerator:
                 .T
                 * 1e6
             )
-            artists_yz = h_yz.plot2d(ax=ax[2], norm=norm, edgecolor="face", linewidth=0)
+            artists_yz = h_yz.plot2d(
+                ax=ax[2],
+                norm=norm,
+                edgecolor="face",
+                linewidth=0,
+                cbar=False,
+            )
             ax[2].set_title("YZ Plane")
             ax[2].set_box_aspect((self.z[-1] - self.z[0]) / (self.y[-1] - self.y[0]))
-            fig.colorbar(
-                artists_yz[0],
-                ax=ax[2],
-                orientation="horizontal",
-                label=r"Median sim time per event [$\mu$s]",
-            )
+            cbar_yz = fig.colorbar(artists_yz[0], ax=ax[2], orientation="horizontal")
+            cbar_yz.set_label(r"Median sim time per event [$\mu$s]")
 
             norm_string = "lin"
             if isinstance(norm, LogNorm):
