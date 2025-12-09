@@ -179,59 +179,6 @@ class SummaryGenerator:
         draw(self, norm=LogNorm())
         draw(self, norm=Normalize())
 
-    def draw_multiplicative(self, suffix: str = "multiplicative.pdf") -> None:
-        if self.mult_map_3d is None:
-            self._multiplicative_reconstruction()
-
-        def draw(self, norm):
-            fig, ax = plt.subplots(1, 3, figsize=(15, 5))
-            img = ax[0].matshow(
-                np.sum(self.mult_map_3d, axis=2)[::-1].T
-                / np.max(np.sum(self.mult_map_3d, axis=2)),
-                extent=self._calculate_extent(self.data_xy["X"], self.data_xy["Y"]),
-                norm=norm,
-            )
-            ax[0].set_title("XY Plane")
-            ax[0].set_xlabel("X")
-            ax[0].set_ylabel("Y")
-            fig.colorbar(img, ax=ax[0], orientation="horizontal")
-
-            img = ax[1].matshow(
-                np.sum(self.mult_map_3d, axis=1)[::-1].T
-                / np.max(np.sum(self.mult_map_3d, axis=1)),
-                extent=self._calculate_extent(self.data_xz["X"], self.data_xz["Z"]),
-                norm=norm,
-            )
-            ax[1].set_title("XZ Plane")
-            ax[1].set_xlabel("X")
-            ax[1].set_ylabel("Z")
-            fig.colorbar(img, ax=ax[1], orientation="horizontal")
-
-            img = ax[2].matshow(
-                np.sum(self.mult_map_3d, axis=0)[::-1].T
-                / np.max(np.sum(self.mult_map_3d, axis=0)),
-                extent=self._calculate_extent(self.data_yz["Y"], self.data_yz["Z"]),
-                norm=norm,
-            )
-            ax[2].set_title("YZ Plane")
-            ax[2].set_xlabel("Y")
-            ax[2].set_ylabel("Z")
-            fig.colorbar(img, ax=ax[2], orientation="horizontal")
-
-            norm_string = "lin"
-            if isinstance(norm, LogNorm):
-                norm_string = "log"
-
-            output_path = (
-                self.output_dir / f"{self.output_file_stem}_{norm_string}_{suffix}"
-            )
-            fig.savefig(output_path)
-
-            plt.close(fig)
-
-        draw(self, norm=LogNorm())
-        draw(self, norm=Normalize())
-
     def _get_hotspot_locations(
         self, threshold: float = 0.8
     ) -> list[tuple[float, float, float]]:
@@ -282,34 +229,6 @@ class SummaryGenerator:
 
         return stats
 
-    #    def print_histogram_of_simulation_times(self, n_bins: int = 101) -> None:
-    #        """
-    #        Print a histogram of simulation times per event using histoprint.
-    #        """
-    #
-    #        sim_times = (
-    #            np.concatenate(
-    #                [
-    #                    ak.to_numpy(self.data_xy["Time"]),
-    #                    ak.to_numpy(self.data_xz["Time"]),
-    #                    ak.to_numpy(self.data_yz["Time"]),
-    #                ]
-    #            )
-    #            * 1e6
-    #        )  # Convert to microseconds
-    #        bins = 10 ** np.linspace(
-    #            np.log10(np.min(sim_times)), np.log10(np.max(sim_times)), n_bins + 1
-    #        )
-    #        hist_data = np.histogram(sim_times, bins=bins)
-    #
-    #        histoprint.print_hist(
-    #            hist_data,
-    #            title="Median Simulation Times per Event [μs]",
-    #            summary=True,
-    #        )
-
     def perform_analysis(self) -> dict:
         self.draw_simulation_time_profiles()
-        # self.print_histogram_of_simulation_times()
-        # self.draw_multiplicative()
         return self.calculate_simulation_statistics()

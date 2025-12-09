@@ -135,11 +135,11 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
                         ->GetSolid();
   auto typeofworld = worldsolid->GetEntityType();
   if (typeofworld != "G4Box")
-    RMGLog::Out(
+    RMGLog::OutFormat(
         RMGLog::warning,
-        "World entity shape (",
-        typeofworld,
-        ") is not a G4Box (why not? :| ). A very large benchmarking cube may crash the simulation."
+        "World entity shape ({}) is not a G4Box (why not? :| ). A very large benchmarking cube may "
+        "crash the simulation.",
+        typeofworld
     );
 
   // set the origin and limit according to the world volume
@@ -183,55 +183,40 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
 
 
   RMGLog::Out(RMGLog::summary, "Benchmark sampling configuration:");
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "  X: ",
+      "  X: {} pixels, width = {} mm, increment = {} mm",
       npixels_x,
-      " pixels, width = ",
       sampling_width.x(),
-      " mm, increment = ",
-      increment.x(),
-      " mm"
+      increment.x()
   );
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "  Y: ",
+      "  Y: {} pixels, width = {} mm, increment = {} mm",
       npixels_y,
-      " pixels, width = ",
       sampling_width.y(),
-      " mm, increment = ",
-      increment.y(),
-      " mm"
+      increment.y()
   );
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "  Z: ",
+      "  Z: {} pixels, width = {} mm, increment = {} mm",
       npixels_z,
-      " pixels, width = ",
       sampling_width.z(),
-      " mm, increment = ",
-      increment.z(),
-      " mm"
+      increment.z()
   );
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "Sampling region origin at (X,Y,Z): (",
+      "Sampling region origin at (X,Y,Z): ({}, {}, {}) mm",
       origin.x(),
-      ", ",
       origin.y(),
-      ", ",
-      origin.z(),
-      ") mm"
+      origin.z()
   );
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "Sampling region lower limit at (X,Y,Z): (",
+      "Sampling region lower limit at (X,Y,Z): ({}, {}, {}) mm",
       limit.x(),
-      ", ",
       limit.y(),
-      ", ",
-      limit.z(),
-      ") mm"
+      limit.z()
   );
 
   // Calculate the number of pixels to simulate, and number of primaries per pixel
@@ -257,32 +242,27 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
       std::ceil(static_cast<double>(neventsperpixel) / events_per_bunch)
   );
 
-  RMGLog::Out(
+  RMGLog::OutFormat(
       RMGLog::summary,
-      "Total pixels to sample: ",
+      "Total pixels to sample: {} (XZ: {}, YZ: {}, XY: {})",
       totalnpixels,
-      " (XZ: ",
       pixels_xz,
-      ", YZ: ",
       pixels_yz,
-      ", XY: ",
-      pixels_xy,
-      ")"
+      pixels_xy
   );
-  RMGLog::Out(RMGLog::debug, "Events per bunch: ", events_per_bunch);
-  RMGLog::Out(RMGLog::debug, "Total batch rounds: ", total_batch_rounds);
+  RMGLog::OutFormat(RMGLog::debug, "Events per bunch: {}", events_per_bunch);
+  RMGLog::OutFormat(RMGLog::debug, "Total batch rounds: {}", total_batch_rounds);
 
   // Safeties
 
   // Could maybe downgrade this from a warning to a summary...
   if (neventsperpixel != floor(neventsperpixel)) {
-    RMGLog::Out(
+    RMGLog::OutFormat(
         RMGLog::warning,
-        "Specified number of primaries(",
+        "Specified number of primaries({}) doesn't divide evenly into the specified number of "
+        "pixels ({})",
         totalnevents,
-        ") doesn't divide evenly into the specified number of pixels (",
-        totalnpixels,
-        ")"
+        totalnpixels
     );
     RMGLog::Out(RMGLog::warning, "Rounding down to nearest integer number of primaries per pixel.");
   }
@@ -292,7 +272,7 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
   // Doing this would also be completely useless from a benchmarking perspective
   if (neventsperpixel < 2)
     RMGLog::Out(RMGLog::fatal, "Not enough primaries to sample each pixel at least twice! Exiting...");
-  else RMGLog::Out(RMGLog::summary, "Number of primaries per pixel: ", neventsperpixel);
+  else RMGLog::OutFormat(RMGLog::summary, "Number of primaries per pixel: {}", neventsperpixel);
 
 } // BeginOfRunAction
 
@@ -313,7 +293,7 @@ void RMGGeomBench::EndOfRunAction(const G4Run* /*r*/) {
 
 void RMGGeomBench::RecordBatchTime(size_t pixel_idx, double batch_time) {
   if (pixel_idx >= totalnpixels) {
-    RMGLog::Out(RMGLog::warning, "Invalid pixel index (", pixel_idx, ") in RecordBatchTime");
+    RMGLog::OutFormat(RMGLog::warning, "Invalid pixel index ({}) in RecordBatchTime", pixel_idx);
     return;
   }
 
@@ -324,7 +304,7 @@ void RMGGeomBench::RecordBatchTime(size_t pixel_idx, double batch_time) {
 
   pixel_batch_times[pixel_idx].push_back(batch_time);
 
-  RMGLog::Out(RMGLog::debug, "Recorded batch time ", batch_time, " s for pixel ", pixel_idx);
+  RMGLog::OutFormat(RMGLog::debug, "Recorded batch time {} s for pixel {}", batch_time, pixel_idx);
 } // RecordBatchTime
 
 void RMGGeomBench::SaveAllPixels() {
@@ -400,17 +380,13 @@ void RMGGeomBench::SaveAllPixels() {
 
           if (events_per_bunch > 0) { median_time_per_event = median_time / events_per_bunch; }
 
-          RMGLog::Out(
+          RMGLog::OutFormat(
               RMGLog::debug,
-              "Pixel ",
+              "Pixel {} (plane {}): {} batches, median time per event: {} s",
               pixel_idx,
-              " (plane ",
               plane,
-              "): ",
               n,
-              " batches, median time per event: ",
-              median_time_per_event,
-              " s"
+              median_time_per_event
           );
         }
 
@@ -420,7 +396,7 @@ void RMGGeomBench::SaveAllPixels() {
     }
   }
 
-  RMGLog::Out(RMGLog::summary, "Saved data for all ", pixel_idx, " pixels");
+  RMGLog::OutFormat(RMGLog::summary, "Saved data for all {} pixels", pixel_idx);
 } // SaveAllPixels
 
 
@@ -461,15 +437,12 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
       double bunch_time = static_cast<double>(std::clock() - bunchstarttime) / CLOCKS_PER_SEC;
       int prev_pixel_index = (ID - 1) % (totalnpixels * events_per_bunch) / events_per_bunch;
       RecordBatchTime(prev_pixel_index, bunch_time);
-      RMGLog::Out(
+      RMGLog::OutFormat(
           RMGLog::debug,
-          "Batch complete for pixel ",
+          "Batch complete for pixel {} at event # {}, CPU time: {} s",
           prev_pixel_index,
-          " at event # ",
           ID - 1,
-          ", CPU time: ",
-          bunch_time,
-          " s"
+          bunch_time
       );
     }
 
@@ -477,7 +450,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
     bunchstarttime = std::clock();
 
     if (current_batch_event == 0 && current_pixel_index == 0) {
-      RMGLog::Out(RMGLog::debug, "Starting batch round ", current_batch_round, " at event # ", ID);
+      RMGLog::OutFormat(RMGLog::debug, "Starting batch round {} at event # {}", current_batch_round, ID);
     }
   }
 
@@ -561,7 +534,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
       break;
     }
     default: {
-      RMGLog::Out(RMGLog::fatal, "Invalid plane (", plane, ") in GeneratePrimaries()");
+      RMGLog::OutFormat(RMGLog::fatal, "Invalid plane ({}) in GeneratePrimaries()", plane);
     }
   } // switch(plane)
 
@@ -569,7 +542,7 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
   fGun->SetParticleMomentumDirection(momentumdir);
   fGun->SetParticleEnergy(1 * u::GeV);
 
-  RMGLog::Out(RMGLog::debug, "Sampled X: ", xtemp, "  Sampled Y: ", ytemp, "  Sampled Z:", ztemp);
+  RMGLog::OutFormat(RMGLog::debug, "Sampled X: {}  Sampled Y: {}  Sampled Z: {}", xtemp, ytemp, ztemp);
   RMGLog::Out(RMGLog::debug, "Momentum direction: ", momentumdir);
 
   fGun->GeneratePrimaryVertex(event);

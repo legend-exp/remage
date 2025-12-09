@@ -46,10 +46,7 @@ def test_generate_macro(tmp_path: Path) -> None:
 
     output_file_stem = args.geometry.stem
 
-    macro_path = generate_macro(args, output_file_stem=output_file_stem)
-
-    with Path(macro_path).open("r") as f:
-        macro_content = f.read()
+    macro_content = generate_macro(args, output_file_stem=output_file_stem)
 
     assert re.search(
         r"/RMG/Geometry/IncludeGDMLFile .*/gdml/geometry.gdml", macro_content

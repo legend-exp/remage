@@ -2,35 +2,15 @@ from __future__ import annotations
 
 import argparse
 import ast
-import tempfile
 from pathlib import Path
 
 from .. import logging as rmg_logging
 from ..cli import remage_run
 from .gdml_handling import (
-    extract_component_from_gdml,
     generate_tmp_gdml_geometry,
     load_gdml_geometry,
 )
 from .summary_generator import SummaryGenerator
-
-
-def generate_output_file_path(output_dir: Path, output_file_stem: str = "") -> Path:
-    """Generate the output file path based on the geometry file name.
-
-    Parameters
-    ----------
-    geometry_path : Path
-        Path to the geometry file.
-    output_dir : Path
-        Directory where the output file will be stored.
-
-    Returns
-    -------
-    Path
-        Full path to the output file with .lh5 extension.
-    """
-    return output_dir / (output_file_stem + ".lh5")
 
 
 def generate_macro(args, output_file_stem: str = "") -> str:
@@ -61,7 +41,7 @@ def generate_macro(args, output_file_stem: str = "") -> str:
     geometry_path = Path(args.geometry)
     filename = geometry_path.absolute()
     output_dir = Path(args.output_dir)
-    output_file = generate_output_file_path(output_dir, output_file_stem)
+    output_file = output_dir / (output_file_stem + ".lh5")
     if issubclass(type(args.grid_increments), str) and args.grid_increments:
         grid_increments = ast.literal_eval(args.grid_increments)
         increment_x = grid_increments.get("x", args.grid_increment)
@@ -92,10 +72,7 @@ def generate_macro(args, output_file_stem: str = "") -> str:
         logger.info(macro_content)
         return ""
 
-    macro_file_path = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".mac")  # noqa: SIM115
-    macro_file_path.write(macro_content)
-    macro_file_path.close()
-    return str(macro_file_path.name)
+    return macro_content
 
 
 def remage_geombench_cli(external_args: list[str] | None = None) -> int:
@@ -175,9 +152,16 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
 
     # Extract specific component if requested, otherwise use full geometry
     if args.logical_volume != "":
-        geometry_to_benchmark = extract_component_from_gdml(
-            original_gdml_dict, args.logical_volume
-        )
+        registry = original_gdml_dict["registry"]
+        if args.logical_volume not in registry.logicalVolumeDict:
+            msg = f"Logical volume '{args.logical_volume}' not found in the geometry registry."
+            raise ValueError(msg)
+
+        geometry_to_benchmark = {
+            "object_lv": registry.logicalVolumeDict[args.logical_volume],
+            "registry": registry,
+        }
+
         object_name = f"{args.logical_volume}_extracted"
         output_file_stem = f"part_{args.logical_volume}_{output_file_stem}"
     else:
@@ -192,18 +176,16 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     )
     args.geometry = str(tmp_gdml_file)
 
-    macro_file = generate_macro(args, output_file_stem=output_file_stem)
+    macro_content = generate_macro(args, output_file_stem=output_file_stem)
 
     if args.dry_run:
         return 0
 
     try:
         # run remage
-        ec, _ = remage_run(macros=macro_file)
+        ec, _ = remage_run(macros=macro_content)
 
-        sim_output_file = generate_output_file_path(
-            Path(args.output_dir), output_file_stem=output_file_stem
-        )
+        sim_output_file = Path(args.output_dir) / (output_file_stem + ".lh5")
 
         if ec != 0 and not sim_output_file.exists():
             logger.error("Remage simulation failed.")
@@ -224,8 +206,8 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         msg = f"An error occurred: {e}"
         logger.error(msg)
         return 1
+
     finally:
-        Path(macro_file).unlink(missing_ok=True)
         if tmp_gdml_file:
             Path(tmp_gdml_file).unlink(missing_ok=True)
 
