@@ -4,8 +4,7 @@ import argparse
 from pathlib import Path
 
 import awkward as ak
-
-# import histoprint
+import hist
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
@@ -85,23 +84,6 @@ class SummaryGenerator:
 
         self.mult_map_3d = map_3d
 
-    def _calculate_extent(
-        self, data_axis1: np.ndarray, data_axis2: np.ndarray
-    ) -> list[float]:
-        min_1 = np.min(data_axis1)
-        min_2 = np.min(data_axis2)
-
-        n_1 = len(np.unique(data_axis1))
-        n_2 = len(np.unique(data_axis2))
-
-        increment_1 = np.unique(data_axis1)[1] - np.unique(data_axis1)[0]
-        increment_2 = np.unique(data_axis2)[1] - np.unique(data_axis2)[0]
-
-        max_1 = min_1 + n_1 * increment_1
-        max_2 = min_2 + n_2 * increment_2
-
-        return [min_1, max_1, min_2, max_2]  # [x_min, x_max, y_min, y_max]
-
     def draw_simulation_time_profiles(
         self, suffix: str = "simulation_time_profiles.pdf"
     ) -> None:
@@ -111,55 +93,77 @@ class SummaryGenerator:
 
         def draw(self, norm):
             fig, ax = plt.subplots(1, 3, figsize=(15, 5))
-            img = ax[0].matshow(
-                np.array(self.data_xy["Time"]).reshape(
-                    self.n_y_gridpoint, self.n_x_gridpoint
-                )[::-1]
-                * 1e6,
-                extent=self._calculate_extent(self.data_xy["X"], self.data_xy["Y"]),
-                norm=norm,
+
+            # Create histogram for XY plane
+            h_xy = hist.Hist(
+                hist.axis.Regular(
+                    self.n_x_gridpoint, self.x[0], self.x[-1], name="X", label="X"
+                ),
+                hist.axis.Regular(
+                    self.n_y_gridpoint, self.y[0], self.y[-1], name="Y", label="Y"
+                ),
             )
+            h_xy[:, :] = (
+                np.array(self.data_xy["Time"])
+                .reshape(self.n_x_gridpoint, self.n_y_gridpoint)
+                .T
+                * 1e6
+            )
+            artists_xy = h_xy.plot2d(ax=ax[0], norm=norm, edgecolor="face", linewidth=0)
             ax[0].set_title("XY Plane")
-            ax[0].set_xlabel("X")
-            ax[0].set_ylabel("Y")
+            ax[0].set_box_aspect((self.y[-1] - self.y[0]) / (self.x[-1] - self.x[0]))
             fig.colorbar(
-                img,
+                artists_xy[0],
                 ax=ax[0],
                 orientation="horizontal",
                 label=r"Median sim time per event [$\mu$s]",
             )
 
-            img = ax[1].matshow(
-                np.array(self.data_xz["Time"]).reshape(
-                    self.n_z_gridpoint, self.n_x_gridpoint
-                )[::-1]
-                * 1e6,
-                extent=self._calculate_extent(self.data_xz["X"], self.data_xz["Z"]),
-                norm=norm,
+            # Create histogram for XZ plane
+            h_xz = hist.Hist(
+                hist.axis.Regular(
+                    self.n_x_gridpoint, self.x[0], self.x[-1], name="X", label="X"
+                ),
+                hist.axis.Regular(
+                    self.n_z_gridpoint, self.z[0], self.z[-1], name="Z", label="Z"
+                ),
             )
+            h_xz[:, :] = (
+                np.array(self.data_xz["Time"])
+                .reshape(self.n_x_gridpoint, self.n_z_gridpoint)
+                .T
+                * 1e6
+            )
+            artists_xz = h_xz.plot2d(ax=ax[1], norm=norm, edgecolor="face", linewidth=0)
             ax[1].set_title("XZ Plane")
-            ax[1].set_xlabel("X")
-            ax[1].set_ylabel("Z")
+            ax[1].set_box_aspect((self.z[-1] - self.z[0]) / (self.x[-1] - self.x[0]))
             fig.colorbar(
-                img,
+                artists_xz[0],
                 ax=ax[1],
                 orientation="horizontal",
                 label=r"Median sim time per event [$\mu$s]",
             )
 
-            img = ax[2].matshow(
-                np.array(self.data_yz["Time"]).reshape(
-                    self.n_z_gridpoint, self.n_y_gridpoint
-                )[::-1]
-                * 1e6,
-                extent=self._calculate_extent(self.data_yz["Y"], self.data_yz["Z"]),
-                norm=norm,
+            # Create histogram for YZ plane
+            h_yz = hist.Hist(
+                hist.axis.Regular(
+                    self.n_y_gridpoint, self.y[0], self.y[-1], name="Y", label="Y"
+                ),
+                hist.axis.Regular(
+                    self.n_z_gridpoint, self.z[0], self.z[-1], name="Z", label="Z"
+                ),
             )
+            h_yz[:, :] = (
+                np.array(self.data_yz["Time"])
+                .reshape(self.n_y_gridpoint, self.n_z_gridpoint)
+                .T
+                * 1e6
+            )
+            artists_yz = h_yz.plot2d(ax=ax[2], norm=norm, edgecolor="face", linewidth=0)
             ax[2].set_title("YZ Plane")
-            ax[2].set_xlabel("Y")
-            ax[2].set_ylabel("Z")
+            ax[2].set_box_aspect((self.z[-1] - self.z[0]) / (self.y[-1] - self.y[0]))
             fig.colorbar(
-                img,
+                artists_yz[0],
                 ax=ax[2],
                 orientation="horizontal",
                 label=r"Median sim time per event [$\mu$s]",
