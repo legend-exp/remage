@@ -56,11 +56,13 @@ class RMGGeneratorFromFile : public RMGVGenerator {
         double fPx = NAN;
         double fPy = NAN;
         double fPz = NAN;
+        double fTime = NAN;
+        int fNpart = -1;
         RowData() {}; // NOLINT(modernize-use-equals-default)
 
         [[nodiscard]] bool IsValid() const {
           return fG4Pid != -1 && !std::isnan(fEkin) && !std::isnan(fPx) && !std::isnan(fPy) &&
-                 !std::isnan(fPz);
+                 !std::isnan(fPz) && !std::isnan(fTime) && fNpart != -1;
         }
     };
 
