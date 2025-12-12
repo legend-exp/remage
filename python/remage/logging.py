@@ -33,7 +33,7 @@ logging.Logger.detail = lambda self, msg, *args, **kwargs: self.log(
 
 
 LEVELS_RMG_TO_PY = {
-    "Debug_Event": logging.DEBUG,
+    "Debug_event": logging.DEBUG,
     "Debug": logging.DEBUG,
     "Detail": DETAIL,
     "Summary": logging.INFO,
@@ -44,7 +44,7 @@ LEVELS_RMG_TO_PY = {
 }
 
 LEVEL_COLORS = {
-    "Debug_Event": "purple",
+    "Debug_event": "purple",
     "Debug": "purple",
     "Detail": "blue",
     "Summary": "green",

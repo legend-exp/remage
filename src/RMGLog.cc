@@ -108,6 +108,7 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
   if (fProcNum >= 0) proc_prefix = "<p" + std::to_string(fProcNum) + "> ";
 
   switch (loglevel) {
+    case debug_event: return Colorize<RMGLog::Ansi::magenta>(proc_prefix + "[DebugE --> ", os);
     case debug: return Colorize<RMGLog::Ansi::magenta>(proc_prefix + "[Debug ---> ", os);
     case detail: return Colorize<RMGLog::Ansi::blue>(proc_prefix + "[Detail --> ", os);
     case summary: return Colorize<RMGLog::Ansi::green>(proc_prefix + "[Summary -> ", os);
