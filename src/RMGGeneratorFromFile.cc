@@ -94,7 +94,6 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
       skipped_rows_this_evt++;
       skipped_rows++;
     }
-    RMGLog::Out(RMGLog::summary, "skipped rows=", skipped_rows, " events=", skipped_events, " start=", start_event);
   }
 }
 
