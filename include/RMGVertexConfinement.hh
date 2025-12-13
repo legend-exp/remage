@@ -113,6 +113,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
     void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
+    void SetWeightByMass(bool mode) { fWeightByMass = mode; }
 
     std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -244,6 +245,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         G4ThreeVector translation;
 
         double volume = -1;
+        double mass = -1;
         double surface = -1;
 
         bool surface_sample = false;
@@ -266,8 +268,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         /** @brief Select a @c SampleableObject from the collection, weighted by volume.
          *  @returns a reference to the chosen @c SampleableObject .
+         *  @param weight_by_mass A flag of whether the volume weighting should be done by mass and not by volume.
          */
-        [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
+        [[nodiscard]] const SampleableObject& VolumeWeightedRand(bool weight_by_mass) const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         // emulate @c std::vector
@@ -283,7 +286,11 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         std::vector<SampleableObject> data;
         double total_volume = 0;
+        bool total_volume_all = true;
+        double total_mass = 0;
+        bool total_mass_all = true;
         double total_surface = 0;
+        bool total_surface_all = true;
     };
 
   private:
@@ -311,6 +318,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
     VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
+    bool fWeightByMass = false;
 
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
