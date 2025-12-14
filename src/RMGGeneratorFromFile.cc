@@ -67,7 +67,7 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
                        G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
   // skip the first start_event rows from the input file.
   if (start_event > 0) {
-    size_t skipped_events = 0, skipped_rows = 0, skipped_rows_this_evt = 0, n_part_this_evt = 1;
+    size_t skipped_events = 0, skipped_rows_this_evt = 0, n_part_this_evt = 1;
     while ((skipped_events < start_event) ||
            (skipped_events == start_event && skipped_rows_this_evt < n_part_this_evt)) {
       fRowData = RowData(); // initialize sentinel values.
@@ -92,7 +92,6 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
       }
 
       skipped_rows_this_evt++;
-      skipped_rows++;
     }
   }
 }
