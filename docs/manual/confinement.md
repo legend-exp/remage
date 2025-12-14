@@ -172,7 +172,7 @@ All sampling modes described above are available, with few notes/limitations:
 
 For more complicated vertex confinement _remage_ supports the possibility to
 read in directly event primary positions from input files, as described in
-{ref}`manual-generators-extfiles`.
+{ref}`manual-input-vertex`.
 
 [^1]:
     J. A. Detwiler, R. Henning, R. A. Johnson and M. G. Marino, in IEEE
