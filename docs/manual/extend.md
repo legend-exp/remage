@@ -30,13 +30,13 @@ otherwise would have forwarded through CLI arguments:
 ```c++
 manager.IncludeMacroFile(macroName);
 manager.SetInteractive(true);
-manager.SetOutputFileName(outputfilename);
 manager.SetNumberOfThreads(nthreads);
-manager.SetOutputOverwriteFiles(overwrite);
+manager.GetOutputManager()->SetOutputFileName(outputfilename);
+manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite);
 ```
 
 For all of the possible options check the public functions of the
-{cpp:class}`RMGManager`.
+{cpp:class}`RMGManager` and {cpp:class}`RMGOutputManager`.
 
 ## Registering custom classes
 
