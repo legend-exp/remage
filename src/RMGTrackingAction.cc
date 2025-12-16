@@ -21,6 +21,7 @@
 #include "G4Track.hh"
 #include "G4TrackingManager.hh"
 
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGLog.hh"
 #include "RMGRunAction.hh"
 
@@ -62,7 +63,10 @@ bool RMGTrackingAction::ResetInitialDecayTime(const G4Track* aTrack) {
 
   // only reset the time if the last process is a radioactive decay.
   auto creator_process = aTrack->GetStep()->GetPostStepPoint()->GetProcessDefinedStep();
-  if (!dynamic_cast<const G4RadioactiveDecay*>(creator_process)) return false;
+
+  if (!dynamic_cast<const G4RadioactiveDecay*>(creator_process) &&
+      !dynamic_cast<const RMGInnerBremsstrahlungProcess*>(creator_process))
+    return false;
 
   const auto secondaries = fpTrackingManager->GimmeSecondaries();
   auto secondaries_in_current_step = aTrack->GetStep()->GetNumberOfSecondariesInCurrentStep();

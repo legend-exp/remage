@@ -62,10 +62,43 @@ pz = Array(np.cos(p_theta))
 
 pdg = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64) * 11)
 ekin = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "MeV"})
+time = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "ns"})
+n_part = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64))
 
 vtx_kin_file = "macros/vtx-kin.lh5"
 lh5.write(
-    Table({"g4_pid": pdg, "ekin": ekin, "px": px, "py": py, "pz": pz}),
+    Table(
+        {
+            "g4_pid": pdg,
+            "ekin": ekin,
+            "px": px,
+            "py": py,
+            "pz": pz,
+            "time": time,
+            "n_part": n_part,
+        }
+    ),
+    "vtx/kin",
+    lh5_file=vtx_kin_file,
+    wo_mode="of",
+)
+_convert_lh5_to_hdf5(vtx_kin_file)
+
+n_part.nda[1::2] = 0
+n_part.nda *= 2
+vtx_kin_file = "macros/vtx-kin2.lh5"
+lh5.write(
+    Table(
+        {
+            "g4_pid": pdg,
+            "ekin": ekin,
+            "px": px,
+            "py": py,
+            "pz": pz,
+            "time": time,
+            "n_part": n_part,
+        }
+    ),
     "vtx/kin",
     lh5_file=vtx_kin_file,
     wo_mode="of",

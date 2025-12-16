@@ -16,6 +16,9 @@ def test_macro_input():
     _remage_run("macros/run.mac")
     _remage_run(["macros/run-a.mac", "macros/run-b.mac"])
 
+    with pytest.raises(TypeError):
+        _remage_run(["boh", 420])
+
     with pytest.raises(RuntimeError):
         _remage_run("this is nonsense")
 
@@ -24,3 +27,13 @@ def test_macro_input():
     _remage_run("\n".join(inline_cmds))
 
     _remage_run(["macros/run-a.mac", "/RMG/Generator/Select GPS", "/run/beamOn 1"])
+
+    _remage_run(
+        [
+            "   macros/run-a.mac",
+            "# this is a comment",
+            "/RMG/Generator/Select GPS   ",
+            " ",
+            "/run/beamOn 1",
+        ]
+    )

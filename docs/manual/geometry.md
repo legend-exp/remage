@@ -91,6 +91,13 @@ This would register any volume with name matching the regular expression
 `.*_cu_.*` under the UID 1. In this case the UIDs will **not** be incremented
 for multiple matches.
 
+This alone might produce unexpected output, when
+<project:../rmg-commands.md#rmgoutputntupleusevolumename> is enabled. To solve
+the problem, a sixth argument (`ntuple_name`) can be used to set the name of the
+resulting ntuple. The same fifth and sixth arguments must be used for all
+detectors that share a uid. In this case, the specified name will be used as the
+table name in the output file, instead of the volume name.
+
 Last but not least, detectors can be imported from a GDML file that includes
 metadata, using the
 <project:../rmg-commands.md#rmggeometryregisterdetectorsfromgdml> command.

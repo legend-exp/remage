@@ -6,6 +6,7 @@ import re
 import sys
 from pathlib import Path
 
+import awkward as ak
 import numpy as np
 from lgdo import lh5
 from remage import remage_run
@@ -44,6 +45,10 @@ else:
     extra_args["procs"] = nthread
     n_events = int(10000 / nthread)
 
+if "kin2" in macro:
+    # when we have two particles per event, we only have half of the events.
+    n_events //= 2
+
 # run remage, produce lh5 output.
 files = remage_run(
     f"macros/{macro}.mac",
@@ -81,24 +86,37 @@ if "pos" in macro:
 
 if "kin" in macro:
     kin_input_file = kin_input_file.replace(".hdf5", ".lh5")
-    input_kin = lh5.read("vtx/kin", lh5_file=kin_input_file).view_as("pd")
-    output_kin = lh5.read("particles", lh5_file=files).view_as("pd")
+    input_kin = lh5.read_as("vtx/kin", kin_input_file, "ak")
+    output_kin = lh5.read_as("particles", files, "ak")
 
-    output_kin = output_kin.sort_values("ekin")  # sort by linear column.
-    output_kin = output_kin[["px", "py", "pz", "ekin", "particle"]]
-    uniq, cnt = np.unique(output_kin["px"], return_counts=True)
+    output_kin = output_kin[ak.argsort(output_kin["ekin"])]  # sort by linear column.
+    uniq, cnt = np.unique(output_kin["px"].to_numpy(), return_counts=True)
     if not np.all(cnt <= 1):
         msg = f"non-unique kin 'indices' {uniq[cnt > 1]}"
         raise ValueError(msg)
 
+    # re-scale to accommodate for different convention (absolute momentum vs direction).
     output_p_scale = np.sqrt(
         output_kin["px"] ** 2 + output_kin["py"] ** 2 + output_kin["pz"] ** 2
     )
-    output_kin["px"] /= output_p_scale
-    output_kin["py"] /= output_p_scale
-    output_kin["pz"] /= output_p_scale
+    for p_field in ("px", "py", "pz"):
+        output_kin[p_field] = output_kin[p_field] / output_p_scale
 
-    input_kin = input_kin.iloc[0 : len(output_kin)]
-    input_kin = input_kin[["px", "py", "pz", "ekin", "g4_pid"]]
+    input_kin = input_kin[0 : len(output_kin)]
 
-    assert np.all(np.isclose(output_kin.to_numpy(), input_kin.to_numpy()))
+    cols_to_compare = {
+        "px": "px",
+        "py": "py",
+        "pz": "pz",
+        "ekin": "ekin",
+        "g4_pid": "particle",
+    }
+    for col_in, col_out in cols_to_compare.items():
+        assert np.all(
+            np.isclose(output_kin[col_out].to_numpy(), input_kin[col_in].to_numpy())
+        )
+
+    # compare number of particles in the events
+    part_in = input_kin["n_part"][input_kin["n_part"] > 0]
+    part_out = ak.run_lengths(output_kin["evtid"])
+    assert ak.all(part_in == part_out)
