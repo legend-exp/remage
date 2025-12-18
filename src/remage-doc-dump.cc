@@ -45,6 +45,7 @@
 #include "RMGVOutputScheme.hh"
 #include "RMGVertexConfinement.hh"
 #include "RMGVertexFromFile.hh"
+#include "RMGVertexFromPoint.hh"
 #include "RMGVertexOutputScheme.hh"
 
 #include "CLI/CLI.hpp"
@@ -70,6 +71,7 @@ void init_extra() {
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();
+  new RMGVertexFromPoint();
 
   // generators
   new RMGGeneratorMUSUNCosmicMuons();

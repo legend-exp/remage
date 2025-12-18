@@ -34,8 +34,9 @@ class RMGMasterGenerator : public G4VUserPrimaryGeneratorAction {
      */
     enum class Confinement {
       kUnConfined, ///< No confinement is applied here; the generator has the duty to sample a primary vertex.
-      kVolume,  ///< The primary vertex is confined to a specific detector volume.
-      kFromFile ///< The primary vertex is read from an external file.
+      kVolume,   ///< The primary vertex is confined to a specific detector volume.
+      kFromFile, ///< The primary vertex is read from an external file.
+      kFromPoint ///< The primary vertex is always at a fixed position.
     };
 
     /**
