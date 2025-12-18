@@ -526,7 +526,7 @@ Select primary confinement strategy
 * **Parameter** – `strategy`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `UnConfined Volume FromFile`
+  * **Candidates** – `UnConfined Volume FromFile FromPoint`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Select`
@@ -549,6 +549,7 @@ Commands for controlling primary confinement
 * `/RMG/Generator/Confinement/Physical/` – Commands for setting physical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/` – Commands for setting geometrical volumes up for primary confinement
 * `/RMG/Generator/Confinement/FromFile/` – Commands for controlling reading event vertex positions from file
+* `/RMG/Generator/Confinement/FromPoint/` – Commands for controlling vertex positions at fixed point
 
 **Commands:**
 
@@ -947,6 +948,30 @@ Uses "vtx" by default
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/Confinement/FromPoint/`
+
+Commands for controlling vertex positions at fixed point
+
+
+**Commands:**
+
+* `Position` – Change the default input directory/group for ntuples.
+
+### `/RMG/Generator/Confinement/FromPoint/Position`
+
+Change the default input directory/group for ntuples.
+
+* **Parameter** – `pos`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `valueY`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `valueZ`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/MUSUNCosmicMuons/`
