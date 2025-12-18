@@ -2,12 +2,6 @@
 
 # Output
 
-:::{todo}
-
-- isotope filtering
-
-:::
-
 _remage_ mainly supports the
 [LH5](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5) output
 format. This is the only format we can provide the convenient output reshaping
@@ -105,7 +99,8 @@ with the `--merge-output-files` (or `-m`) command line option.
 
 Merging involves some additional I/O operations so for some simulations may
 increase run time! _remage_ will report the amount of time spent merging the
-files.
+files. Merging can take a lot of time as these operations are run on a single
+core at the moment.
 
 :::
 
@@ -172,7 +167,7 @@ occur. The macro commands
 <project:../rmg-commands.md#rmgoutputgermaniumedepcutlow> and
 <project:../rmg-commands.md#rmgoutputgermaniumedepcuthigh>:
 
-```remage
+```geant4
 /RMG/Output/Germanium/AddDetectorForEdepThreshold {UID}
 /RMG/Output/Germanium/EdepCutLow {ELOW}
 /RMG/Output/Germanium/EdepCutHigh {EHIGH}
@@ -338,6 +333,8 @@ UID through the symbolic stored in the `/stp/__by_uid__` group.
 
 ## Data reduction methods
 
+### Step (pre-)clustering
+
 Often Geant4 takes steps much shorter than those that are meaningful in a HPGe
 or a scintillation detector. For example the typical dimension of charge clouds
 produced by interactions in germanium are 1-2 mm, so we are not sensitive to
@@ -477,6 +474,55 @@ In this way the output still represents a step, just with a longer effective
 step length.
 
 :::
+
+### Output filtering
+
+Another strategy for output file size reduction is to filter out unwanted events
+before even writing them to disk. In _remage_, these filters can be registered
+as optional "output" schemes (do not get confused by the name, they will not
+produce any additional output).
+
+#### Isotope filter
+
+The isotope filter is rather simple and can be enabled and used like this:
+
+```geant4
+/RMG/Output/ActivateOutputScheme IsotopeFilter
+/RMG/Output/IsotopeFilter/AddIsotope {A} {Z}
+```
+
+Adds an isotope to the list. Only events that have a track with this isotope at
+any point in time will be persisted.
+
+#### Particle filter
+
+The particle filter does not only affect the output files, but actually works on
+the track level. Tracks matching the defined criteria will not be simulated.
+With this, it not only reduces output file size, but also reduces the necessary
+simulation run time.
+
+```geant4
+/RMG/Output/ActivateOutputScheme ParticleFilter
+/RMG/Output/ParticleFilter/AddParticle {PDG_CODE}
+```
+
+Only particles with the PDG encoding `{PDG_CODE}` will be considered to be
+filtered out (the command can be used multiple times). This can be chained with
+additional constraints by physical volume in which the particle was created or
+by creator process:
+
+- <project:../rmg-commands.md#rmgoutputparticlefilteraddkeepvolume> disables the
+  filtering in the specified volume; whereas
+  <project:../rmg-commands.md#rmgoutputparticlefilteraddkillvolume> only
+  performs the filtering in this volume (the two commands cannot be combined).
+- <project:../rmg-commands.md#rmgoutputparticlefilteraddkeepprocess> will only
+  keep the specified particles when they were created by the specified
+  process(es).
+  <project:../rmg-commands.md#rmgoutputparticlefilteraddkillprocess> will not
+  simulate the particles when they were created by the specified process (the
+  two commands cannot be combined).
+
+Filtering by process and process can be combined.
 
 ## LH5 output
 

@@ -79,6 +79,8 @@ too (`/RMG/Generator/Select G4Gun`), a more basic alternative to the GPS.
 
 :::
 
+(manual-generators-decays)=
+
 ## Generating nuclear decays
 
 A special case of the GPS can be used to generate radioactive decays. This is

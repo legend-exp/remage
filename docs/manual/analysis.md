@@ -2,13 +2,18 @@
 
 # Analyzing simulation output
 
-:::{todo}
-
-- pointers to useful tools (reboost or pygama), once they are in place
-
-:::
+By default, the _remage_ output files are already reshaped in a hit-like
+structure and contains a time-coincidence-map for easy event-building. In a lot
+of cases, this is sufficient for analysis. In some cases, further
+post-processing with _reboost_ is required.
 
 ## Event building with the time-coincidence-map
+
+:::{todo}
+
+- this needs considerable rework
+
+:::
 
 This tutorial is based on the output file produced in the {ref}`basic-tutorial`.
 Let's start by reading in the TCM in memory as an Awkward array:
@@ -124,3 +129,22 @@ Let's inspect the `evt` array at event 0 and 6:
 ```
 
 We find the event structure expected from the TCM.
+
+## Post-processing with _reboost_
+
+[_reboost_](https://github.com/legend-exp/reboost) is the general
+post-processing and analysis toolkit for remage output. _remage_ internally uses
+reboost for the output reshaping, but does not apply any further user-defined
+post-processing.
+
+_reboost_ supports various processors for output tables from remage: HPGe
+pulse-shape emulation or heuristics, optical map application for scintillators,
+... It can be used as a command-line tool, or by writing custom code.
+
+:::{important}
+
+When using _reboost_ with a config file, the TCM will not be available after
+post-processing. This is currently a known limitation; in the future we will
+recommend moving away from config files toward a python-script based workflow.
+
+:::
