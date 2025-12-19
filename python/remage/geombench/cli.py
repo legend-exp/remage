@@ -138,10 +138,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     )
 
     # merge external args if provided
-    if external_args is None:
-        args = parser.parse_args()
-    else:
-        args = parser.parse_args(args=external_args)
+    args = parser.parse_args(args=external_args)
 
     logger = rmg_logging.setup_log()
 
