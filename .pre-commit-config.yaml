@@ -1,5 +1,4 @@
 ci:
-  skip: []
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autoupdate_schedule: "monthly"
   autofix_commit_msg: "style: pre-commit fixes"
