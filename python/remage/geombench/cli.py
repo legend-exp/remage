@@ -88,7 +88,8 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         Exit code of the program. Returns 0 on success, non-zero on failure.
     """
     parser = argparse.ArgumentParser(
-        description="Run remage geometry benchmark and analyze results."
+        description="Run remage geometry benchmark and analyze results.",
+        allow_abbrev=False,
     )
     parser.add_argument(
         "geometry",
@@ -138,10 +139,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
     )
 
     # merge external args if provided
-    if external_args is None:
-        args = parser.parse_args()
-    else:
-        args = parser.parse_args(args=external_args)
+    args = parser.parse_args(args=external_args)
 
     logger = rmg_logging.setup_log()
 
