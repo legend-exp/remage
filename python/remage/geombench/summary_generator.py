@@ -40,23 +40,23 @@ class SummaryGenerator:
         self.data_xz = lh5.read("benchmark_xz", sim_output_file).view_as("ak")
         self.data_yz = lh5.read("benchmark_yz", sim_output_file).view_as("ak")
 
-        self.n_x_gridpoint = len(np.unique(self.data_xy["X"]))
-        self.n_y_gridpoint = len(np.unique(self.data_xy["Y"]))
-        self.n_z_gridpoint = len(np.unique(self.data_xz["Z"]))
+        self.n_x_gridpoint = len(np.unique(self.data_xy["x"]))
+        self.n_y_gridpoint = len(np.unique(self.data_xy["y"]))
+        self.n_z_gridpoint = len(np.unique(self.data_xz["z"]))
 
         self.x = np.linspace(
-            np.min(self.data_xy["X"]),
-            np.max(self.data_xy["X"]) + (self.data_xy["X"][1] - self.data_xy["X"][0]),
+            np.min(self.data_xy["x"]),
+            np.max(self.data_xy["x"]) + (self.data_xy["x"][1] - self.data_xy["x"][0]),
             self.n_x_gridpoint + 1,
         )
         self.y = np.linspace(
-            np.min(self.data_xy["Y"]),
-            np.max(self.data_xy["Y"]) + (self.data_yz["Y"][1] - self.data_yz["Y"][0]),
+            np.min(self.data_xy["y"]),
+            np.max(self.data_xy["y"]) + (self.data_yz["y"][1] - self.data_yz["y"][0]),
             self.n_y_gridpoint + 1,
         )
         self.z = np.linspace(
-            np.min(self.data_xz["Z"]),
-            np.max(self.data_xz["Z"]) + (self.data_xz["Z"][1] - self.data_xz["Z"][0]),
+            np.min(self.data_xz["z"]),
+            np.max(self.data_xz["z"]) + (self.data_xz["z"][1] - self.data_xz["z"][0]),
             self.n_z_gridpoint + 1,
         )
 
@@ -75,17 +75,17 @@ class SummaryGenerator:
         map_3d = np.ones((self.n_x_gridpoint, self.n_y_gridpoint, self.n_z_gridpoint))
 
         # Normalize each projection
-        xy_norm = np.array(self.data_xy["Time"]).reshape(
+        xy_norm = np.array(self.data_xy["time"]).reshape(
             self.n_y_gridpoint, self.n_x_gridpoint
         )
         xy_norm = xy_norm / np.max(xy_norm) if np.max(xy_norm) > 0 else xy_norm
 
-        xz_norm = np.array(self.data_xz["Time"]).reshape(
+        xz_norm = np.array(self.data_xz["time"]).reshape(
             self.n_z_gridpoint, self.n_x_gridpoint
         )
         xz_norm = xz_norm / np.max(xz_norm) if np.max(xz_norm) > 0 else xz_norm
 
-        yz_norm = np.array(self.data_yz["Time"]).reshape(
+        yz_norm = np.array(self.data_yz["time"]).reshape(
             self.n_z_gridpoint, self.n_y_gridpoint
         )
         yz_norm = yz_norm / np.max(yz_norm) if np.max(yz_norm) > 0 else yz_norm
@@ -114,14 +114,14 @@ class SummaryGenerator:
             # Create histogram for XY plane
             h_xy = hist.Hist(
                 hist.axis.Regular(
-                    self.n_x_gridpoint, self.x[0], self.x[-1], name="X", label="X"
+                    self.n_x_gridpoint, self.x[0], self.x[-1], name="x", label="x"
                 ),
                 hist.axis.Regular(
-                    self.n_y_gridpoint, self.y[0], self.y[-1], name="Y", label="Y"
+                    self.n_y_gridpoint, self.y[0], self.y[-1], name="y", label="y"
                 ),
             )
             h_xy[:, :] = (
-                np.array(self.data_xy["Time"])
+                np.array(self.data_xy["time"])
                 .reshape(self.n_x_gridpoint, self.n_y_gridpoint)
                 .T
                 * 1e6
@@ -137,14 +137,14 @@ class SummaryGenerator:
             # Create histogram for XZ plane
             h_xz = hist.Hist(
                 hist.axis.Regular(
-                    self.n_x_gridpoint, self.x[0], self.x[-1], name="X", label="X"
+                    self.n_x_gridpoint, self.x[0], self.x[-1], name="x", label="x"
                 ),
                 hist.axis.Regular(
-                    self.n_z_gridpoint, self.z[0], self.z[-1], name="Z", label="Z"
+                    self.n_z_gridpoint, self.z[0], self.z[-1], name="z", label="z"
                 ),
             )
             h_xz[:, :] = (
-                np.array(self.data_xz["Time"])
+                np.array(self.data_xz["time"])
                 .reshape(self.n_x_gridpoint, self.n_z_gridpoint)
                 .T
                 * 1e6
@@ -160,14 +160,14 @@ class SummaryGenerator:
             # Create histogram for YZ plane
             h_yz = hist.Hist(
                 hist.axis.Regular(
-                    self.n_y_gridpoint, self.y[0], self.y[-1], name="Y", label="Y"
+                    self.n_y_gridpoint, self.y[0], self.y[-1], name="y", label="y"
                 ),
                 hist.axis.Regular(
-                    self.n_z_gridpoint, self.z[0], self.z[-1], name="Z", label="Z"
+                    self.n_z_gridpoint, self.z[0], self.z[-1], name="z", label="z"
                 ),
             )
             h_yz[:, :] = (
-                np.array(self.data_yz["Time"])
+                np.array(self.data_yz["time"])
                 .reshape(self.n_y_gridpoint, self.n_z_gridpoint)
                 .T
                 * 1e6
@@ -233,10 +233,10 @@ class SummaryGenerator:
 
         stats = {
             "simulation_time_per_event": {
-                "mean": float(np.mean(ak.to_numpy(self.data_xy["Time"]))),
-                "std": float(np.std(ak.to_numpy(self.data_xy["Time"]))),
-                "min": float(np.min(ak.to_numpy(self.data_xy["Time"]))),
-                "max": float(np.max(ak.to_numpy(self.data_xy["Time"]))),
+                "mean": float(np.mean(ak.to_numpy(self.data_xy["time"]))),
+                "std": float(np.std(ak.to_numpy(self.data_xy["time"]))),
+                "min": float(np.min(ak.to_numpy(self.data_xy["time"]))),
+                "max": float(np.max(ak.to_numpy(self.data_xy["time"]))),
             },
             "hotspots": self._get_hotspot_locations(threshold=0.8),
         }

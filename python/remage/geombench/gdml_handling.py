@@ -21,8 +21,6 @@ from pathlib import Path
 
 import pyg4ometry
 
-## GDML Handling Functions - Helper utilities for copying registry resources
-
 
 def copy_referenced_resources(
     lv: pyg4ometry.geant4.LogicalVolume,

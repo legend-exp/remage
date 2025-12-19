@@ -1,6 +1,6 @@
 // Copyright (C) 2025 Moritz Neuberger <https://orcid.org/0009-0001-8471-9076>
-#ifndef _RMG_GENERATOR_GEOMBENCH_HH_
-#define _RMG_GENERATOR_GEOMBENCH_HH_
+#ifndef _RMG_GEOMBENCH_HH_
+#define _RMG_GEOMBENCH_HH_
 
 #include <chrono>
 #include <memory>

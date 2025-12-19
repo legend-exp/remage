@@ -29,23 +29,23 @@ void RMGGeomBenchOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
   // Create auxiliary ntuple for XZ plane benchmark
   fNtupleIDs[0] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xz", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "X");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Z");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "x");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "z");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[0], "time");
   ana_man->FinishNtuple(fNtupleIDs[0]);
 
   // Create auxiliary ntuple for YZ plane benchmark
   fNtupleIDs[1] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_yz", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Y");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Z");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "y");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "z");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[1], "time");
   ana_man->FinishNtuple(fNtupleIDs[1]);
 
   // Create auxiliary ntuple for XY plane benchmark
   fNtupleIDs[2] = rmg_man->CreateAndRegisterAuxNtuple("benchmark_xy", "RMGGeomBenchOutputScheme", ana_man);
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "X");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Y");
-  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "Time");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "x");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "y");
+  ana_man->CreateNtupleDColumn(fNtupleIDs[2], "time");
   ana_man->FinishNtuple(fNtupleIDs[2]);
 }
 
