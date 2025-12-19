@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<isotope name="Ge74" Z="32" N="74">
+			<atom value="73.921"/>
+		</isotope>
+		<isotope name="Ge76" Z="32" N="76">
+			<atom value="75.921"/>
+		</isotope>
+		<element name="ElementEnrichedGermanium0.874" formula="EnrGe0.874">
+			<fraction ref="Ge74" n="0.126"/>
+			<fraction ref="Ge76" n="0.874"/>
+		</element>
+		<material name="EnrichedGermanium0.874">
+			<D value="5.54634546706681"/>
+			<fraction ref="ElementEnrichedGermanium0.874" n="1"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="World_s" r="5.1" lunit="cm"/>
+		<genericPolycone name="BEGe_L" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad">
+			<rzpoint r="0" z="0"/>
+			<rzpoint r="7.5" z="0"/>
+			<rzpoint r="7.5" z="2.0"/>
+			<rzpoint r="10.5" z="2.0"/>
+			<rzpoint r="10.5" z="0"/>
+			<rzpoint r="36.98" z="0"/>
+			<rzpoint r="36.98" z="29.46"/>
+			<rzpoint r="0" z="29.46"/>
+		</genericPolycone>
+		<tube name="LAr_s" rmin="0" rmax="38.98" z="33.46" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad"/>
+	</solids>
+	<structure>
+		<volume name="BEGe_L">
+			<materialref ref="EnrichedGermanium0.874"/>
+			<solidref ref="BEGe_L"/>
+		</volume>
+		<volume name="LAr_L">
+			<materialref ref="G4_lAr"/>
+			<solidref ref="LAr_s"/>
+			<physvol name="BEGe">
+				<volumeref ref="BEGe_L"/>
+				<position name="BEGe_pos" x="0.000000000000000" y="0.000000000000000" z="-14.730000000000000" unit="mm"/>
+			</physvol>
+		</volume>
+		<volume name="World_L">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="World_s"/>
+			<physvol name="LAr">
+				<volumeref ref="LAr_L"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue="">
+			<auxiliary auxtype="BEGe" auxvalue="{&quot;geometry&quot;: {&quot;groove&quot;: {&quot;depth_in_mm&quot;: 2.0, &quot;radius_in_mm&quot;: {&quot;inner&quot;: 7.5, &quot;outer&quot;: 10.5}}, &quot;height_in_mm&quot;: 29.46, &quot;pp_contact&quot;: {&quot;depth_in_mm&quot;: 0, &quot;radius_in_mm&quot;: 7.5}, &quot;radius_in_mm&quot;: 36.98, &quot;taper&quot;: {&quot;bottom&quot;: {&quot;angle_in_deg&quot;: 0.0, &quot;height_in_mm&quot;: 0.0}, &quot;top&quot;: {&quot;angle_in_deg&quot;: 0.0, &quot;height_in_mm&quot;: 0.0}}}, &quot;name&quot;: &quot;B00000B&quot;, &quot;production&quot;: {&quot;enrichment&quot;: {&quot;unc&quot;: 0.003, &quot;val&quot;: 0.874}, &quot;mass_in_g&quot;: 697.0}, &quot;type&quot;: &quot;bege&quot;}"/>
+		</auxiliary>
+		<auxiliary auxtype="RMG_detector" auxvalue="germanium">
+			<auxiliary auxtype="BEGe" auxvalue="1"/>
+		</auxiliary>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="World_L"/>
+	</setup>
+</gdml>

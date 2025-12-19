@@ -1,0 +1,6 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Select FromFile
+/RMG/Generator/FromFile/FileName macros/vtx-kin2.lh5
+
+/run/beamOn {events}

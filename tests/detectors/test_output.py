@@ -31,3 +31,12 @@ except Exception as err:
         "Detectors not registered correctly when using both functions."
     )
     raise AssertionError(msg) from err
+
+try:
+    lh5.read_as("/stp/germanium_dets", "det-from-gdml-reuse.lh5", "ak")
+except Exception as err:
+    msg = (
+        "Expected output rows for 'det-from-gdml-reuse.lh5' do not exist. "
+        "Detectors not registered correctly when using both functions."
+    )
+    raise AssertionError(msg) from err

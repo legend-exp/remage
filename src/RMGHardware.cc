@@ -91,7 +91,31 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         }
 
         for (const auto& det_aux : *aux.auxList) {
-          RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
+          int uid = -1;
+          std::string ntuple_name;
+          bool allow_uid_reuse = false;
+
+          std::istringstream iss(det_aux.value);
+          std::string part;
+          size_t index = 0;
+          while (std::getline(iss, part, ',')) {
+            if (index == 0) {
+              size_t failed_to_parse_pos = 0;
+              if (part[0] == ':') part.erase(0, 1);
+              uid = std::stoi(part, &failed_to_parse_pos);
+              if (failed_to_parse_pos != part.size())
+                RMGLog::Out(RMGLog::fatal, "invalid detector metadata aux: ", det_aux.value);
+            } else if (index == 1) {
+              allow_uid_reuse = part == "true";
+            } else if (index == 2) {
+              ntuple_name = part;
+            } else {
+              RMGLog::Out(RMGLog::fatal, "invalid detector metadata aux: ", det_aux.value);
+            }
+            index++;
+          }
+
+          RegisterDetector(det_type, det_aux.type, uid, 0, allow_uid_reuse, ntuple_name);
           had_detector = true;
         }
       }
@@ -166,7 +190,14 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       int uid = v.uid;
 
       for (const auto& vol : sortedVolumes) {
-        this->RegisterDetector(v.type, vol->GetName(), uid, vol->GetCopyNo(), v.allow_uid_reuse);
+        this->RegisterDetector(
+            v.type,
+            vol->GetName(),
+            uid,
+            vol->GetCopyNo(),
+            v.allow_uid_reuse,
+            v.ntuple_name
+        );
 
         if (!v.allow_uid_reuse) {
           // if we do not allow uid reuse, we give the next detector a new uid
@@ -355,7 +386,8 @@ void RMGHardware::StageDetector(
     const std::string& name,
     int uid,
     const std::string& copy_nr,
-    bool allow_uid_reuse
+    bool allow_uid_reuse,
+    const std::string& ntuple_name
 ) {
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
@@ -374,7 +406,7 @@ void RMGHardware::StageDetector(
   }
 
   auto r_value = fStagedDetectors.insert(
-      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse}}
+      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse, ntuple_name}}
   );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
@@ -391,11 +423,17 @@ void RMGHardware::RegisterDetector(
     const std::string& pv_name,
     int uid,
     int copy_nr,
-    bool allow_uid_reuse
+    bool allow_uid_reuse,
+    const std::string& ntuple_name
 ) {
   // This should not be possible to occur anymore
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
+    return;
+  }
+
+  if (uid < 0) {
+    RMGLog::Out(RMGLog::error, "Detector with ID less than zero cannot be registered.");
     return;
   }
 
@@ -413,7 +451,9 @@ void RMGHardware::RegisterDetector(
   fActiveDetectors.insert(type);
 
   // FIXME: can this be done with emplace?
-  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name, copy_nr}});
+  auto r_value = fDetectorMetadata.insert(
+      {{pv_name, copy_nr}, {type, uid, pv_name, copy_nr, ntuple_name}}
+  );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
         RMGLog::warning,

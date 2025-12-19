@@ -1,3 +1,18 @@
+# Copyright (C) 2025 Manuel Huber <https://orcid.org/0009-0000-5212-2999>
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from __future__ import annotations
 
 import argparse
@@ -13,6 +28,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from . import logging as rmg_logging
+from . import utils
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 from .post_proc import post_proc
@@ -135,7 +151,7 @@ def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
 def remage_run(
     macros: Sequence[str] | str = (),
     *,
-    gdml_files: Sequence[str] | str = (),
+    gdml_files: Sequence[str | Path] | str | Path = (),
     output: str | Path | None = None,
     threads: int = 1,
     procs: int = 1,
@@ -195,7 +211,7 @@ def remage_run(
         post-processing will be run normally.
     """
     args = []
-    if not isinstance(gdml_files, str):
+    if not isinstance(gdml_files, str | Path):
         for gdml in gdml_files:
             args.append(f"--gdml-files={gdml}")
     else:
@@ -229,11 +245,7 @@ def remage_run(
     if log_level is not None:
         args.append(f"--log-level={log_level}")
 
-    args.append("--")
-    if not isinstance(macros, str):
-        args.extend(macros)
-    else:
-        args.append(macros)
+    args.extend(["--", *utils.sanitize_macro_cmds(macros)])
 
     return remage_run_from_args(
         args, raise_on_error=raise_on_error, raise_on_warning=raise_on_warning
