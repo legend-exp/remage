@@ -66,7 +66,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     for (const auto& file : fGDMLFiles) {
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
       RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
-      RMGIpc::SendIpcBlocking(RMGIpc::CreateMessage("gdml", file));
+      if (RMGManager::Instance()->GetProcessNumberOffset() == 0) {
+        RMGIpc::SendIpcBlocking(RMGIpc::CreateMessage("gdml", file));
+      }
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
