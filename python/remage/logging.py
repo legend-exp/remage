@@ -65,12 +65,23 @@ def setup_log() -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    if supports_color():
-        fmt = "%(log_color)s[%(levelname)-7s ->%(reset)s %(message)s"
+    # Avoid adding duplicate handlers if setup_log() is called multiple times.
+    if not any(getattr(h, "_remage_default_handler", False) for h in logger.handlers):
+        # Keep the visible formatting identical between colored and non-colored output.
+        plain_fmt = "[%(levelname)-7s -> %(message)s"
+        colored_fmt = "%(log_color)s[%(levelname)-7s ->%(reset)s %(message)s"
 
-        handler = colorlog.StreamHandler()
-        handler.setFormatter(colorlog.ColoredFormatter(fmt, log_colors=LEVEL_COLORS))
+        if supports_color():
+            handler = colorlog.StreamHandler()
+            handler.setFormatter(
+                colorlog.ColoredFormatter(colored_fmt, log_colors=LEVEL_COLORS)
+            )
+        else:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(plain_fmt))
+
         handler.setLevel(logging.DEBUG)
+        handler._remage_default_handler = True  # type: ignore[attr-defined]
         logger.addHandler(handler)
 
     set_logging_level(logger, "Summary")
