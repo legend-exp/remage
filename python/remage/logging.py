@@ -96,7 +96,7 @@ def supports_color() -> bool:
         "vt100",
         "xterm",
     ]
-    return sys.stderr.isatty() and any(term in t for t in terms)
+    return sys.stderr.isatty() and term is not None and any(t in term for t in terms)
 
 
 def set_logging_level(logger, rmg_log_level):
