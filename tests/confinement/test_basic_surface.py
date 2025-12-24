@@ -35,7 +35,7 @@ def add_local_pos(vertices, pos):
     return vertices
 
 
-tol = 1e-6
+tol = 1e-6  # mm
 select_sides = {
     "tubby": {
         "func": [
@@ -209,7 +209,10 @@ for idx, fun in enumerate(funcs):
     indices[is_close] = idx
 
 if len(indices[indices == -1]) > 0:
-    msg = f"{dtype} has primaries not close to any side"
+    msg = (
+        f"{dtype} has {len(indices[indices == -1])} in {len(vertices)} "
+        f"primaries not close to any side with absolute tolerance {tol} mm"
+    )
     raise ValueError(msg)
 
 vertices["idx"] = indices
