@@ -29,4 +29,4 @@ add_test(NAME basics/rand-seed
          COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o none --rand-seed 123
                  --macro-substitutions ENERGY=1000 GENERATOR=GPS -- macros/run.mac)
 set_tests_properties(basics/rand-seed PROPERTIES PASS_REGULAR_EXPRESSION
-                                                 "CLHEP::HepRandom seed set to: 123")
+                                                 "CLHEP::HepRandom seed changed to: 123")

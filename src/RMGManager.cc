@@ -328,7 +328,7 @@ void RMGManager::SetRandEngineSeed(int seed) {
     );
     CLHEP::HepRandom::setTheSeed(0);
   } else CLHEP::HepRandom::setTheSeed(seed);
-  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seed);
+  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed changed to: ", seed, " (user value)");
 
   fIsRandControlled = true;
 }
@@ -341,7 +341,12 @@ void RMGManager::SetRandEngineInternalSeed(int index) {
 
   int array_index = index % 2;
   CLHEP::HepRandom::setTheSeed(seeds[array_index]);
-  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", seeds[array_index]);
+  RMGLog::Out(
+      RMGLog::summary,
+      "CLHEP::HepRandom seed changed to: ",
+      seeds[array_index],
+      " (from the internal seed table)"
+  );
 
   fIsRandControlled = true;
 }
@@ -351,7 +356,7 @@ void RMGManager::SetRandSystemEntropySeed() {
   std::random_device rd; // uses RDRND or /dev/urandom
   auto rand_seed = dist(rd);
   CLHEP::HepRandom::setTheSeed(rand_seed);
-  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed set to: ", rand_seed);
+  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed changed to: ", rand_seed, " (from system entropy)");
 }
 
 void RMGManager::DefineCommands() {
