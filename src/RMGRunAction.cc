@@ -400,7 +400,7 @@ void RMGRunAction::PostprocessOutputFile() const {
 
   try {
     fs::rename(worker_tmp, worker_lh5);
-    RMGLog::Out(RMGLog::summary, "Moved output file ", worker_tmp.string(), " to ", worker_lh5.string());
+    RMGLog::Out(RMGLog::detail, "Moved output file ", worker_tmp.string(), " to ", worker_lh5.string());
   } catch (const fs::filesystem_error& e) {
     RMGLog::Out(
         RMGLog::error,
