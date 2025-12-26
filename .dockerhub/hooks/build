@@ -1,0 +1,24 @@
+#!/bin/bash
+# shellcheck disable=SC2001
+
+# for the dev remage image let's use the latest base image
+if [[ "$DOCKER_TAG" == "dev" ]]; then
+    docker build \
+        --build-arg REMAGE_BASE_FLAVOR="latest" \
+        --build-arg REMAGE_VERSION="dev" \
+        -f "$DOCKERFILE_PATH" -t "$IMAGE_NAME" .
+
+# check if tag name terminates with "-slim" and use the slim base image
+elif [[ $(echo "$DOCKER_TAG" | sed 's/.*-//') == "slim" ]]; then
+    _version=$(echo "$DOCKER_TAG" | sed 's/-[^-]*$//')
+    docker build \
+        --build-arg REMAGE_BASE_FLAVOR="slim" \
+        --build-arg REMAGE_VERSION="$_version" \
+        -f "$DOCKERFILE_PATH" -t "$IMAGE_NAME" .
+
+else  # use stable base image for all tagged versions
+    docker build \
+        --build-arg REMAGE_BASE_FLAVOR="stable" \
+        --build-arg REMAGE_VERSION="$DOCKER_TAG" \
+        -f "$DOCKERFILE_PATH" -t "$IMAGE_NAME" .
+fi
