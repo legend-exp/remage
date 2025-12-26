@@ -1,4 +1,4 @@
-ARG REMAGE_BASE_FLAVOR="latest"
+ARG REMAGE_BASE_FLAVOR="stable"
 
 FROM legendexp/remage-base:$REMAGE_BASE_FLAVOR
 
