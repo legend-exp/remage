@@ -9,11 +9,11 @@ _MaGe_. It combines:
 - Optional **optical physics** (scintillation, Cherenkov, absorption, Rayleigh,
   WLS)
 - Configurable **hadronic physics lists**, including high-precision neutron
-  models
+  (NeutronHP) models
 - **Radioactive decay** with extended control over decay time thresholds
-- It contains Multiple **custom processes**:
+- Multiple **custom processes**:
   - Inner Bremsstrahlung for beta decay
-  - Custom neutron capture with gamma cascades loaded from a Grabmayr file
+  - Custom neutron capture with gamma cascades loaded from external files
   - Custom wavelength-shifting (WLS) optical process
 - Production cuts are managed explicitly per-region, including a dedicated
   **SensitiveRegion**.
@@ -26,7 +26,7 @@ This physics list is designed and adjusted for:
 - Optical detector simulations
 - Long-lived radioactive decay chains
 
-## Electromagnetic (Leptonic & EM Physics)
+## Electromagnetic physics
 
 The electromagnetic physics is configurable via the
 <project:../rmg-commands.md#rmgprocesseslowenergyemphysics> command.
@@ -46,14 +46,14 @@ Some additional EM features from `G4EmExtraPhysics` are always enabled:
 - Muon-nuclear interactions
 - e± nuclear interactions
 
-## Optical Physics
+## Optical physics
 
 Optical physics is optional and can be enabled by
 <project:../rmg-commands.md#rmgprocessesopticalphysics>.
 
-This option enables the following physics processes: Boundary interactions,
-Scintillation, Cherenkov radiation, Optical absorption, Rayleigh scattering and
-Wavelength shifting. The wavelength shifting is either the default
+This option enables the following physics processes: Refraction, reflection,
+scintillation, Cherenkov radiation, optical bulk absorption, Rayleigh scattering
+and wavelength shifting. The wavelength shifting (WLS) is either the default
 implementation or a custom WLS process.
 
 Global optical settings:
@@ -76,7 +76,7 @@ setting this efficiency as in the stock process. This also matches our
 expectation, as we do not expect that the emission of multiple photons in a WLS
 material should be described by a Poisson distribution.
 
-## Hadronic Physics
+## Hadronic physics
 
 Hadronic physics can be completely disabled or configured via predefined physics
 lists.
@@ -95,28 +95,43 @@ If enabled, the following processes are included:
 A hadronic physics option can be selected with
 <project:../rmg-commands.md#rmgprocesseshadronicphysics>. Available options are
 
-| Option         | Description                                         |
-| -------------- | --------------------------------------------------- |
-| `None`         | No hadronic physics (**default**)                   |
-| `QGSP_BIC_HP`  | Quark-Gluon String + Binary Cascade + HP neutrons   |
-| `QGSP_BERT_HP` | QGSP with Bertini cascade + HP neutrons             |
-| `FTFP_BERT_HP` | Fritiof string model + Bertini + HP neutrons        |
-| `Shielding`    | Optimized shielding list with HP neutrons (default) |
+| Option         | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `None`         | No hadronic physics (**default**)                             |
+| `QGSP_BIC_HP`  | Quark-Gluon String + Binary Cascade + HP neutrons [^QGSP_BIC] |
+| `QGSP_BERT_HP` | QGSP with Bertini cascade + HP neutrons [^QGSP_BERT]          |
+| `FTFP_BERT_HP` | Fritiof string model + Bertini + HP neutrons [^FTFP_BERT]     |
+| `Shielding`    | Optimized shielding list with HP neutrons [^Shielding]        |
+
+[^QGSP_BIC]
+https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/QGSP_BIC.html
+[^QGSP_BERT]
+https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/QGSP_BERT.html
+[^FTFP_BERT]
+https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/FTFP_BERT.html
+[^Shielding]
+https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/Shielding.html
+
+The Geant4 physics reference contains descriptions of the
+[Fritiof](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/FTFmodel/FTFmodel.html)
+and
+[Bertini cascade](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/BertiniCascade/index.html)
+models.
 
 An addition option,
 <project:../rmg-commands.md#rmgprocessesenableneutronthermalscattering>, enables
-thermal scattering kernels for low-energy neutrons.
+thermal scattering for low-energy neutrons.
 
-### Custom Grabmayr Gamma Cascades
+### Custom Grabmayr gamma cascades
 
 When enabled with
 <project:../rmg-commands.md#rmgprocessesusegrabmayrsgammacascades>, _remage_
 replaces the standard neutron capture process (`nCapture`) with a custom one
-that will generate gamma cascaded for specific isotopes from files as provided
+that will generate gamma cascades for specific isotopes from files as provided
 by P. Grabmayr _et al._. For all other isotopes, this process exactly behaves
 the same.
 
-This option is primarily intended for scimulation sceneraios that require
+This option is primarily intended for simulation scenarios that require
 precision gamma spectroscopy following neutron capture.
 
 The gamma cascade files are not shipped with _remage_ by default, but have to be
@@ -159,14 +174,14 @@ Q-value of the decay. For Ar-39 (Q = 565 keV), the IB photons are typically soft
 (low energy), with most photons below 0.5 MeV. The spectrum is calculated based
 on [^1].
 
-The Inner Bremsstrahlung process is disabled by default in ReMage. To activate
+The Inner Bremsstrahlung process is disabled by default in _remage_. To activate
 Inner Bremsstrahlung process, please use the command
 <project:../rmg-commands.md#rmgprocessesenableinnerbremsstrahlung> before
 `/run/initialize`.
 
-## Production Cuts and Step Limits
+## Production cuts and step limits
 
-### Production Cuts
+### Production cuts
 
 Production cuts are specified in **length units** (as usual in Geant4), and
 applied per particle type (gamma, electron, positron, proton).
@@ -193,7 +208,13 @@ volume) and a sensitive region.
 
 The `G4StepLimiterPhysics` is always added, but will not have an effect by
 default. It allows volume-level step limits to be enforced if configured
-elsewhere.
+elsewhere (e.g. in a GDML file).
+
+:::{todo}
+
+- document this somewhere.
+
+:::
 
 [^1]:
     Hayen et al., in Rev. Mod. Phys. 90, 015008 (2018). doi:
