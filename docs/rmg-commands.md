@@ -1195,7 +1195,7 @@ Set the isotope for the Background mode of the BxDecay0 generator. E.g. 'Co60'
 * **Parameter** – `isotope`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
+  * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Ga68 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sc44 Sc44m Se83 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/BxDecay0/DoubleBetaDecay`
@@ -1206,7 +1206,7 @@ Set the isotope, process and energy level for the double beta decay mode of the 
     – Set the isotope for the double beta decay
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Bi214 Ca40 Ca46 Ca48 Cd106 Cd108 Cd114 Cd116 Ce136 Ce138 Ce142 Dy156 Dy158 Er162 Er164 Er170 Ge76 Mo100 Mo92 Nd148 Nd150 Ni58 Os184 Os192 Pb214 Po218 Pt190 Pt198 Rn222 Ru104 Ru96 Se74 Se82 Sm144 Sm154 Sn112 Sn122 Sn124 Sr84 Te120 Te128 Te130 W180 W186 Xe136 Yb168 Yb176 Zn64 Zn70 Zr94 Zr96`
+  * **Candidates** – `Bi214 Ca40 Ca46 Ca48 Cd106 Cd108 Cd114 Cd116 Ce136 Ce138 Ce142 Dy156 Dy158 Er162 Er164 Er170 Gd160 Ge76 Mo100 Mo92 Nd148 Nd150 Ni58 Os184 Os192 Pb214 Po218 Pt190 Pt198 Rn222 Ru104 Ru96 Se74 Se82 Sm144 Sm154 Sn112 Sn122 Sn124 Sr84 Te120 Te128 Te130 W180 W186 Xe136 Yb168 Yb176 Zn64 Zn70 Zr94 Zr96`
 * **Parameter** – `process`
     – Name the decay process you want to simulate
   * **Parameter type** – `s`
