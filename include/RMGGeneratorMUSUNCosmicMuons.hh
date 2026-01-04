@@ -67,7 +67,12 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
 
     void DefineCommands();
     void SetMUSUNFile(G4String pathToFile);
-    void PrepareCopy(std::string pathToFile);
+
+    /**
+     * @return True if the file contains cartesian momentum (fPx, fPy, fPz), or false for spherical
+     * momentum (fPhi, fTheta).
+     */
+    bool PrepareCopy(std::string pathToFile);
 
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
@@ -76,6 +81,7 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     std::filesystem::path fPathToTmpFile;
 
     static RMGAnalysisReader* fAnalysisReader;
+    static bool fHasCartesianMomentum;
 
     static RMGGeneratorMUSUNCosmicMuons_Data* fInputData;
 };

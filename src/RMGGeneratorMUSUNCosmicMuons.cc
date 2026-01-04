@@ -35,6 +35,7 @@ namespace u = CLHEP;
 
 RMGAnalysisReader* RMGGeneratorMUSUNCosmicMuons::fAnalysisReader = new RMGAnalysisReader();
 RMGGeneratorMUSUNCosmicMuons_Data* RMGGeneratorMUSUNCosmicMuons::fInputData = nullptr;
+bool RMGGeneratorMUSUNCosmicMuons::fHasCartesianMomentum = false;
 
 RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MUSUNCosmicMuons") {
   this->DefineCommands();
@@ -42,7 +43,7 @@ RMGGeneratorMUSUNCosmicMuons::RMGGeneratorMUSUNCosmicMuons() : RMGVGenerator("MU
   fPathToTmpFolder = std::filesystem::temp_directory_path();
 }
 
-void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
+bool RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
   /*
   The working assumption is that the user uses the output directly from MUSUN, i.e. there is no header.
   To allow proper multiprocessing, we want the file to be read using G4CsvAnalysisReader.
@@ -68,7 +69,7 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
   std::string firstLine;
   if (!std::getline(originalFile, firstLine)) {
     RMGLog::Out(RMGLog::error, "Error: File is empty");
-    return;
+    return false; // the return value denotes the file format, just return any.
   }
   std::istringstream iss(firstLine);
   std::vector<std::string> tokens(
@@ -117,6 +118,8 @@ void RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
   // Close files
   originalFile.close();
   tmpFile.close();
+
+  return numColumns == 9;
 }
 
 void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
@@ -128,7 +131,7 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 
     // include in lock
     auto lock = fAnalysisReader->GetLock();
-    PrepareCopy(fPathToFile);
+    fHasCartesianMomentum = PrepareCopy(fPathToFile);
 
     auto reader = fAnalysisReader->OpenFile(fPathToTmpFile, "", "MUSUN", std::move(lock), "csv");
     if (!reader) RMGLog::Out(RMGLog::fatal, "Temp MUSUN file not found! Exit.");
@@ -140,11 +143,14 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
     reader.SetNtupleDColumn("x", (fInputData->fX));
     reader.SetNtupleDColumn("y", (fInputData->fY));
     reader.SetNtupleDColumn("z", (fInputData->fZ));
-    reader.SetNtupleDColumn("theta", (fInputData->fTheta));
-    reader.SetNtupleDColumn("phi", (fInputData->fPhi));
-    reader.SetNtupleDColumn("px", (fInputData->fPx));
-    reader.SetNtupleDColumn("py", (fInputData->fPy));
-    reader.SetNtupleDColumn("pz", (fInputData->fPz));
+    if (!fHasCartesianMomentum) {
+      reader.SetNtupleDColumn("theta", (fInputData->fTheta));
+      reader.SetNtupleDColumn("phi", (fInputData->fPhi));
+    } else {
+      reader.SetNtupleDColumn("px", (fInputData->fPx));
+      reader.SetNtupleDColumn("py", (fInputData->fPy));
+      reader.SetNtupleDColumn("pz", (fInputData->fPz));
+    }
   }
 }
 
@@ -172,6 +178,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
 
   // copy data and end critical section.
   RMGGeneratorMUSUNCosmicMuons_Data input_data = *fInputData;
+  bool has_cartesian = fHasCartesianMomentum;
   reader.unlock();
 
   auto theParticleTable = G4ParticleTable::GetParticleTable();
@@ -187,7 +194,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   );
   fGun->SetParticlePosition({input_data.fX * u::cm, input_data.fY * u::cm, input_data.fZ * u::cm});
 
-  if (input_data.fTheta != 0 && input_data.fPhi != 0) {
+  if (!has_cartesian) {
     G4ThreeVector d_cart(1, 1, 1);
     d_cart.setTheta(input_data.fTheta); // in rad
     d_cart.setPhi(input_data.fPhi);     // in rad
