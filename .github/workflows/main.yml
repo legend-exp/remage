@@ -22,7 +22,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # guideline: only test on latest patch releases (and maybe previous one)
         container_version:
           - latest
           - stable
@@ -60,7 +59,7 @@ jobs:
           fi
 
       - name: Compare checked-in doc dump with current result
-        if: ${{ matrix.container_version == 'latest' }}
+        if: ${{ matrix.container_version == 'stable' }}
         run: |
           cd build
           cp ../docs/rmg-commands.md ../docs/rmg-commands.md.bak

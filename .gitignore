@@ -9,7 +9,7 @@
 /docs/_doxygen
 /docs/api
 /docs/extra
-build
+/build
 install
 .local
 .vscode
