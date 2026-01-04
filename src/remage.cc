@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (no_banner) RMGLog::SetInihibitStartupInfo(true);
+  if (no_banner || proc_num_offset > 0) RMGLog::SetInihibitStartupInfo(true);
 
   if (version_rich) {
     auto g4_version = std::regex_replace(G4Version, std::regex("\\$|Name:"), "");
