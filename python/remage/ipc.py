@@ -78,7 +78,10 @@ from ._version import __version__
 log = logging.getLogger("remage")
 
 
-def handle_ipc_message(msg: str) -> tuple[bool, list, bool, int]:
+def handle_ipc_message(
+    msg: str,
+    proc: list[subprocess.Popen],
+) -> tuple[bool, list, bool, int]:
     """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
 
     This function should directly handle all known blocking IPC messages, which
@@ -114,28 +117,39 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool, int]:
 
     msg_ret = msg
     is_fatal = False
-    # handle blocking messages, if necessary.
-    if msg[0] == "ipc_available":
-        if msg[1] != __version__:
-            log.error(
-                "remage-cpp version %s does not match python-wrapper version %s",
-                msg[1],
-                __version__,
-            )
-            is_fatal = True
-        msg_ret = None
-    elif msg[0] == "gdml":
-        from xml.dom.minidom import parse as minidom_parse
 
-        try:
-            minidom_parse(msg[1])
-        except BaseException as pe:
-            log.error("invalid GDML file %s: %s", msg[1], pe)
-            is_fatal = True
-        msg_ret = None
-    elif is_blocking:
-        log.warning("Unhandled blocking IPC message %s", str(msg))
+    if is_blocking:
+        if len(proc) > 1:
+            # pause all C++ processes in multi-process mode.
+            for p in proc:
+                p.send_signal(signal.SIGSTOP)
 
+        # handle blocking messages, if necessary.
+        if msg[0] == "ipc_available":
+            if msg[1] != __version__:
+                log.error(
+                    "remage-cpp version %s does not match python-wrapper version %s",
+                    msg[1],
+                    __version__,
+                )
+                is_fatal = True
+            msg_ret = None
+        elif msg[0] == "gdml":
+            from xml.dom.minidom import parse as minidom_parse
+
+            try:
+                minidom_parse(msg[1])
+            except BaseException as pe:
+                log.error("invalid GDML file %s: %s", msg[1], pe)
+                is_fatal = True
+            msg_ret = None
+        else:
+            log.warning("Unhandled blocking IPC message %s", str(msg))
+
+        if len(proc) > 1:
+            # resume all C++ processes in multi-process mode.
+            for p in proc:
+                p.send_signal(signal.SIGCONT)
     return is_blocking, msg_ret, is_fatal, proc_num
 
 
@@ -197,7 +211,7 @@ def ipc_thread_fn(
                     msg_buf = msg_buf[msg_end:]
 
                     is_blocking, unhandled_msg, is_fatal, proc_id = handle_ipc_message(
-                        msg
+                        msg, proc
                     )
                     if unhandled_msg is not None:
                         unhandled_ipc_messages.append(unhandled_msg)
