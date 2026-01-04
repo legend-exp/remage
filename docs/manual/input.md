@@ -7,6 +7,11 @@
 The python package [_revertex_](https://revertex.readthedocs.io/en/latest/)
 contains functionality for generating input files in the correct format.
 
+If you generate the input files on your own without _revertex_, you have to
+ensure that all data types and units are as defined here. The input reader does
+not support dynamic type conversions, as you would expect for example for python
+(i.e. float32 to float64)!
+
 :::
 
 (manual-input-vertex)=
@@ -23,15 +28,24 @@ between the particles produced in the event.
 The input file can be selected with the macro command
 <project:../rmg-commands.md#rmggeneratorconfinementfromfilefilename>:
 
-```remage
+```geant4
 /RMG/Generator/Confine FromFile
 /RMG/Generator/Confinement/FromFile/FileName {FILE}
 ```
 
 The vertex input file should be an LH5 table with the following columns:
 
-- `xloc`, `yloc`, `zloc` (with units): the global position of the particle
-  emission
+```
+/
+└── vtx
+    └── vtx · table{xloc,yloc,zloc}
+        ├── xloc · array<1>{real} ── {'units': 'm'}
+        ├── yloc · array<1>{real} ── {'units': 'm'}
+        └── zloc · array<1>{real} ── {'units': 'm'}
+```
+
+- `xloc`, `yloc`, `zloc` (double, with units): the global position of the
+  particle emission
 
 (manual-input-kinetics)=
 
@@ -46,7 +60,7 @@ format.
 ```
 /
 └── vtx
-    └── kin · table{px,py,pz,ekin,g4_pid}
+    └── kin · table{ekin,g4_pid,n_part,px,py,pz}
         ├── ekin · array<1>{real} ── {'units': 'keV'}
         ├── g4_pid · array<1>{real}
         ├── px · array<1>{real}
@@ -69,15 +83,6 @@ Each event starts with a row with `n_part` > 0. This specifies the count of rows
 that will be read in for this event. The following rows for this event are then
 required to set `n_part` to zero.
 
-:::{warning}
-
-In a multithreaded run, the consistent iteration between vertex and kinetic
-input files is not guaranteed. The events from the files might be mixed up in
-the simulation, i.e., it is not possible to simulate particle properties
-statistically dependent on their location.
-
-:::
-
 Once this input file is created it can be read into _remage_ as an event
 generator using the macro command
 <project:../rmg-commands.md#rmggeneratorfromfilefilename>:
@@ -88,3 +93,33 @@ generator using the macro command
 ```
 
 Where `{FILE_PATH}` is the path to the input LH5 file.
+
+## Combining vertex and kinematics input
+
+Combining vertex and kinetics input is possible, even from the same file.
+However, by design, each event can only have a single vertex, that will be
+shared between all particles for an event from the kinetics file.
+
+:::{warning}
+
+In a multithreaded run, the consistent iteration between vertex and kinetic
+input files is not guaranteed. The events from the files might be mixed up in
+the simulation, i.e., it is not possible to simulate particle properties
+statistically dependent on their location.
+
+:::
+
+:::{tip}
+
+When you want to simulate kinetics from a file at a specific point instead of
+confined to volume, you cannot use `/gps/position` to set the position. You can
+however use
+
+```geant4
+/RMG/Vertex/Select FromPoint
+/RMG/Vertex/FromPoint/Position {x} {y} {z}
+```
+
+to set a constant position for all events.
+
+:::

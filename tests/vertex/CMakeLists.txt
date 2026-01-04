@@ -27,7 +27,8 @@ set(_macros
     kin-lh5
     kin-hdf5
     kin2-lh5
-    pos-kin-lh5)
+    pos-kin-lh5
+    pos-kin-combined-lh5)
 
 foreach(_mac ${_macros})
   add_test(NAME vertex/${_mac} COMMAND ${PYTHONPATH} run-vtx.py ${_mac} 1 st)
