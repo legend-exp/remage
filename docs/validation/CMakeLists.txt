@@ -170,4 +170,4 @@ add_custom_target(
 
 # Add an install target to install the docs
 include(GNUInstallDirs)
-install(DIRECTORY ${SPHINX_BUILD} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${CMAKE_INSTALL_DOCDIR}/validation)
