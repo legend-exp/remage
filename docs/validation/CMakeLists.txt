@@ -14,6 +14,10 @@ foreach(_file ${SPHINX_SOURCES})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
+# create an (empty) build directory to satisfy the install rule below if the validation suite
+# has not been built yet.
+file(MAKE_DIRECTORY ${SPHINX_BUILD})
+
 # find and copy docs image files
 file(
   GLOB SPHINX_IMAGES
