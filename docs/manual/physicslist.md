@@ -111,8 +111,14 @@ and
 [Bertini cascade](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/BertiniCascade/index.html)
 models.
 
-High-precision neutron cross sections (NeutronHP), as included in the individual
-options.
+High-precision neutron cross sections (NeutronHP [^NeutronHP]) is enabled when
+it is included in the individual options.
+
+:::{tip}
+
+For cosmogenic simulations, we recommend the `Shielding` hadronic option.
+
+:::
 
 An addition option,
 <project:../rmg-commands.md#rmgprocessesenableneutronthermalscattering>, enables
@@ -124,11 +130,31 @@ When enabled with
 <project:../rmg-commands.md#rmgprocessesusegrabmayrsgammacascades>, _remage_
 replaces the standard neutron capture process (`nCapture`) with a custom one
 that will generate gamma cascades for specific isotopes from files as provided
-by P. Grabmayr _et al._ [^Grabmayr]. For all other isotopes, this process
-exactly behaves the same.
+by P. Grabmayr _et al._ [^Grabmayr] and calculated with MAURINA. For all other
+isotopes without a registered override file, this process exactly behaves the
+same as the builtin process.
 
 This option is primarily intended for simulation scenarios that require
 precision gamma spectroscopy following neutron capture.
+
+:::{admonition} Physical background
+
+The `G4NeutronHP` and the `G4PhotoEvaporation` models are not good at
+reproducing experimental data [^NeutronHP], since they either didn't consider
+energy conservation or do not consider the state density, producing unexpected
+gammas. The MAURINA models for Ge76 and Gd are fine-tuned for these isotopes.
+
+The MAURINA simulations (here as an example: 76Ge(n,g)) are based on estimates
+of photon strength functions tuned to data from 76Ge and level densities tuned
+to the range in which the complete level set is known. The gamma cascade was
+sampled starting from the sampled spin state of the compound nucleus, which is
+iteratively decayed according to the calculated transition probabilities until
+either the metastable or the ground state is reached. For excitation levels
+below the continuum edge at energy 1.56 MeV in 77Ge (critical energy), the known
+discrete levels, including their spin, are used. Above this energy, the level
+densities and spin distributions are used.
+
+:::
 
 :::{important}
 
@@ -241,6 +267,9 @@ elsewhere (e.g. in a GDML file).
     [Shielding](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/Shielding.html)
     physics list docs.
 
+[^NeutronHP]:
+    https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/TrackingAndPhysics/physicsProcess.html#high-precision-neutron-interactions-neutronhp
+
 [^Grabmayr]:
     See calculations of P. Grabmayr with MAURINA. The data files are available
     for inclusion with the simulation:
@@ -251,3 +280,4 @@ elsewhere (e.g. in a GDML file).
     - Gamma cascades in gadolinium isotopes. publication:
       [10.1140/epjc/s10052-023-11602-y](https://doi.org/10.1140/epjc/s10052-023-11602-y)
       and [**data file**](https://zenodo.org/records/7458654).
+    - Other such files exist in the wild, but not in a central place.
