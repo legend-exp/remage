@@ -30,6 +30,8 @@
 #endif
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBench.hh"
+#include "RMGGeomBenchOutputScheme.hh"
 #include "RMGGermaniumOutputScheme.hh"
 #include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGIsotopeFilterScheme.hh"
@@ -63,13 +65,16 @@ void init_extra() {
   new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
+  new RMGGeomBenchOutputScheme();
 
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();
+
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
+  new RMGGeomBench();
 #if RMG_HAS_BXDECAY0
   auto master_gen = new RMGMasterGenerator();
   new RMGGeneratorDecay0(master_gen); // needs a vertex generator

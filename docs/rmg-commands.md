@@ -511,6 +511,7 @@ Commands for controlling generators
 * `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
 * `/RMG/Generator/MUSUNCosmicMuons/` – Commands for controlling the MUSUN µ generator
 * `/RMG/Generator/CosmicMuons/` – Commands for controlling the µ generator
+* `/RMG/Generator/Benchmark/` – Commands for controlling the benchmarking simulation
 * `/RMG/Generator/BxDecay0/` – Commands for controlling the BxDecay0 generator
 * `/RMG/Generator/FromFile/` – Commands for controlling reading event data from file
 
@@ -536,7 +537,7 @@ Select event generator
 * **Parameter** – `generator`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
+  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined GeomBench Undefined`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/`
@@ -1177,6 +1178,110 @@ Maximum zenith angle of the generated muon position on the sphere
   * **Default value** – `deg`
   * **Candidates** – `rad mrad deg radian milliradian degree`
 * **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/Benchmark/`
+
+Commands for controlling the benchmarking simulation
+
+
+**Commands:**
+
+* `IncrementX` – Step size (increment) in X direction (negative = auto, default 30 pixels)
+* `IncrementY` – Step size (increment) in Y direction (negative = auto, default 30 pixels)
+* `IncrementZ` – Step size (increment) in Z direction (negative = auto, default 30 pixels)
+* `SamplingWidthX` – Sampling width in X direction (negative = auto from world)
+* `SamplingWidthY` – Sampling width in Y direction (negative = auto from world)
+* `SamplingWidthZ` – Sampling width in Z direction (negative = auto from world)
+
+### `/RMG/Generator/Benchmark/IncrementX`
+
+Step size (increment) in X direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dx`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/IncrementY`
+
+Step size (increment) in Y direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/IncrementZ`
+
+Step size (increment) in Z direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dz`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthX`
+
+Sampling width in X direction (negative = auto from world)
+
+* **Parameter** – `wx`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthY`
+
+Sampling width in Y direction (negative = auto from world)
+
+* **Parameter** – `wy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthZ`
+
+Sampling width in Z direction (negative = auto from world)
+
+* **Parameter** – `wz`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
 
 ## `/RMG/Generator/BxDecay0/`
 

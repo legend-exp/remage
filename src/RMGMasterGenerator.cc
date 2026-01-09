@@ -27,6 +27,7 @@
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBench.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
@@ -124,6 +125,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       fGeneratorObj = std::make_unique<RMGGeneratorMUSUNCosmicMuons>();
       break;
     case Generator::kFromFile: fGeneratorObj = std::make_unique<RMGGeneratorFromFile>(); break;
+    case Generator::kGeomBench: fGeneratorObj = std::make_unique<RMGGeomBench>(); break;
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:
