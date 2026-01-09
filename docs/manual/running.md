@@ -56,7 +56,26 @@ The most useful options include:
 ## Parallel execution
 
 _remage_ supports two ways of parallelising simulations, each with its own
-advantages and limitations:
+advantages and limitations.
+
+:::{admonition} In short
+
+If memory is the limiting factor, prefer `--threads`; otherwise, try `--procs`
+for better throughput. See below for important notes.
+
+:::
+
+The output from remage running with multiple processes or threads can be merged
+as if they were written by a single remage process. This is described in
+{ref}`manual-output` in more detail.
+
+:::{warning}
+
+Beware that the performance of the merging `--merge-output-files` together with
+`--procs`/`--threads` can take a lot of time as these operations are run on a
+single core at the moment.
+
+:::
 
 ### Geant4 multithreading
 
@@ -81,10 +100,13 @@ independent _remage_ instances, each running a single process. This usually
 provides near 1:1 performance scaling but is more resource-hungry because every
 process carries a full memory footprint.
 
-:::{admonition} In short
+:::{warning}
 
-If memory is the limiting factor, prefer `--threads`; otherwise, try `--procs`
-for better throughput.
+In the current design, a macro executed with multiple processes will simulate
+more events than a single/multi-threaded mode with the same macro. The total
+event count is increased by a factor of the number of processes. Example: with 5
+processes and `/run/beamOn 1000` in the macro, _remage_ will simulate 5000
+events.
 
 :::
 

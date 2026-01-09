@@ -49,6 +49,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGUserInit.hh
     ${_root}/include/RMGVertexConfinement.hh
     ${_root}/include/RMGVertexFromFile.hh
+    ${_root}/include/RMGVertexFromPoint.hh
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
@@ -97,6 +98,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGUserAction.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc
+    ${_root}/src/RMGVertexFromPoint.cc
     ${_root}/src/RMGVertexOutputScheme.cc)
 
 # Write RMGConfig.hh

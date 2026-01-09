@@ -191,6 +191,8 @@ class Geant4MacroLexer(RegexLexer):
             (r"#.*$", Comment),
             # command name at start of line
             (r"^(/\S+)", Name.Function),
+            # geant4 alias
+            (r"\{\w+\}", Name.Variable),
             # any other text
             (r".", Text),
         ],

@@ -2,8 +2,29 @@
 
 # Installation
 
-The recommended and fastest way of running _remage_ is through pre-built
-software containers. Alternatively, the project can be built from source.
+The recommended and fastest way of running _remage_ is through the pre-built
+packages on conda-forge; alternatively through our pre-built software container
+images. Alternatively, the project can be built from source.
+
+## Pre-built packages on conda-forge
+
+Stable releases are made available
+[on conda-forge](https://anaconda.org/conda-forge/remage) for Linux and macOS
+systems. To install the latest version of remage into your environment, use pixi
+or conda:
+
+```console
+$ pixi add remage
+# or
+$ conda install conda-forge::remage
+```
+
+:::{note}
+
+The conda-forge provided binaries do not support the ROOT output format, but
+fully supports LH5/HDF5.
+
+:::
 
 ## Pre-built container images
 
@@ -26,23 +47,6 @@ $ apptainer run remage_latest.sif --help
 More information is available in {ref}`manual-containers`. If containers do not
 work for you, see the next section to learn how to build and install from source
 or from conda-forge.
-
-## Pre-built packages on conda-forge
-
-Stable releases are made available
-[on conda-forge](https://anaconda.org/conda-forge/remage) for Linux and macOS
-systems. To install the latest version use:
-
-```console
-$ conda install conda-forge::remage
-```
-
-:::{note}
-
-The conda-forge provided binaries does not support the ROOT output format, but
-fully supports LH5/HDF5.
-
-:::
 
 ## Building from source
 
