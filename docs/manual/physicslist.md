@@ -38,6 +38,9 @@ Available options:
 - `Livermore` → `G4EmLivermorePhysics` (**default**)
 - `LivermorePolarized` → `G4EmLivermorePolarizedPhysics`
 
+A description of the different modes can be found in the
+[upstream documentation](https://geant4.web.cern.ch/documentation/dev/plg_html/PhysicsListGuide/electromagnetic/emphyslist.html).
+
 Some additional EM features from `G4EmExtraPhysics` are always enabled:
 
 - Synchrotron radiation
@@ -238,7 +241,7 @@ elsewhere (e.g. in a GDML file).
 
 :::{todo}
 
-- document this somewhere.
+- document this somewhere, and add some python code for this.
 
 :::
 
