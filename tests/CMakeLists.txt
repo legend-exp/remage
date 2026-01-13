@@ -8,6 +8,7 @@ get_target_property(REMAGE_PYEXE remage-cli PYEXE_PATH)
 get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
 
 add_subdirectory(basics)
+add_subdirectory(combine_tracks)
 add_subdirectory(confinement)
 add_subdirectory(detectors)
 add_subdirectory(distances)

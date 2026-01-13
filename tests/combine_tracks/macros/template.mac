@@ -1,0 +1,15 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Geometry/RegisterDetector Scintillator lar 001
+/RMG/Manager/Randomization/Seed 1234
+
+/run/initialize
+
+/RMG/Output/Scintillator/Cluster/CombineLowEnergyElectronTracks {MODE}
+/RMG/Output/Scintillator/StoreTrackID true
+
+/RMG/Generator/Select GPS
+/gps/particle gamma
+/gps/ang/type iso
+/gps/energy {ENERGY} keV
+
+/run/beamOn 1000
