@@ -158,8 +158,8 @@ int main(int argc, char** argv) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
 
-  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   if (proc_num_offset >= 0) RMGLog::SetProcNum(proc_num_offset);
+  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
 

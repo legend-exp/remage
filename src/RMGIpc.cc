@@ -29,13 +29,23 @@ void RMGIpc::Setup(int ipc_pipe_fd_out, int ipc_pipe_fd_in, int proc_num) {
     RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
   }
 
+  if (auto timeout_s = std::getenv("RMG_IPC_TIMEOUT")) {
+    fTimeout = std::atoi(timeout_s);
+    RMGLog::OutFormat(RMGLog::detail, "setting IPC timeout to {:d} us.", fTimeout);
+  }
+
   fIpcFdOut = ipc_pipe_fd_out;
   fIpcFdIn = ipc_pipe_fd_in;
   fProcNum = proc_num;
   if (fIpcFdOut < 0 || fIpcFdIn < 0) return;
 
+  bool perform_versioncheck = true;
+  if (auto check_s = std::getenv("RMG_IPC_DISABLE_VERSION_CHECK")) {
+    perform_versioncheck = std::atoi(check_s) > 0;
+  }
   // note: this is just a test for the blocking mode.
-  if (!SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
+  if (perform_versioncheck &&
+      !SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
     RMGLog::Out(RMGLog::error, "blocking test IPC call failed, disabling.");
     fIpcFdOut = -1;
     fIpcFdIn = -1;
@@ -56,8 +66,12 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
   pollfd pfd{.fd = fIpcFdIn, .events = POLLIN, .revents = 0};
 
   int ready = 0;
-  ready = poll(&pfd, 1, /* timeout (us) */ 10000);
-  while (ready == -1 && errno == EINTR) { ready = poll(&pfd, 1, 10000); }
+  RMGLog::Out(RMGLog::debug, "IPC: poll");
+  ready = poll(&pfd, 1, fTimeout);
+  while (ready == -1 && errno == EINTR) {
+    RMGLog::Out(RMGLog::debug, "IPC: restart poll");
+    ready = poll(&pfd, 1, fTimeout);
+  }
   if (ready == 1) {
     char ack[2] = "";
     auto acklen = read(fIpcFdIn, ack, sizeof(ack));
