@@ -11,5 +11,6 @@
 /gps/particle gamma
 /gps/ang/type iso
 /gps/energy {ENERGY} keV
+/gps/number 1000
 
-/run/beamOn 1000
+/run/beamOn 1
