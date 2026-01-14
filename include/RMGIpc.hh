@@ -59,8 +59,6 @@ class RMGIpc final {
     inline static int fIpcFdOut = -1;
     inline static int fIpcFdIn = -1;
     inline static int fProcNum = -1;
-
-    inline static int fTimeout = 100000; // us
 };
 
 #endif
