@@ -42,11 +42,8 @@ jobs:
         run: |
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
-          df -h $(pwd)
-
           # install some tools for more efficient disk space usage.
           pip install uv setuptools-scm
-          df -h $(pwd)
 
           mkdir build
           cd build
@@ -54,9 +51,13 @@ jobs:
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
-          ls -la .
+      - name: post-build cleanup
+        shell: bash
+        run: |
+          echo "freeing some disk space..."
           df -h $(pwd)
           uv cache clean
+          pip cache purge
           df -h $(pwd)
 
       - name: check version equality
