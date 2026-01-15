@@ -55,10 +55,10 @@ jobs:
         shell: bash
         run: |
           echo "freeing some disk space..."
-          df -h $(pwd)
+          echo "free space before: $(df --output=avail -h -- $(pwd) | tail -n1)"
           uv cache clean
           pip cache purge
-          df -h $(pwd)
+          echo "free space after: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: check version equality
         run: |
@@ -91,12 +91,12 @@ jobs:
       - name: Run full test suite
         if: ${{ matrix.container_version != 'slim' }}
         run: |
-          df -h $(pwd)
           cd build
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
           ctest --label-exclude mt -j$(nproc) --output-on-failure
-          df -h $(pwd)
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
           ctest --label-regex mt -j1 --output-on-failure
-          df -h $(pwd)
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
@@ -120,7 +120,7 @@ jobs:
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
           make sphinx-validation
-          df -h $(pwd)
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload validation report to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
