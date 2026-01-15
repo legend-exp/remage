@@ -37,6 +37,14 @@ jobs:
           fetch-tags: true
           ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
+      - name: Free some build space
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/swift
+          df -h
+
       - name: Build project
         shell: bash # make the pipes to tee below propagate errors (pipefail is on by default).
         run: |
