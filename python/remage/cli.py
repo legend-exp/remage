@@ -29,6 +29,7 @@ from pathlib import Path
 
 from . import logging as rmg_logging
 from . import utils
+from ._version import __version__
 from .find_remage import find_remage_cpp
 from .ipc import IpcResult, ipc_thread_fn
 from .post_proc import post_proc
@@ -64,6 +65,9 @@ def _run_remage_cpp(
     if any("--pipe-fd" in av for av in argv[1:]):
         msg = "cannot pass internal argument --pipe-fd"
         raise RuntimeError(msg)
+
+    # add our own version so that remage-cpp can check for it.
+    os.environ["RMG_WRAPPER_VERSION"] = __version__
 
     proc = []
     pipes_o = []

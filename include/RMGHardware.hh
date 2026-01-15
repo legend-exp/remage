@@ -169,6 +169,7 @@ class RMGHardware : public G4VUserDetectorConstruction {
     std::vector<std::string> fGDMLFiles;
     bool fGDMLDisableOverlapCheck = false;
     int fGDMLOverlapCheckNumPoints = 3000;
+    bool fGDMLDisableXmlCheck = false;
     /// Mapping between physical volume names and maximum (user) step size to apply
     std::map<std::string, double> fPhysVolStepLimits;
 

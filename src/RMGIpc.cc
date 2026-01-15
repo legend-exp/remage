@@ -29,11 +29,6 @@ void RMGIpc::Setup(int ipc_pipe_fd_out, int ipc_pipe_fd_in, int proc_num) {
     RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
   }
 
-  if (auto timeout_s = std::getenv("RMG_IPC_TIMEOUT")) {
-    fTimeout = std::atoi(timeout_s);
-    RMGLog::OutFormat(RMGLog::detail, "setting IPC timeout to {:d} us.", fTimeout);
-  }
-
   fIpcFdOut = ipc_pipe_fd_out;
   fIpcFdIn = ipc_pipe_fd_in;
   fProcNum = proc_num;
@@ -65,25 +60,17 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
   // wait for result.
   pollfd pfd{.fd = fIpcFdIn, .events = POLLIN, .revents = 0};
 
+  const int timeout = 10000; // microseconds
   int ready = 0;
-  RMGLog::Out(RMGLog::debug, "IPC: poll");
-  ready = poll(&pfd, 1, fTimeout);
-  while (ready == -1 && errno == EINTR) {
-    RMGLog::Out(RMGLog::debug, "IPC: restart poll");
-    ready = poll(&pfd, 1, fTimeout);
-  }
-  if (ready == 1) {
-    char ack[2] = "";
-    auto acklen = read(fIpcFdIn, ack, sizeof(ack));
-    if (acklen != 1 || ack[0] != '\x06') {
-      RMGLog::Out(RMGLog::fatal, "IPC error: wrong ACK");
-      return false;
-    }
-    return true;
-  } else {
-    RMGLog::Out(RMGLog::fatal, "IPC timeout or error");
+  ready = poll(&pfd, 1, timeout);
+  while ((ready == -1 && errno == EINTR) || ready == 0) { ready = poll(&pfd, 1, timeout); }
+  char ack[2] = "";
+  auto acklen = read(fIpcFdIn, ack, sizeof(ack));
+  if (acklen != 1 || ack[0] != '\x06') {
+    RMGLog::Out(RMGLog::fatal, "IPC error: wrong ACK");
     return false;
   }
+  return true;
 }
 
 bool RMGIpc::SendIpcNonBlocking(std::string msg) {
