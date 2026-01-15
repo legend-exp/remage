@@ -42,11 +42,23 @@ jobs:
         run: |
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
+          # install some tools for more efficient disk space usage.
+          pip install uv setuptools-scm
+
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
+
+      - name: post-build cleanup
+        shell: bash
+        run: |
+          echo "freeing some disk space..."
+          echo "free space before: $(df --output=avail -h -- $(pwd) | tail -n1)"
+          uv cache clean
+          pip cache purge
+          echo "free space after: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: check version equality
         run: |
@@ -80,8 +92,11 @@ jobs:
         if: ${{ matrix.container_version != 'slim' }}
         run: |
           cd build
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
           ctest --label-exclude mt -j$(nproc) --output-on-failure
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
           ctest --label-regex mt -j1 --output-on-failure
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
@@ -105,6 +120,7 @@ jobs:
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
           make sphinx-validation
+          echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload validation report to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
