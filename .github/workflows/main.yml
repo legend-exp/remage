@@ -50,6 +50,8 @@ jobs:
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
+          ls -la build
+
       - name: check version equality
         run: |
           cd build
