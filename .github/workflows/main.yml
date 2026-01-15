@@ -42,6 +42,8 @@ jobs:
         run: |
           git config --global --add safe.directory $(pwd)  # make git work inside container.
 
+          df -h $(pwd)
+
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
@@ -79,9 +81,12 @@ jobs:
       - name: Run full test suite
         if: ${{ matrix.container_version != 'slim' }}
         run: |
+          df -h $(pwd)
           cd build
           ctest --label-exclude mt -j$(nproc) --output-on-failure
+          df -h $(pwd)
           ctest --label-regex mt -j1 --output-on-failure
+          df -h $(pwd)
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
@@ -105,6 +110,7 @@ jobs:
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
           make sphinx-validation
+          df -h $(pwd)
 
       - name: Upload validation report to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
