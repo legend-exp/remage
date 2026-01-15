@@ -44,6 +44,10 @@ jobs:
 
           df -h $(pwd)
 
+          # install some tools for more efficient disk space usage.
+          pip install uv setuptools-scm
+          df -h $(pwd)
+
           mkdir build
           cd build
           cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
@@ -51,6 +55,9 @@ jobs:
           make install | tee -a build.log
 
           ls -la .
+          df -h $(pwd)
+          uv cache clean
+          df -h $(pwd)
 
       - name: check version equality
         run: |
