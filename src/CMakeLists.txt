@@ -33,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
     ${_root}/include/RMGParticleFilterScheme.hh
+    ${_root}/include/RMGPrimaryTransformer.hh
     ${_root}/include/RMGOutputManager.hh
     ${_root}/include/RMGOutputTools.hh
     ${_root}/include/RMGPhysics.hh
