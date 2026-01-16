@@ -44,6 +44,7 @@
 #include "RMGHardware.hh"
 #include "RMGIpc.hh"
 #include "RMGPhysics.hh"
+#include "RMGPrimaryTransformer.hh"
 #include "RMGTools.hh"
 #include "RMGUserAction.hh"
 #include "RMGUserInit.hh"
@@ -101,6 +102,7 @@ void RMGManager::Initialize() {
         );
       }
     }
+    fG4RunManager->SetPrimaryTransformer(new RMGPrimaryTransformer());
   }
 
   if (!fPhysicsList) this->SetUpDefaultProcessesList();
