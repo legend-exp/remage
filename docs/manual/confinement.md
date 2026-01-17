@@ -2,13 +2,6 @@
 
 # Vertex confinement
 
-:::{todo}
-
-- examples
-- tricks for vertex visualization
-
-:::
-
 _remage_ supports generating event vertices either in the bulk or on the surface
 of various solids. This is essential for simulating, for example, the decay of
 radioactive isotopes in detector components.
@@ -159,18 +152,90 @@ All sampling modes described above are available, with few notes/limitations:
   uniform vertex surface density.
 - Sampling on the surface of volumes that contain daughters will result in
   vertices being distributed on the outer surface of the mother volume _only_.
+- volumes that have daughters coincinding with the mothers's surface will be
+  weighted by the surface area including the daughter volume.
 - Sampling on intersections/subtractions of surfaces is not possible. _remage_
   will instead sample vertices in intersections/subtractions between surfaces
   and volumes. Because of this, the group of volumes (geometrical or physical)
   to sample the candidate surface vertices from must be set with
   <project:../rmg-commands.md#rmggeneratorconfinementfirstsamplingvolume>. This
   is not optional.
+- The value of
+  <project:../rmg-commands.md#rmggeneratorconfinementsurfacesamplemaxintersections>
+  should be set to the maximum number of times a line can intersect with the
+  surface of the volume. For example this is 2 for a sphere or cube. The
+  supplied value can be an overestimate. For slight overestimates this is comes
+  with a small but usually acceptable performance cost, however very large
+  values can significantly slow down the simulation.
 
 ## Vertices from external files
 
 For more complicated vertex confinement _remage_ supports the possibility to
 read in directly event primary positions from input files, as described in
-{ref}`manual-generators-extfiles`.
+{ref}`manual-input-vertex`.
+
+## Visualization
+
+You can use `legend-pygeom-vis` from the
+[_legend-pygeom-tools_](https://github.com/legend-exp/legend-pygeom-tools)
+package to visualize the simulated vertices your generated output files:
+
+```console
+$ remage -o {RMG_OUTPUT_FILE} -g {GDML_FILE} -- ...
+$ legend-pygeom-vis --add_points {RMG_OUTPUT_FILE} {GDML_FILE}
+```
+
+If you want to only show the vertices without the run-time overhead of actually
+simulating any physics, you could consider switching to generating only
+geantinos instead of your usual physics.
+
+## Examples
+
+### In the bulk of all Germanium detectors:
+
+Sampling uniformly distributed in all Germanium detectors of the LEGEND
+experiment is simple. Only one volume selection command is needed with the regex
+capabilities described above:
+
+```geant4
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume [BCPV]\w+
+```
+
+### Active LAr region of LEGEND-200
+
+This is a typical example of the sampling from a volume intersection. This will
+sample from the `liquid_argon` volume, but
+
+```geant4
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SamplingMode IntersectPhysicalWithGeometrical
+
+/RMG/Generator/Confinement/Physical/AddVolume liquid_argon
+
+/RMG/Generator/Confinement/Geometrical/AddSolid Cylinder
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0.69 m
+/RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius 0 m
+/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 0.7 m
+/RMG/Generator/Confinement/Geometrical/Cylinder/Height 2 m
+```
+
+### On the surface of the PEN pieces
+
+Assuming the geometry contains PEN parts in volumes named with `_pen_` somewhere
+in their name. Sampling on the surface can then be achieved by:
+
+```geant4
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume .*_pen_.*
+
+# sample on the surfaces of all volumes:
+/RMG/Generator/Confinement/SampleOnSurface true
+# replace "6" with another value suitable for the selected volumes
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
+```
 
 [^1]:
     J. A. Detwiler, R. Henning, R. A. Johnson and M. G. Marino, in IEEE

@@ -60,7 +60,7 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
   do { // NOLINT(cppcoreguidelines-avoid-do-while)
     if (!std::getline(*(it->second), line)) {
       // if end-of-file is reached, reset file and read first line
-      RMGLog::Out(RMGLog::detail, "Gamma cascade file EOF reached, re-opening the file");
+      RMGLog::Out(RMGLog::debug_event, "Gamma cascade file EOF reached, re-opening the file");
       it->second->clear();                 // clear EOF flag
       it->second->seekg(0, std::ios::beg); // move to beginning of file
       if (!std::getline(*(it->second), line)) {

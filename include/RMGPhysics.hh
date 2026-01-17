@@ -141,9 +141,10 @@ class RMGPhysics : public G4VModularPhysicsList {
     ProdCutStore fProdCuts = {};
     ProdCutStore fProdCutsSensitive = {};
     bool fConstructOptical = false;
-    bool fUseOpticalCustomWLS = false;
+    bool fUseOpticalCustomWLS = true;
     bool fUseNeutronThermalScattering = false;
     bool fUseGrabmayrGammaCascades = false;
+    bool fUseInnerBremsstrahlung = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
     G4double fLowEnergyRange = 250 * CLHEP::eV;

@@ -1,3 +1,18 @@
+# Copyright (C) 2025 Manuel Huber <https://orcid.org/0009-0000-5212-2999>
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 """
 IPC message receiver implementation for ``remage-cpp``.
 
@@ -18,12 +33,13 @@ Message parts are separated using ASCII control characters. Each message ends wi
 before continuing.
 
 Records within a message are delimited by ``RS`` (record separator, 0x1E). Each
-message must contain at least two records. The first is treated as the message's
-*key*, whereas the second one is the associated *value*:
+message must contain at least three records. The first is the process index, for
+typical (non-multiprocessing) uses, this is always ``0``. The second is treated as
+the message's *key*, whereas the second one is the associated *value*:
 
-+-------+--------+---------+-----------+--------+
-| *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
-+-------+--------+---------+-----------+--------+
++-----------+-------+--------+---------+-----------+--------+
+| *proc_id* | *key* | ``RS`` | *value* | [``ENQ``] | ``GS`` |
++-----------+-------+--------+---------+-----------+--------+
 
 More values can follow afterwards, again delimited by ``RS``.
 
@@ -32,9 +48,9 @@ with more then one unit are returned as tuples on the python side.
 
 Example: A message
 
-+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
-| *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
-+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
++-----------+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
+| *proc_id* | *key* | ``RS`` | value0 | ``RS`` | value1 | ``US`` | value2 | [``ENQ``] | ``GS`` |
++-----------+-------+--------+--------+--------+--------+--------+--------+-----------+--------+
 
 would be decoded to :code:`["value0", ("value1", "value2")]`.
 
@@ -42,9 +58,10 @@ would be decoded to :code:`["value0", ("value1", "value2")]`.
 Blocking messages
 -----------------
 
-Blocking messages need to be acknowledged by sending the POSIX signal ``SIGUSR2`` to
-the ``remage-cpp`` process, after performing the associated action (example: checking
-version equality of python and C++ IPC sides, pre-processing files).
+Blocking messages need to be acknowledged by sending ASCII ACK over the second pipe
+(per-process file descriptor) to the ``remage-cpp`` process, after performing the
+associated action (example: checking version equality of python and C++ IPC sides,
+pre-processing files).
 
 Transmitting additional response data with the acknowledgement is not possible.
 """
@@ -61,7 +78,10 @@ from ._version import __version__
 log = logging.getLogger("remage")
 
 
-def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
+def handle_ipc_message(
+    msg: str,
+    proc: list[subprocess.Popen],
+) -> tuple[bool, list, bool, int]:
     """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
 
     This function should directly handle all known blocking IPC messages, which
@@ -74,11 +94,12 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
 
     Returns
     -------
-    tuple[bool, list, bool]
+    tuple[bool, list, bool, int]
         ``(is_blocking, parsed_message, is_fatal)`` where ``is_blocking`` is
         ``True`` when the sender waits for a reply, ``parsed_message`` is the
         decoded message or ``None`` if it was consumed internally, and
         ``is_fatal`` signals that the application should terminate.
+        ``proc_num`` is the index of the subprocess.
     """
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
@@ -89,26 +110,54 @@ def handle_ipc_message(msg: str) -> tuple[bool, list, bool]:
     msg = [record.split("\x1f") for record in msg]  # ASCII US ("unit separator")
     msg = [tuple(record) if len(record) > 1 else record[0] for record in msg]
 
+    # first field is process number.
+    assert len(msg) > 1
+    proc_num = int(msg[0])
+    msg = msg[1:]
+
     msg_ret = msg
     is_fatal = False
-    # handle blocking messages, if necessary.
-    if msg[0] == "ipc_available":
-        if msg[1] != __version__:
-            log.error(
-                "remage-cpp version %s does not match python-wrapper version %s",
-                msg[1],
-                __version__,
-            )
-            is_fatal = True
-        msg_ret = None
-    elif is_blocking:
-        log.warning("Unhandled blocking IPC message %s", str(msg))
 
-    return is_blocking, msg_ret, is_fatal
+    if is_blocking:
+        if len(proc) > 1:
+            # pause all C++ processes in multi-process mode.
+            for p in proc:
+                p.send_signal(signal.SIGSTOP)
+
+        # handle blocking messages, if necessary.
+        if msg[0] == "ipc_available":
+            if msg[1] != __version__:
+                log.error(
+                    "remage-cpp version %s does not match python-wrapper version %s",
+                    msg[1],
+                    __version__,
+                )
+                is_fatal = True
+            msg_ret = None
+        elif msg[0] == "gdml":
+            from xml.dom.minidom import parse as minidom_parse
+
+            try:
+                minidom_parse(msg[1])
+            except BaseException as pe:
+                log.error("invalid GDML file %s: %s", msg[1], pe)
+                is_fatal = True
+            msg_ret = None
+        else:
+            log.warning("Unhandled blocking IPC message %s", str(msg))
+
+        if len(proc) > 1:
+            # resume all C++ processes in multi-process mode.
+            for p in proc:
+                p.send_signal(signal.SIGCONT)
+    return is_blocking, msg_ret, is_fatal, proc_num
 
 
 def ipc_thread_fn(
-    pipe_r: int, proc: subprocess.Popen, unhandled_ipc_messages: list
+    pipe_r: int,
+    pipes_o_w: list[int],
+    proc: list[subprocess.Popen],
+    unhandled_ipc_messages: list,
 ) -> None:
     """Read and handle IPC messages coming from ``remage-cpp``.
 
@@ -124,17 +173,17 @@ def ipc_thread_fn(
     handling of the associated action. Any message parts will be decoded as
     UTF-8 before parsing.
 
-    Blocking messages are acknowledged by sending the POSIX signal ``SIGUSR2``
-    to the child  process, while fatal messages trigger ``SIGTERM``. Any
-    messages that are not handled by :func:`handle_ipc_message` are appended
-    to the list ``unhandled_ipc_messages`` for later processing.
+    Blocking messages are acknowledged by sending ASCII ACK over the second pipe
+    (per-process file descriptor).
 
     Parameters
     ----------
     pipe_r
         File descriptor for the read end of the IPC pipe.
     proc
-        The subprocess running ``remage-cpp``.
+        The subprocess(es) running ``remage-cpp``.
+    pipes_o_w
+        File descriptor(s) for the write end of the IPC pipe(s) to the subprocess(es).
     unhandled_ipc_messages
         List that will receive messages which were not directly handled (i.e.,
         for further processing)
@@ -161,15 +210,21 @@ def ipc_thread_fn(
                     msg = msg_buf[0:msg_end].decode("utf-8")
                     msg_buf = msg_buf[msg_end:]
 
-                    is_blocking, unhandled_msg, is_fatal = handle_ipc_message(msg)
+                    is_blocking, unhandled_msg, is_fatal, proc_id = handle_ipc_message(
+                        msg, proc
+                    )
                     if unhandled_msg is not None:
                         unhandled_ipc_messages.append(unhandled_msg)
-                    if is_fatal:  # the handler wants to stop the app.
-                        proc.send_signal(signal.SIGTERM)
+                    if is_fatal:
+                        # the handler wants to stop the app.
+                        # send termination signal to _all_ processes.
+                        for p in proc:
+                            p.send_signal(signal.SIGTERM)
                     elif is_blocking:
-                        proc.send_signal(signal.SIGUSR2)  # send continuation signal.
+                        # send continuation message, only to this process.
+                        os.write(pipes_o_w[proc_id], b"\x06")  # ASCII ACK
     except OSError as e:
-        if e.errno == 9:  # bad file descriptor.
+        if e.errno in (9, 32):  # bad file descriptor or broken pipe.
             return
         raise e
 
@@ -203,11 +258,11 @@ class IpcResult:
         .. note ::
             if more then one value for the key had been submitted, this function will throw.
         """
-        gen = self.get(name)
+        gen = set(self.get(name))
         if len(gen) > 1:
             msg = f"ipc returned key {name} more than once"
             raise RuntimeError(msg)
-        return gen[0] if len(gen) == 1 else default
+        return next(iter(gen)) if len(gen) == 1 else default
 
     def set(self, name: str, values: list[str]) -> None:
         """Replace existing stored messages for they key ``name`` with ``values``.

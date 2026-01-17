@@ -4,19 +4,28 @@ set -euo pipefail
 
 rmg="$1"
 python_path="$2"
-lh5ls="$(dirname "$python_path")/lh5ls"
+bindir="$(dirname "$python_path")/"
+if [[ "$bindir" == "./" ]]; then
+    bindir=""
+fi
+lh5ls="${bindir}lh5ls"
 macro="macros/$3"
 
 is_mt="${4-}"
-extra_args=${is_mt:+"-m -t 2"}
+extra_args=""
+if [[ "$is_mt" == "mt" ]]; then
+    extra_args="-m -t 2"
+elif [[ "$is_mt" == "mp" ]]; then
+    extra_args="-m -P 2"
+fi
 
 output_h5="${3/.mac/.hdf5}"
 output_lh5="${3/.mac/.lh5}"
 output_lh5_jag="${3/.mac/-pproc.lh5}"
 
 if [[ "$is_mt" != "" ]]; then
-    output_lh5="${output_lh5/.lh5/-mt.lh5}"
-    output_lh5_jag="${output_lh5_jag/.lh5/-mt.lh5}"
+    output_lh5="${output_lh5/.lh5/-$is_mt.lh5}"
+    output_lh5_jag="${output_lh5_jag/.lh5/-$is_mt.lh5}"
 fi
 
 output_dump_h5="${output_h5}.ls"

@@ -55,7 +55,7 @@ void RMGGermaniumDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
 bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing germanium detector hits");
+  RMGLog::OutDev(RMGLog::debug_event, "Processing germanium detector hits");
 
   // return if no energy is deposited
   // ignore optical photons
@@ -86,7 +86,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in germanium detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug_event, "Hit in germanium detector nr. ", det_uid, " detected");
 
   // create a new hit and fill it
   auto* hit = new RMGDetectorHit();

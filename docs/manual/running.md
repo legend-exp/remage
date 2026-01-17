@@ -35,7 +35,10 @@ The most useful options include:
   {ref}`manual-output`).
 - `-i, --interactive` – keep the application open after executing macros and
   present a Geant4 prompt.
-- `-t, --threads` – number of worker threads to use.
+- `-t, --threads` – number of worker threads to use (this cannot be combined
+  with `-P/--procs`).
+- `-P, --procs` – number of worker processes to use (this cannot be combined
+  with `-t/--threads`).
 - `-w, --overwrite` – overwrite an existing output file.
 - `-q, --quiet`/`-v, --verbose`/`-l, --log-level` – control the verbosity.
   Logging levels are `debug`, `detail`, `summary`, `warning`, `error`, `fatal`,
@@ -49,6 +52,63 @@ The most useful options include:
   {ref}`manual-output`).
 - `-s, --macro-substitutions` – provide `key=value` pairs that will be expanded
   as Geant4 aliases in macros.
+
+## Parallel execution
+
+_remage_ supports two ways of parallelising simulations, each with its own
+advantages and limitations.
+
+:::{admonition} In short
+
+If memory is the limiting factor, prefer `--threads`; otherwise, try `--procs`
+for better throughput. See below for important notes.
+
+:::
+
+The output from remage running with multiple processes or threads can be merged
+as if they were written by a single remage process. This is described in
+{ref}`manual-output` in more detail.
+
+:::{warning}
+
+Beware that the performance of the merging `--merge-output-files` together with
+`--procs`/`--threads` can take a lot of time as these operations are run on a
+single core at the moment.
+
+:::
+
+### Geant4 multithreading
+
+This mode is enabled by passing `--threads INTEGER` to the command line.
+_remage_ does not implement its own multithreading but delegates it to Geant4.
+This approach is memory-efficient because shared objects (such as the geometry)
+are instantiated only once.
+
+:::{warning}
+
+The performance in multithreaded mode does not scale linearly with the number of
+threads (see [issue #287](https://github.com/legend-exp/remage/issues/287) for
+details).
+
+:::
+
+### Multiple processes
+
+This mode is enabled by passing `--procs INTEGER` to the command line. The
+Python wrapper (see the {ref}`dev-guide` for details) can launch several
+independent _remage_ instances, each running a single process. This usually
+provides near 1:1 performance scaling but is more resource-hungry because every
+process carries a full memory footprint.
+
+:::{warning}
+
+In the current design, a macro executed with multiple processes will simulate
+more events than a single/multi-threaded mode with the same macro. The total
+event count is increased by a factor of the number of processes. Example: with 5
+processes and `/run/beamOn 1000` in the macro, _remage_ will simulate 5000
+events.
+
+:::
 
 ## Batch versus interactive mode
 

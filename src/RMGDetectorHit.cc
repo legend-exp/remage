@@ -31,7 +31,7 @@ G4bool RMGDetectorHit::operator==(const RMGDetectorHit& right) const { return th
 
 void RMGDetectorHit::Print() {
   RMGLog::Out(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "Detector UID: ",
       this->detector_uid,
       " / Particle: ",

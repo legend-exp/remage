@@ -69,7 +69,7 @@ Set verbosity level of application log
 * **Parameter** – `level`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `debug detail summary warning error fatal nothing`
+  * **Candidates** – `debug_event debug detail summary warning error fatal nothing`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Manager/Randomization/`
@@ -128,6 +128,7 @@ Commands for controlling physics processes
 **Sub-directories:**
 
 * `/RMG/Processes/Stepping/` – Commands for controlling physics processes
+* `/RMG/Processes/InnerBremsstrahlung/` – Commands for controlling the inner bremsstrahlung process
 
 **Commands:**
 
@@ -142,6 +143,7 @@ Commands for controlling physics processes
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
+* `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -175,6 +177,8 @@ Set simulation production cuts, for sensitive region for electrons, positions, a
 
 Add optical processes to the physics list
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -185,6 +189,8 @@ Add optical processes to the physics list
 
 Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -194,6 +200,8 @@ Use a custom wavelegth shifting process that produces at maximum one secondary p
 ### `/RMG/Processes/LowEnergyEMPhysics`
 
 Add low energy electromagnetic processes to the physics list
+
+Uses Livermore by default
 
 * **Parameter** – `arg0`
   * **Parameter type** – `s`
@@ -206,6 +214,8 @@ Add low energy electromagnetic processes to the physics list
 
 Add hadronic processes to the physics list
 
+Uses None by default
+
 * **Parameter** – `arg0`
   * **Parameter type** – `s`
   * **Omittable** – `False`
@@ -217,6 +227,8 @@ Add hadronic processes to the physics list
 
 Use thermal scattering cross sections for neutrons
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -226,6 +238,8 @@ Use thermal scattering cross sections for neutrons
 ### `/RMG/Processes/EnableGammaAngularCorrelation`
 
 Set correlated gamma emission flag
+
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -257,6 +271,20 @@ Store e- internal conversion data
 
 Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Processes/EnableInnerBremsstrahlung`
+
+Enable Inner Bremsstrahlung generation for beta decays
+
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -283,6 +311,8 @@ This applies to the defined lifetime of the nucleus, and not on the sampled actu
 
 Set to -1 to disable this feature.
 
+Uses -1 ns  us by default
+
 * **Parameter** – `max_lifetime`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -298,6 +328,8 @@ Set to -1 to disable this feature.
 
 Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -308,6 +340,8 @@ Immediately discard tracks after primary particle generation. This feature is me
 
 If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -317,6 +351,8 @@ If the initial step is a radioactive decay, reset the global time of all its sec
 ### `/RMG/Processes/Stepping/LargeGlobalTimeUncertaintyWarning`
 
 Warn if the global times of tracks get too large to provide the requested time uncertainty.
+
+Uses 1 us by default
 
 * **Parameter** – `value`
   * **Parameter type** – `d`
@@ -329,6 +365,24 @@ Warn if the global times of tracks get too large to provide the requested time u
   * **Candidates** – `s ms us ns ps min h d y second millisecond microsecond nanosecond picosecond minute hour day year`
 * **Allowed states** – `Idle`
 
+## `/RMG/Processes/InnerBremsstrahlung/`
+
+Commands for controlling the inner bremsstrahlung process
+
+
+**Commands:**
+
+* `BiasingFactor` – Sets a biasing factor for IB probability
+
+### `/RMG/Processes/InnerBremsstrahlung/BiasingFactor`
+
+Sets a biasing factor for IB probability
+
+* **Parameter** – `factor`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
 ## `/RMG/Geometry/`
 
 Commands for controlling geometry definitions
@@ -338,6 +392,7 @@ Commands for controlling geometry definitions
 
 * `GDMLDisableOverlapCheck` – Disable the automatic overlap check after loading a GDML file
 * `GDMLOverlapCheckNumPoints` – Change the number of points sampled for overlap checks
+* `GDMLDisableXmlCheck` – Disable the automatic xml validity check after loading a GDML file
 * `RegisterDetectorsFromGDML` – Register detectors as saved in the GDML auxval structure, as written by pygeomtools.
 * `IncludeGDMLFile` – Use GDML file for geometry definition
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
@@ -362,6 +417,16 @@ Change the number of points sampled for overlap checks
 * **Parameter** – `value`
   * **Parameter type** – `i`
   * **Omittable** – `False`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/GDMLDisableXmlCheck`
+
+Disable the automatic xml validity check after loading a GDML file
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/RegisterDetectorsFromGDML`
@@ -414,8 +479,8 @@ register a sensitive detector
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Parameter** – `copy_nr`
-    – copy nr (default 0)
-  * **Parameter type** – `i`
+    – copy nr, accepts regex patterns (default 0)
+  * **Parameter type** – `s`
   * **Omittable** – `True`
   * **Default value** – `0`
 * **Parameter** – `allow_id_reuse`
@@ -423,6 +488,10 @@ register a sensitive detector
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Parameter** – `ntuple_name`
+    – Ntuple name (optional override)
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/SetMaxStepSize`
@@ -453,6 +522,7 @@ Commands for controlling generators
 * `/RMG/Generator/Confinement/` – Commands for controlling primary confinement
 * `/RMG/Generator/MUSUNCosmicMuons/` – Commands for controlling the MUSUN µ generator
 * `/RMG/Generator/CosmicMuons/` – Commands for controlling the µ generator
+* `/RMG/Generator/Benchmark/` – Commands for controlling the benchmarking simulation
 * `/RMG/Generator/BxDecay0/` – Commands for controlling the BxDecay0 generator
 * `/RMG/Generator/FromFile/` – Commands for controlling reading event data from file
 
@@ -468,7 +538,7 @@ Select primary confinement strategy
 * **Parameter** – `strategy`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `UnConfined Volume FromFile`
+  * **Candidates** – `UnConfined Volume FromFile FromPoint`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Select`
@@ -478,7 +548,7 @@ Select event generator
 * **Parameter** – `generator`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined Undefined`
+  * **Candidates** – `G4gun GPS BxDecay0 FromFile CosmicMuons MUSUNCosmicMuons UserDefined GeomBench Undefined`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/Confinement/`
@@ -491,6 +561,7 @@ Commands for controlling primary confinement
 * `/RMG/Generator/Confinement/Physical/` – Commands for setting physical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/` – Commands for setting geometrical volumes up for primary confinement
 * `/RMG/Generator/Confinement/FromFile/` – Commands for controlling reading event vertex positions from file
+* `/RMG/Generator/Confinement/FromPoint/` – Commands for controlling vertex positions at fixed point
 
 **Commands:**
 
@@ -511,6 +582,8 @@ Reset all parameters of vertex confinement, so that it can be reconfigured.
 ### `/RMG/Generator/Confinement/SampleOnSurface`
 
 If true (or omitted argument), sample on the surface of solids
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -561,6 +634,8 @@ Set maximum number of intersections of a line with the surface. Note: can be set
 ### `/RMG/Generator/Confinement/ForceContainmentCheck`
 
 If true (or omitted argument), perform a containment check even after sampling from a natively sampleable object. This is only an extra sanity check that does not alter the behaviour.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -879,10 +954,36 @@ Change the default input directory/group for ntuples.
 this option only has an effect for LH5 or HDF5 input files.
 :::
 
+Uses "vtx" by default
+
 * **Parameter** – `nt_directory`
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/Confinement/FromPoint/`
+
+Commands for controlling vertex positions at fixed point
+
+
+**Commands:**
+
+* `Position` – Change the default input directory/group for ntuples.
+
+### `/RMG/Generator/Confinement/FromPoint/Position`
+
+Change the default input directory/group for ntuples.
+
+* **Parameter** – `pos`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `valueY`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `valueZ`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Generator/MUSUNCosmicMuons/`
@@ -1114,6 +1215,110 @@ Maximum zenith angle of the generated muon position on the sphere
   * **Candidates** – `rad mrad deg radian milliradian degree`
 * **Allowed states** – `PreInit Idle`
 
+## `/RMG/Generator/Benchmark/`
+
+Commands for controlling the benchmarking simulation
+
+
+**Commands:**
+
+* `IncrementX` – Step size (increment) in X direction (negative = auto, default 30 pixels)
+* `IncrementY` – Step size (increment) in Y direction (negative = auto, default 30 pixels)
+* `IncrementZ` – Step size (increment) in Z direction (negative = auto, default 30 pixels)
+* `SamplingWidthX` – Sampling width in X direction (negative = auto from world)
+* `SamplingWidthY` – Sampling width in Y direction (negative = auto from world)
+* `SamplingWidthZ` – Sampling width in Z direction (negative = auto from world)
+
+### `/RMG/Generator/Benchmark/IncrementX`
+
+Step size (increment) in X direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dx`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/IncrementY`
+
+Step size (increment) in Y direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/IncrementZ`
+
+Step size (increment) in Z direction (negative = auto, default 30 pixels)
+
+* **Parameter** – `dz`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthX`
+
+Sampling width in X direction (negative = auto from world)
+
+* **Parameter** – `wx`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthY`
+
+Sampling width in Y direction (negative = auto from world)
+
+* **Parameter** – `wy`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
+### `/RMG/Generator/Benchmark/SamplingWidthZ`
+
+Sampling width in Z direction (negative = auto from world)
+
+* **Parameter** – `wz`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+  * **Default value** – `-1.0`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Init Idle GeomClosed EventProc Abort`
+
 ## `/RMG/Generator/BxDecay0/`
 
 Commands for controlling the BxDecay0 generator
@@ -1330,6 +1535,8 @@ Discard optical photons (before simulating them), if no edep in germanium detect
 If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
 :::
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1339,6 +1546,8 @@ If another output scheme also requests the photons to be discarded, the germaniu
 ### `/RMG/Output/Germanium/StoreSinglePrecisionPosition`
 
 Use float32 (instead of float64) for position output.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1350,6 +1559,8 @@ Use float32 (instead of float64) for position output.
 
 Use float32 (instead of float64) for energy output.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1359,6 +1570,8 @@ Use float32 (instead of float64) for energy output.
 ### `/RMG/Output/Germanium/DiscardZeroEnergyHits`
 
 Discard hits with zero energy.
+
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1370,6 +1583,8 @@ Discard hits with zero energy.
 
 Store Track IDs for hits in the output file.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1379,6 +1594,8 @@ Store Track IDs for hits in the output file.
 ### `/RMG/Output/Germanium/StepPositionMode`
 
 Select which position of the step to store
+
+Uses Average by default
 
 * **Parameter** – `mode`
   * **Parameter type** – `s`
@@ -1397,14 +1614,16 @@ Commands for controlling clustering of hits in germanium detectors.
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
 * `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterDistanceSurface` – Set a distance threshold for the surface pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `PreClusterDistanceSurface * Uses 0 fm` – by default
+* `PreClusterTimeThreshold` – Set a time threshold for pre-clustering.
 * `SurfaceThickness` – Set a surface thickness for the Germanium detector.
 * `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 
 ### `/RMG/Output/Germanium/Cluster/PreClusterOutputs`
 
 Pre-Cluster output hits before saving
+
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1416,6 +1635,8 @@ Pre-Cluster output hits before saving
 
 Merge low energy electron tracks.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1426,6 +1647,8 @@ Merge low energy electron tracks.
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1435,6 +1658,8 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
 ### `/RMG/Output/Germanium/Cluster/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
+
+Uses 50 um  by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1447,6 +1672,8 @@ Set a distance threshold for the bulk pre-clustering.
 * **Allowed states** – `Idle`
 
 ### `/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface`
+
+Uses 0 fm  by default
 
 Set a distance threshold for the surface pre-clustering.
 
@@ -1462,7 +1689,9 @@ Set a distance threshold for the surface pre-clustering.
 
 ### `/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold`
 
-Set a time threshold for  pre-clustering.
+Set a time threshold for pre-clustering.
+
+Uses 10 us  by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1478,6 +1707,8 @@ Set a time threshold for  pre-clustering.
 
 Set a surface thickness for the Germanium detector.
 
+Uses 2 mm  by default
+
 * **Parameter** – `thickness`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1491,6 +1722,8 @@ Set a surface thickness for the Germanium detector.
 ### `/RMG/Output/Germanium/Cluster/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
+
+Uses 10 keV by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1515,6 +1748,8 @@ Commands for controlling output from hits in optical detectors.
 
 Use float32 (instead of float64) for wavelength output.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1537,6 +1772,8 @@ Commands for controlling output of primary vertices.
 
 Store information on primary particle details (not only vertex data).
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1546,6 +1783,8 @@ Store information on primary particle details (not only vertex data).
 ### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
 
 Do not store vertex/primary particle data.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1557,6 +1796,8 @@ Do not store vertex/primary particle data.
 
 Use float32 (instead of float64) for position output.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1566,6 +1807,8 @@ Use float32 (instead of float64) for position output.
 ### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1635,6 +1878,8 @@ Take this detector into account for the filtering by /EdepThreshold.
 
 Discard hits with zero energy.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1644,6 +1889,8 @@ Discard hits with zero energy.
 ### `/RMG/Output/Scintillator/StoreParticleVelocities`
 
 Store velocities of particle in the output file.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1655,6 +1902,8 @@ Store velocities of particle in the output file.
 
 Store Track IDs for hits in the output file.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1665,6 +1914,8 @@ Store Track IDs for hits in the output file.
 
 Use float32 (instead of float64) for position output.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1674,6 +1925,8 @@ Use float32 (instead of float64) for position output.
 ### `/RMG/Output/Scintillator/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1702,12 +1955,14 @@ Commands for controlling clustering of hits in scintillator detectors.
 * `CombineLowEnergyElectronTracks` – Merge low energy electron tracks.
 * `RedistributeGammaEnergy` – Redistribute energy deposited by gamma tracks to nearby electron tracks.
 * `PreClusterDistance` – Set a distance threshold for the bulk pre-clustering.
-* `PreClusterTimeThreshold * Set a time threshold for` – pre-clustering.
+* `PreClusterTimeThreshold` – Set a time threshold for pre-clustering.
 * `ElectronTrackEnergyThreshold` – Set a energy threshold for tracks to be merged.
 
 ### `/RMG/Output/Scintillator/Cluster/PreClusterOutputs`
 
 Pre-Cluster output hits before saving
+
+This is enabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1719,6 +1974,8 @@ Pre-Cluster output hits before saving
 
 Merge low energy electron tracks.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1729,6 +1986,8 @@ Merge low energy electron tracks.
 
 Redistribute energy deposited by gamma tracks to nearby electron tracks.
 
+This is enabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1738,6 +1997,8 @@ Redistribute energy deposited by gamma tracks to nearby electron tracks.
 ### `/RMG/Output/Scintillator/Cluster/PreClusterDistance`
 
 Set a distance threshold for the bulk pre-clustering.
+
+Uses 500 um  by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1751,7 +2012,9 @@ Set a distance threshold for the bulk pre-clustering.
 
 ### `/RMG/Output/Scintillator/Cluster/PreClusterTimeThreshold`
 
-Set a time threshold for  pre-clustering.
+Set a time threshold for pre-clustering.
+
+Uses 10 us  by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1766,6 +2029,8 @@ Set a time threshold for  pre-clustering.
 ### `/RMG/Output/Scintillator/Cluster/ElectronTrackEnergyThreshold`
 
 Set a energy threshold for tracks to be merged.
+
+Uses 10 keV by default
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1858,6 +2123,8 @@ Only include tracks with kinetic energy above this threshold.
 
 Use float32 (instead of float64) for position output.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1868,6 +2135,8 @@ Use float32 (instead of float64) for position output.
 
 Use float32 (instead of float64) for energy output.
 
+This is disabled by default
+
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
@@ -1877,6 +2146,8 @@ Use float32 (instead of float64) for energy output.
 ### `/RMG/Output/Track/StoreAlways`
 
 Always store track data, even if event should be discarded.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`

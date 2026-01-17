@@ -65,7 +65,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
   auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
-    RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors on primary particles");
+    RMGLog::OutDev(RMGLog::debug_event, "Filling persistent data vectors on primary particles");
     const auto ana_man = G4AnalysisManager::Instance();
     auto vntupleid = rmg_man->GetAuxNtupleID("vtx");
     auto pntupleid = fStorePrimaryParticleInformation ? rmg_man->GetAuxNtupleID("particles") : -1;
@@ -75,7 +75,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
       int n_primaries = primary_vertex->GetNumberOfParticle();
 
       int vcol_id = 0;
-      ana_man->FillNtupleIColumn(vntupleid, vcol_id++, event->GetEventID());
+      ana_man->FillNtupleIColumn(vntupleid, vcol_id++, GetEventIDForStorage(event));
       ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
       FillNtupleFOrDColumn(
           ana_man,
@@ -108,7 +108,7 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
           auto primary = primary_vertex->GetPrimary(j);
 
           int pcol_id = 0;
-          ana_man->FillNtupleIColumn(pntupleid, pcol_id++, event->GetEventID());
+          ana_man->FillNtupleIColumn(pntupleid, pcol_id++, GetEventIDForStorage(event));
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, j);
           ana_man->FillNtupleIColumn(pntupleid, pcol_id++, primary->GetPDGcode());
           FillNtupleFOrDColumn(
@@ -158,24 +158,38 @@ void RMGVertexOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StorePrimaryParticleInformation", fStorePrimaryParticleInformation)
       .SetGuidance("Store information on primary particle details (not only vertex data).")
+      .SetGuidance(
+          std::string("This is ") + (fStorePrimaryParticleInformation ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipPrimaryVertexOutput", fSkipPrimaryVertexOutput)
       .SetGuidance("Do not store vertex/primary particle data.")
+      .SetGuidance(
+          std::string("This is ") + (fSkipPrimaryVertexOutput ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionPosition ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

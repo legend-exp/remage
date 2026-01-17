@@ -20,15 +20,15 @@
 #include <string>
 
 #include "G4AnalysisManager.hh"
+#include "G4Event.hh"
 #include "G4Run.hh"
 #include "G4Track.hh"
 #include "G4UserStackingAction.hh"
 
 #include "RMGDetectorMetadata.hh"
 
-#include "fmt/format.h"
+#include "fmt/core.h"
 
-class G4Event;
 /**
  * @brief Virtual output scheme interface.
  *
@@ -124,6 +124,21 @@ class RMGVOutputScheme {
     virtual void TrackingActionPre(const G4Track*) {};
 
     /**
+     * @brief Hook called after tracking a new particle.
+     *
+     * Output schemes may use this to record any track-specific information required for output.
+     */
+    virtual void TrackingActionPost(const G4Track*) {};
+
+    // hook into G4SteppingAction.
+    /**
+     * @brief Hook called after each step.
+     *
+     * Output schemes may use this to record any step-specific information required for output.
+     */
+    virtual void SteppingAction(const G4Step*) {};
+
+    /**
      * @brief Perform final actions at the end of a run.
      *
      * This function can be used by derived output schemes to finalize or write remaining data.
@@ -146,12 +161,18 @@ class RMGVOutputScheme {
      */
     void SetNtupleUseVolumeName(bool use_vol_name) { fNtupleUseVolumeName = use_vol_name; }
 
+    void SetEventIDOffset(int offset) { fEventIDOffset = offset; }
+
+    static inline std::string fUIDKeyFormatString = "det{:03}";
+
   protected:
 
     [[nodiscard]] virtual std::string GetNtupleName(RMGDetectorMetadata det) const {
       if (fNtuplePerDetector) {
-        if (!det.name.empty() && fNtupleUseVolumeName) { return det.name; }
-        return fmt::format(fUIDKeyFormatString, det.uid);
+        if (!det.name.empty() && fNtupleUseVolumeName) {
+          return !det.ntuple_name.empty() ? det.ntuple_name : det.name;
+        }
+        return fmt::format(fmt::runtime(fUIDKeyFormatString), det.uid);
       }
       return GetNtupleNameFlat();
     }
@@ -170,10 +191,15 @@ class RMGVOutputScheme {
       else ana_man->FillNtupleDColumn(nt, col, val);
     }
 
+    [[nodiscard]] int GetEventIDForStorage(const G4Event* evt) const {
+      return fEventIDOffset + evt->GetEventID();
+    }
+
     // global options injected by manager.
     bool fNtuplePerDetector = true;
     bool fNtupleUseVolumeName = false;
-    std::string fUIDKeyFormatString = "det{:03}";
+
+    int fEventIDOffset = 0;
 };
 
 #endif

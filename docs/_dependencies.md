@@ -1,7 +1,7 @@
 ### Required dependencies
 
 - [CMake] 3.14 or higher
-- [Geant4] 11.2.2 or higher
+- [Geant4] 11.2.2 or higher, recommended 11.3
 - Python3 interpreter
 
 ### Optional dependencies

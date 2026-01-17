@@ -8,12 +8,12 @@ from __future__ import annotations
 import sys
 
 import awkward as ak
-import legendhpges as hpges
 import numpy as np
 import pyg4ometry as pg4
-from legendhpges import draw
+import pygeomhpges as hpges
 from lgdo import lh5
 from matplotlib import pyplot as plt
+from pygeomhpges import draw
 from pygeomtools import get_sensvol_metadata
 
 plt.rcParams["lines.linewidth"] = 1
@@ -128,11 +128,11 @@ axs = axs.flatten()
 are_distances_good = make_plot(hits)
 plt.suptitle("Distance check for HPGes")
 caption = "The distance to the surface of the HPGe detectors, as calculated by Geant4, "
-caption += "illustrated within the HPGe outline drawn with legendhpges.\n"
+caption += "illustrated within the HPGe outline drawn with pygeomhpges.\n"
 caption += (
     "The test will fail if the difference between the distances calculated by Geant4 "
 )
-caption += "compared to the distances calculated by legendhpges is not within a tolerance of (default) 1 nm."
+caption += "compared to the distances calculated by pygeomhpges is not within a tolerance of (default) 1 nm."
 plt.figtext(0.02, 0.04, caption, wrap=True, ha="left", fontsize=11)
 plt.tight_layout(rect=[0, 0.12, 1, 1])
 # plt.tight_layout()

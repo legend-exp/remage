@@ -76,6 +76,7 @@ add_compile_options(
   -Wextra # enable extra warnings
   -Wpedantic # enforce stricter standards compliance
   -Wshadow # warn if a variable declaration shadows another
+  -Wundef # warn if an undefined constant is used in preprocessor directives
   -Werror # turn warnings into errors
 )
 
@@ -190,14 +191,17 @@ include(FetchContent)
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG 1239137) # 11.1.4
+  GIT_TAG 40626af88bd7df9a5fb80be7b25ac85b122d6c21) # 11.2.0
 FetchContent_MakeAvailable(fmt)
 # fmt is a static lib, make it linkable into libremage.
-set_target_properties(fmt PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+# it might also be provided by a system installation, so skip this call in that case.
+if(TARGET fmt)
+  set_target_properties(fmt PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+endif()
 
 # obtain CLI11
 FetchContent_Declare(
-  cli11
+  CLI11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_TAG 4160d25) # 2.5.0
 FetchContent_MakeAvailable(cli11)
@@ -217,8 +221,8 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/_deps/.clang-tidy
      "---\nChecks: \"-*,cppcoreguidelines-avoid-goto\"")
 
 # set minimum C++ standard
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 20)
+  set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

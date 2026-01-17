@@ -1,6 +1,7 @@
 # remage
 
-_remage_ is a modern C++ simulation framework for germanium experiments.
+_remage_ is a modern simulation framework for low-background physics
+experiments.
 
 ```{warning}
 We are working on a proper user guide ({doc}`manual/index`). In the meanwhile,
@@ -33,6 +34,8 @@ commands, as well as the [remage macro interface](./rmg-commands).
   useful examples of complex experimental setup implementations.
 - [reboost](https://github.com/legend-exp/reboost): post-processing and analysis
   of remage output.
+- [revertex](https://github.com/legend-exp/revertex): generator for input vertex
+  files for remage.
 
 ## Next steps
 

@@ -91,6 +91,13 @@ This would register any volume with name matching the regular expression
 `.*_cu_.*` under the UID 1. In this case the UIDs will **not** be incremented
 for multiple matches.
 
+This alone might produce unexpected output, when
+<project:../rmg-commands.md#rmgoutputntupleusevolumename> is enabled. To solve
+the problem, a sixth argument (`ntuple_name`) can be used to set the name of the
+resulting ntuple. The same fifth and sixth arguments must be used for all
+detectors that share a uid. In this case, the specified name will be used as the
+table name in the output file, instead of the volume name.
+
 Last but not least, detectors can be imported from a GDML file that includes
 metadata, using the
 <project:../rmg-commands.md#rmggeometryregisterdetectorsfromgdml> command.
@@ -134,6 +141,8 @@ remage> /RMG/Geometry/PrintListOfPhysicalVolumes
 [Summary -> Total: 171 volumes
 ```
 
+## Checking geometry
+
 :::{tip}
 
 As seen above, the Geant4 overlap checker is enabled by default if GDML input is
@@ -141,3 +150,41 @@ provided. It can be disabled with the
 <project:../rmg-commands.md#rmggeometrygdmldisableoverlapcheck> command.
 
 :::
+
+Apart from the on-by-default builtin overlap checking, _remage_ provides a means
+to perform additional geometry checks that go beyond. For this it will be
+checking the integraity of the volume hierarchy along random geantino paths, and
+verify that the geometry navigator is always never mis-navigating the
+implemented hierarchy.
+
+The user has to initialize this test in a specialized macro, that needs to be
+adapted to the geometry dimensions:
+
+```geant4
+/RMG/Output/ActivateOutputScheme GeometryCheck
+
+/run/initialize
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface
+/RMG/Generator/Confinement/FirstSamplingVolume Geometrical
+
+/RMG/Generator/Confinement/Geometrical/AddSolid Box
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 m
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0 m
+/RMG/Generator/Confinement/Geometrical/Box/XLength 10 m
+/RMG/Generator/Confinement/Geometrical/Box/YLength 10 m
+/RMG/Generator/Confinement/Geometrical/Box/ZLength 10 m
+
+/RMG/Generator/Select GPS
+/gps/particle     geantino
+/gps/energy       1 MeV
+/gps/ang/type     iso
+
+/run/beamOn {n}
+```
+
+The sampling surface has to be adjusted so that it lies fully within a single
+volume and also fully contains all daughter volumes of that volume, otherwise
+the check will not be correctly performed.

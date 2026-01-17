@@ -16,12 +16,15 @@
 #include "RMGGeneratorFromFile.hh"
 
 #include <cmath>
+#include <vector>
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4RunManager.hh"
 #include "G4ThreeVector.hh"
 
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 
 namespace u = CLHEP;
 
@@ -46,14 +49,50 @@ void RMGGeneratorFromFile::OpenFile(std::string& name) {
   reader.SetNtupleDColumn("px", fRowData.fPx, {""});
   reader.SetNtupleDColumn("py", fRowData.fPy, {""});
   reader.SetNtupleDColumn("pz", fRowData.fPz, {""});
+  reader.SetNtupleDColumn("time", fRowData.fTime, {"ns", "ms", "s"});
+  reader.SetNtupleIColumn("n_part", fRowData.fNpart, {""});
 }
 
 void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
 
-  if (!fReader->GetLockedReader()) {
+  auto reader = fReader->GetLockedReader();
+  if (!reader) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(), "' not found or in wrong format");
+  }
+
+  // in the multiprocessing-mode we get here with an offset on the main thread.
+  size_t start_event = RMGManager::Instance()->GetProcessNumberOffset() *
+                       G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
+  // skip the first start_event rows from the input file.
+  if (start_event > 0) {
+    size_t skipped_events = 0, skipped_rows_this_evt = 0, n_part_this_evt = 1;
+    while ((skipped_events < start_event) ||
+           (skipped_events == start_event && skipped_rows_this_evt < n_part_this_evt)) {
+      fRowData = RowData(); // initialize sentinel values.
+
+      if (!reader.GetNtupleRow()) {
+        RMGLog::Out(RMGLog::fatal, "[initial seek] No more vertices available in input file!");
+        break;
+      }
+
+      if (!fRowData.IsValid()) {
+        RMGLog::Out(
+            RMGLog::fatal,
+            "[initial seek] At least one of the columns does not exist or of wrong type"
+        );
+        break;
+      }
+
+      if (fRowData.fNpart > 0) {
+        skipped_events += 1;
+        skipped_rows_this_evt = 0;
+        n_part_this_evt = fRowData.fNpart;
+      }
+
+      skipped_rows_this_evt++;
+    }
   }
 }
 
@@ -74,51 +113,86 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  fRowData = RowData(); // initialize sentinel values.
+  std::vector<RowData> particles;
 
-  if (!locked_reader.GetNtupleRow()) {
-    RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
-    return;
+  int n_part = 1, n = 0;
+  bool is_valid = true, is_valid_particle = true;
+  while (n < n_part) {
+    fRowData = RowData(); // initialize sentinel values.
+
+    if (!locked_reader.GetNtupleRow()) {
+      RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
+      return;
+    }
+
+    if (!fRowData.IsValid()) {
+      is_valid = false;
+      break;
+    }
+
+    particles.push_back(fRowData); // make copy of data.
+    if (n == 0) {
+      n_part = fRowData.fNpart;
+      if (n_part <= 0) {
+        is_valid_particle = false;
+        break;
+      }
+    } else if (fRowData.fNpart != 0) {
+      is_valid_particle = false;
+      break;
+    }
+    n++;
   }
 
-  // make copy of data and exit critical section.
-  auto row_data = fRowData;
-  auto unit_name = locked_reader.GetUnit("ekin");
+  // exit critical section.
+  auto unit_ekin = locked_reader.GetUnit("ekin");
+  auto unit_time = locked_reader.GetUnit("time");
   locked_reader.unlock();
 
   // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
-  if (!row_data.IsValid()) {
-    RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
+  if (!is_valid) {
+    RMGLog::Out(RMGLog::error, "At least one of the columns does not exist or of wrong type");
+    return;
+  }
+  if (!is_valid_particle || particles.empty()) {
+    RMGLog::Out(RMGLog::error, "Event particle count not valid in input file");
     return;
   }
 
-  auto particle = G4ParticleTable::GetParticleTable()->FindParticle(row_data.fG4Pid);
-  if (!particle) {
-    RMGLog::Out(RMGLog::error, "invalid particle PDG id ", row_data.fG4Pid);
-    return;
-  }
-
-  RMGLog::OutFormat(
-      RMGLog::debug,
-      "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV",
-      row_data.fG4Pid,
-      row_data.fPx,
-      row_data.fPy,
-      row_data.fPz,
-      row_data.fEkin
-  );
-
-  G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
-
-  const std::map<std::string, double> units =
+  const std::map<std::string, double> energy_units =
       {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV}, {"MeV", u::MeV}, {"GeV", u::GeV}};
+  const std::map<std::string, double> time_units =
+      {{"", u::ns}, {"ns", u::ns}, {"ms", u::ms}, {"s", u::s}};
 
-  fGun->SetParticleDefinition(particle);
-  fGun->SetParticlePosition(fParticlePosition);
-  fGun->SetParticleMomentumDirection(momentum);
-  fGun->SetParticleEnergy(row_data.fEkin * units.at(unit_name));
+  for (const auto& row_data : particles) {
 
-  fGun->GeneratePrimaryVertex(event);
+    auto particle = G4ParticleTable::GetParticleTable()->FindParticle(row_data.fG4Pid);
+    if (!particle) {
+      RMGLog::Out(RMGLog::error, "invalid particle PDG id ", row_data.fG4Pid);
+      return;
+    }
+
+    RMGLog::OutFormat(
+        RMGLog::debug_event,
+        "particle {:d} (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}); Ekin = {:.4g} MeV; time = {:.4g} ns",
+        row_data.fG4Pid,
+        row_data.fPx,
+        row_data.fPy,
+        row_data.fPz,
+        row_data.fEkin * energy_units.at(unit_ekin) / u::MeV,
+        row_data.fTime * time_units.at(unit_time) / u::ns
+    );
+
+    G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
+
+    fGun->SetParticleDefinition(particle);
+    fGun->SetParticlePosition(fParticlePosition);
+    fGun->SetParticleTime(row_data.fTime * time_units.at(unit_time));
+    fGun->SetParticleMomentumDirection(momentum);
+    fGun->SetParticleEnergy(row_data.fEkin * energy_units.at(unit_ekin));
+
+    fGun->GeneratePrimaryVertex(event);
+  }
 }
 
 void RMGGeneratorFromFile::DefineCommands() {

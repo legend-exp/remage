@@ -93,15 +93,15 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
   }
 
   if (hit_coll->entries() <= 0) {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection is empty");
     return;
   } else {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
   auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
-    RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
+    RMGLog::OutDev(RMGLog::debug_event, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();
 
     for (auto hit : *hit_coll->GetVector()) {
@@ -111,7 +111,7 @@ void RMGOpticalOutputScheme::StoreEvent(const G4Event* event) {
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
-      ana_man->FillNtupleIColumn(ntupleid, col_id++, event->GetEventID());
+      ana_man->FillNtupleIColumn(ntupleid, col_id++, GetEventIDForStorage(event));
       if (!fNtuplePerDetector) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
@@ -140,6 +140,9 @@ void RMGOpticalOutputScheme::DefineCommands() {
 
   fMessenger->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for wavelength output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

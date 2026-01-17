@@ -56,10 +56,13 @@ int main(int argc, char** argv) {
   bool quiet = false;
   bool version = false;
   bool version_rich = false;
+  bool no_banner = false;
   int nthreads = 1;
+  int rand_seed = -1;
   bool interactive = false;
   bool overwrite_output = false;
-  int pipe_fd = -1;
+  int pipe_fd_out = -1, pipe_fd_in = -1;
+  int proc_num_offset = -1;
   std::vector<std::string> gdmls;
   std::vector<std::string> macros;
   std::vector<std::string> macro_substitutions;
@@ -77,6 +80,7 @@ int main(int argc, char** argv) {
   app.add_flag("--version", version, "Print remage's version and exit");
   app.add_flag("--version-rich", version_rich, "Print versions of remage and its dependencies and exit");
   app.add_option("-l,--log-level", loglevel, log_level_desc)->type_name("LEVEL")->default_val("summary");
+  app.add_flag("--no-banner", no_banner, "Do not print the remage banner at application start");
 
   app.add_option(
       "-s,--macro-substitutions",
@@ -85,6 +89,7 @@ int main(int argc, char** argv) {
   );
   app.add_flag("-i,--interactive", interactive, "Open an interactive macro command prompt");
   app.add_option("-t,--threads", nthreads, "Set the number of threads used by remage");
+  app.add_option("--rand-seed", rand_seed, "Set the random engine seed")->type_name("INT");
   app.add_option(
          "-g,--gdml-files",
          gdmls,
@@ -94,9 +99,21 @@ int main(int argc, char** argv) {
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option(
-         "--pipe-fd",
-         pipe_fd,
-         "Pipe file descriptor for inter-process communication (internal)"
+         "--pipe-o-fd",
+         pipe_fd_out,
+         "Pipe file descriptor for inter-process communication, output (internal)"
+  )
+      ->group(""); // group("") hides the option from help output.
+  app.add_option(
+         "--pipe-i-fd",
+         pipe_fd_in,
+         "Pipe file descriptor for inter-process communication, input (internal)"
+  )
+      ->group(""); // group("") hides the option from help output.
+  app.add_option(
+         "--proc-num-offset",
+         proc_num_offset,
+         "process number for offset calculations in pseudo-multithreading mode (internal)"
   )
       ->group(""); // group("") hides the option from help output.
   app.add_option(
@@ -114,6 +131,8 @@ int main(int argc, char** argv) {
     return 0;
   }
 
+  if (no_banner || proc_num_offset > 0) RMGLog::SetInihibitStartupInfo(true);
+
   if (version_rich) {
     auto g4_version = std::regex_replace(G4Version, std::regex("\\$|Name:"), "");
     RMGLog::StartupInfo();
@@ -130,6 +149,18 @@ int main(int argc, char** argv) {
   if (verbose) RMGLog::SetLogLevel(RMGLog::debug);
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
+  // check that we have the same version when we are running under the python wrapper.
+  if (char* version_s = std::getenv("RMG_WRAPPER_VERSION")) {
+    if (std::string(version_s) != RMG_PROJECT_VERSION_FULL) {
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "remage-cpp version {} does not match python-wrapper version %s",
+          RMG_PROJECT_VERSION_FULL,
+          version_s
+      );
+    }
+  }
+
   // handle signal to abort the current run.
   struct sigaction sig{};
   sig.sa_handler = &signal_handler;
@@ -139,14 +170,20 @@ int main(int argc, char** argv) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
 
-  RMGIpc::Setup(pipe_fd);
+  if (proc_num_offset >= 0) RMGLog::SetProcNum(proc_num_offset);
+  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
 
   RMGManager manager("remage", argc, argv);
   manager.SetInteractive(interactive);
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
+  if (nthreads > 1 && proc_num_offset >= 0) {
+    RMGLog::Out(RMGLog::fatal, "invalid configuration for multi-threading or multi-processing.");
+  }
   manager.SetNumberOfThreads(nthreads);
+  if (proc_num_offset >= 0) manager.EnableMultiProcessing(proc_num_offset);
+  if (rand_seed >= 0) manager.SetRandEngineSeed(rand_seed);
 
   for (const auto& g : gdmls) manager.GetDetectorConstruction()->IncludeGDMLFile(g);
 

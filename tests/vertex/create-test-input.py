@@ -32,7 +32,7 @@ rng = np.random.default_rng(123456)
 # position input
 
 
-def _create_pos_input(dtype, vtx_pos_file, units):
+def _create_pos_input(dtype, vtx_pos_file: str, units: str, wo_mode: str = "of"):
     attrs = {"units": units}
     xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
     yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
@@ -42,7 +42,7 @@ def _create_pos_input(dtype, vtx_pos_file, units):
         Table({"xloc": xloc, "yloc": yloc, "zloc": zloc}),
         "vtx/pos",
         lh5_file=vtx_pos_file,
-        wo_mode="of",
+        wo_mode=wo_mode,
     )
     _convert_lh5_to_hdf5(vtx_pos_file)
 
@@ -53,21 +53,51 @@ _create_pos_input(np.float64, "macros/vtx-pos-mm.lh5", "mm")
 # ==================================================
 # kinetics input.
 
-p_theta = np.acos(rng.uniform(-1, 1, INPUT_FILE_ROWS))
-p_phi = rng.uniform(0, 2 * np.pi, INPUT_FILE_ROWS)
 
-px = Array(np.cos(p_phi) * np.sin(p_theta))
-py = Array(np.sin(p_phi) * np.sin(p_theta))
-pz = Array(np.cos(p_theta))
+def _create_kin_input(
+    vtx_kin_file: str, wo_mode: str = "of", multiple_particles: bool = False
+):
+    p_theta = np.acos(rng.uniform(-1, 1, INPUT_FILE_ROWS))
+    p_phi = rng.uniform(0, 2 * np.pi, INPUT_FILE_ROWS)
 
-pdg = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64) * 11)
-ekin = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "MeV"})
+    px = Array(np.cos(p_phi) * np.sin(p_theta))
+    py = Array(np.sin(p_phi) * np.sin(p_theta))
+    pz = Array(np.cos(p_theta))
 
-vtx_kin_file = "macros/vtx-kin.lh5"
-lh5.write(
-    Table({"g4_pid": pdg, "ekin": ekin, "px": px, "py": py, "pz": pz}),
-    "vtx/kin",
-    lh5_file=vtx_kin_file,
-    wo_mode="of",
-)
-_convert_lh5_to_hdf5(vtx_kin_file)
+    pdg = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64) * 11)
+    ekin = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "MeV"})
+    time = Array(np.linspace(1, 10, INPUT_FILE_ROWS), attrs={"units": "ns"})
+    n_part = Array(np.ones(INPUT_FILE_ROWS, dtype=np.int64))
+
+    if multiple_particles:
+        n_part.nda[1::2] = 0
+        n_part.nda *= 2
+
+    lh5.write(
+        Table(
+            {
+                "g4_pid": pdg,
+                "ekin": ekin,
+                "px": px,
+                "py": py,
+                "pz": pz,
+                "time": time,
+                "n_part": n_part,
+            }
+        ),
+        "vtx/kin",
+        lh5_file=vtx_kin_file,
+        wo_mode=wo_mode,
+    )
+    _convert_lh5_to_hdf5(vtx_kin_file)
+
+
+_create_kin_input("macros/vtx-kin.lh5")
+_create_kin_input("macros/vtx-kin2.lh5", multiple_particles=True)
+
+
+# ==================================================
+# combined input in one file.
+
+_create_pos_input(np.float64, "macros/vtx-combined.lh5", "m")
+_create_kin_input("macros/vtx-combined.lh5", wo_mode="write_safe")

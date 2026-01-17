@@ -12,17 +12,18 @@ maintainers = [
 ]
 description = "A python wrapper for remage"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+license = "LGPL-3.0"
+license-files = ["LICENSE"]
 classifiers = [
-  "Development Status :: 1 - Planning",
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX",
+  "Operating System :: Unix",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -32,12 +33,13 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "legend-pydataobj >=1.14.3, <1.15",
-  "reboost ==0.6.*",
-  "pygama >=2.2.3, <2.3",
+  "legend-pydataobj >=1.16",
+  "reboost >=0.6",
+  "pygama >=2.2.3",
   "colorlog",
   "rich",
-  "tol_colors",
+  "mplhep",
+  "hist"
 ]
 
 [tool.hatch.metadata]
@@ -49,13 +51,11 @@ test = [
   "pytest-cov >=3",
   "awkward",
   "hist[plot]",
-  "legend-pygeom-optics",
-  "legend-pygeom-hpges",
-  "legend-pygeom-tools",
+  "legend-pygeom-optics >=0.15.0",
+  "legend-pygeom-hpges >=0.9.0",
+  "legend-pygeom-tools >=0.0.26",
   "matplotlib",
-  "mplhep",
   "numpy",
-  "pandas",
   "pyg4ometry",
   "numba", # without this, uv somehow fails to pick a good numba version
 ]
@@ -73,6 +73,7 @@ docs = [
 
 [project.scripts]
 remage = "remage.cli:remage_cli"
+remage-geombench = "remage.geombench.cli:remage_geombench_cli"
 
 [project.urls]
 Homepage = "https://github.com/legend-exp/remage"

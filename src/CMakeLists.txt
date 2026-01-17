@@ -5,19 +5,23 @@ set(_root ${PROJECT_SOURCE_DIR})
 
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGAnalysisReader.hh
+    ${_root}/include/RMGGeomBenchOutputScheme.hh
     ${_root}/include/RMGDetectorHit.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
     ${_root}/include/RMGEventAction.hh
+    ${_root}/include/RMGGeomBench.hh
     ${_root}/include/RMGGeneratorCosmicMuons.hh
     ${_root}/include/RMGGeneratorFromFile.hh
     ${_root}/include/RMGGeneratorMUSUNCosmicMuons.hh
     ${_root}/include/RMGGeneratorG4Gun.hh
     ${_root}/include/RMGGeneratorGPS.hh
     ${_root}/include/RMGGeneratorUtil.hh
+    ${_root}/include/RMGGeometryCheckOutputScheme.hh
     ${_root}/include/RMGGermaniumDetector.hh
     ${_root}/include/RMGGermaniumOutputScheme.hh
     ${_root}/include/RMGGrabmayrGCReader.hh
+    ${_root}/include/RMGInnerBremsstrahlungProcess.hh
     ${_root}/include/RMGIsotopeFilterScheme.hh
     ${_root}/include/RMGIpc.hh
     ${_root}/include/RMGLog.hh
@@ -45,6 +49,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGUserInit.hh
     ${_root}/include/RMGVertexConfinement.hh
     ${_root}/include/RMGVertexFromFile.hh
+    ${_root}/include/RMGVertexFromPoint.hh
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
@@ -53,18 +58,22 @@ set(PROJECT_PUBLIC_HEADERS
 
 set(PROJECT_SOURCES
     ${_root}/src/RMGAnalysisReader.cc
+    ${_root}/src/RMGGeomBenchOutputScheme.cc
     ${_root}/src/RMGDetectorHit.cc
     ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
     ${_root}/src/RMGEventAction.cc
+    ${_root}/src/RMGGeomBench.cc
     ${_root}/src/RMGGeneratorCosmicMuons.cc
     ${_root}/src/RMGGeneratorFromFile.cc
     ${_root}/src/RMGGeneratorMUSUNCosmicMuons.cc
     ${_root}/src/RMGGeneratorUtil.cc
+    ${_root}/src/RMGGeometryCheckOutputScheme.cc
     ${_root}/src/RMGGermaniumDetector.cc
     ${_root}/src/RMGGermaniumOutputScheme.cc
     ${_root}/src/RMGGrabmayrGCReader.cc
+    ${_root}/src/RMGInnerBremsstrahlungProcess.cc
     ${_root}/src/RMGIpc.cc
     ${_root}/src/RMGIsotopeFilterScheme.cc
     ${_root}/src/RMGLog.cc
@@ -89,6 +98,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGUserAction.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc
+    ${_root}/src/RMGVertexFromPoint.cc
     ${_root}/src/RMGVertexOutputScheme.cc)
 
 # Write RMGConfig.hh
@@ -121,6 +131,9 @@ endif()
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
+# for initial C++20 compatibility with a C++17 compiled ROOT image. TODO: remove later
+target_compile_options(remage PRIVATE -Wno-cpp)
+
 target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
                                          $<INSTALL_INTERFACE:include/remage>)
 
@@ -131,7 +144,7 @@ target_link_libraries(
   PRIVATE magic_enum::magic_enum)
 
 if(BxDecay0_FOUND)
-  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4 BxDecay0::BxDecay0)
 endif()
 
 if(ROOT_FOUND)
@@ -171,7 +184,7 @@ target_link_libraries(
   PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 set_target_properties(remage-doc-dump-cli PROPERTIES OUTPUT_NAME remage-doc-dump)
 if(BxDecay0_FOUND)
-  target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4)
+  target_link_libraries(remage-doc-dump-cli PRIVATE BxDecay0::BxDecay0_Geant4 BxDecay0::BxDecay0)
 endif()
 add_custom_target(
   remage-doc-dump

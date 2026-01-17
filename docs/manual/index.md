@@ -7,6 +7,7 @@ install.md
 containers.md
 running.md
 geometry.md
+geombench.md
 physicslist.md
 confinement.md
 generators.md

@@ -4,7 +4,6 @@ import sys
 
 import awkward as ak
 import hist
-import tol_colors as tc
 from lgdo import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
@@ -18,17 +17,12 @@ plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 12
 
-vib = tc.colorsets["vibrant"]
-vset = tc.colorsets["vibrant"]
-mset = tc.colorsets["muted"]
-
-
 # Get the BuPu colormap
 cmap = plt.get_cmap("cividis")
 
 
 def plot_tracks(_data, idx, savename=None):
-    fig, ax = plt.subplots(figsize=(6, 6))
+    _fig, ax = plt.subplots(figsize=(6, 6))
 
     data = _data[_data.evtid == idx]
 
@@ -47,7 +41,7 @@ def plot_tracks(_data, idx, savename=None):
             alpha=1,
             linewidth=2,
             label=label,
-            color=vset.blue,
+            color="tab:blue",
         )
 
     ax.scatter(
@@ -55,7 +49,7 @@ def plot_tracks(_data, idx, savename=None):
         1000 * data_tmp.zloc - 1000 * z0,
         s=20,
         label="steps",
-        color=vset.red,
+        color="tab:red",
     )
 
     prefix = "m"
@@ -71,7 +65,7 @@ def plot_tracks(_data, idx, savename=None):
 def plot_hist2d(
     dist, step_len, n=-1, high_stp=300, high_dist=5000, bins=500, savename=None
 ):
-    fig, ax = plt.subplots(1, 1, figsize=(12, 4))
+    _fig, ax = plt.subplots(1, 1, figsize=(12, 4))
 
     # Create a 2D histogram
     h = ax.hist2d(
@@ -93,7 +87,7 @@ def plot_hist2d(
 
 
 def plot_steps(steps, bins=100, range=(0, 100), savename=None):
-    fig, ax = plt.subplots(figsize=(12, 4))
+    _fig, ax = plt.subplots(figsize=(12, 4))
     h = hist.new.Reg(bins, range[0], range[1], name="steps").Double().fill(steps)
     h.plot(ax=ax, **style)
     ax.set_ylabel("Counts")

@@ -1,0 +1,13 @@
+processing_groups:
+  - name: geds
+
+    detector_mapping:
+      - output: det001
+
+    outputs:
+      - t0
+      - evtid
+      - active_energy
+
+    operations:
+      active_energy: ak.sum(HITS.edep, axis=-1)

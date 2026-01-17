@@ -79,6 +79,8 @@ too (`/RMG/Generator/Select G4Gun`), a more basic alternative to the GPS.
 
 :::
 
+(manual-generators-decays)=
+
 ## Generating nuclear decays
 
 A special case of the GPS can be used to generate radioactive decays. This is
@@ -275,50 +277,3 @@ possibility to read in directly event kinematics (or positions) from input
 files.
 
 The functionality for reading input files is described in <project:./input.md>.
-For generating event kinematics we support reading LH5 files with the following
-format.
-
-```
-/
-└── vtx
-    └── kin · table{px,py,pz,ekin,g4_pid}
-        ├── ekin · array<1>{real} ── {'units': 'keV'}
-        ├── g4_pid · array<1>{real}
-        ├── px · array<1>{real} ── {'units': 'keV'}
-        ├── py · array<1>{real} ── {'units': 'keV'}
-        └── pz · array<1>{real} ── {'units': 'keV'}
-```
-
-Here:
-
-- `ekin` (double) is the kinetic energy,
-- `g4_pid` (int) is the particle code (see
-  [link](https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf)),
-- `px`, `py`, `pz` (double) are the x, y and z momenta.
-
-:::{tip}
-
-- It is supported to supply units for the energy with the LH5 attributes. It is
-  then assumed the momenta have the same units!
-- The python package [_revertex_](https://revertex.readthedocs.io/en/latest/)
-  contains functionality for generating input files in the correct format.
-
-:::
-
-Once this input file is created it can be read into _remage_ as an event
-generator using the macro command
-<project:../rmg-commands.md#rmggeneratorfromfilefilename>:
-
-```geant4
-/RMG/Generator/Select FromFile
-/RMG/Generator/FromFile/FileName {FILE_PATH}
-```
-
-Where `{FILE_PATH}` is the path to the input LH5 file.
-
-:::{warning}
-
-This functionality is currently limited to events where a single primary
-particle is produced per event.
-
-:::

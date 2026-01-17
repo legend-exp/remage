@@ -7,7 +7,6 @@ from pathlib import Path
 import awkward as ak
 import hist
 import numpy as np
-import tol_colors as tc
 from lgdo import lh5
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -16,8 +15,6 @@ from scipy.stats import beta, norm, poisson
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 14
-vset = tc.colorsets["vibrant"]
-mset = tc.colorsets["muted"]
 
 style = {
     "yerr": False,
@@ -79,7 +76,7 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
 def get_bins(list_range, list_binning, e_max=1000):
     # Define bin ranges
     bin_list = []
-    for r, b in zip(list_range, list_binning):
+    for r, b in zip(list_range, list_binning, strict=True):
         bin_list.append(np.arange(r[0] * e_max / 1000, r[1] * e_max / 1000, b))
 
     return np.unique(np.concatenate(bin_list))
@@ -169,14 +166,21 @@ def plot(
     steps = {}
     eff_def = {}
     n_sels = {}
-    colors = [vset.blue, vset.orange, vset.magenta, vset.teal, vset.grey, vset.cyan]
+    colors = [
+        "tab:blue",
+        "tab:orange",
+        "tab:purple",
+        "tab:green",
+        "tab:grey",
+        "tab:cyan",
+    ]
 
     # get default
     for field in fields:
         effs[field] = {}
         steps[field] = {}
         n_sels[field] = {}
-        fig, axs = plt.subplots(
+        _fig, axs = plt.subplots(
             2,
             1,
             gridspec_kw={"height_ratios": [4, 1], "hspace": 0},
@@ -224,7 +228,7 @@ def plot(
                     flow=None,
                     fill=True,
                     alpha=0.2,
-                    color=vset.blue,
+                    color="tab:blue",
                     label="No limits",
                 )
 
@@ -285,7 +289,7 @@ def plot(
         resid = np.array(
             [
                 normalized_poisson_residual(mu, obs)
-                for mu, obs in zip(def_counts, low_counts)
+                for mu, obs in zip(def_counts, low_counts, strict=True)
             ]
         )
         axs[1].axhspan(-3, 3, color="red", alpha=0.2)
@@ -304,7 +308,7 @@ def plot(
             return
 
     # plot the efficiency
-    fig, ax = plt.subplots()
+    _fig, ax = plt.subplots()
     for idx, field in enumerate(effs.keys()):
         eff_def_low = (
             100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[0]
@@ -336,11 +340,11 @@ def plot(
             s = steps[field][name]
             err_low = [
                 get_binomial_interval(et, nt)[0] * 100
-                for et, nt in zip(e, n_sels[field][name])
+                for et, nt in zip(e, n_sels[field][name], strict=True)
             ]
             err_high = [
                 get_binomial_interval(et, nt)[1] * 100
-                for et, nt in zip(e, n_sels[field][name])
+                for et, nt in zip(e, n_sels[field][name], strict=True)
             ]
 
             ax.errorbar(

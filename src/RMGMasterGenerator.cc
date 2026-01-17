@@ -27,6 +27,7 @@
 #include "RMGGeneratorG4Gun.hh"
 #include "RMGGeneratorGPS.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBench.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
 #include "RMGTools.hh"
@@ -34,6 +35,7 @@
 #include "RMGVVertexGenerator.hh"
 #include "RMGVertexConfinement.hh"
 #include "RMGVertexFromFile.hh"
+#include "RMGVertexFromPoint.hh"
 
 RMGMasterGenerator::RMGMasterGenerator() : fVertexGeneratorObj(nullptr), fGeneratorObj(nullptr) {
 
@@ -63,7 +65,7 @@ void RMGMasterGenerator::GeneratePrimaries(G4Event* event) {
       );
       RMGManager::Instance()->GetG4RunManager()->AbortRun();
     }
-    RMGLog::OutDev(RMGLog::debug, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
+    RMGLog::OutDev(RMGLog::debug_event, "Primary vertex position: ", vertex / CLHEP::cm, " cm");
 
     // pass the generated vertex to the actual generator
     fGeneratorObj->SetParticlePosition(vertex);
@@ -85,6 +87,9 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       fVertexGeneratorObj = std::make_unique<RMGVertexConfinement>();
       break;
     case Confinement::kFromFile: fVertexGeneratorObj = std::make_unique<RMGVertexFromFile>(); break;
+    case Confinement::kFromPoint:
+      fVertexGeneratorObj = std::make_unique<RMGVertexFromPoint>();
+      break;
     default:
       RMGLog::Out(
           RMGLog::fatal,
@@ -124,6 +129,7 @@ void RMGMasterGenerator::SetGenerator(RMGMasterGenerator::Generator gen) {
       fGeneratorObj = std::make_unique<RMGGeneratorMUSUNCosmicMuons>();
       break;
     case Generator::kFromFile: fGeneratorObj = std::make_unique<RMGGeneratorFromFile>(); break;
+    case Generator::kGeomBench: fGeneratorObj = std::make_unique<RMGGeomBench>(); break;
     case Generator::kUndefined:
     case Generator::kUserDefined: break;
     default:

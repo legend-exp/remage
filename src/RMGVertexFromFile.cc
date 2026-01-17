@@ -17,9 +17,11 @@
 #include "RMGVertexFromFile.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
+#include "G4RunManager.hh"
 #include "G4Threading.hh"
 
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 
 RMGAnalysisReader* RMGVertexFromFile::fReader = new RMGAnalysisReader();
 
@@ -87,9 +89,15 @@ void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
 
   if (!G4Threading::IsMasterThread()) return;
 
-  if (!fReader->GetLockedReader()) {
+  auto reader = fReader->GetLockedReader();
+  if (!reader) {
     RMGLog::Out(RMGLog::fatal, "vertex file '", fReader->GetFileName(), "' not found or in wrong format");
   }
+
+  // in the mzultiprocessing-mode we get here with an offset on the main thread.
+  size_t start_event = RMGManager::Instance()->GetProcessNumberOffset() *
+                       G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
+  reader.Seek(start_event);
 }
 
 void RMGVertexFromFile::EndOfRunAction(const G4Run*) {
@@ -118,6 +126,7 @@ void RMGVertexFromFile::DefineCommands() {
   fMessenger->DeclareProperty("NtupleDirectory", fNtupleDirectoryName)
       .SetGuidance("Change the default input directory/group for ntuples.")
       .SetGuidance("note: this option only has an effect for LH5 or HDF5 input files.")
+      .SetGuidance(std::string("Uses \"") + fNtupleDirectoryName + "\" by default")
       .SetParameterName("nt_directory", false)
       .SetDefaultValue(fNtupleDirectoryName)
       .SetStates(G4State_PreInit, G4State_Idle);

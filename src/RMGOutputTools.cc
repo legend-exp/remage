@@ -155,7 +155,7 @@ bool RMGOutputTools::check_step_point_containment(
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != det_type) {
       RMGLog::OutFormatDev(
-          RMGLog::debug,
+          RMGLog::debug_event,
           "Volume '{}' (copy nr. {} not registered as {} detector",
           pv_name,
           pv_copynr,
@@ -165,7 +165,7 @@ bool RMGOutputTools::check_step_point_containment(
     }
   } catch (const std::out_of_range& e) {
     RMGLog::OutFormatDev(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Volume '{}' (copy nr. {}) not registered as detector",
         pv_name,
         pv_copynr
@@ -181,7 +181,7 @@ void RMGOutputTools::redistribute_gamma_energy(
     bool has_distance_to_surface
 ) {
 
-  RMGLog::Out(RMGLog::debug, "Merging gamma tracks ");
+  RMGLog::Out(RMGLog::debug_event, "Merging gamma tracks ");
 
   // for tracks of gammas look for a step close to each post-step point
   // to redistribute the energy to
@@ -227,7 +227,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_t
     bool has_distance_to_surface
 ) {
 
-  RMGLog::Out(RMGLog::debug, "Merging low energy electron tracks ");
+  RMGLog::Out(RMGLog::debug_event, "Merging low energy electron tracks ");
 
 
   // for tracks below an energy threshold look for a close neighbour to merge it with
@@ -291,7 +291,7 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_t
       );
 
       output_hits.erase(trackid);
-      RMGLog::Out(RMGLog::debug, "Removing trackid ", trackid);
+      RMGLog::Out(RMGLog::debug_event, "Removing trackid ", trackid);
     }
   }
   return output_hits;

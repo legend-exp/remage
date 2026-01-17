@@ -74,7 +74,7 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   if (!IsApplicable) return ProposedResult;
 
   // If Applicable we have to propose our own result
-  RMGLog::OutDev(RMGLog::debug, "Proposing own neutron capture result");
+  RMGLog::OutDev(RMGLog::debug_event, "Proposing own neutron capture result");
   // If we do it ourselves, we are responsible that everything is done correctly.
   // Most of this is copied from G4HadronicProcess PostStepDoIt() or FillResult(), as we are replacing that method.
   theTotalResult->Clear();

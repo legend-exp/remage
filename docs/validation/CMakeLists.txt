@@ -14,6 +14,10 @@ foreach(_file ${SPHINX_SOURCES})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/${_dir} COPYONLY)
 endforeach()
 
+# create an (empty) build directory to satisfy the install rule below if the validation suite
+# has not been built yet.
+file(MAKE_DIRECTORY ${SPHINX_BUILD})
+
 # find and copy docs image files
 file(
   GLOB SPHINX_IMAGES
@@ -48,6 +52,7 @@ set(TESTS_IMAGES
     confinement/vis-surface-tubby.output.jpeg
     confinement/vis-surface-uni.output.jpeg
     confinement/vis-surface-trd.output.jpeg
+    confinement/with-daughters.output.jpeg
     confinement/confinement.simple-solids-surface-box-3d.output.png
     confinement/confinement.simple-solids-surface-con-3d.output.png
     confinement/confinement.simple-solids-surface-sub-3d.output.png
@@ -109,7 +114,10 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-active-energy.eff.output.png
     observables/beta-observables.surf-active-energy.spec.output.png
     observables/beta-observables.surf-max-z.eff.output.png
-    observables/beta-observables.surf-max-z.spec.output.png)
+    observables/beta-observables.surf-max-z.spec.output.png
+    processes/innerbrem-gamma-vertex-energy.output.png
+    processes/innerbrem-signal.output.png
+    processes/innerbrem-difference.output.png)
 
 # cmake-format: on
 
@@ -166,4 +174,4 @@ add_custom_target(
 
 # Add an install target to install the docs
 include(GNUInstallDirs)
-install(DIRECTORY ${SPHINX_BUILD} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${CMAKE_INSTALL_DOCDIR}/validation)

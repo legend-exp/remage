@@ -217,8 +217,7 @@ radioactive source:
 The macro commands should be placed in a plain text file (conventionally ended
 with the `.mac` suffix). For example the complete macro file is shown below.
 
-:::{admonition} Complete macro file (`vis-gammas.mac`)
-
+````{admonition} Complete macro file (vis-gammas.mac)
 :class: dropdown
 
 ```geant4
@@ -254,7 +253,7 @@ with the `.mac` suffix). For example the complete macro file is shown below.
 /run/beamOn 10
 ```
 
-:::
+````
 
 We can finally pass the GDML geometry and the macro to the `remage` executable
 and look at the result!

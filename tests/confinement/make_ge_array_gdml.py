@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pyg4ometry as pg4
 import pygeomtools as pytools
-from legendhpges import make_hpge
+from pygeomhpges import make_hpge
 
 # read the configs
 out_gdml = "gdml/ge-array.gdml"
@@ -102,7 +102,7 @@ for string in det_info:
     angle = string["angle"]
     radius = string["radius"]
     z = offset
-    for d, o in zip(string["detectors"], string["offsets"]):
+    for d, o in zip(string["detectors"], string["offsets"], strict=True):
         z -= heights[d]
         n = add_hpge(lar_l, reg, angle, radius, z, n, d)
         z -= o

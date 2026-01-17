@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import legendhpges as hpges
 import pyg4ometry as pg4
+import pygeomhpges as hpges
 
 reg = pg4.geant4.Registry()
 

@@ -16,6 +16,7 @@
 #include "RMGHardware.hh"
 
 #include <filesystem>
+#include <format>
 namespace fs = std::filesystem;
 
 #include "G4GenericMessenger.hh"
@@ -63,9 +64,11 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     G4GDMLParser parser;
     parser.SetOverlapCheck(false); // overlap check is performed below.
     for (const auto& file : fGDMLFiles) {
-      RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
-      // TODO: decide here
+      RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
+      if (!fGDMLDisableXmlCheck && RMGManager::Instance()->GetProcessNumberOffset() == 0) {
+        RMGIpc::SendIpcBlocking(RMGIpc::CreateMessage("gdml", file));
+      }
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
@@ -73,6 +76,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // register detectors from the GDML file, as written by pygeomtools.
     // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
     if (!fRegisterDetectorsFromGDML.empty()) {
+      RMGLog::Out(RMGLog::debug, "Registering detectors from GDML");
       const auto aux_list = parser.GetAuxList();
       auto had_mapping = false;
       auto had_detector = false;
@@ -89,7 +93,31 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         }
 
         for (const auto& det_aux : *aux.auxList) {
-          RegisterDetector(det_type, det_aux.type, std::stoi(det_aux.value));
+          int uid = -1;
+          std::string ntuple_name;
+          bool allow_uid_reuse = false;
+
+          std::istringstream iss(det_aux.value);
+          std::string part;
+          size_t index = 0;
+          while (std::getline(iss, part, ',')) {
+            if (index == 0) {
+              size_t failed_to_parse_pos = 0;
+              if (part[0] == ':') part.erase(0, 1);
+              uid = std::stoi(part, &failed_to_parse_pos);
+              if (failed_to_parse_pos != part.size())
+                RMGLog::Out(RMGLog::fatal, "invalid detector metadata aux: ", det_aux.value);
+            } else if (index == 1) {
+              allow_uid_reuse = part == "true";
+            } else if (index == 2) {
+              ntuple_name = part;
+            } else {
+              RMGLog::Out(RMGLog::fatal, "invalid detector metadata aux: ", det_aux.value);
+            }
+            index++;
+          }
+
+          RegisterDetector(det_type, det_aux.type, uid, 0, allow_uid_reuse, ntuple_name);
           had_detector = true;
         }
       }
@@ -147,7 +175,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
   if (!fStagedDetectors.empty()) {
     RMGLog::Out(RMGLog::debug, "Registering staged detectors");
     for (const auto& [k, v] : fStagedDetectors) {
-      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, std::to_string(k.second));
+      auto volumes = RMGNavigationTools::FindPhysicalVolume(k.first, k.second);
 
       // Sort alphabetically by name
       std::vector<G4VPhysicalVolume*> sortedVolumes(volumes.begin(), volumes.end());
@@ -164,7 +192,14 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       int uid = v.uid;
 
       for (const auto& vol : sortedVolumes) {
-        this->RegisterDetector(v.type, vol->GetName(), uid, vol->GetCopyNo(), v.allow_uid_reuse);
+        this->RegisterDetector(
+            v.type,
+            vol->GetName(),
+            uid,
+            vol->GetCopyNo(),
+            v.allow_uid_reuse,
+            v.ntuple_name
+        );
 
         if (!v.allow_uid_reuse) {
           // if we do not allow uid reuse, we give the next detector a new uid
@@ -352,8 +387,9 @@ void RMGHardware::StageDetector(
     RMGDetectorType type,
     const std::string& name,
     int uid,
-    int copy_nr,
-    bool allow_uid_reuse
+    const std::string& copy_nr,
+    bool allow_uid_reuse,
+    const std::string& ntuple_name
 ) {
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
@@ -372,7 +408,7 @@ void RMGHardware::StageDetector(
   }
 
   auto r_value = fStagedDetectors.insert(
-      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse}}
+      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse, ntuple_name}}
   );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
@@ -389,11 +425,17 @@ void RMGHardware::RegisterDetector(
     const std::string& pv_name,
     int uid,
     int copy_nr,
-    bool allow_uid_reuse
+    bool allow_uid_reuse,
+    const std::string& ntuple_name
 ) {
   // This should not be possible to occur anymore
   if (fActiveDetectorsInitialized) {
     RMGLog::Out(RMGLog::error, "Active detectors cannot be mutated after constructing the detector.");
+    return;
+  }
+
+  if (uid < 0) {
+    RMGLog::Out(RMGLog::error, "Detector with ID less than zero cannot be registered.");
     return;
   }
 
@@ -411,7 +453,9 @@ void RMGHardware::RegisterDetector(
   fActiveDetectors.insert(type);
 
   // FIXME: can this be done with emplace?
-  auto r_value = fDetectorMetadata.insert({{pv_name, copy_nr}, {type, uid, pv_name, copy_nr}});
+  auto r_value = fDetectorMetadata.insert(
+      {{pv_name, copy_nr}, {type, uid, pv_name, copy_nr, ntuple_name}}
+  );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
         RMGLog::warning,
@@ -432,7 +476,7 @@ void RMGHardware::RegisterDetector(
     RMGIpc::SendIpcNonBlocking(
         RMGIpc::CreateMessage(
             "detector",
-            fmt::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)
+            std::format("{}\x1e{}\x1e{}", magic_enum::enum_name(type), uid, pv_name)
         )
     );
   }
@@ -471,6 +515,12 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
       .SetGuidance("Change the number of points sampled for overlap checks")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("GDMLDisableXmlCheck", fGDMLDisableXmlCheck)
+      .SetGuidance("Disable the automatic xml validity check after loading a GDML file")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("RegisterDetectorsFromGDML", &RMGHardware::RegisterDetectorsFromGDML)

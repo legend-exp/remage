@@ -10,8 +10,14 @@ foreach(_file ${_aux})
 endforeach()
 
 # MAIN OUTPUT TESTS
-set(_macros ntuple-per-det.mac ntuple-per-det-vol.mac ntuple-single-table.mac
-            ntuple-single-table-with-tracks.mac ntuple-optionals.mac ntuple-no-stp.mac)
+set(_macros
+    ntuple-per-det.mac
+    ntuple-per-det-vol.mac
+    ntuple-per-det-shared.mac
+    ntuple-single-table.mac
+    ntuple-single-table-with-tracks.mac
+    ntuple-optionals.mac
+    ntuple-no-stp.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
@@ -20,11 +26,15 @@ foreach(_mac ${_macros})
 
   add_test(NAME output-mt/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
                                                ${_mac} mt)
+  add_test(NAME output-mp/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
+                                               ${_mac} mp)
 endforeach()
 
 list(TRANSFORM _macros PREPEND "output/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS extra)
 list(TRANSFORM _macros PREPEND "output-mt/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
+set_tests_properties(${_macros_hdf5} PROPERTIES LABELS "mt;extra" PROCESSORS 2)
+list(TRANSFORM _macros PREPEND "output-mp/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS "mt;extra" PROCESSORS 2)
 
 # SPECIAL TESTS

@@ -15,7 +15,7 @@
 
 #include "RMGIpc.hh"
 
-#include <csignal>
+#include <poll.h>
 #include <unistd.h>
 
 #include "G4Threading.hh"
@@ -23,37 +23,27 @@
 #include "RMGLog.hh"
 #include "RMGVersion.hh"
 
-/// \cond this creates weird namespaces @<long number>
-namespace {
-  void ipc_signal_handler(int) {
-    if (!RMGIpc::fWaitForIpc.is_lock_free()) return;
-    RMGIpc::fWaitForIpc = true;
-  }
-} // namespace
-/// \endcond
 
-void RMGIpc::Setup(int ipc_pipe_fd) {
+void RMGIpc::Setup(int ipc_pipe_fd_out, int ipc_pipe_fd_in, int proc_num) {
   if (!G4Threading::IsMasterThread()) {
     RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
   }
 
-  fIpcFd = ipc_pipe_fd;
-  if (fIpcFd < 0) return;
+  fIpcFdOut = ipc_pipe_fd_out;
+  fIpcFdIn = ipc_pipe_fd_in;
+  fProcNum = proc_num;
+  if (fIpcFdOut < 0 || fIpcFdIn < 0) return;
 
-  struct sigaction sig{};
-  sig.sa_handler = &ipc_signal_handler;
-  sigemptyset(&sig.sa_mask);
-  sig.sa_flags = 0;
-
-  if (sigaction(SIGUSR2, &sig, nullptr) != 0) {
-    RMGLog::Out(RMGLog::error, "IPC SIGUSR2 signal handler install failed.");
-    fIpcFd = -1;
+  bool perform_versioncheck = true;
+  if (auto check_s = std::getenv("RMG_IPC_DISABLE_VERSION_CHECK")) {
+    perform_versioncheck = std::atoi(check_s) > 0;
   }
-
   // note: this is just a test for the blocking mode.
-  if (!SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
+  if (perform_versioncheck &&
+      !SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
     RMGLog::Out(RMGLog::error, "blocking test IPC call failed, disabling.");
-    fIpcFd = -1;
+    fIpcFdOut = -1;
+    fIpcFdIn = -1;
   }
 }
 
@@ -61,32 +51,32 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
   if (!G4Threading::IsMasterThread()) {
     RMGLog::OutDev(RMGLog::fatal, "can only be used on the master thread");
   }
-  if (fIpcFd < 0) return false;
+  if (fIpcFdOut < 0) return false;
 
   msg += "\x05"; // ASCII ENQ enquiry = ask for continuation.
 
-  sigset_t sig2, sigold;
-  sigemptyset(&sig2);
-  sigaddset(&sig2, SIGUSR2);
+  if (!SendIpcNonBlocking(msg)) { return false; }
 
-  // Block SIGUSR2 _before_ writing message.
-  pthread_sigmask(SIG_BLOCK, &sig2, &sigold);
+  // wait for result.
+  pollfd pfd{.fd = fIpcFdIn, .events = POLLIN, .revents = 0};
 
-  if (!SendIpcNonBlocking(msg)) {
-    pthread_sigmask(SIG_UNBLOCK, &sig2, nullptr);
+  const int timeout = 10000; // microseconds
+  int ready = 0;
+  ready = poll(&pfd, 1, timeout);
+  while ((ready == -1 && errno == EINTR) || ready == 0) { ready = poll(&pfd, 1, timeout); }
+  char ack[2] = "";
+  auto acklen = read(fIpcFdIn, ack, sizeof(ack));
+  if (acklen != 1 || ack[0] != '\x06') {
+    RMGLog::Out(RMGLog::fatal, "IPC error: wrong ACK");
     return false;
   }
-
-  // now wait for continuation signal.
-  while (!fWaitForIpc) sigsuspend(&sigold);
-  fWaitForIpc = false;
-  pthread_sigmask(SIG_UNBLOCK, &sig2, nullptr);
-
   return true;
 }
 
 bool RMGIpc::SendIpcNonBlocking(std::string msg) {
-  if (fIpcFd < 0) return false;
+  if (fIpcFdOut < 0) return false;
+
+  msg = std::to_string(fProcNum) + "\x1e" + msg;
 
   msg += "\x1d"; // ASCII GS group separator = end of message.
   if (msg.size() > SSIZE_MAX) {
@@ -94,7 +84,7 @@ bool RMGIpc::SendIpcNonBlocking(std::string msg) {
     return false;
   }
 
-  auto len = write(fIpcFd, msg.c_str(), msg.size());
+  auto len = write(fIpcFdOut, msg.c_str(), msg.size());
 
   if (len < 0) {
     RMGLog::Out(RMGLog::error, "IPC message transmit failed with errno=", errno);

@@ -19,11 +19,16 @@
 #include "G4Ions.hh"
 #include "G4Step.hh"
 #include "G4Threading.hh"
+#include "G4UnitsTable.hh"
 
-#include "RMGEventAction.hh"
+#include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
+#include "RMGRunAction.hh"
 
-RMGSteppingAction::RMGSteppingAction(RMGEventAction*) { this->DefineCommands(); }
+RMGSteppingAction::RMGSteppingAction(RMGRunAction* run_action) : fRunAction(run_action) {
+  this->DefineCommands();
+}
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
@@ -31,6 +36,8 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
     step->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
+
+  for (auto& el : fRunAction->GetAllOutputDataFields()) { el->SteppingAction(step); }
 
   // Kill _daughter_ nuclei with a lifetime longer than a user-defined threshold. This applies to
   // the defined half-life of the particle, and not the sampled time to the decay of the secondary
@@ -48,7 +55,7 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
       // inspired by G4RadioactiveDecay::IsApplicable
       if (lifetime > fDaughterKillLifetime && excitation <= 0) {
         RMGLog::OutFormat(
-            RMGLog::debug,
+            RMGLog::debug_event,
             "Killing daughter nucleus {} (lifetime={} us)",
             ion->GetParticleName(),
             lifetime / CLHEP::us
@@ -94,12 +101,16 @@ void RMGSteppingAction::DefineCommands() {
           "actual halflife of the simulated particle."
       )
       .SetGuidance("Set to -1 to disable this feature.")
+      .SetGuidance(
+          std::string("Uses ") + std::string(G4BestUnit(fDaughterKillLifetime, "Time")) + " us by default"
+      )
       .SetParameterName("max_lifetime", false)
       .SetDefaultValue("-1")
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipTracking", fSkipTracking)
       .SetGuidance("Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.")
+      .SetGuidance(std::string("This is ") + (fSkipTracking ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

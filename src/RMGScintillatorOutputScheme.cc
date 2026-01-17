@@ -23,6 +23,7 @@
 #include "G4HCtable.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
+#include "G4UnitsTable.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
@@ -153,7 +154,7 @@ bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
     RMGLog::Out(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Discarding event - energy threshold has not been met",
         event_edep,
         fEdepCutLow,
@@ -171,10 +172,10 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
   if (!hit_coll) return;
 
   if (hit_coll->entries() <= 0) {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection is empty");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection is empty");
     return;
   } else {
-    RMGLog::OutDev(RMGLog::debug, "Hit collection contains ", hit_coll->entries(), " hits");
+    RMGLog::OutDev(RMGLog::debug_event, "Hit collection contains ", hit_coll->entries(), " hits");
   }
 
   // pre-cluster the hits if requested
@@ -186,7 +187,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
 
   auto rmg_man = RMGOutputManager::Instance();
   if (rmg_man->IsPersistencyEnabled()) {
-    RMGLog::OutDev(RMGLog::debug, "Filling persistent data vectors");
+    RMGLog::OutDev(RMGLog::debug_event, "Filling persistent data vectors");
     const auto ana_man = G4AnalysisManager::Instance();
 
     for (auto hit : *hit_coll->GetVector()) {
@@ -196,7 +197,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
       auto ntupleid = rmg_man->GetNtupleID(hit->detector_uid);
 
       int col_id = 0;
-      ana_man->FillNtupleIColumn(ntupleid, col_id++, event->GetEventID());
+      ana_man->FillNtupleIColumn(ntupleid, col_id++, GetEventIDForStorage(event));
       if (!fNtuplePerDetector) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
@@ -354,6 +355,9 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("DiscardZeroEnergyHits", fDiscardZeroEnergyHits)
       .SetGuidance("Discard hits with zero energy.")
+      .SetGuidance(
+          std::string("This is ") + (fDiscardZeroEnergyHits ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -361,6 +365,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreParticleVelocities", fStoreVelocity)
       .SetGuidance("Store velocities of particle in the output file.")
+      .SetGuidance(std::string("This is ") + (fStoreVelocity ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -368,6 +373,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreTrackID", fStoreTrackID)
       .SetGuidance("Store Track IDs for hits in the output file.")
+      .SetGuidance(std::string("This is ") + (fStoreTrackID ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -375,6 +381,10 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
       .SetGuidance("Use float32 (instead of float64) for position output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionPosition ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -382,6 +392,9 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("StoreSinglePrecisionEnergy", fStoreSinglePrecisionEnergy)
       .SetGuidance("Use float32 (instead of float64) for energy output.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -408,6 +421,7 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("PreClusterOutputs", fPreClusterHits)
       .SetGuidance("Pre-Cluster output hits before saving")
+      .SetGuidance(std::string("This is ") + (fPreClusterHits ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -415,6 +429,10 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("CombineLowEnergyElectronTracks", fPreClusterPars.combine_low_energy_tracks)
       .SetGuidance("Merge low energy electron tracks.")
+      .SetGuidance(
+          std::string("This is ") +
+          (fPreClusterPars.combine_low_energy_tracks ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -422,6 +440,10 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("RedistributeGammaEnergy", fPreClusterPars.reassign_gamma_energy)
       .SetGuidance("Redistribute energy deposited by gamma tracks to nearby electron tracks.")
+      .SetGuidance(
+          std::string("This is ") +
+          (fPreClusterPars.reassign_gamma_energy ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
@@ -429,6 +451,10 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethodWithUnit("PreClusterDistance", "um", &RMGScintillatorOutputScheme::SetClusterDistance)
       .SetGuidance("Set a distance threshold for the bulk pre-clustering.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.cluster_distance, "Length")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
@@ -438,7 +464,11 @@ void RMGScintillatorOutputScheme::DefineCommands() {
           "us",
           &RMGScintillatorOutputScheme::SetClusterTimeThreshold
       )
-      .SetGuidance("Set a time threshold for  pre-clustering.")
+      .SetGuidance("Set a time threshold for pre-clustering.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.cluster_time_threshold, "Time")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
@@ -449,6 +479,10 @@ void RMGScintillatorOutputScheme::DefineCommands() {
           &RMGScintillatorOutputScheme::SetElectronTrackEnergyThreshold
       )
       .SetGuidance("Set a energy threshold for tracks to be merged.")
+      .SetGuidance(
+          std::string("Uses ") +
+          std::string(G4BestUnit(fPreClusterPars.track_energy_threshold, "Energy")) + " by default"
+      )
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 }

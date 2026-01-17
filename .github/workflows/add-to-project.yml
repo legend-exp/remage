@@ -1,0 +1,15 @@
+name: Add new issues to remage project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/legend-exp/projects/31 # remage
+          github-token: ${{ secrets.ADD_TO_REMAGE_PROJECT }}

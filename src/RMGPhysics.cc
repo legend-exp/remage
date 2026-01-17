@@ -67,8 +67,10 @@
 #include "G4StepLimiterPhysics.hh"
 #include "G4StoppingPhysics.hh"
 #include "G4ThermalNeutrons.hh"
+#include "G4Version.hh"
 
 #include "RMGConfig.hh"
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGLog.hh"
 #include "RMGNeutronCaptureProcess.hh"
 #include "RMGOpWLSProcess.hh"
@@ -305,6 +307,51 @@ void RMGPhysics::ConstructProcess() {
   const auto the_ion_table = G4ParticleTable::GetParticleTable()->GetIonTable();
   RMGLog::Out(RMGLog::detail, "Entries in ion table ", the_ion_table->Entries());
 
+  if (fUseInnerBremsstrahlung) {
+    RMGLog::Out(RMGLog::detail, "Adding Inner Bremsstrahlung physics");
+
+    GetParticleIterator()->reset();
+    while ((*GetParticleIterator())()) {
+      auto particle = GetParticleIterator()->value();
+      auto proc_manager = particle->GetProcessManager();
+
+      // Look for radioactive decay process in ions
+      if (particle->GetParticleType() == "nucleus" && particle->GetPDGLifeTime() < DBL_MAX) {
+#if G4VERSION_NUMBER >= 1130
+        auto rdm_process = proc_manager->GetProcess("RadioactiveDecay");
+#else
+        auto rdm_process = proc_manager->GetProcess("Radioactivation");
+#endif
+
+        if (rdm_process) {
+          // Create wrapper process
+          auto ib_process = new RMGInnerBremsstrahlungProcess();
+          ib_process->RegisterProcess(rdm_process);
+          ib_process->SetEnabled(true);
+
+          proc_manager->RemoveProcess(rdm_process);
+          proc_manager->AddProcess(ib_process);
+          proc_manager->SetProcessOrderingToLast(ib_process, idxAtRest);
+          proc_manager->SetProcessOrderingToLast(ib_process, idxPostStep);
+          RMGLog::OutFormat(
+              RMGLog::debug,
+              "Inner Bremsstrahlung added for ",
+              particle->GetParticleName()
+          );
+        } else {
+          RMGLog::Out(
+              RMGLog::debug,
+              "Inner Bremsstrahlung is disabled for ",
+              particle->GetParticleName(),
+              " (no RDM process found)"
+          );
+        }
+      }
+    }
+  } else {
+    RMGLog::Out(RMGLog::detail, "Inner Bremsstrahlung is disabled");
+  }
+
   // add step limits
   auto step_limits = new G4StepLimiterPhysics();
   step_limits->ConstructProcess();
@@ -483,6 +530,9 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
       .SetGuidance("Add optical processes to the physics list")
+      .SetGuidance(
+          std::string("This is ") + (fConstructOptical ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
@@ -491,30 +541,49 @@ void RMGPhysics::DefineCommands() {
       .SetGuidance(
           "Use a custom wavelegth shifting process that produces at maximum one secondary photon."
       )
+      .SetGuidance(
+          std::string("This is ") + (fUseOpticalCustomWLS ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("LowEnergyEMPhysics", &RMGPhysics::SetLowEnergyEMOptionString)
       .SetGuidance("Add low energy electromagnetic processes to the physics list")
+      .SetGuidance(std::string("Uses ") + RMGTools::GetCandidate(fLowEnergyEMOption) + " by default")
       .SetCandidates(RMGTools::GetCandidates<LowEnergyEMOption>())
       .SetDefaultValue(RMGTools::GetCandidate(LowEnergyEMOption::kLivermore))
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("HadronicPhysics", &RMGPhysics::SetHadronicPhysicsListOptionString)
       .SetGuidance("Add hadronic processes to the physics list")
+      .SetGuidance(
+          std::string("Uses ") + RMGTools::GetCandidate(fHadronicPhysicsListOption) + " by default"
+      )
       .SetCandidates(RMGTools::GetCandidates<HadronicPhysicsListOption>())
       .SetDefaultValue(RMGTools::GetCandidate(HadronicPhysicsListOption::kShielding))
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareProperty("EnableNeutronThermalScattering", fUseNeutronThermalScattering)
       .SetGuidance("Use thermal scattering cross sections for neutrons")
+      .SetGuidance(
+          std::string("This is ") + (fUseNeutronThermalScattering ? "enabled" : "disabled") +
+          " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
+#if G4VERSION_NUMBER >= 1130
+  bool gamma_ang_by_default = true;
+#else
+  bool gamma_ang_by_default = false;
+#endif
   fMessenger->DeclareMethod("EnableGammaAngularCorrelation", &RMGPhysics::SetUseGammaAngCorr)
       .SetGuidance("Set correlated gamma emission flag")
+      .SetGuidance(
+          std::string("This is ") + (gamma_ang_by_default ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
@@ -533,6 +602,18 @@ void RMGPhysics::DefineCommands() {
 
   fMessenger->DeclareProperty("UseGrabmayrsGammaCascades", fUseGrabmayrGammaCascades)
       .SetGuidance("Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.")
+      .SetGuidance(
+          std::string("This is ") + (fUseGrabmayrGammaCascades ? "enabled" : "disabled") + " by default"
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("EnableInnerBremsstrahlung", fUseInnerBremsstrahlung)
+      .SetGuidance("Enable Inner Bremsstrahlung generation for beta decays")
+      .SetGuidance(
+          std::string("This is ") + (fUseInnerBremsstrahlung ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);

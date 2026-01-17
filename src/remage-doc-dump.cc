@@ -30,7 +30,10 @@
 #endif
 #include "RMGGeneratorFromFile.hh"
 #include "RMGGeneratorMUSUNCosmicMuons.hh"
+#include "RMGGeomBench.hh"
+#include "RMGGeomBenchOutputScheme.hh"
 #include "RMGGermaniumOutputScheme.hh"
+#include "RMGInnerBremsstrahlungProcess.hh"
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
@@ -42,6 +45,7 @@
 #include "RMGVOutputScheme.hh"
 #include "RMGVertexConfinement.hh"
 #include "RMGVertexFromFile.hh"
+#include "RMGVertexFromPoint.hh"
 #include "RMGVertexOutputScheme.hh"
 
 #include "CLI/CLI.hpp"
@@ -51,6 +55,9 @@ void init_extra() {
   // initialize non-default things that have messengers.
   // add here other things in the future.
 
+  // processes
+  new RMGInnerBremsstrahlungProcess();
+
   // output schemes
   new RMGGermaniumOutputScheme();
   new RMGOpticalOutputScheme();
@@ -59,13 +66,17 @@ void init_extra() {
   new RMGIsotopeFilterScheme();
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
+  new RMGGeomBenchOutputScheme();
 
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();
+  new RMGVertexFromPoint();
+
   // generators
   new RMGGeneratorMUSUNCosmicMuons();
   new RMGGeneratorCosmicMuons();
+  new RMGGeomBench();
 #if RMG_HAS_BXDECAY0
   auto master_gen = new RMGMasterGenerator();
   new RMGGeneratorDecay0(master_gen); // needs a vertex generator

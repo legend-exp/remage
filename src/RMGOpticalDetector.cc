@@ -39,7 +39,7 @@ G4bool RMGOpticalDetectorHit::operator==(const RMGOpticalDetectorHit& right) con
 
 void RMGOpticalDetectorHit::Print() {
   RMGLog::OutFormat(
-      RMGLog::debug,
+      RMGLog::debug_event,
       "Detector UID: {} / Wavelength: {} nm",
       this->detector_uid,
       this->photon_wavelength / CLHEP::nm
@@ -88,7 +88,7 @@ void RMGOpticalDetector::Initialize(G4HCofThisEvent* hit_coll) {
 
 bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history*/) {
 
-  RMGLog::OutDev(RMGLog::debug, "Processing optical detector hits");
+  RMGLog::OutDev(RMGLog::debug_event, "Processing optical detector hits");
 
   // optical photon?
   auto particle = step->GetTrack()->GetDefinition();
@@ -113,7 +113,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
     auto d_type = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).type;
     if (d_type != RMGDetectorType::kOptical) {
       RMGLog::OutFormatDev(
-          RMGLog::debug,
+          RMGLog::debug_event,
           "Volume '{}' (copy nr. {} not registered as optical detector",
           pv_name,
           pv_copynr
@@ -122,7 +122,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
     }
   } catch (const std::out_of_range& e) {
     RMGLog::OutFormatDev(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "Volume '{}' (copy nr. {} not registered as detector",
         pv_name,
         pv_copynr
@@ -133,7 +133,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   // retrieve unique id for persistency
   auto det_uid = det_cons->GetDetectorMetadata({pv_name, pv_copynr}).uid;
 
-  RMGLog::OutDev(RMGLog::debug, "Hit in optical detector nr. ", det_uid, " detected");
+  RMGLog::OutDev(RMGLog::debug_event, "Hit in optical detector nr. ", det_uid, " detected");
 
   // initialize hit object for uid, if not already there
   auto* hit = new RMGOpticalDetectorHit();

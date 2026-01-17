@@ -4,6 +4,7 @@
 
 Simulation framework for low background physics experiments
 
+[![conda-forge](https://img.shields.io/conda/vn/conda-forge/remage.svg)](https://anaconda.org/conda-forge/remage)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/legend-exp/remage?logo=git)
 [![GitHub Workflow Status](https://img.shields.io/github/checks-status/legend-exp/remage/main?label=main%20branch&logo=github)](https://github.com/legend-exp/remage/actions)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
