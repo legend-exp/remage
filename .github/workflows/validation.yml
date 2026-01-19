@@ -20,7 +20,7 @@ concurrency:
 jobs:
   run_validation:
     name: Run validation suite
-    runs-on: ubuntu-latest # self-hosted
+    runs-on: self-hosted # ubuntu-latest
 
     container: docker://legendexp/remage-base:stable
 
