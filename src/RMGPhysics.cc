@@ -383,6 +383,7 @@ void RMGPhysics::ConstructOptical() {
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   wls_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  cerenkov_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   if (fUseOpticalCustomWLS) {
     auto wls_proc_wrapped = new RMGOpWLSProcess();
