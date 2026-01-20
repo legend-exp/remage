@@ -9,13 +9,10 @@ import numpy as np
 from lgdo import lh5
 from remage import remage_run
 
-modes = ["true", "false"]
 energies = np.array([500, 2000, 5000])  # in keV
 
 combined_elapsed_time = []
 uncombined_elapsed_time = []
-
-# Run the other three
 
 for energy in energies:
     start = time.time()
@@ -102,14 +99,14 @@ ax_time.bar(
     x + offset_time - bar_w / 2,
     combined_elapsed_time,
     width=bar_w,
-    label="Combined time",
+    label="Elapsed time with combine",
     color="green",
 )
 ax_time.bar(
     x + offset_time + bar_w / 2,
     uncombined_elapsed_time,
     width=bar_w,
-    label="Uncombined time",
+    label="Elapsed time without combine",
     color="red",
 )
 

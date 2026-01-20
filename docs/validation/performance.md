@@ -2,7 +2,7 @@
 
 This section tests the performance of remage for critical functions and options.
 
-## Combine low energy tracks options
+## Combine low energy tracks option
 
 This part evaluates the performance of the
 `/RMG/Output/.*/Cluster/CombineLowEnergyElectronTracks` option. This option
