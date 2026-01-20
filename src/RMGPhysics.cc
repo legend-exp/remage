@@ -434,6 +434,11 @@ void RMGPhysics::ConstructOptical() {
       proc_manager->AddDiscreteProcess(boundary_proc);
       proc_manager->AddDiscreteProcess(rayleigh_scatt_proc);
       proc_manager->AddDiscreteProcess(wls_proc);
+
+#if G4VERSION_NUMBER < 1140
+      // this was added by default in G4 11.4 (otherwise would warn if invoked twice).
+      proc_manager->SetProcessOrderingToLast(boundary_proc, G4ProcessVectorDoItIndex::idxPostStep);
+#endif
     }
   }
 }
