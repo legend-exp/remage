@@ -9,6 +9,6 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-add_test(NAME combine_tracks/gen-output COMMAND ${PYTHONPATH} ./run_sims_and_plot.py
-                                                ${REMAGE_PYEXE})
-set_tests_properties(combine_tracks/gen-output PROPERTIES LABELS extra)
+add_test(NAME performance/combine-tracks COMMAND ${PYTHONPATH} ./combine_tracks_benchmark.py
+                                                 ${REMAGE_PYEXE})
+set_tests_properties(performance/combine-tracks PROPERTIES LABELS extra)

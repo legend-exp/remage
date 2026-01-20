@@ -19,6 +19,7 @@ distances
 nist
 observables-ge
 processes-ib
+performance
 ```
 
 ```{toctree}

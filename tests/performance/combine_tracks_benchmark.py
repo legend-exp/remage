@@ -165,5 +165,5 @@ h2, l2 = ax_size.get_legend_handles_labels()
 ax_time.legend(h1 + h2, l1 + l2, loc="best")
 
 fig.tight_layout()
-plt.savefig("combine_tracks_benchmark.png")
+plt.savefig("combine_tracks_benchmark.output.png")
 plt.close()
