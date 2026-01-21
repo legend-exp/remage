@@ -1,5 +1,3 @@
-/control/execute macros/_init.mac
-
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/ForceContainmentCheck true
 

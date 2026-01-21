@@ -18,7 +18,7 @@ reg.setWorld(world_l)
 
 # box
 box_s = geant4.solid.Box("Box", 1, 1, 1, reg, lunit="m")
-box_l = geant4.LogicalVolume(box_s, "G4_Pb", "Box", reg)
+box_l = geant4.LogicalVolume(box_s, "G4_H", "Box", reg)
 geant4.PhysicalVolume(
     [pi / 4, -pi / 4, pi / 4], [2, 0, 0, "m"], box_l, "Box", world_l, reg
 )

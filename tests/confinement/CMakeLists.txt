@@ -19,22 +19,22 @@ set(_macros
     native-surface.mac
     geometrical-and-physical.mac
     geometrical-or-physical.mac
-    native-volume.mac)
+    native-volume.mac
+    native-volume-mass.mac)
 
 foreach(_mac ${_macros})
-  add_test(NAME confinement/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root
-                                            -- macros/${_mac})
+  add_test(NAME confinement/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -w -o
+                                            test-${_mac}.lh5 -- macros/_init.mac macros/${_mac})
 
-  add_test(NAME confinement-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t
-                                               ${NUM_CORES} -o test-out.root -- macros/${_mac})
+  add_test(NAME confinement-mt/${_mac}
+           COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -t ${NUM_CORES} -w -o none --
+                   macros/_init.mac macros/${_mac})
   set_tests_properties(confinement-mt/${_mac} PROPERTIES LABELS mt PROCESSORS ${NUM_CORES})
 
   add_test(NAME confinement-vis/${_mac}
-           COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
-                   macros/${_mac} macros/_vis-export.mac)
+           COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -w -o none -- macros/_init.mac
+                   macros/_vis.mac macros/${_mac} macros/_vis-export.mac)
   set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS vis)
-  set_tests_properties(confinement-vis/${_mac} PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                          "couldn't open display")
 endforeach()
 
 # this test needs another geometry.
@@ -45,8 +45,6 @@ add_test(NAME confinement-vis/with-daughters.mac
          COMMAND ${REMAGE_PYEXE} -g gdml/geometry_boxes.gdml -o test-out.root -- macros/_vis.mac
                  macros/with-daughters.mac macros/_vis-export.mac)
 set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES LABELS vis)
-set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                   "couldn't open display")
 
 # generate the GDML file
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
@@ -60,7 +58,6 @@ add_test(NAME confinement-ge/vis
 
 set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                                    confine-gdml-fixture)
-set_tests_properties(confinement-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # test on HPGe containment
 add_test(NAME confinement-ge/gen-output
@@ -164,13 +161,6 @@ foreach(_test ${_surface_tests})
   set_tests_properties(
     confinement-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
                                             test-surface-sampler-methods-fixture)
-
-  if(_test MATCHES "test-points-.*")
-    set_tests_properties(
-      confinement-surface/${_test} PROPERTIES LABELS "extra;vis" SKIP_REGULAR_EXPRESSION
-                                              "couldn't open display")
-  endif()
-
 endforeach()
 
 # now run some simulations and test the outputs
@@ -203,8 +193,6 @@ foreach(det ${_solids})
   set_tests_properties(
     confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
                                               confine-surface-vis-macro-${det}-fixture)
-  set_tests_properties(confinement-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                 "couldn't open display")
 endforeach()
 
 # run simulations and check
@@ -238,3 +226,11 @@ foreach(det ${_solids})
                MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 endforeach()
+
+add_test(NAME confinement/native-volume-check-mass COMMAND ${PYTHONPATH} test_check_mass_ratio.py)
+
+set_tests_properties(
+  confinement/native-volume-check-mass
+  PROPERTIES LABELS extra DEPENDS
+             "confinement/native-volume.mac;confinement/native-volume-mass.mac" ENVIRONMENT
+             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)

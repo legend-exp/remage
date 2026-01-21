@@ -5,6 +5,8 @@
 /RMG/Generator/Confinement/Physical/AddVolume Sphere
 /RMG/Generator/Confinement/Physical/AddVolume Tubs
 
+/RMG/Generator/Confinement/SampleWeightByMass
+
 /RMG/Generator/Select GPS
 /gps/particle e-
 /gps/energy 1 eV
