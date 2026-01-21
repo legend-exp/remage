@@ -35,7 +35,7 @@ def add_local_pos(vertices, pos):
     return vertices
 
 
-tol = 1e-6  # mm
+tol = 1e-5  # mm
 select_sides = {
     "tubby": {
         "func": [
