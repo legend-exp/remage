@@ -430,7 +430,7 @@ import glob
 import hist
 import matplotlib.pyplot as plt
 
-plt.rcParams["figure.figsize"] = (10, 3)
+plt.rcParams["figure.figsize"] = (9, 3)
 
 
 def plot_edep(detid):
@@ -458,7 +458,7 @@ shoulder. We can also plot the interaction points:
 
 ```python
 def plot_hits(detid):
-    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")[:20_000]
+    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")[:1_000]
     plt.scatter(
         ak.flatten(data.xloc), ak.flatten(data.yloc), marker="o", s=1, label=detid
     )
