@@ -48,16 +48,15 @@ jobs:
           ctest --label-exclude mt -j$(nproc) --output-on-failure
           ctest --label-regex mt -j1 --output-on-failure
 
-      - name: Test docs building
-        if: ${{ matrix.container_version != 'slim' }}
+      - name: Build validation report
         run: |
           cd build
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx-validation
 
       - name: Upload validation report to GitHub
-        if: ${{ always() && matrix.container_version != 'slim' }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v6
         with:
-          name: remage-validation-report-g4flavor-${{ matrix.container_version }}-runner
+          name: remage-validation-report-g4flavor-runner
           path: build/docs/validation/_build/
