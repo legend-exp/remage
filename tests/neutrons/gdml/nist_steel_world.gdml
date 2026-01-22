@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<orb name="world" r="200" lunit="m"/>
+		<orb name="material" r="199.99" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="material">
+			<materialref ref="G4_STAINLESS-STEEL"/>
+			<solidref ref="material"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="material">
+				<volumeref ref="material"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue=""/>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>

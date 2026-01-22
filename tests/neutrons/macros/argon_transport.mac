@@ -1,0 +1,34 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Manager/Randomization/Seed 1234
+
+/RMG/Geometry/RegisterDetector Germanium material 001
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme ParticleFilter
+
+/run/initialize
+
+/RMG/Output/Germanium/DiscardZeroEnergyHits False
+
+/RMG/Output/ParticleFilter/AddParticle 11
+/RMG/Output/ParticleFilter/AddParticle 22
+
+/RMG/Output/Germanium/Cluster/PreClusterOutputs False
+/RMG/Output/Germanium/StoreParticleVelocities True
+/RMG/Output/Germanium/StoreTrackID True
+
+/RMG/Output/Track/AddProcessFilter nCapture
+
+/RMG/Processes/Stepping/DaughterNucleusMaxLifetime 1 ps
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/ene/type Pow
+/gps/ene/min 0.01 eV
+/gps/ene/max 10 MeV
+/gps/ene/alpha -1 # Create log-uniform distribution
+/gps/ang/type iso
+
+
+/run/beamOn 35000

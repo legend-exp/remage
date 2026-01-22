@@ -1,0 +1,24 @@
+{
+  "fine_mesh": false,
+  "default": {
+    "focus": [0, 0, 0],
+    "up": [0, 0, 1],
+    "camera": [-3000, 7000, 1200]
+  },
+  "points": [
+    {
+      "file": "neutron_captures_shielding.lh5",
+      "table": "tracks",
+      "columns": ["xloc", "yloc", "zloc"],
+      "color": [1, 0, 0, 1]
+    }
+  ],
+  "color_overrides": {
+    "argon": [0, 1, 0, 0.6],
+    "moderator": [0, 1, 1, 0.9],
+    "steel": [0.3, 0.3, 0.3, 0.4],
+    "water": [0, 0, 1, 0.3]
+  },
+  "export_scale": 1,
+  "export_and_exit": "neutron_complex_geometry.output.png"
+}
