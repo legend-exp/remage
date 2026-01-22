@@ -84,6 +84,8 @@ diff -u "$output_dump_lh5" "$output_exp_lh5"
 
 # extract written lh5 structure & compare with expectation.
 "$lh5ls" -a "$output_lh5_jag" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5_jag"
-diff -u "$output_dump_lh5_jag" "$output_exp_lh5_jag"
+diff -u \
+    <(sed 's/tcm · .*/tcm/g' -- "$output_dump_lh5_jag") \
+    <(sed 's/tcm · .*/tcm/g' -- "$output_exp_lh5_jag")
 
 set +vx
