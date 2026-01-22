@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Comparison with NIST" href="nist.html"><link rel="prev" title="Vertex confinement" href="confinement.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Internal Bremsstrahlung in Ar-39 decay" href="processes-ib.html">
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>HPGe detector distance to surface - remage 0.19.6.dev30+ge1b35a933 validation suite</title>
+        <title>Performance Benchmarks - remage 0.19.6.dev30+ge1b35a933 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -208,11 +208,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">HPGe detector distance to surface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a></li>
 <li class="toctree-l1"><a class="reference internal" href="observables-ge.html">HPGe tracking and observables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processes-ib.html">Internal Bremsstrahlung in Ar-39 decay</a></li>
-<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Performance Benchmarks</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
@@ -237,12 +237,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/distances.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/performance.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/distances.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/performance.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -254,45 +254,29 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="hpge-detector-distance-to-surface">
-<h1>HPGe detector distance to surface<a class="headerlink" href="#hpge-detector-distance-to-surface" title="Link to this heading">¶</a></h1>
-<p>Geant4 has the possibility to compute the distance of points to the surface of a
-solid. This is saved in the remage germanium output scheme for use in detector
-post-processing. This section of the validation report validates this
-calculation by comparing to one from python.</p>
-<p>These tests fill fail if the difference is large, and we also produce some plots
-showing the computed distance compared to the profile of the detectors.</p>
-<p>In this output scheme it is possible to save the position of the step based on
-either the pre or post-step point or the average of the two. All three options
-are used.</p>
+          <section class="tex2jax_ignore mathjax_ignore" id="performance-benchmarks">
+<h1>Performance Benchmarks<a class="headerlink" href="#performance-benchmarks" title="Link to this heading">¶</a></h1>
+<p>This section tests the performance of remage for critical functions and options.</p>
+<section id="combine-low-energy-tracks-option">
+<h2>Combine low energy tracks option<a class="headerlink" href="#combine-low-energy-tracks-option" title="Link to this heading">¶</a></h2>
+<p>This part evaluates the performance of the
+<code class="docutils literal notranslate"><span class="pre">/RMG/Output/.*/Cluster/CombineLowEnergyElectronTracks</span></code> option. This option
+combines the tracks of low energetic electrons with nearby higher energetic
+tracks to reduce file size. This function was found to be problematic in
+extensive simulations (like showers) if not optimized.</p>
 <figure class="align-default" id="id1">
-<a class="reference internal image-reference" href="_images/distance-ge-average.output.png"><img alt="_images/distance-ge-average.output.png" src="_images/distance-ge-average.output.png" style="width: 800px;" />
+<a class="reference internal image-reference" href="_images/combine-tracks-benchmark.output.png"><img alt="_images/combine-tracks-benchmark.output.png" src="_images/combine-tracks-benchmark.output.png" style="width: 600px;" />
 </a>
 <figcaption>
-<p><span class="caption-text">For the average of pre and post-step point, used by default.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Benchmark results. For each energy 1000 gammas were simulated within one event to maximize the number of tracks to merge. The geometry is a 2x2x2m box out of liquid argon.</em></span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p> </p>
-<figure class="align-default" id="id2">
-<a class="reference internal image-reference" href="_images/distance-ge-poststep.output.png"><img alt="_images/distance-ge-poststep.output.png" src="_images/distance-ge-poststep.output.png" style="width: 800px;" />
-</a>
-<figcaption>
-<p><span class="caption-text">For the poststep point.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p> </p>
-<figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="_images/distance-ge-prestep.output.png"><img alt="_images/distance-ge-prestep.output.png" src="_images/distance-ge-prestep.output.png" style="width: 800px;" />
-</a>
-<figcaption>
-<p><span class="caption-text">For the pre-step point</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
+</section>
 </section>
 
         </article>
@@ -300,23 +284,15 @@ are used.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="nist.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Comparison with NIST</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="confinement.html">
+          
+          <a class="prev-page" href="processes-ib.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Vertex confinement</div>
+                <div class="title">Internal Bremsstrahlung in Ar-39 decay</div>
                 
               </div>
             </a>
@@ -338,8 +314,27 @@ are used.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Performance Benchmarks</a><ul>
+<li><a class="reference internal" href="#combine-low-energy-tracks-option">Combine low energy tracks option</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
