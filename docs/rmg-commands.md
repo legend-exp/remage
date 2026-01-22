@@ -1566,6 +1566,7 @@ Commands for controlling output from hits in germanium detectors.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `StepPositionMode` – Select which position of the step to store
 
@@ -1655,6 +1656,18 @@ This is disabled by default
 Discard hits with zero energy.
 
 This is enabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreParticleVelocities`
+
+Store velocities of particle in the output file.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`

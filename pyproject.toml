@@ -181,4 +181,4 @@ exclude = [
 ]
 
 [tool.codespell]
-ignore-words-list = "hist, manuel, inactivate"
+ignore-words-list = "hist, manuel, inactivate, Te, Nd"
