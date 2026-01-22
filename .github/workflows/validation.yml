@@ -24,6 +24,9 @@ jobs:
 
     container: docker://legendexp/remage-base:stable
 
+    permissions:
+      contents: read
+
     steps:
       - uses: actions/checkout@v6
         with:
@@ -47,3 +50,50 @@ jobs:
           cd build
           ctest --label-exclude mt -j$(nproc) --output-on-failure
           ctest --label-regex mt -j1 --output-on-failure
+
+      - name: Build validation report
+        run: |
+          cd build
+          cmake -DRMG_BUILD_DOCS=ON ..
+          make sphinx-validation
+
+      - name: Upload validation report to GitHub
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: remage-validation-report-g4flavor-runner
+          path: build/docs/validation/_build/
+
+  deploy_validation_report:
+    name: Deploy validation report to legend-exp.github.io/remage/validation
+    if: github.event_name != 'pull_request'
+    needs: run_validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: remage-validation-report-g4flavor-stable
+          path: output/
+
+      - name: Determine target directory
+        id: target
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "dir=$(echo '${{ github.event.release.tag_name }}')" >> $GITHUB_ENV
+          else
+            echo "dir=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: output
+          destination_dir: validation/${{ env.dir }}
+# vim: expandtab tabstop=2 shiftwidth=2
