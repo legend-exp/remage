@@ -77,7 +77,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v7
         with:
-          name: remage-validation-report-g4flavor-stable
+          name: remage-validation-report-g4flavor-runner
           path: output/
 
       - name: Determine target directory
