@@ -92,11 +92,12 @@ def gamma_spectrum_and_sum(data, isotope):
 
     gamma_mask = np.isin(data.evtid, evt_ids)
     gamma_evtids = data.evtid[gamma_mask]
-    gamma_energies = data.ekin[gamma_mask]
+    secondary_energies = data.ekin[gamma_mask]
+    gamma_energies = data.ekin[gamma_mask & (data.particle == 22)]
 
     summed_energy = np.bincount(
         gamma_evtids,
-        weights=gamma_energies,
+        weights=secondary_energies,
     )
     summed_energy = summed_energy[summed_energy > 0]
 
@@ -121,8 +122,8 @@ expected_sum_energy = {
     1000280590: 8.9993,  # Capture on Ni-58 produces Ni-59
     1000280610: 7.8201,  # Capture on Ni-60 produces Ni-61
     1000280630: 6.8377,  # Capture on Ni-62 produces Ni-63
-    1000641560: 8.54,  # Capture on Gd-155 produces Gd-156
-    1000641580: 7.94,  # Capture on Gd-157 produces Gd-158
+    1000641560: 8.5365,  # Capture on Gd-155 produces Gd-156
+    1000641580: 7.9374,  # Capture on Gd-157 produces Gd-158
 }
 
 bins = np.linspace(0, 10.6, 250)  # MeV
@@ -156,7 +157,7 @@ for isotope in expected_sum_energy:
         bins=bins,
         histtype="step",
         linewidth=2,
-        label="ΣEy per event",
+        label="ΣEy per capture",
     )
     ax_norm.set_title(f"Standard Shielding {len(s_norm)} captures")
     ax_norm.set_xlabel("Energy [MeV]")
@@ -174,7 +175,7 @@ for isotope in expected_sum_energy:
         bins=bins,
         histtype="step",
         linewidth=2,
-        label="ΣEy per event",
+        label="ΣEy per capture",
     )
     ax_evap.set_title(f"G4PhotonEvaporation {len(s_evap)} captures")
     ax_evap.set_xlabel("Energy [MeV]")
@@ -199,4 +200,4 @@ for isotope in expected_sum_energy:
 
     ax_norm.set_yscale("log")
     plt.tight_layout()
-    plt.savefig(f"neutron_capture_{iso_label.replace('-', '_')}.png")
+    plt.savefig(f"neutron_capture_{iso_label.replace('-', '_')}.output.png")
