@@ -41,6 +41,8 @@ jobs:
 
       - name: Minimally test installed executable
         run: |
+          conda activate rosetta-env
+          python -c "import platform;print(platform.machine())"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
 # vim: expandtab tabstop=2 shiftwidth=2
