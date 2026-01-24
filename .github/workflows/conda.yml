@@ -1,0 +1,46 @@
+name: try macOS conda
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_on_mac:
+    name: Test on macOS
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: "geant4-env"
+          auto-activate-base: "false"
+          channels: conda-forge
+          channel-priority: "strict"
+          conda-remove-defaults: "true"
+
+      - name: Install remage
+        run: |
+          CONDA_SUBDIR=osx-64 conda create -n rosetta-env --channel conda-forge --override-channels python
+          conda activate rosetta-env
+          conda config --env --add channels conda-forge
+          conda config --env --set channel_priority strict
+          conda config --show
+          python -c "import platform;print(platform.machine())"
+          conda config --env --set subdir osx-64
+          conda install conda-forge::remage
+
+      - name: Minimally test installed executable
+        run: |
+          REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
+
+# vim: expandtab tabstop=2 shiftwidth=2
