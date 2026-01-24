@@ -51,11 +51,24 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
   const auto vol_name = aTrack->GetVolume()->GetLogicalVolume()->GetName();
   if (vol_name != fVolumeName) return std::nullopt;
 
+  if (fVolumeSafety == 0) return fWaiting;
+
   // only defer tracks that have a minimum distance to other volumes.
-  auto distance = RMGOutputTools::distance_to_surface(aTrack->GetVolume(), aTrack->GetPosition());
-  if (distance < fVolumeSafety) return std::nullopt;
+  bool is_within_safety = RMGOutputTools::is_within_surface_safety(
+      aTrack->GetVolume(), aTrack->GetPosition(), fVolumeSafety
+  );
+  RMGLog::Out(
+        RMGLog::debug_event,
+        "track ", aTrack->GetTrackID(), 
+        is_within_safety ? " is within safety" : " is beyond safety"
+    );
+  if (is_within_safety) return std::nullopt;
 
   return fWaiting;
+}
+
+void RMGVolumeDistanceStacker::SetFilterGermaniumOnly(bool enable) {
+  RMGOutputTools::SetFilterGermaniumOnly(enable);
 }
 
 
@@ -75,6 +88,12 @@ void RMGVolumeDistanceStacker::DefineCommands() {
   fMessenger->DeclareMethod("VolumeName", &RMGVolumeDistanceStacker::SetVolumeName)
       .SetGuidance("Set the volume name in which to stack e-/e+ tracks.")
       .SetParameterName("volume", false)
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareMethod("FilterGermaniumOnly", &RMGVolumeDistanceStacker::SetFilterGermaniumOnly)
+      .SetGuidance("Enable/disable Germanium-only filtering for surface distance checks.")
+      .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
+      .SetParameterName("enable", false)
       .SetStates(G4State_Idle);
 }
 

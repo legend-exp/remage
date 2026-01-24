@@ -42,6 +42,12 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
     /** @brief Set the volume name in which to stack e-/e+ tracks. */
     void SetVolumeName(std::string volume) { fVolumeName = volume; }
 
+    /** @brief Enable or disable Germanium-only filtering for distance calculations.
+     *  @details When enabled, surface distance checks only consider daughter volumes
+     *  registered as Germanium detectors, potentially improving performance.
+     */
+    void SetFilterGermaniumOnly(bool enable);
+
   private:
 
     std::unique_ptr<G4GenericMessenger> fMessenger;

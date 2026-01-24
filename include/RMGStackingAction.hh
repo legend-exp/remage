@@ -16,6 +16,8 @@
 #ifndef _RMG_STACKING_ACTION_HH_
 #define _RMG_STACKING_ACTION_HH_
 
+#include <chrono>
+
 #include "G4UserStackingAction.hh"
 
 class G4Track;
@@ -40,6 +42,10 @@ class RMGStackingAction : public G4UserStackingAction {
 
     int fStage = 0;
     RMGRunAction* fRunAction = nullptr;
+
+    // Timing statistics for ClassifyNewTrack
+    long long fClassifyCallCount = 0;
+    std::chrono::nanoseconds fClassifyTotalTime{0};
 };
 
 #endif
