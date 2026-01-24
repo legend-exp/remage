@@ -30,7 +30,7 @@ jobs:
 
       - name: Install remage
         run: |
-          CONDA_SUBDIR=osx-64 conda create -n rosetta-env --channel conda-forge --override-channels python
+          CONDA_SUBDIR=osx-64 conda create -n rosetta-env --channel conda-forge --override-channels python=3.13
           conda activate rosetta-env
           conda config --env --add channels conda-forge
           conda config --env --set channel_priority strict
