@@ -96,7 +96,7 @@ the installation on a fresh system.
 
 :::
 
-## Setting up Jupyter
+## Setting up Jupyter with a container
 
 To set up a _remage_-aware Jupyter kernel, you only have to provide the correct
 `kernel.json` file to your Jupyter installation.
