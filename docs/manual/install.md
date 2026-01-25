@@ -36,8 +36,6 @@ $ conda install conda-forge::remage
 
 :::
 
-:::{admonition}
-
 ## Pre-built container images
 
 Stable releases are regularly made available
@@ -98,7 +96,7 @@ the installation on a fresh system.
 
 :::
 
-## Setting up Jupyter with our container images
+## Setting up Jupyter
 
 To set up a _remage_-aware Jupyter kernel, you only have to provide the correct
 `kernel.json` file to your Jupyter installation.
