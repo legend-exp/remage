@@ -26,7 +26,7 @@ $ conda install conda-forge::remage
 - Make sure that you don't have the anacoda channels enabled in your conda
   environment, otherwise incompatibilities can arise with the conda-forge repo
   [(see upstream docs)](https://conda-forge.org/docs/user/transitioning_from_defaults/).
-  You can directly create an evironment with only the conda-forge channel
+  You can directly create an environment with only the conda-forge channel
   enabled:
   ```console
   $ conda create -n remage-env --channel conda-forge --override-channels python=3.13
