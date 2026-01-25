@@ -83,10 +83,10 @@ The build system is based on CMake.
 :::{important}
 
 It is important that you **use a unique install prefix** for remage. **Do not
-use a location that is controlled by your linux package manager** (i.e.
-`/usr`). The default value of `/usr/local` is also dangerous if you install
-other software into that prefix. Failing to do so might create conflicts with
-other python packages or might even render your system unusable.
+use a location that is controlled by your linux package manager** (i.e. `/usr`).
+The default value of `/usr/local` is also dangerous if you install other
+software into that prefix. Failing to do so might create conflicts with other
+python packages or might even render your system unusable.
 
 :::
 
