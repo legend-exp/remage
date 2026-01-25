@@ -21,10 +21,22 @@ $ conda install conda-forge::remage
 
 :::{note}
 
-The conda-forge provided binaries do not support the ROOT output format, but
-fully supports LH5/HDF5.
+- The conda-forge provided binaries do not support the ROOT output format, but
+  fully supports LH5/HDF5.
+- Make sure that you don't have the anacoda channels enabled in your conda
+  environment, otherwise
+  [incompatibilities can arise with the conda-forge repo](https://conda-forge.org/docs/user/transitioning_from_defaults/).
+- To **install _remage_ on an arm64 Mac**, you need to perform special set-up
+  steps at environment creation time:
+  ```console
+  $ CONDA_SUBDIR=osx-64 conda create [...]
+  $ conda activate [...]
+  $ conda config --env --set subdir osx-64
+  ```
 
 :::
+
+:::{admonition}
 
 ## Pre-built container images
 
@@ -86,7 +98,7 @@ the installation on a fresh system.
 
 :::
 
-## Setting up Jupyter
+## Setting up Jupyter with our container images
 
 To set up a _remage_-aware Jupyter kernel, you only have to provide the correct
 `kernel.json` file to your Jupyter installation.
