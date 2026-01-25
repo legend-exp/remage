@@ -24,14 +24,23 @@ $ conda install conda-forge::remage
 - The conda-forge provided binaries do not support the ROOT output format, but
   fully supports LH5/HDF5.
 - Make sure that you don't have the anacoda channels enabled in your conda
-  environment, otherwise
-  [incompatibilities can arise with the conda-forge repo](https://conda-forge.org/docs/user/transitioning_from_defaults/).
+  environment, otherwise incompatibilities can arise with the conda-forge repo
+  [(see upstream docs)](https://conda-forge.org/docs/user/transitioning_from_defaults/).
+  ```console
+  $ conda create -n remage-env --channel conda-forge --override-channels python=3.13
+  $ conda activate remage-env
+  $ conda config --env --add channels conda-forge
+  $ conda config --env --remove channels defaults
+  $ conda config --env --set channel_priority strict
+  $ conda install remage
+  ```
 - To **install _remage_ on an arm64 Mac**, you need to perform special set-up
   steps at environment creation time:
   ```console
-  $ CONDA_SUBDIR=osx-64 conda create [...]
-  $ conda activate [...]
+  $ CONDA_SUBDIR=osx-64 conda create -n remage-env python=3.13
+  $ conda activate remage-env
   $ conda config --env --set subdir osx-64
+  $ conda install remage
   ```
 
 :::
