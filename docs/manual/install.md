@@ -37,10 +37,10 @@ $ conda install conda-forge::remage
 - To **install _remage_ on an arm64 Mac**, you need to perform special set-up
   steps at environment creation time:
   ```console
-  $ CONDA_SUBDIR=osx-64 conda create -n remage-env python=3.13
+  $ CONDA_SUBDIR=osx-64 conda create [...]
   $ conda activate remage-env
   $ conda config --env --set subdir osx-64
-  $ conda install remage
+  $ # ... continue with the additional steps above
   ```
 
 :::
