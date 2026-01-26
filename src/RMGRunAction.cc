@@ -399,18 +399,33 @@ void RMGRunAction::PostprocessOutputFile() const {
 #endif
 
   try {
+    // try a rename first. This will fail when the two files are on different file systems.
     fs::rename(worker_tmp, worker_lh5);
     RMGLog::Out(RMGLog::detail, "Moved output file ", worker_tmp.string(), " to ", worker_lh5.string());
-  } catch (const fs::filesystem_error& e) {
-    RMGLog::Out(
-        RMGLog::error,
-        "Moving output file ",
-        worker_tmp.string(),
-        " to ",
-        worker_lh5.string(),
-        " failed: ",
-        e.what()
-    );
+  } catch (const fs::filesystem_error& e_move) {
+    if (e_move.code().value() == EXDEV) {
+      try {
+        // now try moving between the file systems.
+        fs::copy_file(worker_tmp, worker_lh5);
+        fs::remove(worker_tmp);
+      } catch (const fs::filesystem_error& e_copy) {
+        RMGLog::OutFormat(
+            RMGLog::error,
+            "Moving (copy&unlink) output file {} to {} failed: {}",
+            worker_tmp.string(),
+            worker_lh5.string(),
+            e_copy.what()
+        );
+      }
+    } else {
+      RMGLog::OutFormat(
+          RMGLog::error,
+          "Moving output file {} to {} failed: {}",
+          worker_tmp.string(),
+          worker_lh5.string(),
+          e_move.what()
+      );
+    }
   }
 }
 
