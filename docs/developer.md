@@ -58,10 +58,16 @@ It is also possible to use conda to install all dependencies for building remage
 from source.
 
 ```console
-conda activate remage-env
-conda install -c conda-forge geant4 bxdecay0 "python<3.14" cmake make gcc
-export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
+# these are just the normal steps tp get a conda-forge only environment
+$ conda create -n remage-env --channel conda-forge --override-channels python=3.13
+$ conda activate remage-env
+$ conda config --env --add channels conda-forge
+$ conda config --env --remove channels defaults
+$ conda config --env --set channel_priority strict
 
+# now install our dependencies
+$ conda install -c conda-forge geant4 bxdecay0 "python<3.14" cmake make gcc
+$ export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
 ```
 
 When using the `cmake` command later for the first time, you will need to add an
