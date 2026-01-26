@@ -137,7 +137,7 @@ RMGDetectorHitsCollection* RMGScintillatorOutputScheme::GetHitColl(const G4Event
 
 bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
   // exit fast if no threshold is configured.
-  if ((fEdepCutLow < 0 && fEdepCutHigh < 0) || fEdepCutDetectors.empty()) return false;
+  if (fEdepCutLow < 0 && fEdepCutHigh < 0) return false;
 
   auto hit_coll = GetHitColl(event);
   if (!hit_coll) return false;
@@ -147,11 +147,12 @@ bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   for (auto hit : *hit_coll->GetVector()) {
     if (!hit) continue;
-    if (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end())
+    if (fEdepCutDetectors.empty() or
+        (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end()))
       event_edep += hit->energy_deposition;
   }
 
-  if ((fEdepCutLow > 0 && event_edep < fEdepCutLow) ||
+  if ((fEdepCutLow >= 0 && event_edep <= fEdepCutLow) ||
       (fEdepCutHigh > 0 && event_edep > fEdepCutHigh)) {
     RMGLog::Out(
         RMGLog::debug_event,
@@ -337,18 +338,20 @@ void RMGScintillatorOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGScintillatorOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy \\leq threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGScintillatorOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy > threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethod("AddDetectorForEdepThreshold", &RMGScintillatorOutputScheme::AddEdepCutDetector)
-      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold.")
+      .SetGuidance("Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.")
       .SetParameterName("det_uid", false)
       .SetStates(G4State_Idle);
 
