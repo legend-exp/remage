@@ -48,6 +48,11 @@ RMGOutputManager::RMGOutputManager() {
   this->DefineCommands();
 }
 
+void RMGOutputManager::SetTempFolder(std::string tmp) {
+  fTempDirectory = fs::path(tmp);
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpdir", std::string(fTempDirectory)));
+}
+
 fs::path RMGOutputManager::GetTempOrOutputFolder(const fs::path out_dir) const {
   return fTempDirectory.empty() ? out_dir : fTempDirectory;
 }

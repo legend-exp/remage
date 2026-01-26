@@ -146,7 +146,7 @@ class RMGOutputManager {
     /**
      * @brief Set a temporary directory path for all files created by the remage C++ app.
      */
-    void SetTempFolder(std::string tmp) { fTempDirectory = fs::path(tmp); }
+    void SetTempFolder(std::string tmp);
     /**
      * @brief Sets the directory for output ntuples.
      * @details this might not be used by all output file formats.
