@@ -1494,6 +1494,8 @@ Commands for controlling output from hits in germanium detectors.
 
 Set a lower energy cut that has to be met for this event to be stored.
 
+This removes events with {math}`energy \leq threshold`.
+
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1507,6 +1509,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 ### `/RMG/Output/Germanium/EdepCutHigh`
 
 Set an upper energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy > threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1829,7 +1833,7 @@ Commands for controlling output from hits in scintillator detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
@@ -1840,6 +1844,8 @@ Commands for controlling output from hits in scintillator detectors.
 ### `/RMG/Output/Scintillator/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy \leq threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1855,6 +1861,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 
 Set an upper energy cut that has to be met for this event to be stored.
 
+This removes events with {math}`energy > threshold`.
+
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1867,7 +1875,7 @@ Set an upper energy cut that has to be met for this event to be stored.
 
 ### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
 
-Take this detector into account for the filtering by /EdepThreshold.
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
