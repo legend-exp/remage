@@ -33,6 +33,8 @@
 #include "RMGUserAction.hh"
 #include "RMGUserInit.hh"
 
+// namespace fs = std::filesystem;
+
 RMGOutputManager* RMGOutputManager::fRMGOutputManager = nullptr;
 
 G4ThreadLocal std::map<int, std::pair<int, std::string>> RMGOutputManager::fNtupleIDs = {};
@@ -44,6 +46,10 @@ RMGOutputManager::RMGOutputManager() {
   fRMGOutputManager = this;
 
   this->DefineCommands();
+}
+
+fs::path RMGOutputManager::GetTempOrOutputFolder(const fs::path out_dir) const {
+  return fTempDirectory.empty() ? out_dir : fTempDirectory;
 }
 
 int RMGOutputManager::RegisterNtuple(int det_uid, int ntuple_id, std::string table_name) {

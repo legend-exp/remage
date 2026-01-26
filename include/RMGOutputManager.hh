@@ -17,6 +17,7 @@
 #define _RMG_OUTPUT_MANAGER_HH_
 
 #include <atomic>
+#include <filesystem>
 #include <memory>
 #include <set>
 #include <vector>
@@ -26,6 +27,8 @@
 #include "globals.hh"
 
 #include "RMGLog.hh"
+
+namespace fs = std::filesystem;
 
 class G4GenericMessenger;
 /**
@@ -85,6 +88,13 @@ class RMGOutputManager {
      * @return true if overwriting is enabled.
      */
     [[nodiscard]] bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
+
+    /**
+     * @brief Get a directory to save a temporary file to.
+     * @detail this decides whether the global temp dir or the given output dir should be used.
+     * @return either the configured temp directory, or the given output dir.
+     */
+    [[nodiscard]] fs::path GetTempOrOutputFolder(fs::path out_dir) const;
     /**
      * @brief Gets the directory name for output ntuples.
      * @return Reference to the ntuple directory name.
@@ -133,6 +143,10 @@ class RMGOutputManager {
      * @param overwrite True to enable overwriting, false otherwise.
      */
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
+    /**
+     * @brief Set a temporary directory path for all files created by the remage C++ app.
+     */
+    void SetTempFolder(std::string tmp) { fTempDirectory = fs::path(tmp); }
     /**
      * @brief Sets the directory for output ntuples.
      * @details this might not be used by all output file formats.
@@ -209,8 +223,10 @@ class RMGOutputManager {
 
     static inline const std::string OUTPUT_FILE_NONE = "none";
     std::string fOutputFile;
-    bool fIsPersistencyEnabled = true;
     bool fOutputOverwriteFiles = false;
+    fs::path fTempDirectory;
+
+    bool fIsPersistencyEnabled = true;
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";

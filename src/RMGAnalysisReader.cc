@@ -33,6 +33,7 @@ namespace fs = std::filesystem;
 #endif
 #include "RMGIpc.hh"
 #include "RMGLog.hh"
+#include "RMGOutputManager.hh"
 
 G4Mutex RMGAnalysisReader::fMutex = G4MUTEX_INITIALIZER;
 
@@ -106,9 +107,11 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(
     std::random_device rd;
     std::string new_fn = ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() +
                          ".hdf5";
+    auto rmg_man = RMGOutputManager::Instance();
+    fs::path new_path = rmg_man->GetTempOrOutputFolder(fs::path(".")) / fs::path(new_fn);
 
     std::error_code ec;
-    if (!fs::copy_file(path, fs::path(new_fn), ec)) {
+    if (!fs::copy_file(path, new_path, ec)) {
       RMGLog::Out(
           RMGLog::error,
           "copy of input file ",
@@ -119,21 +122,21 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(
       );
       return invalid_access;
     }
-    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", new_fn));
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("tmpfile", new_path.string()));
 
-    auto result = RMGConvertLH5::ConvertFromLH5(new_fn, ntuple_dir_name, false, false, units_map);
+    auto result = RMGConvertLH5::ConvertFromLH5(new_path.string(), ntuple_dir_name, false, false, units_map);
     if (!result) {
       RMGLog::Out(
           RMGLog::error,
           "Conversion of input file ",
-          new_fn,
+          new_path.string(),
           " to LH5 failed. Data is potentially corrupted."
       );
       return invalid_access;
     }
 
     fHasUnits = true;
-    fFileName = new_fn;
+    fFileName = new_path.string();
     fReader = G4Hdf5AnalysisReader::Instance();
     fFileIsTemp = true;
 #else

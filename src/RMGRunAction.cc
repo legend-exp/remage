@@ -327,7 +327,7 @@ RMGRunAction::OutputFilePaths RMGRunAction::BuildOutputFile() const {
 
     std::string new_fn = ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() +
                          ".hdf5";
-    auto new_path = path.parent_path() / new_fn;
+    auto new_path = rmg_man->GetTempOrOutputFolder(path.parent_path()) / new_fn;
     return OutputFilePaths{new_path, path};
   }
   return OutputFilePaths{path, path};

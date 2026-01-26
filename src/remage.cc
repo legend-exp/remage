@@ -67,6 +67,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> macros;
   std::vector<std::string> macro_substitutions;
   std::string output;
+  std::string temp_dir;
   RMGLog::LogLevel loglevel = RMGLog::summary;
 
   auto log_level_desc = "Logging level " + RMGTools::GetCandidates<RMGLog::LogLevel>('|');
@@ -97,6 +98,7 @@ int main(int argc, char** argv) {
   )
       ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
+  app.add_option("--tmpdir", temp_dir, "Directory for temporary files")->type_name("DIR");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option(
          "--pipe-o-fd",
@@ -198,6 +200,7 @@ int main(int argc, char** argv) {
 
   for (const auto& m : macros) manager.IncludeMacroFile(m);
   if (!output.empty()) manager.GetOutputManager()->SetOutputFileName(output);
+  if (!temp_dir.empty()) manager.GetOutputManager()->SetTempFolder(temp_dir);
 
   manager.Initialize();
   manager.Run();
