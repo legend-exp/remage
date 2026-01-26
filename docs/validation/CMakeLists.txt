@@ -87,6 +87,21 @@ set(TESTS_IMAGES
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
+    neutrons/neutron_capture_Ar_36.output.png
+    neutrons/neutron_capture_Ar_38.output.png
+    neutrons/neutron_capture_Ar_40.output.png
+    neutrons/neutron_capture_Cr_50.output.png
+    neutrons/neutron_capture_Cr_52.output.png
+    neutrons/neutron_capture_Cr_53.output.png
+    neutrons/neutron_capture_Fe_54.output.png
+    neutrons/neutron_capture_Fe_56.output.png
+    neutrons/neutron_capture_Fe_57.output.png
+    neutrons/neutron_capture_Gd_155.output.png
+    neutrons/neutron_capture_Gd_157.output.png
+    neutrons/neutron_capture_H_1.output.png
+    neutrons/neutron_capture_Ni_58.output.png
+    neutrons/neutron_capture_Ni_60.output.png
+    neutrons/neutron_capture_Ni_62.output.png
     observables/tracks-bulk-10um-limit.tracks.out0.png
     observables/tracks-bulk-10um-limit.tracks.out1.png
     observables/tracks-bulk-10um-limit.tracks.out2.png

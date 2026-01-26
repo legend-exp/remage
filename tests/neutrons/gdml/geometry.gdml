@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<element name="Hydrogen" formula="H" Z="1">
+			<atom value="1.008"/>
+		</element>
+		<element name="Gadolinium" formula="Gd" Z="64">
+			<atom value="157.25"/>
+		</element>
+		<material name="moderator_mat">
+			<D value="1.2"/>
+			<fraction ref="Hydrogen" n="0.97"/>
+			<fraction ref="Gadolinium" n="0.03"/>
+		</material>
+	</materials>
+	<solids>
+		<tube name="world" rmin="0" rmax="2000" z="2000" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad"/>
+		<tube name="water" rmin="0" rmax="1900" z="1900" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad"/>
+		<tube name="steel" rmin="0" rmax="1600" z="1600" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad"/>
+		<tube name="argon" rmin="0" rmax="1400" z="1400" startphi="0" deltaphi="6.283185307179586" lunit="mm" aunit="rad"/>
+		<box name="moderator" x="20" y="1400" z="900" lunit="mm"/>
+	</solids>
+	<structure>
+		<volume name="moderator">
+			<materialref ref="moderator_mat"/>
+			<solidref ref="moderator"/>
+		</volume>
+		<volume name="argon">
+			<materialref ref="G4_lAr"/>
+			<solidref ref="argon"/>
+			<physvol name="moderator">
+				<volumeref ref="moderator"/>
+				<position name="moderator_pos" x="100.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+		</volume>
+		<volume name="steel">
+			<materialref ref="G4_STAINLESS-STEEL"/>
+			<solidref ref="steel"/>
+			<physvol name="argon">
+				<volumeref ref="argon"/>
+			</physvol>
+		</volume>
+		<volume name="water">
+			<materialref ref="G4_WATER"/>
+			<solidref ref="water"/>
+			<physvol name="steel">
+				<volumeref ref="steel"/>
+			</physvol>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="water">
+				<volumeref ref="water"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue=""/>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
