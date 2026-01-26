@@ -52,6 +52,37 @@ time and moved into the package source folder.
 
 ```
 
+### Installing dependencies with conda-forge (mostly for macOS)
+
+It is also possible to use conda to install all dependencies for building remage
+from source.
+
+```console
+conda activate remage-env
+conda install -c conda-forge geant4 bxdecay0 "python<3.14" cmake make gcc
+export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
+
+```
+
+When using the `cmake` command later for the first time, you will need to add an
+additional argument to use the right python version from the conda environment:
+
+```console
+$ cmake [...] -D Python3_EXECUTABLE="$(command -v python)" [...]
+```
+
+for running the compiled executable, you might need to add the conda library
+path to `LD_LIBRARY_PATH` (Linux) or `DYLD_FALLBACK_LIBRARY_PATH` (macOS); in
+addition to the remage library path that `cmake` will instruct you to add
+there):
+
+```console
+# Linux
+$ export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
+# macOS
+$ export DYLD_FALLBACK_LIBRARY_PATH="$CONDA_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+```
+
 ## Building
 
 _remage_ currently only supports an out-of-tree build using CMake. To build and
