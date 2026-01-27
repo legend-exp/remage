@@ -108,7 +108,9 @@ RMGAnalysisReader::Access RMGAnalysisReader::OpenFile(
     std::string new_fn = ".rmg-vtx-" + std::to_string(dist(rd)) + "." + path.stem().string() +
                          ".hdf5";
     auto rmg_man = RMGOutputManager::Instance();
-    fs::path new_path = fs::path(rmg_man->GetOutputFileName()).parent_path() / fs::path(new_fn);
+    fs::path new_path = fs::path(new_fn);
+    if (!rmg_man->HasOutputFileNameNone())
+      new_path = fs::path(rmg_man->GetOutputFileName()).parent_path() / new_path;
 
     std::error_code ec;
     if (!fs::copy_file(path, new_path, ec)) {
