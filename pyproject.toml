@@ -46,6 +46,9 @@ dependencies = [
 allow-direct-references = true
 
 [project.optional-dependencies]
+pygeom = [
+    "legend-pygeom-tools >=0.0.26",
+]
 test = [
   "pytest >=6",
   "pytest-cov >=3",
