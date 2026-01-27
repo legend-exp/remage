@@ -264,8 +264,8 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_t
 
   for (int trackid : low_energy_tracks) {
 
-    const auto* input_front = front_hit.find(trackid)->second;
-    const double this_energy = track_energy.find(trackid)->second;
+    const auto* input_front = front_hit.at(trackid);
+    const double this_energy = track_energy.at(trackid);
 
     const double threshold = (!has_distance_to_surface || input_front->distance_to_surface_prestep >
                                                               cluster_pars.surface_thickness)
@@ -277,12 +277,12 @@ std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_t
     for (const auto& [second_trackid, second_hits] : hits_map) {
       if (second_trackid == trackid) continue;
 
-      const double second_energy = track_energy.find(second_trackid)->second;
+      const double second_energy = track_energy.at(second_trackid);
 
       // only merge into higher-energy tracks
       if (second_energy <= this_energy) continue;
 
-      const auto* second_front = front_hit.find(second_trackid)->second;
+      const auto* second_front = front_hit.at(second_trackid);
 
       const double distance = (input_front->global_position_prestep -
                                second_front->global_position_prestep)
