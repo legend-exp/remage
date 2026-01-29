@@ -39,8 +39,14 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
     /** @brief Set the minimum distance to any other volume for this track to be stacked. */
     void SetVolumeSafety(double safety) { fVolumeSafety = safety; }
 
-    /** @brief Set the volume name in which to stack e-/e+ tracks. */
-    void SetVolumeName(std::string volume) { fVolumeName = volume; }
+    /** @brief Add a volume name in which to stack e-/e+ tracks. */
+    void AddVolumeName(std::string volume) { fVolumeNames.insert(volume); }
+
+    /** @brief Enable or disable Germanium-only filtering for distance calculations.
+     *  @details When enabled, surface distance checks only consider daughter volumes
+     *  registered as Germanium detectors, potentially improving performance.
+     */
+    void SetFilterGermaniumOnly(bool enable);
 
   private:
 
@@ -48,7 +54,7 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
     void DefineCommands();
 
     double fVolumeSafety = -1;
-    std::string fVolumeName;
+    std::set<std::string> fVolumeNames;
 };
 
 #endif
