@@ -77,15 +77,23 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
     }
   }
   this->volume = cubic_volume;
-  if (physvol) {
-    this->mass = cubic_volume * physvol->GetLogicalVolume()->GetMaterial()->GetDensity();
-  }
+  if (physvol) this->RecalcMass();
   this->surface = solid->GetSurfaceArea();
+}
+
+void RMGVertexConfinement::SampleableObject::RecalcMass() {
+  if (!this->physical_volume) return;
+
+  auto mat = this->physical_volume->GetLogicalVolume()->GetMaterial();
+  this->mass = this->volume * mat->GetDensity();
 }
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() const {
 
-  if (data.empty()) RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
+  if (data.empty()) [[unlikely]]
+    RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
+  if (this->total_surface == 0) [[unlikely]]
+    RMGLog::OutDev(RMGLog::fatal, "Cannot sample from a collection with no total weight");
 
   auto choice = this->total_surface * G4UniformRand();
   double w = 0;
@@ -111,16 +119,10 @@ const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableOb
   if (data.empty()) [[unlikely]]
     RMGLog::OutDev(RMGLog::fatal, "Cannot sample from an empty collection");
 
-  if (weight_by_mass && !this->total_mass_all) [[unlikely]] {
-    RMGLog::Out(
-        RMGLog::fatal,
-        "One of the sampled solids has no mass attribute, ",
-        "will not add it to the total mass of the collection. ",
-        "this will affect sampling from multiple solids."
-    );
-  }
-
   const auto total_weight = weight_by_mass ? this->total_mass : this->total_volume;
+
+  if (total_weight == 0) [[unlikely]]
+    RMGLog::OutDev(RMGLog::fatal, "Cannot sample from a collection with no total weight");
 
   auto choice = total_weight * G4UniformRand();
   double w = 0;
@@ -409,33 +411,45 @@ template<typename... Args>
 void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... args) {
 
   this->data.emplace_back(std::forward<Args>(args)...);
+}
 
-  const auto& _v = this->data.back().volume;
-  const auto& _m = this->data.back().mass;
-  const auto& _s = this->data.back().surface;
+void RMGVertexConfinement::SampleableObjectCollection::recalc_total(bool weigh_by_mass) {
 
-  if (_v > 0) this->total_volume += _v;
-  else {
-    this->total_volume_all = false;
-    RMGLog::Out(
-        RMGLog::error,
-        "One of the sampled solids has no volume attribute, ",
-        "will not add it to the total volume of the collection. ",
-        "this will affect sampling from multiple solids."
-    );
-  }
-  if (_m > 0) this->total_mass += _m;
-  else this->total_mass_all = false;
+  this->total_volume = 0;
+  this->total_mass = 0;
+  this->total_surface = 0;
 
-  if (_s > 0) this->total_surface += _s;
-  else {
-    this->total_surface_all = false;
-    RMGLog::Out(
-        RMGLog::error,
-        "One of the sampled solids has no surface attribute, ",
-        "will not add it to the total surface of the collection. ",
-        "this will affect sampling from multiple solids."
-    );
+  for (auto& v : this->data) {
+    this->total_volume += v.volume;
+    if (v.volume <= 0) {
+      RMGLog::Out(
+          RMGLog::error,
+          "One of the sampled solids has no volume attribute, ",
+          "will not add it to the total volume of the collection. ",
+          "this will affect sampling from multiple solids."
+      );
+    }
+
+    v.RecalcMass();
+    this->total_mass += v.mass;
+    if (v.mass <= 0 && weigh_by_mass) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "One of the sampled solids has no mass attribute, ",
+          "will not add it to the total mass of the collection. ",
+          "this will affect sampling from multiple solids."
+      );
+    }
+
+    this->total_surface += v.surface;
+    if (v.surface <= 0) {
+      RMGLog::Out(
+          RMGLog::error,
+          "One of the sampled solids has no surface attribute, ",
+          "will not add it to the total surface of the collection. ",
+          "this will affect sampling from multiple solids."
+      );
+    }
   }
 }
 
@@ -640,6 +654,9 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   // invalidates old iterators).
   for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.emplace_back(s); }
 
+  // calculate the total volume/surface/mass.
+  fPhysicalVolumes.recalc_total(fWeightByMass);
+
   RMGLog::OutFormat(
       RMGLog::detail,
       "Sampling from {} physical volumes, volume = {}",
@@ -726,6 +743,9 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
         G4BestUnit(volume_solids.back().surface, "Surface")
     );
   }
+
+  // calculate the total volume/surface/mass.
+  volume_solids.recalc_total(fWeightByMass);
 
   RMGLog::Out(
       RMGLog::detail,

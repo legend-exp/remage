@@ -239,6 +239,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
+        void RecalcMass();
+
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
         G4RotationMatrix rotation;
@@ -282,15 +284,17 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         void clear() { data.clear(); }
         void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
+          this->total_volume += other.total_volume;
+          this->total_mass += other.total_mass;
+          this->total_surface += other.total_surface;
         }
+
+        void recalc_total(bool weigh_by_mass);
 
         std::vector<SampleableObject> data;
         double total_volume = 0;
-        bool total_volume_all = true;
         double total_mass = 0;
-        bool total_mass_all = true;
         double total_surface = 0;
-        bool total_surface_all = true;
     };
 
   private:
