@@ -4,9 +4,6 @@ import numpy as np
 from lgdo import lh5
 from remage import remage_run
 
-file_vols = "test-weight-volume.lh5"
-file_mass = "test-weight-mass.lh5"
-
 
 def run_sim(run_name: str, cmd: str, gdml: str):
     macro = f"""
@@ -49,7 +46,14 @@ runs = [
         "test-weight-mass",
         "/RMG/Generator/Confinement/SampleWeightByMass true",
     ),
+    (
+        "test-weight-isotope",
+        "/RMG/Generator/Confinement/SampleWeightByMassIsotope 32 76",
+    ),
 ]
+file_vols = "test-weight-volume.lh5"
+file_mass = "test-weight-mass.lh5"
+file_isot = "test-weight-isotope.lh5"
 
 # Run each simulation
 for run_name, register_command in runs:
@@ -59,10 +63,13 @@ for run_name, register_command in runs:
 def get_ratio(file):
     box1 = lh5.read_as("/stp/Box1", file, "ak")
     box2 = lh5.read_as("/stp/Box2", file, "ak")
+    print(file, len(box1) / len(box2))
     return len(box1) / len(box2)
 
 
 exp_vol = 1
 assert np.abs(get_ratio(file_vols) - exp_vol) / exp_vol < 0.1
-exp_mass = 11.3 / 1.85
+exp_mass = 10 / 5
 assert np.abs(get_ratio(file_mass) - exp_mass) / exp_mass < 0.1
+exp_isot = (10 * 0.5) / (5 * 0.25)
+assert np.abs(get_ratio(file_isot) - exp_isot) / exp_isot < 0.1
