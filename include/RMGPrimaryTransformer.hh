@@ -21,7 +21,7 @@
 class RMGPrimaryTransformer : public G4PrimaryTransformer {
   public:
 
-    RMGPrimaryTransformer() : G4PrimaryTransformer() {
+    RMGPrimaryTransformer() {
       // this suppresses the ZeroPolarization warning emitted for optical photons.
       nWarn = 11;
     };
