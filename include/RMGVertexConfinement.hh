@@ -114,6 +114,11 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
     void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
     void SetWeightByMass(bool mode) { fWeightByMass = mode; }
+    void SetWeightByMassIsotope(int z, int n) {
+      fWeightByMass = true;
+      fWeightByMassIsotopeZ = z;
+      fWeightByMassIsotopeN = n;
+    }
 
     std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -239,7 +244,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
-        void RecalcMass();
+        void RecalcMass(int z, int n);
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
@@ -289,7 +294,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
           this->total_surface += other.total_surface;
         }
 
-        void recalc_total(bool weigh_by_mass);
+        void recalc_total(bool weigh_by_mass, int mass_isotope_z, int mass_istotope_n);
 
         std::vector<SampleableObject> data;
         double total_volume = 0;
@@ -323,6 +328,8 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
     VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
     bool fWeightByMass = false;
+    int fWeightByMassIsotopeZ = 0;
+    int fWeightByMassIsotopeN = 0;
 
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;
