@@ -168,6 +168,19 @@ All sampling modes described above are available, with few notes/limitations:
   with a small but usually acceptable performance cost, however very large
   values can significantly slow down the simulation.
 
+## Weighting modes
+
+For the sampling in volumes, _remage_ by default weights the probability to find
+a sampled vertex in one of the volumes by the ratio of their volume to the total
+sampling volume. Other weighting modes can be selected by the user with a macro
+command:
+
+- by the mass of the volumes can with the command
+  <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymass>.
+- by the mass of a given isotope (specified by the pair of proton and neutron
+  number) in the materials with the command
+  <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymassisotope>.
+
 ## Vertices from external files
 
 For more complicated vertex confinement _remage_ supports the possibility to
@@ -200,6 +213,14 @@ capabilities described above:
 ```geant4
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume [BCPV]\w+
+```
+
+This can now be used as an example to weigh the volumes not by their volume: It
+could be useful to weigh the different volumes by the mass fraction of the
+isotope $^{76}$Ge, i.e. for simulating double beta decays with bxdecay0:
+
+```geant4
+/RMG/Generator/Confinement/SampleWeightByMassIsotope 32 76
 ```
 
 ### Active LAr region of LEGEND-200
