@@ -239,11 +239,15 @@ The `G4StepLimiterPhysics` is always added, but will not have an effect by
 default. It allows volume-level step limits to be enforced if configured
 elsewhere (e.g. in a GDML file).
 
-:::{todo}
+### Setting production cuts and step limits via GDML
 
-- document this somewhere, and add some python code for this.
+If the default setup of production cuts in _remage_ is not enough, regions with
+attached productioon cuts (and optional step limits) can be defined in a GDML
+file. The information is stored in a specific format in an auxiliary structure.
 
-:::
+These region definitions can be created easily with our python tooling. For
+this, refer to the documentation of this feature in the _legend-pygeom-tools_
+package, see {doc}`pygeomtools:region`.
 
 [^innerbremsstrahlung]:
     Hayen et al., in Rev. Mod. Phys. 90, 015008 (2018). doi:
