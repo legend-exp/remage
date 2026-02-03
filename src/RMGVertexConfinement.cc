@@ -497,7 +497,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       RMGLog::OutFormat(
           RMGLog::detail,
           " · '{}[{}]', volume = {}",
-          volume->GetName().c_str(),
+          volume->GetName(),
           volume->GetCopyNo(),
           std::string(G4BestUnit(fPhysicalVolumes.data.back().volume, "Volume"))
       );
@@ -674,12 +674,24 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   // calculate the total volume/surface/mass.
   fPhysicalVolumes.recalc_total(fWeightByMass, fWeightByMassIsotopeZ, fWeightByMassIsotopeN);
 
-  RMGLog::OutFormat(
-      RMGLog::detail,
-      "Sampling from {} physical volumes, volume = {}",
-      fPhysicalVolumes.size(),
-      std::string(G4BestUnit(fPhysicalVolumes.total_volume, "Volume"))
-  );
+  if (!fWeightByMass) {
+    RMGLog::OutFormat(
+        RMGLog::detail,
+        "Sampling from {} physical volumes, volume = {}",
+        fPhysicalVolumes.size(),
+        std::string(G4BestUnit(fPhysicalVolumes.total_volume, "Volume"))
+    );
+  } else {
+    RMGLog::OutFormat(
+        RMGLog::detail,
+        "Sampling from {} physical volumes, mass = {}",
+        fPhysicalVolumes.size(),
+        std::string(G4BestUnit(fPhysicalVolumes.total_mass, "Mass"))
+    );
+  }
+  if (fWeightByMass && fOnSurface) {
+    RMGLog::Out(RMGLog::fatal, "cannot sample from surface while weighting by mass");
+  }
 }
 
 void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volumes) {
@@ -748,16 +760,13 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
     volume_solids.back().native_sample = true;
     volume_solids.back().surface_sample = fOnSurface;
 
-    RMGLog::Out(
+    RMGLog::OutFormat(
         RMGLog::detail,
-        "Added geometrical solid ",
+        "Added geometrical solid of type '{}' with volume = {} and surface = {}",
         use_excluded_volumes ? "(excluded) " : " ",
-        "of type '",
         volume_solids.back().sampling_solid->GetEntityType(),
-        "' with volume ",
-        G4BestUnit(volume_solids.back().volume, "Volume"),
-        "and surface ",
-        G4BestUnit(volume_solids.back().surface, "Surface")
+        std::string(G4BestUnit(volume_solids.back().volume, "Volume")),
+        std::string(G4BestUnit(volume_solids.back().surface, "Surface"))
     );
   }
 
@@ -770,6 +779,9 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
       fOnSurface ? "surface" : "bulk",
       " of geometrical volumes"
   );
+  if (fWeightByMass && fOnSurface) {
+    RMGLog::Out(RMGLog::fatal, "cannot sample from surface while weighting by mass");
+  }
 }
 
 void RMGVertexConfinement::Reset() {
@@ -1155,7 +1167,6 @@ void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
 }
 
 void RMGVertexConfinement::DefineCommands() {
-
 
   fMessengers.push_back(
       std::make_unique<G4GenericMessenger>(
