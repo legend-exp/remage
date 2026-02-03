@@ -288,4 +288,3 @@ package, see {doc}`pygeomtools:region`.
       [10.1140/epjc/s10052-023-11602-y](https://doi.org/10.1140/epjc/s10052-023-11602-y)
       and [**data file**](https://zenodo.org/records/7458654).
     - Other such files exist in the wild, but not in a central place.
-  
