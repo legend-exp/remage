@@ -125,9 +125,7 @@ cluster_z = apply_cluster(cluster_idx, shaped.zloc)
 
 cluster_dist_to_surf = apply_cluster(cluster_idx, shaped.dist_to_surf)
 
-step_len = ak.flatten(
-    1e6 * ak.flatten(step_lengths(cluster_x, cluster_y, cluster_z))
-)
+step_len = ak.flatten(1e6 * ak.flatten(step_lengths(cluster_x, cluster_y, cluster_z)))
 
 distance_to_surface = 1e6 * shaped.dist_to_surf
 dist = 1e6 * ak.flatten(ak.flatten(cluster_dist_to_surf[:, :, :-1], axis=-2), axis=-1)
