@@ -115,8 +115,8 @@ cluster_idx = cluster_by_step_length(
     shaped.zloc,
     shaped.dist_to_surf,
     surf_cut=0,
-    threshold=100,
-    threshold_surf=0,
+    threshold_in_mm=100,
+    threshold_surf_in_mm=0,
 ).view_as("ak")
 
 cluster_x = apply_cluster(cluster_idx, shaped.xloc).view_as("ak")
