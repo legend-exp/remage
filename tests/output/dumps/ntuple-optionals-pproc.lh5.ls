@@ -1,13 +1,13 @@
 /
 ├── detector_origins · struct{det1,det2} 
 │   ├── det1 · struct{xloc,yloc,zloc} 
-│   │   ├── xloc · real 
-│   │   ├── yloc · real 
-│   │   └── zloc · real 
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   └── det2 · struct{xloc,yloc,zloc} 
-│       ├── xloc · real 
-│       ├── yloc · real 
-│       └── zloc · real 
+│       ├── xloc · real ── {'units': 'm'}
+│       ├── yloc · real ── {'units': 'm'}
+│       └── zloc · real ── {'units': 'm'}
 ├── particles · table{ekin,evtid,particle,px,py,pz,vertexid} 
 │   ├── ekin · array<1>{real} ── {'units': 'MeV'}
 │   ├── evtid · array<1>{real} 
