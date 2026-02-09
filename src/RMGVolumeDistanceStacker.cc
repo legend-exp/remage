@@ -70,7 +70,6 @@ void RMGVolumeDistanceStacker::SetDistanceCheckGermaniumOnly(bool enable) {
   RMGOutputTools::SetDistanceCheckGermaniumOnly(enable);
 }
 
-
 void RMGVolumeDistanceStacker::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
