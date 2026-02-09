@@ -55,7 +55,7 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
 
     double fVolumeSafety = -1;
     std::set<std::string> fVolumeNames;
-};
+
 
 #endif
 

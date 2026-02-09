@@ -70,7 +70,6 @@ void RMGVolumeDistanceStacker::SetDistanceCheckGermaniumOnly(bool enable) {
   RMGOutputTools::SetDistanceCheckGermaniumOnly(enable);
 }
 
-
 void RMGVolumeDistanceStacker::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
@@ -99,6 +98,7 @@ void RMGVolumeDistanceStacker::DefineCommands() {
       .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
       .SetParameterName("enable", false)
       .SetStates(G4State_Idle);
+
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
