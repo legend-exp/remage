@@ -191,9 +191,9 @@ void RMGPhysics::ConstructProcess() {
   // e+/e- nuclear interactions
   RMGLog::Out(RMGLog::detail, "Adding extra electromagnetic physics");
   auto em_extra_physics = new G4EmExtraPhysics(G4VModularPhysicsList::verboseLevel);
-  em_extra_physics->Synch(true);
-  em_extra_physics->GammaNuclear(true);
-  em_extra_physics->MuonNuclear(true);
+  em_extra_physics->Synch(true);        // _not_ default
+  em_extra_physics->GammaNuclear(true); // already default
+  em_extra_physics->MuonNuclear(true);  // already default
   em_extra_physics->ConstructProcess();
 
   // G4EmExtraPhysics does not propagate the verbose level...
@@ -214,13 +214,15 @@ void RMGPhysics::ConstructProcess() {
   G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(1.0e+27 * u::ns);
 
   /*
-  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false );
-  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
-  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
-  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false );
+  // TODO: ?
+  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false ); // default
+  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true ); // _not_ default
+  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true ); // _not_ default
+  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false ); // default
+  // default, except for Shielding
   G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( false );
-  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false );
-  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
+  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false ); // default
+  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false ); // default
   */
 
   if (fHadronicPhysicsListOption != HadronicPhysicsListOption::kNone) {
@@ -362,9 +364,9 @@ void RMGPhysics::ConstructOptical() {
   RMGLog::Out(RMGLog::detail, "Adding optical physics");
 
   G4OpticalParameters* op_par = G4OpticalParameters::Instance();
-  op_par->SetScintTrackSecondariesFirst(true);
-  op_par->SetScintByParticleType(true);
-  op_par->SetBoundaryInvokeSD(true);
+  op_par->SetScintTrackSecondariesFirst(true); // default
+  op_par->SetScintByParticleType(true);        // not default
+  op_par->SetBoundaryInvokeSD(true);           // not default
 
   // scintillation process
   auto scint_proc = new G4Scintillation("Scintillation");
@@ -381,6 +383,7 @@ void RMGPhysics::ConstructOptical() {
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   wls_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  cerenkov_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   if (fUseOpticalCustomWLS) {
     auto wls_proc_wrapped = new RMGOpWLSProcess();

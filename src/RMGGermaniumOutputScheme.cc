@@ -423,12 +423,14 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy \\leq threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy > threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 

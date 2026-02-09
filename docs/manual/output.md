@@ -188,6 +188,8 @@ function returning `true`, like the `RMGTrackOutputScheme` or the
 
 :::
 
+Similar commands are available for the scintillator output scheme.
+
 Similarly, for simulations involving optical photons it is possible to discard
 all optical photon tracks before simulating them if no energy was deposited in
 germanium. This can be enabled with

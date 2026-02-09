@@ -171,8 +171,8 @@ namespace RMGOutputTools {
    * @returns A map of steps after combining low energy tracks.
    */
   std::map<int, std::vector<RMGDetectorHit*>> combine_low_energy_tracks(
-      std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-      ClusterPars cluster_pars,
+      const std::map<int, std::vector<RMGDetectorHit*>>& hits_map,
+      const ClusterPars& cluster_pars,
       bool has_distance_to_surface
   );
 

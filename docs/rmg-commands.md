@@ -567,6 +567,8 @@ Commands for controlling primary confinement
 
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
+* `SampleWeightByMass` – If true (or omitted argument), weigh the different volumes by mass and not by volume
+* `SampleWeightByMassIsotope` – Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
 * `SamplingMode` – Select sampling mode for volume confinement
 * `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
@@ -589,6 +591,28 @@ This is disabled by default
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/SampleWeightByMass`
+
+If true (or omitted argument), weigh the different volumes by mass and not by volume
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/SampleWeightByMassIsotope`
+
+Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
+
+* **Parameter** – `Z`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Parameter** – `N`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/SamplingMode`
@@ -1494,6 +1518,8 @@ Commands for controlling output from hits in germanium detectors.
 
 Set a lower energy cut that has to be met for this event to be stored.
 
+This removes events with {math}`energy \leq threshold`.
+
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1507,6 +1533,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 ### `/RMG/Output/Germanium/EdepCutHigh`
 
 Set an upper energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy > threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1829,7 +1857,7 @@ Commands for controlling output from hits in scintillator detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
@@ -1840,6 +1868,8 @@ Commands for controlling output from hits in scintillator detectors.
 ### `/RMG/Output/Scintillator/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy \leq threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1855,6 +1885,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 
 Set an upper energy cut that has to be met for this event to be stored.
 
+This removes events with {math}`energy > threshold`.
+
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1867,7 +1899,7 @@ Set an upper energy cut that has to be met for this event to be stored.
 
 ### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
 
-Take this detector into account for the filtering by /EdepThreshold.
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`

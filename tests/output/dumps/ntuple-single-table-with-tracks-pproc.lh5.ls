@@ -1,13 +1,13 @@
 /
 ├── detector_origins · struct{det1,det2} 
 │   ├── det1 · struct{xloc,yloc,zloc} 
-│   │   ├── xloc · real 
-│   │   ├── yloc · real 
-│   │   └── zloc · real 
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   └── det2 · struct{xloc,yloc,zloc} 
-│       ├── xloc · real 
-│       ├── yloc · real 
-│       └── zloc · real 
+│       ├── xloc · real ── {'units': 'm'}
+│       ├── yloc · real ── {'units': 'm'}
+│       └── zloc · real ── {'units': 'm'}
 ├── processes · struct{compt,eBrem,phot} 
 │   ├── compt · real 
 │   ├── eBrem · real 

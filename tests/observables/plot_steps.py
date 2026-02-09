@@ -101,7 +101,7 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
 
 path = sys.argv[1]
 name = sys.argv[2]
-shaped = lh5.read("stp/germanium", path).view_as("ak")
+shaped = lh5.read("stp/germanium", path).view_as("ak", with_units=True)
 
 plot_tracks(shaped, 0, f"{name}.tracks.out0.png")
 plot_tracks(shaped, 1, f"{name}.tracks.out1.png")
@@ -115,19 +115,17 @@ cluster_idx = cluster_by_step_length(
     shaped.zloc,
     shaped.dist_to_surf,
     surf_cut=0,
-    threshold=100,
-    threshold_surf=0,
-).view_as("ak")
-
-cluster_x = apply_cluster(cluster_idx, shaped.xloc).view_as("ak")
-cluster_y = apply_cluster(cluster_idx, shaped.yloc).view_as("ak")
-cluster_z = apply_cluster(cluster_idx, shaped.zloc).view_as("ak")
-
-cluster_dist_to_surf = apply_cluster(cluster_idx, shaped.dist_to_surf).view_as("ak")
-
-step_len = ak.flatten(
-    1e6 * ak.flatten(step_lengths(cluster_x, cluster_y, cluster_z).view_as("ak"))
+    threshold_in_mm=100,
+    threshold_surf_in_mm=0,
 )
+
+cluster_x = apply_cluster(cluster_idx, shaped.xloc)
+cluster_y = apply_cluster(cluster_idx, shaped.yloc)
+cluster_z = apply_cluster(cluster_idx, shaped.zloc)
+
+cluster_dist_to_surf = apply_cluster(cluster_idx, shaped.dist_to_surf)
+
+step_len = ak.flatten(1e6 * ak.flatten(step_lengths(cluster_x, cluster_y, cluster_z)))
 
 distance_to_surface = 1e6 * shaped.dist_to_surf
 dist = 1e6 * ak.flatten(ak.flatten(cluster_dist_to_surf[:, :, :-1], axis=-2), axis=-1)

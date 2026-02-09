@@ -238,3 +238,7 @@ foreach(det ${_solids})
                MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 
 endforeach()
+
+add_test(NAME confinement/weighting COMMAND ${PYTHONPATH} test_weighting.py)
+set_tests_properties(confinement/weighting PROPERTIES LABELS extra ENVIRONMENT
+                                                      MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
