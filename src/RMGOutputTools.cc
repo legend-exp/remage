@@ -88,7 +88,12 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
 }
 
 void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
-  is_distance_check_germanium_only = enable;
+  RMGOutputTools::is_distance_check_germanium_only = enable;
+  RMGLog::OutFormatDev(
+      RMGLog::detail,
+      "Setting distance check Germanium-only filtering to {}",
+      RMGOutputTools::is_distance_check_germanium_only ? "ENABLED" : "DISABLED"
+  );
   // Clear cache when filter setting changes to rebuild with correct detector status
   volume_cache.clear();
 }
@@ -468,7 +473,7 @@ std::unordered_map<const G4VPhysicalVolume*, RMGOutputTools::VolumeCache>::itera
 
       // Check if daughter is a Germanium detector
       bool is_germanium = false;
-      if (is_distance_check_germanium_only) {
+      if (RMGOutputTools::is_distance_check_germanium_only) {
         try {
           auto d_type = det_cons->GetDetectorMetadata({daughter->GetName(), daughter->GetCopyNo()}).type;
           is_germanium = (d_type == RMGDetectorType::kGermanium);
@@ -494,9 +499,21 @@ std::unordered_map<const G4VPhysicalVolume*, RMGOutputTools::VolumeCache>::itera
       cache.daughter_centers.push_back(parent_center);
       cache.daughter_radii.push_back(local_radius);
     }
-
+    RMGLog::OutFormatDev(
+        RMGLog::debug_event,
+        "Added volume '{}' (copy nr. {}) to cache with {} daughters",
+        pv->GetName(),
+        pv->GetCopyNo(),
+        cache.num_daughters
+    );
     return volume_cache.emplace(pv, std::move(cache)).first;
   }
+  RMGLog::OutFormatDev(
+      RMGLog::debug_event,
+      "Cache hit for volume '{}' (copy nr. {})",
+      pv->GetName(),
+      pv->GetCopyNo()
+  );
   return cache_it;
 }
 
@@ -559,14 +576,25 @@ bool RMGOutputTools::is_within_surface_safety(
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
     // Skip non-Germanium daughters if filtering is enabled
-    if (is_distance_check_germanium_only && !cache.daughter_is_germanium[i]) continue;
+    if (RMGOutputTools::is_distance_check_germanium_only && !cache.daughter_is_germanium[i]) continue;
 
     // Early rejection: check distance to bounding sphere first (cheap)
     const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
     const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
 
     // Skip if bounding sphere is farther than safety threshold
-    if (sphere_surface_dist > safety) continue;
+    if (sphere_surface_dist > safety) {
+      RMGLog::OutFormatDev(
+          RMGLog::debug_event,
+          "Skipping daughter {} of volume '{}' (copy nr. {}) - bounding sphere is {:.2f} mm away, beyond safety {:.2f} mm",
+          i,
+          pv->GetName(),
+          pv->GetCopyNo(),
+          sphere_surface_dist / CLHEP::mm,
+          safety / CLHEP::mm
+      );
+      continue;
+    }
 
     // Only do expensive surface calculation if bounding sphere is close
     const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
@@ -582,10 +610,30 @@ bool RMGOutputTools::is_within_surface_safety(
     }
 
     // Early exit if this daughter is within safety
-    if (sample_dist < safety) return true;
+    if (sample_dist < safety) {
+      RMGLog::OutFormatDev(
+          RMGLog::debug_event,
+          "Volume '{}' (copy nr. {}) is within {:.2f} mm of daughter {} - sample point distance is {:.2f} mm, within safety {:.2f} mm.",
+          pv->GetName(),
+          pv->GetCopyNo(),
+          sphere_surface_dist / CLHEP::mm,
+          i,
+          sample_dist / CLHEP::mm,
+          safety / CLHEP::mm
+      );
+      return true;
+    }
   }
 
   // No surface found within safety distance
+  RMGLog::OutFormatDev(
+      RMGLog::debug_event,
+      "Volume '{}' (copy nr. {}) is farther than {:.2f} mm from all surfaces, outside safety {:.2f} mm.",
+      pv->GetName(),
+      pv->GetCopyNo(),
+      cache.solid->DistanceToOut(local_pos) / CLHEP::mm,
+      safety / CLHEP::mm
+  );
   return false;
 }
 
