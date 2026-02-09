@@ -46,7 +46,7 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
      *  @details When enabled, surface distance checks only consider daughter volumes
      *  registered as Germanium detectors, potentially improving performance.
      */
-    void SetFilterGermaniumOnly(bool enable);
+    void SetDistanceCheckGermaniumOnly(bool enable);
 
   private:
 

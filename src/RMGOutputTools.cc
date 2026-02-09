@@ -34,26 +34,12 @@
 #include "magic_enum/magic_enum.hpp"
 
 
-namespace {
-  // Configuration for bounding sphere optimization
-  bool g_filter_germanium_only = false;
-  
-  // Cache structure for volume geometry data
-  struct VolumeCache {
-    G4AffineTransform inverse_transform;
-    const G4VSolid* solid;
-    size_t num_daughters;
-    std::vector<G4AffineTransform> daughter_transforms;
-    std::vector<const G4VSolid*> daughter_solids;
-    std::vector<bool> daughter_is_multiunion;
-    std::vector<G4ThreeVector> daughter_centers;  // bounding sphere centers in parent local coords
-    std::vector<double> daughter_radii;           // bounding sphere radii
-    std::vector<bool> daughter_is_germanium;      // whether daughter is registered as Germanium detector
-  };
-  
-  // Cache for volume data, keyed by physical volume pointer
+namespace RMGOutputTools {
+
   std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
-}
+  bool is_distance_check_germanium_only = false;
+
+} // namespace RMGOutputTools
 
 G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
   G4ThreeVector position;
@@ -101,8 +87,8 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
   return distance;
 }
 
-void RMGOutputTools::SetFilterGermaniumOnly(bool enable) {
-  g_filter_germanium_only = enable;
+void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
+  is_distance_check_germanium_only = enable;
   // Clear cache when filter setting changes to rebuild with correct detector status
   volume_cache.clear();
 }
@@ -447,48 +433,56 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 }
 
 
-double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
+std::unordered_map<const G4VPhysicalVolume*, RMGOutputTools::VolumeCache>::iterator RMGOutputTools::AddOrGetFromCache(
+    const G4VPhysicalVolume* pv
+) {
 
-  // Check cache first
   auto cache_it = volume_cache.find(pv);
   if (cache_it == volume_cache.end()) {
-    // Not in cache, build cache entry
+
     VolumeCache cache;
     const auto lv = pv->GetLogicalVolume();
-    
-    // Cache parent transform and solid
+
     cache.inverse_transform = G4AffineTransform(pv->GetRotation(), pv->GetTranslation()).Inverse();
     cache.solid = lv->GetSolid();
     cache.num_daughters = lv->GetNoDaughters();
-    
-    // Cache daughter data
+
     cache.daughter_transforms.reserve(cache.num_daughters);
     cache.daughter_solids.reserve(cache.num_daughters);
     cache.daughter_is_multiunion.reserve(cache.num_daughters);
     cache.daughter_centers.reserve(cache.num_daughters);
     cache.daughter_radii.reserve(cache.num_daughters);
     cache.daughter_is_germanium.reserve(cache.num_daughters);
-    
-    
+
+    // Get detector construction for Germanium filtering
+    const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
+
     for (size_t i = 0; i < cache.num_daughters; ++i) {
       const auto daughter = lv->GetDaughter(i);
       cache.daughter_transforms.emplace_back(
-        G4AffineTransform(daughter->GetRotation(), daughter->GetTranslation()).Inverse()
+          G4AffineTransform(daughter->GetRotation(), daughter->GetTranslation()).Inverse()
       );
       const auto daughter_solid = daughter->GetLogicalVolume()->GetSolid();
       cache.daughter_solids.push_back(daughter_solid);
-      // Do type check once during cache creation
-      cache.daughter_is_multiunion.push_back(
-        daughter_solid->GetEntityType() == "G4MultiUnion"
-      );
-      
+      cache.daughter_is_multiunion.push_back(daughter_solid->GetEntityType() == "G4MultiUnion");
+
+      // Check if daughter is a Germanium detector
+      bool is_germanium = false;
+      if (is_distance_check_germanium_only) {
+        try {
+          auto d_type = det_cons->GetDetectorMetadata({daughter->GetName(), daughter->GetCopyNo()}).type;
+          is_germanium = (d_type == RMGDetectorType::kGermanium);
+        } catch (const std::out_of_range&) { is_germanium = false; }
+      }
+      cache.daughter_is_germanium.push_back(is_germanium);
+
       // Compute bounding sphere for early rejection
       G4ThreeVector pMin, pMax;
       daughter_solid->BoundingLimits(pMin, pMax);
       G4ThreeVector local_center = (pMin + pMax) * 0.5;
       double local_radius = (pMax - local_center).mag();
-      
-      // Transform center to parent coordinates (daughter translation + rotation of local center)
+
+      // Transform center to parent coordinates
       const auto daughter_rot = daughter->GetRotation();
       G4ThreeVector parent_center = daughter->GetTranslation();
       if (daughter_rot) {
@@ -496,32 +490,39 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
       } else {
         parent_center += local_center;
       }
-      
+
       cache.daughter_centers.push_back(parent_center);
       cache.daughter_radii.push_back(local_radius);
     }
-    
-    cache_it = volume_cache.emplace(pv, std::move(cache)).first;
+
+    return volume_cache.emplace(pv, std::move(cache)).first;
   }
-  
+  return cache_it;
+}
+
+double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
+
+  // Check cache first
+  auto cache_it = AddOrGetFromCache(pv);
+
   const auto& cache = cache_it->second;
-  
+
   // Transform to local coordinates and get distance to parent surface
   const G4ThreeVector local_pos = cache.inverse_transform.TransformPoint(position);
   double dist = cache.solid->DistanceToOut(local_pos);
 
   // Check distance to daughters
-  for (size_t i = 0; i < cache.num_daughters; ++i) {    
+  for (size_t i = 0; i < cache.num_daughters; ++i) {
     // Early rejection: check distance to bounding sphere first (cheap)
     const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
     const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
-    
+
     // Skip if bounding sphere is farther than current best distance
     if (sphere_surface_dist > dist) continue;
-    
+
     // Only do expensive surface calculation if bounding sphere is close
     const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
-    
+
     // Handle MultiUnion flag
     if (cache.daughter_is_multiunion[i]) {
       auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
@@ -534,103 +535,42 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
       if (sample_dist < dist) dist = sample_dist;
     }
   }
-  
+
   return dist;
 }
 
-bool RMGOutputTools::is_within_surface_safety(const G4VPhysicalVolume* pv, const G4ThreeVector& position, double safety) {
+bool RMGOutputTools::is_within_surface_safety(
+    const G4VPhysicalVolume* pv,
+    const G4ThreeVector& position,
+    double safety
+) {
 
   // Check cache first
-  auto cache_it = volume_cache.find(pv);
-  if (cache_it == volume_cache.end()) {
-    // Not in cache, build cache entry (same as distance_to_surface)
-    VolumeCache cache;
-    const auto lv = pv->GetLogicalVolume();
-    
-    cache.inverse_transform = G4AffineTransform(pv->GetRotation(), pv->GetTranslation()).Inverse();
-    cache.solid = lv->GetSolid();
-    cache.num_daughters = lv->GetNoDaughters();
-    
-    cache.daughter_transforms.reserve(cache.num_daughters);
-    cache.daughter_solids.reserve(cache.num_daughters);
-    cache.daughter_is_multiunion.reserve(cache.num_daughters);
-    cache.daughter_centers.reserve(cache.num_daughters);
-    cache.daughter_radii.reserve(cache.num_daughters);
-    cache.daughter_is_germanium.reserve(cache.num_daughters);
-    
-    // Get detector construction for Germanium filtering
-    const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
-    
-    for (size_t i = 0; i < cache.num_daughters; ++i) {
-      const auto daughter = lv->GetDaughter(i);
-      cache.daughter_transforms.emplace_back(
-        G4AffineTransform(daughter->GetRotation(), daughter->GetTranslation()).Inverse()
-      );
-      const auto daughter_solid = daughter->GetLogicalVolume()->GetSolid();
-      cache.daughter_solids.push_back(daughter_solid);
-      cache.daughter_is_multiunion.push_back(
-        daughter_solid->GetEntityType() == "G4MultiUnion"
-      );
-      
-      // Check if daughter is a Germanium detector
-      bool is_germanium = false;
-      if (g_filter_germanium_only) {
-        try {
-          auto d_type = det_cons->GetDetectorMetadata(
-            {daughter->GetName(), daughter->GetCopyNo()}
-          ).type;
-          is_germanium = (d_type == RMGDetectorType::kGermanium);
-        } catch (const std::out_of_range&) {
-          is_germanium = false;
-        }
-      }
-      cache.daughter_is_germanium.push_back(is_germanium);
-      
-      // Compute bounding sphere for early rejection
-      G4ThreeVector pMin, pMax;
-      daughter_solid->BoundingLimits(pMin, pMax);
-      G4ThreeVector local_center = (pMin + pMax) * 0.5;
-      double local_radius = (pMax - local_center).mag();
-      
-      // Transform center to parent coordinates
-      const auto daughter_rot = daughter->GetRotation();
-      G4ThreeVector parent_center = daughter->GetTranslation();
-      if (daughter_rot) {
-        parent_center += (*daughter_rot) * local_center;
-      } else {
-        parent_center += local_center;
-      }
-      
-      cache.daughter_centers.push_back(parent_center);
-      cache.daughter_radii.push_back(local_radius);
-    }
-    
-    cache_it = volume_cache.emplace(pv, std::move(cache)).first;
-  }
-  
+  auto cache_it = AddOrGetFromCache(pv);
+
   const auto& cache = cache_it->second;
-  
+
   // Transform to local coordinates
   const G4ThreeVector local_pos = cache.inverse_transform.TransformPoint(position);
-  
+
   // Check parent surface - early exit if within safety
   if (cache.solid->DistanceToOut(local_pos) < safety) return true;
 
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
     // Skip non-Germanium daughters if filtering is enabled
-    if (g_filter_germanium_only && !cache.daughter_is_germanium[i]) continue;
-    
+    if (is_distance_check_germanium_only && !cache.daughter_is_germanium[i]) continue;
+
     // Early rejection: check distance to bounding sphere first (cheap)
     const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
     const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
-    
+
     // Skip if bounding sphere is farther than safety threshold
     if (sphere_surface_dist > safety) continue;
-    
+
     // Only do expensive surface calculation if bounding sphere is close
     const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
-    
+
     double sample_dist;
     if (cache.daughter_is_multiunion[i]) {
       auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
@@ -640,11 +580,11 @@ bool RMGOutputTools::is_within_surface_safety(const G4VPhysicalVolume* pv, const
     } else {
       sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
     }
-    
+
     // Early exit if this daughter is within safety
     if (sample_dist < safety) return true;
   }
-  
+
   // No surface found within safety distance
   return false;
 }
