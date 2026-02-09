@@ -444,6 +444,7 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
     sample_tf.Invert();
     const auto sample_point = sample_tf.TransformPoint(position);
     const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+
     const double sample_dist = sample_solid->DistanceToIn(sample_point);
     if (sample_dist < dist) { dist = sample_dist; }
   }
