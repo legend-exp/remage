@@ -47,6 +47,7 @@
 #include "RMGVertexFromFile.hh"
 #include "RMGVertexFromPoint.hh"
 #include "RMGVertexOutputScheme.hh"
+#include "RMGVolumeDistanceStacker.hh"
 
 #include "CLI/CLI.hpp"
 #include "magic_enum/magic_enum.hpp"
@@ -67,7 +68,8 @@ void init_extra() {
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
   new RMGGeomBenchOutputScheme();
-
+  new RMGVolumeDistanceStacker();
+  
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();
