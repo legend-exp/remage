@@ -1,0 +1,21 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Manager/Randomization/Seed 1234
+
+/RMG/Output/ActivateOutputScheme Track
+
+/run/initialize
+
+/process/had/particle_hp/use_photo_evaporation {EVAP}
+
+/RMG/Output/Track/AddProcessFilter nCapture
+
+/RMG/Processes/Stepping/DaughterNucleusMaxLifetime 1 hour
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/energy 5 keV
+/gps/ang/type iso
+
+
+/run/beamOn 20000
