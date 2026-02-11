@@ -17,3 +17,5 @@ set_tests_properties(processes/innerbrem-run PROPERTIES LABELS extra FIXTURES_SE
 add_test(NAME processes/innerbrem-plot COMMAND ${PYTHONPATH} innerbrem_plot_effect.py)
 set_tests_properties(processes/innerbrem-plot PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                          innerbrem-output-fixture)
+
+add_test(NAME processes/dump-physics COMMAND ${PYTHONPATH} ./dump_physics.py ${REMAGE_PYEXE})

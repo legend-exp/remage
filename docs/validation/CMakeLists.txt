@@ -124,6 +124,11 @@ set(TESTS_IMAGES
     processes/innerbrem-gamma-vertex-energy.output.png
     processes/innerbrem-signal.output.png
     processes/innerbrem-difference.output.png
+    processes/processes.default.output.txt
+    processes/processes.grabmayr.output.txt
+    processes/processes.hadr-shielding.output.txt
+    processes/processes.innerbrem.output.txt
+    processes/processes.optical.output.txt
     performance/combine-tracks-benchmark.output.png)
 
 # cmake-format: on
