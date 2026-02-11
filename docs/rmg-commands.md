@@ -2123,6 +2123,7 @@ Commands for controlling output of track vertices.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StoreAlways` – Always store track data, even if event should be discarded.
+* `StoreOpticalPhotons` – Store optical photons in the track table.
 
 ### `/RMG/Output/Track/AddProcessFilter`
 
@@ -2178,6 +2179,22 @@ This is disabled by default
 ### `/RMG/Output/Track/StoreAlways`
 
 Always store track data, even if event should be discarded.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreOpticalPhotons`
+
+Store optical photons in the track table.
+
+:::{note}
+this will typically increase the output file size significantly.
+:::
 
 This is disabled by default
 

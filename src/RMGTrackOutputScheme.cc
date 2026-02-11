@@ -61,8 +61,10 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled()) return;
 
-  // do never write tracks of optical photons (there will be many).
-  if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { return; }
+  // do not write tracks of optical photons if not specifically instructed (there will be many).
+  if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition() && !fStoreOpticalPhotons) {
+    return;
+  }
 
   auto pos = track->GetPosition();
   auto primary = track->GetDynamicParticle();
@@ -222,6 +224,16 @@ void RMGTrackOutputScheme::DefineCommands() {
   fMessenger->DeclareProperty("StoreAlways", fStoreAlways)
       .SetGuidance("Always store track data, even if event should be discarded.")
       .SetGuidance(std::string("This is ") + (fStoreAlways ? "enabled" : "disabled") + " by default")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreOpticalPhotons", fStoreOpticalPhotons)
+      .SetGuidance("Store optical photons in the track table.")
+      .SetGuidance("note: this will typically increase the output file size significantly.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreOpticalPhotons ? "enabled" : "disabled") + " by default"
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
