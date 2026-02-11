@@ -28,8 +28,6 @@ foreach(value prestep poststep average)
   add_test(NAME distances-ge/distance-${value} COMMAND ${PYTHONPATH} ./test_ge_distance.py
                                                        test-distance-${value}.lh5 ${value})
 
-  set_tests_properties(
-    distances-ge/distance-${value}
-    PROPERTIES LABELS extra FIXTURES_REQUIRED distance-output-fixture-${value} ENVIRONMENT
-               MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+  set_tests_properties(distances-ge/distance-${value} PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                                 distance-output-fixture-${value})
 endforeach()

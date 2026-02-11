@@ -15,6 +15,5 @@ set_tests_properties(processes/innerbrem-run PROPERTIES LABELS extra FIXTURES_SE
                                                         innerbrem-output-fixture)
 
 add_test(NAME processes/innerbrem-plot COMMAND ${PYTHONPATH} innerbrem_plot_effect.py)
-set_tests_properties(
-  processes/innerbrem-plot PROPERTIES LABELS extra FIXTURES_REQUIRED innerbrem-output-fixture
-                                      ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(processes/innerbrem-plot PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                         innerbrem-output-fixture)

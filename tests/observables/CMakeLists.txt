@@ -33,22 +33,16 @@ set_tests_properties(
 add_test(NAME observables-ge/tracks-bulk-no-limit
          COMMAND ${PYTHONPATH} ./plot_steps.py out/beta_bulk/step_limits/max_None/stp/out.lh5
                  tracks-bulk-no-limit)
-set_tests_properties(
-  observables-ge/tracks-bulk-no-limit
-  PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(observables-ge/tracks-bulk-no-limit
+                     PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture)
 
 add_test(NAME observables-ge/tracks-bulk-10um-limit
          COMMAND ${PYTHONPATH} ./plot_steps.py out/beta_bulk/step_limits/max_10/stp/out.lh5
                  tracks-bulk-10um-limit)
-set_tests_properties(
-  observables-ge/tracks-bulk-10um-limit
-  PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(observables-ge/tracks-bulk-10um-limit
+                     PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture)
 
 add_test(NAME observables-ge/observables COMMAND ${PYTHONPATH} ./plot_observables.py
                                                  beta-observables)
-set_tests_properties(
-  observables-ge/observables
-  PROPERTIES LABELS "extra" FIXTURES_REQUIRED observables-ge-run-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(observables-ge/observables PROPERTIES LABELS "extra" FIXTURES_REQUIRED
+                                                           observables-ge-run-fixture)

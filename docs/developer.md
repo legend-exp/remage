@@ -208,16 +208,6 @@ stored in the `PYTHONPATH` variable:
 
 ```cmake
 add_test(NAME basics/test COMMAND ${PYTHONPATH} script.py)
-set_tests_properties(${_test} PROPERTIES ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
-```
-
-If the Python script is generating an output file (to be e.g. shown in the
-validation report), make sure it uses the _remage_ Matplotlib settings by
-pointing the `MPLCONFIGDIR` environment variable to the `tests/matplotlibrc`
-file:
-
-```cmake
-set_tests_properties(${_test} PROPERTIES ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 ```
 
 In case a simulation output file needs to be generated with _remage_, before a

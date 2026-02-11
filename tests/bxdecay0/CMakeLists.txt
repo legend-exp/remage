@@ -14,6 +14,5 @@ set_tests_properties(bxdecay0/gen-output PROPERTIES LABELS extra FIXTURES_SETUP
                                                     bxdecay0-output-fixture)
 
 add_test(NAME bxdecay0/plot-output COMMAND ${PYTHONPATH} plot_decay_modes.py)
-set_tests_properties(
-  bxdecay0/plot-output PROPERTIES LABELS extra FIXTURES_REQUIRED bxdecay0-output-fixture
-                                  ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(bxdecay0/plot-output PROPERTIES LABELS extra FIXTURES_REQUIRED
+                                                     bxdecay0-output-fixture)

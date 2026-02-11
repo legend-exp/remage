@@ -14,6 +14,5 @@ set_tests_properties(nist/gen-output PROPERTIES LABELS extra FIXTURES_SETUP outp
 add_test(NAME nist/e-range COMMAND ${PYTHONPATH} ./test_electron_interactions.py)
 
 foreach(_test nist/e-range)
-  set_tests_properties(${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED output-fixture
-                                           ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+  set_tests_properties(${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED output-fixture)
 endforeach()

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.28)
 project(remage-tests)
 
 # this can be used as the path to the remage executable in the tests
@@ -30,3 +30,23 @@ endif()
 if(BxDecay0_FOUND)
   add_subdirectory(bxdecay0)
 endif()
+
+# ---------------------------------------------------------------------
+# set global environment variables for all defined tests.
+get_property(
+  _subdirs
+  DIRECTORY
+  PROPERTY SUBDIRECTORIES)
+foreach(_subdir ${_subdirs})
+  get_property(
+    _tests
+    DIRECTORY ${_subdir}
+    PROPERTY TESTS)
+
+  foreach(_test ${_tests})
+    # set the environment variables without overriding the ENVIRONMENT property.
+    set_tests_properties(
+      ${_test} DIRECTORY ${_subdir} PROPERTIES ENVIRONMENT_MODIFICATION
+                                               "MPLCONFIGDIR=set:${CMAKE_SOURCE_DIR}/tests")
+  endforeach()
+endforeach()

@@ -11,5 +11,4 @@ endforeach()
 
 add_test(NAME performance/combine-tracks COMMAND ${PYTHONPATH} ./combine_tracks_benchmark.py
                                                  ${REMAGE_PYEXE})
-set_tests_properties(performance/combine-tracks PROPERTIES LABELS extra ENVIRONMENT
-                                                           MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(performance/combine-tracks PROPERTIES LABELS extra)
