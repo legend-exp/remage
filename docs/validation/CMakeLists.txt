@@ -87,6 +87,12 @@ set(TESTS_IMAGES
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
+    nist/e-range-ar-distributions.output.png
+    nist/e-range-ar-vs-estar.output.png
+    nist/e-stopping-power-ar-vs-estar.output.png
+    nist/e-range-cu-distributions.output.png
+    nist/e-range-cu-vs-estar.output.png
+    nist/e-stopping-power-cu-vs-estar.output.png
     observables/tracks-bulk-10um-limit.tracks.out0.png
     observables/tracks-bulk-10um-limit.tracks.out1.png
     observables/tracks-bulk-10um-limit.tracks.out2.png
