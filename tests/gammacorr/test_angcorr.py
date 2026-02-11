@@ -27,16 +27,24 @@ macro = """
 /gps/energy       0 keV
 /gps/ang/type     iso
 
-/run/beamOn 100000
+/run/beamOn {events}
 """
 
 
 def simulate(Z, A, level, angcorr):
     output = f"output-{Z}-{A}-{level}-angcorr-{angcorr}.lh5"
 
+    events = 100000
+
     remage_run(
         macro.split("\n"),
-        macro_substitutions={"Z": Z, "A": A, "level": level, "angcorr": angcorr},
+        macro_substitutions={
+            "Z": Z,
+            "A": A,
+            "level": level,
+            "angcorr": angcorr,
+            "events": events,
+        },
         gdml_files="gdml/geometry.gdml",
         output=output,
         overwrite_output=True,
@@ -46,17 +54,22 @@ def simulate(Z, A, level, angcorr):
     return output
 
 
+def _expectation_co60(cos_theta):
+    return 1 + 1 / 8 * cos_theta**2 + 1 / 24 * cos_theta**4
+
+
 def test_plot_gammacorr():
     level = 0
 
     items = [
-        (27, 60, "$^{60}$Co: 1.17 MeV vs. 1.33 MeV"),
-        (81, 208, "$^{208}$Tl: 0.58 MeV vs. 2.6 MeV"),
+        (27, 60, "$^{60}$Co: 1.17 MeV vs. 1.33 MeV", _expectation_co60),
+        (81, 208, "$^{208}$Tl: 0.58 MeV vs. 2.6 MeV", None),
     ]
 
-    for Z, A, title in items:
+    for Z, A, title, expectation_func in items:
         fig, ax = plt.subplots()
 
+        data = {}
         for angcorr in (True, False):
             remage_output = simulate(Z, A, level, angcorr)
             # read in track data
@@ -97,12 +110,30 @@ def test_plot_gammacorr():
             cos_theta = dot / (norm1 * norm2)
 
             h = hist.new.Reg(50, -1, 1).Double().fill(cos_theta)
+            data[angcorr] = h.view(flow=False)
 
             h.plot(
                 ax=ax, yerr=False, label=rf"$\gamma$ angular correlations = {angcorr}"
             )
 
+        # this is the expectation for 60Co and 108Tl
+        cos_theta = np.linspace(-1, 1)
+        if expectation_func is not None:
+            expectation = expectation_func(cos_theta)
+            expectation_normed = data[True].mean() / expectation.mean() * expectation
+            plt.plot(
+                cos_theta,
+                expectation_normed,
+                label=r"$\frac{1}{8}\cos(\theta)^2 + \frac{1}{24}\cos(\theta)^4$",
+            )
+        plt.plot(
+            cos_theta,
+            data[True].mean() * np.ones_like(cos_theta),
+            label=r"uniform",
+            linestyle="--",
+        )
+
         ax.set_title(title)
-        ax.set_xlabel(r"$cos(\theta)$")
+        ax.set_xlabel(r"$\cos(\theta)$")
         ax.legend()
         fig.savefig(f"gamma-angular-distribution-{Z}-{A}.output.png")
