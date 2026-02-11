@@ -723,6 +723,13 @@ the command:
 /RMG/Output/ActivateOutputScheme Track
 ```
 
+:::{warning}
+
+Optical photon tracks are never written out, since their number in a typical
+simulation is often extremely large.
+
+:::
+
 A new table named `tracks` is created in the output file, with columns:
 
 - `evtid`: Geant4 event identifier,
