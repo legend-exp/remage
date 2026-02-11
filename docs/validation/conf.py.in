@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
+
+sys.path.append(Path("../_extensions").resolve().as_posix())
 
 project = "remage's validation suite"
 copyright = "2020, the LEGEND Collaboration"
@@ -14,6 +18,7 @@ extensions = [
     "sphinx_inline_tabs",
     "sphinx_subfigure",
     "myst_parser",
+    "remage_lexers",
 ]
 
 myst_enable_extensions = ["colon_fence", "substitution", "dollarmath"]
