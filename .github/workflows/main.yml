@@ -93,9 +93,9 @@ jobs:
         run: |
           cd build
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
-          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-exclude 'mt|val-only' -j$(nproc) --output-on-failure
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
-          ctest --label-regex mt -j1 --output-on-failure
+          ctest --label-regex mt --label-exclude val-only -j1 --output-on-failure
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload test suite outputs to GitHub
@@ -110,8 +110,8 @@ jobs:
         if: ${{ matrix.container_version == 'slim' }}
         run: |
           cd build
-          ctest --label-exclude 'extra|vis|mt' -j$(nproc) --output-on-failure
-          ctest --label-regex mt --label-exclude 'extra|vis' -j --output-on-failure
+          ctest --label-exclude 'extra|vis|mt|val-only' -j$(nproc) --output-on-failure
+          ctest --label-regex mt --label-exclude 'extra|vis|val-only' -j --output-on-failure
 
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
@@ -178,8 +178,8 @@ jobs:
       - name: Run full test suite
         run: |
           cd build
-          ctest --label-exclude mt -j$(nproc) --output-on-failure
-          ctest --label-regex mt -j1 --output-on-failure
+          ctest --label-exclude 'mt|val-only' -j$(nproc) --output-on-failure
+          ctest --label-regex mt --label-exclude val-only -j1 --output-on-failure
 
       - name: Minimally test installed executable
         run: |

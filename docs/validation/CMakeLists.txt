@@ -31,6 +31,7 @@ endforeach()
 
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
+# note: the tests producing these files must be labeled "val"!
 # TODO: add new images here
 # cmake-format: off
 set(TESTS_IMAGES

@@ -9,10 +9,12 @@ foreach(_file ${_file_list})
 endforeach()
 
 add_test(NAME nist/gen-output COMMAND ${PYTHONPATH} run_e_sims.py)
-set_tests_properties(nist/gen-output PROPERTIES LABELS extra FIXTURES_SETUP output-fixture)
+set_tests_properties(nist/gen-output PROPERTIES LABELS "extra;val;val-only" FIXTURES_SETUP
+                                                output-fixture)
 
 add_test(NAME nist/e-range COMMAND ${PYTHONPATH} ./test_electron_interactions.py)
 
 foreach(_test nist/e-range)
-  set_tests_properties(${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED output-fixture)
+  set_tests_properties(${_test} PROPERTIES LABELS "extra;val;val-only" FIXTURES_REQUIRED
+                                           output-fixture)
 endforeach()

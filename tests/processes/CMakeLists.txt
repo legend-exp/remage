@@ -11,11 +11,13 @@ endforeach()
 
 add_test(NAME processes/innerbrem-run COMMAND ${PYTHONPATH} ./innerbrem_run_sims.py
                                               ${REMAGE_PYEXE})
-set_tests_properties(processes/innerbrem-run PROPERTIES LABELS extra FIXTURES_SETUP
+set_tests_properties(processes/innerbrem-run PROPERTIES LABELS "extra;val;val-only" FIXTURES_SETUP
                                                         innerbrem-output-fixture)
 
 add_test(NAME processes/innerbrem-plot COMMAND ${PYTHONPATH} innerbrem_plot_effect.py)
-set_tests_properties(processes/innerbrem-plot PROPERTIES LABELS extra FIXTURES_REQUIRED
-                                                         innerbrem-output-fixture)
+set_tests_properties(
+  processes/innerbrem-plot PROPERTIES LABELS "extra;val;val-only" FIXTURES_REQUIRED
+                                      innerbrem-output-fixture)
 
 add_test(NAME processes/dump-physics COMMAND ${PYTHONPATH} ./dump_physics.py ${REMAGE_PYEXE})
+set_tests_properties(processes/dump-physics PROPERTIES LABELS val)
