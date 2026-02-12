@@ -33,8 +33,6 @@ foreach(_mac ${_macros})
            COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
                    macros/${_mac} macros/_vis-export.mac)
   set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS "vis;val")
-  set_tests_properties(confinement-vis/${_mac} PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                          "couldn't open display")
 endforeach()
 
 # this test needs another geometry.
@@ -45,8 +43,6 @@ add_test(NAME confinement-vis/with-daughters.mac
          COMMAND ${REMAGE_PYEXE} -g gdml/geometry_boxes.gdml -o test-out.root -- macros/_vis.mac
                  macros/with-daughters.mac macros/_vis-export.mac)
 set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES LABELS "vis;val")
-set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                   "couldn't open display")
 
 # generate the GDML file
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
@@ -59,7 +55,6 @@ add_test(NAME confinement-ge/vis
 
 set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis;val" FIXTURES_REQUIRED
                                                    confine-gdml-fixture)
-set_tests_properties(confinement-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # test on HPGe containment
 add_test(NAME confinement-ge/gen-output
@@ -159,9 +154,7 @@ foreach(_test ${_surface_tests})
                                             test-surface-sampler-methods-fixture)
 
   if(_test MATCHES "test-points-.*")
-    set_tests_properties(
-      confinement-surface/${_test} PROPERTIES LABELS "extra;vis;val" SKIP_REGULAR_EXPRESSION
-                                              "couldn't open display")
+    set_tests_properties(confinement-surface/${_test} PROPERTIES LABELS "extra;vis;val")
   endif()
 
 endforeach()
@@ -195,8 +188,6 @@ foreach(det ${_solids})
   set_tests_properties(
     confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis;val" FIXTURES_REQUIRED
                                               confine-surface-vis-macro-${det}-fixture)
-  set_tests_properties(confinement-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                 "couldn't open display")
 endforeach()
 
 # run simulations and check
