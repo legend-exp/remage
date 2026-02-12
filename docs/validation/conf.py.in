@@ -13,6 +13,7 @@ author = "The remage developers"
 extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
     "sphinx_copybutton",
     "sphinx_togglebutton",
     "sphinx_inline_tabs",
@@ -21,7 +22,13 @@ extensions = [
     "remage_lexers",
 ]
 
-myst_enable_extensions = ["colon_fence", "substitution", "dollarmath"]
+myst_enable_extensions = [
+    "colon_fence",
+    "substitution",
+    "attrs_block",
+    "deflist",
+    "dollarmath",
+]
 
 version = "@RMG_GIT_VERSION_FULL@"
 html_logo = "@PROJECT_SOURCE_DIR@/.github/logo/remage-logo.png"
@@ -44,3 +51,5 @@ myst_substitutions = {
     "geant4_version": "`v@Geant4_VERSION@`",
     "bxdecay0_version": "`v@BxDecay0_VERSION@`",
 }
+
+todo_include_todos = True
