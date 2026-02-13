@@ -11,8 +11,7 @@ endforeach()
 # run python tests using pytest
 add_test(NAME gammacorr/pytest-all COMMAND ${PYTHONPATH} -m pytest -s -vvv .)
 
-set_tests_properties(gammacorr/pytest-all PROPERTIES LABELS "mt;extra" ENVIRONMENT
-                                                     MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(gammacorr/pytest-all PROPERTIES LABELS "mt;extra;val;val-only")
 
 if(Geant4_VERSION VERSION_LESS "11.3.0")
   set_tests_properties(gammacorr/pytest-all PROPERTIES DISABLED True)
