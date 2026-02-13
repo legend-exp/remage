@@ -256,6 +256,12 @@ A macro command interface to the library is available below
 <project:../rmg-commands.md#rmggeneratorcosmicmuons>. For further documentation,
 refer to the [original publication](https://doi.org/10.1016/j.nima.2021.165732).
 
+Only generation on a plane or from a hemisphere is supported, in the latter case
+the hemisphere is centered on the origin.
+
+:::{tip} ExoMug is best suited for applications at sea level or shallow depth,
+but is not applicable deep underground. :::
+
 ### MUSUN
 
 [MUSUN](https://doi.org/10.1016/j.cpc.2008.10.013) is a popular software to

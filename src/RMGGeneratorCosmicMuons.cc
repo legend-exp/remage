@@ -37,7 +37,6 @@ namespace u = CLHEP;
 RMGGeneratorCosmicMuons::RMGGeneratorCosmicMuons() : RMGVGenerator("CosmicMuons") {
   this->DefineCommands();
 
-  // docs: https://doi.org/10.1016/j.nima.2021.165732
   fEcoMug = std::make_unique<EcoMug>();
   fGun = std::make_unique<G4ParticleGun>();
 }
@@ -47,19 +46,28 @@ RMGGeneratorCosmicMuons::~RMGGeneratorCosmicMuons() = default; // NOLINT
 
 void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
 
-  // TODO: get this info from detector construction
-  const auto world_side = fSkyPlaneHeight; /*50* u::m*/
 
   RMGLog::Out(RMGLog::debug, "Configuring EcoMug");
 
-  // TODO: add sphere?
   switch (fSkyShape) {
     case SkyShape::kPlane: {
+
+      const auto world_side = fSkyPlaneHeight;
       fEcoMug->SetUseSky();
+
       // put sky exactly on the top of the world
       fEcoMug->SetSkyCenterPosition({0, 0, world_side / u::m});
+
       auto sky_size = fSkyPlaneSize > 0 ? fSkyPlaneSize : world_side;
       fEcoMug->SetSkySize({sky_size / u::m, sky_size / u::m});
+      break;
+    }
+    case SkyShape::kSphere: {
+      fEcoMug->SetUseHSphere();
+      fEcoMug->SetHSphereRadius(fSkyHSphereRadius / u::m);
+
+      // place at the origin
+      fEcoMug->SetHSphereCenterPosition({{0., 0., 0.}});
       break;
     }
     default: {
@@ -177,6 +185,13 @@ void RMGGeneratorCosmicMuons::DefineCommands() {
       .SetGuidance("Maximum momentum of the generated muon")
       .SetParameterName("p", false)
       .SetRange("p > 0 && p <= 1000")
+      .SetToBeBroadcasted(true)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclarePropertyWithUnit("SkyHSphereRadius", "m", fSkyHSphereRadius)
+      .SetGuidance("Radius of the hemi-sphere, if it has a spherical shape.")
+      .SetParameterName("l", false)
+      .SetRange("l > 0")
       .SetToBeBroadcasted(true)
       .SetStates(G4State_PreInit, G4State_Idle);
 
