@@ -1050,6 +1050,7 @@ Commands for controlling the µ generator
 * `SkyPlaneHeight` – Height of the sky, if it has a planar shape
 * `MomentumMin` – Minimum momentum of the generated muon
 * `MomentumMax` – Maximum momentum of the generated muon
+* `SkyHSphereRadius` – Radius of the hemi-sphere, if it has a spherical shape.
 * `ThetaMin` – Minimum azimutal angle of the generated muon momentum
 * `ThetaMax` – Maximum azimutal angle of the generated muon momentum
 * `PhiMin` – Minimum zenith angle of the generated muon momentum
@@ -1127,6 +1128,21 @@ Maximum momentum of the generated muon
   * **Omittable** – `True`
   * **Default value** – `GeV/c`
   * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SkyHSphereRadius`
+
+Radius of the hemi-sphere, if it has a spherical shape.
+
+* **Range of parameters** – `l > 0`
+* **Parameter** – `l`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `m`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/ThetaMin`
