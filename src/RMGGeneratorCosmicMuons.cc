@@ -67,7 +67,7 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
       fEcoMug->SetHSphereRadius(fSkyHSphereRadius / u::m);
 
       // place at the origin
-      fEcoMug->SetHSphereCenterPosition({{0., 0., 0.}});
+      fEcoMug->SetHSphereCenterPosition({0., 0., 0.});
 
       // set angles for hemisphere
       fEcoMug->SetHSphereMinPositionTheta(fSpherePositionThetaMin / u::rad);
