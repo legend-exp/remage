@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import awkward as ak
 import hist
 import matplotlib.pyplot as plt
@@ -34,7 +36,7 @@ macro = """
 def simulate(Z, A, level, angcorr):
     output = f"output-{Z}-{A}-{level}-angcorr-{angcorr}.lh5"
 
-    events = 100000
+    events = 100000 * int(os.environ.get("RMG_STATS_FACTOR", "1"))
 
     remage_run(
         macro.split("\n"),
