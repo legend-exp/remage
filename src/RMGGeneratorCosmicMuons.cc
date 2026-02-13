@@ -68,6 +68,13 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
 
       // place at the origin
       fEcoMug->SetHSphereCenterPosition({{0., 0., 0.}});
+
+      // set angles for hemisphere
+      fEcoMug->SetHSphereMinPositionTheta(fSpherePositionThetaMin / u::rad);
+      fEcoMug->SetHSphereMaxPositionTheta(fSpherePositionThetaMax / u::rad);
+      fEcoMug->SetHSphereMinPositionPhi(fSpherePositionPhiMin / u::rad);
+      fEcoMug->SetHSphereMaxPositionPhi(fSpherePositionPhiMax / u::rad);
+    
       break;
     }
     default: {
@@ -86,10 +93,6 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
   fEcoMug->SetMaximumTheta(fThetaMax / u::rad);
   fEcoMug->SetMinimumPhi(fPhiMin / u::rad);
   fEcoMug->SetMaximumPhi(fPhiMax / u::rad);
-  fEcoMug->SetHSphereMinPositionTheta(fSpherePositionThetaMin / u::rad);
-  fEcoMug->SetHSphereMaxPositionTheta(fSpherePositionThetaMax / u::rad);
-  fEcoMug->SetHSphereMinPositionPhi(fSpherePositionPhiMin / u::rad);
-  fEcoMug->SetHSphereMaxPositionPhi(fSpherePositionPhiMax / u::rad);
 
   // FIXME: somehow this always sets the same seed
   // RMGLog::OutFormat(RMGLog::debug, "EcoMug random seed: {}", CLHEP::HepRandom::getTheSeed());
