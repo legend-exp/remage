@@ -32,9 +32,7 @@ foreach(_mac ${_macros})
   add_test(NAME confinement-vis/${_mac}
            COMMAND ${REMAGE_PYEXE} -g gdml/geometry.gdml -o test-out.root -- macros/_vis.mac
                    macros/${_mac} macros/_vis-export.mac)
-  set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS vis)
-  set_tests_properties(confinement-vis/${_mac} PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                          "couldn't open display")
+  set_tests_properties(confinement-vis/${_mac} PROPERTIES LABELS "vis;val")
 endforeach()
 
 # this test needs another geometry.
@@ -44,38 +42,32 @@ add_test(NAME confinement/with-daughters.mac COMMAND ${REMAGE_PYEXE} -g gdml/geo
 add_test(NAME confinement-vis/with-daughters.mac
          COMMAND ${REMAGE_PYEXE} -g gdml/geometry_boxes.gdml -o test-out.root -- macros/_vis.mac
                  macros/with-daughters.mac macros/_vis-export.mac)
-set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES LABELS vis)
-set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                   "couldn't open display")
+set_tests_properties(confinement-vis/with-daughters.mac PROPERTIES LABELS "vis;val")
 
 # generate the GDML file
 add_test(NAME confinement-ge/gen-gdml COMMAND ${PYTHONPATH} make_ge_array_gdml.py)
 
-set_tests_properties(
-  confinement-ge/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP confine-gdml-fixture ENVIRONMENT
-                                     MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement-ge/gen-gdml PROPERTIES LABELS "extra;val" FIXTURES_SETUP
+                                                        confine-gdml-fixture)
 add_test(NAME confinement-ge/vis
          COMMAND ${REMAGE_PYEXE} macros/vis-ge-array.mac macros/_vis-export.mac -g
                  gdml/ge-array.gdml -o none -l detail)
 
-set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
+set_tests_properties(confinement-ge/vis PROPERTIES LABELS "extra;vis;val" FIXTURES_REQUIRED
                                                    confine-gdml-fixture)
-set_tests_properties(confinement-ge/vis PROPERTIES SKIP_REGULAR_EXPRESSION "couldn't open display")
 
 # test on HPGe containment
 add_test(NAME confinement-ge/gen-output
          COMMAND ${REMAGE_PYEXE} -g gdml/ge-array.gdml -w -o test-confine.lh5 --flat-output --
                  macros/test-ge-confine.mac)
 set_tests_properties(
-  confinement-ge/gen-output PROPERTIES LABELS extra FIXTURES_SETUP confine-output-fixture
+  confinement-ge/gen-output PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-output-fixture
                                        FIXTURES_REQUIRED confine-gdml-fixture)
 
 add_test(NAME confinement-ge/relative-fraction COMMAND ${PYTHONPATH} ./test_confinement_ge.py)
 
-set_tests_properties(
-  confinement-ge/relative-fraction
-  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-output-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement-ge/relative-fraction
+                     PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED confine-output-fixture)
 
 # test on lar intersection
 add_test(NAME confinement-lar/intersection-gen-output
@@ -83,15 +75,13 @@ add_test(NAME confinement-lar/intersection-gen-output
                  -- macros/lar-in.mac)
 set_tests_properties(
   confinement-lar/intersection-gen-output
-  PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-output-fixture FIXTURES_REQUIRED
+  PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-lar-in-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
 add_test(NAME confinement-lar/intersection COMMAND ${PYTHONPATH} ./test_lar_intersection.py)
 
-set_tests_properties(
-  confinement-lar/intersection
-  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-output-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement-lar/intersection PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
+                                                             confine-lar-in-output-fixture)
 
 # generate subtraction output
 add_test(NAME confinement-lar/subtraction-gen-output
@@ -100,17 +90,15 @@ add_test(NAME confinement-lar/subtraction-gen-output
 
 set_tests_properties(
   confinement-lar/subtraction-gen-output
-  PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-out-output-fixture FIXTURES_REQUIRED
+  PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-lar-out-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
 # analyse subtraction
 add_test(NAME confinement-lar/subtraction COMMAND ${PYTHONPATH} ./test_lar_subtraction.py
                                                   test-confine-lar-out.lh5 lar-sub-check)
 
-set_tests_properties(
-  confinement-lar/subtraction
-  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-out-output-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement-lar/subtraction PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
+                                                            confine-lar-out-output-fixture)
 
 # generate intersection and subtraction output
 add_test(NAME confinement-lar/intersection-and-subtraction-gen-output
@@ -119,7 +107,7 @@ add_test(NAME confinement-lar/intersection-and-subtraction-gen-output
 
 set_tests_properties(
   confinement-lar/intersection-and-subtraction-gen-output
-  PROPERTIES LABELS extra FIXTURES_SETUP confine-lar-in-out-output-fixture FIXTURES_REQUIRED
+  PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-lar-in-out-output-fixture FIXTURES_REQUIRED
              confine-gdml-fixture)
 
 # analyse intersection and subtraction
@@ -128,9 +116,8 @@ add_test(NAME confinement-lar/intersection-and-subtraction
                  lar-int-and-sub-check)
 
 set_tests_properties(
-  confinement-lar/intersection-and-subtraction
-  PROPERTIES LABELS extra FIXTURES_REQUIRED confine-lar-in-out-output-fixture ENVIRONMENT
-             MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+  confinement-lar/intersection-and-subtraction PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
+                                                          confine-lar-in-out-output-fixture)
 
 # test generic surface sampling methods
 add_executable(test-surface-sampler-methods EXCLUDE_FROM_ALL test-surface-sampler-methods.cpp)
@@ -143,8 +130,9 @@ add_test(NAME confinement-surface/test-surface-sampler-methods-build
          COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --target
                  test-surface-sampler-methods)
 
-set_tests_properties(confinement-surface/test-surface-sampler-methods-build
-                     PROPERTIES LABELS extra FIXTURES_SETUP test-surface-sampler-methods-fixture)
+set_tests_properties(
+  confinement-surface/test-surface-sampler-methods-build
+  PROPERTIES LABELS "extra;val" FIXTURES_SETUP test-surface-sampler-methods-fixture)
 
 # add the tests
 set(_surface_tests
@@ -162,13 +150,11 @@ foreach(_test ${_surface_tests})
   add_test(NAME confinement-surface/${_test} COMMAND ./test-surface-sampler-methods ${_test})
 
   set_tests_properties(
-    confinement-surface/${_test} PROPERTIES LABELS extra FIXTURES_REQUIRED
+    confinement-surface/${_test} PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
                                             test-surface-sampler-methods-fixture)
 
   if(_test MATCHES "test-points-.*")
-    set_tests_properties(
-      confinement-surface/${_test} PROPERTIES LABELS "extra;vis" SKIP_REGULAR_EXPRESSION
-                                              "couldn't open display")
+    set_tests_properties(confinement-surface/${_test} PROPERTIES LABELS "extra;vis;val")
   endif()
 
 endforeach()
@@ -177,9 +163,8 @@ endforeach()
 
 # generate the GDML file
 add_test(NAME confinement-surface/gen-gdml COMMAND ${PYTHONPATH} make_basic_solids.py)
-set_tests_properties(
-  confinement-surface/gen-gdml PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-gdml-fixture
-                                          ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement-surface/gen-gdml PROPERTIES LABELS "extra;val" FIXTURES_SETUP
+                                                             confine-surface-gdml-fixture)
 
 # visualise
 set(_solids tubby box con uni sub trd)
@@ -193,7 +178,7 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinement-surface/gen-vis-macro-${det}
-    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
+    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
                FIXTURES_REQUIRED confine-surface-gdml-fixture)
 
   add_test(NAME confinement-surface/${det}-vis
@@ -201,10 +186,8 @@ foreach(det ${_solids})
                    gdml/simple-solids.gdml -o none -l detail)
 
   set_tests_properties(
-    confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis" FIXTURES_REQUIRED
+    confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis;val" FIXTURES_REQUIRED
                                               confine-surface-vis-macro-${det}-fixture)
-  set_tests_properties(confinement-surface/${det}-vis PROPERTIES SKIP_REGULAR_EXPRESSION
-                                                                 "couldn't open display")
 endforeach()
 
 # run simulations and check
@@ -217,8 +200,8 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinement-surface/gen-macro-${det}
-    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-macro-${det}-fixture FIXTURES_REQUIRED
-               confine-surface-gdml-fixture)
+    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-macro-${det}-fixture
+               FIXTURES_REQUIRED confine-surface-gdml-fixture)
 
   add_test(NAME confinement-surface/${det}-gen
            COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
@@ -226,7 +209,7 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinement-surface/${det}-gen
-    PROPERTIES LABELS extra FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
+    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
                confine-surface-macro-${det}-fixture)
 
   add_test(NAME confinement-surface/relative-fractions-${det}
@@ -234,11 +217,9 @@ foreach(det ${_solids})
 
   set_tests_properties(
     confinement-surface/relative-fractions-${det}
-    PROPERTIES LABELS "extra;flaky" FIXTURES_REQUIRED confine-surface-${det} ENVIRONMENT
-               MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+    PROPERTIES LABELS "extra;val;flaky" FIXTURES_REQUIRED confine-surface-${det})
 
 endforeach()
 
 add_test(NAME confinement/weighting COMMAND ${PYTHONPATH} test_weighting.py)
-set_tests_properties(confinement/weighting PROPERTIES LABELS extra ENVIRONMENT
-                                                      MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
+set_tests_properties(confinement/weighting PROPERTIES LABELS extra)

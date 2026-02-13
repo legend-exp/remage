@@ -17,10 +17,14 @@ energies = np.concatenate(
     ]
 )
 
-nat_ge_density = 5.323  # g/cm3, room temperature
+mats = {
+    "ge": 5.323,  # g/cm3, room temperature
+    "cu": 8.96,  # g/cm3
+    "ar": 1.39,  # g/cm3
+}
 
 
-def read_estar():
+def read_estar(mat: str):
     columns = [
         "kinetic_energy",
         "collision_stp",
@@ -30,7 +34,7 @@ def read_estar():
         "radiation_yield",
     ]
 
-    with Path("data/estar-ge.txt").open() as f:
+    with Path(f"data/estar-{mat}.txt").open() as f:
         lines = f.readlines()
 
     # Find the start of numeric data (skip headers)
@@ -43,11 +47,9 @@ def read_estar():
     values = np.array([list(map(float, line.split())) for line in data_lines])
 
     # Convert to an Awkward Array
-    return ak.Array({col: values[:, i] for i, col in enumerate(columns)})
-
-
-estar_data = read_estar()[:43]
-estar_x = 1000 * estar_data.kinetic_energy  # in mm
+    a = ak.Array({col: values[:, i] for i, col in enumerate(columns)})[:43]
+    a["x"] = 1000 * a.kinetic_energy  # in mm
+    return a
 
 
 def ak_diff(data):
@@ -93,11 +95,11 @@ def calc_stopping_power(filename):
 # =====
 
 
-def test_electron_range_distributions():
+def test_electron_range_distributions(mat: str):
     fig, ax = plt.subplots()
 
     for energy in [300, 500, 1000, 1500, 2000, 3000, 4000]:  # in keV
-        eranges = calc_range(f"electrons-ge-{energy}-keV.lh5")
+        eranges = calc_range(f"electrons-{mat}-{energy}-keV.lh5")
         # convert to mm
         h = hist.new.Reg(200, 0, 7, name="Electron integrated path [mm]").Double()
         h.fill(eranges)
@@ -106,26 +108,26 @@ def test_electron_range_distributions():
     ax.set_ylabel("Density")
     ax.legend()
     ax.grid()
-    fig.savefig("e-range-ge-distributions.output.png")
+    fig.savefig(f"e-range-{mat}-distributions.output.png")
 
 
-def test_electron_range_vs_energy():
+def test_electron_range_vs_energy(mat: str, density: float, estar_data: ak.Array):
     fig, ax = plt.subplots()
 
     ax.plot(
-        estar_x,
-        10 * estar_data.csda_range / nat_ge_density,  # convert to mm
+        estar_data.x,
+        10 * estar_data.csda_range / density,  # convert to mm
         label="CSDA range (ESTAR)",
     )
 
     ax.plot(
         energies,
-        [ak.mean(calc_range(f"electrons-ge-{e}-keV.lh5")) for e in energies],
+        [ak.mean(calc_range(f"electrons-{mat}-{e}-keV.lh5")) for e in energies],
         c="black",
         marker="o",
         lw=0,
         ms=3,
-        label="$remage$ simulation: $e^-$ in Ge",
+        label=f"$remage$ simulation: $e^-$ in {mat.title()}",
     )
 
     ax.set_xlim(0, 5000)
@@ -133,40 +135,45 @@ def test_electron_range_vs_energy():
     ax.set_ylabel("Electron integrated path [mm]")
     ax.legend()
     ax.grid()
-    fig.savefig("e-range-ge-vs-estar.output.png")
+    fig.savefig(f"e-range-{mat}-vs-estar.output.png")
 
 
-def test_electron_stopping_power_vs_energy():
+def test_electron_stopping_power_vs_energy(
+    mat: str, density: float, estar_data: ak.Array
+):
     fig, ax = plt.subplots()
 
     ax.plot(
-        estar_x,
-        100 * estar_data.radiative_stp * nat_ge_density,  # convert to keV/mm
+        estar_data.x,
+        100 * estar_data.radiative_stp * density,  # convert to keV/mm
         ls="--",
         label="Radiative stopping power (ESTAR)",
     )
 
     ax.plot(
-        estar_x,
-        100 * estar_data.collision_stp * nat_ge_density,
+        estar_data.x,
+        100 * estar_data.collision_stp * density,
         ls="--",
         label="Collisional stopping power (ESTAR)",
     )
 
     ax.plot(
-        estar_x,
-        100 * estar_data.total_stp * nat_ge_density,
+        estar_data.x,
+        100 * estar_data.total_stp * density,
         label="Total stopping power (ESTAR)",
     )
 
     ax.plot(
         energies,
-        [ak.mean(calc_stopping_power(f"electrons-ge-{e}-keV.lh5")) for e in energies],
+        [
+            ak.mean(calc_stopping_power(f"electrons-{mat}-{e}-keV.lh5"))
+            for e in energies
+        ],
         c="black",
         marker="o",
         lw=0,
         ms=3,
-        label="$remage$ simulation: $e^-$ in Ge",
+        label=f"$remage$ simulation: $e^-$ in {mat.title()}",
     )
 
     ax.set_xlabel("Electron kinetic energy [keV]")
@@ -175,9 +182,11 @@ def test_electron_stopping_power_vs_energy():
     ax.grid()
     ax.set_xscale("log")
 
-    fig.savefig("e-stopping-power-ge-vs-estar.output.png")
+    fig.savefig(f"e-stopping-power-{mat}-vs-estar.output.png")
 
 
-test_electron_range_distributions()
-test_electron_range_vs_energy()
-test_electron_stopping_power_vs_energy()
+for mat, density in mats.items():
+    estar_data = read_estar(mat)
+    test_electron_range_distributions(mat)
+    test_electron_range_vs_energy(mat, density, estar_data)
+    test_electron_stopping_power_vs_energy(mat, density, estar_data)

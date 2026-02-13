@@ -15,6 +15,9 @@
 
 #include "RMGPhysics.hh"
 
+#include <fstream>
+#include <iostream>
+
 #include "G4BaryonConstructor.hh"
 #include "G4BosonConstructor.hh"
 #include "G4Cerenkov.hh"
@@ -505,6 +508,52 @@ void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
   } catch (const std::bad_cast&) { return; }
 }
 
+void RMGPhysics::DumpProcessesForParticles(std::string file_name) {
+  std::ofstream out(file_name);
+  std::streambuf* coutbuf = std::cout.rdbuf();
+  std::cout.rdbuf(out.rdbuf());
+
+  const std::vector<std::string> types =
+      {"lepton", "gamma", "baryon", "nucleus", "anti_nucleus", "opticalphoton"};
+  for (const auto& type_to_show : types) {
+    GetParticleIterator()->reset();
+    while ((*GetParticleIterator())()) {
+      auto particle = GetParticleIterator()->value();
+      auto proc_manager = particle->GetProcessManager();
+      auto list = *proc_manager->GetProcessList();
+      auto type = particle->GetParticleType();
+      auto particle_name = particle->GetParticleName();
+      // skip some particle types to avoid verbose output.
+      if (type != type_to_show ||
+          (type == "baryon" && particle_name != "proton" && particle_name != "anti_proton" &&
+           particle_name != "neutron") ||
+          particle_name.find("hyper") != std::string::npos) {
+        continue;
+      }
+
+      std::vector<std::string> procs;
+      for (size_t i = 0; i < list.size(); i++) {
+        const auto& proc_name = list[i]->GetProcessName();
+        if (proc_name != "Transportation" && proc_name != "UserSpecialCut" &&
+            proc_name != "StepLimiter")
+          procs.push_back(proc_name);
+      }
+      // skip particles that only have a basic set of processes.
+      if (procs.size() == 0) { continue; }
+
+      std::cout << particle->GetParticleName() << std::endl;
+      for (size_t counter = 0; counter < procs.size(); counter++) {
+        if (counter % 4 != 0) std::cout << ",";
+        std::cout << std::setw(19) << procs[counter];
+        if ((counter) % 4 == 3) std::cout << std::endl;
+      }
+      std::cout << std::endl;
+    }
+  }
+
+  std::cout.rdbuf(coutbuf);
+}
+
 void RMGPhysics::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
@@ -620,6 +669,10 @@ void RMGPhysics::DefineCommands() {
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("DumpProcessesForParticles", &RMGPhysics::DumpProcessesForParticles)
+      .SetGuidance("Dump registered processes for important particles")
+      .SetStates(G4State_Idle);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

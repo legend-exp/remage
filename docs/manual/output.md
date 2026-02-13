@@ -653,13 +653,13 @@ struct (or in a table if reshaping is off) called `detector_origins`:
 /
 ├── detector_origins · struct{B00000C,B00000D,...}
 │   ├── B00000C · struct{xloc,yloc,zloc}
-│   │   ├── xloc · real
-│   │   ├── yloc · real
-│   │   └── zloc · real
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   ├── B00000D · struct{xloc,yloc,zloc}
-│   │   ├── xloc · real
-│   │   ├── yloc · real
-│   │   └── zloc · real
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   └── ...
 └── ...
 ```
@@ -723,6 +723,14 @@ the command:
 /RMG/Output/ActivateOutputScheme Track
 ```
 
+:::{important}
+
+Optical photon tracks are not written out by default, since their number in a
+typical simulation is often extremely large. You will need to enable the option
+<project:../rmg-commands.md#rmgoutputtrackstoreopticalphotons> to include them.
+
+:::
+
 A new table named `tracks` is created in the output file, with columns:
 
 - `evtid`: Geant4 event identifier,
@@ -743,7 +751,8 @@ A new table named `tracks` is created in the output file, with columns:
 :::{tip}
 
 Use [scikit-hep/particle](https://github.com/scikit-hep/particle) to identify
-particles based on their PDG ID.
+particles based on their PDG ID. If included, optical photons will use a
+non-standard encoding of -22.
 
 :::
 

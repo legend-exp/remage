@@ -144,6 +144,7 @@ Commands for controlling physics processes
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 * `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
+* `DumpProcessesForParticles` – Dump registered processes for important particles
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -290,6 +291,15 @@ This is disabled by default
   * **Omittable** – `True`
   * **Default value** – `true`
 * **Allowed states** – `PreInit`
+
+### `/RMG/Processes/DumpProcessesForParticles`
+
+Dump registered processes for important particles
+
+* **Parameter** – `arg0`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Processes/Stepping/`
 
