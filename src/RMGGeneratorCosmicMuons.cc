@@ -74,7 +74,7 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
       fEcoMug->SetHSphereMaxPositionTheta(fSpherePositionThetaMax / u::rad);
       fEcoMug->SetHSphereMinPositionPhi(fSpherePositionPhiMin / u::rad);
       fEcoMug->SetHSphereMaxPositionPhi(fSpherePositionPhiMax / u::rad);
-    
+
       break;
     }
     default: {
