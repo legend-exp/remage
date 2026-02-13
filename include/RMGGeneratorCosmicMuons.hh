@@ -33,7 +33,6 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
 
-
     enum class SkyShape {
       kPlane,
       kSphere
