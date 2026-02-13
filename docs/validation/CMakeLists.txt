@@ -31,6 +31,7 @@ endforeach()
 
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
+# note: the tests producing these files must be labeled "val"!
 # TODO: add new images here
 # cmake-format: off
 set(TESTS_IMAGES
@@ -87,6 +88,12 @@ set(TESTS_IMAGES
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
+    nist/e-range-ar-distributions.output.png
+    nist/e-range-ar-vs-estar.output.png
+    nist/e-stopping-power-ar-vs-estar.output.png
+    nist/e-range-cu-distributions.output.png
+    nist/e-range-cu-vs-estar.output.png
+    nist/e-stopping-power-cu-vs-estar.output.png
     observables/tracks-bulk-10um-limit.tracks.out0.png
     observables/tracks-bulk-10um-limit.tracks.out1.png
     observables/tracks-bulk-10um-limit.tracks.out2.png
@@ -118,6 +125,11 @@ set(TESTS_IMAGES
     processes/innerbrem-gamma-vertex-energy.output.png
     processes/innerbrem-signal.output.png
     processes/innerbrem-difference.output.png
+    processes/processes.default.output.txt
+    processes/processes.grabmayr.output.txt
+    processes/processes.hadr-shielding.output.txt
+    processes/processes.innerbrem.output.txt
+    processes/processes.optical.output.txt
     performance/combine-tracks-benchmark.output.png)
 
 # cmake-format: on
