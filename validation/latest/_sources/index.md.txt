@@ -20,6 +20,7 @@ nist
 observables-ge
 processes
 processes-ib
+gammacorr
 performance
 ```
 

@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="About this validation report" href="versioninfo.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Performance Benchmarks" href="performance.html"><link rel="prev" title="Internal Bremsstrahlung in Ar-39 decay" href="processes-ib.html">
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>remage 0.20.1.dev31+g385626330 validation suite</title>
+        <title>Gamma correlations - remage 0.20.1.dev31+g385626330 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">remage 0.20.1.dev31+g385626330 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.20.1.dev31+g385626330 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -188,7 +188,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
@@ -205,7 +205,7 @@
 <li class="toctree-l1"><a class="reference internal" href="versioninfo.html">About this validation report</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Sections</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
@@ -213,7 +213,7 @@
 <li class="toctree-l1"><a class="reference internal" href="observables-ge.html">HPGe tracking and observables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processes.html">Physics lists</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processes-ib.html">Internal Bremsstrahlung in Ar-39 decay</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gammacorr.html">Gamma correlations</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Gamma correlations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Links</span></p>
@@ -239,12 +239,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/index.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/gammacorr.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/index.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/gammacorr.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -256,90 +256,94 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="remage-s-validation-suite">
-<h1>remage’s validation suite<a class="headerlink" href="#remage-s-validation-suite" title="Link to this heading">¶</a></h1>
-<p>These web pages provide a report of the
-<a class="reference external" href="https://remage.readthedocs.io"><em>remage</em></a> validation suite.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="versioninfo.html">About this validation report</a></li>
-</ul>
+          
+<style>
+  .ss-layout-default-AB { grid-template-areas: 'A B'; }
+</style>
+<section class="tex2jax_ignore mathjax_ignore" id="gamma-correlations">
+<h1>Gamma correlations<a class="headerlink" href="#gamma-correlations" title="Link to this heading">¶</a></h1>
+<p>This section of the validation report shows the effect of angular correlations
+after emission of multiple gammas after a decay. As an example: The background
+rate of Co-60 depends on both gammas hitting one detector, so the angle between
+the gammas matter.</p>
+<section id="expected-correlations">
+<h2>Expected correlations<a class="headerlink" href="#expected-correlations" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference external" href="https://indico.cern.ch/event/372884/contributions/1792361/">presentation</a>
+for more background on the calculation.</p>
+<p>The angular correlation functions take an approximate form of</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[W(\theta) = 1 + a_2 \cos^2\theta + a_4 \cos^4\theta\]</div>
 </div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bxdecay0.html#primary-electron-properties">Primary electron properties</a></li>
+<p>For Co-60, the parameters <span class="math notranslate nohighlight">\(a_2 = 1/8\)</span> and <span class="math notranslate nohighlight">\(a_4 = 1/24\)</span> can be obtained from the
+tables in <a class="footnote-reference brackets" href="#gammacorr-table" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> by normalizing the 0th-coefficient to 1.</p>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<ul class="simple">
+<li><p>expectation for Tl-208</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#natively-sampleable-solids">Natively sampleable solids</a></li>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#complex-solids">Complex solids</a></li>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#unions-and-intersections">Unions and intersections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#volumes-with-daughters">Volumes with daughters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#generic-surface-sampling">Generic surface sampling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="confinement.html#dedicated-simulations-for-ge-in-lar">Dedicated simulations for Ge in LAr</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="nist.html#electron-interactions">Electron interactions</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="observables-ge.html">HPGe tracking and observables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="observables-ge.html#electron-tracking-plots">Electron tracking plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="observables-ge.html#step-limits-effect-on-observables">Step limits effect on observables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="observables-ge.html#production-cuts-effect-on-observables">Production cuts effect on observables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="processes.html">Physics lists</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="processes.html#default-no-extra-options">Default (no extra options)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processes.html#with-hadronic-physics-shielding">With hadronic physics (shielding)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processes.html#with-hadronic-physics-shielding-with-external-gamma-cascades">With hadronic physics (shielding) with external gamma cascades</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processes.html#with-inner-bremsstrahlung-enabled">With inner bremsstrahlung enabled</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processes.html#optical-physics-enabled">Optical physics enabled</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="processes-ib.html">Internal Bremsstrahlung in Ar-39 decay</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="processes-ib.html#validation-test">Validation test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processes-ib.html#reference">Reference</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="gammacorr.html">Gamma correlations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gammacorr.html#expected-correlations">Expected correlations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gammacorr.html#simulated-correlations">Simulated correlations</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="performance.html#combine-low-energy-tracks-option">Combine low energy tracks option</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
 </div>
 </section>
+<section id="simulated-correlations">
+<h2>Simulated correlations<a class="headerlink" href="#simulated-correlations" title="Link to this heading">¶</a></h2>
+<figure class="sphinx-subfigure align-default" id="id3">
+<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<a class="reference internal image-reference" href="_images/gamma-angular-distribution-27-60.output.png"><img alt="_images/gamma-angular-distribution-27-60.output.png" src="_images/gamma-angular-distribution-27-60.output.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<a class="reference internal image-reference" href="_images/gamma-angular-distribution-81-208.output.png"><img alt="_images/gamma-angular-distribution-81-208.output.png" src="_images/gamma-angular-distribution-81-208.output.png" style="width: 300px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Plots of the angle between two emitted gammas after a Co-60 and Tl-208 decay.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="gammacorr-table" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>H.W. Taylor, B. Singh, F.S. Prato, R. McPherson, A tabulation of gamma-gamma
+directional-correlation coefficients, Atomic Data and Nuclear Data Tables,
+Volume 9, Issue 1 (1971), Pages 1-83,
+<a class="reference external" href="https://doi.org/10.1016/S0092-640X(71)80040-2">10.1016/S0092-640X(71)80040-2</a>.</p>
+</aside>
+</aside>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="versioninfo.html">
+          <a class="next-page" href="performance.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">About this validation report</div>
+                <div class="title">Performance Benchmarks</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="processes-ib.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Internal Bremsstrahlung in Ar-39 decay</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -358,8 +362,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Gamma correlations</a><ul>
+<li><a class="reference internal" href="#expected-correlations">Expected correlations</a></li>
+<li><a class="reference internal" href="#simulated-correlations">Simulated correlations</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -376,5 +400,7 @@
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js?v=1ae7504c"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>
