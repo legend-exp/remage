@@ -2,8 +2,15 @@ from __future__ import annotations
 
 import awkward as ak
 import matplotlib.pyplot as plt
+import numpy as np
+import pint
+import pyg4ometry as pg4
+import pygeomoptics
 from lgdo import lh5
+from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
+
+u = pint.get_application_registry()
 
 n_events = 3000
 macro = """
@@ -25,6 +32,51 @@ macro = """
 """
 
 
+def _add_dummy_sipm_surface(r, e, reg, det_l):
+    det_surf = pg4.geant4.solid.OpticalSurface(
+        "det_surf",
+        finish="ground",
+        model="unified",
+        surf_type="dielectric_metal",
+        value=0.05,
+        registry=reg,
+    )
+
+    wvl = np.array([100, 800]) * u.nm
+    eff = np.array([e, e])
+    refl = np.array([r, r])
+
+    with u.context("sp"):
+        det_surf.addVecPropertyPint("EFFICIENCY", wvl.to("eV"), eff)
+        det_surf.addVecPropertyPint("REFLECTIVITY", wvl.to("eV"), refl)
+
+    pg4.geant4.SkinSurface("det_surf", det_l, det_surf, reg)
+
+
+def geometry_detection(r: float, e: float):
+    reg = pg4.geant4.Registry()
+    matreg = LegendMaterialRegistry(reg, enable_optical=False)
+
+    mat = matreg.liquidargon
+    pygeomoptics.lar.pyg4_lar_attach_rindex(mat, reg)
+
+    world_s = pg4.geant4.solid.Orb("world", 20, registry=reg, lunit="cm")
+    world_l = pg4.geant4.LogicalVolume(world_s, mat, "world", registry=reg)
+    reg.setWorld(world_l)
+
+    det_s = pg4.geant4.solid.Orb("detector", 15, registry=reg, lunit="cm")
+    det_l = pg4.geant4.LogicalVolume(
+        det_s, matreg.metal_silicon, "detector", registry=reg
+    )
+    pg4.geant4.PhysicalVolume(
+        [0, 0, 0], [0, 0, 0], det_l, "detector", world_l, registry=reg
+    )
+
+    _add_dummy_sipm_surface(r, e, reg, det_l)
+
+    return reg
+
+
 def simulate(r: float, e: float):
     output = f"output-detection-{e:.2f}-{r:.2f}.lh5"
 
@@ -33,7 +85,7 @@ def simulate(r: float, e: float):
         macro_substitutions={
             "events": n_events,
         },
-        gdml_files=f"gdml/geometry-detection-{e:.2f}-{r:.2f}.gdml",
+        gdml_files=geometry_detection(r, e),
         output=output,
         overwrite_output=True,
         log_level="summary",

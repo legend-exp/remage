@@ -6,8 +6,14 @@ import awkward as ak
 import hist
 import matplotlib.pyplot as plt
 import numpy as np
+import pint
+import pyg4ometry as pg4
+import pygeomoptics
 from lgdo import lh5
+from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
+
+u = pint.get_application_registry()
 
 macro = """
 /RMG/Processes/OpticalPhysics
@@ -39,6 +45,28 @@ macro = """
 """
 
 
+def geometry_emission(mat_name: str):
+    reg = pg4.geant4.Registry()
+    matreg = LegendMaterialRegistry(reg, enable_optical=False)
+
+    if mat_name == "lar":
+        mat = matreg.liquidargon
+        pygeomoptics.lar.pyg4_lar_attach_rindex(mat, reg)
+        pygeomoptics.lar.pyg4_lar_attach_scintillation(mat, reg)
+    elif mat_name == "water":
+        mat = matreg.water
+        pygeomoptics.water.pyg4_water_attach_rindex(mat, mat)
+    else:
+        msg = f"unknown material {mat_name}"
+        raise ValueError(msg)
+
+    world_s = pg4.geant4.solid.Orb("world", 20, registry=reg, lunit="cm")
+    world_l = pg4.geant4.LogicalVolume(world_s, mat, "world", registry=reg)
+    reg.setWorld(world_l)
+
+    return reg
+
+
 def simulate(particle: str, energy: int, scintillate: bool):
     output = f"output-{'scintillation' if scintillate else 'cerenkov'}-{particle}-{energy}.lh5"
 
@@ -52,7 +80,7 @@ def simulate(particle: str, energy: int, scintillate: bool):
             "events": events,
             "inactive_proc": "Cerenkov" if scintillate else "Scintillation",
         },
-        gdml_files=f"gdml/geometry-emission-{'lar' if scintillate else 'water'}.gdml",
+        gdml_files=geometry_emission("lar" if scintillate else "water"),
         output=output,
         overwrite_output=True,
         log_level="summary",
