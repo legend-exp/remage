@@ -2,15 +2,12 @@ from __future__ import annotations
 
 import awkward as ak
 import matplotlib.pyplot as plt
-import numpy as np
-import pint
 import pyg4ometry as pg4
 import pygeomoptics
+from _geometry import _add_dummy_sipm_surface
 from lgdo import lh5
 from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
-
-u = pint.get_application_registry()
 
 n_events = 3000
 macro = """
@@ -30,27 +27,6 @@ macro = """
 
 /run/beamOn {events}
 """
-
-
-def _add_dummy_sipm_surface(r, e, reg, det_l):
-    det_surf = pg4.geant4.solid.OpticalSurface(
-        "det_surf",
-        finish="ground",
-        model="unified",
-        surf_type="dielectric_metal",
-        value=0.05,
-        registry=reg,
-    )
-
-    wvl = np.array([100, 800]) * u.nm
-    eff = np.array([e, e])
-    refl = np.array([r, r])
-
-    with u.context("sp"):
-        det_surf.addVecPropertyPint("EFFICIENCY", wvl.to("eV"), eff)
-        det_surf.addVecPropertyPint("REFLECTIVITY", wvl.to("eV"), refl)
-
-    pg4.geant4.SkinSurface("det_surf", det_l, det_surf, reg)
 
 
 def geometry_detection(r: float, e: float):

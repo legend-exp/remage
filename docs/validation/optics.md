@@ -100,6 +100,50 @@ detection `EFFICIENCY` and also proportional to `1 - REFLECTIVITY`:
 :alt: Detected light at a surface with efficiency and reflectivity
 ```
 
+## Attenuation (Absorption & Rayleigh scattering)
+
+This validation test checks the behaviour of the attenuating processes
+implemented in Geant4. These processes include bulk absorption through the
+`ABSLENGTH` material property and Rayleigh scattering through the `RAYLEIGH`
+property. The total attenuation is observed as the combination of both processes
+that each have an exponential profile.
+
+The geometry consists of a registered sensitive volume at one end of a tube of
+liquid argon (with 100% efficiency and 0% reflectivity). Optical photons are
+started in various distances in from of the detector plane, perpendicular to the
+detetcor plane.
+
+For each length $l \in {30\mathrm{ cm}, 60\mathrm{ cm}}$, three different sets
+of optical properties are simulated:
+
+- setting only an absorption length of $l$ and no Rayleigh scattering,
+- setting only a Rayleigh scattering length of $l$ and no bulk absorption, and
+- setting both, so that $1/l = 1/\lambda_{abs} + 1/\lambda_{rayl}$ is fulfilled.
+
+```{subfigure} AB
+:subcaptions: above
+
+:::{image} ./_img/optics/photon-attenuation-30.output.png
+:width: 97%
+:alt: Attenuation behaviour for l = 30 cm.
+:::
+
+:::{image} ./_img/optics/photon-attenuation-60.output.png
+:width: 97%
+:alt: Attenuation behaviour for l = 60 cm.
+:::
+
+Attenuation behaviour in liquid argon with simulated points and fitted
+exponential attenuation curves.
+```
+
+The absorption-only variant shows a clean fit of the expected attenuation
+length. In this simple case (without scattering), the absorption is fully
+linear. For the Rayleigh-only case, the fitted attenuation length is larger.
+This should be an effect of the finite aperture of the detector. Some
+forward-scattered photons will still reach the detecting surface, despite being
+scattered. The mixed case shows a behaviour in between the two cases.
+
 :::{note}
 
 Simulation and analysis scripts are available in

@@ -123,6 +123,8 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-max-z.eff.output.png
     observables/beta-observables.surf-max-z.spec.output.png
     optics/photon-detection.output.png
+    optics/photon-attenuation-30.output.png
+    optics/photon-attenuation-60.output.png
     optics/scintillation-alpha.output.png
     optics/scintillation-ion.output.png
     optics/scintillation-e-.output.png
