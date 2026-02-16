@@ -12,6 +12,7 @@ endforeach()
 # MAIN OUTPUT TESTS
 set(_macros
     ntuple-per-det.mac
+    ntuple-per-det-no-vtx.mac
     ntuple-per-det-vol.mac
     ntuple-per-det-shared.mac
     ntuple-single-table.mac
