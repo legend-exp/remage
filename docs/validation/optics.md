@@ -41,7 +41,8 @@ dependent linear function. The expectation is also shown in the plot.
 
 ```{figure} ./_img/optics/scintillation-yield.output.png
 :width: 70%
-:alt: The light output for each particle forms a linear function.
+
+The light output for each particle forms a linear function.
 ```
 
 ## Cerenkov emission
@@ -97,7 +98,8 @@ detection `EFFICIENCY` and also proportional to `1 - REFLECTIVITY`:
 
 ```{figure} ./_img/optics/photon-detection.output.png
 :width: 70%
-:alt: Detected light at a surface with efficiency and reflectivity
+
+Detected light at a surface with efficiency and reflectivity
 ```
 
 ## Attenuation (Absorption & Rayleigh scattering)
@@ -144,9 +146,79 @@ This should be an effect of the finite aperture of the detector. Some
 forward-scattered photons will still reach the detecting surface, despite being
 scattered. The mixed case shows a behaviour in between the two cases.
 
+## Wavelenth-shifting (WLS)
+
+The simulation setup contains a volume of liquid argon as optical medium. The
+attenuating properties of the liquid argon have been removed, and a thin disk of
+a wavelength-shifting material is introduced between emission point and
+detector. The WLS emission is isotropic, so the detector is a sphereical surface
+that contains the shifting disk and a small opening for the incoming light, to
+also be able to detect back-scattered shifted light.
+
+To reduce the effect of the border interfaces to the WLS disk, the disk has the
+same refractive index as the LAr. It is also not a known material from LEGEND,
+to simplify the calculation of the expectation values[^tpb_note]. It has a WLS
+absorption length of 2 mm and a broad emission between around 200 and 300 nm.
+
+The simulation is repeated with varying thickness of the WLS disk. VUV photons
+of 128 nm wavelength are started; the detector records the photons with their
+wavelength, and also their arrival times.
+
+```{figure} ./_img/optics/photon-wls.output.png
+:width: 70%
+
+Detected light after transmission through a WLS disk.
+```
+
+With increasing thickness of the WLS disk, the fraction of shifted light
+increases exponentially, and the fraction of transmitted VUV light decreases.
+
+### Time profiles of wavelength shifting
+
+Geant4 offers two modes how the WLS time profiles are generated. The default
+mode, `delta`, does not sample from the (exponential= emission time distribution
+characterized by the WLS time constant, but assumes a delta-function as time
+distribution. Only the `exponential` mode will sample from the correct
+distribution:
+
+```{subfigure} AB
+:subcaptions: above
+
+:::{image} ./_img/optics/photon-wls-times-delta.output.png
+:width: 97%
+:alt: Recorded photon arrival times for "delta" time profile.
+:::
+
+:::{image} ./_img/optics/photon-wls-times-exponential.output.png
+:width: 97%
+:alt: Recorded photon arrival times for "exponential" time profile.
+:::
+
+Recorded photon arrival times after WLS.
+```
+
+### Number of emitted WLS photons
+
+The number of emitted photons can be influenced with the scalar material
+property `WLSMEANNUMBERPHOTONS`. _remage_ implements a custom WLS process to
+limit the number of emitted photons to 1, instead of lsampling from a Poisson
+distribution as in stock Geant4. The effect of this process can be seen here:
+With `RMGOpWLS`, this limit is enforced, whereas with `OpWLS`, it is not.
+
+```{figure} ./_img/optics/photon-wls-photon-count.output.png
+:width: 70%
+
+Number of emitted photons from the `{RMG,}OpWLS` processes.
+```
+
 :::{note}
 
 Simulation and analysis scripts are available in
 [`tests/optics`](https://github.com/legend-exp/remage/tree/main/tests/optics).
 
 :::
+
+[^tpb_note]:
+    The most prominent WLS material, TPB, has complex optical properties. It has
+    an extremely short WLS absorption length and also has overlapping absorption
+    and emission spectra.
