@@ -576,7 +576,8 @@ bool RMGOutputTools::is_within_surface_safety(
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
     // Skip non-Germanium daughters if filtering is enabled
-    if (RMGOutputTools::is_distance_check_germanium_only && !cache.daughter_is_germanium[i]) continue;
+    if (RMGOutputTools::is_distance_check_germanium_only && !cache.daughter_is_germanium[i])
+      continue;
 
     // Early rejection: check distance to bounding sphere first (cheap)
     const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
@@ -586,7 +587,8 @@ bool RMGOutputTools::is_within_surface_safety(
     if (sphere_surface_dist > safety) {
       RMGLog::OutFormatDev(
           RMGLog::debug_event,
-          "Skipping daughter {} of volume '{}' (copy nr. {}) - bounding sphere is {:.2f} mm away, beyond safety {:.2f} mm",
+          "Skipping daughter {} of volume '{}' (copy nr. {}) - bounding sphere is {:.2f} mm away, "
+          "beyond safety {:.2f} mm",
           i,
           pv->GetName(),
           pv->GetCopyNo(),
@@ -613,7 +615,8 @@ bool RMGOutputTools::is_within_surface_safety(
     if (sample_dist < safety) {
       RMGLog::OutFormatDev(
           RMGLog::debug_event,
-          "Volume '{}' (copy nr. {}) is within {:.2f} mm of daughter {} - sample point distance is {:.2f} mm, within safety {:.2f} mm.",
+          "Volume '{}' (copy nr. {}) is within {:.2f} mm of daughter {} - sample point distance is "
+          "{:.2f} mm, within safety {:.2f} mm.",
           pv->GetName(),
           pv->GetCopyNo(),
           sphere_surface_dist / CLHEP::mm,
@@ -628,7 +631,8 @@ bool RMGOutputTools::is_within_surface_safety(
   // No surface found within safety distance
   RMGLog::OutFormatDev(
       RMGLog::debug_event,
-      "Volume '{}' (copy nr. {}) is farther than {:.2f} mm from all surfaces, outside safety {:.2f} mm.",
+      "Volume '{}' (copy nr. {}) is farther than {:.2f} mm from all surfaces, outside safety "
+      "{:.2f} mm.",
       pv->GetName(),
       pv->GetCopyNo(),
       cache.solid->DistanceToOut(local_pos) / CLHEP::mm,

@@ -69,7 +69,7 @@ void init_extra() {
   new RMGParticleFilterScheme();
   new RMGGeomBenchOutputScheme();
   new RMGVolumeDistanceStacker();
-  
+
   // confinments
   new RMGVertexConfinement();
   new RMGVertexFromFile();
