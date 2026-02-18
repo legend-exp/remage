@@ -16,6 +16,7 @@
 #include "RMGOutputTools.hh"
 
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 
 #include "G4AffineTransform.hh"
@@ -36,10 +37,16 @@
 
 namespace RMGOutputTools {
 
-  std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
-  bool is_distance_check_germanium_only = false;
+  G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+  G4ThreadLocal bool is_distance_check_germanium_only = false;
 
 } // namespace RMGOutputTools
+
+namespace {
+
+  std::mutex multiunion_mutex;
+
+} // namespace
 
 G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
   G4ThreeVector position;
@@ -94,7 +101,7 @@ void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
       "Setting distance check Germanium-only filtering to {}",
       RMGOutputTools::is_distance_check_germanium_only ? "ENABLED" : "DISABLED"
   );
-  // Clear cache when filter setting changes to rebuild with correct detector status
+  // Clear per-thread cache when filter setting changes to rebuild with correct detector status
   volume_cache.clear();
 }
 
@@ -542,6 +549,7 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
 
     // Handle MultiUnion flag
     if (cache.daughter_is_multiunion[i]) {
+      std::lock_guard<std::mutex> lock(multiunion_mutex);
       auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
       mu->SetAccurateSafety(true);
       const double sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
@@ -603,6 +611,7 @@ bool RMGOutputTools::is_within_surface_safety(
 
     double sample_dist;
     if (cache.daughter_is_multiunion[i]) {
+      std::lock_guard<std::mutex> lock(multiunion_mutex);
       auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
       mu->SetAccurateSafety(true);
       sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);

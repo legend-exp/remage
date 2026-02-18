@@ -24,6 +24,7 @@
 #include "G4AffineTransform.hh"
 #include "G4ThreeVector.hh"
 #include "G4VSolid.hh"
+#include "G4Threading.hh"
 
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
@@ -208,7 +209,7 @@ namespace RMGOutputTools {
   };
 
   // Cache for volume data, keyed by physical volume pointer
-  extern std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+    extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
 
   /** @brief Add a physical volume to the cache for distance to surface calculations.
    *
@@ -221,7 +222,7 @@ namespace RMGOutputTools {
   );
 
   // Configuration for safety distance check
-  extern bool is_distance_check_germanium_only;
+    extern G4ThreadLocal bool is_distance_check_germanium_only;
 
 
 } // namespace RMGOutputTools
