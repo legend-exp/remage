@@ -208,8 +208,10 @@ namespace RMGOutputTools {
       std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
   };
 
+  /// \cond this triggers a sphinx error
   // Cache for volume data, keyed by physical volume pointer
   extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+  /// \endcond
 
   /** @brief Add a physical volume to the cache for distance to surface calculations.
    *
@@ -221,9 +223,10 @@ namespace RMGOutputTools {
       const G4VPhysicalVolume* pv
   );
 
+  /// \cond this triggers a sphinx error
   // Configuration for safety distance check
   extern G4ThreadLocal bool is_distance_check_germanium_only;
-
+  /// \endcond
 
 } // namespace RMGOutputTools
 
