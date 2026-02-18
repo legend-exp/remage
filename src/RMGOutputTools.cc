@@ -619,7 +619,7 @@ bool RMGOutputTools::is_within_surface_safety(
           "{:.2f} mm, within safety {:.2f} mm.",
           pv->GetName(),
           pv->GetCopyNo(),
-          sphere_surface_dist / CLHEP::mm,
+          sample_dist / CLHEP::mm,
           i,
           sample_dist / CLHEP::mm,
           safety / CLHEP::mm
