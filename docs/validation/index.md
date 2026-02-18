@@ -18,7 +18,9 @@ confinement
 distances
 nist
 observables-ge
+processes
 processes-ib
+gammacorr
 performance
 ```
 

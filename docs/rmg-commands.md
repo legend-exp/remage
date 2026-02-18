@@ -144,6 +144,7 @@ Commands for controlling physics processes
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 * `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
+* `DumpProcessesForParticles` – Dump registered processes for important particles
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -290,6 +291,15 @@ This is disabled by default
   * **Omittable** – `True`
   * **Default value** – `true`
 * **Allowed states** – `PreInit`
+
+### `/RMG/Processes/DumpProcessesForParticles`
+
+Dump registered processes for important particles
+
+* **Parameter** – `arg0`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
 
 ## `/RMG/Processes/Stepping/`
 
@@ -1793,7 +1803,7 @@ Commands for controlling output of primary vertices.
 **Commands:**
 
 * `StorePrimaryParticleInformation` – Store information on primary particle details (not only vertex data).
-* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data.
+* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data (except the evtid column).
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 
@@ -1811,7 +1821,7 @@ This is disabled by default
 
 ### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
 
-Do not store vertex/primary particle data.
+Do not store vertex/primary particle data (except the evtid column).
 
 This is disabled by default
 
@@ -2124,6 +2134,7 @@ Commands for controlling output of track vertices.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StoreAlways` – Always store track data, even if event should be discarded.
+* `StoreOpticalPhotons` – Store optical photons in the track table.
 
 ### `/RMG/Output/Track/AddProcessFilter`
 
@@ -2179,6 +2190,22 @@ This is disabled by default
 ### `/RMG/Output/Track/StoreAlways`
 
 Always store track data, even if event should be discarded.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreOpticalPhotons`
+
+Store optical photons in the track table.
+
+:::{note}
+this will typically increase the output file size significantly.
+:::
 
 This is disabled by default
 

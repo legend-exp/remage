@@ -27,21 +27,22 @@ RMGVertexOutputScheme::RMGVertexOutputScheme() { this->DefineCommands(); }
 
 // invoked in RMGRunAction::SetupAnalysisManager()
 void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
-  if (fSkipPrimaryVertexOutput) return;
-
   auto vid = RMGOutputManager::Instance()
                  ->CreateAndRegisterAuxNtuple("vtx", "RMGVertexOutputScheme", ana_man);
 
   ana_man->CreateNtupleIColumn(vid, "evtid");
-  ana_man->CreateNtupleDColumn(vid, "time_in_ns");
-  CreateNtupleFOrDColumn(ana_man, vid, "xloc_in_m", fStoreSinglePrecisionPosition);
-  CreateNtupleFOrDColumn(ana_man, vid, "yloc_in_m", fStoreSinglePrecisionPosition);
-  CreateNtupleFOrDColumn(ana_man, vid, "zloc_in_m", fStoreSinglePrecisionPosition);
-  ana_man->CreateNtupleIColumn(vid, "n_part");
+
+  if (!fSkipPrimaryVertexOutput) {
+    ana_man->CreateNtupleDColumn(vid, "time_in_ns");
+    CreateNtupleFOrDColumn(ana_man, vid, "xloc_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, vid, "yloc_in_m", fStoreSinglePrecisionPosition);
+    CreateNtupleFOrDColumn(ana_man, vid, "zloc_in_m", fStoreSinglePrecisionPosition);
+    ana_man->CreateNtupleIColumn(vid, "n_part");
+  }
 
   ana_man->FinishNtuple(vid);
 
-  if (fStorePrimaryParticleInformation) {
+  if (!fSkipPrimaryVertexOutput && fStorePrimaryParticleInformation) {
     auto pid = RMGOutputManager::Instance()
                    ->CreateAndRegisterAuxNtuple("particles", "RMGVertexOutputScheme", ana_man);
 
@@ -59,8 +60,6 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
 
 // invoked in RMGEventAction::EndOfEventAction()
 void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
-  if (fSkipPrimaryVertexOutput) return;
-
   int n_vertex = event->GetNumberOfPrimaryVertex();
 
   auto rmg_man = RMGOutputManager::Instance();
@@ -76,34 +75,36 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
 
       int vcol_id = 0;
       ana_man->FillNtupleIColumn(vntupleid, vcol_id++, GetEventIDForStorage(event));
-      ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
-      FillNtupleFOrDColumn(
-          ana_man,
-          vntupleid,
-          vcol_id++,
-          primary_vertex->GetX0() / u::m,
-          fStoreSinglePrecisionPosition
-      );
-      FillNtupleFOrDColumn(
-          ana_man,
-          vntupleid,
-          vcol_id++,
-          primary_vertex->GetY0() / u::m,
-          fStoreSinglePrecisionPosition
-      );
-      FillNtupleFOrDColumn(
-          ana_man,
-          vntupleid,
-          vcol_id++,
-          primary_vertex->GetZ0() / u::m,
-          fStoreSinglePrecisionPosition
-      );
-      ana_man->FillNtupleIColumn(vntupleid, vcol_id++, n_primaries);
+      if (!fSkipPrimaryVertexOutput) {
+        ana_man->FillNtupleDColumn(vntupleid, vcol_id++, primary_vertex->GetT0() / u::ns);
+        FillNtupleFOrDColumn(
+            ana_man,
+            vntupleid,
+            vcol_id++,
+            primary_vertex->GetX0() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            vntupleid,
+            vcol_id++,
+            primary_vertex->GetY0() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            vntupleid,
+            vcol_id++,
+            primary_vertex->GetZ0() / u::m,
+            fStoreSinglePrecisionPosition
+        );
+        ana_man->FillNtupleIColumn(vntupleid, vcol_id++, n_primaries);
+      }
 
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(vntupleid);
 
-      if (fStorePrimaryParticleInformation) {
+      if (!fSkipPrimaryVertexOutput && fStorePrimaryParticleInformation) {
         for (int j = 0; j < n_primaries; j++) {
           auto primary = primary_vertex->GetPrimary(j);
 
@@ -167,7 +168,7 @@ void RMGVertexOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("SkipPrimaryVertexOutput", fSkipPrimaryVertexOutput)
-      .SetGuidance("Do not store vertex/primary particle data.")
+      .SetGuidance("Do not store vertex/primary particle data (except the evtid column).")
       .SetGuidance(
           std::string("This is ") + (fSkipPrimaryVertexOutput ? "enabled" : "disabled") + " by default"
       )

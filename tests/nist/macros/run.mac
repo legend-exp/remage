@@ -1,6 +1,6 @@
-/RMG/Geometry/RegisterDetector Germanium germanium 001
+/RMG/Geometry/RegisterDetector Germanium target 001
 
-/RMG/Geometry/SetMaxStepSize {MAX_STEP_SIZE_IN_M} m germanium
+/RMG/Geometry/SetMaxStepSize {MAX_STEP_SIZE_IN_M} m target
 
 /run/initialize
 
@@ -23,4 +23,4 @@
 /gps/ang/type iso
 /gps/energy {ENERGY} keV
 
-/run/beamOn 2000
+/run/beamOn {EVENTS}

@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<element name="Copper" formula="Cu" Z="29">
+			<atom value="63.55"/>
+		</element>
+		<material name="metal_copper">
+			<D value="8.96"/>
+			<composite ref="Copper" n="1"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="world" r="20" lunit="cm"/>
+		<orb name="target" r="15" lunit="cm"/>
+	</solids>
+	<structure>
+		<volume name="target">
+			<materialref ref="metal_copper"/>
+			<solidref ref="target"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="target">
+				<volumeref ref="target"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
