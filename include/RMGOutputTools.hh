@@ -21,6 +21,9 @@
 #include <vector>
 
 #include "G4Step.hh"
+#include "G4AffineTransform.hh"
+#include "G4ThreeVector.hh"
+#include "G4VSolid.hh"
 
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
@@ -73,10 +76,10 @@ namespace RMGOutputTools {
 
   /** @brief Enable or disable Germanium-only filtering for bounding sphere optimization.
    *
-   * @details When enabled, the bounding sphere optimization in distance_to_surface and
-   * is_within_surface_safety will only be applied to daughter volumes that are registered
-   * as Germanium detectors. This can improve performance when only Germanium detectors
-   * are relevant for surface distance calculations.
+   * @details When enabled, the bounding sphere optimization in is_within_surface_safety 
+   * will only be applied to daughter volumes that are registered as Germanium detectors. 
+   * This can improve performance when only Germanium detectors are relevant for surface 
+   * distance calculations.
    *
    * Note: Enabling this will clear the volume cache to rebuild with detector status.
    *
