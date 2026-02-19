@@ -35,6 +35,7 @@
 #include "magic_enum/magic_enum.hpp"
 
 
+/// \cond this triggers a sphinx error or creates weird namespaces @<long number>
 namespace RMGOutputTools {
 
   G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
@@ -43,10 +44,9 @@ namespace RMGOutputTools {
 } // namespace RMGOutputTools
 
 namespace {
-
   std::mutex multiunion_mutex;
-
 } // namespace
+/// \endcond
 
 G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
   G4ThreeVector position;

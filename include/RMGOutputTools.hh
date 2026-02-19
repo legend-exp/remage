@@ -20,11 +20,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "G4Step.hh"
 #include "G4AffineTransform.hh"
+#include "G4Step.hh"
+#include "G4Threading.hh"
 #include "G4ThreeVector.hh"
 #include "G4VSolid.hh"
-#include "G4Threading.hh"
 
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
@@ -77,9 +77,9 @@ namespace RMGOutputTools {
 
   /** @brief Enable or disable Germanium-only filtering for bounding sphere optimization.
    *
-   * @details When enabled, the bounding sphere optimization in is_within_surface_safety 
-   * will only be applied to daughter volumes that are registered as Germanium detectors. 
-   * This can improve performance when only Germanium detectors are relevant for surface 
+   * @details When enabled, the bounding sphere optimization in is_within_surface_safety
+   * will only be applied to daughter volumes that are registered as Germanium detectors.
+   * This can improve performance when only Germanium detectors are relevant for surface
    * distance calculations.
    *
    * Note: Enabling this will clear the volume cache to rebuild with detector status.
@@ -208,8 +208,10 @@ namespace RMGOutputTools {
       std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
   };
 
+  /// \cond this triggers a sphinx error
   // Cache for volume data, keyed by physical volume pointer
-    extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+  extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+  /// \endcond
 
   /** @brief Add a physical volume to the cache for distance to surface calculations.
    *
@@ -221,9 +223,10 @@ namespace RMGOutputTools {
       const G4VPhysicalVolume* pv
   );
 
+  /// \cond this triggers a sphinx error
   // Configuration for safety distance check
-    extern G4ThreadLocal bool is_distance_check_germanium_only;
-
+  extern G4ThreadLocal bool is_distance_check_germanium_only;
+  /// \endcond
 
 } // namespace RMGOutputTools
 
