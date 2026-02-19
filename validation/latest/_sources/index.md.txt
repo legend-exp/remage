@@ -21,6 +21,7 @@ observables-ge
 processes
 processes-ib
 gammacorr
+optics
 performance
 ```
 
