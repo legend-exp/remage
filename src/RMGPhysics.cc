@@ -533,13 +533,13 @@ void RMGPhysics::DumpProcessesForParticles(std::string file_name) {
 
       std::vector<std::string> procs;
       for (size_t i = 0; i < list.size(); i++) {
-        const auto& proc_name = list[i]->GetProcessName();
+        const auto& proc_name = list[static_cast<int>(i)]->GetProcessName();
         if (proc_name != "Transportation" && proc_name != "UserSpecialCut" &&
             proc_name != "StepLimiter")
           procs.push_back(proc_name);
       }
       // skip particles that only have a basic set of processes.
-      if (procs.size() == 0) { continue; }
+      if (procs.empty()) { continue; }
 
       std::cout << particle->GetParticleName() << std::endl;
       for (size_t counter = 0; counter < procs.size(); counter++) {
