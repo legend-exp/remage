@@ -104,12 +104,12 @@ void RMGVolumeDistanceStacker::DefineCommands() {
       .SetStates(G4State_Idle);
 
     fMessenger
-      ->DeclareMethod(
-            "MaxEnergyThresholdForStacking",
+      ->DeclareMethodWithUnit(
+            "MaxEnergyThresholdForStacking", "MeV",
             &RMGVolumeDistanceStacker::SetMaxEnergyThresholdForStacking
       )
       .SetGuidance("Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.")
-      .SetParameterName("energy", false)
+      .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 }
 
