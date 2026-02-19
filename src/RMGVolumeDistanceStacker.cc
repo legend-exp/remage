@@ -45,7 +45,8 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
     return std::nullopt;
 
   // if a max energy threshold is set, only defer tracks below that threshold.
-  if (fMaxEnergyThresholdForStacking >= 0 && aTrack->GetKineticEnergy() > fMaxEnergyThresholdForStacking)
+  if (fMaxEnergyThresholdForStacking >= 0 &&
+      aTrack->GetKineticEnergy() > fMaxEnergyThresholdForStacking)
     return std::nullopt;
 
   // note: aTrack->GetLogicalVolumeAtVertex() and aTrack->GetVertexPosition() might not be correctly
@@ -103,10 +104,11 @@ void RMGVolumeDistanceStacker::DefineCommands() {
       .SetParameterName("enable", false)
       .SetStates(G4State_Idle);
 
-    fMessenger
+  fMessenger
       ->DeclareMethodWithUnit(
-            "MaxEnergyThresholdForStacking", "MeV",
-            &RMGVolumeDistanceStacker::SetMaxEnergyThresholdForStacking
+          "MaxEnergyThresholdForStacking",
+          "MeV",
+          &RMGVolumeDistanceStacker::SetMaxEnergyThresholdForStacking
       )
       .SetGuidance("Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.")
       .SetParameterName("threshold", false)

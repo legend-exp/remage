@@ -2283,6 +2283,7 @@ Commands for controlling stacking tracks in the bulk of a volume.
 * `VolumeSafety` – Set the minimum distance to any other volume for this track to be stacked.
 * `AddVolumeName` – Add a volume name in which to stack e-/e+ tracks.
 * `DistanceCheckGermaniumOnly` – Enable/disable Germanium-only filtering for surface distance checks.
+* `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
 
 ### `/RMG/Output/VolumeStacker/VolumeSafety`
 
@@ -2318,6 +2319,20 @@ When true, only daughter volumes registered as Germanium detectors are considere
 * **Parameter** – `enable`
   * **Parameter type** – `b`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking`
+
+Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `MeV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
 ## `/RMG/GrabmayrGammaCascades/`
