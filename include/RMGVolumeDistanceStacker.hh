@@ -49,8 +49,14 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
      */
     void SetDistanceCheckGermaniumOnly(bool enable);
 
+    /** @brief Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
+     *  @details Only tracks with kinetic energy below this threshold will be stacked.
+     *  If set to a negative value, no energy threshold is applied.
+     */    void SetMaxEnergyThresholdForStacking(double energy) { fMaxEnergyThresholdForStacking = energy; }
+
   private:
 
+    double fMaxEnergyThresholdForStacking = -1;
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
 

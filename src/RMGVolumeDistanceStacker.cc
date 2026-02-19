@@ -44,6 +44,10 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
       aTrack->GetDefinition() != G4Positron::Definition())
     return std::nullopt;
 
+  // if a max energy threshold is set, only defer tracks below that threshold.
+  if (fMaxEnergyThresholdForStacking >= 0 && aTrack->GetKineticEnergy() > fMaxEnergyThresholdForStacking)
+    return std::nullopt;
+
   // note: aTrack->GetLogicalVolumeAtVertex() and aTrack->GetVertexPosition() might not be correctly
   // set at this point - do not trust it.
 
@@ -97,6 +101,15 @@ void RMGVolumeDistanceStacker::DefineCommands() {
       .SetGuidance("Enable/disable Germanium-only filtering for surface distance checks.")
       .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
       .SetParameterName("enable", false)
+      .SetStates(G4State_Idle);
+
+    fMessenger
+      ->DeclareMethod(
+            "MaxEnergyThresholdForStacking",
+            &RMGVolumeDistanceStacker::SetMaxEnergyThresholdForStacking
+      )
+      .SetGuidance("Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.")
+      .SetParameterName("energy", false)
       .SetStates(G4State_Idle);
 }
 
