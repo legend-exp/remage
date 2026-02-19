@@ -22,6 +22,7 @@ enum RMGDetectorType {
   kGermanium,
   kOptical,
   kScintillator,
+  kCalorimeter,
 };
 
 struct RMGDetectorMetadata {
