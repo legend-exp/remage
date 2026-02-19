@@ -87,17 +87,17 @@ def geometry_attenuation(wls_thickness: float):
     pygeomoptics.lar.pyg4_lar_attach_rindex(mat, reg)
 
     # attach some dummy WLS properties.
-    wls_abs_wvl = np.array([100, 105, 195, 200]) * u.nm
+    λ_abs = np.array([100, 105, 195, 200]) * u.nm
     wls_abs = 2 * u.m / np.array([0.00001, 1000, 1000, 0.00001])
 
-    wls_em_wvl = pygeomoptics.pyg4utils.pyg4_sample_λ(210 * u.nm, 300 * u.nm)
-    wls_em = np.ones_like(wls_em_wvl) * wls_em_wvl**2 / wls_em_wvl[0] ** 2
+    λ_em = pygeomoptics.pyg4utils.pyg4_sample_λ(210 * u.nm, 300 * u.nm)
+    wls_em = np.ones_like(λ_em) * λ_em**2 / λ_em[0] ** 2
     wls_em[0] = 0
     wls_em[-1] = 0
 
     with u.context("sp"):
-        mat.addVecPropertyPint("WLSABSLENGTH", wls_abs_wvl.to("eV"), wls_abs)
-        mat.addVecPropertyPint("WLSCOMPONENT", wls_em_wvl.to("eV"), wls_em)
+        mat.addVecPropertyPint("WLSABSLENGTH", λ_abs.to("eV"), wls_abs)
+        mat.addVecPropertyPint("WLSCOMPONENT", λ_em.to("eV"), wls_em)
 
     mat.addConstPropertyPint("WLSTIMECONSTANT", 1 * u.us)
     mat.addConstPropertyPint("WLSMEANNUMBERPHOTONS", 1)
@@ -169,8 +169,8 @@ def test_wls():
         processes = lh5.read("processes", remage_output)
         proc_wls = processes["RMGOpWLS"].value
 
-        tracks_wvl = 1239 / tracks.ekin[tracks.procid == proc_wls] / 1e6
-        spectra[i] = hist.new.Reg(100, 0, 400).Double().fill(tracks_wvl)
+        tracks_λ = 1239 / tracks.ekin[tracks.procid == proc_wls] / 1e6
+        spectra[i] = hist.new.Reg(100, 0, 400).Double().fill(tracks_λ)
 
     def shifted_fit(x, a, b):
         return a * (1 - np.exp(-b * x))

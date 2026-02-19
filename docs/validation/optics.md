@@ -10,9 +10,11 @@ sphere of scintillating liquid argon. No attenuating optical processes are
 enabled. Cerenkov emission is disabled. The number and energy of the created
 photons is recorded.
 
-For all particles, the same emission peak around a wavelength of 128 nm is
-expected. For each primary energy, a narrow peak of emitted photons is visible,
-varying with particle type.
+For all particles, the same emission spectrum around a wavelength of 128 nm is
+expected. We do not expect the typical narrow liquid argon emission peak here,
+as for this validation we implemented a broad shape (step-function) as the
+emission spetctrum[^spectral_densities]. For each primary energy, a narrow peak
+of emitted photons is visible, varying with particle type.
 
 ```{subfigure} AA|BC
 :subcaptions: above
@@ -217,6 +219,10 @@ Simulation and analysis scripts are available in
 [`tests/optics`](https://github.com/legend-exp/remage/tree/main/tests/optics).
 
 :::
+
+[^spectral_densities]:
+    For the emission quantities of scintillation and WLS processes, using a flat
+    function makes it easier to spot deviations in sampling.
 
 [^tpb_note]:
     The most prominent WLS material, TPB, has complex optical properties. It has

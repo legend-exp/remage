@@ -22,12 +22,12 @@ def _add_dummy_sipm_surface(
         registry=reg,
     )
 
-    wvl = np.array([100, 800]) * u.nm
+    λ = np.array([100, 800]) * u.nm
     eff = np.array([efficiency, efficiency])
     refl = np.array([reflectivity, reflectivity])
 
     with u.context("sp"):
-        det_surf.addVecPropertyPint("EFFICIENCY", wvl.to("eV"), eff)
-        det_surf.addVecPropertyPint("REFLECTIVITY", wvl.to("eV"), refl)
+        det_surf.addVecPropertyPint("EFFICIENCY", λ.to("eV"), eff)
+        det_surf.addVecPropertyPint("REFLECTIVITY", λ.to("eV"), refl)
 
     pg4.geant4.SkinSurface("det_surf", det_l, det_surf, reg)

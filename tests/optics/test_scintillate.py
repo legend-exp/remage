@@ -52,6 +52,10 @@ def geometry_emission(mat_name: str):
     if mat_name == "lar":
         mat = matreg.liquidargon
         pygeomoptics.lar.pyg4_lar_attach_rindex(mat, reg)
+
+        pygeomoptics.lar.lar_emission_spectrum.replace_implementation(
+            lambda λ: np.ones_like(λ) * λ**2 / λ[0] ** 2
+        )
         pygeomoptics.lar.pyg4_lar_attach_scintillation(mat, reg)
     elif mat_name == "water":
         mat = matreg.water
@@ -124,7 +128,8 @@ def simulate_and_plot(items, scintillate: bool, label: str):
             results[particle][energy] = np.mean(num_phot)
 
             wavelengths = ak.flatten(1239 / ptrk.ekin / 1e6)
-            h = hist.new.Reg(100, 0, 800).Double().fill(wavelengths)
+            bounds = (100, 200) if scintillate else (0, 800)
+            h = hist.new.Reg(100, *bounds).Double().fill(wavelengths)
             h.plot(
                 ax=ax2,
                 yerr=False,
