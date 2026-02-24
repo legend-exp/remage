@@ -13,10 +13,12 @@ macro="macros/$3"
 
 is_mt="${4-}"
 extra_args=""
+expected_count=1000
 if [[ "$is_mt" == "mt" ]]; then
     extra_args="-m -t 2"
 elif [[ "$is_mt" == "mp" ]]; then
     extra_args="-m -P 2"
+    expected_count=2000
 fi
 
 output_h5="${3/.mac/.hdf5}"
@@ -74,6 +76,8 @@ fi
 "$lh5ls" -a "$output_lh5" | sed -r 's/\x1B\[[0-9;]*[mK]//g' > "$output_dump_lh5"
 diff -u "$output_dump_lh5" "$output_exp_lh5"
 
+"$python_path" ./verify_lh5_nevents.py "$expected_count" "$output_lh5"
+
 # -------------------------------------
 # TEST remage post-precessed LH5 output
 # -------------------------------------
@@ -87,5 +91,7 @@ diff -u "$output_dump_lh5" "$output_exp_lh5"
 diff -u \
     <(sed 's/tcm · .*/tcm/g' -- "$output_dump_lh5_jag") \
     <(sed 's/tcm · .*/tcm/g' -- "$output_exp_lh5_jag")
+
+"$python_path" ./verify_lh5_nevents.py "$expected_count" "$output_lh5_jag"
 
 set +vx
