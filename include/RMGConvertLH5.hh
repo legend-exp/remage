@@ -52,6 +52,7 @@ class RMGConvertLH5 {
      * @param ntuple_meta A mapping of detector uids to a pair of ntuple id and ntuple name.
      * @param dry_run If true, the conversion is performed in-memory without writing to disk.
      * @param part_of_batch Indicates if this conversion is part of a batch operation.
+     * @param n_ev number of events to write as an additional attribute into the file.
      *
      * @return True if the conversion is successful, false otherwise.
      */
@@ -61,7 +62,8 @@ class RMGConvertLH5 {
         std::set<std::string>,
         const std::map<int, std::pair<int, std::string>>&,
         bool,
-        bool part_of_batch = false
+        bool part_of_batch = false,
+        int n_ev = -1
     );
     /**
      * @brief Convert an LH5 input file to HDF5 format.
@@ -95,10 +97,12 @@ class RMGConvertLH5 {
         std::set<std::string> aux_ntuples,
         const std::map<int, std::pair<int, std::string>>& ntuple_meta,
         bool dry_run,
-        bool part_of_batch
+        bool part_of_batch,
+        int n_ev
     )
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fAuxNtuples(aux_ntuples),
-          fNtupleMeta(ntuple_meta), fDryRun(dry_run), fIsPartOfBatch(part_of_batch) {};
+          fNtupleMeta(ntuple_meta), fDryRun(dry_run), fIsPartOfBatch(part_of_batch),
+          fEventCount(n_ev) {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,6 +169,7 @@ class RMGConvertLH5 {
     std::string fUIDKeyFormatString = "det{:03}";
     bool fDryRun;
     bool fIsPartOfBatch;
+    int fEventCount = -1;
 };
 
 #endif

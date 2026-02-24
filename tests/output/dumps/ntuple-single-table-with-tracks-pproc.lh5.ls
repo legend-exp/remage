@@ -8,6 +8,7 @@
 │       ├── xloc · real ── {'units': 'm'}
 │       ├── yloc · real ── {'units': 'm'}
 │       └── zloc · real ── {'units': 'm'}
+├── number_of_events · real 
 ├── processes · struct{compt,eBrem,phot} 
 │   ├── compt · real 
 │   ├── eBrem · real 
