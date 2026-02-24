@@ -4,6 +4,7 @@
 │   ├── xloc · array<1>{real} ── {'units': 'm'}
 │   ├── yloc · array<1>{real} ── {'units': 'm'}
 │   └── zloc · array<1>{real} ── {'units': 'm'}
+├── number_of_events · real 
 ├── particles · table{ekin,evtid,particle,px,py,pz,vertexid} 
 │   ├── ekin · array<1>{real} ── {'units': 'MeV'}
 │   ├── evtid · array<1>{real} 

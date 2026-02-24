@@ -8,6 +8,7 @@
 │       ├── xloc · real ── {'units': 'm'}
 │       ├── yloc · real ── {'units': 'm'}
 │       └── zloc · real ── {'units': 'm'}
+├── number_of_events · real 
 ├── stp · struct{germanium,optical,scintillator} 
 │   ├── __by_uid__ · struct{det001,det011,det101} 
 │   │   ├── det001 -> /stp/scintillator
