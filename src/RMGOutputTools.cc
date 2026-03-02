@@ -41,8 +41,9 @@ G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::
     position = hit->global_position_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     position = hit->global_position_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     position = hit->global_position_average;
   } else
@@ -64,8 +65,9 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
     distance = hit->distance_to_surface_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     distance = hit->distance_to_surface_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     distance = hit->distance_to_surface_average;
   } else
