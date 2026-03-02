@@ -28,7 +28,7 @@
 class EcoMug;
 
 namespace u = CLHEP;
-
+/* @brief Generate cosmic muons, based on https://doi.org/10.1016/j.nima.2021.165732 */
 class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
@@ -64,6 +64,7 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     SkyShape fSkyShape = SkyShape::kSphere;
     double fSkyPlaneSize = -1;
     double fSkyPlaneHeight = 50;
+    double fSkyHSphereRadius = 50;
 
     double fSpherePositionThetaMin = 0 * u::deg;
     double fSpherePositionThetaMax = 90 * u::deg;
