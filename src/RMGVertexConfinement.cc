@@ -586,8 +586,10 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
     }
     // if we have a subtraction solid and the first one is supported for
     // sampling, use it but check for containment
-    else if (solid_type == "G4SubtractionSolid" and
-             RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())) {
+    else if (
+        solid_type == "G4SubtractionSolid" and
+        RMGGeneratorUtil::IsSampleable(solid->GetConstituentSolid(0)->GetEntityType())
+    ) {
       RMGLog::OutDev(
           RMGLog::debug,
           "Is a subtraction solid, sampling from constituent solid with containment check"
