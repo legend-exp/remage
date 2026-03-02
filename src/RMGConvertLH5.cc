@@ -307,9 +307,11 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
 
-  std::string links_group_name = "__by_uid__";
+  const std::string links_group_name = "__by_uid__";
+  const std::string n_ev_name = "number_of_events";
   std::vector<std::string> links;
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_links_group_name", links_group_name));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_event_number_name", n_ev_name));
 
   for (auto& ntuple : ntuples) {
     if (ntuple.empty()) LH5Log(RMGLog::fatal, "empty ntuple name, how is this possible?");
@@ -363,6 +365,13 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   // if the stp group is empty, remove it
   if (ntuples.empty()) hfile.unlink(ntuple_group_name);
   else {
+    if (fEventCount > 0) {
+      CreateUIntDataset(hfile, n_ev_name, fEventCount);
+      auto n_ev_dset = hfile.openDataSet(n_ev_name);
+      SetStringAttribute(n_ev_dset, "datatype", "real");
+      n_ev_dset.close();
+    }
+
     // make the root HDF5 group an LH5 struct.
     if (!ntuples_group.attrExists("datatype")) {
       LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
@@ -417,7 +426,8 @@ bool RMGConvertLH5::ConvertToLH5(
     std::set<std::string> aux_ntuples,
     const std::map<int, std::pair<int, std::string>>& ntuple_meta,
     bool dry_run,
-    bool part_of_batch
+    bool part_of_batch,
+    int n_ev
 ) {
   auto conv = RMGConvertLH5(
       hdf5_file_name,
@@ -425,7 +435,8 @@ bool RMGConvertLH5::ConvertToLH5(
       aux_ntuples,
       ntuple_meta,
       dry_run,
-      part_of_batch
+      part_of_batch,
+      n_ev
   );
   try {
     return conv.ConvertToLH5Internal();
@@ -594,7 +605,7 @@ bool RMGConvertLH5::ConvertFromLH5(
     bool part_of_batch,
     std::map<std::string, std::map<std::string, std::string>>& units_map
 ) {
-  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, {}, {}, dry_run, part_of_batch);
+  auto conv = RMGConvertLH5(lh5_file_name, ntuple_group_name, {}, {}, dry_run, part_of_batch, -1);
   try {
     return conv.ConvertFromLH5Internal(units_map);
   } catch (const H5::Exception& e) {
