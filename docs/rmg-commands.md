@@ -1441,6 +1441,7 @@ Commands for controlling the simulation output
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
 * `/RMG/Output/Track/` – Commands for controlling output of track vertices.
 * `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
+* `/RMG/Output/VolumeStacker/` – Commands for controlling stacking tracks in the bulk of a volume.
 
 **Commands:**
 
@@ -2270,6 +2271,68 @@ Add a physics process by name. This will only keep the specified particles when 
 * **Parameter** – `proc`
   * **Parameter type** – `s`
   * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+## `/RMG/Output/VolumeStacker/`
+
+Commands for controlling stacking tracks in the bulk of a volume.
+
+
+**Commands:**
+
+* `VolumeSafety` – Set the minimum distance to any other volume for this track to be stacked.
+* `AddVolumeName` – Add a volume name in which to stack e-/e+ tracks.
+* `DistanceCheckGermaniumOnly` – Enable/disable Germanium-only filtering for surface distance checks.
+* `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
+
+### `/RMG/Output/VolumeStacker/VolumeSafety`
+
+Set the minimum distance to any other volume for this track to be stacked.
+
+* **Parameter** – `safety`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `cm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/VolumeStacker/AddVolumeName`
+
+Add a volume name in which to stack e-/e+ tracks.
+
+Can be called multiple times to register multiple volumes.
+
+* **Parameter** – `volume`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/VolumeStacker/DistanceCheckGermaniumOnly`
+
+Enable/disable Germanium-only filtering for surface distance checks.
+
+When true, only daughter volumes registered as Germanium detectors are considered.
+
+* **Parameter** – `enable`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking`
+
+Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `MeV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
 * **Allowed states** – `Idle`
 
 ## `/RMG/GrabmayrGammaCascades/`
