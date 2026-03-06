@@ -11,14 +11,26 @@ electrons and compare them with data from the
 short description of the reported quantities is available
 [here](https://physics.nist.gov/PhysRefData/Star/Text/method.html)).
 
-Multiple Coulomb scattering is disabled through the
+The simulation physics is modified by the commands:
 
 ```
 /process/inactivate msc
+/process/eLoss/fluct {FLUCT}
+/RMG/Processes/DefaultProductionCut 1 km
+/RMG/Processes/SensitiveProductionCut 1 km
 ```
 
-command, since it prevents us to measure the true integrated particle path
-length in the simulation (unless a very short step size limit is set).
+- Multiple Coulomb scattering is disabled, since it prevents us to measure the
+  true integrated particle path length in the simulation (unless a very short
+  step size limit is set).
+- the high production cuts ensure that no secondaries are created, this is
+  required to correctly measure the bremsstrahlung component.
+- energy-loss fluctuations are (conditionally) disabled to get more accurate
+  CSDA range distributions. They are only kept activated for the plot of the
+  distributions of the integrated path length.
+
+An effect of the step length is visible. The larger the step length, the larger
+the difference to the expected integrated path length.
 
 ### Electron interactions in natural germanium
 
