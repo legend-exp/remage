@@ -8,6 +8,13 @@
 # to the theoretical range
 /process/inactivate msc
 
+# disable energy loss fluctuations (straggling)
+/process/eLoss/fluct {FLUCT}
+
+# prevent any secondary production
+/RMG/Processes/DefaultProductionCut 1 km
+/RMG/Processes/SensitiveProductionCut 1 km
+
 /RMG/Output/Germanium/StoreTrackID true
 
 /RMG/Generator/Confine Volume
