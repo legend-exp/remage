@@ -370,6 +370,7 @@ void RMGPhysics::ConstructOptical() {
   op_par->SetScintTrackSecondariesFirst(true); // default
   op_par->SetScintByParticleType(true);        // not default
   op_par->SetBoundaryInvokeSD(true);           // not default
+  op_par->SetWLSTimeProfile("exponential");    // not default
 
   // scintillation process
   auto scint_proc = new G4Scintillation("Scintillation");

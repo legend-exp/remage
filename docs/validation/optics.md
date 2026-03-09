@@ -177,23 +177,22 @@ increases exponentially, and the fraction of transmitted VUV light decreases.
 
 ### Time profiles of wavelength shifting
 
-Geant4 offers two modes how the WLS time profiles are generated. The default
-mode, `delta`, does not sample from the (exponential= emission time distribution
-characterized by the WLS time constant, but assumes a delta-function as time
-distribution. Only the `exponential` mode will sample from the correct
-distribution:
+Geant4 offers two modes how the WLS time profiles are generated. _remage_'s
+default mode,`exponential`, will sample from the exponential emission time
+distribution characterized by the WLS time constant. Upstream Geant4's default,
+`delta`, assumes a delta-function as time distribution.
 
 ```{subfigure} AB
 :subcaptions: above
 
-:::{image} ./_img/optics/photon-wls-times-delta.output.png
-:width: 97%
-:alt: Recorded photon arrival times for "delta" time profile.
-:::
-
 :::{image} ./_img/optics/photon-wls-times-exponential.output.png
 :width: 97%
 :alt: Recorded photon arrival times for "exponential" time profile.
+:::
+
+:::{image} ./_img/optics/photon-wls-times-delta.output.png
+:width: 97%
+:alt: Recorded photon arrival times for "delta" time profile.
 :::
 
 Recorded photon arrival times after WLS.
