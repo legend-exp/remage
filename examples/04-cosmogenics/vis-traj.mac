@@ -17,7 +17,6 @@
 /vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate
 
-/RMG/Processes/Realm CosmicRays
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select CosmicMuons
 

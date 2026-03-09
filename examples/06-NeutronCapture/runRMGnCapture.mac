@@ -21,6 +21,4 @@
 /gps/ang/type iso
 /gps/energy 0.5 MeV
 
-#/RMG/Processes/Realm CosmicRays
-
 /run/beamOn 10000
