@@ -24,6 +24,8 @@ int main(int argc, char** argv) {
   if (!macro.empty()) manager.IncludeMacroFile(macro);
   else manager.SetInteractive(true);
 
+  manager.GetOutputManager()->SetOutputOverwriteFiles(true);
+
   manager.SetNumberOfThreads(1);
   manager.Initialize();
   manager.Run();

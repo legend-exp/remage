@@ -11,3 +11,14 @@ endif()
 add_executable(06-NeutronCapture main.cc HPGeTestStand.hh HPGeTestStand.cc IsotopeOutputScheme.cc
                                  IsotopeOutputScheme.hh)
 target_link_libraries(06-NeutronCapture PUBLIC RMG::remage)
+
+# collect auxiliary files
+file(
+  GLOB _aux
+  RELATIVE ${PROJECT_SOURCE_DIR}
+  *.mac GammaCascades/*.txt)
+
+# copy them to the build area
+foreach(_file ${_aux})
+  configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
+endforeach()

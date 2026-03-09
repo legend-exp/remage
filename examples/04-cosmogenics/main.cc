@@ -18,6 +18,8 @@ int main(int argc, char** argv) {
   std::string macro = argc > 1 ? argv[1] : "";
   if (!macro.empty()) manager.IncludeMacroFile(macro);
 
+  manager.GetOutputManager()->SetOutputOverwriteFiles(true);
+
   manager.Initialize();
   manager.Run();
 
