@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Optical physics - remage 0.21.1.dev5+g36e9e2394 validation suite</title>
+        <title>Optical physics - remage 0.21.1.dev6+gdfce7ee02 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.21.1.dev5+g36e9e2394 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.21.1.dev6+gdfce7ee02 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.21.1.dev5+g36e9e2394 validation suite</span>
+  <span class="sidebar-brand-text">remage 0.21.1.dev6+gdfce7ee02 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -440,21 +440,20 @@ wavelength, and also their arrival times.</p>
 increases exponentially, and the fraction of transmitted VUV light decreases.</p>
 <section id="time-profiles-of-wavelength-shifting">
 <h3>Time profiles of wavelength shifting<a class="headerlink" href="#time-profiles-of-wavelength-shifting" title="Link to this heading">¶</a></h3>
-<p>Geant4 offers two modes how the WLS time profiles are generated. The default
-mode, <code class="docutils literal notranslate"><span class="pre">delta</span></code>, does not sample from the (exponential= emission time distribution
-characterized by the WLS time constant, but assumes a delta-function as time
-distribution. Only the <code class="docutils literal notranslate"><span class="pre">exponential</span></code> mode will sample from the correct
-distribution:</p>
+<p>Geant4 offers two modes how the WLS time profiles are generated. <em>remage</em>’s
+default mode,<code class="docutils literal notranslate"><span class="pre">exponential</span></code>, will sample from the exponential emission time
+distribution characterized by the WLS time constant. Upstream Geant4’s default,
+<code class="docutils literal notranslate"><span class="pre">delta</span></code>, assumes a delta-function as time distribution.</p>
 <figure class="sphinx-subfigure align-default" id="id9">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
-<span class="caption">Recorded photon arrival times for &quot;delta&quot; time profile.</span>
-<a class="reference internal image-reference" href="_images/photon-wls-times-delta.output.png"><img alt="Recorded photon arrival times for &quot;delta&quot; time profile." src="_images/photon-wls-times-delta.output.png" style="width: 97%;" />
+<span class="caption">Recorded photon arrival times for &quot;exponential&quot; time profile.</span>
+<a class="reference internal image-reference" href="_images/photon-wls-times-exponential.output.png"><img alt="Recorded photon arrival times for &quot;exponential&quot; time profile." src="_images/photon-wls-times-exponential.output.png" style="width: 97%;" />
 </a>
 </div>
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
-<span class="caption">Recorded photon arrival times for &quot;exponential&quot; time profile.</span>
-<a class="reference internal image-reference" href="_images/photon-wls-times-exponential.output.png"><img alt="Recorded photon arrival times for &quot;exponential&quot; time profile." src="_images/photon-wls-times-exponential.output.png" style="width: 97%;" />
+<span class="caption">Recorded photon arrival times for &quot;delta&quot; time profile.</span>
+<a class="reference internal image-reference" href="_images/photon-wls-times-delta.output.png"><img alt="Recorded photon arrival times for &quot;delta&quot; time profile." src="_images/photon-wls-times-delta.output.png" style="width: 97%;" />
 </a>
 </div>
 </div>
