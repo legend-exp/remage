@@ -28,6 +28,7 @@ message(STATUS "stats factor for validation tests: ${STATS_FACTOR}")
 
 add_subdirectory(basics)
 add_subdirectory(confinement)
+add_subdirectory(cosmogenics)
 add_subdirectory(detectors)
 add_subdirectory(distances)
 add_subdirectory(gammacorr)
@@ -43,10 +44,6 @@ add_subdirectory(python)
 add_subdirectory(trackoutput)
 add_subdirectory(observables)
 add_subdirectory(vertex)
-
-if(RMG_BUILD_EXAMPLES)
-  add_subdirectory(examples)
-endif()
 
 if(BxDecay0_FOUND)
   add_subdirectory(bxdecay0)
