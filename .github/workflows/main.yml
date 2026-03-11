@@ -47,7 +47,7 @@ jobs:
 
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          cmake -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
@@ -168,7 +168,6 @@ jobs:
           cmake \
             -D CMAKE_INSTALL_PREFIX=../local \
             -D Python3_EXECUTABLE="$(command -v python)" \
-            -D RMG_BUILD_EXAMPLES=1 \
             -D BUILD_TESTING=ON \
             -D RMG_BUILD_DOCS=OFF \
             ..
