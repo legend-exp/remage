@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 add_executable(test-surface-cosmogenic EXCLUDE_FROM_ALL main.cc HPGeTestStand.hh HPGeTestStand.cc)
-target_link_libraries(test-surface-cosmogenic PUBLIC RMG::remage)
+target_link_libraries(test-surface-cosmogenic PUBLIC remage)
 
 # collect auxiliary files
 file(
