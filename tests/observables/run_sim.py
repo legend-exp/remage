@@ -1,27 +1,17 @@
 from __future__ import annotations
 
-import logging
-import subprocess
+import os
 import sys
+from multiprocessing import Pool
 from pathlib import Path
 
-import colorlog
 import dbetto
 from reboost.build_hit import build_hit
-
-log = logging.getLogger(__name__)
-
-handler = colorlog.StreamHandler()
-handler.setFormatter(
-    colorlog.ColoredFormatter("%(log_color)s%(name)s [%(levelname)s] %(message)s")
-)
-logger = logging.getLogger()
-logger.handlers.clear()
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
-
+from remage import remage_run
 
 rmg = sys.argv[1]
+n_proc = int(os.environ.get("RMG_STATS_FACTOR", "1"))
+n_events = 20000 * n_proc * (4 if n_proc > 1 else 1)
 
 
 def replace_lines(
@@ -109,14 +99,13 @@ def run_sim(
     replace_lines(
         "macros/template.mac", macro_directory / Path(macro_file), replacements
     )
-    subprocess.run(
-        (
-            f"{rmg} {macro_directory / macro_file} -g "
-            f"gdml/geometry.gdml -o {stp_directory}/out.lh5 "
-            "-w -t 1 "
-        ),
-        shell=True,
-        check=False,
+    remage_run(
+        str(macro_directory / macro_file),
+        macro_substitutions={"NEVENTS": str(n_events)},
+        gdml_files="gdml/geometry.gdml",
+        output=f"{stp_directory}/out.lh5",
+        overwrite_output=True,
+        threads=1,
     )
 
 
@@ -149,10 +138,8 @@ if do_bulk:
 """
 
 
-# with and without the argon table
-profile = {}
-for generator, config in generators.items():
-    profile[generator] = {}
+def run_sim_and_pproc(gen):
+    generator, config = gen
 
     # loop over step limits
     for step_limits in cuts:
@@ -182,3 +169,8 @@ for generator, config in generators.items():
             val=step_limits,
             reboost_config="config/hit_config.yaml",
         )
+
+
+if __name__ == "__main__":
+    with Pool(n_proc) as pool:
+        pool.map(run_sim_and_pproc, list(generators.items()))
