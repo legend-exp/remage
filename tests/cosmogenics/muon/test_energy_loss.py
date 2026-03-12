@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 
 import awkward as ak
-import hist
 import matplotlib.pyplot as plt
 import numpy as np
 import pint
 import pyg4ometry as pg4
+import scipy as sp
 from lgdo import lh5
 from pygeomtools import RemageDetectorInfo
 from pygeomtools.materials import LegendMaterialRegistry
@@ -16,7 +16,8 @@ from remage import remage_run
 u = pint.get_application_registry()
 
 macro = """
-/RMG/Processes/HadronicPhysics Shielding
+/RMG/Processes/HadronicPhysics {had_physics}
+/RMG/Processes/LowEnergyEMPhysics {em_physics}
 /RMG/Output/ActivateOutputScheme Track
 /RMG/Geometry/RegisterDetectorsFromGDML Scintillator
 
@@ -27,6 +28,8 @@ macro = """
 
 /RMG/Output/Track/StoreSinglePrecisionEnergy
 /RMG/Output/Track/StoreSinglePrecisionPosition
+
+/RMG/Output/Scintillator/StoreParticleVelocities true
 
 /RMG/Generator/Confine UnConfined
 
@@ -48,6 +51,8 @@ def geometry(mat_name: str):
 
     if mat_name == "lar":
         mat = matreg.liquidargon
+    elif mat_name == "water":
+        mat = matreg.water
     else:
         msg = f"unknown material {mat_name}"
         raise ValueError(msg)
@@ -57,7 +62,7 @@ def geometry(mat_name: str):
     reg.setWorld(world_l)
 
     thin_slab_s = pg4.geant4.solid.Box(
-        "thin_slab", 20, 20, 0.1, registry=reg, lunit="cm"
+        "thin_slab", 0.1, 20 - 0.001, 20 - 0.001, registry=reg, lunit="cm"
     )
     thin_slab_l = pg4.geant4.LogicalVolume(thin_slab_s, mat, "thin_slab", registry=reg)
     thin_slab_p = pg4.geant4.PhysicalVolume(
@@ -74,15 +79,30 @@ def geometry(mat_name: str):
     return reg
 
 
-def simulate(energy: int, material: str = "lar"):
-    output = f"output-energy_loss-{energy}.lh5"
+def simulate(
+    energy: float,
+    material: str = "lar",
+    had_physics: str = "Shielding",
+    em_physics: str = "Livermore",
+) -> str:
+    output = (
+        f"output-energy_loss-{energy:.0f}-{material}-{had_physics}-{em_physics}.lh5"
+    )
 
-    events = 100 * int(os.environ.get("RMG_STATS_FACTOR", "1"))
+
+    events = 100000 * int(os.environ.get("RMG_STATS_FACTOR", "1"))
+
+    geom = geometry(material)
 
     remage_run(
         macro.split("\n"),
-        macro_substitutions={"energy": energy, "events": events},
-        gdml_files=geometry(material),
+        macro_substitutions={
+            "energy": energy,
+            "events": events,
+            "had_physics": had_physics,
+            "em_physics": em_physics,
+        },
+        gdml_files=geom,
         output=output,
         overwrite_output=True,
         log_level="summary",
@@ -91,80 +111,115 @@ def simulate(energy: int, material: str = "lar"):
     return output
 
 
-def simulate_and_plot(energies: list[int], material: str):
-    results = {}
-
-    for energy in energies:
-        results[energy] = {}
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-
-        remage_output = simulate(energy, material=material)
-
-        # read in track data
-        tracks = lh5.read_as("tracks", remage_output, library="ak")
-
-        # read in event data
-        sct_output = lh5.read_as("stp/thin_slab", remage_output, library="ak")
-
-        # group-by event id
-        trk = ak.unflatten(tracks, ak.run_lengths(tracks.evtid))
-
-        # select optical photons.
-        ptrk = trk[(trk.particle == -22)]
-
-        num_phot = ak.num(ptrk.particle, axis=1)
-
-        h = hist.new.Reg(200, 0, 5000).Double().fill(num_phot)
-        h.plot(
-            ax=ax1,
-            yerr=False,
-            label=rf"energy = {energy} keV",
-        )
-        results[particle][energy] = np.mean(num_phot)
-
-        wavelengths = ak.flatten(1239 / ptrk.ekin / 1e6)
-        bounds = (100, 200) if scintillate else (0, 800)
-        h = hist.new.Reg(100, *bounds).Double().fill(wavelengths)
-        h.plot(
-            ax=ax2,
-            yerr=False,
-            label=rf"energy = {energy} keV",
-            density=True,
-        )
-
-    fig.suptitle(f"{label} light yield for {particle}")
-    ax1.set_xlabel(f"emitted {label} photon density [a.u.]")
-    ax1.legend()
-    ax2.set_xlabel(f"{label} photon wavelength [nm]")
-    fig.savefig(f"{label.lower()}-{particle}.output.png")
-
-    # plot linear dependency.
-    endpoint = max(max(r) for r in results.values()) * 1.1
+def simulate_and_plot(energy: float, material: str, had_physics: str, em_physics: str):
 
     fig, ax = plt.subplots()
-    x = np.array([0, endpoint])
-    for particle, _, expectation in items:
-        if scintillate:
-            ax.plot(x, x * expectation, color="black", linestyle="--", linewidth=1)
-        ax.scatter(
-            results[particle].keys(),
-            results[particle].values(),
-            label=particle,
-            marker="x",
-            zorder=100,
-        )
 
-    ax.set_title(f"{label} light yield")
-    ax.set_ylabel(f"number of emitted {label} photons")
-    ax.set_xlabel("particle energy [keV]")
-    ax.set_xlim([0, endpoint])
-    ax.legend()
-    fig.savefig(f"{label.lower()}-yield.output.png")
+    remage_output = simulate(
+        energy, material=material, had_physics=had_physics, em_physics=em_physics
+    )
+
+    # read in track data
+    tracks = lh5.read_as("tracks", remage_output, library="ak")
+    mask = tracks["parent_trackid"] == 0
+
+    # read in event data
+    stp = lh5.read("stp/", remage_output)
+
+    c = sp.constants.physical_constants["speed of light in vacuum"][0]
+    m = sp.constants.physical_constants["muon mass energy equivalent in MeV"][0]
+
+    v_in_m_per_s = stp["detector"]["v_post"].view_as("ak") * 1e9
+    E_post = m / np.sqrt(1.0 - v_in_m_per_s**2 / c**2)
+    E_kin_post = E_post - m
+
+    E_lost = np.max(tracks[mask]["ekin"]) - ak.max(E_kin_post, axis=-1)
+    distance = 20  # cm
+
+    dEdx_sim = E_lost / distance
+
+    densities = {
+        "lar": 1.396,  # g/cm^3
+        "water": 1.0,  # g/cm^3
+    }
+
+    c_minimal_ionization = 1.5  # MeV*cm^2/g
+    dEdx_min_ionizing = c_minimal_ionization * densities[material]  # MeV/cm
+
+    mean_dEdx = np.mean(dEdx_sim)
+    median_dEdx = np.median(dEdx_sim)
+
+    ax.hist(
+        ak.ravel(dEdx_sim),
+        bins=10 ** np.linspace(0, 5, 101),
+        label="simulated",
+        histtype="step",
+    )
+    ax.axvline(
+        dEdx_min_ionizing,
+        color="black",
+        ls=":",
+        label=f"minimal ionization = {dEdx_min_ionizing:.2f} MeV/cm",
+    )
+    ax.axvline(
+        mean_dEdx, color="red", ls="--", label=f"mean dE/dx = {mean_dEdx:.2f} MeV/cm"
+    )
+    ax.axvline(
+        median_dEdx,
+        color="blue",
+        ls="--",
+        label=f"median dE/dx = {median_dEdx:.2f} MeV/cm",
+    )
+
+    ax.axvline(
+        np.max(tracks[mask]["ekin"]) / distance,
+        color="green",
+        ls=":",
+        label=f"upper limit from sim = {np.max(tracks[mask]['ekin']) / distance} MeV/cm",
+    )
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    ax.set_ylim(1, 1e5)
+
+    ax.set_xlabel("energy loss dE/dx [MeV/cm]")
+    ax.legend(loc="upper right")
+    ax.text(
+        3e2,
+        1e3,
+        "energy: \nmaterial: \nhadronic physics: \nEM physics: ",
+        size=10,
+        ha="left",
+        va="top",
+    )
+    ax.text(
+        1e5,
+        1e2,
+        1e3,
+        f"{energy:.0f} GeV\n{material}\n{had_physics}\n{em_physics}",
+        weight="bold",
+        ha="right",
+        va="top",
+    )
+
+    fig.savefig(
+        f"energy_loss_{material}_{had_physics}_{em_physics}_{energy}GeV.output.png"
+    )
 
 
 def test_energy_loss():
-    energies = [1, 10, 100, 500, 1000]
+    energies = [10.0, 100.0, 1000.0]
     materials = ["lar", "water"]
+    had_physics_list = ["Shielding", "QGSP_BERT", "QGSP_BIC", "FTFP_BERT", "None"]
+    em_physics_list = [
+        "Option1",
+        "Option4",
+        "Penelope",
+        "Livermore",
+    ]
 
     for material in materials:
-        simulate_and_plot(energies, material)
+        for had_physics in had_physics_list:
+            for em_physics in em_physics_list:
+                for energy in energies:
+                    simulate_and_plot(energy, material, had_physics, em_physics)
