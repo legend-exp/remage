@@ -41,11 +41,14 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     path = f"{generator}/{name}/max_{val}/"
     hit_directory = Path(f"out/{path}/hit/")
 
-    data = lh5.read_as("hit/germanium", f"{hit_directory}/out.lh5", "ak")
-    verts = lh5.read_as("hit/vtx", f"{hit_directory}/out.lh5", "ak")
+    data = lh5.read_as(
+        "hit/germanium", f"{hit_directory}/out.lh5", "ak", with_units=True
+    )
+    verts = lh5.read_as("hit/vtx", f"{hit_directory}/out.lh5", "ak", with_units=True)
     verts["dist_to_surf"] = get_cylinder_dist(
         1000 * verts.rloc, 1000 * verts.zloc, radius, height
     )
+    verts["dist_to_surf"] = ak.with_parameter(verts["dist_to_surf"], "units", "mm")
 
     if dist_low is not None:
         n_sel = ak.sum(
@@ -57,11 +60,14 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     hit_ids = np.searchsorted(verts.evtid, data.evtid)
     verts = verts[hit_ids]
 
-    data["vert_rloc"] = 1000 * verts.rloc
-    data["vert_zloc"] = 1000 * verts.zloc
+    data["vert_rloc"] = verts.rloc
+    data["vert_zloc"] = verts.zloc
 
     data["vert_dist_to_surf"] = get_cylinder_dist(
-        data.vert_rloc, data.vert_zloc, radius, height
+        1000 * data.vert_rloc, 1000 * data.vert_zloc, radius, height
+    )
+    data["vert_dist_to_surf"] = ak.with_parameter(
+        data["vert_dist_to_surf"], "units", "mm"
     )
 
     if dist_low is not None:
@@ -461,7 +467,6 @@ plot(
     save_spec_name=f"{plot_name}.surf-active-energy.spec.output.png",
     save_eff_name=f"{plot_name}.surf-active-energy.eff.output.png",
 )
-
 
 plot(
     "beta_surf",
