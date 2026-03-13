@@ -1,7 +1,7 @@
 file(
   GLOB _file_list
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac gdml/*.gdml *.py)
+  macros/*.mac gdml/*.gdml misc/*.yaml *.py)
 
 # copy them to the build area
 foreach(_file ${_file_list})
@@ -10,4 +10,5 @@ endforeach()
 
 # run python tests using pytest
 add_test(NAME cosmogenics/muon/pytest-all COMMAND ${PYTHONPATH} -m pytest -s -vvv .)
-set_tests_properties(cosmogenics/muon/pytest-all PROPERTIES LABELS "extra;val")
+set_tests_properties(cosmogenics/muon/pytest-all PROPERTIES LABELS "extra;val;val-only" TIMEOUT
+                                                            36000)

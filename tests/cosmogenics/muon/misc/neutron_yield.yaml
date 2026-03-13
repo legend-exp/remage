@@ -1,0 +1,21 @@
+# simulation data digitized from https://doi.org/10.1134/S106377881603011X
+Y_gen:
+  lar:
+    100: 0.0006141876797088565
+    280: 0.001367709572991316
+  water:
+    100: 0.00012277499957428353
+    280: 0.00026574153569584104
+  rock:
+    100: 0.00015301408425936515
+    280: 0.00035309281896991977
+energy_dependence: # parameters of the power law fit Y = b * E^n_eff
+  lar:
+    b: 1.71071819e-05
+    n_eff: 7.77561314e-01
+  water:
+    b: 3.88324714e-06
+    n_eff: 7.49957455e-01
+  rock:
+    b: 3.63446076e-06
+    n_eff: 8.12145712e-01
