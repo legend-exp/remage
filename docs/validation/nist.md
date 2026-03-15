@@ -15,7 +15,6 @@ The simulation physics is modified by the commands:
 
 ```
 /process/inactivate msc
-/process/eLoss/fluct {FLUCT}
 /RMG/Processes/DefaultProductionCut 1 km
 /RMG/Processes/SensitiveProductionCut 1 km
 ```
@@ -23,14 +22,15 @@ The simulation physics is modified by the commands:
 - Multiple Coulomb scattering is disabled, since it prevents us to measure the
   true integrated particle path length in the simulation (unless a very short
   step size limit is set).
-- the high production cuts ensure that no secondaries are created, this is
-  required to correctly measure the bremsstrahlung component.
-- energy-loss fluctuations are (conditionally) disabled to get more accurate
-  CSDA range distributions. They are only kept activated for the plot of the
-  distributions of the integrated path length.
+- the high production cuts ensure that no secondaries are created. This is
+  required to correctly measure the bremsstrahlung component of the CSDA loss.
 
 An effect of the step length is visible. The larger the step length, the larger
 the difference to the expected integrated path length.
+
+The statistical uncertainties are dominated by energy-loss fluctuations. They
+are kept enabled here to show the effect of the user-chosen step length values.
+Especially the stopping power at low step sizes are the most affected.
 
 ### Electron interactions in natural germanium
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import awkward as ak
 import hist
+import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
@@ -146,23 +147,20 @@ def test_electron_range_vs_energy(mat: str, density: float, estar_data: ak.Array
             10 * estar_data.csda_range / density,  # convert to mm
             label="CSDA range (ESTAR)",
         )
+        nm = matplotlib.colors.LogNorm()
+        step_colors = matplotlib.cm.viridis(nm(combined_step))
         sc = a.scatter(
             combined_e,
             combined_range,
-            c=combined_step,
+            c=step_colors,
             marker="o",
             s=3**2,
             label=f"$remage$ simulation: $e^-$ in {mat.title()}",
-            norm=matplotlib.colors.LogNorm(),
         )
-        ax.errorbar(
-            combined_e,
-            combined_range,
-            yerr=combined_range_err,
-            color="black",
-            linestyle="",
-            zorder=0,
-        )
+        for e, s, err, c in zip(
+            combined_e, combined_range, combined_range_err, step_colors, strict=True
+        ):
+            a.errorbar(e, s, yerr=err, color=c, linewidth=1, linestyle="", zorder=0)
 
     x_max = 4000
     axin.set_xlim(-0.1 * x_max, 1.1 * x_max)
@@ -218,24 +216,21 @@ def test_electron_stopping_power_vs_energy(
             combined_stop.append(ak.mean(sp))
             combined_stop_err.append(ak.std(sp) / np.sqrt(ak.count(sp)))
 
+    nm = matplotlib.colors.LogNorm()
+    step_colors = matplotlib.cm.viridis(nm(combined_step))
     sc = ax.scatter(
         combined_e,
         combined_stop,
-        c=combined_step,
+        c=step_colors,
         marker="o",
         s=3**2,
         label=f"$remage$ simulation: $e^-$ in {mat.title()}",
-        norm=matplotlib.colors.LogNorm(),
         zorder=100,
     )
-    ax.errorbar(
-        combined_e,
-        combined_stop,
-        yerr=combined_stop_err,
-        color="black",
-        linestyle="",
-        zorder=0,
-    )
+    for e, s, err, c in zip(
+        combined_e, combined_stop, combined_stop_err, step_colors, strict=True
+    ):
+        ax.errorbar(e, s, yerr=err, color=c, linewidth=1, linestyle="", zorder=0)
     plt.colorbar(sc, ax=ax, label="maximum step length [m]")
 
     ax.set_xlabel("Electron kinetic energy [keV]")

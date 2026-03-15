@@ -29,7 +29,7 @@ for mat in ("ge", "ar", "cu"):
                         "ENERGY": energy,
                         "EVENTS": n_events,
                         "MAX_STEP_SIZE_IN_M": step_size,
-                        "FLUCT": "false",
+                        "FLUCT": "true",
                     },
                     "gdml_files": f"gdml/geometry-{mat}.gdml",
                     "output": f"output/electrons-{mat}-{energy}-keV-{step_size}-m.lh5",
