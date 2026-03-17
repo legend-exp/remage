@@ -32,6 +32,19 @@ The statistical uncertainties are dominated by energy-loss fluctuations. They
 are kept enabled here to show the effect of the user-chosen step length values.
 Especially the stopping power at low step sizes are the most affected.
 
+:::{note}
+
+The simulated stopping powers are derived from the energy deposition in the
+first step and its length. This leads to the stopping powers only matching with
+the ESTAR-provided values until a material-specific energy.
+
+Below that, the energy is fully deposited in one single small step, from which
+we cannot estimate the stopping power at the incident energy any more. For these
+low energies, we plot the incident energy over the full expected ranged from
+ESTAR data as the expectation value.
+
+:::
+
 ### Electron interactions in natural germanium
 
 Monoenergetic electrons are simulated in a natural germanium sphere of 15 cm

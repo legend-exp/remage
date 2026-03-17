@@ -16,6 +16,8 @@
 /RMG/Processes/SensitiveProductionCut 1 km
 
 /RMG/Output/Germanium/StoreTrackID true
+# store only post-steps so that we can correctly calculate step lengths
+/RMG/Output/Germanium/StepPositionMode PostStep
 
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Geometrical/AddSolid Sphere

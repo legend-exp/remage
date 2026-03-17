@@ -55,8 +55,9 @@ def ak_diff(data):
     return data[..., :-1] - data[..., 1:]
 
 
-def calc_range(filename):
+def calc_range(filename: str):
     data = lh5.read_as("/stp/det001", filename, "ak")
+    vtx = lh5.read_as("/vtx", filename, "ak")
 
     # select only track 1, we are not interested in secondaries
     data = data[data.trackid == 1]
@@ -64,32 +65,52 @@ def calc_range(filename):
     # make events
     data = ak.unflatten(data, ak.run_lengths(data.evtid))
 
+    def stp_len_field(field: str):
+        # inject the first position from the vtx table before the first edep
+        vtx_loc = vtx[field][(data.evtid[..., 0] == vtx.evtid)]
+        vtx_loc = ak.unflatten(vtx_loc, ak.ones_like(vtx_loc, dtype=int))
+        loc = ak.concatenate([vtx_loc, data[field]], axis=1)
+
+        return ak_diff(loc) ** 2
+
     # convert to mm
     return 1000 * ak.sum(
-        np.sqrt(
-            ak_diff(data.xloc) ** 2 + ak_diff(data.yloc) ** 2 + ak_diff(data.zloc) ** 2
-        ),
+        np.sqrt(stp_len_field("xloc") + stp_len_field("yloc") + stp_len_field("zloc")),
         axis=-1,
     )
 
 
-def calc_stopping_power(filename):
+def calc_stopping_power(filename: str):
     data = lh5.read_as("/stp/det001", filename, "ak")
+    vtx = lh5.read_as("/vtx", filename, "ak")
 
     # select only track 1, we are not interested in secondaries
     data = data[data.trackid == 1]
 
     # make events
-    data = ak.unflatten(data, ak.run_lengths(data.evtid))[..., :2]
+    # we are only interested in the first step for each event, as we will
+    # inject the first position from the vtx table.
+    data = ak.unflatten(data, ak.run_lengths(data.evtid))[..., :1]
+
+    def stp_len_field(field: str):
+        # inject the first position from the vtx table before the first edep
+        vtx_loc = vtx[field][(data.evtid[..., 0] == vtx.evtid)]
+        vtx_loc = ak.unflatten(vtx_loc, ak.ones_like(vtx_loc, dtype=int))
+        loc = ak.concatenate([vtx_loc, data[field]], axis=1)
+
+        # we should now have 2 positions per event.
+        assert ak.all(ak.num(loc, axis=-1) <= 2)
+        return ak_diff(loc) ** 2
 
     stp_len = np.sqrt(
-        ak_diff(data.xloc) ** 2 + ak_diff(data.yloc) ** 2 + ak_diff(data.zloc) ** 2
+        stp_len_field("xloc") + stp_len_field("yloc") + stp_len_field("zloc")
     )
     assert ak.all(stp_len > 0)
     assert not ak.any(np.isnan(data.edep[..., 0]))
 
     # convert to keV / mm
     stop = data.edep[..., 0] / stp_len / 1000
+    stop = ak.flatten(stop)
     assert not ak.any(np.isnan(stop))
 
     return stop
@@ -102,14 +123,21 @@ def calc_stopping_power(filename):
 def test_electron_range_distributions(mat: str):
     fig, ax = plt.subplots()
 
+    eranges = {}
+    rmax = 3
     for step_size in range_step_sizes:  # in m
         for energy in range_energies:  # in keV
-            eranges = calc_range(
+            eranges[(step_size, energy)] = calc_range(
                 f"output/electrons-range-{mat}-{energy}-keV-{step_size}-m.lh5"
             )
-            # convert to mm
-            h = hist.new.Reg(200, 0, 7, name="Electron integrated path [mm]").Double()
-            h.fill(eranges)
+            rmax = max(rmax, ak.max(eranges[(step_size, energy)]))
+
+    for step_size in range_step_sizes:  # in m
+        for energy in range_energies:  # in keV
+            h = hist.new.Reg(
+                200, 0, rmax + 0.5, name="Electron integrated path [mm]"
+            ).Double()
+            h.fill(eranges[(step_size, energy)])
             h.plot(ax=ax, yerr=False, label="$E^{kin}_e$" + f" = {energy:.1f} keV")
 
     ax.set_ylabel("Density")
@@ -149,7 +177,8 @@ def test_electron_range_vs_energy(mat: str, density: float, estar_data: ak.Array
         )
         nm = matplotlib.colors.LogNorm()
         step_colors = matplotlib.cm.viridis(nm(combined_step))
-        sc = a.scatter(
+        sm = matplotlib.cm.ScalarMappable(norm=nm, cmap=matplotlib.cm.viridis)
+        a.scatter(
             combined_e,
             combined_range,
             c=step_colors,
@@ -162,18 +191,19 @@ def test_electron_range_vs_energy(mat: str, density: float, estar_data: ak.Array
         ):
             a.errorbar(e, s, yerr=err, color=c, linewidth=1, linestyle="", zorder=0)
 
+        a.grid()
+
     x_max = 4000
     axin.set_xlim(-0.1 * x_max, 1.1 * x_max)
     y_max = np.max(combined_range[combined_e < x_max])
     axin.set_ylim(-0.1 * y_max, 1.1 * y_max)
 
-    plt.colorbar(sc, ax=ax, label="maximum step length [m]")
+    plt.colorbar(sm, ax=ax, label="maximum step length [m]")
 
     ax.set_xlabel("Electron kinetic energy [keV]")
     ax.set_ylabel("Electron integrated path [mm]")
     leg = ax.legend()
     leg.legend_handles[1].set(array=None, ec="black", fc="black")
-    ax.grid()
     fig.savefig(f"e-range-{mat}-vs-estar.output.png")
 
 
@@ -202,6 +232,16 @@ def test_electron_stopping_power_vs_energy(
         label="Total stopping power (ESTAR)",
     )
 
+    estar_e_over_range = estar_data.x / (
+        10 * estar_data.csda_range / density
+    )  # convert to mm
+    ax.plot(
+        estar_data.x[estar_data.x < 1000],
+        estar_e_over_range[estar_data.x < 1000],
+        label="E / CSDA range (ESTAR)",
+        linestyle=":",
+    )
+
     combined_e = []
     combined_stop = []
     combined_step = []
@@ -218,7 +258,8 @@ def test_electron_stopping_power_vs_energy(
 
     nm = matplotlib.colors.LogNorm()
     step_colors = matplotlib.cm.viridis(nm(combined_step))
-    sc = ax.scatter(
+    sm = matplotlib.cm.ScalarMappable(norm=nm, cmap=matplotlib.cm.viridis)
+    ax.scatter(
         combined_e,
         combined_stop,
         c=step_colors,
@@ -231,12 +272,12 @@ def test_electron_stopping_power_vs_energy(
         combined_e, combined_stop, combined_stop_err, step_colors, strict=True
     ):
         ax.errorbar(e, s, yerr=err, color=c, linewidth=1, linestyle="", zorder=0)
-    plt.colorbar(sc, ax=ax, label="maximum step length [m]")
+    plt.colorbar(sm, ax=ax, label="maximum step length [m]")
 
     ax.set_xlabel("Electron kinetic energy [keV]")
     ax.set_ylabel("Stopping power [keV / mm]")
     leg = ax.legend()
-    leg.legend_handles[3].set(array=None, ec="black", fc="black")
+    leg.legend_handles[-1].set(array=None, ec="black", fc="black")
     ax.grid()
     ax.set_xscale("log")
 
