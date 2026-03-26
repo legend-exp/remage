@@ -103,9 +103,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
      * - **Uniform**: flat distribution over a user-defined range.
      *
      * @note The depth profile is applied in the local coordinate system of the solid before
-     * the global rotation and translation are applied. No containment check is performed
-     * after the displacement; the user is responsible for choosing parameters consistent
-     * with the solid geometry.
+     * the global rotation and translation are applied. By default, no containment
+     * enforcement is performed after the displacement; the user is responsible for
+     * choosing parameters consistent with the solid geometry. When
+     * @c ForceContainmentCheck is enabled, an additional containment check may be
+     * performed after applying the depth offset, but this is used only for logging or
+     * diagnostic purposes and does not trigger resampling or correction of the vertex.
      */
     struct DepthProfile {
 
