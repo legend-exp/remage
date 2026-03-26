@@ -1,0 +1,16 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/ForceContainmentCheck true
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/Physical/AddVolume Box
+/RMG/Generator/Confinement/Physical/AddVolume Orb
+/RMG/Generator/Confinement/Physical/AddVolume Tubs
+
+/RMG/Generator/Select GPS
+/gps/particle e-
+/gps/energy 1 eV
+
+/run/beamOn 5000
+
+/control/alias export-fn native-surface.output

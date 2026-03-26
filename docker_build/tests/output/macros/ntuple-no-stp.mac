@@ -1,0 +1,15 @@
+/RMG/Output/ActivateOutputScheme Track
+
+/control/execute macros/_init.mac
+
+/RMG/Manager/Randomization/Seed 1403045745
+
+/RMG/Generator/Confine UnConfined
+
+/RMG/Generator/Select GPS
+/gps/position 0 0 0
+/gps/ang/type iso
+/gps/particle gamma
+/gps/energy 200 keV
+
+/run/beamOn 1000

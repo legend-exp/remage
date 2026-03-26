@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+<!ENTITY define_source SYSTEM "define_source.xml">
+<!--<!ENTITY materials SYSTEM "materials.xml"> -->
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+ <define>
+	 <constant name="TWOPI" value="2.*pi"/>
+
+	 &define_source;
+
+	<quantity name="source_z" type="length" value="source_height" unit="mm"/>
+    	<quantity name="source_radius" type="length" value="source_width/2" unit="mm"/>
+
+	<quantity name="source_foil_z" type="length" value="source_foil_height" unit="mm"/>
+
+	<quantity name="source_Alring_z" type="length" value="source_Alring_height" unit="mm"/>
+	<quantity name="source_Alring_radius_min" type="length" value="source_Alring_width_min/2" unit="mm"/>
+	<quantity name="source_Alring_radius_max" type="length" value="source_Alring_width_max/2" unit="mm"/>
+
+	<position name="pos_center" z="0"/>
+
+ </define>
+
+
+ <materials>
+         <element Z="1" formula="H" name="Hydrogen" >
+                 <atom value="1" />
+         </element>
+         <element Z="6" formula="C" name="Carbon" >
+                 <atom value="12.01" />
+         </element>
+         <material name="HD1000" >
+                 <D value="0.93" unit="g/cm3" />
+                 <composite n="4" ref="Hydrogen" />
+                 <composite n="2" ref="Carbon" />
+         </material>
+
+ </materials>
+
+
+ <solids>
+	<tube name="source" rmax="source_radius" z="source_z" startphi="0" deltaphi="TWOPI" aunit="rad" />
+
+	<tube name="source_Alring" rmin = "source_Alring_radius_min" rmax="source_Alring_radius_max" z="source_Alring_z" startphi="0" deltaphi="TWOPI" aunit="rad" />
+	<tube name="source_foil"  rmax="source_Alring_radius_min" z="source_foil_z" startphi="0" deltaphi="TWOPI" aunit="rad" />
+	<tube name="source_vacuum"  rmax="source_Alring_radius_max" z="source_Alring_z" startphi="0" deltaphi="TWOPI" aunit="rad" />
+
+ </solids>
+
+
+ <structure>
+
+         <volume name="Source">
+		 <materialref ref="HD1000"/>
+                 <solidref ref="source"/>
+         </volume>
+
+
+	 <volume name="Source_foil">
+		 <materialref ref="HD1000"/>
+                 <solidref ref="source_foil"/>
+		 <physvol>
+			 <volumeref ref="Source"/>
+                         <positionref ref="pos_center"/>
+            	 </physvol>
+         </volume>
+
+
+	<volume name="Source_Alring">
+		 <materialref ref="G4_Al"/>
+		 <solidref ref="source_Alring"/>
+	 </volume>
+
+	<volume name="Source_Encapsulated">
+		<materialref ref="G4_Galactic"/>
+                <solidref ref="source_vacuum"/>
+		<physvol>
+		 	<volumeref ref="Source_foil"/>
+                        <positionref ref="pos_center"/>
+                </physvol>
+		<physvol>
+		 	<volumeref ref="Source_Alring"/>
+                        <positionref ref="pos_center"/>
+                </physvol>
+        </volume>
+
+ </structure>
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="Source_Encapsulated"/>
+ </setup>
+
+</gdml>

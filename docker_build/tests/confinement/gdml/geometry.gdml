@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="World" x="10" y="10" z="10" lunit="m"/>
+		<box name="Box" x="1" y="1" z="1" lunit="m"/>
+		<orb name="Orb" r="0.5" lunit="m"/>
+		<sphere name="Sphere" rmin="0.2" rmax="0.4" deltaphi="2.0943951023931953" startphi="1.0471975511965976" starttheta="0.5235987755982988" deltatheta="1.5707963267948966" lunit="m" aunit="rad"/>
+		<tube name="Tubs" rmin="0.2" rmax="0.5" z="1.2" startphi="1.0471975511965976" deltaphi="4.1887902047863905" lunit="m" aunit="rad"/>
+		<box name="Box2" x="1" y="1" z="1" lunit="m"/>
+		<orb name="Hole" r="0.6" lunit="m"/>
+		<subtraction name="BoxWithHole">
+			<first ref="Box2"/>
+			<second ref="Hole"/>
+		</subtraction>
+		<union name="BoxAndOrb">
+			<first ref="Box2"/>
+			<second ref="Hole"/>
+		</union>
+		<union name="BoxAndOrb2">
+			<first ref="Box2"/>
+			<second ref="Hole"/>
+		</union>
+		<orb name="MotherOrb" r="1" lunit="m"/>
+		<polycone name="Polycone" startphi="0" deltaphi="6.283185307179586" lunit="m" aunit="rad">
+			<zplane rmin="0" rmax="0.5" z="-0.5"/>
+			<zplane rmin="0" rmax="0.3" z="0.5"/>
+		</polycone>
+	</solids>
+	<structure>
+		<volume name="Box">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Box"/>
+		</volume>
+		<volume name="Orb">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Orb"/>
+		</volume>
+		<volume name="Sphere">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Sphere"/>
+		</volume>
+		<volume name="Tubs">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Tubs"/>
+		</volume>
+		<volume name="BoxWithHole">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="BoxWithHole"/>
+		</volume>
+		<volume name="BoxAndOrb">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="BoxAndOrb"/>
+		</volume>
+		<volume name="BoxAndOrb2">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="BoxAndOrb2"/>
+		</volume>
+		<volume name="MotherOrb">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="MotherOrb"/>
+			<physvol name="BoxAndOrb2">
+				<volumeref ref="BoxAndOrb2"/>
+			</physvol>
+		</volume>
+		<volume name="Polycone">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="Polycone"/>
+		</volume>
+		<volume name="World">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="World"/>
+			<physvol name="Box">
+				<volumeref ref="Box"/>
+				<position name="Box_pos" x="2.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="m"/>
+				<rotation name="Box_rot" x="0.785398163397448" y="-0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="Orb">
+				<volumeref ref="Orb"/>
+				<position name="Orb_pos" x="0.000000000000000" y="2.000000000000000" z="0.000000000000000" unit="m"/>
+			</physvol>
+			<physvol name="Sphere">
+				<volumeref ref="Sphere"/>
+				<position name="Sphere_pos" x="0.000000000000000" y="0.000000000000000" z="2.000000000000000" unit="m"/>
+				<rotation name="Sphere_rot" x="0.785398163397448" y="0.785398163397448" z="-0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="Tubs">
+				<volumeref ref="Tubs"/>
+				<position name="Tubs_pos" x="-2.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="m"/>
+				<rotation name="Tubs_rot" x="-0.785398163397448" y="0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="BoxWithHole">
+				<volumeref ref="BoxWithHole"/>
+				<rotation name="BoxWithHole_rot" x="0.785398163397448" y="-0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="BoxAndOrb">
+				<volumeref ref="BoxAndOrb"/>
+				<position name="BoxAndOrb_pos" x="2.000000000000000" y="2.000000000000000" z="0.000000000000000" unit="m"/>
+				<rotation name="BoxAndOrb_rot" x="0.785398163397448" y="-0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="MotherOrb">
+				<volumeref ref="MotherOrb"/>
+				<position name="MotherOrb_pos" x="2.000000000000000" y="2.000000000000000" z="2.000000000000000" unit="m"/>
+			</physvol>
+			<physvol name="Polycone">
+				<volumeref ref="Polycone"/>
+				<position name="Polycone_pos" x="0.000000000000000" y="0.000000000000000" z="-2.000000000000000" unit="m"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="World"/>
+	</setup>
+</gdml>

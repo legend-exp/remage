@@ -1,0 +1,9 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine FromFile
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-combined.lh5
+
+/RMG/Generator/Select FromFile
+/RMG/Generator/FromFile/FileName macros/vtx-combined.lh5
+
+/run/beamOn {events}

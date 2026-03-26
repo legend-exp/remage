@@ -1,0 +1,17 @@
+/control/execute macros/vis.mac
+
+/vis/geometry/set/forceSolid Detector
+/vis/geometry/set/forceSolid Source_Encapsulated
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Source_Encapsulated_PV
+
+/RMG/Generator/Select GPS
+/gps/particle ion
+/gps/ion 27 60
+/gps/energy 0 eV
+
+/run/beamOn 100
+
+/vis/tsg/offscreen/set/file vis-co60.output.jpeg
+/vis/viewer/rebuild

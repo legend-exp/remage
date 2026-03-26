@@ -1,0 +1,14 @@
+# Target labels
+ magic_enum-populate
+# Source files and their labels
+/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/magic_enum-populate
+/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/magic_enum-populate.rule
+/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/magic_enum-populate-complete.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-build.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-configure.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-download.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-install.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-mkdir.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-patch.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-test.rule
+/src/docker_build/_deps/magic_enum-subbuild/magic_enum-populate-prefix/src/magic_enum-populate-stamp/magic_enum-populate-update.rule

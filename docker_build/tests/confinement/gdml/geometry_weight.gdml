@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<isotope name="isotope1" Z="32" N="76">
+			<atom value="76"/>
+		</isotope>
+		<isotope name="isotope2" Z="32" N="75">
+			<atom value="75"/>
+		</isotope>
+		<element name="element1" formula="X">
+			<fraction ref="isotope1" n="0.5"/>
+			<fraction ref="isotope2" n="0.5"/>
+		</element>
+		<element name="element2" formula="X">
+			<fraction ref="isotope1" n="0.25"/>
+			<fraction ref="isotope2" n="0.75"/>
+		</element>
+		<material name="mat1">
+			<D value="10"/>
+			<fraction ref="element1" n="1"/>
+		</material>
+		<material name="mat2">
+			<D value="5"/>
+			<fraction ref="element2" n="1"/>
+		</material>
+	</materials>
+	<solids>
+		<box name="World" x="10" y="10" z="10" lunit="m"/>
+		<box name="Box" x="1" y="1" z="1" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="Box1">
+			<materialref ref="mat1"/>
+			<solidref ref="Box"/>
+		</volume>
+		<volume name="Box2">
+			<materialref ref="mat2"/>
+			<solidref ref="Box"/>
+		</volume>
+		<volume name="World">
+			<materialref ref="G4_Pb"/>
+			<solidref ref="World"/>
+			<physvol name="Box1">
+				<volumeref ref="Box1"/>
+				<position name="Box1_pos" x="2.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="m"/>
+				<rotation name="Box1_rot" x="0.785398163397448" y="-0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+			<physvol name="Box2">
+				<volumeref ref="Box2"/>
+				<position name="Box2_pos" x="-2.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="m"/>
+				<rotation name="Box2_rot" x="0.785398163397448" y="-0.785398163397448" z="0.785398163397448" unit="rad"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="World"/>
+	</setup>
+</gdml>

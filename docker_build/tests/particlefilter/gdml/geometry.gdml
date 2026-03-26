@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials/>
+	<solids>
+		<box name="world" x="2" y="2" z="2" lunit="m"/>
+		<box name="scint" x="0.5" y="1" z="1" lunit="m"/>
+		<box name="det" x="0.1" y="0.5" z="0.5" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="det">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="det"/>
+		</volume>
+		<volume name="scint1">
+			<materialref ref="G4_lAr"/>
+			<solidref ref="scint"/>
+			<physvol name="det1">
+				<volumeref ref="det"/>
+			</physvol>
+		</volume>
+		<volume name="scint2">
+			<materialref ref="G4_lAr"/>
+			<solidref ref="scint"/>
+			<physvol name="det2">
+				<volumeref ref="det"/>
+			</physvol>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="scint1">
+				<volumeref ref="scint1"/>
+				<position name="scint1_pos" x="-255.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+			<physvol name="scint2">
+				<volumeref ref="scint2"/>
+				<position name="scint2_pos" x="255.000000000000000" y="0.000000000000000" z="0.000000000000000" unit="mm"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>

@@ -86,6 +86,88 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       kUnset,
     };
 
+    /**
+     * @brief Depth profile for displacing surface-sampled vertices into the material.
+     *
+     * @details When surface sampling is enabled, an optional depth can be sampled from a
+     * statistical distribution. The vertex is then displaced inward from the surface by that
+     * depth along the outward surface normal, i.e.:
+     * @code
+     *   vertex -= depth * solid->SurfaceNormal(vertex);
+     * @endcode
+     * Three distributions are supported in addition to the default of no depth offset:
+     * - **Exponential**: physically motivated model for e.g. alpha/beta surface contamination,
+     *   characterised by a mean implantation depth.
+     * - **Truncated Gaussian**: Gaussian distribution restricted to a finite range, suitable
+     *   when a peak depth with physical cut-offs is needed.
+     * - **Uniform**: flat distribution over a user-defined range.
+     *
+     * @note The depth profile is applied in the local coordinate system of the solid before
+     * the global rotation and translation are applied. No containment check is performed
+     * after the displacement; the user is responsible for choosing parameters consistent
+     * with the solid geometry.
+     */
+    struct DepthProfile {
+
+        /**
+         * @brief Distribution type for the depth profile.
+         * @see DepthProfile for a description of each type.
+         */
+        enum class Type {
+          kNone,              ///< No depth profile – vertex remains on the surface
+          kExponential,       ///< Exponential distribution parametrised by @c mean
+          kTruncatedGaussian, ///< Gaussian distribution truncated to [@c range_lo, @c range_hi]
+          kUniform,           ///< Uniform distribution over [@c range_lo, @c range_hi]
+        };
+
+        /** @brief Distribution type. Defaults to @c kNone (no displacement). */
+        Type type = Type::kNone;
+
+        /**
+         * @brief Mean depth for the exponential and truncated-Gaussian distributions.
+         * @details For @c kExponential this is the sole parameter (1/λ). For
+         * @c kTruncatedGaussian it is the centre of the underlying Gaussian before truncation.
+         * Value is in Geant4 length units (mm by default).
+         */
+        double mean = 0;
+
+        /**
+         * @brief Standard deviation for the truncated-Gaussian distribution.
+         * @details Only used when @c type is @c kTruncatedGaussian.
+         * Value is in Geant4 length units (mm by default).
+         */
+        double sigma = 0;
+
+        /**
+         * @brief Lower bound of the depth range for uniform and truncated-Gaussian distributions.
+         * @details For @c kUniform: minimum sampled depth. For @c kTruncatedGaussian: values
+         * below this bound are rejected. Value is in Geant4 length units (mm by default).
+         */
+        double range_lo = 0;
+
+        /**
+         * @brief Upper bound of the depth range for uniform and truncated-Gaussian distributions.
+         * @details For @c kUniform: maximum sampled depth. For @c kTruncatedGaussian: values
+         * above this bound are rejected. Value is in Geant4 length units (mm by default).
+         */
+        double range_hi = 0;
+
+        /**
+         * @brief Sample a depth value from the configured distribution.
+         *
+         * @details
+         * - @c kNone: always returns 0.
+         * - @c kExponential: inverse-CDF sampling from Exp(mean), all returned values ≥ 0.
+         * - @c kTruncatedGaussian: Box-Muller Gaussian with rejection outside
+         *   [@c range_lo, @c range_hi]. Aborts with a warning if @c 10000 consecutive
+         *   attempts all fall outside the range (mis-configured parameters).
+         * - @c kUniform: uniform over [@c range_lo, @c range_hi].
+         *
+         * @returns The sampled depth in Geant4 length units (mm by default).
+         */
+        [[nodiscard]] double Sample() const;
+    };
+
     RMGVertexConfinement();
 
     void BeginOfRunAction(const G4Run* run) override;
@@ -258,6 +340,13 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         bool surface_sample = false;
         bool native_sample = false;
         size_t max_num_intersections = 0;
+
+        /**
+         * @brief Depth profile applied when displacing vertices inward from the surface.
+         * @details Only used when @c surface_sample is @c true. Defaults to no displacement
+         * (@c DepthProfile::Type::kNone).
+         */
+        DepthProfile depth_profile = {};
     };
 
     /** @brief A collection of @c SampleableObject objects. It can be used
@@ -336,6 +425,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     bool fLastSolidExcluded = false;
     size_t fSurfaceSampleMaxIntersections = 0;
 
+    /** @brief Depth profile configuration propagated to all sampled volumes. */
+    DepthProfile fDepthProfile = {};
+
     // counters used for the current run.
     size_t fTrials = 0;
     std::chrono::nanoseconds fVertexGenerationTime{};
@@ -394,6 +486,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     }
 
     void DefineCommands();
+
+    void SetDepthProfileTypeString(std::string type);
+    void SetDepthProfileMean(double mean) { fDepthProfile.mean = mean; }
+    void SetDepthProfileSigma(double sigma) { fDepthProfile.sigma = sigma; }
+    void SetDepthProfileRangeLo(double lo) { fDepthProfile.range_lo = lo; }
+    void SetDepthProfileRangeHi(double hi) { fDepthProfile.range_hi = hi; }
 };
 
 #endif

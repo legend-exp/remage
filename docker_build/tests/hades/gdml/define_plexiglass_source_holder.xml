@@ -1,0 +1,12 @@
+
+<!--  <constant name="source_holder_height"   value="82.5" /> it depends on the source position from cryostat during the data taking -->
+  <constant name="source_holder_top_plate_height"   value="3." />
+  <constant name="source_holder_top_height"   value="10." />
+
+  <constant name="source_holder_top_plate_width"   value="30." />
+  <constant name="source_holder_top_inner_width"   value="20." />
+  <constant name="source_holder_inner_width"   value="87." />
+  <constant name="source_holder_bottom_inner_width"   value="102." />
+  <constant name="source_holder_outer_width"   value="108." />
+
+  <constant name="source_holder_topbottom_height"  value="6.1" />

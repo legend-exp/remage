@@ -1,0 +1,10 @@
+
+  <constant name="source_height"   value="0.1" />
+  <constant name="source_width"   value="5" />
+
+  <constant name="source_foil_height"   value="0.5" />
+  <constant name="source_foil_width"   value="26" />
+
+  <constant name="source_Alring_height"   value="3." />
+  <constant name="source_Alring_width_max"   value="30." />
+  <constant name="source_Alring_width_min"   value="26." />

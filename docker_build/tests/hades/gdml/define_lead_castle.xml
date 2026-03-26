@@ -1,0 +1,55 @@
+
+<!-- TABLE 1 -->
+
+  <constant name="base_width_1"  value="480" />
+  <constant name="base_depth_1"  value="450"  />
+  <constant name="base_height_1" value="500"  />
+
+  <constant name="inner_cavity_width_1"  value="300" />
+  <constant name="inner_cavity_depth_1"  value="250" />
+  <constant name="inner_cavity_height_1"  value="500" />
+
+  <constant name="cavity_width_1"  value="120" />
+  <constant name="cavity_depth_1"  value="100" />
+  <constant name="cavity_height_1"  value="400" />
+
+  <constant name="top_width_1"  value="300" />
+  <constant name="top_depth_1"  value="300" />
+  <constant name="top_height_1"  value="90" />
+
+  <constant name="front_width_1"  value="160" />
+  <constant name="front_depth_1"  value="100" />
+  <constant name="front_height_1"  value="400" />
+
+
+  <!--  TABLE 2 -->
+
+
+  <constant name="base_width_2"  value="350" />
+  <constant name="base_depth_2"  value="350"  />
+  <constant name="base_height_2"  value="400" />
+
+  <constant name="inner_cavity_width_2"  value="250" />
+  <constant name="inner_cavity_depth_2"  value="250" />
+  <constant name="inner_cavity_height_2"  value="400" />
+
+  <constant name="top_width_2"  value="200" />
+  <constant name="top_depth_2"  value="200" />
+  <constant name="top_height_2"  value="50" />
+
+  <constant name="copper_plate_width"  value="350" />
+  <constant name="copper_plate_depth"  value="350" />
+  <constant name="copper_plate_height"  value="10" />
+
+
+
+  <!-- BOTTOM TABLE -->
+
+
+  <constant name="bottom_plate_width"  value="750" />
+  <constant name="bottom_plate_depth"  value="750" />
+  <constant name="bottom_plate_height"  value="15" />
+
+  <constant name="cavity_bottom_plate_width"  value="120" />
+  <constant name="cavity_bottom_plate_depth"  value="940" /> <!--475*2-->
+  <constant name="cavity_bottom_plate_height"  value="20"/>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+<!ENTITY define_cryostat SYSTEM "define_cryostat.xml">
+<!--<!ENTITY materials SYSTEM "materials.xml"> -->
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+ <define>
+
+
+ &define_cryostat;
+
+          <constant name="TWOPI" value="2.*pi"/>
+
+	  <quantity name="cryostat_z" type="length" value="cryostat_height" unit="mm"/>
+	  <quantity name="cryostat_radius" type="length" value="cryostat_width/2" unit="mm"/>
+
+	  <quantity name="cryostat_cavity_radius" type="length" value="(cryostat_width-2*cryostat_thickness)/2" unit="mm"/>
+
+	  <quantity name="start_cavity_z" type="length" value="position_cryostat_cavity_fromTop" unit="mm"/>
+	  <quantity name="end_cavity_z" type="length" value="(cryostat_height-position_cryostat_cavity_fromBottom)" unit="mm"/>
+
+ </define>
+
+
+
+ <materials>
+         <element Z="13" formula="Al" name="Aluminium" >
+                 <atom value="26.98" />
+         </element>
+         <element Z="29" formula="Cu" name="Copper" >
+                 <atom value="63.546" />
+         </element>
+         <element Z="82" formula="Pb" name="Lead" >
+                 <atom value="207.2" />
+         </element>
+         <element Z="83" formula="Bi" name="Bismuth" >
+                 <atom value="208.98" />
+         </element>
+
+         <material name="EN_AW-2011T8" formula="Al_Cu6BiPb" >
+                 <D value="2.84" unit="g/cm3" />
+                 <fraction n="0.06" ref="Copper" />
+                 <fraction n="0.004" ref="Lead" />
+                 <fraction n="0.004" ref="Bismuth" />
+                 <fraction n="0.932" ref="Aluminium" />
+         </material>
+
+ </materials>
+
+
+
+ <solids>
+
+	 <polycone name="cryostat" startphi="0" deltaphi="TWOPI" aunit="rad">
+                 <zplane rmin="0" rmax="cryostat_radius" z="0" />
+                 <zplane rmin="0" rmax="cryostat_radius" z="start_cavity_z" />
+                 <zplane rmin="cryostat_cavity_radius" rmax="cryostat_radius" z="start_cavity_z" />
+                 <zplane rmin="cryostat_cavity_radius" rmax="cryostat_radius" z="end_cavity_z" />
+                 <zplane rmin="0" rmax="cryostat_radius" z="end_cavity_z" />
+		 <zplane rmin="0" rmax="cryostat_radius" z="cryostat_z" />
+         </polycone>
+
+ </solids>
+
+
+ <structure>
+	 <volume name="Cryostat">
+		 <materialref ref="EN_AW-2011T8"/>
+		 <solidref ref="cryostat"/>
+	 </volume>
+ </structure>
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="Cryostat"/>
+ </setup>
+
+</gdml>

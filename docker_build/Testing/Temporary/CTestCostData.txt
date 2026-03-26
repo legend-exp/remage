@@ -1,0 +1,16 @@
+confinement-surface/test-surface-sampler-methods-build 2 0.0959754
+confinement-surface/test-intersections-basic 1 0.129555
+confinement-surface/test-intersections-subtraction 1 0.125545
+confinement-surface/test-intersections-union 1 0.126798
+confinement-surface/test-containment-subtraction 1 0.138233
+confinement-surface/test-containment-union 1 0.169747
+confinement-surface/test-depth-profile-exponential 1 0.122486
+confinement-surface/test-depth-profile-uniform 1 0.121851
+confinement-surface/test-depth-profile-truncated-gaussian 1 0.120608
+confinement-surface/test-depth-profile-surface-point 1 0.122276
+confinement/complex-volume.mac 1 13.7934
+confinement/complex-surface.mac 1 5.12633
+confinement/native-surface.mac 1 4.93855
+confinement/native-volume.mac 1 4.97174
+confinement/with-daughters.mac 1 5.05371
+---

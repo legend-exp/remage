@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE gdml [
+]>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+<define>
+
+	<constant name="TWOPI" value="2.*pi"/>
+
+	<quantity name="detector_height" type="length" value="75.2" unit="mm" />
+	<quantity name="detector_radius" type="length" value="40.0" unit="mm"/>
+
+	<quantity name="well_height" type="length" value="42.0" unit="mm"/>
+	<quantity name="well_radius" type="length" value="4.0" unit="mm"/>
+
+	<quantity name="groove_height" type="length" value="73.2" unit="mm"/>
+	<quantity name="groove_inner_radius" type="length" value="13.0" unit="mm"/>
+	<quantity name="groove_outer_radius" type="length" value="16.0" unit="mm"/>
+
+
+        <!-- taper -->
+
+
+
+
+
+  </define>
+
+
+<materials>
+
+         <isotope name="Ge70" Z="32" N="70">
+                 <atom type="A" value="69.9243" />
+         </isotope>
+         <isotope name="Ge72" Z="32" N="72">
+                 <atom type="A" value="71.9221" />
+         </isotope>
+         <isotope name="Ge73" Z="32" N="73">
+                 <atom type="A" value="72.9235" />
+         </isotope>
+         <isotope name="Ge74" Z="32" N="74">
+                 <atom type="A" value="73.9212" />
+         </isotope>
+         <isotope name="Ge76" Z="32" N="76">
+                 <atom type="A" value="75.9214" />
+	 </isotope>
+	 <element name="enr_ge" formula="Ge" >
+		 <fraction n="0.0000397" ref="Ge70" />
+		 <fraction n="0.0000893" ref="Ge72" />
+                 <fraction n="0.000278" ref="Ge73" />
+                 <fraction n="0.1258" ref="Ge74" />
+                 <fraction n="0.8738" ref="Ge76" />
+	 </element>
+         <material name="enriched_germanium" formula="Ge" >
+                 <D value="5.545" unit="g/cm3" />
+                 <fraction n="1.0" ref="enr_ge" />
+	 </material>
+
+ </materials>
+
+
+ <solids>
+
+	<genericPolycone name = "detector" startphi="1" deltaphi="TWOPI" aunit="rad">
+		 <rzpoint r="well_radius" z="0" />
+		 <rzpoint r="detector_radius" z="0" />
+		 <rzpoint r="detector_radius" z="detector_height" />
+		 <rzpoint r="groove_outer_radius" z="detector_height" />
+		 <rzpoint r="groove_outer_radius" z="groove_height" />
+		 <rzpoint r="groove_inner_radius" z="groove_height" />
+		 <rzpoint r="groove_inner_radius" z="detector_height" />
+		 <rzpoint r="0" z="detector_height" />
+		 <rzpoint r="0" z="well_height" />
+		 <rzpoint r="well_radius" z="well_height" />
+	</genericPolycone>
+
+ </solids>
+
+
+ <structure>
+	 <volume name="Detector">
+		 <materialref ref="enriched_germanium"/>
+		 <solidref ref="detector"/>
+	 </volume>
+ </structure>
+
+
+ <setup name="Default" version="1.0">
+	 <world ref="Detector"/>
+ </setup>
+
+</gdml>
