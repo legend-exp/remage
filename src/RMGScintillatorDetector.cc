@@ -56,8 +56,6 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
 
   RMGLog::OutDev(RMGLog::debug_event, "Processing scintillator detector hits");
 
-  // return if no energy is deposited
-  if (step->GetTotalEnergyDeposit() == 0) return false;
   // ignore optical photons
   if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
