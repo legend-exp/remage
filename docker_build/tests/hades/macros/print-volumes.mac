@@ -1,7 +1,0 @@
-# note: this file cannot be overlap-checked on G4 with USolids.
-/RMG/Geometry/GDMLDisableOverlapCheck true
-
-/run/initialize
-
-/RMG/Geometry/PrintListOfLogicalVolumes
-/RMG/Geometry/PrintListOfPhysicalVolumes

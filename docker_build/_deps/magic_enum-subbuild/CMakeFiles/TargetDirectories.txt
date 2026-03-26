@@ -1,3 +1,0 @@
-/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/magic_enum-populate.dir
-/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/edit_cache.dir
-/src/docker_build/_deps/magic_enum-subbuild/CMakeFiles/rebuild_cache.dir
