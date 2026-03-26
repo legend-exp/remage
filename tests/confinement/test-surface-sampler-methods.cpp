@@ -491,8 +491,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!in_range) {
-      std::cout << "TruncatedGaussian produced a sample outside [range_lo, range_hi]"
-                << std::endl;
+      std::cout << "TruncatedGaussian produced a sample outside [range_lo, range_hi]" << std::endl;
       return 1;
     }
 
@@ -530,8 +529,7 @@ int main(int argc, char* argv[]) {
 
       // Verify the unmodified point is on the surface.
       if (tubs_solid->Inside(pos) != EInside::kSurface) {
-        std::cout << "Surface point is not on the surface: " << tubs_solid->Inside(pos)
-                  << std::endl;
+        std::cout << "Surface point is not on the surface: " << tubs_solid->Inside(pos) << std::endl;
         return 1;
       }
 
@@ -541,14 +539,12 @@ int main(int argc, char* argv[]) {
       const G4ThreeVector pos_inside = pos - depth * normal;
 
       // The displaced point must be strictly inside the solid.
-      if (tubs_solid->Inside(pos_inside) != EInside::kInside) {
-        failures++;
-      }
+      if (tubs_solid->Inside(pos_inside) != EInside::kInside) { failures++; }
     }
 
     if (failures > 0) {
-      std::cout << failures << " out of " << N
-                << " depth-displaced points are not inside the solid" << std::endl;
+      std::cout << failures << " out of " << N << " depth-displaced points are not inside the solid"
+                << std::endl;
       return 1;
     }
     return 0;

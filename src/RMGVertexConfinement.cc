@@ -142,9 +142,7 @@ double RMGVertexConfinement::DepthProfile::Sample() const {
       return range_lo + (range_hi - range_lo) * G4UniformRand();
     }
 
-    default:
-      RMGLog::Out(RMGLog::error, "Unknown DepthProfile::Type, returning 0");
-      return 0;
+    default: RMGLog::Out(RMGLog::error, "Unknown DepthProfile::Type, returning 0"); return 0;
   }
 }
 
