@@ -182,7 +182,7 @@ void RMGScintillatorOutputScheme::StoreEvent(const G4Event* event) {
   // pre-cluster the hits if requested
   std::shared_ptr<RMGDetectorHitsCollection> _clustered_hits;
   if (fPreClusterHits) {
-    _clustered_hits = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, false, true);
+    _clustered_hits = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, false, fStoreVelocity);
     hit_coll = _clustered_hits.get(); // get an unmanaged ptr for use in this function
   }
 
