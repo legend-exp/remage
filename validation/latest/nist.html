@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Comparison with NIST - remage 0.21.1.dev10+g424f747e9 validation suite</title>
+        <title>Comparison with NIST - remage 0.21.1.dev17+g71195eb3f validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.21.1.dev10+g424f747e9 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.21.1.dev17+g71195eb3f validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.21.1.dev10+g424f747e9 validation suite</span>
+  <span class="sidebar-brand-text">remage 0.21.1.dev17+g71195eb3f validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -277,12 +277,34 @@ electrons and compare them with data from the
 <a class="reference external" href="https://physics.nist.gov/PhysRefData/Star/Text/ESTAR.html">ESTAR database</a> (a
 short description of the reported quantities is available
 <a class="reference external" href="https://physics.nist.gov/PhysRefData/Star/Text/method.html">here</a>).</p>
-<p>Multiple Coulomb scattering is disabled through the</p>
+<p>The simulation physics is modified by the commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">process</span><span class="o">/</span><span class="n">inactivate</span> <span class="n">msc</span>
+<span class="o">/</span><span class="n">RMG</span><span class="o">/</span><span class="n">Processes</span><span class="o">/</span><span class="n">DefaultProductionCut</span> <span class="mi">1</span> <span class="n">km</span>
+<span class="o">/</span><span class="n">RMG</span><span class="o">/</span><span class="n">Processes</span><span class="o">/</span><span class="n">SensitiveProductionCut</span> <span class="mi">1</span> <span class="n">km</span>
 </pre></div>
 </div>
-<p>command, since it prevents us to measure the true integrated particle path
-length in the simulation (unless a very short step size limit is set).</p>
+<ul class="simple">
+<li><p>Multiple Coulomb scattering is disabled, since it prevents us to measure the
+true integrated particle path length in the simulation (unless a very short
+step size limit is set).</p></li>
+<li><p>the high production cuts ensure that no secondaries are created. This is
+required to correctly measure the bremsstrahlung component of the CSDA loss.</p></li>
+</ul>
+<p>An effect of the step length is visible. The larger the step length, the larger
+the difference to the expected integrated path length.</p>
+<p>The statistical uncertainties are dominated by energy-loss fluctuations. They
+are kept enabled here to show the effect of the user-chosen step length values.
+Especially the stopping power at low step sizes are the most affected.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The simulated stopping powers are derived from the energy deposition in the
+first step and its length. This leads to the stopping powers only matching with
+the ESTAR-provided values until a material-specific energy.</p>
+<p>Below that, the energy is fully deposited in one single small step, from which
+we cannot estimate the stopping power at the incident energy any more. For these
+low energies, we plot the incident energy over the full expected ranged from
+ESTAR data as the expectation value.</p>
+</div>
 <section id="electron-interactions-in-natural-germanium">
 <h3>Electron interactions in natural germanium<a class="headerlink" href="#electron-interactions-in-natural-germanium" title="Link to this heading">¶</a></h3>
 <p>Monoenergetic electrons are simulated in a natural germanium sphere of 15 cm
@@ -456,7 +478,7 @@ tuning of production cuts or step length).</span><a class="headerlink" href="#id
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="_static/togglebutton.js?v=1ae7504c"></script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     </body>
 </html>
