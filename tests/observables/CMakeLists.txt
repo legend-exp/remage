@@ -25,8 +25,15 @@ set_tests_properties(observables-ge/vis PROPERTIES LABELS "extra;vis;val" FIXTUR
 ## run
 add_test(NAME observables-ge/run COMMAND ${PYTHONPATH} ./run_sim.py ${REMAGE_PYEXE})
 set_tests_properties(
-  observables-ge/run PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED observables-ge-gdml-fixture
-                                FIXTURES_SETUP observables-ge-run-fixture)
+  observables-ge/run
+  PROPERTIES LABELS
+             "extra;val;val-only"
+             FIXTURES_REQUIRED
+             observables-ge-gdml-fixture
+             FIXTURES_SETUP
+             observables-ge-run-fixture
+             PROCESSORS
+             ${STATS_FACTOR})
 ## plot some tracks
 
 add_test(NAME observables-ge/tracks-bulk-no-limit

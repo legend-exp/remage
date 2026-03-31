@@ -32,7 +32,7 @@ RMGSteppingAction::RMGSteppingAction(RMGRunAction* run_action) : fRunAction(run_
 
 void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
 
-  if (fSkipTracking) {
+  if (fSkipTracking || (fKillSecondaries && step->GetTrack()->GetParentID() > 0)) {
     step->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
@@ -111,6 +111,13 @@ void RMGSteppingAction::DefineCommands() {
   fMessenger->DeclareProperty("SkipTracking", fSkipTracking)
       .SetGuidance("Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.")
       .SetGuidance(std::string("This is ") + (fSkipTracking ? "enabled" : "disabled") + " by default")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("KillSecondaries", fKillSecondaries)
+      .SetGuidance("Kill all secondary particles (tracks with parent ID > 0) at their first step.")
+      .SetGuidance(std::string("This is ") + (fKillSecondaries ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
