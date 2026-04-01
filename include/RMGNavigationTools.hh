@@ -19,12 +19,15 @@
 #include <regex>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
+#include "G4AffineTransform.hh"
 #include "G4LogicalVolume.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4VSolid.hh"
 
 // TODO: write function that locates points in global coordinates by using an
 // auxiliary G4Navigator. The G4Navigator instance must be unique and its
@@ -95,6 +98,7 @@ namespace RMGNavigationTools {
   struct VolumeTreeEntry {
       VolumeTreeEntry() = delete;
       VolumeTreeEntry(const VolumeTreeEntry&) = default;
+      VolumeTreeEntry& operator=(const VolumeTreeEntry&) = default;
       VolumeTreeEntry(const G4VPhysicalVolume* pv) { physvol = pv; }
 
       const G4VPhysicalVolume* physvol;
@@ -115,7 +119,31 @@ namespace RMGNavigationTools {
    * @brief find the only way to reach the world volume from a given physical volume, or error.
    * @param pv the physical volume to start with.
    */
-  VolumeTreeEntry FindGlobalPositionCached(const G4VPhysicalVolume* pv);
+  VolumeTreeEntry FindGlobalPosition(const G4VPhysicalVolume* pv);
+
+  /** @brief Cache structure for volume geometry data */
+  struct VolumeCacheEntry {
+      G4AffineTransform inverse_transform;
+      const G4VSolid* solid{};
+      size_t num_daughters{};
+      std::vector<G4AffineTransform> daughter_transforms;
+      std::vector<const G4VSolid*> daughter_solids;
+  };
+
+  /// \cond this triggers a sphinx error
+  // Cache for volume data, keyed by physical volume pointer
+  extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry> volume_cache;
+  /// \endcond
+
+  /** @brief Add a physical volume to the cache for distance to surface calculations.
+   *
+   * @details This computes the inverse transform and daughter volume information for the physical
+   * volume and stores it in the cache. If the volume is already in the cache, it returns an
+   * iterator to the existing entry. Otherwise, it adds a new entry and returns an iterator to it.
+   */
+  std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry>::iterator GetVolumeCacheEntry(
+      const G4VPhysicalVolume* pv
+  );
 
 } // namespace RMGNavigationTools
 

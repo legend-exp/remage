@@ -99,7 +99,7 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       );
     }
     auto pv = *volumes.begin();
-    auto tree = RMGNavigationTools::FindGlobalPositionCached(pv);
+    auto tree = RMGNavigationTools::FindGlobalPosition(pv);
     fDetectorOrigins.insert({det.second.name, tree.vol_global_translation});
 
     auto ntuple_name = this->GetNtupleName(det.second);
