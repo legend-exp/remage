@@ -64,7 +64,7 @@ namespace RMGNavigationTools {
    * @param volume Pointer to the @c G4VPhysicalVolume whose direct mother is sought.
    * @return Pointer to the direct mother @c G4VPhysicalVolume.
    */
-  G4VPhysicalVolume* FindDirectMother(G4VPhysicalVolume* volume);
+  G4VPhysicalVolume* FindDirectMother(const G4VPhysicalVolume* volume);
   /**
    * @brief Finds all direct mother volumes of a given physical volume.
    *
@@ -75,7 +75,7 @@ namespace RMGNavigationTools {
    * @param volume Pointer to the @c G4VPhysicalVolume whose direct mothers are to be found.
    * @return A @c std::set of pointers to the direct mother @c G4VPhysicalVolume objects.
    */
-  std::set<G4VPhysicalVolume*> FindDirectMothers(G4VPhysicalVolume* volume);
+  std::set<G4VPhysicalVolume*> FindDirectMothers(const G4VPhysicalVolume* volume);
 
   /**
    * @brief Prints all logical volumes in the store.
@@ -95,9 +95,9 @@ namespace RMGNavigationTools {
   struct VolumeTreeEntry {
       VolumeTreeEntry() = delete;
       VolumeTreeEntry(const VolumeTreeEntry&) = default;
-      VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
+      VolumeTreeEntry(const G4VPhysicalVolume* pv) { physvol = pv; }
 
-      G4VPhysicalVolume* physvol;
+      const G4VPhysicalVolume* physvol;
 
       G4ThreeVector vol_global_translation; // origin
       G4RotationMatrix vol_global_rotation; // identity
@@ -109,7 +109,13 @@ namespace RMGNavigationTools {
    * @brief find all ways to reach the world volume from a given physical volume.
    * @param pv the physical volume to start with.
    */
-  std::vector<VolumeTreeEntry> FindGlobalPositions(G4VPhysicalVolume* pv);
+  std::vector<VolumeTreeEntry> FindGlobalPositions(const G4VPhysicalVolume* pv);
+
+  /**
+   * @brief find the only way to reach the world volume from a given physical volume, or error.
+   * @param pv the physical volume to start with.
+   */
+  VolumeTreeEntry FindGlobalPositionCached(const G4VPhysicalVolume* pv);
 
 } // namespace RMGNavigationTools
 

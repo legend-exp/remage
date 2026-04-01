@@ -90,7 +90,7 @@ G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
   return *result;
 }
 
-G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volume) {
+G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(const G4VPhysicalVolume* volume) {
 
   auto ancestors = RMGNavigationTools::FindDirectMothers(volume);
 
@@ -105,7 +105,7 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
   return *ancestors.begin();
 }
 
-std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(G4VPhysicalVolume* volume) {
+std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(const G4VPhysicalVolume* volume) {
 
   std::set<G4VPhysicalVolume*> ancestors;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
@@ -197,7 +197,7 @@ void RMGNavigationTools::PrintListOfPhysicalVolumes() {
 
 
 std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalPositions(
-    G4VPhysicalVolume* pv
+    const G4VPhysicalVolume* pv
 ) {
   auto world_volume = G4TransportationManager::GetTransportationManager()
                           ->GetNavigatorForTracking()
@@ -266,6 +266,16 @@ std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalP
     RMGLog::OutDev(RMGLog::fatal, "No path to world volume found, that should not be!");
 
   return trees;
+}
+
+RMGNavigationTools::VolumeTreeEntry RMGNavigationTools::FindGlobalPositionCached(
+    const G4VPhysicalVolume* pv
+) {
+  auto trees = RMGNavigationTools::FindGlobalPositions(pv);
+  if (trees.size() > 1) {
+    RMGLog::Out(RMGLog::fatal, "more than one way to reach world volume from volume ", pv->GetName());
+  }
+  return trees[0];
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

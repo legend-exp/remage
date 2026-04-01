@@ -428,12 +428,12 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
   const auto sv = lv->GetSolid();
 
   // get translation
-  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
+  auto pv_p = RMGNavigationTools::FindGlobalPositionCached(pv);
+  G4AffineTransform tf(pv_p.vol_global_rotation, pv_p.vol_global_translation);
   tf.Invert();
 
   // Get distance to surface.
   // First transform coordinates into local system
-
   double dist = sv->DistanceToOut(tf.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
@@ -442,7 +442,8 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
   // increase by one to keep positive in reverse loop.
   for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
     const auto sample_physical = lv->GetDaughter(sample_no - 1);
-    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
+    auto sample_pv_p = RMGNavigationTools::FindGlobalPositionCached(sample_physical);
+    G4AffineTransform sample_tf(sample_pv_p.vol_global_rotation, sample_pv_p.vol_global_translation);
     sample_tf.Invert();
     const auto sample_point = sample_tf.TransformPoint(position);
     const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
