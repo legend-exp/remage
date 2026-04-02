@@ -20,7 +20,7 @@ u = pint.get_application_registry()
 FRACTION_OF_ENERGY_LOSS = 0.05
 
 WORLD_WIDTH_CM = 50
-
+N_EVENTS = 200000
 ENERGY_LOSS = TextDB("./misc/")["energy_loss"]
 DENSITIES = TextDB("./misc/")["densities"]
 
@@ -82,8 +82,15 @@ def calculate_dEdx(remage_output: str, energy: float, material: str):
 
 
 def calculate_material_height(energy, material):
+    energy_GeV = np.clip(
+        energy * 1e3,
+        np.min(ENERGY_LOSS["energy_points"][material]) * 1.01,
+        np.max(ENERGY_LOSS["energy_points"][material]) * 0.99,
+    )
     dEdx = np.interp(
-        energy, ENERGY_LOSS["energy_points"][:, 0], ENERGY_LOSS["total"][material]
+        energy_GeV,
+        ENERGY_LOSS["energy_points"][material],
+        ENERGY_LOSS["total"][material],
     )
     return energy * FRACTION_OF_ENERGY_LOSS / dEdx
 
@@ -158,38 +165,46 @@ def plot_energy_range(energies, materials, had_physics, em_physics, outfiles):
             ]
         )
 
-        x_exp = np.array(ENERGY_LOSS["energy_points"])
+        x_exp = np.array(ENERGY_LOSS["energy_points"][material]) * 1e-3
         y_exp = np.array(ENERGY_LOSS["total"][material]) * DENSITIES[material]
+        y_ion = np.array(ENERGY_LOSS["ionization"][material]) * DENSITIES[material]
+        y_brems = np.array(ENERGY_LOSS["brems"][material]) * DENSITIES[material]
+        y_pp = np.array(ENERGY_LOSS["pairprod"][material]) * DENSITIES[material]
+        y_photonuclear = (
+            np.array(ENERGY_LOSS["photonuclear"][material]) * DENSITIES[material]
+        )
 
         fig, ax = plt.subplots()
-        ax.errorbar(x, y, yerr=y_unc, fmt="o", label="simulation")
-        ax.plot(x_exp, y_exp, label="expected")
+        ax.errorbar(x, y, yerr=y_unc, fmt=".", label="remage simulation", color="black")
+        ax.plot(x_exp, y_exp, label="total", color="tab:blue")
+        ax.plot(x_exp, y_ion, label="ionization ", color="tab:orange", ls="--")
+        ax.plot(x_exp, y_brems, label="Bremsstrahlung", color="tab:green", ls="--")
+        ax.plot(x_exp, y_pp, label="pair production", color="tab:red", ls="--")
+        ax.plot(
+            x_exp, y_photonuclear, label="photonuclear", color="tab:purple", ls="--"
+        )
         ax.set_xscale("log")
         ax.set_xlabel("muon energy [GeV]")
         ax.set_ylabel("mean energy loss dE/dx [MeV/cm]")
+        ax.set_ylim(0, np.max(y_exp) * 1.1)
+        ax.set_xlim(np.min(x_exp), np.max(x_exp))
+        ax.grid(ls=":", color="black", alpha=0.5)
         ax.legend()
         ax.set_title(
-            f"Energy loss of muons in {material}",
-            size=8,
+            f"Energy loss of muons in {material} compared to DOI: 10.1006/adnd.2001.0861",
+            size=9,
         )
         fig.savefig(f"energy_loss_{material}_energy_range.output.png")
 
 
 def _simulate_case(
-    case: tuple[float, str, str, str], max_threads: int = 1
+    case_id: int, case: tuple[float, str, str, str], max_threads: int = 1
 ) -> tuple[tuple[float, str, str, str], str]:
 
     energy, material, had_physics, em_physics = case
-    if energy > 1:
-        output = (
-            f"output-energy_loss-{energy:.0f}-{material}-{had_physics}-{em_physics}.lh5"
-        )
-    else:
-        output = (
-            f"output-energy_loss-{energy:.2f}-{material}-{had_physics}-{em_physics}.lh5"
-        )
+    output = f"output-energy_loss-{case_id:03d}-{energy:.6g}-{material}-{had_physics}-{em_physics}.lh5"
 
-    events = 100 * int(os.environ.get("RMG_STATS_FACTOR", "1"))
+    events = N_EVENTS
 
     geom = geometry(material, energy)
 
@@ -216,7 +231,15 @@ def _simulate_case(
 
 
 def test_energy_loss():
-    energies = np.array(ENERGY_LOSS["energy_points"])[:, 0][10::2] / 1e3
+    energies = (
+        10
+        ** np.linspace(
+            np.log10(np.min(ENERGY_LOSS["energy_points"]["lar"])),
+            np.log10(np.max(ENERGY_LOSS["energy_points"]["lar"])),
+            50,
+        )
+        / 1e3
+    )
     materials = ["lar", "water"]
     had_physics_list = ["Shielding"]
     em_physics_list = ["Livermore"]
@@ -229,20 +252,21 @@ def test_energy_loss():
         for energy in energies
     ]
 
-    max_workers = min(len(cases), os.cpu_count() // 2)
-    max_threads = os.cpu_count() // 2 // max_workers
-    max_threads = max(1, max_threads)
+    cpu_count = os.cpu_count() or 1
+    cpu_budget = max(1, cpu_count // 2)
+    max_workers = max(1, min(len(cases), cpu_budget))
+    max_threads = max(1, cpu_budget // max_workers)
 
     outfiles = {}
     if max_workers == 1:
-        for case in cases:
-            key, output = _simulate_case(case, max_threads=max_threads)
+        for case_id, case in enumerate(cases):
+            key, output = _simulate_case(case_id, case, max_threads=max_threads)
             outfiles[key] = output
     else:
         with ProcessPoolExecutor(max_workers=max_workers) as ex:
             futures = [
-                ex.submit(_simulate_case, case, max_threads=max_threads)
-                for case in cases
+                ex.submit(_simulate_case, case_id, case, max_threads=max_threads)
+                for case_id, case in enumerate(cases)
             ]
             for fut in as_completed(futures):
                 key, output = fut.result()

@@ -1,21 +1,83 @@
 # simulation data digitized from https://doi.org/10.1134/S106377881603011X
-Y_gen:
-  lar:
-    100: 0.0006141876797088565
-    280: 0.001367709572991316
-  water:
-    100: 0.00012277499957428353
-    280: 0.00026574153569584104
-  rock:
-    100: 0.00015301408425936515
-    280: 0.00035309281896991977
-energy_dependence: # parameters of the power law fit Y = b * E^n_eff
-  lar:
-    b: 1.71071819e-05
-    n_eff: 7.77561314e-01
-  water:
-    b: 3.88324714e-06
-    n_eff: 7.49957455e-01
-  rock:
-    b: 3.63446076e-06
-    n_eff: 8.12145712e-01
+Manukovsky_et_al_2016:
+  name: Neutron production by cosmic-ray muons in various materials
+  authors: K. V. Manukovsky, O. G. Ryazhskaya, N. M. Sobolevsky & A. V. Yudin
+  doi: 10.1134/S106377881603011X
+  data:
+    Y_gen:
+      lar:
+        100: 0.0006141876797088565
+        280: 0.001367709572991316
+      water:
+        100: 0.00012277499957428353
+        280: 0.00026574153569584104
+      rock:
+        100: 0.00015301408425936515
+        280: 0.00035309281896991977
+    energy_dependence: # parameters of the power law fit Y = b * E^n_eff
+      lar:
+        b: 1.71071819e-05
+        n_eff: 7.77561314e-01
+      water:
+        b: 3.88324714e-06
+        n_eff: 7.49957455e-01
+      rock:
+        b: 3.63446076e-06
+        n_eff: 8.12145712e-01
+SK_2023:
+  name: Measurement of the cosmogenic neutron yield in Super-Kamiokande with gadolinium loaded water
+  authors: The Super-Kamiokande Collaboration
+  doi: 10.1103/PhysRevD.107.092009
+  data:
+    Y_gen:
+      water:
+        259:
+          val: 2.76e-4
+          std: 0.19e-4
+SNO_2026:
+  name: Cosmogenic Neutron Production in Water at SNO+
+  authors: SNO+ Collaboration
+  doi: 10.1103/vs3y-sbb2
+  data:
+    Y_gen:
+      water:
+        364:
+          val: 3.38e-4
+          std: 0.30e-4
+FLUKA_2001:
+  name: Predicting neutron production from cosmic-ray muons
+  authors: Y.-F. Wang, V. Balic, G. Gratta, A. Fassò, S. Roesler, and A. Ferrari
+  doi: 10.1103/PhysRevD.64.013012
+  data:
+    energy_dependence:
+      water:
+        b: 4.14e-6
+        n_eff: 0.74
+FLUKA_2003:
+  name: Simulations of muon-induced neutron flux at large depths underground
+  authors: V.A. Kudryavtsev, N.J.C. Spooner, J.E. McMillan
+  doi: 10.1016/S0168-9002(03)00983-5
+  data:
+    energy_dependence:
+      water:
+        b: 3.2e-6
+        n_eff: 0.79
+UNIVERSAL_FORMULA_2013:
+  name: Universal formula for the muon-induced neutron yield
+  authors: N. Yu. Agafonova and A. S. Malgin
+  doi: 10.1103/physrevd.87.113013
+  data:
+    energy_dependence:
+      lar:
+        b: 1.4635570910697696e-05
+        n_eff: 0.78
+      water:
+        b: 5.521161982977689e-06
+        n_eff: 0.78
+      rock:
+        b: 8.293812697024135e-06
+        n_eff: 0.78
+    mass_dependence:
+      b: 4.4e-7
+      alpha: 0.78
+      beta: 0.95

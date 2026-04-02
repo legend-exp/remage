@@ -47,7 +47,7 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 file(
   GLOB_RECURSE SPHINX_SOURCES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  *.rst **/*.rst *.md **/*.md)
+  *.rst **/*.rst *.md **/*.md *.conf)
 
 foreach(_file ${SPHINX_SOURCES})
   get_filename_component(_dir ${_file} DIRECTORY)
