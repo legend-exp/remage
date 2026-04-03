@@ -99,15 +99,8 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       );
     }
     auto pv = *volumes.begin();
-    auto trees = RMGNavigationTools::FindGlobalPositions(pv);
-    if (trees.size() > 1) {
-      RMGLog::Out(
-          RMGLog::fatal,
-          "more than one way to reach world volume from detector ",
-          det.second.name
-      );
-    }
-    fDetectorOrigins.insert({det.second.name, trees[0].vol_global_translation});
+    auto tree = RMGNavigationTools::FindGlobalPosition(pv);
+    fDetectorOrigins.insert({det.second.name, tree.vol_global_translation});
 
     auto ntuple_name = this->GetNtupleName(det.second);
     auto ntuple_reg = registered_ntuples.find(ntuple_name);

@@ -8,6 +8,8 @@ import pyg4ometry as pg4
 import pygeomtools as pytools
 from pygeomhpges import make_hpge
 
+Path("gdml/").mkdir(exist_ok=True)
+
 # read the configs
 out_gdml = "gdml/ge-array.gdml"
 det_macro = "macros/detectors-fake.mac"
@@ -23,7 +25,7 @@ def add_hpge(lar, reg, angle, radius, z, idx, dtype):
     logical_detector = make_hpge(config_dict[dtype], name=f"{dtype}{idx}", registry=reg)
     logical_detector.pygeom_color_rgba = (0, 1, 1, 0.2)
     physical_detector = pg4.geant4.PhysicalVolume(
-        [0, 0, 0], [x, y, z], logical_detector, f"{dtype}{idx}", lar, reg
+        [0, -np.pi, 0], [x, y, z], logical_detector, f"{dtype}{idx}", lar, reg
     )
 
     physical_detector.pygeom_active_dector = pytools.RemageDetectorInfo(
@@ -42,6 +44,9 @@ wl.pygeom_color_rgba = (0.1, 1, 0.1, 0.5)
 
 reg.setWorld(wl)
 
+inner_s = pg4.geant4.solid.Box("inner", 299, 299, 299, reg, lunit="mm")
+inner_l = pg4.geant4.LogicalVolume(inner_s, "G4_Galactic", "inner", reg)
+pg4.geant4.PhysicalVolume([0, +np.pi, 0], [0, 0, 0], inner_l, "inner", wl, reg)
 
 # hpge strings
 string_radius = 85
@@ -50,7 +55,7 @@ string_angles = [0, 90, 180, 270]
 n = 0
 for i, det in enumerate(["V", "P", "B", "C"]):
     angle = string_angles[i]
-    n = add_hpge(wl, reg, angle, string_radius, -20, n, det)
+    n = add_hpge(inner_l, reg, angle, string_radius, -20, n, det)
 
 pytools.detectors.write_detector_auxvals(reg)
 pytools.geometry.check_registry_sanity(reg, reg)

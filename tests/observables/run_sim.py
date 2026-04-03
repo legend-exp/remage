@@ -137,40 +137,43 @@ if do_bulk:
 /gps/energy {energy} keV
 """
 
+jobs = []
+for generator, config in generators.items():
+    for step_limits in cuts:
+        jobs.append((generator, config, step_limits))
+
 
 def run_sim_and_pproc(gen):
-    generator, config = gen
+    generator, config, step_limits = gen
 
-    # loop over step limits
-    for step_limits in cuts:
-        command = (
-            f"/RMG/Geometry/SetMaxStepSize {step_limits} um germanium"
-            if step_limits is not None
-            else ""
-        )
+    command = (
+        f"/RMG/Geometry/SetMaxStepSize {step_limits} um germanium"
+        if step_limits is not None
+        else ""
+    )
 
-        # run the simulation
-        run_sim(
-            generator_name=generator,
-            name="step_limits",
-            val=step_limits,
-            step_limits=command,
-            prod_cuts="",
-            proc="",
-            step_points="/RMG/Output/Germanium/StepPositionMode Both",
-            generator=config,
-            register_lar=False,
-        )
+    # run the simulation
+    run_sim(
+        generator_name=generator,
+        name="step_limits",
+        val=step_limits,
+        step_limits=command,
+        prod_cuts="",
+        proc="",
+        step_points="/RMG/Output/Germanium/StepPositionMode Both",
+        generator=config,
+        register_lar=False,
+    )
 
-        # post-process it
-        run_reboost(
-            generator_name=generator,
-            name="step_limits",
-            val=step_limits,
-            reboost_config="config/hit_config.yaml",
-        )
+    # post-process it
+    run_reboost(
+        generator_name=generator,
+        name="step_limits",
+        val=step_limits,
+        reboost_config="config/hit_config.yaml",
+    )
 
 
 if __name__ == "__main__":
     with Pool(n_proc) as pool:
-        pool.map(run_sim_and_pproc, list(generators.items()))
+        pool.map(run_sim_and_pproc, jobs)

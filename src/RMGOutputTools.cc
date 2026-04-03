@@ -422,30 +422,20 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
 
-  // get logical volume and solid
-  auto pv_name = pv->GetName();
-  const auto lv = pv->GetLogicalVolume();
-  const auto sv = lv->GetSolid();
-
-  // get translation
-  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
-  tf.Invert();
+  // get solid and cached data.
+  const auto sv = pv->GetLogicalVolume()->GetSolid();
+  const auto cache_entry = (*RMGNavigationTools::GetVolumeCacheEntry(pv)).second;
 
   // Get distance to surface.
   // First transform coordinates into local system
-
-  double dist = sv->DistanceToOut(tf.TransformPoint(position));
+  double dist = sv->DistanceToOut(cache_entry.inverse_transform.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  auto local_no_daughters = lv->GetNoDaughters();
 
   // increase by one to keep positive in reverse loop.
-  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
-    const auto sample_physical = lv->GetDaughter(sample_no - 1);
-    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
-    sample_tf.Invert();
-    const auto sample_point = sample_tf.TransformPoint(position);
-    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+  for (auto sample_no = cache_entry.num_daughters; sample_no >= 1; sample_no--) {
+    const auto sample_point = cache_entry.daughter_transforms[sample_no].TransformPoint(position);
+    const auto sample_solid = cache_entry.daughter_solids[sample_no];
 
     const double sample_dist = sample_solid->DistanceToIn(sample_point);
     if (sample_dist < dist) { dist = sample_dist; }
