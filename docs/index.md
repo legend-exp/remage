@@ -3,12 +3,6 @@
 _remage_ is a modern simulation framework for low-background physics
 experiments.
 
-```{warning}
-We are working on a proper user guide ({doc}`manual/index`). In the meanwhile,
-users can have a look at the {doc}`tutorial` or the provided
-[examples](https://github.com/legend-exp/remage/tree/main/examples).
-```
-
 ## Quick start
 
 The installation process is documented in {doc}`manual/install`. In the simplest
@@ -34,6 +28,8 @@ commands, as well as the [remage macro interface](./rmg-commands).
   useful examples of complex experimental setup implementations.
 - [reboost](https://github.com/legend-exp/reboost): post-processing and analysis
   of remage output.
+- [revertex](https://github.com/legend-exp/revertex): generator for input vertex
+  files for remage.
 
 ## Next steps
 

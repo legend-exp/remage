@@ -35,6 +35,7 @@
 #include "RMGVVertexGenerator.hh"
 #include "RMGVertexConfinement.hh"
 #include "RMGVertexFromFile.hh"
+#include "RMGVertexFromPoint.hh"
 
 RMGMasterGenerator::RMGMasterGenerator() : fVertexGeneratorObj(nullptr), fGeneratorObj(nullptr) {
 
@@ -86,6 +87,9 @@ void RMGMasterGenerator::SetConfinement(RMGMasterGenerator::Confinement code) {
       fVertexGeneratorObj = std::make_unique<RMGVertexConfinement>();
       break;
     case Confinement::kFromFile: fVertexGeneratorObj = std::make_unique<RMGVertexFromFile>(); break;
+    case Confinement::kFromPoint:
+      fVertexGeneratorObj = std::make_unique<RMGVertexFromPoint>();
+      break;
     default:
       RMGLog::Out(
           RMGLog::fatal,

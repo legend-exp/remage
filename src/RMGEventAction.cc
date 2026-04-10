@@ -100,10 +100,16 @@ void RMGEventAction::EndOfEventAction(const G4Event* event) {
     fEventTotalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - fEventStartTime);
     auto event_time_ns = fEventTotalTime.count();
     RMGLog::Out(
-      RMGLog::debug,
-      "Event ", event->GetEventID(), " processing time: ", event_time_ns, " ns (",
-      event_time_ns / 1000.0, " μs, ",
-      event_time_ns / 1000000.0, " ms)"
+        RMGLog::debug,
+        "Event ",
+        event->GetEventID(),
+        " processing time: ",
+        event_time_ns,
+        " ns (",
+        event_time_ns / 1000.0,
+        " μs, ",
+        event_time_ns / 1000000.0,
+        " ms)"
     );
   }
 

@@ -31,18 +31,18 @@
 	</materials>
 	<solids>
 		<orb name="world" r="20" lunit="cm"/>
-		<orb name="germanium" r="15" lunit="cm"/>
+		<orb name="target" r="15" lunit="cm"/>
 	</solids>
 	<structure>
-		<volume name="germanium">
+		<volume name="target">
 			<materialref ref="NaturalGermanium"/>
-			<solidref ref="germanium"/>
+			<solidref ref="target"/>
 		</volume>
 		<volume name="world">
 			<materialref ref="G4_Galactic"/>
 			<solidref ref="world"/>
-			<physvol name="germanium">
-				<volumeref ref="germanium"/>
+			<physvol name="target">
+				<volumeref ref="target"/>
 			</physvol>
 		</volume>
 	</structure>

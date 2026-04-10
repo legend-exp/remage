@@ -113,6 +113,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
     void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
+    void SetWeightByMass(bool mode) { fWeightByMass = mode; }
+    void SetWeightByMassIsotope(int z, int n) {
+      fWeightByMass = true;
+      fWeightByMassIsotopeZ = z;
+      fWeightByMassIsotopeN = n;
+    }
 
     std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
       return fGeomVolumeData;
@@ -238,12 +244,15 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         void GetDirection(G4ThreeVector& dir, G4ThreeVector& pos) const;
 
+        void RecalcMass(int z, int n);
+
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
         G4RotationMatrix rotation;
         G4ThreeVector translation;
 
         double volume = -1;
+        double mass = -1;
         double surface = -1;
 
         bool surface_sample = false;
@@ -266,8 +275,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
         /** @brief Select a @c SampleableObject from the collection, weighted by volume.
          *  @returns a reference to the chosen @c SampleableObject .
+         *  @param weight_by_mass A flag of whether the volume weighting should be done by mass and not by volume.
          */
-        [[nodiscard]] const SampleableObject& VolumeWeightedRand() const;
+        [[nodiscard]] const SampleableObject& VolumeWeightedRand(bool weight_by_mass) const;
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
         // emulate @c std::vector
@@ -279,10 +289,16 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         void clear() { data.clear(); }
         void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
+          this->total_volume += other.total_volume;
+          this->total_mass += other.total_mass;
+          this->total_surface += other.total_surface;
         }
+
+        void recalc_total(bool weigh_by_mass, int mass_isotope_z, int mass_istotope_n);
 
         std::vector<SampleableObject> data;
         double total_volume = 0;
+        double total_mass = 0;
         double total_surface = 0;
     };
 
@@ -311,6 +327,9 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
 
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
     VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
+    bool fWeightByMass = false;
+    int fWeightByMassIsotopeZ = 0;
+    int fWeightByMassIsotopeN = 0;
 
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;

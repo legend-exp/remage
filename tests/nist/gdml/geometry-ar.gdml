@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<element name="argon" formula="Ar" Z="18">
+			<atom value="39.95"/>
+		</element>
+		<material name="liquid_argon" state="liquid">
+			<T value="88.8" unit="K"/>
+			<P value="100000.0" unit="pascal"/>
+			<D value="1.39"/>
+			<composite ref="argon" n="1"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="world" r="20" lunit="cm"/>
+		<orb name="target" r="15" lunit="cm"/>
+	</solids>
+	<structure>
+		<volume name="target">
+			<materialref ref="liquid_argon"/>
+			<solidref ref="target"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="target">
+				<volumeref ref="target"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>

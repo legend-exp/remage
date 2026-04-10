@@ -34,8 +34,13 @@ void RMGIpc::Setup(int ipc_pipe_fd_out, int ipc_pipe_fd_in, int proc_num) {
   fProcNum = proc_num;
   if (fIpcFdOut < 0 || fIpcFdIn < 0) return;
 
+  bool perform_versioncheck = true;
+  if (auto check_s = std::getenv("RMG_IPC_DISABLE_VERSION_CHECK")) {
+    perform_versioncheck = std::atoi(check_s) > 0;
+  }
   // note: this is just a test for the blocking mode.
-  if (!SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
+  if (perform_versioncheck &&
+      !SendIpcBlocking(CreateMessage("ipc_available", RMG_PROJECT_VERSION_FULL))) {
     RMGLog::Out(RMGLog::error, "blocking test IPC call failed, disabling.");
     fIpcFdOut = -1;
     fIpcFdIn = -1;
@@ -55,21 +60,17 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
   // wait for result.
   pollfd pfd{.fd = fIpcFdIn, .events = POLLIN, .revents = 0};
 
+  const int timeout = 10000; // microseconds
   int ready = 0;
-  ready = poll(&pfd, 1, /* timeout (us) */ 10000);
-  while (ready == -1 && errno == EINTR) { ready = poll(&pfd, 1, 10000); }
-  if (ready == 1) {
-    char ack[2] = "";
-    auto acklen = read(fIpcFdIn, ack, sizeof(ack));
-    if (acklen != 1 || ack[0] != '\x06') {
-      RMGLog::Out(RMGLog::fatal, "IPC error: wrong ACK");
-      return false;
-    }
-    return true;
-  } else {
-    RMGLog::Out(RMGLog::fatal, "IPC timeout or error");
+  ready = poll(&pfd, 1, timeout);
+  while ((ready == -1 && errno == EINTR) || ready == 0) { ready = poll(&pfd, 1, timeout); }
+  char ack[2] = "";
+  auto acklen = read(fIpcFdIn, ack, sizeof(ack));
+  if (acklen != 1 || ack[0] != '\x06') {
+    RMGLog::Out(RMGLog::fatal, "IPC error: wrong ACK");
     return false;
   }
+  return true;
 }
 
 bool RMGIpc::SendIpcNonBlocking(std::string msg) {

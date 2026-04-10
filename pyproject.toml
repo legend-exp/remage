@@ -34,7 +34,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "legend-pydataobj >=1.16",
-  "reboost >=0.6",
+  "reboost >=0.10.0a2",
   "pygama >=2.2.3",
   "colorlog",
   "rich",
@@ -46,6 +46,9 @@ dependencies = [
 allow-direct-references = true
 
 [project.optional-dependencies]
+pygeom = [
+    "legend-pygeom-tools >=0.0.26",
+]
 test = [
   "pytest >=6",
   "pytest-cov >=3",

@@ -149,6 +149,18 @@ int main(int argc, char** argv) {
   if (verbose) RMGLog::SetLogLevel(RMGLog::debug);
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
+  // check that we have the same version when we are running under the python wrapper.
+  if (char* version_s = std::getenv("RMG_WRAPPER_VERSION")) {
+    if (std::string(version_s) != RMG_PROJECT_VERSION_FULL) {
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "remage-cpp version {} does not match python-wrapper version %s",
+          RMG_PROJECT_VERSION_FULL,
+          version_s
+      );
+    }
+  }
+
   // handle signal to abort the current run.
   struct sigaction sig{};
   sig.sa_handler = &signal_handler;
@@ -158,8 +170,8 @@ int main(int argc, char** argv) {
     RMGLog::Out(RMGLog::error, "signal install failed.");
   }
 
-  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   if (proc_num_offset >= 0) RMGLog::SetProcNum(proc_num_offset);
+  RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
 

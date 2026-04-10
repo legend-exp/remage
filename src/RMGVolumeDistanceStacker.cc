@@ -37,11 +37,16 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
   if (aTrack->GetTrackID() == 0) return std::nullopt;
 
   // stop if not configured.
-  if (fVolumeName.empty() || fVolumeSafety < 0) return std::nullopt;
+  if (fVolumeNames.empty() || fVolumeSafety < 0) return std::nullopt;
 
   // only defer electron/positron tracks.
   if (aTrack->GetDefinition() != G4Electron::Definition() &&
       aTrack->GetDefinition() != G4Positron::Definition())
+    return std::nullopt;
+
+  // if a max energy threshold is set, only defer tracks below that threshold.
+  if (fMaxEnergyThresholdForStacking >= 0 &&
+      aTrack->GetKineticEnergy() > fMaxEnergyThresholdForStacking)
     return std::nullopt;
 
   // note: aTrack->GetLogicalVolumeAtVertex() and aTrack->GetVertexPosition() might not be correctly
@@ -49,28 +54,26 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
 
   // only defer tracks in the specified volume.
   const auto vol_name = aTrack->GetVolume()->GetLogicalVolume()->GetName();
-  if (vol_name != fVolumeName) return std::nullopt;
+  if (fVolumeNames.count(vol_name) == 0) return std::nullopt;
 
+  // if safety is zero, always defer.
   if (fVolumeSafety == 0) return fWaiting;
 
   // only defer tracks that have a minimum distance to other volumes.
   bool is_within_safety = RMGOutputTools::is_within_surface_safety(
-      aTrack->GetVolume(), aTrack->GetPosition(), fVolumeSafety
+      aTrack->GetVolume(),
+      aTrack->GetPosition(),
+      fVolumeSafety
   );
-  RMGLog::Out(
-        RMGLog::debug_event,
-        "track ", aTrack->GetTrackID(), 
-        is_within_safety ? " is within safety" : " is beyond safety"
-    );
   if (is_within_safety) return std::nullopt;
+
 
   return fWaiting;
 }
 
-void RMGVolumeDistanceStacker::SetFilterGermaniumOnly(bool enable) {
-  RMGOutputTools::SetFilterGermaniumOnly(enable);
+void RMGVolumeDistanceStacker::SetDistanceCheckGermaniumOnly(bool enable) {
+  RMGOutputTools::SetDistanceCheckGermaniumOnly(enable);
 }
-
 
 void RMGVolumeDistanceStacker::DefineCommands() {
 
@@ -85,15 +88,31 @@ void RMGVolumeDistanceStacker::DefineCommands() {
       .SetParameterName("safety", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("VolumeName", &RMGVolumeDistanceStacker::SetVolumeName)
-      .SetGuidance("Set the volume name in which to stack e-/e+ tracks.")
+  fMessenger->DeclareMethod("AddVolumeName", &RMGVolumeDistanceStacker::AddVolumeName)
+      .SetGuidance("Add a volume name in which to stack e-/e+ tracks.")
+      .SetGuidance("Can be called multiple times to register multiple volumes.")
       .SetParameterName("volume", false)
       .SetStates(G4State_Idle);
 
-  fMessenger->DeclareMethod("FilterGermaniumOnly", &RMGVolumeDistanceStacker::SetFilterGermaniumOnly)
+  fMessenger
+      ->DeclareMethod(
+          "DistanceCheckGermaniumOnly",
+          &RMGVolumeDistanceStacker::SetDistanceCheckGermaniumOnly
+      )
       .SetGuidance("Enable/disable Germanium-only filtering for surface distance checks.")
       .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
       .SetParameterName("enable", false)
+      .SetStates(G4State_Idle);
+
+
+  fMessenger
+      ->DeclareMethodWithUnit(
+          "MaxEnergyThresholdForStacking",
+          "MeV",
+          &RMGVolumeDistanceStacker::SetMaxEnergyThresholdForStacking
+      )
+      .SetGuidance("Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.")
+      .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 }
 

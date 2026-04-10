@@ -1,30 +1,36 @@
 from __future__ import annotations
 
+import os
+
 import numpy as np
 from remage import remage_run_from_args
 
-base_args = [
-    "--macro-substitutions",
-    "ENERGY={}",
-    "MAX_STEP_SIZE_IN_M=1",
-    "--gdml-files",
-    "gdml/geometry.gdml",
-    "--output-file",
-    "electrons-ge-{}-keV.lh5",
-    "--flat-output",
-    "--overwrite",
-    "macros/run.mac",
-]
+n_events = 500 * int(os.environ["RMG_STATS_FACTOR"])
 
-energies = np.concatenate(
-    [
-        np.arange(30, 100, step=20),
-        np.arange(100, 500, step=200),
-        np.arange(500, 5000, step=500),
+for mat in ("ge", "ar", "cu"):
+    base_args = [
+        "--macro-substitutions",
+        "ENERGY={}",
+        f"EVENTS={n_events}",
+        "MAX_STEP_SIZE_IN_M=1",
+        "--gdml-files",
+        f"gdml/geometry-{mat}.gdml",
+        "--output-file",
+        f"electrons-{mat}-{{}}-keV.lh5",
+        "--flat-output",
+        "--overwrite",
+        "macros/run.mac",
     ]
-)
 
-for energy in energies:  # in keV
-    args = [arg.format(energy) for arg in base_args]
-    print("remage", " ".join(args))
-    remage_run_from_args(args, raise_on_error=True)
+    energies = np.concatenate(
+        [
+            np.arange(30, 100, step=20),
+            np.arange(100, 500, step=200),
+            np.arange(500, 5000, step=500),
+        ]
+    )
+
+    for energy in energies:  # in keV
+        args = [arg.format(energy) for arg in base_args]
+        print("remage", " ".join(args))
+        remage_run_from_args(args, raise_on_error=True)

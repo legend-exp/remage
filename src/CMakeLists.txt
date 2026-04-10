@@ -33,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
     ${_root}/include/RMGParticleFilterScheme.hh
+    ${_root}/include/RMGPrimaryTransformer.hh
     ${_root}/include/RMGOutputManager.hh
     ${_root}/include/RMGOutputTools.hh
     ${_root}/include/RMGPhysics.hh
@@ -49,6 +50,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGUserInit.hh
     ${_root}/include/RMGVertexConfinement.hh
     ${_root}/include/RMGVertexFromFile.hh
+    ${_root}/include/RMGVertexFromPoint.hh
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
@@ -98,6 +100,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGUserAction.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc
+    ${_root}/src/RMGVertexFromPoint.cc
     ${_root}/src/RMGVertexOutputScheme.cc
     ${_root}/src/RMGVolumeDistanceStacker.cc)
 

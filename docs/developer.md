@@ -52,6 +52,43 @@ time and moved into the package source folder.
 
 ```
 
+### Installing dependencies with conda-forge (mostly for macOS)
+
+It is also possible to use conda to install all dependencies for building remage
+from source.
+
+```console
+# these are just the normal steps tp get a conda-forge only environment
+$ conda create -n remage-env --channel conda-forge --override-channels python=3.13
+$ conda activate remage-env
+$ conda config --env --add channels conda-forge
+$ conda config --env --remove channels defaults
+$ conda config --env --set channel_priority strict
+
+# now install our dependencies
+$ conda install -c conda-forge geant4 bxdecay0 "python<3.14" cmake make gcc
+$ export CMAKE_PREFIX_PATH="$CONDA_PREFIX"
+```
+
+When using the `cmake` command later for the first time, you will need to add an
+additional argument to use the right python version from the conda environment:
+
+```console
+$ cmake [...] -D Python3_EXECUTABLE="$(command -v python)" [...]
+```
+
+for running the compiled executable, you might need to add the conda library
+path to `LD_LIBRARY_PATH` (Linux) or `DYLD_FALLBACK_LIBRARY_PATH` (macOS); in
+addition to the remage library path that `cmake` will instruct you to add
+there):
+
+```console
+# Linux
+$ export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
+# macOS
+$ export DYLD_FALLBACK_LIBRARY_PATH="$CONDA_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+```
+
 ## Building
 
 _remage_ currently only supports an out-of-tree build using CMake. To build and
@@ -171,16 +208,6 @@ stored in the `PYTHONPATH` variable:
 
 ```cmake
 add_test(NAME basics/test COMMAND ${PYTHONPATH} script.py)
-set_tests_properties(${_test} PROPERTIES ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
-```
-
-If the Python script is generating an output file (to be e.g. shown in the
-validation report), make sure it uses the _remage_ Matplotlib settings by
-pointing the `MPLCONFIGDIR` environment variable to the `tests/matplotlibrc`
-file:
-
-```cmake
-set_tests_properties(${_test} PROPERTIES ENVIRONMENT MPLCONFIGDIR=${CMAKE_SOURCE_DIR}/tests)
 ```
 
 In case a simulation output file needs to be generated with _remage_, before a
@@ -202,6 +229,30 @@ set_tests_properties(germanium/e-range PROPERTIES FIXTURES_REQUIRED output-fixtu
 ```
 
 For more complete examples, have a look at the existing tests.
+
+### Test labels
+
+Tests are labelled with ctest Labels
+
+```cmake
+set_tests_properties(${test_name} PROPERTIES LABELS ${labels})
+```
+
+where `labels` is a semicolon-separated list of labels. The labels used
+throughout the test suite are as follows:
+
+- `extra` requires some optional dependency to run. As HDF5 is an optional
+  dependency, this is most tests.
+- `mt` multi-threaded tests that should get the whole number of available CPUs
+  allocated.
+- `val` validation tests. These tests produce output for the validation suite
+  but might be valuable as unit tests, too.
+- `val-only` validation tests that might take long and should not be run as unit
+  tests.
+- `vis` test with Geant4 visualization. Historically required an active X11
+  setup, but not any more.
+- `flaky` tests that should not be run when tests are needed to pass arelease
+  build, as they might be flaky.
 
 ## Documentation
 

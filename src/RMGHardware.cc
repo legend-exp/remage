@@ -66,7 +66,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     for (const auto& file : fGDMLFiles) {
       if (!fs::exists(fs::path(file.data()))) RMGLog::Out(RMGLog::fatal, file, " does not exist");
       RMGLog::Out(RMGLog::detail, "Reading ", file, " GDML file");
-      if (RMGManager::Instance()->GetProcessNumberOffset() == 0) {
+      if (!fGDMLDisableXmlCheck && RMGManager::Instance()->GetProcessNumberOffset() == 0) {
         RMGIpc::SendIpcBlocking(RMGIpc::CreateMessage("gdml", file));
       }
       parser.Read(file, false);
@@ -515,6 +515,12 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareProperty("GDMLOverlapCheckNumPoints", fGDMLOverlapCheckNumPoints)
       .SetGuidance("Change the number of points sampled for overlap checks")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("GDMLDisableXmlCheck", fGDMLDisableXmlCheck)
+      .SetGuidance("Disable the automatic xml validity check after loading a GDML file")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareMethod("RegisterDetectorsFromGDML", &RMGHardware::RegisterDetectorsFromGDML)

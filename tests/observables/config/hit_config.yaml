@@ -32,13 +32,13 @@ processing_groups:
 
       activeness_pre:
         reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf_pre*1000,
-        fccd=1, dlf=0.5)
+        fccd_in_mm=1, dlf=0.5)
       activeness_post:
         reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf_post*1000,
-        fccd=1, dlf=0.5)
+        fccd_in_mm=1, dlf=0.5)
       activeness_avg:
         reboost.math.functions.piecewise_linear_activeness(HITS.dist_to_surf*1000,
-        fccd=1, dlf=0.5)
+        fccd_in_mm=1, dlf=0.5)
 
       active_energy_pre: ak.sum(HITS.edep*HITS.activeness_pre, axis=-1)
       active_energy_post: ak.sum(HITS.edep*HITS.activeness_post, axis=-1)

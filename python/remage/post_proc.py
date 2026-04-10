@@ -224,11 +224,14 @@ def deduplicate_table(
         keys = list(set(table.keys()) - {unique_col})
         d = {}
         for idx in range(table.size):
-            obj = (
-                Struct({col: Scalar(table[col].nda[idx]) for col in keys})
-                if len(keys) > 1
-                else Scalar(table[keys[0]].nda[idx])
-            )
+            scalars = {}
+            for col in keys:
+                attrs = {}
+                if "units" in table[col].attrs:
+                    attrs = {"units": table[col].attrs["units"]}
+                scalars[col] = Scalar(table[col].nda[idx], attrs=attrs)
+
+            obj = Struct(scalars) if len(keys) > 1 else scalars[keys[0]]
             d[table[unique_col].nda[idx].decode("utf-8")] = obj
 
         lh5.write(Struct(d), table_name, file, wo_mode="overwrite")

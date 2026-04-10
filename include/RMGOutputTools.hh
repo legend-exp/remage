@@ -17,9 +17,14 @@
 #define _RMG_OUTPUT_TOOLS_HH_
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
+#include "G4AffineTransform.hh"
 #include "G4Step.hh"
+#include "G4Threading.hh"
+#include "G4ThreeVector.hh"
+#include "G4VSolid.hh"
 
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
@@ -72,17 +77,16 @@ namespace RMGOutputTools {
 
   /** @brief Enable or disable Germanium-only filtering for bounding sphere optimization.
    *
-   * @details When enabled, the bounding sphere optimization in distance_to_surface and
-   * is_within_surface_safety will only be applied to daughter volumes that are registered
-   * as Germanium detectors. This can improve performance when only Germanium detectors
-   * are relevant for surface distance calculations.
-   * 
+   * @details When enabled, the bounding sphere optimization in is_within_surface_safety
+   * will only be applied to daughter volumes that are registered as Germanium detectors.
+   * This can improve performance when only Germanium detectors are relevant for surface
+   * distance calculations.
+   *
    * Note: Enabling this will clear the volume cache to rebuild with detector status.
    *
    * @param enable true to filter for Germanium detectors only, false to apply to all volumes
    */
-  void SetFilterGermaniumOnly(bool enable);
-
+  void SetDistanceCheckGermaniumOnly(bool enable);
 
   /** @brief Compute the distance from the point to the surface of the physical volume.
    * @details Checks distance to surfaces of mother volume.
@@ -172,8 +176,8 @@ namespace RMGOutputTools {
    * @returns A map of steps after combining low energy tracks.
    */
   std::map<int, std::vector<RMGDetectorHit*>> combine_low_energy_tracks(
-      std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-      ClusterPars cluster_pars,
+      const std::map<int, std::vector<RMGDetectorHit*>>& hits_map,
+      const ClusterPars& cluster_pars,
       bool has_distance_to_surface
   );
 
@@ -190,6 +194,39 @@ namespace RMGOutputTools {
       bool has_distance_to_surface
   );
 
+
+  // Cache structure for volume geometry data
+  struct VolumeCache {
+      G4AffineTransform inverse_transform;
+      const G4VSolid* solid;
+      size_t num_daughters;
+      std::vector<G4AffineTransform> daughter_transforms;
+      std::vector<const G4VSolid*> daughter_solids;
+      std::vector<bool> daughter_is_multiunion;
+      std::vector<G4ThreeVector> daughter_centers; // bounding sphere centers in parent local coords
+      std::vector<double> daughter_radii;          // bounding sphere radii
+      std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
+  };
+
+  /// \cond this triggers a sphinx error
+  // Cache for volume data, keyed by physical volume pointer
+  extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
+  /// \endcond
+
+  /** @brief Add a physical volume to the cache for distance to surface calculations.
+   *
+   * @details This computes the inverse transform and daughter volume information for the physical
+   * volume and stores it in the cache. If the volume is already in the cache, it returns an
+   * iterator to the existing entry. Otherwise, it adds a new entry and returns an iterator to it.
+   */
+  std::unordered_map<const G4VPhysicalVolume*, VolumeCache>::iterator AddOrGetFromCache(
+      const G4VPhysicalVolume* pv
+  );
+
+  /// \cond this triggers a sphinx error
+  // Configuration for safety distance check
+  extern G4ThreadLocal bool is_distance_check_germanium_only;
+  /// \endcond
 
 } // namespace RMGOutputTools
 

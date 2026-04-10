@@ -33,8 +33,14 @@ G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aT
   }
 
   std::optional<G4ClassificationOfNewTrack> new_status = std::nullopt;
-  
-  RMGLog::Out(RMGLog::debug_event, "Looping over output schemes for track ", aTrack->GetTrackID(), " of particle type ", aTrack->GetDefinition()->GetParticleName());
+
+  RMGLog::Out(
+      RMGLog::debug_event,
+      "Looping over output schemes for track ",
+      aTrack->GetTrackID(),
+      " of particle type ",
+      aTrack->GetDefinition()->GetParticleName()
+  );
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
     RMGLog::Out(RMGLog::debug_event, "Asking output scheme ", typeid(*el).name());
     auto request_status = el->StackingActionClassify(aTrack, fStage);
@@ -73,15 +79,17 @@ void RMGStackingAction::NewStage() {
 
   auto stack_man = G4EventManager::GetEventManager()->GetStackManager();
   RMGLog::Out(
-    RMGLog::debug,
-    "Tracks moved from Waiting to Urgent stack. Size: ", stack_man->GetNUrgentTrack()
+      RMGLog::debug,
+      "Tracks moved from Waiting to Urgent stack. Size: ",
+      stack_man->GetNUrgentTrack()
   );
 
   if (should_do_stage.has_value() && !should_do_stage.value()) {
-    //RMGLog::Out(
-    //    RMGLog::debug,
-    //    "Freeing up urgent stack of size ", stack_man->GetNUrgentTrack(), " and waiting stack of size ", stack_man->GetNWaitingTrack()
-    //  );
+    // RMGLog::Out(
+    //     RMGLog::debug,
+    //     "Freeing up urgent stack of size ", stack_man->GetNUrgentTrack(), " and waiting stack of
+    //     size ", stack_man->GetNWaitingTrack()
+    //   );
     stack_man->clear();
   }
   fStage++;
@@ -92,10 +100,15 @@ void RMGStackingAction::PrepareNewEvent() {
   if (RMGLog::GetLogLevel() <= RMGLog::debug && fClassifyCallCount > 0) {
     auto avg_time_ns = fClassifyTotalTime.count() / fClassifyCallCount;
     RMGLog::Out(
-      RMGLog::debug,
-      "ClassifyNewTrack called ", fClassifyCallCount, " times. "
-      "Average time: ", avg_time_ns, " ns (",
-      avg_time_ns / 1000.0, " μs)"
+        RMGLog::debug,
+        "ClassifyNewTrack called ",
+        fClassifyCallCount,
+        " times. "
+        "Average time: ",
+        avg_time_ns,
+        " ns (",
+        avg_time_ns / 1000.0,
+        " μs)"
     );
   }
 
