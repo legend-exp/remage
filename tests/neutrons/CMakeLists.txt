@@ -22,7 +22,7 @@ set_tests_properties(neutrons/plot-argon PROPERTIES LABELS "extra;val" FIXTURES_
 add_test(NAME neutrons/plot-gd COMMAND ${PYTHONPATH} gd_endf_comparison.py)
 set_tests_properties(neutrons/plot-gd PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
                                                  neutrons-output-fixture)
-add_test(NAME neutrons/show-geom COMMAND legend-pygeom-vis gdml/geometry.gdml --scene
-                                         gdml/scene.json)
+add_test(NAME neutrons/show-geom COMMAND ${PYTHONPATH} -m pygeomtools.viewer gdml/geometry.gdml
+                                         --scene gdml/scene.json)
 set_tests_properties(neutrons/show-geom PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
                                                    neutrons-output-fixture)
