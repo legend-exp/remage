@@ -114,7 +114,7 @@ def handle_ipc_message(
 
     # first field is process number.
     assert len(fields) > 1
-    assert isinstance(fields[0], str)
+    assert isinstance(fields[0], str)  # proc_id is always a single string, not a tuple
     proc_num = int(fields[0])
     fields = fields[1:]
 
