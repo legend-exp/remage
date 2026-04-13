@@ -118,3 +118,12 @@ repos:
     hooks:
       - id: clang-format
         types_or: [c++]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.20.0"
+    hooks:
+      - id: mypy
+        files: "^python/"
+        args: []
+        additional_dependencies:
+          - types-PyYAML

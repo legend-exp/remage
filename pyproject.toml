@@ -172,5 +172,13 @@ messages_control.disable = [
   "too-many-nested-blocks"
 ]
 
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+
+exclude = [
+    "^build/",
+]
+
 [tool.codespell]
 ignore-words-list = "hist, manuel, inactivate"

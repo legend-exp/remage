@@ -9,7 +9,7 @@ from remage.geombench.gdml_handling import (
 
 
 def test_generate_tmp_gdml_geometry() -> None:
-    geometry_path = "gdml/geometry.gdml"
+    geometry_path = Path("gdml/geometry.gdml")
     component_name = "germanium"
 
     loaded_gdml = load_gdml_geometry(geometry_path)
