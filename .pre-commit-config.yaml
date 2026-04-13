@@ -123,5 +123,5 @@ repos:
     rev: "v1.20.0"
     hooks:
       - id: mypy
-        files: src
+        files: python
         args: []
