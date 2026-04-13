@@ -41,9 +41,9 @@ def post_proc(
     time_window_in_us: float,
 ) -> None:
     remage_files: list[str] = ipc_info.get("output")
-    main_output_file: str = ipc_info.get_single("output_main", None)
+    main_output_file: str | None = ipc_info.get_single("output_main")
     overwrite_output: bool = ipc_info.get_single("overwrite_output", "0") == "1"
-    det_tables_path: str = ipc_info.get_single("ntuple_output_directory", None)
+    det_tables_path: str | None = ipc_info.get_single("ntuple_output_directory")
 
     ipc_info.remove("output_main")
 
@@ -296,7 +296,7 @@ def get_reboost_config(
     -------
     config file as a dictionary.
     """
-    config = {}
+    config: dict = {}
 
     # get the config for tables to be reshaped
     config["processing_groups"] = [
