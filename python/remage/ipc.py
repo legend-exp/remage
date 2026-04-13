@@ -107,7 +107,9 @@ def handle_ipc_message(
         msg = msg[0:-1]
         is_blocking = True
     records = msg.split("\x1e")  # ASCII RS ("record separator")
-    split_records = [record.split("\x1f") for record in records]  # ASCII US ("unit separator")
+    split_records = [
+        record.split("\x1f") for record in records
+    ]  # ASCII US ("unit separator")
     fields: list[tuple[str, ...] | str] = [
         tuple(record) if len(record) > 1 else record[0] for record in split_records
     ]
