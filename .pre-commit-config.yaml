@@ -125,3 +125,5 @@ repos:
       - id: mypy
         files: python
         args: []
+        additional_dependencies:
+          - types-PyYAML

@@ -213,7 +213,7 @@ class SummaryGenerator:
             x_coord = self.x[hs[0]]
             y_coord = self.y[hs[1]]
             z_coord = self.z[hs[2]]
-            hotspot_coords.append([float(x_coord), float(y_coord), float(z_coord)])
+            hotspot_coords.append((float(x_coord), float(y_coord), float(z_coord)))
 
         return hotspot_coords
 

@@ -81,7 +81,7 @@ log = logging.getLogger("remage")
 def handle_ipc_message(
     msg: str,
     proc: list[subprocess.Popen],
-) -> tuple[bool, list, bool, int]:
+) -> tuple[bool, list | None, bool, int]:
     """Parse a already UTF-8 decoded IPC message from ``remage-cpp``.
 
     This function should directly handle all known blocking IPC messages, which
@@ -94,7 +94,7 @@ def handle_ipc_message(
 
     Returns
     -------
-    tuple[bool, list, bool, int]
+    tuple[bool, list | None, bool, int]
         ``(is_blocking, parsed_message, is_fatal)`` where ``is_blocking`` is
         ``True`` when the sender waits for a reply, ``parsed_message`` is the
         decoded message or ``None`` if it was consumed internally, and
@@ -106,16 +106,19 @@ def handle_ipc_message(
     if msg[-1] == "\x05":  # ASCII ENQ ("enquiry")
         msg = msg[0:-1]
         is_blocking = True
-    msg = msg.split("\x1e")  # ASCII RS ("record separator")
-    msg = [record.split("\x1f") for record in msg]  # ASCII US ("unit separator")
-    msg = [tuple(record) if len(record) > 1 else record[0] for record in msg]
+    records = msg.split("\x1e")  # ASCII RS ("record separator")
+    split_records = [record.split("\x1f") for record in records]  # ASCII US ("unit separator")
+    fields: list[tuple[str, ...] | str] = [
+        tuple(record) if len(record) > 1 else record[0] for record in split_records
+    ]
 
     # first field is process number.
-    assert len(msg) > 1
-    proc_num = int(msg[0])
-    msg = msg[1:]
+    assert len(fields) > 1
+    assert isinstance(fields[0], str)
+    proc_num = int(fields[0])
+    fields = fields[1:]
 
-    msg_ret = msg
+    msg_ret: list | None = fields
     is_fatal = False
 
     if is_blocking:
@@ -125,26 +128,27 @@ def handle_ipc_message(
                 p.send_signal(signal.SIGSTOP)
 
         # handle blocking messages, if necessary.
-        if msg[0] == "ipc_available":
-            if msg[1] != __version__:
+        if fields[0] == "ipc_available":
+            if fields[1] != __version__:
                 log.error(
                     "remage-cpp version %s does not match python-wrapper version %s",
-                    msg[1],
+                    fields[1],
                     __version__,
                 )
                 is_fatal = True
             msg_ret = None
-        elif msg[0] == "gdml":
+        elif fields[0] == "gdml":
             from xml.dom.minidom import parse as minidom_parse
 
+            assert isinstance(fields[1], str)
             try:
-                minidom_parse(msg[1])
+                minidom_parse(fields[1])
             except BaseException as pe:
-                log.error("invalid GDML file %s: %s", msg[1], pe)
+                log.error("invalid GDML file %s: %s", fields[1], pe)
                 is_fatal = True
             msg_ret = None
         else:
-            log.warning("Unhandled blocking IPC message %s", str(msg))
+            log.warning("Unhandled blocking IPC message %s", str(fields))
 
         if len(proc) > 1:
             # resume all C++ processes in multi-process mode.
@@ -252,7 +256,7 @@ class IpcResult:
             return [msg[0] for msg in msgs]
         return msgs
 
-    def get_single(self, name: str, default: str) -> str:
+    def get_single(self, name: str, default: str | None = None) -> str | None:
         """Return the single single value for the key ``name`` or ``default`` if not present.
 
         .. note ::
@@ -264,7 +268,7 @@ class IpcResult:
             raise RuntimeError(msg)
         return next(iter(gen)) if len(gen) == 1 else default
 
-    def set(self, name: str, values: list[str]) -> None:
+    def set(self, name: str, values: list[str] | str) -> None:
         """Replace existing stored messages for they key ``name`` with ``values``.
 
         .. note ::
@@ -272,6 +276,8 @@ class IpcResult:
             complex messages is not implemented yet.
         """
         self.remove(name)
+        if isinstance(values, str):
+            values = [values]
         for v in values:
             self.ipc_info.append([name, v])
 

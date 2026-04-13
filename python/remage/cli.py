@@ -44,7 +44,7 @@ def _run_remage_cpp(
     args: Sequence[str] | None = None,
     is_cli: bool = False,
     num_procs: int | None = 0,
-) -> tuple[list[int], list[signal.Signals], IpcResult]:
+) -> tuple[list[int], list[signal.Signals | None], IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
     logger = logging.getLogger("remage")
 
@@ -57,9 +57,9 @@ def _run_remage_cpp(
 
     if args is None:
         argv = list(sys.argv)
-        exe_name = Path(argv[0]).name
+        exe_name: str | None = Path(argv[0]).name
     else:
-        argv = [remage_exe, *args]
+        argv = [str(remage_exe), *args]
         exe_name = Path(sys.argv[0]).name if is_cli else None
 
     if exe_name is not None and shutil.which(exe_name) == sys.argv[0]:
@@ -124,7 +124,7 @@ def _run_remage_cpp(
 
     # start a thread listening for IPC messages.
     # remage-cpp will only continue to do real work after we handled one sync message.
-    unhandled_ipc_messages = []
+    unhandled_ipc_messages: list = []
     ipc_thread = threading.Thread(
         target=ipc_thread_fn, args=(pipe_i_r, pipes_o, proc, unhandled_ipc_messages)
     )
@@ -276,7 +276,7 @@ def remage_run(
             write_pygeom(geom_or_file, tmp_file)
             extra_tmp_files.append(tmp_file)
             return tmp_file
-        return geom_or_file
+        return str(geom_or_file)
 
     # hint: a string is also a sequence, so we need to exclude it here.
     if isinstance(gdml_files, Sequence) and not isinstance(gdml_files, str):
@@ -388,14 +388,14 @@ def remage_run_from_args(
     )
     py_args, cpp_args = parser.parse_known_args(args)
 
-    ec, termsig, ipc_info = _run_remage_cpp(
+    ec_list, termsig, ipc_info = _run_remage_cpp(
         cpp_args, is_cli=args is None, num_procs=py_args.procs
     )
-    ec = 1 if 1 in ec else max(ec)
+    ec: int = 1 if 1 in ec_list else max(ec_list)
 
     # print an error message for the termination signal, similar to what bash does.
     for proc_num, t in enumerate(termsig):
-        if t not in (None, signal.SIGINT, signal.SIGPIPE):
+        if t is not None and t not in (signal.SIGINT, signal.SIGPIPE):
             logger.error(
                 "remage-cpp%s exited with signal %s (%s)",
                 f"[{proc_num}]" if len(termsig) > 1 else "",

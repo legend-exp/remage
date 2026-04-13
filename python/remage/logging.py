@@ -27,7 +27,7 @@ _TRACEBACK_INSTALLED = False
 DETAIL = 11
 
 # monkey-patch Logger to add the .detail(...) method
-logging.Logger.detail = lambda self, msg, *args, **kwargs: self.log(
+logging.Logger.detail = lambda self, msg, *args, **kwargs: self.log(  # type: ignore[attr-defined]
     DETAIL, msg, *args, **kwargs
 )
 
