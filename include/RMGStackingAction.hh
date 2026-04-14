@@ -16,8 +16,6 @@
 #ifndef _RMG_STACKING_ACTION_HH_
 #define _RMG_STACKING_ACTION_HH_
 
-#include <chrono>
-
 #include "G4UserStackingAction.hh"
 
 class G4Track;
@@ -36,8 +34,7 @@ class RMGStackingAction : public G4UserStackingAction {
 
     G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack) override;
     void NewStage() override;
-
-    int GetCurrentStage() const { return fStage; }
+    void PrepareNewEvent() override;
 
   private:
 

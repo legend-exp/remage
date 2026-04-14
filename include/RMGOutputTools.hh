@@ -17,14 +17,9 @@
 #define _RMG_OUTPUT_TOOLS_HH_
 
 #include <map>
-#include <unordered_map>
 #include <vector>
 
-#include "G4AffineTransform.hh"
 #include "G4Step.hh"
-#include "G4Threading.hh"
-#include "G4ThreeVector.hh"
-#include "G4VSolid.hh"
 
 #include "RMGDetectorHit.hh"
 #include "RMGDetectorMetadata.hh"
@@ -75,21 +70,6 @@ namespace RMGOutputTools {
    */
   double get_distance(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode);
 
-  /** @brief Enable or disable Germanium-only filtering for bounding sphere optimization.
-   *
-   * @details When enabled, the bounding sphere optimization in is_within_surface_safety
-   * will only be applied to daughter volumes that are registered as Germanium detectors.
-   * This can improve performance when only Germanium detectors are relevant for surface
-   * distance calculations.
-   *
-   * Note: Enabling this will clear the volume cache to rebuild with detector status.
-   *
-   * @param enable true to filter for Germanium detectors only, false to apply to all volumes
-   */
-  void SetDistanceCheckGermaniumOnly(bool enable);
-
-  /** @brief Get the current setting for Germanium-only filtering for bounding sphere optimization. */
-  bool GetDistanceCheckGermaniumOnly();
 
   /** @brief Compute the distance from the point to the surface of the physical volume.
    * @details Checks distance to surfaces of mother volume.
@@ -97,16 +77,6 @@ namespace RMGOutputTools {
    * @param position The position to evaluate the distance for.
    */
   double distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position);
-
-  /** @brief Check if any surface is closer than a given safety distance.
-   * @details More efficient than distance_to_surface when only a threshold check is needed,
-   * as it can exit early as soon as any surface is found closer than the safety.
-   * @param pv The physical volume to check.
-   * @param position The position to evaluate.
-   * @param safety The safety distance threshold.
-   * @return true if any surface (parent or daughters) is within the safety distance.
-   */
-  bool is_within_surface_safety(const G4VPhysicalVolume* pv, const G4ThreeVector& position, double safety);
 
   /** @brief Perform a basic reduction of the hits collection removing very short steps.
    *
@@ -196,10 +166,7 @@ namespace RMGOutputTools {
       ClusterPars cluster_pars,
       bool has_distance_to_surface
   );
-  /// \cond this triggers a sphinx error
-  // Configuration for safety distance check
-  extern G4ThreadLocal bool is_distance_check_germanium_only;
-  /// \endcond
+
 
 } // namespace RMGOutputTools
 

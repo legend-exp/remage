@@ -27,9 +27,7 @@
 RMGStackingAction::RMGStackingAction(RMGRunAction* runaction) : fRunAction(runaction) {}
 
 G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aTrack) {
-
   std::optional<G4ClassificationOfNewTrack> new_status = std::nullopt;
-
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
     auto request_status = el->StackingActionClassify(aTrack, fStage);
     if (!request_status.has_value()) continue; // this output scheme does not care.
@@ -59,15 +57,13 @@ void RMGStackingAction::NewStage() {
     }
   }
 
-  auto stack_man = G4EventManager::GetEventManager()->GetStackManager();
-  RMGLog::Out(
-      RMGLog::debug,
-      "Tracks moved from Waiting to Urgent stack. Size: ",
-      stack_man->GetNUrgentTrack()
-  );
-
-  if (should_do_stage.has_value() && !should_do_stage.value()) { stack_man->clear(); }
+  if (should_do_stage.has_value() && !should_do_stage.value()) {
+    auto stack_man = G4EventManager::GetEventManager()->GetStackManager();
+    stack_man->clear();
+  }
   fStage++;
 }
+
+void RMGStackingAction::PrepareNewEvent() { fStage = 0; }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

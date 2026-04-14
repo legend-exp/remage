@@ -19,12 +19,10 @@
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4OpticalPhoton.hh"
-#include "G4RunManager.hh"
 
 #include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
-#include "RMGStackingAction.hh"
 
 namespace u = CLHEP;
 
@@ -48,7 +46,6 @@ void RMGTrackOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
   CreateNtupleFOrDColumn(ana_man, vid, "py_in_MeV", fStoreSinglePrecisionEnergy);
   CreateNtupleFOrDColumn(ana_man, vid, "pz_in_MeV", fStoreSinglePrecisionEnergy);
   CreateNtupleFOrDColumn(ana_man, vid, "ekin_in_MeV", fStoreSinglePrecisionEnergy);
-  if (fStoreStageID) { ana_man->CreateNtupleIColumn(vid, "stageid"); }
 
   ana_man->FinishNtuple(vid);
 
@@ -102,15 +99,6 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
     proc_id = static_cast<int>(fProcessMap[proc_name]);
   }
 
-  int stage_id = 0;
-  if (fStoreStageID) {
-    if (const RMGStackingAction* stackAction = dynamic_cast<const RMGStackingAction*>(
-            G4RunManager::GetRunManager()->GetUserStackingAction()
-        )) {
-      stage_id = stackAction->GetCurrentStage();
-    }
-  }
-
   fTrackEntries.emplace_back(
       GetEventIDForStorage(G4EventManager::GetEventManager()->GetConstCurrentEvent()),
       track->GetTrackID(),
@@ -124,8 +112,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
       primary->GetMomentum().getX(),
       primary->GetMomentum().getY(),
       primary->GetMomentum().getZ(),
-      track->GetKineticEnergy(),
-      stage_id
+      track->GetKineticEnergy()
   );
 }
 
@@ -158,8 +145,6 @@ void RMGTrackOutputScheme::StoreEvent(const G4Event*) {
         entry.kinetic_energy / u::MeV,
         fStoreSinglePrecisionEnergy
     );
-
-    if (fStoreStageID) { ana_man->FillNtupleIColumn(ntupleid, col_id++, entry.stage_id); }
 
     fStoredProcessIDs.insert(entry.proc_id);
     ana_man->AddNtupleRow(ntupleid);
@@ -216,11 +201,6 @@ void RMGTrackOutputScheme::DefineCommands() {
   fMessenger->DeclareMethod("EnergyFilter", &RMGTrackOutputScheme::SetEnergyFilter)
       .SetGuidance("Only include tracks with kinetic energy above this threshold.")
       .SetParameterName("energy", false)
-      .SetStates(G4State_Idle);
-
-  fMessenger->DeclareMethod("StoreStageID", &RMGTrackOutputScheme::SetStoreStageID)
-      .SetGuidance("If enabled, the output scheme records the current tracking stage ID.")
-      .SetParameterName("flag", false)
       .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("StoreSinglePrecisionPosition", fStoreSinglePrecisionPosition)
