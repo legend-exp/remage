@@ -202,6 +202,9 @@ can be configured in two explicit steps:
 When waiting tracks are cleared, this applies to the full waiting stack (not
 only optical photons deferred by the staging scheme).
 
+For a detailed staging guide (including electron caveats and example setups),
+see {ref}`manual-staging`.
+
 By default, the position saved for each step is the average of the pre and
 post-step point. This can be controlled with
 <project:../rmg-commands.md#rmgoutputgermaniumsteppositionmode>, which can be

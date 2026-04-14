@@ -2353,6 +2353,8 @@ Set a gamma cascade file for neutron capture on a specified isotope
 
 ## `/RMG/Staging/`
 
+See <project:manual/staging.md> for an overview, configuration checklist and examples.
+
 
 **Sub-directories:**
 
@@ -2372,12 +2374,12 @@ Commands for staging optical photon tracks.
 
 Defer optical photons to the waiting stack during stage 0.
 
-This is disabled by default.
+This is enabled by default.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
-  * **Default value** – `false`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Staging/Electrons/`
@@ -2397,12 +2399,12 @@ Commands for staging electron tracks.
 
 Defer secondary electrons to the waiting stack during stage 0.
 
-This is disabled by default.
+This is enabled by default.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
-  * **Default value** – `false`
+  * **Default value** – `true`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Staging/Electrons/VolumeSafety`
