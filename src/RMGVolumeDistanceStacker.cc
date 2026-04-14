@@ -34,15 +34,13 @@ std::optional<G4ClassificationOfNewTrack> RMGVolumeDistanceStacker::StackingActi
   if (stage != 0) return std::nullopt;
 
   // do not touch the initial track of an event.
-  if (aTrack->GetTrackID() == 0) return std::nullopt;
+  if (aTrack->GetParentID() == 0) return std::nullopt;
 
   // stop if not configured.
   if (fVolumeNames.empty() || fVolumeSafety < 0) return std::nullopt;
 
-  // only defer electron/positron tracks.
-  if (aTrack->GetDefinition() != G4Electron::Definition() &&
-      aTrack->GetDefinition() != G4Positron::Definition())
-    return std::nullopt;
+  // only defer electron tracks. We still want to track positrons for the annihilation gammas.
+  if (aTrack->GetDefinition() != G4Electron::Definition()) return std::nullopt;
 
   // if a max energy threshold is set, only defer tracks below that threshold.
   if (fMaxEnergyThresholdForStacking >= 0 &&

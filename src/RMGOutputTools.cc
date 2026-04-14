@@ -35,8 +35,6 @@
 #include "magic_enum/magic_enum.hpp"
 
 namespace {
-  // Configuration for bounding sphere optimization
-  bool g_filter_germanium_only = false;
 
   // Cache structure for volume geometry data
   struct VolumeCache {
