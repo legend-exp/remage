@@ -2377,7 +2377,7 @@ This is disabled by default.
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
-  * **Default value** – `true`
+  * **Default value** – `false`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Staging/Electrons/`
@@ -2402,7 +2402,7 @@ This is disabled by default.
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
   * **Omittable** – `True`
-  * **Default value** – `true`
+  * **Default value** – `false`
 * **Allowed states** – `Idle`
 
 ### `/RMG/Staging/Electrons/VolumeSafety`
