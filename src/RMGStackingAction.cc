@@ -26,6 +26,8 @@
 
 RMGStackingAction::RMGStackingAction(RMGRunAction* runaction) : fRunAction(runaction) {}
 
+void RMGStackingAction::PrepareNewEvent() { fStage = 0; }
+
 G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aTrack) {
 
   std::optional<G4ClassificationOfNewTrack> new_status = std::nullopt;

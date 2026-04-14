@@ -61,7 +61,10 @@ class RMGStagingScheme : public RMGVOutputScheme {
 
   private:
 
-    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
+    std::unique_ptr<G4GenericMessenger> fElectronStagingMessengers;
+    std::unique_ptr<G4GenericMessenger> fOpticalPhotonStagingMessengers;
+
+
     void DefineCommands();
 
     bool fDeferOpticalPhotonsToWaitingStage = false;

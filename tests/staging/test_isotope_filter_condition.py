@@ -74,4 +74,6 @@ def test_ar39_filter_discards_event():
     deferred_secondary_electrons = count_tracks_by_stage(
         tracks, pdg=11, stage=1, primary_only=False
     )
+    assert tracks is not None, "Missing track output"
+    assert "stageid" in tracks.fields, "Missing stageid column"
     assert deferred_secondary_electrons == 0

@@ -29,7 +29,7 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
   // we are only interested in staging into waiting at stage 0.
   if (stage != 0) return std::nullopt;
 
-  if (fDeferOpticalPhotonsToWaitingStage &&
+  if ((fDeferOpticalPhotonsToWaitingStage || fDeferElectronsToWaitingStage) &&
       aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
     return fWaiting;
   }
@@ -80,15 +80,13 @@ void RMGStagingScheme::SetDistanceCheckGermaniumOnly(bool enable) {
 
 void RMGStagingScheme::DefineCommands() {
 
-  fMessengers.push_back(
-      std::make_unique<G4GenericMessenger>(
-          this,
-          "/RMG/Staging/OpticalPhotons/",
-          "Commands for staging optical photon tracks."
-      )
+  fOpticalPhotonStagingMessengers = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Staging/OpticalPhotons/",
+      "Commands for staging optical photon tracks."
   );
 
-  fMessengers.back()
+  fOpticalPhotonStagingMessengers
       ->DeclareProperty("DeferToWaitingStage", fDeferOpticalPhotonsToWaitingStage)
       .SetGuidance("Defer optical photons to the waiting stack during stage 0.")
       .SetGuidance(
@@ -96,43 +94,40 @@ void RMGStagingScheme::DefineCommands() {
           " by default."
       )
       .SetParameterName("boolean", true)
-      .SetDefaultValue("false")
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
-  fMessengers.push_back(
-      std::make_unique<G4GenericMessenger>(
-          this,
-          "/RMG/Staging/Electrons/",
-          "Commands for staging electron tracks."
-      )
+  fElectronStagingMessengers = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Staging/Electrons/",
+      "Commands for staging electron tracks."
   );
 
-  fMessengers.back()
-      ->DeclareProperty("DeferToWaitingStage", fDeferElectronsToWaitingStage)
-      .SetGuidance("Defer secondary electrons to the waiting stack during stage 0.")
+  fElectronStagingMessengers->DeclareProperty("DeferToWaitingStage", fDeferElectronsToWaitingStage)
+      .SetGuidance("Defer secondary electrons to the waiting stack during stage 0. This also automatically defers any optical photons.")
       .SetGuidance(
           std::string("This is ") + (fDeferElectronsToWaitingStage ? "enabled" : "disabled") +
           " by default."
       )
       .SetParameterName("boolean", true)
-      .SetDefaultValue("false")
+      .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
-  fMessengers.back()
+  fElectronStagingMessengers
       ->DeclareMethodWithUnit("VolumeSafety", "cm", &RMGStagingScheme::SetElectronVolumeSafety)
       .SetGuidance("Set the minimum distance to any other volume for this electron to be staged.")
       .SetGuidance("Set to 0 to stage regardless of surface distance.")
       .SetParameterName("safety", false)
       .SetStates(G4State_Idle);
 
-  fMessengers.back()
+  fElectronStagingMessengers
       ->DeclareMethod("AddVolumeName", &RMGStagingScheme::AddElectronVolumeName)
       .SetGuidance("Add a volume name in which electron staging is active.")
       .SetGuidance("If this command is not called, electron staging applies to all volumes.")
       .SetParameterName("volume", false)
       .SetStates(G4State_Idle);
 
-  fMessengers.back()
+  fElectronStagingMessengers
       ->DeclareMethod("DistanceCheckGermaniumOnly", &RMGStagingScheme::SetDistanceCheckGermaniumOnly)
       .SetGuidance("Enable/disable Germanium-only filtering for electron surface distance checks.")
       .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
@@ -143,7 +138,7 @@ void RMGStagingScheme::DefineCommands() {
       .SetParameterName("enable", false)
       .SetStates(G4State_Idle);
 
-  fMessengers.back()
+  fElectronStagingMessengers
       ->DeclareMethodWithUnit(
           "MaxEnergyThresholdForStacking",
           "MeV",
