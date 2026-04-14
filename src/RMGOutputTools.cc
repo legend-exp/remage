@@ -16,11 +16,14 @@
 #include "RMGOutputTools.hh"
 
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 
 #include "G4AffineTransform.hh"
 #include "G4Electron.hh"
 #include "G4Gamma.hh"
 #include "G4LogicalVolume.hh"
+#include "G4MultiUnion.hh"
 #include "G4TransportationManager.hh"
 #include "G4VSolid.hh"
 
@@ -28,9 +31,56 @@
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGNavigationTools.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
+/// \cond this triggers a sphinx error or creates weird namespaces @<long number>
+namespace RMGOutputTools {
+
+  G4ThreadLocal bool is_distance_check_germanium_only = false;
+
+} // namespace RMGOutputTools
+
+namespace {
+  std::mutex multiunion_mutex;
+
+  bool ShouldCheckDaughterSurface(
+      const RMGNavigationTools::VolumeCacheEntry& cache,
+      const G4ThreeVector& local_pos,
+      size_t i,
+      double threshold,
+      bool germanium_only
+  ) {
+    if (germanium_only && !cache.daughter_is_germanium[i]) return false;
+
+    // Early rejection: check distance to bounding sphere first (cheap)
+    const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
+    const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
+
+    return sphere_surface_dist <= threshold;
+  }
+
+  double DistanceToDaughterSurface(
+      const RMGNavigationTools::VolumeCacheEntry& cache,
+      const G4ThreeVector& local_pos,
+      size_t i
+  ) {
+    const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
+
+    if (cache.daughter_is_multiunion[i]) {
+      std::lock_guard<std::mutex> lock(multiunion_mutex);
+      auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
+      mu->SetAccurateSafety(true);
+      const double sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
+      mu->SetAccurateSafety(false);
+      return sample_dist;
+    }
+
+    return cache.daughter_solids[i]->DistanceToIn(sample_point);
+  }
+} // namespace
+/// \endcond
 
 G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::PositionMode mode) {
   G4ThreeVector position;
@@ -78,6 +128,21 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
     );
 
   return distance;
+}
+
+void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
+  RMGOutputTools::is_distance_check_germanium_only = enable;
+  RMGLog::OutFormatDev(
+      RMGLog::detail,
+      "Setting distance check Germanium-only filtering to {}",
+      RMGOutputTools::is_distance_check_germanium_only ? "ENABLED" : "DISABLED"
+  );
+  // Clear per-thread volume cache to keep optimization metadata in sync.
+  RMGNavigationTools::ClearVolumeCache();
+}
+
+bool RMGOutputTools::GetDistanceCheckGermaniumOnly() {
+  return RMGOutputTools::is_distance_check_germanium_only;
 }
 
 RMGDetectorHit* RMGOutputTools::average_hits(
@@ -421,26 +486,85 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 
 
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
+  // Check cache first
+  auto cache_it = RMGNavigationTools::GetVolumeCacheEntry(pv);
 
-  // get solid and cached data.
-  const auto sv = pv->GetLogicalVolume()->GetSolid();
-  const auto cache_entry = (*RMGNavigationTools::GetVolumeCacheEntry(pv)).second;
+  const auto& cache = cache_it->second;
 
-  // Get distance to surface.
-  // First transform coordinates into local system
-  double dist = sv->DistanceToOut(cache_entry.inverse_transform.TransformPoint(position));
+  // Transform to local coordinates and get distance to parent surface
+  const G4ThreeVector local_pos = cache.inverse_transform.TransformPoint(position);
+  double dist = cache.solid->DistanceToOut(local_pos);
 
-  // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
+  // Check distance to daughters
+  for (size_t i = 0; i < cache.num_daughters; ++i) {
+    if (
+        !ShouldCheckDaughterSurface(cache, local_pos, i, dist, RMGOutputTools::is_distance_check_germanium_only)
+    ) {
+      continue;
+    }
 
-  // increase by one to keep positive in reverse loop.
-  for (auto sample_no = cache_entry.num_daughters; sample_no >= 1; sample_no--) {
-    const auto sample_point = cache_entry.daughter_transforms[sample_no].TransformPoint(position);
-    const auto sample_solid = cache_entry.daughter_solids[sample_no];
-
-    const double sample_dist = sample_solid->DistanceToIn(sample_point);
-    if (sample_dist < dist) { dist = sample_dist; }
+    const double sample_dist = DistanceToDaughterSurface(cache, local_pos, i);
+    if (sample_dist < dist) dist = sample_dist;
   }
+
   return dist;
+}
+
+bool RMGOutputTools::is_within_surface_safety(
+    const G4VPhysicalVolume* pv,
+    const G4ThreeVector& position,
+    double safety
+) {
+
+  // Check cache first
+  auto cache_it = RMGNavigationTools::GetVolumeCacheEntry(pv);
+
+  const auto& cache = cache_it->second;
+
+  // Transform to local coordinates
+  const G4ThreeVector local_pos = cache.inverse_transform.TransformPoint(position);
+
+  // Check parent surface - early exit if within safety
+  if (cache.solid->DistanceToOut(local_pos) < safety) return true;
+
+  // Check daughters - early exit as soon as we find one within safety
+  for (size_t i = 0; i < cache.num_daughters; ++i) {
+    if (
+        !ShouldCheckDaughterSurface(cache, local_pos, i, safety, RMGOutputTools::is_distance_check_germanium_only)
+    ) {
+      continue;
+    }
+
+    const double sample_dist = DistanceToDaughterSurface(cache, local_pos, i);
+
+    // Early exit if this daughter is within safety
+    if (sample_dist < safety) {
+      RMGLog::OutFormatDev(
+          RMGLog::debug_event,
+          "Volume '{}' (copy nr. {}) is within {:.2f} mm of daughter {} - sample point distance is "
+          "{:.2f} mm, within safety {:.2f} mm.",
+          pv->GetName(),
+          pv->GetCopyNo(),
+          sample_dist / CLHEP::mm,
+          i,
+          sample_dist / CLHEP::mm,
+          safety / CLHEP::mm
+      );
+      return true;
+    }
+  }
+
+  // No surface found within safety distance
+  RMGLog::OutFormatDev(
+      RMGLog::debug_event,
+      "Volume '{}' (copy nr. {}) is farther than {:.2f} mm from all surfaces, outside safety "
+      "{:.2f} mm.",
+      pv->GetName(),
+      pv->GetCopyNo(),
+      cache.solid->DistanceToOut(local_pos) / CLHEP::mm,
+      safety / CLHEP::mm
+  );
+  return false;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<isotope name="Ar40" Z="18" N="40">
+			<atom type="A" value="39.962383"/>
+		</isotope>
+		<element name="argon40" formula="Ar40">
+			<fraction n="1.0" ref="Ar40"/>
+		</element>
+		<material name="liquid_argon_40" state="liquid">
+			<T value="88.8" unit="K"/>
+			<P value="100000.0" unit="pascal"/>
+			<D value="1.39"/>
+			<fraction n="1.0" ref="argon40"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="world" r="600" lunit="cm"/>
+		<tube name="detector_solid" rmin="0.0" rmax="2.5" z="5.0" startphi="0.0" deltaphi="6.283185307179586" lunit="cm" aunit="rad"/>
+	</solids>
+	<structure>
+		<volume name="detector_vol">
+			<materialref ref="G4_Ge"/>
+			<solidref ref="detector_solid"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="liquid_argon_40"/>
+			<solidref ref="world"/>
+			<physvol name="detector_phys">
+				<volumeref ref="detector_vol"/>
+				<position name="detector_pos" x="0" y="0" z="0" unit="cm"/>
+			</physvol>
+		</volume>
+	</structure>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
