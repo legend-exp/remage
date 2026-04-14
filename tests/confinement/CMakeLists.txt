@@ -143,7 +143,11 @@ set(_surface_tests
     test-intersections-subtraction
     test-intersections-union
     test-containment-subtraction
-    test-containment-union)
+    test-containment-union
+    test-depth-profile-exponential
+    test-depth-profile-uniform
+    test-depth-profile-truncated-gaussian
+    test-depth-profile-surface-point)
 
 foreach(_test ${_surface_tests})
 

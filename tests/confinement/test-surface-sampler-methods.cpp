@@ -1,6 +1,8 @@
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include "G4Box.hh"
@@ -399,6 +401,153 @@ int main(int argc, char* argv[]) {
     // get some points to plot
     auto obj = sampleables["tubs"];
     return RunVis(obj, "simple");
+
+  } else if (test_type == "test-depth-profile-exponential") {
+    // Verify that the exponential depth profile produces the correct mean.
+    // For Exp(mean), the sample mean should be within 5 sigma_mean = 5*mean/sqrt(N).
+    RMGVertexConfinement::DepthProfile profile;
+    profile.type = RMGVertexConfinement::DepthProfile::Type::kExponential;
+    profile.mean = 5.0 * mm;
+
+    const int N = 10000;
+    double sum = 0;
+    bool all_nonneg = true;
+    for (int i = 0; i < N; i++) {
+      const double d = profile.Sample();
+      if (d < 0) all_nonneg = false;
+      sum += d;
+    }
+
+    if (!all_nonneg) {
+      std::cout << "Exponential depth profile produced a negative sample" << std::endl;
+      return 1;
+    }
+
+    const double measured_mean = sum / N;
+    // Standard deviation of the sample mean for exponential = mean/sqrt(N)
+    const double sigma_of_mean = profile.mean / std::sqrt(static_cast<double>(N));
+    if (std::abs(measured_mean - profile.mean) > 5 * sigma_of_mean) {
+      std::cout << "Exponential mean out of range: measured=" << measured_mean / mm
+                << " mm, expected=" << profile.mean / mm << " mm, "
+                << "5-sigma tolerance=" << 5 * sigma_of_mean / mm << " mm" << std::endl;
+      return 1;
+    }
+    return 0;
+
+  } else if (test_type == "test-depth-profile-uniform") {
+    // Verify that the uniform depth profile stays within [range_lo, range_hi] and has the
+    // correct mean = (range_lo + range_hi) / 2.
+    RMGVertexConfinement::DepthProfile profile;
+    profile.type = RMGVertexConfinement::DepthProfile::Type::kUniform;
+    profile.range_lo = 2.0 * mm;
+    profile.range_hi = 8.0 * mm;
+
+    const int N = 10000;
+    double sum = 0;
+    bool in_range = true;
+    for (int i = 0; i < N; i++) {
+      const double d = profile.Sample();
+      if (d < profile.range_lo || d > profile.range_hi) in_range = false;
+      sum += d;
+    }
+
+    if (!in_range) {
+      std::cout << "Uniform depth profile produced a sample outside [range_lo, range_hi]"
+                << std::endl;
+      return 1;
+    }
+
+    const double expected_mean = 0.5 * (profile.range_lo + profile.range_hi);
+    const double measured_mean = sum / N;
+    // Standard deviation of uniform over [a,b] is (b-a)/sqrt(12); std dev of mean is /sqrt(N)
+    const double width = profile.range_hi - profile.range_lo;
+    const double sigma_of_mean = width / std::sqrt(12.0 * N);
+    if (std::abs(measured_mean - expected_mean) > 5 * sigma_of_mean) {
+      std::cout << "Uniform mean out of range: measured=" << measured_mean / mm
+                << " mm, expected=" << expected_mean / mm << " mm, "
+                << "5-sigma tolerance=" << 5 * sigma_of_mean / mm << " mm" << std::endl;
+      return 1;
+    }
+    return 0;
+
+  } else if (test_type == "test-depth-profile-truncated-gaussian") {
+    // Verify that the truncated Gaussian stays within [range_lo, range_hi] and that
+    // the sample mean is consistent with a truncated Gaussian (here symmetric about mean
+    // so the truncated mean equals mean when the range is symmetric about mean).
+    RMGVertexConfinement::DepthProfile profile;
+    profile.type = RMGVertexConfinement::DepthProfile::Type::kTruncatedGaussian;
+    profile.mean = 3.0 * mm;
+    profile.sigma = 1.0 * mm;
+    profile.range_lo = 0.0 * mm;
+    profile.range_hi = 6.0 * mm; // symmetric: [mean-3*sigma, mean+3*sigma]
+
+    const int N = 10000;
+    double sum = 0;
+    bool in_range = true;
+    for (int i = 0; i < N; i++) {
+      const double d = profile.Sample();
+      if (d < profile.range_lo || d > profile.range_hi) in_range = false;
+      sum += d;
+    }
+
+    if (!in_range) {
+      std::cout << "TruncatedGaussian produced a sample outside [range_lo, range_hi]" << std::endl;
+      return 1;
+    }
+
+    // For a symmetric truncation the mean of the truncated distribution equals the untruncated
+    // mean.  Use a generous tolerance of 5 * sigma/sqrt(N).
+    const double measured_mean = sum / N;
+    const double sigma_of_mean = profile.sigma / std::sqrt(static_cast<double>(N));
+    if (std::abs(measured_mean - profile.mean) > 5 * sigma_of_mean) {
+      std::cout << "TruncatedGaussian mean out of range: measured=" << measured_mean / mm
+                << " mm, expected=" << profile.mean / mm << " mm, "
+                << "5-sigma tolerance=" << 5 * sigma_of_mean / mm << " mm" << std::endl;
+      return 1;
+    }
+    return 0;
+
+  } else if (test_type == "test-depth-profile-surface-point") {
+    // Verify that applying a uniform depth profile to a surface-sampled point moves the
+    // vertex to the interior of the solid.
+    auto obj = sampleables["tubs"];
+    auto tubs_solid = obj.physical_volume->GetLogicalVolume()->GetSolid();
+    obj.max_num_intersections = 2;
+
+    const double depth_lo = 0.5 * mm;
+    const double depth_hi = 1.0 * mm;
+    const int N = 1000;
+    int failures = 0;
+
+    for (int i = 0; i < N; i++) {
+      G4ThreeVector pos;
+      bool success = obj.GenerateSurfacePoint(pos, 200, 2);
+      if (!success) {
+        std::cout << "GenerateSurfacePoint failed" << std::endl;
+        return 1;
+      }
+
+      // Verify the unmodified point is on the surface.
+      if (tubs_solid->Inside(pos) != EInside::kSurface) {
+        std::cout << "Surface point is not on the surface: " << tubs_solid->Inside(pos) << std::endl;
+        return 1;
+      }
+
+      // Apply a uniform depth offset in [depth_lo, depth_hi] via the outward normal.
+      const double depth = depth_lo + (depth_hi - depth_lo) * G4UniformRand();
+      const G4ThreeVector normal = tubs_solid->SurfaceNormal(pos);
+      const G4ThreeVector pos_inside = pos - depth * normal;
+
+      // The displaced point must be strictly inside the solid.
+      if (tubs_solid->Inside(pos_inside) != EInside::kInside) { failures++; }
+    }
+
+    if (failures > 0) {
+      std::cout << failures << " out of " << N << " depth-displaced points are not inside the solid"
+                << std::endl;
+      return 1;
+    }
+    return 0;
   }
 
   return 0;
