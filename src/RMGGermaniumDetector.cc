@@ -57,7 +57,6 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   RMGLog::OutDev(RMGLog::debug_event, "Processing germanium detector hits");
 
-  // return if no energy is deposited
   // ignore optical photons
   if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 

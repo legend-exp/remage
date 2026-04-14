@@ -4,6 +4,7 @@
 │   ├── xloc · array<1>{real} ── {'units': 'm'}
 │   ├── yloc · array<1>{real} ── {'units': 'm'}
 │   └── zloc · array<1>{real} ── {'units': 'm'}
+├── number_of_events · real 
 ├── processes · table{name,procid} 
 │   ├── name · array<1>{string} 
 │   └── procid · array<1>{real} 

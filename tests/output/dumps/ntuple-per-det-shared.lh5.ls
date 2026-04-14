@@ -4,6 +4,7 @@
 │   ├── xloc · array<1>{real} ── {'units': 'm'}
 │   ├── yloc · array<1>{real} ── {'units': 'm'}
 │   └── zloc · array<1>{real} ── {'units': 'm'}
+├── number_of_events · real 
 ├── stp · struct{det1,det2,optdets,scint1,scint2} 
 │   ├── __by_uid__ · struct{det001,det002,det011,det012,det101} 
 │   │   ├── det001 -> /stp/scint1

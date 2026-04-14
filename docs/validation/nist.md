@@ -11,14 +11,39 @@ electrons and compare them with data from the
 short description of the reported quantities is available
 [here](https://physics.nist.gov/PhysRefData/Star/Text/method.html)).
 
-Multiple Coulomb scattering is disabled through the
+The simulation physics is modified by the commands:
 
 ```
 /process/inactivate msc
+/RMG/Processes/DefaultProductionCut 1 km
+/RMG/Processes/SensitiveProductionCut 1 km
 ```
 
-command, since it prevents us to measure the true integrated particle path
-length in the simulation (unless a very short step size limit is set).
+- Multiple Coulomb scattering is disabled, since it prevents us to measure the
+  true integrated particle path length in the simulation (unless a very short
+  step size limit is set).
+- the high production cuts ensure that no secondaries are created. This is
+  required to correctly measure the bremsstrahlung component of the CSDA loss.
+
+An effect of the step length is visible. The larger the step length, the larger
+the difference to the expected integrated path length.
+
+The statistical uncertainties are dominated by energy-loss fluctuations. They
+are kept enabled here to show the effect of the user-chosen step length values.
+Especially the stopping power at low step sizes are the most affected.
+
+:::{note}
+
+The simulated stopping powers are derived from the energy deposition in the
+first step and its length. This leads to the stopping powers only matching with
+the ESTAR-provided values until a material-specific energy.
+
+Below that, the energy is fully deposited in one single small step, from which
+we cannot estimate the stopping power at the incident energy any more. For these
+low energies, we plot the incident energy over the full expected ranged from
+ESTAR data as the expectation value.
+
+:::
 
 ### Electron interactions in natural germanium
 

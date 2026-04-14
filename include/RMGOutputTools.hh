@@ -88,6 +88,9 @@ namespace RMGOutputTools {
    */
   void SetDistanceCheckGermaniumOnly(bool enable);
 
+  /** @brief Get the current setting for Germanium-only filtering for bounding sphere optimization. */
+  bool GetDistanceCheckGermaniumOnly();
+
   /** @brief Compute the distance from the point to the surface of the physical volume.
    * @details Checks distance to surfaces of mother volume.
    * @param pv The physical volume to find the distance to.
@@ -193,36 +196,6 @@ namespace RMGOutputTools {
       ClusterPars cluster_pars,
       bool has_distance_to_surface
   );
-
-
-  // Cache structure for volume geometry data
-  struct VolumeCache {
-      G4AffineTransform inverse_transform;
-      const G4VSolid* solid;
-      size_t num_daughters;
-      std::vector<G4AffineTransform> daughter_transforms;
-      std::vector<const G4VSolid*> daughter_solids;
-      std::vector<bool> daughter_is_multiunion;
-      std::vector<G4ThreeVector> daughter_centers; // bounding sphere centers in parent local coords
-      std::vector<double> daughter_radii;          // bounding sphere radii
-      std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
-  };
-
-  /// \cond this triggers a sphinx error
-  // Cache for volume data, keyed by physical volume pointer
-  extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
-  /// \endcond
-
-  /** @brief Add a physical volume to the cache for distance to surface calculations.
-   *
-   * @details This computes the inverse transform and daughter volume information for the physical
-   * volume and stores it in the cache. If the volume is already in the cache, it returns an
-   * iterator to the existing entry. Otherwise, it adds a new entry and returns an iterator to it.
-   */
-  std::unordered_map<const G4VPhysicalVolume*, VolumeCache>::iterator AddOrGetFromCache(
-      const G4VPhysicalVolume* pv
-  );
-
   /// \cond this triggers a sphinx error
   // Configuration for safety distance check
   extern G4ThreadLocal bool is_distance_check_germanium_only;

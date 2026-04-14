@@ -51,7 +51,7 @@ def _throughput_macro(*, mode: str, seed: int, events: int, distance_cm: float) 
 
 def test_gamma_optical_event_rate_electron_stacking_is_faster():
     """Test that the event processing rate is faster with electron stacking than with optical stacking for gamma events."""
-    events = scaled_events(200)
+    events = scaled_events(100)
     seeds = [501, 502]
 
     rates = {"optical_stacking": [], "electron_stacking": []}

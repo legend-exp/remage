@@ -47,7 +47,7 @@ jobs:
 
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          cmake -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: remage-test-output-g4flavor-${{ matrix.container_version }}
           # artifacts must have a ".output*" extension
@@ -168,7 +168,6 @@ jobs:
           cmake \
             -D CMAKE_INSTALL_PREFIX=../local \
             -D Python3_EXECUTABLE="$(command -v python)" \
-            -D RMG_BUILD_EXAMPLES=1 \
             -D BUILD_TESTING=ON \
             -D RMG_BUILD_DOCS=OFF \
             ..

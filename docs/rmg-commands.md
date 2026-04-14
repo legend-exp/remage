@@ -310,6 +310,7 @@ Commands for controlling physics processes
 
 * `DaughterNucleusMaxLifetime` – Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
 * `SkipTracking` – Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
+* `KillSecondaries` – Kill all secondary particles (tracks with parent ID > 0) at their first step.
 * `ResetInitialDecayTime` – If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
 * `LargeGlobalTimeUncertaintyWarning` – Warn if the global times of tracks get too large to provide the requested time uncertainty.
 
@@ -337,6 +338,18 @@ Uses -1 ns  us by default
 ### `/RMG/Processes/Stepping/SkipTracking`
 
 Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Processes/Stepping/KillSecondaries`
+
+Kill all secondary particles (tracks with parent ID > 0) at their first step.
 
 This is disabled by default
 
@@ -1050,6 +1063,7 @@ Commands for controlling the µ generator
 * `SkyPlaneHeight` – Height of the sky, if it has a planar shape
 * `MomentumMin` – Minimum momentum of the generated muon
 * `MomentumMax` – Maximum momentum of the generated muon
+* `SkyHSphereRadius` – Radius of the hemi-sphere, if it has a spherical shape.
 * `ThetaMin` – Minimum azimutal angle of the generated muon momentum
 * `ThetaMax` – Maximum azimutal angle of the generated muon momentum
 * `PhiMin` – Minimum zenith angle of the generated muon momentum
@@ -1127,6 +1141,21 @@ Maximum momentum of the generated muon
   * **Omittable** – `True`
   * **Default value** – `GeV/c`
   * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SkyHSphereRadius`
+
+Radius of the hemi-sphere, if it has a spherical shape.
+
+* **Range of parameters** – `l > 0`
+* **Parameter** – `l`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `m`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/ThetaMin`

@@ -214,12 +214,12 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
   RMGLog::OutDev(RMGLog::debug, "End of run action");
 
   // report some stats
+  int n_ev = fRMGRun->GetNumberOfEvent();
   if (this->IsMaster()) {
     auto time_now = std::chrono::system_clock::now();
     const time_t end_time = std::chrono::system_clock::to_time_t(time_now);
     tm local_end_time{};
 
-    int n_ev = fRMGRun->GetNumberOfEvent();
     int n_ev_requested = fRMGRun->GetNumberOfEventToBeProcessed();
 
     RMGLog::OutFormat(
@@ -290,7 +290,7 @@ void RMGRunAction::EndOfRunAction(const G4Run*) {
     G4AnalysisManager::Instance()->Write();
     G4AnalysisManager::Instance()->CloseFile();
 
-    PostprocessOutputFile();
+    PostprocessOutputFile(n_ev);
   }
 }
 
@@ -339,7 +339,7 @@ namespace {
 }
 /// \endcond
 
-void RMGRunAction::PostprocessOutputFile() const {
+void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primaries) const {
 
   if (fCurrentOutputFile.tmp == fCurrentOutputFile.original && fs::exists(fCurrentOutputFile.tmp)) {
     RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output", fCurrentOutputFile.tmp));
@@ -383,7 +383,9 @@ void RMGRunAction::PostprocessOutputFile() const {
       rmg_man->GetOutputNtupleDirectory(),
       rmg_man->GetAuxNtupleNames(),
       rmg_man->GetNtupleIDs(),
-      false
+      false,
+      false,
+      number_of_primaries
   );
   if (!result) {
     RMGLog::Out(

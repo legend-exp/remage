@@ -33,13 +33,19 @@ macro = """
 """
 
 
-def simulate(Z, A, level, angcorr):
+def simulate(Z: int, A: int, level: int, angcorr: bool | None):
     output = f"output-{Z}-{A}-{level}-angcorr-{angcorr}.lh5"
 
     events = 100000 * int(os.environ.get("RMG_STATS_FACTOR", "1"))
 
+    macro_lines = macro.split("\n")
+    if angcorr is None:
+        macro_lines = filter(
+            lambda m: "EnableGammaAngularCorrelation" not in m, macro_lines
+        )
+
     remage_run(
-        macro.split("\n"),
+        list(macro_lines),
         macro_substitutions={
             "Z": Z,
             "A": A,
@@ -72,7 +78,7 @@ def test_plot_gammacorr():
         fig, ax = plt.subplots()
 
         data = {}
-        for angcorr in (True, False):
+        for angcorr in (True, False, None):
             remage_output = simulate(Z, A, level, angcorr)
             # read in track data
             tracks = lh5.read_as("tracks", remage_output, library="ak")
@@ -114,8 +120,11 @@ def test_plot_gammacorr():
             h = hist.new.Reg(50, -1, 1).Double().fill(cos_theta)
             data[angcorr] = h.view(flow=False)
 
+            angcorr_label = "default" if angcorr is None else angcorr
             h.plot(
-                ax=ax, yerr=False, label=rf"$\gamma$ angular correlations = {angcorr}"
+                ax=ax,
+                yerr=False,
+                label=rf"$\gamma$ angular correlations = {angcorr_label}",
             )
 
         # this is the expectation for 60Co and 108Tl

@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac macros/*.json gdml/*.gdml gdml/*.xml *.py)
+  macros/*.mac macros/*.json *.py)
 
 # copy them to the build area
 

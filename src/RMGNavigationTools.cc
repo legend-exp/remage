@@ -27,7 +27,15 @@
 #include "G4TransportationManager.hh"
 #include "G4UnitsTable.hh"
 
+#include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
+
+/// \cond this triggers a sphinx error or creates weird namespaces @<long number>
+namespace RMGNavigationTools {
+  G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry> volume_cache;
+} // namespace RMGNavigationTools
+/// \endcond
 
 std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
     std::string name,
@@ -90,7 +98,7 @@ G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
   return *result;
 }
 
-G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volume) {
+G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(const G4VPhysicalVolume* volume) {
 
   auto ancestors = RMGNavigationTools::FindDirectMothers(volume);
 
@@ -105,7 +113,7 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
   return *ancestors.begin();
 }
 
-std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(G4VPhysicalVolume* volume) {
+std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(const G4VPhysicalVolume* volume) {
 
   std::set<G4VPhysicalVolume*> ancestors;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
@@ -197,7 +205,7 @@ void RMGNavigationTools::PrintListOfPhysicalVolumes() {
 
 
 std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalPositions(
-    G4VPhysicalVolume* pv
+    const G4VPhysicalVolume* pv
 ) {
   auto world_volume = G4TransportationManager::GetTransportationManager()
                           ->GetNavigatorForTracking()
@@ -266,6 +274,102 @@ std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalP
     RMGLog::OutDev(RMGLog::fatal, "No path to world volume found, that should not be!");
 
   return trees;
+}
+
+RMGNavigationTools::VolumeTreeEntry RMGNavigationTools::FindGlobalPosition(
+    const G4VPhysicalVolume* pv
+) {
+  auto trees = RMGNavigationTools::FindGlobalPositions(pv);
+  if (trees.size() > 1) {
+    RMGLog::Out(RMGLog::fatal, "more than one way to reach world volume from volume ", pv->GetName());
+  }
+  return trees[0];
+}
+
+void RMGNavigationTools::ClearVolumeCache() { volume_cache.clear(); }
+
+std::unordered_map<const G4VPhysicalVolume*, RMGNavigationTools::VolumeCacheEntry>::iterator RMGNavigationTools::GetVolumeCacheEntry(
+    const G4VPhysicalVolume* pv
+) {
+
+  auto cache_it = volume_cache.find(pv);
+  if (cache_it == volume_cache.end()) {
+
+    VolumeCacheEntry cache;
+
+    auto global_pos = RMGNavigationTools::FindGlobalPosition(pv);
+    cache.inverse_transform = G4AffineTransform(
+                                  global_pos.vol_global_rotation,
+                                  global_pos.vol_global_translation
+    )
+                                  .Inverse();
+
+    const auto lv = pv->GetLogicalVolume();
+    cache.solid = lv->GetSolid();
+    cache.num_daughters = lv->GetNoDaughters();
+
+    cache.daughter_transforms.reserve(cache.num_daughters);
+    cache.daughter_solids.reserve(cache.num_daughters);
+    cache.daughter_is_multiunion.reserve(cache.num_daughters);
+    cache.daughter_centers.reserve(cache.num_daughters);
+    cache.daughter_radii.reserve(cache.num_daughters);
+    cache.daughter_is_germanium.reserve(cache.num_daughters);
+
+    const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
+
+    for (size_t i = 0; i < cache.num_daughters; ++i) {
+      const auto daughter = lv->GetDaughter(i);
+
+      cache.daughter_transforms.emplace_back(
+          G4AffineTransform(daughter->GetRotation(), daughter->GetTranslation()).Inverse()
+      );
+
+      const auto daughter_solid = daughter->GetLogicalVolume()->GetSolid();
+      cache.daughter_solids.push_back(daughter_solid);
+      cache.daughter_is_multiunion.push_back(daughter_solid->GetEntityType() == "G4MultiUnion");
+
+      bool is_germanium = false;
+      try {
+        auto d_type = det_cons->GetDetectorMetadata({daughter->GetName(), daughter->GetCopyNo()}).type;
+        is_germanium = (d_type == RMGDetectorType::kGermanium);
+      } catch (const std::out_of_range&) { is_germanium = false; }
+      cache.daughter_is_germanium.push_back(is_germanium);
+
+      G4ThreeVector pMin, pMax;
+      daughter_solid->BoundingLimits(pMin, pMax);
+      G4ThreeVector local_center = (pMin + pMax) * 0.5;
+      double local_radius = (pMax - local_center).mag();
+
+      const auto daughter_rot = daughter->GetRotation();
+      G4ThreeVector parent_center = daughter->GetTranslation();
+      if (daughter_rot) {
+        parent_center += (*daughter_rot) * local_center;
+      } else {
+        parent_center += local_center;
+      }
+
+      cache.daughter_centers.push_back(parent_center);
+      cache.daughter_radii.push_back(local_radius);
+    }
+
+    RMGLog::OutFormatDev(
+        RMGLog::debug_event,
+        "Added volume '{}' (copy nr. {}) to cache with {} daughters",
+        pv->GetName(),
+        pv->GetCopyNo(),
+        cache.num_daughters
+    );
+    return volume_cache.emplace(pv, std::move(cache)).first;
+  }
+
+  RMGLog::OutFormatDev(
+      RMGLog::debug_event,
+      "Cache hit for volume '{}' (copy nr. {})",
+      pv->GetName(),
+      pv->GetCopyNo()
+  );
+
+  return cache_it;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

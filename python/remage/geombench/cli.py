@@ -148,7 +148,7 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
 
     logger = rmg_logging.setup_log()
 
-    tmp_gdml_file = ""
+    tmp_gdml_file: str | Path = ""
 
     original_gdml_dict = load_gdml_geometry(Path(args.geometry))
     output_file_stem = Path(args.geometry).stem

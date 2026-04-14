@@ -66,7 +66,7 @@ class RMGRunAction : public G4UserRunAction {
 
     [[nodiscard]] OutputFilePaths BuildOutputFile() const;
     [[nodiscard]] fs::path GetWorkerTmpPath(fs::path path, std::string extension) const;
-    void PostprocessOutputFile() const;
+    void PostprocessOutputFile(int number_of_primaries) const;
 
     RMGRun* fRMGRun = nullptr;
     bool fIsPersistencyEnabled = false;

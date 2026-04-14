@@ -25,23 +25,33 @@ set_tests_properties(observables-ge/vis PROPERTIES LABELS "extra;vis;val" FIXTUR
 ## run
 add_test(NAME observables-ge/run COMMAND ${PYTHONPATH} ./run_sim.py ${REMAGE_PYEXE})
 set_tests_properties(
-  observables-ge/run PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED observables-ge-gdml-fixture
-                                FIXTURES_SETUP observables-ge-run-fixture)
+  observables-ge/run
+  PROPERTIES LABELS
+             "extra;val;val-only;mt"
+             FIXTURES_REQUIRED
+             observables-ge-gdml-fixture
+             FIXTURES_SETUP
+             observables-ge-run-fixture
+             PROCESSORS
+             ${STATS_FACTOR})
 ## plot some tracks
 
 add_test(NAME observables-ge/tracks-bulk-no-limit
          COMMAND ${PYTHONPATH} ./plot_steps.py out/beta_bulk/step_limits/max_None/stp/out.lh5
                  tracks-bulk-no-limit)
-set_tests_properties(observables-ge/tracks-bulk-no-limit
-                     PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED observables-ge-run-fixture)
+set_tests_properties(
+  observables-ge/tracks-bulk-no-limit PROPERTIES LABELS "extra;val;val-only;mt" FIXTURES_REQUIRED
+                                                 observables-ge-run-fixture)
 
 add_test(NAME observables-ge/tracks-bulk-10um-limit
          COMMAND ${PYTHONPATH} ./plot_steps.py out/beta_bulk/step_limits/max_10/stp/out.lh5
                  tracks-bulk-10um-limit)
-set_tests_properties(observables-ge/tracks-bulk-10um-limit
-                     PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED observables-ge-run-fixture)
+set_tests_properties(
+  observables-ge/tracks-bulk-10um-limit PROPERTIES LABELS "extra;val;val-only;mt"
+                                                   FIXTURES_REQUIRED observables-ge-run-fixture)
 
 add_test(NAME observables-ge/observables COMMAND ${PYTHONPATH} ./plot_observables.py
                                                  beta-observables)
-set_tests_properties(observables-ge/observables PROPERTIES LABELS "extra;val" FIXTURES_REQUIRED
-                                                           observables-ge-run-fixture)
+set_tests_properties(
+  observables-ge/observables PROPERTIES LABELS "extra;val;val-only;mt" FIXTURES_REQUIRED
+                                        observables-ge-run-fixture)

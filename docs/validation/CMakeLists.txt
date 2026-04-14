@@ -122,6 +122,19 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-active-energy.spec.output.png
     observables/beta-observables.surf-max-z.eff.output.png
     observables/beta-observables.surf-max-z.spec.output.png
+    optics/photon-detection.output.png
+    optics/photon-wls.output.png
+    optics/photon-wls-times-delta.output.png
+    optics/photon-wls-times-exponential.output.png
+    optics/photon-wls-photon-count.output.png
+    optics/photon-attenuation-30.output.png
+    optics/photon-attenuation-60.output.png
+    optics/scintillation-alpha.output.png
+    optics/scintillation-ion.output.png
+    optics/scintillation-e-.output.png
+    optics/scintillation-yield.output.png
+    optics/cerenkov-e-.output.png
+    optics/cerenkov-yield.output.png
     gammacorr/gamma-angular-distribution-27-60.output.png
     gammacorr/gamma-angular-distribution-81-208.output.png
     processes/innerbrem-gamma-vertex-energy.output.png

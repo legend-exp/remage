@@ -91,6 +91,10 @@ void RMGStagingScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("DeferToWaitingStage", fDeferOpticalPhotonsToWaitingStage)
       .SetGuidance("Defer optical photons to the waiting stack during stage 0.")
+      .SetGuidance(
+          std::string("This is ") + (fDeferOpticalPhotonsToWaitingStage ? "enabled" : "disabled") +
+          " by default."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("false")
       .SetStates(G4State_Idle);
@@ -106,6 +110,10 @@ void RMGStagingScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareProperty("DeferToWaitingStage", fDeferElectronsToWaitingStage)
       .SetGuidance("Defer secondary electrons to the waiting stack during stage 0.")
+      .SetGuidance(
+          std::string("This is ") + (fDeferElectronsToWaitingStage ? "enabled" : "disabled") +
+          " by default."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("false")
       .SetStates(G4State_Idle);
@@ -128,6 +136,10 @@ void RMGStagingScheme::DefineCommands() {
       ->DeclareMethod("DistanceCheckGermaniumOnly", &RMGStagingScheme::SetDistanceCheckGermaniumOnly)
       .SetGuidance("Enable/disable Germanium-only filtering for electron surface distance checks.")
       .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
+      .SetGuidance(
+          std::string("This is ") +
+          (RMGOutputTools::GetDistanceCheckGermaniumOnly() ? "enabled" : "disabled") + " by default."
+      )
       .SetParameterName("enable", false)
       .SetStates(G4State_Idle);
 

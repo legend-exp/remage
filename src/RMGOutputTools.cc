@@ -31,13 +31,13 @@
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
 #include "RMGManager.hh"
+#include "RMGNavigationTools.hh"
 
 #include "magic_enum/magic_enum.hpp"
 
 /// \cond this triggers a sphinx error or creates weird namespaces @<long number>
 namespace RMGOutputTools {
 
-  G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
   G4ThreadLocal bool is_distance_check_germanium_only = false;
 
 } // namespace RMGOutputTools
@@ -46,7 +46,7 @@ namespace {
   std::mutex multiunion_mutex;
 
   bool ShouldCheckDaughterSurface(
-      const RMGOutputTools::VolumeCache& cache,
+      const RMGNavigationTools::VolumeCacheEntry& cache,
       const G4ThreeVector& local_pos,
       size_t i,
       double threshold,
@@ -62,7 +62,7 @@ namespace {
   }
 
   double DistanceToDaughterSurface(
-      const RMGOutputTools::VolumeCache& cache,
+      const RMGNavigationTools::VolumeCacheEntry& cache,
       const G4ThreeVector& local_pos,
       size_t i
   ) {
@@ -91,8 +91,9 @@ G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::
     position = hit->global_position_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     position = hit->global_position_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     position = hit->global_position_average;
   } else
@@ -114,8 +115,9 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
     distance = hit->distance_to_surface_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     distance = hit->distance_to_surface_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     distance = hit->distance_to_surface_average;
   } else
@@ -135,8 +137,12 @@ void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
       "Setting distance check Germanium-only filtering to {}",
       RMGOutputTools::is_distance_check_germanium_only ? "ENABLED" : "DISABLED"
   );
-  // Clear per-thread cache when filter setting changes to rebuild with correct detector status
-  volume_cache.clear();
+  // Clear per-thread volume cache to keep optimization metadata in sync.
+  RMGNavigationTools::ClearVolumeCache();
+}
+
+bool RMGOutputTools::GetDistanceCheckGermaniumOnly() {
+  return RMGOutputTools::is_distance_check_germanium_only;
 }
 
 RMGDetectorHit* RMGOutputTools::average_hits(
@@ -479,89 +485,9 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 }
 
 
-std::unordered_map<const G4VPhysicalVolume*, RMGOutputTools::VolumeCache>::iterator RMGOutputTools::AddOrGetFromCache(
-    const G4VPhysicalVolume* pv
-) {
-
-  auto cache_it = volume_cache.find(pv);
-  if (cache_it == volume_cache.end()) {
-
-    VolumeCache cache;
-    const auto lv = pv->GetLogicalVolume();
-
-    cache.inverse_transform = G4AffineTransform(pv->GetRotation(), pv->GetTranslation()).Inverse();
-    cache.solid = lv->GetSolid();
-    cache.num_daughters = lv->GetNoDaughters();
-
-    cache.daughter_transforms.reserve(cache.num_daughters);
-    cache.daughter_solids.reserve(cache.num_daughters);
-    cache.daughter_is_multiunion.reserve(cache.num_daughters);
-    cache.daughter_centers.reserve(cache.num_daughters);
-    cache.daughter_radii.reserve(cache.num_daughters);
-    cache.daughter_is_germanium.reserve(cache.num_daughters);
-
-    // Get detector construction for Germanium filtering
-    const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
-
-    for (size_t i = 0; i < cache.num_daughters; ++i) {
-      const auto daughter = lv->GetDaughter(i);
-      cache.daughter_transforms.emplace_back(
-          G4AffineTransform(daughter->GetRotation(), daughter->GetTranslation()).Inverse()
-      );
-      const auto daughter_solid = daughter->GetLogicalVolume()->GetSolid();
-      cache.daughter_solids.push_back(daughter_solid);
-      cache.daughter_is_multiunion.push_back(daughter_solid->GetEntityType() == "G4MultiUnion");
-
-      // Check if daughter is a Germanium detector
-      bool is_germanium = false;
-      if (RMGOutputTools::is_distance_check_germanium_only) {
-        try {
-          auto d_type = det_cons->GetDetectorMetadata({daughter->GetName(), daughter->GetCopyNo()}).type;
-          is_germanium = (d_type == RMGDetectorType::kGermanium);
-        } catch (const std::out_of_range&) { is_germanium = false; }
-      }
-      cache.daughter_is_germanium.push_back(is_germanium);
-
-      // Compute bounding sphere for early rejection
-      G4ThreeVector pMin, pMax;
-      daughter_solid->BoundingLimits(pMin, pMax);
-      G4ThreeVector local_center = (pMin + pMax) * 0.5;
-      double local_radius = (pMax - local_center).mag();
-
-      // Transform center to parent coordinates
-      const auto daughter_rot = daughter->GetRotation();
-      G4ThreeVector parent_center = daughter->GetTranslation();
-      if (daughter_rot) {
-        parent_center += (*daughter_rot) * local_center;
-      } else {
-        parent_center += local_center;
-      }
-
-      cache.daughter_centers.push_back(parent_center);
-      cache.daughter_radii.push_back(local_radius);
-    }
-    RMGLog::OutFormatDev(
-        RMGLog::debug_event,
-        "Added volume '{}' (copy nr. {}) to cache with {} daughters",
-        pv->GetName(),
-        pv->GetCopyNo(),
-        cache.num_daughters
-    );
-    return volume_cache.emplace(pv, std::move(cache)).first;
-  }
-  RMGLog::OutFormatDev(
-      RMGLog::debug_event,
-      "Cache hit for volume '{}' (copy nr. {})",
-      pv->GetName(),
-      pv->GetCopyNo()
-  );
-  return cache_it;
-}
-
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
-
   // Check cache first
-  auto cache_it = AddOrGetFromCache(pv);
+  auto cache_it = RMGNavigationTools::GetVolumeCacheEntry(pv);
 
   const auto& cache = cache_it->second;
 
@@ -571,13 +497,9 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
 
   // Check distance to daughters
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-    if (!ShouldCheckDaughterSurface(
-            cache,
-            local_pos,
-            i,
-            dist,
-            RMGOutputTools::is_distance_check_germanium_only
-        )) {
+    if (
+        !ShouldCheckDaughterSurface(cache, local_pos, i, dist, RMGOutputTools::is_distance_check_germanium_only)
+    ) {
       continue;
     }
 
@@ -595,7 +517,7 @@ bool RMGOutputTools::is_within_surface_safety(
 ) {
 
   // Check cache first
-  auto cache_it = AddOrGetFromCache(pv);
+  auto cache_it = RMGNavigationTools::GetVolumeCacheEntry(pv);
 
   const auto& cache = cache_it->second;
 
@@ -607,13 +529,9 @@ bool RMGOutputTools::is_within_surface_safety(
 
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-    if (!ShouldCheckDaughterSurface(
-            cache,
-            local_pos,
-            i,
-            safety,
-            RMGOutputTools::is_distance_check_germanium_only
-        )) {
+    if (
+        !ShouldCheckDaughterSurface(cache, local_pos, i, safety, RMGOutputTools::is_distance_check_germanium_only)
+    ) {
       continue;
     }
 
