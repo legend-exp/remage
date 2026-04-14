@@ -23,7 +23,7 @@ def _primary_macro(
 /random/setSeeds {seed} {seed}
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
 /RMG/Output/ActivateOutputScheme Track
-/RMG/Output/ActivateOutputScheme VolumeStacker
+/RMG/Output/ActivateOutputScheme Staging
 
 /run/initialize
 
@@ -31,9 +31,10 @@ def _primary_macro(
 /RMG/Output/Track/StoreStageID true
 /RMG/Output/Track/StoreOpticalPhotons false
 
-/RMG/Output/VolumeStacker/VolumeSafety {safety_cm} cm
-/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking {threshold_mev} MeV
-/RMG/Output/VolumeStacker/AddVolumeName {stack_volume}
+/RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/VolumeSafety {safety_cm} cm
+/RMG/Staging/Electrons/MaxEnergyThresholdForStacking {threshold_mev} MeV
+/RMG/Staging/Electrons/AddVolumeName {stack_volume}
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true
@@ -60,7 +61,7 @@ def _gamma_macro(
 /random/setSeeds {seed} {seed}
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
 /RMG/Output/ActivateOutputScheme Track
-/RMG/Output/ActivateOutputScheme VolumeStacker
+/RMG/Output/ActivateOutputScheme Staging
 
 /run/initialize
 
@@ -68,9 +69,10 @@ def _gamma_macro(
 /RMG/Output/Track/StoreStageID true
 /RMG/Output/Track/StoreOpticalPhotons false
 
-/RMG/Output/VolumeStacker/VolumeSafety {safety_cm} cm
-/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking {threshold_mev} MeV
-/RMG/Output/VolumeStacker/AddVolumeName world_vol
+/RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/VolumeSafety {safety_cm} cm
+/RMG/Staging/Electrons/MaxEnergyThresholdForStacking {threshold_mev} MeV
+/RMG/Staging/Electrons/AddVolumeName world_vol
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true

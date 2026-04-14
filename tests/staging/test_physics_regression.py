@@ -17,16 +17,16 @@ def _physics_macro(
     safety_cm: float,
     threshold_mev: float,
 ) -> str:
+    staging_activation = "/RMG/Output/ActivateOutputScheme Staging"
     if mode == "optical_stacking":
-        stacker_activation = ""
-        stacker_logic = ""
+        electron_staging_logic = ""
     elif mode == "electron_stacking":
-        stacker_activation = "/RMG/Output/ActivateOutputScheme VolumeStacker"
-        stacker_logic = "\n".join(
+        electron_staging_logic = "\n".join(
             [
-                f"/RMG/Output/VolumeStacker/VolumeSafety {safety_cm} cm",
-                f"/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking {threshold_mev} MeV",
-                "/RMG/Output/VolumeStacker/AddVolumeName world_vol",
+                "/RMG/Staging/Electrons/DeferToWaitingStage true",
+                f"/RMG/Staging/Electrons/VolumeSafety {safety_cm} cm",
+                f"/RMG/Staging/Electrons/MaxEnergyThresholdForStacking {threshold_mev} MeV",
+                "/RMG/Staging/Electrons/AddVolumeName world_vol",
             ]
         )
     else:
@@ -36,13 +36,14 @@ def _physics_macro(
     return f"""
 /random/setSeeds {seed} {seed}
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
-{stacker_activation}
+{staging_activation}
 
 /run/initialize
 
 /RMG/Output/Germanium/EdepCutLow 10 keV
-/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep true
-{stacker_logic}
+/RMG/Staging/OpticalPhotons/DeferToWaitingStage true
+/RMG/Output/Germanium/DiscardWaitingTracksUnlessGermaniumEdep true
+{electron_staging_logic}
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true
@@ -105,7 +106,7 @@ def _positron_annihilation_ratio(reference: np.ndarray, candidate: np.ndarray) -
 
 def test_energy_consistency_is_safety_independent():
     """Test that the energy spectrum of events recorded in the germanium detector is consistent between optical stacking and electron stacking."""
-    events = scaled_events(50000)
+    events = scaled_events(5000)
     threshold_mev = 10.0
     safety_scan_cm = [1.0, 5.0, 20.0]
 

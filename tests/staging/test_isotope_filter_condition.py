@@ -9,8 +9,8 @@ def _isotope_filter_macro(
     return f"""
 /random/setSeeds {seed} {seed}
 /RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme Staging
 /RMG/Output/ActivateOutputScheme IsotopeFilter
-/RMG/Output/ActivateOutputScheme VolumeStacker
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
 
 
@@ -21,11 +21,13 @@ def _isotope_filter_macro(
 /RMG/Output/Track/StoreStageID true
 
 /RMG/Output/IsotopeFilter/AddIsotope {isotope_a} {isotope_z}
-/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced true
+/RMG/Staging/OpticalPhotons/DeferToWaitingStage true
+/RMG/Output/IsotopeFilter/DiscardWaitingTracksUnlessIsotopeProduced true
 
-/RMG/Output/VolumeStacker/VolumeSafety 0.0 cm
-/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking 10.0 MeV
-/RMG/Output/VolumeStacker/AddVolumeName world
+/RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/VolumeSafety 0.0 cm
+/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 10.0 MeV
+/RMG/Staging/Electrons/AddVolumeName world
 
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select GPS
@@ -53,7 +55,7 @@ def test_ar41_capture_keeps_event():
         "Expected Ar41 track in retained event"
     )
 
-    # Secondary electrons in world should be deferred by VolumeStacker to stage 1.
+    # Secondary electrons in world should be deferred by the central staging scheme to stage 1.
     deferred_secondary_electrons = count_tracks_by_stage(
         tracks, pdg=11, stage=1, primary_only=False
     )
@@ -68,7 +70,7 @@ def test_ar39_filter_discards_event():
     run_macro(macro, output, gdml_file="gdml/geometry-isotope-ar40.gdml")
 
     tracks = read_tracks(output)
-    # Secondary electrons in world should be deferred by VolumeStacker to stage 1.
+    # Secondary electrons in world should be deferred by the central staging scheme to stage 1.
     deferred_secondary_electrons = count_tracks_by_stage(
         tracks, pdg=11, stage=1, primary_only=False
     )

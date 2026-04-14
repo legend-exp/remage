@@ -30,10 +30,6 @@ RMGEventAction::RMGEventAction(RMGRunAction* run_action) : fRunAction(run_action
 
 void RMGEventAction::BeginOfEventAction(const G4Event* event) {
 
-  if (RMGLog::GetLogLevel() <= RMGLog::debug) {
-    fEventStartTime = std::chrono::high_resolution_clock::now();
-  }
-
   if (RMGManager::ShouldAbortRun()) {
     // the run should be aborted (e.g. by user signal).
     RMGLog::Out(RMGLog::warning, "aborting run in event ", event->GetEventID() + 1);
@@ -92,25 +88,6 @@ void RMGEventAction::EndOfEventAction(const G4Event* event) {
 
   for (const auto& oscheme : oschemes) {
     if (oscheme->StoreAlways() || !discard_event) oscheme->StoreEvent(event);
-  }
-
-  // Output timing statistics for this event
-  if (RMGLog::GetLogLevel() <= RMGLog::debug) {
-    auto end_time = std::chrono::high_resolution_clock::now();
-    fEventTotalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - fEventStartTime);
-    auto event_time_ns = fEventTotalTime.count();
-    RMGLog::Out(
-        RMGLog::debug,
-        "Event ",
-        event->GetEventID(),
-        " processing time: ",
-        event_time_ns,
-        " ns (",
-        event_time_ns / 1000.0,
-        " μs, ",
-        event_time_ns / 1000000.0,
-        " ms)"
-    );
   }
 
   // NOTE: G4analysisManager::AddNtupleRow() must be called here for event-oriented output

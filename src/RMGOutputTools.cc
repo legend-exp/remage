@@ -34,25 +34,6 @@
 
 #include "magic_enum/magic_enum.hpp"
 
-namespace {
-
-  // Cache structure for volume geometry data
-  struct VolumeCache {
-      G4AffineTransform inverse_transform;
-      const G4VSolid* solid;
-      size_t num_daughters;
-      std::vector<G4AffineTransform> daughter_transforms;
-      std::vector<const G4VSolid*> daughter_solids;
-      std::vector<bool> daughter_is_multiunion;
-      std::vector<G4ThreeVector> daughter_centers; // bounding sphere centers in parent local coords
-      std::vector<double> daughter_radii;          // bounding sphere radii
-      std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
-  };
-
-  // Cache for volume data, keyed by physical volume pointer
-  std::unordered_map<const G4VPhysicalVolume*, VolumeCache> volume_cache;
-} // namespace
-
 /// \cond this triggers a sphinx error or creates weird namespaces @<long number>
 namespace RMGOutputTools {
 
@@ -63,6 +44,41 @@ namespace RMGOutputTools {
 
 namespace {
   std::mutex multiunion_mutex;
+
+  bool ShouldCheckDaughterSurface(
+      const RMGOutputTools::VolumeCache& cache,
+      const G4ThreeVector& local_pos,
+      size_t i,
+      double threshold,
+      bool germanium_only
+  ) {
+    if (germanium_only && !cache.daughter_is_germanium[i]) return false;
+
+    // Early rejection: check distance to bounding sphere first (cheap)
+    const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
+    const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
+
+    return sphere_surface_dist <= threshold;
+  }
+
+  double DistanceToDaughterSurface(
+      const RMGOutputTools::VolumeCache& cache,
+      const G4ThreeVector& local_pos,
+      size_t i
+  ) {
+    const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
+
+    if (cache.daughter_is_multiunion[i]) {
+      std::lock_guard<std::mutex> lock(multiunion_mutex);
+      auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
+      mu->SetAccurateSafety(true);
+      const double sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
+      mu->SetAccurateSafety(false);
+      return sample_dist;
+    }
+
+    return cache.daughter_solids[i]->DistanceToIn(sample_point);
+  }
 } // namespace
 /// \endcond
 
@@ -545,7 +561,6 @@ std::unordered_map<const G4VPhysicalVolume*, RMGOutputTools::VolumeCache>::itera
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
 
   // Check cache first
-
   auto cache_it = AddOrGetFromCache(pv);
 
   const auto& cache = cache_it->second;
@@ -556,29 +571,18 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
 
   // Check distance to daughters
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-
-    // Early rejection: check distance to bounding sphere first (cheap)
-    const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
-    const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
-
-    // Skip if bounding sphere is farther than current best distance
-    if (sphere_surface_dist > dist) continue;
-
-    // Only do expensive surface calculation if bounding sphere is close
-    const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
-
-    // Handle MultiUnion flag
-    if (cache.daughter_is_multiunion[i]) {
-      std::lock_guard<std::mutex> lock(multiunion_mutex);
-      auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
-      mu->SetAccurateSafety(true);
-      const double sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
-      if (sample_dist < dist) dist = sample_dist;
-      mu->SetAccurateSafety(false);
-    } else {
-      const double sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
-      if (sample_dist < dist) dist = sample_dist;
+    if (!ShouldCheckDaughterSurface(
+            cache,
+            local_pos,
+            i,
+            dist,
+            RMGOutputTools::is_distance_check_germanium_only
+        )) {
+      continue;
     }
+
+    const double sample_dist = DistanceToDaughterSurface(cache, local_pos, i);
+    if (sample_dist < dist) dist = sample_dist;
   }
 
   return dist;
@@ -603,44 +607,17 @@ bool RMGOutputTools::is_within_surface_safety(
 
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-    // Skip non-Germanium daughters if filtering is enabled
-
-    if (RMGOutputTools::is_distance_check_germanium_only && !cache.daughter_is_germanium[i])
-      continue;
-
-    // Early rejection: check distance to bounding sphere first (cheap)
-    const double center_dist = (cache.daughter_centers[i] - local_pos).mag();
-    const double sphere_surface_dist = center_dist - cache.daughter_radii[i];
-
-    // Skip if bounding sphere is farther than safety threshold
-    if (sphere_surface_dist > safety) {
-      RMGLog::OutFormatDev(
-          RMGLog::debug_event,
-          "Skipping daughter {} of volume '{}' (copy nr. {}) - bounding sphere is {:.2f} mm away, "
-          "beyond safety {:.2f} mm",
-          i,
-          pv->GetName(),
-          pv->GetCopyNo(),
-          sphere_surface_dist / CLHEP::mm,
-          safety / CLHEP::mm
-      );
+    if (!ShouldCheckDaughterSurface(
+            cache,
+            local_pos,
+            i,
+            safety,
+            RMGOutputTools::is_distance_check_germanium_only
+        )) {
       continue;
     }
 
-    // Only do expensive surface calculation if bounding sphere is close
-    const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
-
-    double sample_dist;
-    if (cache.daughter_is_multiunion[i]) {
-      std::lock_guard<std::mutex> lock(multiunion_mutex);
-      auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
-      mu->SetAccurateSafety(true);
-      sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
-      mu->SetAccurateSafety(false);
-    } else {
-      sample_dist = cache.daughter_solids[i]->DistanceToIn(sample_point);
-    }
-
+    const double sample_dist = DistanceToDaughterSurface(cache, local_pos, i);
 
     // Early exit if this daughter is within safety
     if (sample_dist < safety) {

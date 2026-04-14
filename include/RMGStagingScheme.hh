@@ -13,35 +13,36 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _RMG_VOLUME_DISTANCE_STACKER_HH_
-#define _RMG_VOLUME_DISTANCE_STACKER_HH_
+#ifndef _RMG_STAGING_SCHEME_HH_
+#define _RMG_STAGING_SCHEME_HH_
 
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "G4GenericMessenger.hh"
 
 #include "RMGVOutputScheme.hh"
 
-/** @brief Special scheme to stack electron/positron tracks created in a specific volume. */
-class RMGVolumeDistanceStacker : public RMGVOutputScheme {
+/** @brief Centralized staging policy for waiting-stack based track deferral. */
+class RMGStagingScheme : public RMGVOutputScheme {
 
   public:
 
-    RMGVolumeDistanceStacker();
+    RMGStagingScheme();
 
     /** @brief Wraps @c G4UserStackingAction::StackingActionClassify
-     *  @details This is used to classify all e-/e+ tracks as @c fWaiting if the conditions are met.
+     *  @details This classifies configured optical photons and electrons as @c fWaiting.
      */
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
-    /** @brief Set the minimum distance to any other volume for this track to be stacked. */
-    void SetVolumeSafety(double safety) { fVolumeSafety = safety; }
+    /** @brief Set the minimum distance to any other volume for an electron to be staged. */
+    void SetElectronVolumeSafety(double safety) { fElectronVolumeSafety = safety; }
 
-    /** @brief Add a volume name in which to stack e-/e+ tracks. */
-    void AddVolumeName(std::string volume) { fVolumeNames.insert(volume); }
+    /** @brief Add a volume name in which electron staging is active. */
+    void AddElectronVolumeName(std::string volume) { fElectronVolumeNames.insert(volume); }
 
     /** @brief Enable or disable Germanium-only filtering for distance calculations.
      *  @details When enabled, surface distance checks only consider daughter volumes
@@ -50,23 +51,26 @@ class RMGVolumeDistanceStacker : public RMGVOutputScheme {
 
     void SetDistanceCheckGermaniumOnly(bool enable);
 
-    /** @brief Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
-     *  @details Only tracks with kinetic energy below this threshold will be stacked.
+    /** @brief Set the maximum kinetic energy for e- tracks to be considered for staging.
+     *  @details Only tracks with kinetic energy below this threshold will be staged.
      *  If set to a negative value, no energy threshold is applied.
      */
-    void SetMaxEnergyThresholdForStacking(double energy) {
-      fMaxEnergyThresholdForStacking = energy;
+    void SetElectronMaxEnergyThresholdForStacking(double energy) {
+      fElectronMaxEnergyThresholdForStacking = energy;
     }
 
   private:
 
-    double fMaxEnergyThresholdForStacking = -1;
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void DefineCommands();
 
-    double fVolumeSafety = -1;
+    bool fDeferOpticalPhotonsToWaitingStage = false;
 
-    std::set<std::string> fVolumeNames;
+    bool fDeferElectronsToWaitingStage = false;
+    double fElectronMaxEnergyThresholdForStacking = -1;
+    double fElectronVolumeSafety = -1;
+
+    std::set<std::string> fElectronVolumeNames;
 };
 
 #endif

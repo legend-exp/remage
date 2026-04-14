@@ -19,7 +19,6 @@
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
-#include "G4OpticalPhoton.hh"
 
 #include "RMGLog.hh"
 
@@ -64,28 +63,22 @@ bool RMGIsotopeFilterScheme::ShouldDiscardEvent(const G4Event* event) {
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGIsotopeFilterScheme::StackingActionClassify(
-    const G4Track* aTrack,
+    const G4Track*,
     int stage
 ) {
-  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
+  // Optical-photon defer-to-waiting behavior is handled by RMGStagingScheme.
   if (stage != 0) return std::nullopt;
-
-  // defer tracking of optical photons.
-  if (fDiscardPhotonsIfIsotopeNotProduced &&
-      aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition())
-    return fWaiting;
   return std::nullopt;
 }
 
 std::optional<bool> RMGIsotopeFilterScheme::StackingActionNewStage(const int stage) {
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
-  // force `true` on them).
-  if (!fDiscardPhotonsIfIsotopeNotProduced) return std::nullopt;
+  // if we do not want to discard waiting tracks ourselves, let other output schemes decide.
+  if (!fDiscardWaitingTracksUnlessIsotopeProduced) return std::nullopt;
 
   const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
-  // discard all waiting events, if there were none of the requested isotopes produced.
+  // discard all waiting tracks, if there were none of the requested isotopes produced.
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
@@ -107,14 +100,17 @@ void RMGIsotopeFilterScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessenger
-      ->DeclareProperty("DiscardPhotonsIfIsotopeNotProduced", fDiscardPhotonsIfIsotopeNotProduced)
-      .SetGuidance(
-          "Discard optical photons (before simulating them), if the specified isotopes "
-          "had not been produced in the same event."
+      ->DeclareProperty(
+          "DiscardWaitingTracksUnlessIsotopeProduced",
+          fDiscardWaitingTracksUnlessIsotopeProduced
       )
       .SetGuidance(
-          "note: If another output scheme also requests the photons to be discarded, the "
-          "isotope filter does not force the photons to be simulated."
+          "At stage transition, clear the full waiting stack unless one of the configured "
+          "isotopes was produced in this event."
+      )
+      .SetGuidance(
+          "This decision applies to all waiting tracks, including those deferred by other "
+          "schemes."
       )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")

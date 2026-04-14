@@ -16,7 +16,6 @@
 #ifndef _RMG_EVENT_ACTION_HH_
 #define _RMG_EVENT_ACTION_HH_
 
-#include <chrono>
 #include <memory>
 
 #include "G4Event.hh"
@@ -41,10 +40,6 @@ class RMGEventAction : public G4UserEventAction {
   private:
 
     RMGRunAction* fRunAction = nullptr;
-
-    // Timing statistics for event processing
-    std::chrono::high_resolution_clock::time_point fEventStartTime;
-    std::chrono::nanoseconds fEventTotalTime{0};
 };
 
 #endif

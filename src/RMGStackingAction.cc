@@ -27,22 +27,10 @@
 RMGStackingAction::RMGStackingAction(RMGRunAction* runaction) : fRunAction(runaction) {}
 
 G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aTrack) {
-  std::chrono::high_resolution_clock::time_point start_time;
-  if (RMGLog::GetLogLevel() <= RMGLog::debug) {
-    start_time = std::chrono::high_resolution_clock::now();
-  }
 
   std::optional<G4ClassificationOfNewTrack> new_status = std::nullopt;
 
-  RMGLog::Out(
-      RMGLog::debug_event,
-      "Looping over output schemes for track ",
-      aTrack->GetTrackID(),
-      " of particle type ",
-      aTrack->GetDefinition()->GetParticleName()
-  );
   for (auto& el : fRunAction->GetAllOutputDataFields()) {
-    RMGLog::Out(RMGLog::debug_event, "Asking output scheme ", typeid(*el).name());
     auto request_status = el->StackingActionClassify(aTrack, fStage);
     if (!request_status.has_value()) continue; // this output scheme does not care.
 
@@ -51,12 +39,6 @@ G4ClassificationOfNewTrack RMGStackingAction::ClassifyNewTrack(const G4Track* aT
     } else {
       RMGLog::OutDev(RMGLog::error, "Conflicting requests for new track classification.");
     }
-  }
-
-  if (RMGLog::GetLogLevel() <= RMGLog::debug) {
-    auto end_time = std::chrono::high_resolution_clock::now();
-    fClassifyTotalTime += std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
-    fClassifyCallCount++;
   }
 
   if (new_status.has_value()) return new_status.value();
@@ -84,40 +66,8 @@ void RMGStackingAction::NewStage() {
       stack_man->GetNUrgentTrack()
   );
 
-  if (should_do_stage.has_value() && !should_do_stage.value()) {
-    // RMGLog::Out(
-    //     RMGLog::debug,
-    //     "Freeing up urgent stack of size ", stack_man->GetNUrgentTrack(), " and waiting stack of
-    //     size ", stack_man->GetNWaitingTrack()
-    //   );
-    stack_man->clear();
-  }
+  if (should_do_stage.has_value() && !should_do_stage.value()) { stack_man->clear(); }
   fStage++;
-}
-
-void RMGStackingAction::PrepareNewEvent() {
-  // Output timing statistics from previous event
-  if (RMGLog::GetLogLevel() <= RMGLog::debug && fClassifyCallCount > 0) {
-    auto avg_time_ns = fClassifyTotalTime.count() / fClassifyCallCount;
-    RMGLog::Out(
-        RMGLog::debug,
-        "ClassifyNewTrack called ",
-        fClassifyCallCount,
-        " times. "
-        "Average time: ",
-        avg_time_ns,
-        " ns (",
-        avg_time_ns / 1000.0,
-        " μs)"
-    );
-  }
-
-  // Reset for new event
-  fStage = 0;
-  if (RMGLog::GetLogLevel() <= RMGLog::debug) {
-    fClassifyCallCount = 0;
-    fClassifyTotalTime = std::chrono::nanoseconds{0};
-  }
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

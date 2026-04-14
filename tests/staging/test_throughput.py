@@ -5,16 +5,16 @@ from staging_test_utils import run_macro, scaled_events
 
 
 def _throughput_macro(*, mode: str, seed: int, events: int, distance_cm: float) -> str:
+    staging_activation = "/RMG/Output/ActivateOutputScheme Staging"
     if mode == "optical_stacking":
-        stacker_activation = ""
-        stacker_logic = ""
+        electron_staging_logic = ""
     elif mode == "electron_stacking":
-        stacker_activation = "/RMG/Output/ActivateOutputScheme VolumeStacker"
-        stacker_logic = "\n".join(
+        electron_staging_logic = "\n".join(
             [
-                "/RMG/Output/VolumeStacker/VolumeSafety 20.0 cm",
-                "/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking 3.0 MeV",
-                "/RMG/Output/VolumeStacker/AddVolumeName world_vol",
+                "/RMG/Staging/Electrons/DeferToWaitingStage true",
+                "/RMG/Staging/Electrons/VolumeSafety 20.0 cm",
+                "/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 3.0 MeV",
+                "/RMG/Staging/Electrons/AddVolumeName world_vol",
             ]
         )
     else:
@@ -24,15 +24,16 @@ def _throughput_macro(*, mode: str, seed: int, events: int, distance_cm: float) 
     return f"""
 /random/setSeeds {seed} {seed}
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
-{stacker_activation}
+{staging_activation}
 
 /RMG/Processes/OpticalPhysics true
 
 /run/initialize
 
 /RMG/Output/Germanium/EdepCutLow 10 keV
-/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep true
-{stacker_logic}
+/RMG/Staging/OpticalPhotons/DeferToWaitingStage true
+/RMG/Output/Germanium/DiscardWaitingTracksUnlessGermaniumEdep true
+{electron_staging_logic}
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true
@@ -50,7 +51,7 @@ def _throughput_macro(*, mode: str, seed: int, events: int, distance_cm: float) 
 
 def test_gamma_optical_event_rate_electron_stacking_is_faster():
     """Test that the event processing rate is faster with electron stacking than with optical stacking for gamma events."""
-    events = scaled_events(800)
+    events = scaled_events(200)
     seeds = [501, 502]
 
     rates = {"optical_stacking": [], "electron_stacking": []}

@@ -21,7 +21,6 @@
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4HCtable.hh"
-#include "G4OpticalPhoton.hh"
 #include "G4SDManager.hh"
 #include "G4UnitsTable.hh"
 
@@ -360,28 +359,22 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGGermaniumOutputScheme::StackingActionClassify(
-    const G4Track* aTrack,
+    const G4Track*,
     int stage
 ) {
-  // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
+  // Optical-photon defer-to-waiting behavior is handled by RMGStagingScheme.
   if (stage != 0) return std::nullopt;
-
-  // defer tracking of optical photons.
-  if (fDiscardPhotonsIfNoGermaniumEdep &&
-      aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition())
-    return fWaiting;
   return std::nullopt;
 }
 
 std::optional<bool> RMGGermaniumOutputScheme::StackingActionNewStage(const int stage) {
   // we are only interested in stacking optical photons into stage 1 after stage 0 finished.
   if (stage != 0) return std::nullopt;
-  // if we do not want to discard any photons ourselves, let other output schemes decide (i.e. not
-  // force `true` on them).
-  if (!fDiscardPhotonsIfNoGermaniumEdep) return std::nullopt;
+  // if we do not want to discard waiting tracks ourselves, let other output schemes decide.
+  if (!fDiscardWaitingTracksUnlessGermaniumEdep) return std::nullopt;
 
   const auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
-  // discard all waiting events, if there was no energy deposition in Germanium.
+  // discard all waiting tracks, if there was no energy deposition in Germanium.
   return ShouldDiscardEvent(event) ? std::make_optional(false) : std::nullopt;
 }
 
@@ -441,18 +434,18 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fMessengers.back()
-      ->DeclareProperty("DiscardPhotonsIfNoGermaniumEdep", fDiscardPhotonsIfNoGermaniumEdep)
+      ->DeclareProperty("DiscardWaitingTracksUnlessGermaniumEdep", fDiscardWaitingTracksUnlessGermaniumEdep)
       .SetGuidance(
-          "Discard optical photons (before simulating them), if no edep in germanium "
-          "detectors occurred in the same event."
+          "At stage transition, clear the full waiting stack unless Germanium energy deposition "
+          "occurred in this event."
       )
       .SetGuidance(
-          "note: If another output scheme also requests the photons to be discarded, the "
-          "germanium edep filter does not force the photons to be simulated."
+          "This decision applies to all waiting tracks, including those deferred by other "
+          "schemes."
       )
       .SetGuidance(
-          std::string("This is ") + (fDiscardPhotonsIfNoGermaniumEdep ? "enabled" : "disabled") +
-          " by default"
+          std::string("This is ") +
+          (fDiscardWaitingTracksUnlessGermaniumEdep ? "enabled" : "disabled") + " by default"
       )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")

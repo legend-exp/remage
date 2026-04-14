@@ -2,6 +2,7 @@
 /RMG/Processes/HadronicPhysics Shielding
 /RMG/Processes/EnableNeutronThermalScattering 1
 /RMG/Output/ActivateOutputScheme IsotopeFilter
+/RMG/Output/ActivateOutputScheme Staging
 /run/initialize
 /vis/open OGL
 
@@ -18,7 +19,8 @@
 /vis/scene/endOfEventAction accumulate
 
 /RMG/Output/IsotopeFilter/AddIsotope 77 32
-/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced true
+/RMG/Staging/OpticalPhotons/DeferToWaitingStage true
+/RMG/Output/IsotopeFilter/DiscardWaitingTracksUnlessIsotopeProduced true
 /RMG/Output/NtuplePerDetector false
 
 /RMG/Generator/Select GPS
