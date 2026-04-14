@@ -17,6 +17,7 @@ Macro commands
 * `/RMG/Generator/` – Commands for controlling generators
 * `/RMG/Output/` – Commands for controlling the simulation output
 * `/RMG/GrabmayrGammaCascades/` – Control Peters gamma cascade model
+* `/RMG/Staging/` – ...Title not available...
 
 ## `/RMG/Manager/`
 
@@ -1399,7 +1400,7 @@ Set the isotope for the Background mode of the BxDecay0 generator. E.g. 'Co60'
 * **Parameter** – `isotope`
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
+  * **Candidates** – `Ac228 Am241 Ar39 Ar42 As79+Se79m Bi207+Pb207m Bi208 Bi210 Bi212+Po212 Bi214+Po214 C14 Ca48+Sc48 Cd113 Co60 Cs136 Cs137+Ba137m Eu147 Eu152 Eu154 Ga68 Gd146 Hf182 I126 I133 I134 I135 K40 K42 Kr81 Kr85 Mn54 Na22 P32 Pa231 Pa234m Pb210 Pb211 Pb212 Pb214 Po210 Po218 Ra226 Ra228 Rb87 Rh106 Rn222 Sb125 Sb126 Sb133 Sc44 Sc44m Se83 Sr90 Ta180m-B- Ta180m-EC Ta182 Te133 Te133m Te134 Th230 Th234 Tl207 Tl208 U234 U238 Xe129m Xe131m Xe133 Xe135 Y88 Y90 Zn65 Zr96+Nb96`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/BxDecay0/DoubleBetaDecay`
@@ -1410,7 +1411,7 @@ Set the isotope, process and energy level for the double beta decay mode of the 
     – Set the isotope for the double beta decay
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `Bi214 Ca40 Ca46 Ca48 Cd106 Cd108 Cd114 Cd116 Ce136 Ce138 Ce142 Dy156 Dy158 Er162 Er164 Er170 Ge76 Mo100 Mo92 Nd148 Nd150 Ni58 Os184 Os192 Pb214 Po218 Pt190 Pt198 Rn222 Ru104 Ru96 Se74 Se82 Sm144 Sm154 Sn112 Sn122 Sn124 Sr84 Te120 Te128 Te130 W180 W186 Xe136 Yb168 Yb176 Zn64 Zn70 Zr94 Zr96`
+  * **Candidates** – `Bi214 Ca40 Ca46 Ca48 Cd106 Cd108 Cd114 Cd116 Ce136 Ce138 Ce142 Dy156 Dy158 Er162 Er164 Er170 Gd160 Ge76 Mo100 Mo92 Nd148 Nd150 Ni58 Os184 Os192 Pb214 Po218 Pt190 Pt198 Rn222 Ru104 Ru96 Se74 Se82 Sm144 Sm154 Sn112 Sn122 Sn124 Sr84 Te120 Te128 Te130 W180 W186 Xe136 Yb168 Yb176 Zn64 Zn70 Zr94 Zr96`
 * **Parameter** – `process`
     – Name the decay process you want to simulate
   * **Parameter type** – `s`
@@ -1470,7 +1471,6 @@ Commands for controlling the simulation output
 * `/RMG/Output/IsotopeFilter/` – Commands for filtering event out by created isotopes.
 * `/RMG/Output/Track/` – Commands for controlling output of track vertices.
 * `/RMG/Output/ParticleFilter/` – Commands for filtering particles out by PDG encoding.
-* `/RMG/Output/VolumeStacker/` – Commands for controlling stacking tracks in the bulk of a volume.
 
 **Commands:**
 
@@ -1547,7 +1547,7 @@ Commands for controlling output from hits in germanium detectors.
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
 * `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
-* `DiscardPhotonsIfNoGermaniumEdep` – Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+* `DiscardWaitingTracksUnlessGermaniumEdep` – At stage transition, clear the full waiting stack unless Germanium energy deposition occurred in this event.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
@@ -1595,13 +1595,11 @@ Take this detector into account for the filtering by /EdepThreshold. If this is 
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/Germanium/DiscardPhotonsIfNoGermaniumEdep`
+### `/RMG/Output/Germanium/DiscardWaitingTracksUnlessGermaniumEdep`
 
-Discard optical photons (before simulating them), if no edep in germanium detectors occurred in the same event.
+At stage transition, clear the full waiting stack unless Germanium energy deposition occurred in this event.
 
-:::{note}
-If another output scheme also requests the photons to be discarded, the germanium edep filter does not force the photons to be simulated.
-:::
+This decision applies to all waiting tracks, including those deferred by other schemes.
 
 This is disabled by default
 
@@ -2122,7 +2120,7 @@ Commands for filtering event out by created isotopes.
 **Commands:**
 
 * `AddIsotope` – Add an isotope to the list. Only events that have a track with this isotope at any point in time will be persisted.
-* `DiscardPhotonsIfIsotopeNotProduced` – Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
+* `DiscardWaitingTracksUnlessIsotopeProduced` – At stage transition, clear the full waiting stack unless one of the configured isotopes was produced in this event.
 
 ### `/RMG/Output/IsotopeFilter/AddIsotope`
 
@@ -2136,13 +2134,11 @@ Add an isotope to the list. Only events that have a track with this isotope at a
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Output/IsotopeFilter/DiscardPhotonsIfIsotopeNotProduced`
+### `/RMG/Output/IsotopeFilter/DiscardWaitingTracksUnlessIsotopeProduced`
 
-Discard optical photons (before simulating them), if the specified isotopes had not been produced in the same event.
+At stage transition, clear the full waiting stack unless one of the configured isotopes was produced in this event.
 
-:::{note}
-If another output scheme also requests the photons to be discarded, the isotope filter does not force the photons to be simulated.
-:::
+This decision applies to all waiting tracks, including those deferred by other schemes.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -2160,6 +2156,7 @@ Commands for controlling output of track vertices.
 * `AddProcessFilter` – Only include tracks created by this process.
 * `AddParticleFilter` – Only include tracks with this particle.
 * `EnergyFilter` – Only include tracks with kinetic energy above this threshold.
+* `StoreStageID` – If enabled, the output scheme records the current tracking stage ID.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StoreAlways` – Always store track data, even if event should be discarded.
@@ -2189,6 +2186,15 @@ Only include tracks with kinetic energy above this threshold.
 
 * **Parameter** – `energy`
   * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreStageID`
+
+If enabled, the output scheme records the current tracking stage ID.
+
+* **Parameter** – `flag`
+  * **Parameter type** – `b`
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
@@ -2302,68 +2308,6 @@ Add a physics process by name. This will only keep the specified particles when 
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-## `/RMG/Output/VolumeStacker/`
-
-Commands for controlling stacking tracks in the bulk of a volume.
-
-
-**Commands:**
-
-* `VolumeSafety` – Set the minimum distance to any other volume for this track to be stacked.
-* `AddVolumeName` – Add a volume name in which to stack e-/e+ tracks.
-* `DistanceCheckGermaniumOnly` – Enable/disable Germanium-only filtering for surface distance checks.
-* `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
-
-### `/RMG/Output/VolumeStacker/VolumeSafety`
-
-Set the minimum distance to any other volume for this track to be stacked.
-
-* **Parameter** – `safety`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `cm`
-  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/VolumeStacker/AddVolumeName`
-
-Add a volume name in which to stack e-/e+ tracks.
-
-Can be called multiple times to register multiple volumes.
-
-* **Parameter** – `volume`
-  * **Parameter type** – `s`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/VolumeStacker/DistanceCheckGermaniumOnly`
-
-Enable/disable Germanium-only filtering for surface distance checks.
-
-When true, only daughter volumes registered as Germanium detectors are considered.
-
-* **Parameter** – `enable`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
-### `/RMG/Output/VolumeStacker/MaxEnergyThresholdForStacking`
-
-Set the maximum kinetic energy for e-/e+ tracks to be considered for stacking.
-
-* **Parameter** – `threshold`
-  * **Parameter type** – `d`
-  * **Omittable** – `False`
-* **Parameter** – `Unit`
-  * **Parameter type** – `s`
-  * **Omittable** – `True`
-  * **Default value** – `MeV`
-  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
-* **Allowed states** – `Idle`
-
 ## `/RMG/GrabmayrGammaCascades/`
 
 Control Peters gamma cascade model
@@ -2406,3 +2350,111 @@ Set a gamma cascade file for neutron capture on a specified isotope
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
+
+## `/RMG/Staging/`
+
+
+**Sub-directories:**
+
+* `/RMG/Staging/OpticalPhotons/` – Commands for staging optical photon tracks.
+* `/RMG/Staging/Electrons/` – Commands for staging electron tracks.
+
+## `/RMG/Staging/OpticalPhotons/`
+
+Commands for staging optical photon tracks.
+
+
+**Commands:**
+
+* `DeferToWaitingStage` – Defer optical photons to the waiting stack during stage 0.
+
+### `/RMG/Staging/OpticalPhotons/DeferToWaitingStage`
+
+Defer optical photons to the waiting stack during stage 0.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `false`
+* **Allowed states** – `Idle`
+
+## `/RMG/Staging/Electrons/`
+
+Commands for staging electron tracks.
+
+
+**Commands:**
+
+* `DeferToWaitingStage` – Defer secondary electrons to the waiting stack during stage 0.
+* `VolumeSafety` – Set the minimum distance to any other volume for this electron to be staged.
+* `AddVolumeName` – Add a volume name in which electron staging is active.
+* `DistanceCheckGermaniumOnly` – Enable/disable Germanium-only filtering for electron surface distance checks.
+* `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e- tracks to be considered for staging.
+
+### `/RMG/Staging/Electrons/DeferToWaitingStage`
+
+Defer secondary electrons to the waiting stack during stage 0.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `false`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/VolumeSafety`
+
+Set the minimum distance to any other volume for this electron to be staged.
+
+Set to 0 to stage regardless of surface distance.
+
+* **Parameter** – `safety`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `cm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/AddVolumeName`
+
+Add a volume name in which electron staging is active.
+
+If this command is not called, electron staging applies to all volumes.
+
+* **Parameter** – `volume`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/DistanceCheckGermaniumOnly`
+
+Enable/disable Germanium-only filtering for electron surface distance checks.
+
+When true, only daughter volumes registered as Germanium detectors are considered.
+
+This is disabled by default.
+
+* **Parameter** – `enable`
+  * **Parameter type** – `b`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/MaxEnergyThresholdForStacking`
+
+Set the maximum kinetic energy for e- tracks to be considered for staging.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `MeV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
