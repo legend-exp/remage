@@ -41,7 +41,6 @@
 #include "RMGOpticalOutputScheme.hh"
 #include "RMGParticleFilterScheme.hh"
 #include "RMGScintillatorOutputScheme.hh"
-#include "RMGStagingScheme.hh"
 #include "RMGTrackOutputScheme.hh"
 #include "RMGVOutputScheme.hh"
 #include "RMGVertexConfinement.hh"
@@ -68,7 +67,6 @@ void init_extra() {
   new RMGTrackOutputScheme();
   new RMGParticleFilterScheme();
   new RMGGeomBenchOutputScheme();
-  new RMGStagingScheme();
 
   // confinments
   new RMGVertexConfinement();

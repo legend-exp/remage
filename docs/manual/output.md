@@ -190,17 +190,10 @@ function returning `true`, like the `RMGTrackOutputScheme` or the
 
 Similar commands are available for the scintillator output scheme.
 
-Similarly, for simulations involving optical photons, the waiting-stack behavior
-can be configured in two explicit steps:
-
-- defer optical photons to the waiting stack with
-  <project:../rmg-commands.md#rmgstagingopticalphotonsdefertowaitingstage>
-- clear waiting tracks at stage transition unless germanium energy deposition
-  occurred with
-  <project:../rmg-commands.md#rmgoutputgermaniumdiscardwaitingtracksunlessgermaniumedep>
-
-When waiting tracks are cleared, this applies to the full waiting stack (not
-only optical photons deferred by the staging scheme).
+Similarly, for simulations involving optical photons it is possible to discard
+all optical photon tracks before simulating them if no energy was deposited in
+germanium. This can be enabled with
+<project:../rmg-commands.md#rmgoutputgermaniumdiscardphotonsifnogermaniumedep>.
 
 By default, the position saved for each step is the average of the pre and
 post-step point. This can be controlled with

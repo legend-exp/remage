@@ -84,7 +84,6 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     void AddParticleFilter(const int pdg) { fFilterParticle.insert(pdg); }
     void AddProcessFilter(const std::string proc) { fFilterProcess.insert(proc); }
     void SetEnergyFilter(double energy) { fFilterEnergy = energy; }
-    void SetStoreStageID(bool flag) { fStoreStageID = flag; }
 
   private:
 
@@ -95,7 +94,6 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionPosition = false;
     bool fStoreAlways = false;
     bool fStoreOpticalPhotons = false;
-    bool fStoreStageID = false;
 
     std::map<std::string, uint32_t> fProcessMap;
     std::set<int> fStoredProcessIDs; // This set keeps track of the process IDs that have not been discarded.
@@ -118,7 +116,6 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
         double y_momentum;
         double z_momentum;
         double kinetic_energy;
-        int stage_id;
     };
 
     std::vector<RMGTrackEntry> fTrackEntries;
