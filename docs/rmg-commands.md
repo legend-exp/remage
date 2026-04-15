@@ -2353,8 +2353,6 @@ Set a gamma cascade file for neutron capture on a specified isotope
 
 ## `/RMG/Staging/`
 
-See <project:manual/staging.md> for an overview, configuration checklist and examples.
-
 
 **Sub-directories:**
 
@@ -2375,7 +2373,7 @@ Commands for staging optical photon tracks.
 
 Defer optical photons to the waiting stack during stage 0.
 
-This is enabled by default.
+This is disabled by default.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -2390,7 +2388,7 @@ Commands for staging electron tracks.
 
 **Commands:**
 
-* `DeferToWaitingStage` – Defer secondary electrons to the waiting stack during stage 0.
+* `DeferToWaitingStage` – Defer secondary electrons to the waiting stack during stage 0. This also automatically defers any optical photons.
 * `VolumeSafety` – Set the minimum distance to any other volume for this electron to be staged.
 * `AddVolumeName` – Add a volume name in which electron staging is active.
 * `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e- tracks to be considered for staging.
@@ -2398,11 +2396,9 @@ Commands for staging electron tracks.
 
 ### `/RMG/Staging/Electrons/DeferToWaitingStage`
 
-Defer secondary electrons to the waiting stack during stage 0.
+Defer secondary electrons to the waiting stack during stage 0. This also automatically defers any optical photons.
 
-This also automatically defers any optical photons.
-
-This is enabled by default.
+This is disabled by default.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -2482,7 +2478,7 @@ Commands for staging gamma tracks.
 
 Defer secondary gammas to the waiting stack during stage 0.
 
-This is enabled by default.
+This is disabled by default.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
