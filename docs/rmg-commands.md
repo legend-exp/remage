@@ -2360,6 +2360,7 @@ See <project:manual/staging.md> for an overview, configuration checklist and exa
 
 * `/RMG/Staging/OpticalPhotons/` – Commands for staging optical photon tracks.
 * `/RMG/Staging/Electrons/` – Commands for staging electron tracks.
+* `/RMG/Staging/Gammas/` – Commands for staging gamma tracks.
 
 ## `/RMG/Staging/OpticalPhotons/`
 
@@ -2392,12 +2393,14 @@ Commands for staging electron tracks.
 * `DeferToWaitingStage` – Defer secondary electrons to the waiting stack during stage 0.
 * `VolumeSafety` – Set the minimum distance to any other volume for this electron to be staged.
 * `AddVolumeName` – Add a volume name in which electron staging is active.
-* `DistanceCheckGermaniumOnly` – Enable/disable Germanium-only filtering for electron surface distance checks.
 * `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e- tracks to be considered for staging.
+* `SuspendOnEnergyDrop` – Suspend secondary electrons when they cross from above to below the configured kinetic-energy threshold.
 
 ### `/RMG/Staging/Electrons/DeferToWaitingStage`
 
 Defer secondary electrons to the waiting stack during stage 0.
+
+This also automatically defers any optical photons.
 
 This is enabled by default.
 
@@ -2434,19 +2437,6 @@ If this command is not called, electron staging applies to all volumes.
   * **Omittable** – `False`
 * **Allowed states** – `Idle`
 
-### `/RMG/Staging/Electrons/DistanceCheckGermaniumOnly`
-
-Enable/disable Germanium-only filtering for electron surface distance checks.
-
-When true, only daughter volumes registered as Germanium detectors are considered.
-
-This is disabled by default.
-
-* **Parameter** – `enable`
-  * **Parameter type** – `b`
-  * **Omittable** – `False`
-* **Allowed states** – `Idle`
-
 ### `/RMG/Staging/Electrons/MaxEnergyThresholdForStacking`
 
 Set the maximum kinetic energy for e- tracks to be considered for staging.
@@ -2459,4 +2449,98 @@ Set the maximum kinetic energy for e- tracks to be considered for staging.
   * **Omittable** – `True`
   * **Default value** – `MeV`
   * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/SuspendOnEnergyDrop`
+
+Suspend secondary electrons when they cross from above to below the configured kinetic-energy threshold.
+
+The threshold is taken from MaxEnergyThresholdForStacking.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `false`
+* **Allowed states** – `Idle`
+
+## `/RMG/Staging/Gammas/`
+
+Commands for staging gamma tracks.
+
+
+**Commands:**
+
+* `DeferToWaitingStage` – Defer secondary gammas to the waiting stack during stage 0.
+* `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for gamma tracks to be considered for staging.
+* `SuspendOnEnergyDrop` – Suspend secondary gammas when they cross from above to below the configured kinetic-energy threshold.
+* `VolumeSafety` – Set the minimum distance to any other volume for this gamma to be staged.
+* `AddVolumeName` – Add a volume name in which gamma staging is active.
+
+### `/RMG/Staging/Gammas/DeferToWaitingStage`
+
+Defer secondary gammas to the waiting stack during stage 0.
+
+This is enabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Gammas/MaxEnergyThresholdForStacking`
+
+Set the maximum kinetic energy for gamma tracks to be considered for staging.
+
+* **Parameter** – `threshold`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `MeV`
+  * **Candidates** – `eV keV MeV GeV TeV PeV meV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt millielectronVolt joule`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Gammas/SuspendOnEnergyDrop`
+
+Suspend secondary gammas when they cross from above to below the configured kinetic-energy threshold.
+
+The threshold is taken from MaxEnergyThresholdForStacking.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `false`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Gammas/VolumeSafety`
+
+Set the minimum distance to any other volume for this gamma to be staged.
+
+Set to 0 to stage regardless of surface distance.
+
+* **Parameter** – `safety`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `cm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Gammas/AddVolumeName`
+
+Add a volume name in which gamma staging is active.
+
+If this command is not called, gamma staging applies to all volumes.
+
+* **Parameter** – `volume`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
 * **Allowed states** – `Idle`
