@@ -16,6 +16,7 @@
 #include "RMGStagingScheme.hh"
 
 #include "G4Electron.hh"
+#include "G4Gamma.hh"
 #include "G4OpticalPhoton.hh"
 
 #include "RMGOutputTools.hh"
@@ -26,21 +27,33 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
     const G4Track* aTrack,
     int stage
 ) {
-  // we are only interested in staging into waiting at stage 0.
-  if (stage != 0) return std::nullopt;
+  if (stage != 0) return std::nullopt; // only apply staging logic in stage 0
 
-  if ((fDeferOpticalPhotonsToWaitingStage || fDeferElectronsToWaitingStage) &&
+  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+    return Classify_OpticalPhoton(aTrack);
+  } else if (aTrack->GetDefinition() == G4Electron::Definition()) {
+    return Classify_Electron(aTrack);
+  } else if (aTrack->GetDefinition() == G4Gamma::Definition()) {
+    return Classify_Gamma(aTrack);
+  }
+  return std::nullopt;
+}
+
+std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_OpticalPhoton(
+    const G4Track* aTrack
+) {
+  if (fDeferOpticalPhotonsToWaitingStage &&
       aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
     return fWaiting;
   }
+  return std::nullopt;
+}
 
+std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_Electron(const G4Track* aTrack) {
   if (!fDeferElectronsToWaitingStage) return std::nullopt;
 
   // do not touch the primary track of an event.
   if (aTrack->GetParentID() == 0) return std::nullopt;
-
-  // only defer electron tracks.
-  if (aTrack->GetDefinition() != G4Electron::Definition()) return std::nullopt;
 
   // if a max energy threshold is set, only defer tracks below that threshold.
   if (fElectronMaxEnergyThresholdForStacking >= 0 &&
@@ -66,16 +79,50 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
   bool is_within_safety = RMGOutputTools::is_within_surface_safety(
       volume,
       aTrack->GetPosition(),
-      fElectronVolumeSafety
+      fElectronVolumeSafety,
+      true
   );
   if (is_within_safety) return std::nullopt;
-
 
   return fWaiting;
 }
 
-void RMGStagingScheme::SetDistanceCheckGermaniumOnly(bool enable) {
-  RMGOutputTools::SetDistanceCheckGermaniumOnly(enable);
+std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_Gamma(const G4Track* aTrack) {
+  if (!fDeferGammasToWaitingStage) return std::nullopt;
+
+  // do not touch the primary track of an event.
+  if (aTrack->GetParentID() == 0) return std::nullopt;
+
+  // if a max energy threshold is set, only defer tracks below that threshold.
+  if (fGammaMaxEnergyThresholdForStacking >= 0 &&
+      aTrack->GetKineticEnergy() > fGammaMaxEnergyThresholdForStacking)
+    return std::nullopt;
+
+  const auto* volume = aTrack->GetVolume();
+  if (volume == nullptr) return std::nullopt;
+
+  // If no volume names are configured, apply gamma staging to all volumes.
+  if (!fGammaVolumeNames.empty()) {
+    const auto vol_name = volume->GetLogicalVolume()->GetName();
+    if (fGammaVolumeNames.count(vol_name) == 0) return std::nullopt;
+  }
+
+  // stop if gamma safety is not configured.
+  if (fGammaVolumeSafety < 0) return std::nullopt;
+
+  // if safety is zero, always defer.
+  if (fGammaVolumeSafety == 0) return fWaiting;
+
+  // only defer tracks that have a minimum distance to other volumes.
+  bool is_within_safety = RMGOutputTools::is_within_surface_safety(
+      volume,
+      aTrack->GetPosition(),
+      fGammaVolumeSafety,
+      true
+  );
+  if (is_within_safety) return std::nullopt;
+
+  return fWaiting;
 }
 
 void RMGStagingScheme::DefineCommands() {
@@ -128,17 +175,6 @@ void RMGStagingScheme::DefineCommands() {
       .SetStates(G4State_Idle);
 
   fElectronStagingMessengers
-      ->DeclareMethod("DistanceCheckGermaniumOnly", &RMGStagingScheme::SetDistanceCheckGermaniumOnly)
-      .SetGuidance("Enable/disable Germanium-only filtering for electron surface distance checks.")
-      .SetGuidance("When true, only daughter volumes registered as Germanium detectors are considered.")
-      .SetGuidance(
-          std::string("This is ") +
-          (RMGOutputTools::GetDistanceCheckGermaniumOnly() ? "enabled" : "disabled") + " by default."
-      )
-      .SetParameterName("enable", false)
-      .SetStates(G4State_Idle);
-
-  fElectronStagingMessengers
       ->DeclareMethodWithUnit(
           "MaxEnergyThresholdForStacking",
           "MeV",
@@ -146,6 +182,44 @@ void RMGStagingScheme::DefineCommands() {
       )
       .SetGuidance("Set the maximum kinetic energy for e- tracks to be considered for staging.")
       .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fGammaStagingMessengers = std::make_unique<G4GenericMessenger>(
+      this,
+      "/RMG/Staging/Gammas/",
+      "Commands for staging gamma tracks."
+  );
+
+  fGammaStagingMessengers->DeclareProperty("DeferToWaitingStage", fDeferGammasToWaitingStage)
+      .SetGuidance("Defer secondary gammas to the waiting stack during stage 0.")
+      .SetGuidance(
+          std::string("This is ") + (fDeferGammasToWaitingStage ? "enabled" : "disabled") + " by default."
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fGammaStagingMessengers
+      ->DeclareMethodWithUnit(
+          "MaxEnergyThresholdForStacking",
+          "MeV",
+          &RMGStagingScheme::SetGammaMaxEnergyThresholdForStacking
+      )
+      .SetGuidance("Set the maximum kinetic energy for gamma tracks to be considered for staging.")
+      .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fGammaStagingMessengers
+      ->DeclareMethodWithUnit("VolumeSafety", "cm", &RMGStagingScheme::SetGammaVolumeSafety)
+      .SetGuidance("Set the minimum distance to any other volume for this gamma to be staged.")
+      .SetGuidance("Set to 0 to stage regardless of surface distance.")
+      .SetParameterName("safety", false)
+      .SetStates(G4State_Idle);
+
+  fGammaStagingMessengers->DeclareMethod("AddVolumeName", &RMGStagingScheme::AddGammaVolumeName)
+      .SetGuidance("Add a volume name in which gamma staging is active.")
+      .SetGuidance("If this command is not called, gamma staging applies to all volumes.")
+      .SetParameterName("volume", false)
       .SetStates(G4State_Idle);
 }
 

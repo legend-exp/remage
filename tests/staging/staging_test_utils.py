@@ -20,14 +20,19 @@ def run_macro(
     *,
     gdml_file: str = "gdml/geometry.gdml",
     log_level: str = "error",
+    threads: int | None = None,
 ) -> float:
     start = time.perf_counter()
+    if threads is None:
+        threads = 1
     remage_run(
         macro.splitlines(),
         gdml_files=gdml_file,
         output=output,
         overwrite_output=True,
         log_level=log_level,
+        threads=threads,
+        merge_output_files=True,
     )
     return time.perf_counter() - start
 

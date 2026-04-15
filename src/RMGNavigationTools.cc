@@ -226,12 +226,30 @@ std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalP
           "Blame RMGNavigationTools::FindDirectMother?"
       );
 
+    // Root volumes (including world) have no mother path by construction.
+    if (v.physvol == world_volume || v.physvol->GetMotherLogical() == nullptr) {
+      trees.push_back(v);
+      continue;
+    }
+
     v.partial_rotations.push_back(v.physvol->GetObjectRotationValue());
     v.partial_translations.push_back(v.physvol->GetObjectTranslation());
 
     v.vol_global_rotation = v.partial_rotations.back() * v.vol_global_rotation;
 
-    for (auto m : RMGNavigationTools::FindDirectMothers(v.physvol)) {
+    auto direct_mothers = RMGNavigationTools::FindDirectMothers(v.physvol);
+    if (direct_mothers.empty()) {
+      RMGLog::OutFormatDev(
+          RMGLog::warning,
+          "No direct mothers found for volume '{}' (copy nr. {}), treating it as a root volume",
+          v.physvol->GetName(),
+          v.physvol->GetCopyNo()
+      );
+      trees.push_back(v);
+      continue;
+    }
+
+    for (auto m : direct_mothers) {
       if (m != world_volume) {
         auto v_m = VolumeTreeEntry(v); // create a copy of the current helper object.
         v_m.physvol = m;
@@ -297,12 +315,17 @@ std::unordered_map<const G4VPhysicalVolume*, RMGNavigationTools::VolumeCacheEntr
 
     VolumeCacheEntry cache;
 
-    auto global_pos = RMGNavigationTools::FindGlobalPosition(pv);
-    cache.inverse_transform = G4AffineTransform(
-                                  global_pos.vol_global_rotation,
-                                  global_pos.vol_global_translation
-    )
-                                  .Inverse();
+    // Root volumes have no mother chain; local transform is sufficient here.
+    if (pv->GetMotherLogical() == nullptr) {
+      cache.inverse_transform = G4AffineTransform(pv->GetRotation(), pv->GetTranslation()).Inverse();
+    } else {
+      auto global_pos = RMGNavigationTools::FindGlobalPosition(pv);
+      cache.inverse_transform = G4AffineTransform(
+                                    global_pos.vol_global_rotation,
+                                    global_pos.vol_global_translation
+      )
+                                    .Inverse();
+    }
 
     const auto lv = pv->GetLogicalVolume();
     cache.solid = lv->GetSolid();

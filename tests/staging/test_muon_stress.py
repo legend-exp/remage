@@ -4,6 +4,8 @@ import json
 import subprocess
 import sys
 
+import matplotlib.pyplot as plt
+
 
 def _muon_macro(*, mode: str, seed: int, events: int) -> str:
     staging_activation = "/RMG/Output/ActivateOutputScheme Staging"
@@ -92,6 +94,8 @@ print(json.dumps({
         text=True,
     )
 
+    print(f"Subprocess output:\n{proc.stdout}\n{proc.stderr}", file=sys.stderr)
+
     for line in reversed((proc.stdout + "\n" + proc.stderr).splitlines()):
         line_striped = line.strip()
         if line_striped.startswith("{") and line_striped.endswith("}"):
@@ -115,6 +119,32 @@ def test_muon_memory_and_rate_directionality():
 
     optical = metrics["optical_stacking"]
     electron = metrics["electron_stacking"]
+
+    # memory consumption example
+    fig, ax = plt.subplots()
+    ax.bar(
+        ["Optical Stacking", "Electron Stacking"],
+        [optical["maxrss_kb"] / 1024, electron["maxrss_kb"] / 1024],
+        color=["tab:blue", "tab:orange"],
+    )
+    ax.set_ylabel("Peak RSS (GB)")
+    ax.set_title("Muon Event Peak Memory Usage")
+    ax.grid(ls=":", color="gray", alpha=0.5)
+    fig.savefig("muon_stress_memory.png", dpi=300, bbox_inches="tight")
+    fig.clf()
+
+    # time per event example
+    fig, ax = plt.subplots()
+    ax.bar(
+        ["Optical Stacking", "Electron Stacking"],
+        [optical["rate_evt_s"], electron["rate_evt_s"]],
+        color=["tab:blue", "tab:orange"],
+    )
+    ax.set_ylabel("Processing Rate (events/s)")
+    ax.set_title("Muon Event Processing Rate")
+    ax.grid(ls=":", color="gray", alpha=0.5)
+    fig.savefig("muon_stress_rate.png", dpi=300, bbox_inches="tight")
+    fig.clf()
 
     assert electron["maxrss_kb"] < optical["maxrss_kb"], (
         f"Electron stacking did not reduce muon peak RSS enough: "

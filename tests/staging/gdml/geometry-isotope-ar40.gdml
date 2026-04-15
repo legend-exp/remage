@@ -16,7 +16,7 @@
 		</material>
 	</materials>
 	<solids>
-		<orb name="world" r="600" lunit="cm"/>
+		<orb name="world_solid" r="600" lunit="cm"/>
 		<tube name="detector_solid" rmin="0.0" rmax="2.5" z="5.0" startphi="0.0" deltaphi="6.283185307179586" lunit="cm" aunit="rad"/>
 	</solids>
 	<structure>
@@ -24,9 +24,9 @@
 			<materialref ref="G4_Ge"/>
 			<solidref ref="detector_solid"/>
 		</volume>
-		<volume name="world">
+		<volume name="world_vol">
 			<materialref ref="liquid_argon_40"/>
-			<solidref ref="world"/>
+			<solidref ref="world_solid"/>
 			<physvol name="detector_phys">
 				<volumeref ref="detector_vol"/>
 				<position name="detector_pos" x="0" y="0" z="0" unit="cm"/>
@@ -34,6 +34,6 @@
 		</volume>
 	</structure>
 	<setup name="Default" version="1.0">
-		<world ref="world"/>
+		<world ref="world_vol"/>
 	</setup>
 </gdml>

@@ -27,7 +27,7 @@ def _isotope_filter_macro(
 /RMG/Staging/Electrons/DeferToWaitingStage true
 /RMG/Staging/Electrons/VolumeSafety 0.0 cm
 /RMG/Staging/Electrons/MaxEnergyThresholdForStacking 10.0 MeV
-/RMG/Staging/Electrons/AddVolumeName world
+/RMG/Staging/Electrons/AddVolumeName world_vol
 
 /RMG/Generator/Confine UnConfined
 /RMG/Generator/Select GPS

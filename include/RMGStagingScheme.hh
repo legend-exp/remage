@@ -44,13 +44,6 @@ class RMGStagingScheme : public RMGVOutputScheme {
     /** @brief Add a volume name in which electron staging is active. */
     void AddElectronVolumeName(std::string volume) { fElectronVolumeNames.insert(volume); }
 
-    /** @brief Enable or disable Germanium-only filtering for distance calculations.
-     *  @details When enabled, surface distance checks only consider daughter volumes
-     *  registered as Germanium detectors, potentially improving performance.
-     */
-
-    void SetDistanceCheckGermaniumOnly(bool enable);
-
     /** @brief Set the maximum kinetic energy for e- tracks to be considered for staging.
      *  @details Only tracks with kinetic energy below this threshold will be staged.
      *  If set to a negative value, no energy threshold is applied.
@@ -59,13 +52,32 @@ class RMGStagingScheme : public RMGVOutputScheme {
       fElectronMaxEnergyThresholdForStacking = energy;
     }
 
+    /** @brief Set the minimum distance to any other volume for a gamma to be staged. */
+    void SetGammaVolumeSafety(double safety) { fGammaVolumeSafety = safety; }
+
+    /** @brief Add a volume name in which gamma staging is active. */
+    void AddGammaVolumeName(std::string volume) { fGammaVolumeNames.insert(volume); }
+
+    /** @brief Set the maximum kinetic energy for gamma tracks to be considered for staging.
+     *  @details Only tracks with kinetic energy below this threshold will be staged.
+     *  If set to a negative value, no energy threshold is applied.
+     */
+    void SetGammaMaxEnergyThresholdForStacking(double energy) {
+      fGammaMaxEnergyThresholdForStacking = energy;
+    }
+
   private:
 
     std::unique_ptr<G4GenericMessenger> fElectronStagingMessengers;
     std::unique_ptr<G4GenericMessenger> fOpticalPhotonStagingMessengers;
+    std::unique_ptr<G4GenericMessenger> fGammaStagingMessengers;
 
 
     void DefineCommands();
+
+    std::optional<G4ClassificationOfNewTrack> Classify_OpticalPhoton(const G4Track* aTrack);
+    std::optional<G4ClassificationOfNewTrack> Classify_Electron(const G4Track* aTrack);
+    std::optional<G4ClassificationOfNewTrack> Classify_Gamma(const G4Track* aTrack);
 
     bool fDeferOpticalPhotonsToWaitingStage = false;
 
@@ -73,7 +85,12 @@ class RMGStagingScheme : public RMGVOutputScheme {
     double fElectronMaxEnergyThresholdForStacking = -1;
     double fElectronVolumeSafety = -1;
 
+    bool fDeferGammasToWaitingStage = false;
+    double fGammaMaxEnergyThresholdForStacking = -1;
+    double fGammaVolumeSafety = -1;
+
     std::set<std::string> fElectronVolumeNames;
+    std::set<std::string> fGammaVolumeNames;
 };
 
 #endif

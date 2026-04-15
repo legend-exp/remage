@@ -36,12 +36,6 @@
 #include "magic_enum/magic_enum.hpp"
 
 /// \cond this triggers a sphinx error or creates weird namespaces @<long number>
-namespace RMGOutputTools {
-
-  G4ThreadLocal bool is_distance_check_germanium_only = false;
-
-} // namespace RMGOutputTools
-
 namespace {
   std::mutex multiunion_mutex;
 
@@ -128,21 +122,6 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
     );
 
   return distance;
-}
-
-void RMGOutputTools::SetDistanceCheckGermaniumOnly(bool enable) {
-  RMGOutputTools::is_distance_check_germanium_only = enable;
-  RMGLog::OutFormatDev(
-      RMGLog::detail,
-      "Setting distance check Germanium-only filtering to {}",
-      RMGOutputTools::is_distance_check_germanium_only ? "ENABLED" : "DISABLED"
-  );
-  // Clear per-thread volume cache to keep optimization metadata in sync.
-  RMGNavigationTools::ClearVolumeCache();
-}
-
-bool RMGOutputTools::GetDistanceCheckGermaniumOnly() {
-  return RMGOutputTools::is_distance_check_germanium_only;
 }
 
 RMGDetectorHit* RMGOutputTools::average_hits(
@@ -486,6 +465,14 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 
 
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
+  return distance_to_surface(pv, position, false);
+}
+
+double RMGOutputTools::distance_to_surface(
+    const G4VPhysicalVolume* pv,
+    const G4ThreeVector& position,
+    bool is_distance_check_germanium_only
+) {
   // Check cache first
   auto cache_it = RMGNavigationTools::GetVolumeCacheEntry(pv);
 
@@ -497,9 +484,7 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
 
   // Check distance to daughters
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-    if (
-        !ShouldCheckDaughterSurface(cache, local_pos, i, dist, RMGOutputTools::is_distance_check_germanium_only)
-    ) {
+    if (!ShouldCheckDaughterSurface(cache, local_pos, i, dist, is_distance_check_germanium_only)) {
       continue;
     }
 
@@ -513,7 +498,8 @@ double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4
 bool RMGOutputTools::is_within_surface_safety(
     const G4VPhysicalVolume* pv,
     const G4ThreeVector& position,
-    double safety
+    double safety,
+    bool is_distance_check_germanium_only
 ) {
 
   // Check cache first
@@ -529,9 +515,7 @@ bool RMGOutputTools::is_within_surface_safety(
 
   // Check daughters - early exit as soon as we find one within safety
   for (size_t i = 0; i < cache.num_daughters; ++i) {
-    if (
-        !ShouldCheckDaughterSurface(cache, local_pos, i, safety, RMGOutputTools::is_distance_check_germanium_only)
-    ) {
+    if (!ShouldCheckDaughterSurface(cache, local_pos, i, safety, is_distance_check_germanium_only)) {
       continue;
     }
 
