@@ -72,6 +72,36 @@ def count_tracks_by_stage(
     return int(ak.sum(mask))
 
 
+def count_duplicate_trackids(
+    tracks,
+    pdg: int,
+    primary_only: bool | None = False,
+) -> int:
+    if tracks is None or len(tracks) == 0:
+        return 0
+    if "trackid" not in tracks.fields:
+        return 0
+
+    mask = tracks.particle == pdg
+    if primary_only is True:
+        mask = mask & (tracks.parent_trackid == 0)
+    elif primary_only is False:
+        mask = mask & (tracks.parent_trackid > 0)
+
+    selected = tracks[mask]
+    if len(selected) == 0:
+        return 0
+
+    pairs = [
+        (e, t)
+        for e, t in zip(
+            ak.to_numpy(selected.evtid), ak.to_numpy(selected.trackid), strict=True
+        )
+    ]
+    _, counts = np.unique(pairs, return_counts=True, axis=0)
+    return int(np.sum(np.maximum(counts - 1, 0)))
+
+
 def triggered_event_count(step_data) -> int:
     if step_data is None or len(step_data) == 0:
         return 0

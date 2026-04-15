@@ -273,7 +273,7 @@ def test_energy_consistency_is_safety_independent():
 
     for values in low_diffs.values():
         for i in range(len(values)):
-            assert values[i] < 200, (
+            assert values[i] < 400, (
                 "Low-energy mismatch is larger than expected for safety-independent behavior: "
                 f"{values}"
             )

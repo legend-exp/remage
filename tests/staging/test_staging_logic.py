@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from staging_test_utils import (
+    count_duplicate_trackids,
     count_tracks_by_stage,
     read_tracks,
     run_macro,
@@ -83,6 +84,88 @@ def _gamma_macro(
 /gps/particle gamma
 /gps/energy 2.6 MeV
 /gps/ang/type iso
+
+/run/beamOn {events}
+"""
+
+
+def _electron_suspension_macro(
+    *,
+    seed: int,
+    suspend_on_drop: bool,
+    threshold_mev: float,
+    events: int,
+) -> str:
+    suspend = "true" if suspend_on_drop else "false"
+    return f"""
+/random/setSeeds {seed} {seed}
+/RMG/Geometry/RegisterDetector Germanium detector_phys 0
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme Staging
+
+/run/initialize
+
+/RMG/Output/Track/StoreAlways true
+/RMG/Output/Track/StoreStageID true
+/RMG/Output/Track/StoreOpticalPhotons false
+
+/RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/VolumeSafety 0 cm
+/RMG/Staging/Electrons/MaxEnergyThresholdForStacking {threshold_mev} MeV
+/RMG/Staging/Electrons/SuspendOnEnergyDrop {suspend}
+/RMG/Staging/Electrons/AddVolumeName world_vol
+
+/RMG/Output/NtuplePerDetector true
+/RMG/Output/NtupleUseVolumeName true
+
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select GPS
+/gps/position 0 0 5 cm
+/gps/particle gamma
+/gps/energy 2.6 MeV
+/gps/direction 0 0 -1
+
+/run/beamOn {events}
+"""
+
+
+def _gamma_suspension_macro(
+    *,
+    seed: int,
+    suspend_on_drop: bool,
+    threshold_mev: float,
+    events: int,
+) -> str:
+    suspend = "true" if suspend_on_drop else "false"
+    return f"""
+/random/setSeeds {seed} {seed}
+/RMG/Geometry/RegisterDetector Germanium detector_phys 0
+
+/RMG/Output/ActivateOutputScheme Track
+/RMG/Output/ActivateOutputScheme Staging
+
+/run/initialize
+
+/RMG/Output/Track/StoreAlways true
+/RMG/Output/Track/StoreStageID true
+/RMG/Output/Track/StoreOpticalPhotons false
+
+/RMG/Staging/Gammas/DeferToWaitingStage true
+/RMG/Staging/Gammas/VolumeSafety 0 cm
+/RMG/Staging/Gammas/MaxEnergyThresholdForStacking {threshold_mev} MeV
+/RMG/Staging/Gammas/SuspendOnEnergyDrop {suspend}
+/RMG/Staging/Gammas/AddVolumeName world_vol
+
+/RMG/Output/NtuplePerDetector true
+/RMG/Output/NtupleUseVolumeName true
+
+/RMG/Generator/Confine UnConfined
+/RMG/Generator/Select GPS
+/gps/position 0 0 5 cm
+/gps/particle e-
+/gps/energy 10 MeV
+/gps/direction 0 0 -1
 
 /run/beamOn {events}
 """
@@ -250,3 +333,95 @@ def test_secondary_electron_production_responds_to_safety():
 
     assert secondary_stage1_low_safety > 0
     assert secondary_stage1_low_safety > secondary_stage1_high_safety
+
+
+def test_secondary_electron_suspension_on_energy_drop():
+    """Test electron suspension by comparing duplicate track IDs with suspension on/off."""
+    events = scaled_events(250)
+
+    output_on = "stacking-suspension-electrons-on.lh5"
+    output_off = "stacking-suspension-electrons-off.lh5"
+
+    macro_on = _electron_suspension_macro(
+        seed=6100,
+        suspend_on_drop=True,
+        threshold_mev=0.5,
+        events=events,
+    )
+    macro_off = _electron_suspension_macro(
+        seed=6101,
+        suspend_on_drop=False,
+        threshold_mev=0.5,
+        events=events,
+    )
+
+    run_macro(macro_on, output_on)
+    run_macro(macro_off, output_off)
+
+    tracks_on = read_tracks(output_on)
+    tracks_off = read_tracks(output_off)
+
+    assert tracks_on is not None, "Missing suspension-on track output"
+    assert tracks_off is not None, "Missing suspension-off track output"
+    assert "trackid" in tracks_on.fields, "Missing trackid column"
+    assert "trackid" in tracks_off.fields, "Missing trackid column"
+
+    duplicates_on = count_duplicate_trackids(
+        tracks_on,
+        pdg=11,
+        primary_only=False,
+    )
+    duplicates_off = count_duplicate_trackids(
+        tracks_off,
+        pdg=11,
+        primary_only=False,
+    )
+
+    assert duplicates_on > 0
+    assert duplicates_off == 0
+
+
+def test_secondary_gamma_suspension_on_energy_drop():
+    """Test gamma suspension by comparing duplicate track IDs with suspension on/off."""
+    events = scaled_events(250)
+
+    output_on = "stacking-suspension-gammas-on.lh5"
+    output_off = "stacking-suspension-gammas-off.lh5"
+
+    macro_on = _gamma_suspension_macro(
+        seed=6200,
+        suspend_on_drop=True,
+        threshold_mev=1.0,
+        events=events,
+    )
+    macro_off = _gamma_suspension_macro(
+        seed=6201,
+        suspend_on_drop=False,
+        threshold_mev=1.0,
+        events=events,
+    )
+
+    run_macro(macro_on, output_on)
+    run_macro(macro_off, output_off)
+
+    tracks_on = read_tracks(output_on)
+    tracks_off = read_tracks(output_off)
+
+    assert tracks_on is not None, "Missing suspension-on track output"
+    assert tracks_off is not None, "Missing suspension-off track output"
+    assert "trackid" in tracks_on.fields, "Missing trackid column"
+    assert "trackid" in tracks_off.fields, "Missing trackid column"
+
+    duplicates_on = count_duplicate_trackids(
+        tracks_on,
+        pdg=22,
+        primary_only=False,
+    )
+    duplicates_off = count_duplicate_trackids(
+        tracks_off,
+        pdg=22,
+        primary_only=False,
+    )
+
+    assert duplicates_on > 0
+    assert duplicates_off == 0

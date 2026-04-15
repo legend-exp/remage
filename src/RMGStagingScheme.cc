@@ -18,6 +18,7 @@
 #include "G4Electron.hh"
 #include "G4Gamma.hh"
 #include "G4OpticalPhoton.hh"
+#include "G4Step.hh"
 
 #include "RMGOutputTools.hh"
 
@@ -37,6 +38,44 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
     return Classify_Gamma(aTrack);
   }
   return std::nullopt;
+}
+
+void RMGStagingScheme::SteppingAction(const G4Step* step) {
+
+  auto track = step->GetTrack();
+  if (track == nullptr) return;
+
+  // Keep primaries unaffected, matching existing staging behavior.
+  if (track->GetParentID() == 0) return;
+
+  if (track->GetTrackStatus() != fAlive) return;
+
+  bool suspend_on_drop = false;
+  double threshold = -1;
+
+  auto definition = track->GetDefinition();
+  if (definition == G4Electron::Definition()) {
+    suspend_on_drop = fSuspendElectronsOnEnergyDrop;
+    threshold = fElectronMaxEnergyThresholdForStacking;
+  } else if (definition == G4Gamma::Definition()) {
+    suspend_on_drop = fSuspendGammasOnEnergyDrop;
+    threshold = fGammaMaxEnergyThresholdForStacking;
+  } else {
+    return;
+  }
+
+  if (!suspend_on_drop || threshold < 0) return;
+
+  const auto* pre_step = step->GetPreStepPoint();
+  const auto* post_step = step->GetPostStepPoint();
+  if (pre_step == nullptr || post_step == nullptr) return;
+
+  const auto pre_energy = pre_step->GetKineticEnergy();
+  const auto post_energy = post_step->GetKineticEnergy();
+
+  // Suspend exactly at threshold crossing to avoid repeatedly suspending tracks that always stay
+  // below threshold.
+  if (pre_energy > threshold && post_energy <= threshold) track->SetTrackStatus(fSuspend);
 }
 
 std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_OpticalPhoton(
@@ -184,6 +223,17 @@ void RMGStagingScheme::DefineCommands() {
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
+  fElectronStagingMessengers->DeclareProperty("SuspendOnEnergyDrop", fSuspendElectronsOnEnergyDrop)
+      .SetGuidance("Suspend secondary electrons when they cross from above to below the configured kinetic-energy threshold.")
+      .SetGuidance("The threshold is taken from MaxEnergyThresholdForStacking.")
+      .SetGuidance(
+          std::string("This is ") + (fSuspendElectronsOnEnergyDrop ? "enabled" : "disabled") +
+          " by default."
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("false")
+      .SetStates(G4State_Idle);
+
   fGammaStagingMessengers = std::make_unique<G4GenericMessenger>(
       this,
       "/RMG/Staging/Gammas/",
@@ -207,6 +257,16 @@ void RMGStagingScheme::DefineCommands() {
       )
       .SetGuidance("Set the maximum kinetic energy for gamma tracks to be considered for staging.")
       .SetParameterName("threshold", false)
+      .SetStates(G4State_Idle);
+
+  fGammaStagingMessengers->DeclareProperty("SuspendOnEnergyDrop", fSuspendGammasOnEnergyDrop)
+      .SetGuidance("Suspend secondary gammas when they cross from above to below the configured kinetic-energy threshold.")
+      .SetGuidance("The threshold is taken from MaxEnergyThresholdForStacking.")
+      .SetGuidance(
+          std::string("This is ") + (fSuspendGammasOnEnergyDrop ? "enabled" : "disabled") + " by default."
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("false")
       .SetStates(G4State_Idle);
 
   fGammaStagingMessengers

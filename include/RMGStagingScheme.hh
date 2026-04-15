@@ -26,6 +26,8 @@
 
 #include "RMGVOutputScheme.hh"
 
+class G4Step;
+
 /** @brief Centralized staging policy for waiting-stack based track deferral. */
 class RMGStagingScheme : public RMGVOutputScheme {
 
@@ -37,6 +39,9 @@ class RMGStagingScheme : public RMGVOutputScheme {
      *  @details This classifies configured optical photons and electrons as @c fWaiting.
      */
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
+
+    /** @brief Evaluate optional stepping-time suspension criteria for configured particles. */
+    void SteppingAction(const G4Step*) override;
 
     /** @brief Set the minimum distance to any other volume for an electron to be staged. */
     void SetElectronVolumeSafety(double safety) { fElectronVolumeSafety = safety; }
@@ -83,10 +88,12 @@ class RMGStagingScheme : public RMGVOutputScheme {
 
     bool fDeferElectronsToWaitingStage = false;
     double fElectronMaxEnergyThresholdForStacking = -1;
+    bool fSuspendElectronsOnEnergyDrop = false;
     double fElectronVolumeSafety = -1;
 
     bool fDeferGammasToWaitingStage = false;
     double fGammaMaxEnergyThresholdForStacking = -1;
+    bool fSuspendGammasOnEnergyDrop = false;
     double fGammaVolumeSafety = -1;
 
     std::set<std::string> fElectronVolumeNames;
