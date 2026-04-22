@@ -712,6 +712,22 @@ always equal to the number of simulated events.
 The vertex table is useful to reconstruct the event vertex of hits recorded in
 sensitive detectors by matching the information stored in the `evtid` column.
 
+## Run metadata
+
+The output file will also contain the total number of simulated Geant4 events in
+the `number_of_events` field:
+
+```
+/
+├── number_of_events · real
+├── ...
+└── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
+    └── ...
+```
+
+This number will also be produced when the vertex table is not created and can
+be used to normalize detected hit counts without having to read the `vtx` table.
+
 ## The track output scheme
 
 Information about tracks simulated by Geant4 can be often beneficial to
