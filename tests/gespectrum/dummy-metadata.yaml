@@ -1,0 +1,70 @@
+cryostat:
+  B00000B:
+    detector:
+      name: B00000B
+      position: 5.0
+    holder:
+      geometry:
+        bottom_cyl:
+          inner:
+            height_in_mm: 0
+            radius_in_mm: 0
+          outer:
+            height_in_mm: 0
+            radius_in_mm: 0
+        cylinder:
+          inner:
+            height_in_mm: 62.5
+            radius_in_mm: 39.5
+          outer:
+            height_in_mm: 65.5
+            radius_in_mm: 41.0
+        edge:
+          height_in_mm: 0
+          radius_in_mm: 0
+        rings:
+          height_in_mm: 8.6
+          position_bottom_ring_in_mm: 0
+          position_top_ring_in_mm: 14.7
+          radius_in_mm: 41.5
+      position: 3.5
+    wrap:
+      geometry:
+        inner:
+          height_in_mm: 49.0
+          radius_in_mm: 37.2
+        outer:
+          height_in_mm: 50.0
+          radius_in_mm: 37.7
+      position: 3.5
+
+detectors:
+  germanium:
+    diodes:
+      B00000B:
+        name: B00000B
+        type: bege
+        production:
+          order: null
+          slice: null
+          enrichment:
+            val: 0.9
+            unc: 0.01
+        geometry:
+          height_in_mm: 29.46
+          radius_in_mm: 36.98
+          groove:
+            depth_in_mm: 0.0
+            radius_in_mm:
+              outer: 0.01
+              inner: 0.02
+          pp_contact:
+            radius_in_mm: 0.01
+            depth_in_mm: 0
+          taper:
+            top:
+              angle_in_deg: 0.0
+              height_in_mm: 0.0
+            bottom:
+              angle_in_deg: 0.0
+              height_in_mm: 0.0

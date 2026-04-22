@@ -23,6 +23,7 @@ processes-ib
 gammacorr
 optics
 performance
+gespectrum
 ```
 
 ```{toctree}
