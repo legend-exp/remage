@@ -84,7 +84,9 @@ set(TESTS_IMAGES
     distances/distance-ge-poststep.output.png
     distances/distance-ge-prestep.output.png
     distances/distance-ge-average.output.png
-    observables/vis-observables-ge-gdml.output.jpeg
+    gespectrum/hades-spectrum.output.png
+    gespectrum/hades-spectrum-full.output.png
+    gespectrum/hades-spectrum-linear.output.png
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
@@ -94,6 +96,7 @@ set(TESTS_IMAGES
     nist/e-range-cu-distributions.output.png
     nist/e-range-cu-vs-estar.output.png
     nist/e-stopping-power-cu-vs-estar.output.png
+    observables/vis-observables-ge-gdml.output.jpeg
     observables/tracks-bulk-10um-limit.tracks.out0.png
     observables/tracks-bulk-10um-limit.tracks.out1.png
     observables/tracks-bulk-10um-limit.tracks.out2.png

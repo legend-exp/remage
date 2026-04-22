@@ -1,0 +1,20 @@
+/RMG/Geometry/GDMLDisableOverlapCheck true
+
+/RMG/Geometry/RegisterDetectorsFromGDML Germanium
+
+/run/initialize
+
+/RMG/Output/Vertex/StorePrimaryParticleInformation false
+/RMG/Output/Vertex/StoreSinglePrecisionEnergy true
+/RMG/Output/Vertex/StoreSinglePrecisionPosition true
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume Source_PV
+
+/RMG/Generator/Select GPS
+/gps/particle                ion
+/gps/energy                  0 eV
+/gps/ang/type                iso
+
+/gps/ion                     90 228  # Th-228
+/run/beamOn {EVENTS}
