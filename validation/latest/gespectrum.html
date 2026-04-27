@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Vertex confinement" href="confinement.html"><link rel="prev" title="About this validation report" href="versioninfo.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Performance Benchmarks" href="performance.html">
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Double-beta decay physics - remage 0.22.1.dev8+g256f5ed35 validation suite</title>
+        <title>Germanium spectra - remage 0.22.1.dev8+g256f5ed35 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -206,7 +206,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Sections</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Double-beta decay physics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a></li>
@@ -216,7 +216,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gammacorr.html">Gamma correlations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optics.html">Optical physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gespectrum.html">Germanium spectra</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Germanium spectra</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
@@ -241,12 +241,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/bxdecay0.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/gespectrum.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/bxdecay0.md" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/gespectrum.md" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -258,52 +258,48 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<style>
-  .ss-layout-default-AB { grid-template-areas: 'A B'; }
-</style>
-<section class="tex2jax_ignore mathjax_ignore" id="double-beta-decay-physics">
-<h1>Double-beta decay physics<a class="headerlink" href="#double-beta-decay-physics" title="Link to this heading">¶</a></h1>
-<p>In this section we take a look at the primary spectrum produced by the
-<em>bxdecay0</em> package. The main documentation for this extension is available
-<a class="reference external" href="https://github.com/BxCppDev/bxdecay0">here</a>. It aims to reproduce reasonable
-primary particles to be used as generator for double beta decay physics.</p>
-<section id="primary-electron-properties">
-<h2>Primary electron properties<a class="headerlink" href="#primary-electron-properties" title="Link to this heading">¶</a></h2>
-<p>The main thing we can compare here are the properties of the primary electrons
-produced. The <em>bxdecay0</em> package actually does not even produce the neutrinos
-emitted in e.g. <span class="math notranslate nohighlight">\(2\nu\beta\beta\)</span>.</p>
-<figure class="sphinx-subfigure align-default" id="id1">
-<div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
-<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
-<span class="caption">The combined energy of the two primary electrons.</span>
-<a class="reference internal image-reference" href="_images/double-beta-e-combined-primary-energy.output.png"><img alt="The combined energy of the two primary electrons." src="_images/double-beta-e-combined-primary-energy.output.png" style="width: 95%;" />
+          <section class="tex2jax_ignore mathjax_ignore" id="germanium-spectra">
+<h1>Germanium spectra<a class="headerlink" href="#germanium-spectra" title="Link to this heading">¶</a></h1>
+<p>This test is modeled after a real-world example of a characterization test stand
+used for LEGEND (HADES). It simulates a BEGe detector with a very simple
+geometry next to a Th-228 source and copares the resulting spectrum with
+experimental data. The test uses a simplified geometry of the chosen BEGe
+detector.</p>
+<p>The data is scaled by the expected source activity at the point of measurement,
+and to match the simulated decay count. The efficiency of the applied quality
+cuts is accounted for.</p>
+<p>In the simulation post-processing, an piecewise activeness model and a variable
+energy resolution is applied. The binning of the spectrum is widened around the
+gamma line peaks, so that we do not compare the detailed peak shape.</p>
+<p>A good agreement for higher energies is found:</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="_images/hades-spectrum.output.png"><img alt="_images/hades-spectrum.output.png" src="_images/hades-spectrum.output.png" style="width: 800px;" />
 </a>
-</div>
-<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
-<span class="caption">The opening angle between the two primary electrons.</span>
-<a class="reference internal image-reference" href="_images/double-beta-e-primary-opening-angle.output.png"><img alt="The opening angle between the two primary electrons." src="_images/double-beta-e-primary-opening-angle.output.png" style="width: 95%;" />
-</a>
-</div>
-</div>
 <figcaption>
-<p><span class="caption-text">Different decay modes for the Ge76 decay.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector.</em></span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p>Here <span class="math notranslate nohighlight">\(2\nu\beta\beta\)</span> is the two neutrino double beta decay as predicted by the
-Standard Model. <span class="math notranslate nohighlight">\(0\nu\beta\beta\)</span> is the neutrinoless double beta decay channel
-(assuming light majorana neutrino exchange) used for e.g. sensitivity estimates
-by experiments like LEGEND. More exotic physics like the Majoron-emitting
-neutrinoless double beta decay with SI=1 <span class="math notranslate nohighlight">\(0\nu\beta\beta\_M1\)</span> shows a
-distinctive continuous electron spectrum. Other exotic physics like the
-<span class="math notranslate nohighlight">\(0\nu\beta\beta\_\lambda0\)</span> is a decay mode driven by right-handed currents
-according to the lambda mechanism and shows a distinctive angular correlation.</p>
-</section>
+<p>In the lower-energy spectrum (&lt;200 keV), some minor deviations can be observed:</p>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="_images/hades-spectrum-full.output.png"><img alt="_images/hades-spectrum-full.output.png" src="_images/hades-spectrum-full.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (full range).</em></span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<hr class="docutils" />
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="_images/hades-spectrum-linear.output.png"><img alt="_images/hades-spectrum-linear.output.png" src="_images/hades-spectrum-linear.output.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (linear scale).</em></span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
 </section>
 
         </article>
@@ -311,23 +307,15 @@ according to the lambda mechanism and shows a distinctive angular correlation.</
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="confinement.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Vertex confinement</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="versioninfo.html">
+          
+          <a class="prev-page" href="performance.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">About this validation report</div>
+                <div class="title">Performance Benchmarks</div>
                 
               </div>
             </a>
@@ -349,27 +337,8 @@ according to the lambda mechanism and shows a distinctive angular correlation.</
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Double-beta decay physics</a><ul>
-<li><a class="reference internal" href="#primary-electron-properties">Primary electron properties</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -386,7 +355,5 @@ according to the lambda mechanism and shows a distinctive angular correlation.</
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js?v=b8b12719"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>
