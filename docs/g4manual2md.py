@@ -15,16 +15,10 @@ if len(sys.argv) < 2:
 
 path = sys.argv[1]
 
-outlines = [
-    "Macro commands",
-    "=" * 31,
-    "",
-    "```{contents} Command table",
-    ":class: this-will-duplicate-information-and-it-is-still-useful-here",
-    ":local:",
-    "```",
-    "",
-]
+# load the template file as the first output lines.
+with Path("rmg-commands.md.in").open() as tmfile:
+    outlines = [line.strip("\n") for line in tmfile]
+
 with Path(path).open() as infile:
     inlines = [line.strip("\n") for line in infile]
 

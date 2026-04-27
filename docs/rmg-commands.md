@@ -1,10 +1,26 @@
 Macro commands
-===============================
+==============
 
 ```{contents} Command table
-:class: this-will-duplicate-information-and-it-is-still-useful-here
 :local:
+:class: admonition this-will-duplicate-information-and-it-is-still-useful-here
 ```
+
+Also refer to the [documentation on the built-in Geant4 commands][geant-commands]
+which can also be used in _remage_ macro file.
+
+[geant-commands]: https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Control/commands.html
+
+:::{note}
+
+This documentation refers to "allowed states" for the commands. These refer to
+specific phases in the execution of the macro program/the simulation:
+
+- `PreInit`: before running `/run/initialize`
+- `Idle`: after running `/run/initialize`, but before starting the run
+- `GeomClosed`, `EventProc` and `Abort` are typically not so useful to users
+
+:::
 
 ## `/RMG/`
 
