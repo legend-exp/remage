@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import awkward as ak
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import pint
 import pyg4ometry as pg4
 import scipy as sp
 from dbetto import TextDB
-from lgdo import lh5
 from pygeomtools import RemageDetectorInfo
 from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
@@ -62,7 +61,7 @@ def calculate_dEdx(remage_output: str, energy: float, material: str):
     # read in event data
     try:
         stp = lh5.read("stp/", remage_output)
-    except lh5.exceptions.LH5DecodeError:
+    except lh5.io.exceptions.LH5DecodeError:
         return np.array([0])
 
     c = sp.constants.physical_constants["speed of light in vacuum"][0]
@@ -195,6 +194,7 @@ def plot_energy_range(energies, materials, had_physics, em_physics, outfiles):
             size=9,
         )
         fig.savefig(f"energy_loss_{material}_energy_range.output.png")
+        plt.clf()
 
 
 def _simulate_case(
@@ -252,10 +252,8 @@ def test_energy_loss():
         for energy in energies
     ]
 
-    cpu_count = os.cpu_count() or 1
-    cpu_budget = max(1, cpu_count // 2)
-    max_workers = max(1, min(len(cases), cpu_budget))
-    max_threads = max(1, cpu_budget // max_workers)
+    max_workers = 16
+    max_threads = 1
 
     outfiles = {}
     if max_workers == 1:

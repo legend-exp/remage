@@ -365,7 +365,7 @@ This is disabled by default
 
 ### `/RMG/Processes/Stepping/KillSecondaries`
 
-Kill all secondary particles (tracks with parent ID > 0) at their first step. This affects all particle types including neutrons.
+Kill all secondary particles (tracks with parent ID > 0) at their first step.
 
 This is disabled by default
 

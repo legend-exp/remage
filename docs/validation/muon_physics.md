@@ -28,38 +28,74 @@ At sea level, the muon spectrum is commonly described by the Gaisser
 parameterization [^Gaisser], while underground spectra are typically obtained by
 propagating muons through rock with tools such as MUSIC/MUSUN [^MUSIC_MUSUN].
 This leads to a broad underground spectrum, which motivates testing across wide
-energy intervals rather than at a single representative value. At Gran Sasso,
-muon energies range from tens of GeV to several TeV with an average around 270
-GeV. In addition, muons traverse different materials before and within the
-detector setup, in particular rock, water, and liquid argon. A meaningful
-validation of muon physics in remage therefore has to cover both a broad energy
-range and multiple materials.
+energy intervals. At Gran Sasso, muon energies range from tens of GeV to several
+TeV with an average around 273 GeV. In addition, muons traverse different
+materials in the LEGEND setup, in particular rock, water, and liquid argon. A
+meaningful validation of muon physics in remage therefore has to cover both a
+broad energy range and multiple materials.
 
-This validation page focuses on five observables. For prompt backgrounds, the
-key observable is the mean muon energy loss in matter, compared to PDG reference
-tables [^pdg_energy_loss]. For delayed backgrounds, the key observable is the
-muon-induced neutron yield, compared to both parameterizations and previous
-simulations [^Wang] [^Kudryavtsev] [^Agafonova] [^Manukovsky]. To better
-understand potential discrepancies, three additional observables for muon
-showers are included: the relative contribution of different neutron production
-channels, the development of the shower profile as a function of penetration
-depth, and the production of radioactive isotopes in the shower.
+:::{warning}
 
-Whenever possible, the observables are compared to experimental measurements and
-to reference simulations from Geant4 and FLUKA. The present tests were designed
-to be as close as possible to the setup in [^Manukovsky], which provides a
-useful baseline for cross-version consistency checks.
-
-:::{note}
-
-The Geant4 version and G4NDL library used in [^Manukovsky] are outdated compared
-to current production versions. In the future, it would be preferable to compare
-against dedicated FLUKA simulations using an identical geometry and analysis
-setup.
+**Limitations**: These tests use simplified configurations, such as
+mono-energetic muons, idealized pure materials, reduced electron/gamma tracking
+thresholds (≈8 MeV), and limited statistics (≈20k events per configuration).
+They are intended to detect large discrepancies and assess model consistency
+(remage vs. FLUKA / literature), not to provide quantitative predictions of
+LEGEND's in‑situ background rates. Interpret results comparatively. Do not
+extrapolate them to experimental backgrounds without a dedicated, site‑specific
+study.
 
 :::
 
-## Energy loss of muons in matter
+## Validation approach
+
+Two separate setups are used in this validation: one for the energy-loss
+measurements (Section 1) and a second for neutron yield, isotope production and
+shower dimensions (Sections 2–4).
+
+- Energy-loss setup: mono-energetic muons are shot through a block of material.
+  The block length is chosen such that the muon loses about 5% of its initial
+  energy (this keeps the effective energy-averaging window small while providing
+  sufficient statistics for the mean loss measurement).
+
+- Neutron/isotope/shower setup: mono-energetic muons are shot through a cylinder
+  of material with length $2000\,g/cm^2\\cdot\\rho$ and radius 1.25 m (chosen
+  for containment). Electrons and gammas are tracked down to the lowest neutron
+  separation energy in the material (slightly below 10 MeV in these setups).
+  Each configuration is limited to ≈20k events due to computational cost. This
+  test setups were designed to be as close as possible to the setup in
+  [^Manukovsky], which provides a useful baseline for cross-version consistency
+  checks.
+
+This validation page focuses on four observables. For prompt backgrounds, the
+key observable is the mean muon energy loss (1) in matter, compared to PDG
+reference tables [^pdg_energy_loss]. For delayed backgrounds, the key observable
+is the muon-induced neutron yield (2), compared to both parameterizations and
+previous simulations [^Wang] [^Kudryavtsev] [^Agafonova] [^Manukovsky]. In
+addition, the individual contribution from different production channels and the
+multiplicity of neutrons per interaction. This allows for more meanigful
+comparison between different physics lists or simulation frameworks.
+Furthermore, the production of radioactive isotopes in the shower (3) is of
+interest to understand the contribution from not only neutron capture but also
+from spallation processes, which usually have high systematic uncertainties.
+Finally, the development of the shower profile as a function of penetration
+depth (4) allows for a cross-check of the whole muon shower physics and to
+identify general issues in the physics model.
+
+In addition, the Neutron/isotope/shower setup also were used to generate
+reference FLUKA simulations (v4.5.1) for comparison. The workflow for these
+FLUKA simulations can be found,
+[[here](https://github.com/MoritzNeuberger/remage_fluka_muon_validation/tree/main)]
+and uses the following physics settings: PRECISIO, PHOTONUC, EVAPORAT, COALESCE,
+EM-DISSO, IONTRANS and JEFF-3.3 for neutron cross-sections. FLUKA is a
+well-studied Monte Carlo simulation tool for hadronic interactions and is widely
+adopted to estimate production of particles.
+
+Finally, whenever possible, the generated observables are also compared to
+literature experimental measurements and to reference simulations from Geant4
+and FLUKA.
+
+## 1.) Energy loss of muons in matter
 
 The energy loss of muons in matter consists of four main processes: ionization,
 bremsstrahlung, pair production, and photonuclear interactions. Ionization is a
@@ -96,16 +132,21 @@ be good over the full energy range.
 :alt: Energy loss of muons in water compared to DOI: 10.1006/adnd.2001.0861
 ```
 
+Figure: Energy loss of muons in water compared to DOI: 10.1006/adnd.2001.0861
+
 ```{image} ./_img/cosmogenics/muon/energy_loss_lar_energy_range.output.png
 :height: 300px
 :alt: Energy loss of muons in liquid argon compared to DOI: 10.1006/adnd.2001.0861
 ```
 
-## Muon induced neutron yield
+Figure: Energy loss of muons in liquid argon compared to DOI:
+10.1006/adnd.2001.0861
 
-The muon-induced neutron yield is one of the most relevant observables for
-delayed cosmogenic backgrounds, but it is also one of the most difficult to
-model robustly.
+## 2.) Muon induced neutron yield
+
+The muon-induced neutron yield is one the most relevant observables to validate
+the delayed cosmogenic backgrounds in LEGEND, but it is also one of the most
+difficult to model robustly.
 
 Following [^Wang], the dominant neutron-production mechanisms are:
 
@@ -116,38 +157,45 @@ Following [^Wang], the dominant neutron-production mechanisms are:
 - Secondary neutron multiplication following the primary channels, dominated by
   inelastic neutron reactions $(n,Xn)$.
 
-Processes based on elastic scattering and photonuclear reactions are generally
-better understood, while muon spallation and secondary neutron multiplication
-dominate the modeling difficulty [^Wang]. Existing reference studies in FLUKA
-and Geant4 [^Wang] [^Kudryavtsev] [^Manukovsky] provide important guidance, but
-their numerical values depend on the chosen hadronic models and cross-section
-data and can be associated with large uncertainties.
+In the following test, neutron yields are compared to three different types of
+references:
 
-From the experimental side, data are scarce because neutron-yield measurements
-require large detectors with good containment and high detection efficiency.
-Water and liquid-scintillator experiments provide important constraints [^SK]
-[^SNO], but direct measurements for liquid argon at relevant muon energies are
-(to the knowledge of the author) not available.
+- **Experimental estimates** from water based experiments such as
+  Super-Kamiokande [^SK] and SNO+ [^SNO].
+- **Parameterizations** based on experimental and simulation data from
+  literature, such as [^Agafonova], [^Wang], [^Kudryavtsev], and [^Manukovsky].
+- **Dedicated FLUKA simulations** performed with the same geometry and physics
+  settings as the remage simulations.
 
-The motivation for such parameterizations is discussed in [^Malgin], where the
-observed scaling behavior is interpreted phenomenologically.
+The experimental values are the most robust references, however, they are scarce
+since neutron-yield measurements require large detectors with good containment
+and high detection efficiency. Thus, such measurements are available for water
+and liquid scintillator, but (to the knowledge of the author) not for liquid
+argon at relevant muon energies. In addition, since the initial muon energy is
+not known in the relevant experiments, the neutron yield is associated with the
+average muon energy for the corresponding experiment.
 
-For this validation, we distinguish two parameterization classes:
+Parameterizations of the neutron yield assume a power-law dependence on the muon
+energy $E_\mu$ and the target material mass $A$. A **general parameterization**
+based entirely on experimental data is given by [^Agafonova] depending both
+$E_\mu$ and $A$, while **material-specific parameterizations**, i.e., only
+dependent on $E_\mu$ generated for specific $A$, based on FLUKA simulations
+[^Wang], [^Kudryavtsev], as well as Geant4 simulations [^Manukovsky]. The
+matter-specific parameterizations are expected to be more accurate since they
+can better consider unique characteristics of the target such as the neutron
+separation energy and cross-sections.
 
-- General parameterization: the global fit of $Y_n = c E_\mu^\alpha A^\beta$
-  with $c = 4.4 \times 10^{-7}$, $\alpha = 0.78$, and $\beta = 0.95$ by
-  [^Agafonova], extracted from experimental data across several materials.
-- Material-specific parameterization: material-specific fits of
-  $Y_n = c(A) E_\mu^{\alpha(A)}$, based on liquid scintillator FLUKA simulations
-  by [^Wang] and [^Kudryavtsev] and general materials using Geant4 simulations
-  by [^Manukovsky].
+:::{note}
 
-Comparing both helps separate broad phenomenology from model-dependent details.
+The Geant4 version (9.4) and G4NDL library (ENDF/B-V) used in [^Manukovsky] are
+outdated compared to current production versions. Deviations can be expected.
 
-For the present validation, computational constraints are significant. To reduce
-computational cost, electrons, positrons, and gammas are only tracked down to
-the lowest neutron separation energy in each material (slightly below 10 MeV in
-the setups shown), and each configuration is limited to 20k events.
+:::
+
+Since the FLUKA simulations used in [^Wang] and [^Kudryavtsev] only covered
+water and liquid scintillator and are already quite dated, dedicated FLUKA
+simulations were performed for all test cases presented here to provide a more
+direct comparison.
 
 In the simulation, mono-energetic muons are shot through a cylinder of material
 with a length of $2000 g/cm^2 \cdot \rho$ similar to [^Manukovsky]. The radius
@@ -156,67 +204,66 @@ containment of the resulting showers. The neutron yield is then calculated as
 the number of neutrons produced per muon per g/cm$^2$ after the burn-in depth
 (see the shower dimensions section below).
 
-The following tests are useful to validate that the simulations are in the right
-range and to check for large discrepancies between simulation and expectation.
+The following tests are useful to identify large discrepancies between
+simulation and expectation.
 
 ### Material dependence
 
-Following the power-law framework introduced above, this subsection focuses on
-the material dependence of the neutron yield. The comparison uses the
-parameterization [^Agafonova] based on experimental trends together with the
-material-specific Geant4-based study from [^Manukovsky] and the FLUKA
-simulations by [^Wang] and [^Kudryavtsev] for water. A key feature from
-[^Manukovsky] is that argon can deviate upwards from the generic trend of
-[^Agafonova] because of its low neutron separation energy and high $(n,2n)$
-cross-section.
-
 The following plot shows the muon-induced neutron yield in different materials
-at 100 GeV The agreement between the points and the material-specific
-expectation should be good for all materials, the generalized parameterization
-should give a rough estimate, though it is not expected to precisely match the
-simulated values.
+at 100 GeV. The agreement between the remage estimates, the FLUKA estimates and
+the material-specific expectation should be good for all materials, the
+generalized parameterization should give a rough estimate, though it is not
+expected to precisely match the simulated values. Especially, in rock remage is
+expected to result in a higher value compared to FLUKA.
 
-```{image} ./_img/cosmogenics/muon/neutron_yield_material_scan_100.0_Shielding_Livermore_30_8.045.output.png
+```{image} ./_img/cosmogenics/muon/neutron_yield_material_scan_100.0_Shielding_Livermore_30.output.png
 :height: 300px
 :alt: Muon induced neutron yield in different materials at 100 GeV. Compared to DOI: 10.1134/S106377881603011X
 ```
 
+Figure: Muon induced neutron yield in different materials at 100 GeV. Compared
+to DOI: 10.1134/S106377881603011X
+
 ### Energy dependence
 
-This subsection uses the same parameterizations as above but now emphasizes the
-energy dependence of the neutron yield.
-
-As mentioned above, in experiments, the initial muon energy is not known and can
-vary up to several TeV. Instead, usually the neutron yield is associated with
-the average muon energy for the corresponding experiment. This is related to the
-overburden of the underground site resulting in Super-Kamiokande at about 2.7
-km.w.e. having a lower mean energy of 259 GeV [^SK] compared to SNO+ with 364
-GeV located at 6 km.w.e. [^SNO].
+As mentioned above, in underground experiments, the initial muon energy is not
+known and can vary up to several TeV. Instead, usually the neutron yield in
+experiments is associated with the average muon energy for the corresponding
+experiment. This is related to the overburden of the underground site resulting
+in Super-Kamiokande at about 2.7 km.w.e. having a lower mean energy of 259 GeV
+[^SK] compared to SNO+ with 364 GeV located at 6 km.w.e. [^SNO].
 
 The following plots show the muon-induced neutron yield at 100 GeV and 280 GeV
 (similar to [^Manukovsky]), the latter roughly corresponding to the mean muon
 energy at Gran Sasso.
 
 The first plot compares the remage estimated value for water with the
-experimental values and parameterizations. The remage estimate should lie
-approximately on the material-specific parameterization lines, which are in turn
-consistent with measurements. Again, the generalized parameterization is
-expected to deviate significantly from the simulated values.
+experimental values and parameterizations. The remage estimate should be
+consistent with the FLUKA estimate and the material-specific parameterization
+lines, the latter in turn should be consistent with measurements. Again, the
+generalized parameterization is expected to deviate significantly from the
+simulated values.
 
 ```{image} ./_img/cosmogenics/muon/neutron_yield_energy_scan_water_Shielding_Livermore_30_8.045.output.png
 :height: 300px
 :alt: Muon induced neutron yield at different energies in water. Compared to DOI: 10.1134/S106377881603011X
 ```
 
+Figure: Muon induced neutron yield at different energies in water. Compared to
+DOI: 10.1134/S106377881603011X
+
 The second plot compares the remage estimated value for liquid argon. Since only
 parameterizations from [^Manukovsky] and [^Agafonova] are available, only these
 are shown. The remage estimate should be consistent with the [^Manukovsky]
-estimate, while lying above that of [^Agafonova].
+estimate and the FLUKA estimate, while lying above that of [^Agafonova].
 
 ```{image} ./_img/cosmogenics/muon/neutron_yield_energy_scan_lar_Shielding_Livermore_30_9.869.output.png
 :height: 300px
 :alt: Muon induced neutron yield at different energies in liquid argon. Compared to DOI: 10.1134/S106377881603011X
 ```
+
+Figure: Muon induced neutron yield at different energies in liquid argon.
+Compared to DOI: 10.1134/S106377881603011X
 
 ### Hadronic physics list
 
@@ -233,16 +280,35 @@ be visible.
 
 ```{image} ./_img/cosmogenics/muon/neutron_yield_had_physics_scan_100.0_lar_Livermore_30_9.869.output.png
 :height: 300px
-:alt: Muon induced neutron yield for different hadronic physics lists at 100 GeV in liquid argon. Compared to DOI: 10.1134/S106377881603011X
+:alt: Muon induced neutron yield for different hadronic physics lists at 100 GeV in liquid argon.
 ```
 
-## Neutron production processes
+Figure: Muon induced neutron yield for different hadronic physics lists at 100
+GeV in liquid argon.
 
-Besides the total neutron yield, neutron production channels are an important
-diagnostic for comparing different Geant4 versions and simulation frameworks. At
-the relevant energies of 100 GeV and 280 GeV, the dominant channels are
-photonuclear interactions $(\gamma,Xn)$ and neutron inelastic interactions
-$(n,Xn)$, which generate secondary neutrons.
+To understand the reason for the differences between physics lists, it is useful
+to look at the individual contribution of the different incoming particles
+producing the neutrons, which is shown in the following plots together with the
+results for the FLUKA simulations. In addition, the multiplicity of the neutrons
+emitted in the interactions is indicated by color.
+
+The following plot shows the individual contributions for liquid argon at 100
+GeV. The dominant contribution is expected to come from photonuclear
+interactions $(\gamma,Xn)$ and neutron inelastic interactions $(n,Xn)$. The
+individual contributions should be consistent among all physics lists and
+particles, with potentially the exception of QGSP_BIC_HP which predicts slightly
+lower neutron yield from neutron inelastic interactions. Conversely, all
+estimates should also be consistent with the FLUKA estimates, with the exception
+of the neutron inelastic interactions, which are expected to be significnatly
+lower in FLUKA any Geant4 physics list.
+
+```{image} ./_img/cosmogenics/muon/neutron_production_particle_hadronic_100.0_lar_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Muon induced neutron production processes for different hadronic physics lists at 100 GeV in liquid argon.
+```
+
+Figure: Muon induced neutron production processes for different hadronic physics
+lists at 100 GeV in liquid argon.
 
 :::{note}
 
@@ -254,24 +320,120 @@ correction has already been applied in the results shown here.
 
 :::
 
-The plots below show the process-wise neutron contribution in liquid argon at
-100 GeV and 280 GeV. The multiplicity of individual interactions is indicated by
-color. At both energies, photonuclear and neutron inelastic interactions are
-expected to contribute most of the total neutron yield, with neutron inelastic
-interactions becoming more important at higher energies. Their multiplicity per
-interaction is generally lower than for muon-, pion-, or proton-induced events.
+## Neutron production processes
 
-```{image} ./_img/cosmogenics/muon/neutron_production_processes_100.0_lar_Shielding_Livermore_30_9.869.output.png
+In addition to comparing hadronic physics lists, it is also interesting to look
+at the individual contribution of the different incoming particles for different
+material. The following plots show the individual contributions for the
+Shielding physics list for liquid argon (first) and water (second) at 100 GeV,
+as well as for liquid argon at 280 GeV (third).
+
+Compared to liquid argon, in water, the neutron production is less dominantly
+driven by photonuclear interactions and neutron inelastic interactions, and is
+more evenly distributed. Conversely, at higher energies, in liquid argon, the
+contributions from neutron inelastic interactions and photonuclear interactions
+become even more dominant.
+
+```{image} ./_img/cosmogenics/muon/neutron_production_particle_100.0_lar_Shielding_Livermore_30_9.869.output.png
 :height: 300px
 :alt: Muon induced neutron production processes in liquid argon at 100 GeV.
 ```
 
-```{image} ./_img/cosmogenics/muon/neutron_production_processes_280.0_lar_Shielding_Livermore_30_9.869.output.png
+Figure: Muon induced neutron production processes in liquid argon at 100 GeV.
+
+```{image} ./_img/cosmogenics/muon/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Muon induced neutron production processes in water at 100 GeV.
+```
+
+Figure: Muon induced neutron production processes in water at 100 GeV.
+
+```{image} ./_img/cosmogenics/muon/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png
 :height: 300px
 :alt: Muon induced neutron production processes in liquid argon at 280 GeV.
 ```
 
-## Muon shower dimensions
+Figure: Muon induced neutron production processes in liquid argon at 280 GeV.
+
+## 3.) Isotope production
+
+While the production of $^{77}$Ge in LEGEND is driven by neutron capture on
+$^{76}$Ge and thus depends on the neutron yield, it is also important to
+understand the production of other isotopes via spallation processes. To this
+end, using the simulations performed in 2.), the production yield per muon was
+calculated for all isotopes produced in the showers in liquid argon and enriched
+germanium at 100 GeV. The following plots show heatmaps of the isotope
+production yield for the two materials in remage and FLUKA, as well as a
+relative comparison between the two. Isotopes identified as potential background
+sources in LEGEND are highlighted in the plots and their production yields
+separately plotted below. In general, the isotope production yields should be
+consistent between remage and FLUKA up to a factor of 2x for the isotopes of
+interest, i.e., the potential background isotopes. In general, the remage
+estimates show slight overproduction compared to FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_remage_lar_100.0_Shielding_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Muon induced isotope production in liquid argon at 100 GeV in remage.
+```
+
+Figure: Muon induced isotope production in liquid argon at 100 GeV in remage.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_fluka_lar_100.0_Shielding_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Muon induced isotope production in liquid argon at 100 GeV in FLUKA.
+```
+
+Figure: Muon induced isotope production in liquid argon at 100 GeV in FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_diff_lar_100.0_Shielding_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Relative isotope production in liquid argon at 100 GeV in remage / FLUKA.
+```
+
+Figure: Relative isotope production in liquid argon at 100 GeV in remage /
+FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_comp_lar_100.0_Shielding_Livermore_30_9.869.output.png
+:height: 300px
+:alt: Comparison for relevant isotopes in liquid argon at 100 GeV in remage and FLUKA.
+```
+
+Figure: Comparison for relevant isotopes in liquid argon at 100 GeV in remage
+and FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_remage_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+:height: 300px
+:alt: Muon induced isotope production in enriched germanium at 100 GeV in remage.
+```
+
+Figure: Muon induced isotope production in enriched germanium at 100 GeV in
+remage.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_fluka_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+:height: 300px
+:alt: Muon induced isotope production in enriched germanium at 100 GeV in FLUKA.
+```
+
+Figure: Muon induced isotope production in enriched germanium at 100 GeV in
+FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_diff_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+:height: 300px
+:alt: Relative isotope production in enriched germanium at 100 GeV in remage / FLUKA.
+```
+
+Figure: Relative isotope production in enriched germanium at 100 GeV in remage /
+FLUKA.
+
+```{image} ./_img/cosmogenics/muon/isotope_production_comp_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+:height: 300px
+:alt: Comparison for relevant isotopes in enriched germanium at 100 GeV in remage and FLUKA.
+```
+
+Figure: Comparison for relevant isotopes in enriched germanium at 100 GeV in
+remage and FLUKA.
+
+## 4.) Muon shower dimensions
 
 To compare muon shower physics across materials, it is useful to study the
 development of the shower profile as a function of penetration depth.
@@ -319,32 +481,27 @@ water, 30 cm in liquid argon, and 20 cm in rock.
 :alt: Muon shower profile in liquid argon at 100 GeV.
 ```
 
+Figure: Muon shower profile in liquid argon at 100 GeV.
+
 ```{image} ./_img/cosmogenics/muon/shower_dimensions_100.0_rock_Shielding_Livermore_30_8.045.output.png
 :height: 300px
 :alt: Muon shower profile in rock at 100 GeV.
 ```
+
+Figure: Muon shower profile in rock at 100 GeV.
 
 ```{image} ./_img/cosmogenics/muon/shower_dimensions_100.0_water_Shielding_Livermore_30_8.045.output.png
 :height: 300px
 :alt: Muon shower profile in water at 100 GeV.
 ```
 
+Figure: Muon shower profile in water at 100 GeV.
+
 :::{note}
 
 The burn-in depth also depends on energy. Considering the wide muon energy range
 up to several TeV, it is recommended to use burn-in depths of up to ~3 m in
 rock. More thorough estimates should be added here in the future.
-
-:::
-
-## Isotope production
-
-:::{note}
-
-This part is still in development. Ideally, these results, especially isotopes
-produced via spallation, should be compared to FLUKA. Isotopes produced via
-neutron capture need additional treatment as laid out in the neutron physics
-validation section.
 
 :::
 
@@ -374,11 +531,6 @@ validation section.
     N. Yu. Agafonova and A. S. Malgin, Universal formula for the muon-induced
     neutron yield, Phys. Rev. D 87, 113013 – Published 27 June, 2013,
     [10.1103/physrevd.87.113013](https://doi.org/10.1103/physrevd.87.113013).
-
-[^Malgin]:
-    A. S. Malgin, Phenomenological analysis of the muon-induced neutron yield,
-    Phys. Rev. D 88, 073003 – Published 11 October, 2013,
-    [10.1103/physrevd.88.073003](https://doi.org/10.1103/physrevd.88.073003).
 
 [^SK]:
     Super-Kamiokande Collaboration, Measurement of the cosmogenic neutron yield

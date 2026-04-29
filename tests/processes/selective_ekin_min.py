@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import lh5
 import numpy as np
 import pyg4ometry as pg
 import pytest
 import scipy as sp
-from lgdo import lh5
 from remage import remage_run
 
 
@@ -36,7 +36,6 @@ def _write_macro(
     writer.addDetector(reg)
     writer.write(str(gdml_path))
 
-    macro_path = tmp_path / f"macro_{particle}_{cut}.mac"
     macro_content = f"""
 /RMG/Manager/Logging/LogLevel detail
 /RMG/Geometry/SetEkinMinForParticle {cut} MeV lar {selective_particle}
@@ -62,8 +61,7 @@ def _write_macro(
 
 /run/beamOn 1
 """
-    macro_path.write_text(macro_content)
-    return gdml_path, macro_path
+    return gdml_path, macro_content
 
 
 def _read_steps(output_lh5):
@@ -82,11 +80,11 @@ def test_selective_ekin_min_electrons(tmp_path, cut):
     For cut=0.6, a 1 MeV electron starts above threshold and should continue until it drops
     below the cut.
     """
-    gdml_path, macro_path = _write_macro(tmp_path, cut=cut, particle="e-")
+    gdml_path, macro_content = _write_macro(tmp_path, cut=cut, particle="e-")
 
     output_lh5 = tmp_path / "output_electron.lh5"
     remage_run(
-        str(macro_path),
+        macro_content.split("\n"),
         gdml_files=str(gdml_path),
         output=str(output_lh5),
         flat_output=True,
@@ -145,13 +143,13 @@ def test_selective_ekin_min_unregistered_particles_are_ignored(tmp_path, particl
     if particle in ["alpha", "proton"]:
         energy = 100.0
         cut = 200.0
-    gdml_path, macro_path = _write_macro(
+    gdml_path, macro_content = _write_macro(
         tmp_path, cut=cut, particle=particle, energy=energy
     )
 
     output_lh5 = tmp_path / f"output_{particle}.lh5"
     remage_run(
-        str(macro_path),
+        macro_content.split("\n"),
         gdml_files=str(gdml_path),
         output=str(output_lh5),
         flat_output=True,
