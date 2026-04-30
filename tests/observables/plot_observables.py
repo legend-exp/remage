@@ -6,8 +6,8 @@ from pathlib import Path
 
 import awkward as ak
 import hist
+import lh5
 import numpy as np
-from lgdo import lh5
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from scipy.stats import beta, norm, poisson

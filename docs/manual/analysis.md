@@ -84,7 +84,7 @@ def read_hits_as_events(
         # read the data!
         # NOTE: lh5.read() is smart enough to detect contiguous ranges. If not,
         # it will read min(idx):max(idx) and then slice
-        # https://legend-pydataobj.readthedocs.io/en/stable/api/lgdo.lh5.html#lgdo.lh5.core.read
+        # https://legend-lh5io.readthedocs.io/en/latest/api/lh5.io.html#lh5.io.core.read
         data = lh5.read(f"{table}/{field}", filename, idx=rows_in_table).view_as("ak")
 
         # concatenate data from this table to the event structure

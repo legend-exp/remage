@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import pint
 import pyg4ometry as pg4
 import pygeomoptics
 from _geometry import _add_dummy_sipm_surface
-from lgdo import lh5
 from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
 from scipy.optimize import curve_fit

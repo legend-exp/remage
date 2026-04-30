@@ -4,9 +4,9 @@ import os
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
-from lgdo import lh5
 from remage import remage_run
 
 macro = """

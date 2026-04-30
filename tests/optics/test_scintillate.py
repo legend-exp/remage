@@ -4,12 +4,12 @@ import os
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import pint
 import pyg4ometry as pg4
 import pygeomoptics
-from lgdo import lh5
 from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections import Counter
 
 import awkward as ak
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import plots_basics
-from lgdo import lh5
 
 
 # Due to the way the Trackoutput works this needs the pdg code of the isotope that is created after capture.

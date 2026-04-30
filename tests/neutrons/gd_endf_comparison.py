@@ -5,11 +5,11 @@ import zlib
 from pathlib import Path
 
 import awkward as ak
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import plots_basics
 from argon_endf_comparison import get_latest_g4ndl
-from lgdo import lh5
 from matplotlib.lines import Line2D
 
 # --- Load data ---

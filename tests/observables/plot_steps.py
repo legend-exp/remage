@@ -4,7 +4,7 @@ import sys
 
 import awkward as ak
 import hist
-from lgdo import lh5
+import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
 from reboost.shape.cluster import apply_cluster, cluster_by_step_length, step_lengths

@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 import copy
 
+import lh5
 import numpy as np
 import pyg4ometry as pg4
-from lgdo import lh5
 from matplotlib import pyplot as plt
 from scipy import stats
 

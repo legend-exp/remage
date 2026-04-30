@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from lgdo import lh5
+import lh5
 from remage.geombench.cli import generate_macro, remage_geombench_cli
 
 

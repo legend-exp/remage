@@ -6,8 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+import lh5
 import numpy as np
-from lgdo import Array, Table, lh5
+from lgdo import Array, Table
 
 rmg_from_lh5 = sys.argv[1]
 

@@ -8,10 +8,10 @@ from __future__ import annotations
 import sys
 
 import awkward as ak
+import lh5
 import numpy as np
 import pyg4ometry as pg4
 import pygeomhpges as hpges
-from lgdo import lh5
 from matplotlib import pyplot as plt
 from pygeomhpges import draw
 from pygeomtools import get_sensvol_metadata

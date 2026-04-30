@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 import awkward as ak
+import lh5
 import numpy as np
-from lgdo import lh5
 from remage import remage_run
 
 macro = sys.argv[1]

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import awkward as ak
+import lh5
 import matplotlib.pyplot as plt
 import pyg4ometry as pg4
 import pygeomoptics
 from _geometry import _add_dummy_sipm_surface
-from lgdo import lh5
 from pygeomtools.materials import LegendMaterialRegistry
 from remage import remage_run
 

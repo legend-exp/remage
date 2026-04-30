@@ -3,8 +3,8 @@ from __future__ import annotations
 import awkward as ak
 import boost_histogram as bh
 import hist
+import lh5
 import matplotlib.pyplot as plt
-from lgdo import lh5
 
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12

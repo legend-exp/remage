@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from lgdo import lh5
+import lh5
 
 output_files = [
     ("gdml", "det-from-gdml.lh5"),
