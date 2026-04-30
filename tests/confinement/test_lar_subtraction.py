@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+import lh5
 import numpy as np
-from lgdo import lh5
 from matplotlib import pyplot as plt
 
 plt.rcParams["lines.linewidth"] = 1

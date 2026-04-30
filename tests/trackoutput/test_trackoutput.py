@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import lh5
 import numpy as np
-from lgdo import lh5
 
 # First check the store always option
 track_data_store = lh5.read_as("tracks", "track-store-true.lh5", "ak")

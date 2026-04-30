@@ -20,9 +20,9 @@ class DummyLH5:
 @pytest.fixture(autouse=True)
 def patch_lh5(monkeypatch):
     # Monkey-patch lh5.ls
-    import lgdo
+    import lh5
 
-    monkeypatch.setattr(lgdo.lh5, "ls", DummyLH5.ls)
+    monkeypatch.setattr(lh5, "ls", DummyLH5.ls)
 
 
 def test_get_reboost_config():

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from lgdo import lh5
+import lh5
 from remage import remage_run
 
 macro = "macros/th228-chain.mac"

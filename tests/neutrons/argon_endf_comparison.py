@@ -5,10 +5,10 @@ import re
 import zlib
 from pathlib import Path
 
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import plots_basics
-from lgdo import lh5
 
 
 def get_latest_g4ndl(path):

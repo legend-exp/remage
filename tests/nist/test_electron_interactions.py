@@ -4,11 +4,11 @@ from pathlib import Path
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
-from lgdo import lh5
 
 # simulated energies in keV
 energies = np.geomspace(30, 50000, num=15).astype(int)  # in keV

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 
-from lgdo import lh5
+import lh5
 
 file = sys.argv[2]
 expected = int(sys.argv[1])
@@ -12,6 +12,6 @@ try:
     if n_ev.value != expected:
         msg = f"event count {n_ev.value} in file {file} does not match expectation {expected}"
         raise RuntimeError(msg)
-except lh5.exceptions.LH5DecodeError:
+except lh5.io.exceptions.LH5DecodeError:
     # not present (but already checked through the other parts of this test)
     pass

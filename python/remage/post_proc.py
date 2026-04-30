@@ -22,11 +22,12 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import h5py
+import lh5
 import numpy as np
 import pygama.evt
 import reboost
-from lgdo import Array, Scalar, Struct, lh5
-from lgdo.lh5.concat import lh5concat
+from lgdo import Array, Scalar, Struct
+from lh5.io.concat import lh5concat
 
 from . import utils
 from .ipc import IpcResult

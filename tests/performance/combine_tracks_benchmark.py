@@ -4,9 +4,9 @@ import time
 from pathlib import Path
 
 import awkward as ak
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
-from lgdo import lh5
 from remage import remage_run
 
 energies = np.array([500, 2000, 5000])  # in keV

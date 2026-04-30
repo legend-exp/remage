@@ -21,10 +21,10 @@ from pathlib import Path
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
-from lgdo import lh5
 from matplotlib.colors import LogNorm, Normalize
 
 

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import awkward as ak
 import hist
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
-from lgdo import lh5
 from numpy.linalg import norm
 
 

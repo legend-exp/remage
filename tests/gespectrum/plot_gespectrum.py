@@ -4,13 +4,13 @@ from datetime import datetime
 
 import awkward as ak
 import dbetto
+import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import reboost
 import reboost.hpge.surface
 import reboost.math.functions
 import reboost.math.stats
-from lgdo import lh5
 from pygeomhpges import make_hpge
 
 d1 = datetime.strptime("2013-11-01", "%Y-%m-%d")
