@@ -1,10 +1,26 @@
 Macro commands
-===============================
+==============
 
 ```{contents} Command table
-:class: this-will-duplicate-information-and-it-is-still-useful-here
 :local:
+:class: admonition this-will-duplicate-information-and-it-is-still-useful-here
 ```
+
+Also refer to the [documentation on the built-in Geant4 commands][geant-commands]
+which can also be used in _remage_ macro file.
+
+[geant-commands]: https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Control/commands.html
+
+:::{note}
+
+This documentation refers to "allowed states" for the commands. These refer to
+specific phases in the execution of the macro program/the simulation:
+
+- `PreInit`: before running `/run/initialize`
+- `Idle`: after running `/run/initialize`, but before starting the run
+- `GeomClosed`, `EventProc` and `Abort` are typically not so useful to users
+
+:::
 
 ## `/RMG/`
 
@@ -1551,6 +1567,7 @@ Commands for controlling output from hits in germanium detectors.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `StepPositionMode` – Select which position of the step to store
 
@@ -1638,6 +1655,18 @@ This is disabled by default
 Discard hits with zero energy.
 
 This is enabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreParticleVelocities`
+
+Store velocities of particle in the output file.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`

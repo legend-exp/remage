@@ -45,7 +45,7 @@ jobs:
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
-      - name: Run full test suite
+      - name: Run validation test suite
         run: |
           cd build
           ctest --label-regex val --label-exclude mt -j$(nproc) --output-on-failure
@@ -57,11 +57,17 @@ jobs:
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx-validation
 
+      - name: Disk space statistics
+        run: |
+          cd build/tests
+          du -sh *
+          df -h .
+
       - name: Upload validation report to GitHub
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: remage-validation-report-g4flavor-runner
+          name: remage-validation-report
           path: build/docs/validation/_build/
 
   deploy_validation_report:
@@ -77,7 +83,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
-          name: remage-validation-report-g4flavor-runner
+          name: remage-validation-report
           path: output/
 
       - name: Determine target directory

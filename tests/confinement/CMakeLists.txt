@@ -1,6 +1,11 @@
 include(ProcessorCount)
 ProcessorCount(NUM_CORES)
 
+# limit to 32 cores to have enough stats per core.
+if(NUM_CORES GREATER 32)
+  set(NUM_CORES 32)
+endif()
+
 # collect auxiliary files
 file(
   GLOB _aux

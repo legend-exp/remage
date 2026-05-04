@@ -111,6 +111,8 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->distance_to_surface_poststep = RMGOutputTools::distance_to_surface(pv, position_poststep);
   hit->distance_to_surface_average = RMGOutputTools::distance_to_surface(pv, position_average);
 
+  hit->velocity_pre = prestep->GetVelocity();
+  hit->velocity_post = poststep->GetVelocity();
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
 
