@@ -112,6 +112,7 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "error",
+  "ignore:lgdo\\.lh5:DeprecationWarning:pygama",
 ]
 log_cli_level = "INFO"
 testpaths = [
