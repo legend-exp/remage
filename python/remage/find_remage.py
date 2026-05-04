@@ -36,8 +36,8 @@ def find_remage_cpp() -> Path:
     path = _find_remage_from_config()
 
     if path is None:
-        path = shutil.which("remage-cpp")
-        path = (Path(path), "path") if path is not None else None
+        which_result = shutil.which("remage-cpp")
+        path = (Path(which_result), "path") if which_result is not None else None
 
     if path is None or not path[0].exists():
         missing = path[0] if path is not None else "None"

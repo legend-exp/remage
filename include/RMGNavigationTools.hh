@@ -19,12 +19,15 @@
 #include <regex>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
+#include "G4AffineTransform.hh"
 #include "G4LogicalVolume.hh"
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4VSolid.hh"
 
 // TODO: write function that locates points in global coordinates by using an
 // auxiliary G4Navigator. The G4Navigator instance must be unique and its
@@ -64,7 +67,7 @@ namespace RMGNavigationTools {
    * @param volume Pointer to the @c G4VPhysicalVolume whose direct mother is sought.
    * @return Pointer to the direct mother @c G4VPhysicalVolume.
    */
-  G4VPhysicalVolume* FindDirectMother(G4VPhysicalVolume* volume);
+  G4VPhysicalVolume* FindDirectMother(const G4VPhysicalVolume* volume);
   /**
    * @brief Finds all direct mother volumes of a given physical volume.
    *
@@ -75,7 +78,7 @@ namespace RMGNavigationTools {
    * @param volume Pointer to the @c G4VPhysicalVolume whose direct mothers are to be found.
    * @return A @c std::set of pointers to the direct mother @c G4VPhysicalVolume objects.
    */
-  std::set<G4VPhysicalVolume*> FindDirectMothers(G4VPhysicalVolume* volume);
+  std::set<G4VPhysicalVolume*> FindDirectMothers(const G4VPhysicalVolume* volume);
 
   /**
    * @brief Prints all logical volumes in the store.
@@ -95,9 +98,10 @@ namespace RMGNavigationTools {
   struct VolumeTreeEntry {
       VolumeTreeEntry() = delete;
       VolumeTreeEntry(const VolumeTreeEntry&) = default;
-      VolumeTreeEntry(G4VPhysicalVolume* pv) { physvol = pv; }
+      VolumeTreeEntry& operator=(const VolumeTreeEntry&) = default;
+      VolumeTreeEntry(const G4VPhysicalVolume* pv) { physvol = pv; }
 
-      G4VPhysicalVolume* physvol;
+      const G4VPhysicalVolume* physvol;
 
       G4ThreeVector vol_global_translation; // origin
       G4RotationMatrix vol_global_rotation; // identity
@@ -109,7 +113,37 @@ namespace RMGNavigationTools {
    * @brief find all ways to reach the world volume from a given physical volume.
    * @param pv the physical volume to start with.
    */
-  std::vector<VolumeTreeEntry> FindGlobalPositions(G4VPhysicalVolume* pv);
+  std::vector<VolumeTreeEntry> FindGlobalPositions(const G4VPhysicalVolume* pv);
+
+  /**
+   * @brief find the only way to reach the world volume from a given physical volume, or error.
+   * @param pv the physical volume to start with.
+   */
+  VolumeTreeEntry FindGlobalPosition(const G4VPhysicalVolume* pv);
+
+  /** @brief Cache structure for volume geometry data */
+  struct VolumeCacheEntry {
+      G4AffineTransform inverse_transform;
+      const G4VSolid* solid{};
+      size_t num_daughters{};
+      std::vector<G4AffineTransform> daughter_transforms;
+      std::vector<const G4VSolid*> daughter_solids;
+  };
+
+  /// \cond this triggers a sphinx error
+  // Cache for volume data, keyed by physical volume pointer
+  extern G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry> volume_cache;
+  /// \endcond
+
+  /** @brief Add a physical volume to the cache for distance to surface calculations.
+   *
+   * @details This computes the inverse transform and daughter volume information for the physical
+   * volume and stores it in the cache. If the volume is already in the cache, it returns an
+   * iterator to the existing entry. Otherwise, it adds a new entry and returns an iterator to it.
+   */
+  std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry>::iterator GetVolumeCacheEntry(
+      const G4VPhysicalVolume* pv
+  );
 
 } // namespace RMGNavigationTools
 

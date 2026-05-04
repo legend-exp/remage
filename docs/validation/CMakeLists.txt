@@ -31,6 +31,7 @@ endforeach()
 
 # now we want to add also images from the test suite. need to make an
 # (explicit) list of images to pick from the test suite
+# note: the tests producing these files must be labeled "val"!
 # TODO: add new images here
 # cmake-format: off
 set(TESTS_IMAGES
@@ -83,10 +84,46 @@ set(TESTS_IMAGES
     distances/distance-ge-poststep.output.png
     distances/distance-ge-prestep.output.png
     distances/distance-ge-average.output.png
-    observables/vis-observables-ge-gdml.output.jpeg
+    gespectrum/hades-spectrum.output.png
+    gespectrum/hades-spectrum-full.output.png
+    gespectrum/hades-spectrum-linear.output.png
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
+    nist/e-range-ar-distributions.output.png
+    nist/e-range-ar-vs-estar.output.png
+    nist/e-stopping-power-ar-vs-estar.output.png
+    nist/e-range-cu-distributions.output.png
+    nist/e-range-cu-vs-estar.output.png
+    nist/e-stopping-power-cu-vs-estar.output.png
+    neutrons/neutron_argon_summary.output.png
+    neutrons/neutron_argon36_comparison.output.png
+    neutrons/neutron_argon38_comparison.output.png
+    neutrons/neutron_argon40_comparison.output.png
+    neutrons/neutron_jeff_vs_g4ndl.output.png
+    neutrons/neutron_capture_Ar_40.output.png
+    neutrons/neutron_capture_Cr_50.output.png
+    neutrons/neutron_capture_Cr_52.output.png
+    neutrons/neutron_capture_Cr_53.output.png
+    neutrons/neutron_capture_Fe_54.output.png
+    neutrons/neutron_capture_Fe_56.output.png
+    neutrons/neutron_capture_Fe_57.output.png
+    neutrons/neutron_capture_Gd_155.output.png
+    neutrons/neutron_capture_Gd_157.output.png
+    neutrons/neutron_capture_H_1.output.png
+    neutrons/neutron_capture_Ni_58.output.png
+    neutrons/neutron_capture_Ni_60.output.png
+    neutrons/neutron_capture_Ni_62.output.png
+    neutrons/neutron_complex_geometry.output.png
+    neutrons/neutron_gd_cross_section.output.png
+    neutrons/neutron_gd_G4NDL.output.png
+    neutrons/neutron_pie_chart_general.output.png
+    neutrons/neutron_pie_chart_normal.output.png
+    neutrons/neutron_pie_chart_rmgncapture.output.png
+    neutrons/neutron_pie_chart_steel.output.png
+    neutrons/neutron_spectrum_gd_shielding.output.png
+    neutrons/neutron_spectrum_steel_shielding.output.png
+    observables/vis-observables-ge-gdml.output.jpeg
     observables/tracks-bulk-10um-limit.tracks.out0.png
     observables/tracks-bulk-10um-limit.tracks.out1.png
     observables/tracks-bulk-10um-limit.tracks.out2.png
@@ -115,9 +152,30 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-active-energy.spec.output.png
     observables/beta-observables.surf-max-z.eff.output.png
     observables/beta-observables.surf-max-z.spec.output.png
+    optics/photon-detection.output.png
+    optics/photon-wls.output.png
+    optics/photon-wls-times-delta.output.png
+    optics/photon-wls-times-exponential.output.png
+    optics/photon-wls-photon-count.output.png
+    optics/photon-attenuation-30.output.png
+    optics/photon-attenuation-60.output.png
+    optics/scintillation-alpha.output.png
+    optics/scintillation-ion.output.png
+    optics/scintillation-e-.output.png
+    optics/scintillation-yield.output.png
+    optics/cerenkov-e-.output.png
+    optics/cerenkov-yield.output.png
+    gammacorr/gamma-angular-distribution-27-60.output.png
+    gammacorr/gamma-angular-distribution-81-208.output.png
     processes/innerbrem-gamma-vertex-energy.output.png
     processes/innerbrem-signal.output.png
-    processes/innerbrem-difference.output.png)
+    processes/innerbrem-difference.output.png
+    processes/processes.default.output.txt
+    processes/processes.grabmayr.output.txt
+    processes/processes.hadr-shielding.output.txt
+    processes/processes.innerbrem.output.txt
+    processes/processes.optical.output.txt
+    performance/combine-tracks-benchmark.output.png)
 
 # cmake-format: on
 

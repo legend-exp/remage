@@ -57,7 +57,6 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
 
   RMGLog::OutDev(RMGLog::debug_event, "Processing germanium detector hits");
 
-  // return if no energy is deposited
   // ignore optical photons
   if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
@@ -112,6 +111,8 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   hit->distance_to_surface_poststep = RMGOutputTools::distance_to_surface(pv, position_poststep);
   hit->distance_to_surface_average = RMGOutputTools::distance_to_surface(pv, position_average);
 
+  hit->velocity_pre = prestep->GetVelocity();
+  hit->velocity_post = poststep->GetVelocity();
   // register the hit in the hit collection for the event
   fHitsCollection->insert(hit);
 

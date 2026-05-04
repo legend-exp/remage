@@ -1,0 +1,10 @@
+detector: B00000B
+daq_settings:
+  flashcam:
+    card_interface: efb1
+run: run0001
+measurement: th_HS2_top_psa
+source_position:
+  phi_in_deg: 0.0
+  r_in_mm: 0.0
+  z_in_mm: 41.0

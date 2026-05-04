@@ -3,12 +3,6 @@
 _remage_ is a modern simulation framework for low-background physics
 experiments.
 
-```{warning}
-We are working on a proper user guide ({doc}`manual/index`). In the meanwhile,
-users can have a look at the {doc}`tutorial` or the provided
-[examples](https://github.com/legend-exp/remage/tree/main/examples).
-```
-
 ## Quick start
 
 The installation process is documented in {doc}`manual/install`. In the simplest

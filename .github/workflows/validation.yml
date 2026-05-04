@@ -20,9 +20,12 @@ concurrency:
 jobs:
   run_validation:
     name: Run validation suite
-    runs-on: ubuntu-latest # self-hosted
+    runs-on: self-hosted # ubuntu-latest
 
     container: docker://legendexp/remage-base:stable
+
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v6
@@ -38,12 +41,65 @@ jobs:
 
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          cmake -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
-      - name: Run full test suite
+      - name: Run validation test suite
         run: |
           cd build
-          ctest --label-exclude mt -j$(nproc) --output-on-failure
-          ctest --label-regex mt -j1 --output-on-failure
+          ctest --label-regex val --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-regex val --label-regex mt -j1 --output-on-failure
+
+      - name: Build validation report
+        run: |
+          cd build
+          cmake -DRMG_BUILD_DOCS=ON ..
+          make sphinx-validation
+
+      - name: Disk space statistics
+        run: |
+          cd build/tests
+          du -sh *
+          df -h .
+
+      - name: Upload validation report to GitHub
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: remage-validation-report
+          path: build/docs/validation/_build/
+
+  deploy_validation_report:
+    name: Deploy validation report to legend-exp.github.io/remage/validation
+    if: github.event_name != 'pull_request'
+    needs: run_validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: remage-validation-report
+          path: output/
+
+      - name: Determine target directory
+        id: target
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "dir=$(echo '${{ github.event.release.tag_name }}')" >> $GITHUB_ENV
+          else
+            echo "dir=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: output
+          destination_dir: validation/${{ env.dir }}
+# vim: expandtab tabstop=2 shiftwidth=2

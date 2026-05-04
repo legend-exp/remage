@@ -16,6 +16,8 @@
 
 #include "RMGOpWLSProcess.hh"
 
+#include "G4OpWLS.hh"
+#include "G4OpWLS2.hh"
 #include "G4Threading.hh"
 #include "Randomize.hh"
 
@@ -68,6 +70,10 @@ G4VParticleChange* RMGOpWLSProcess::PostStepDoIt(const G4Track& aTrack, const G4
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 void RMGOpWLSProcess::BuildPhysicsTable(const G4ParticleDefinition& aParticleType) {
+
+  if (!dynamic_cast<G4OpWLS*>(pRegProcess) && !dynamic_cast<G4OpWLS2*>(pRegProcess)) {
+    RMGLog::OutDev(RMGLog::fatal, "RMGOpWLSProcess can only be used with OpWLS/OpWLS2");
+  }
 
   pRegProcess->BuildPhysicsTable(aParticleType);
 

@@ -26,21 +26,24 @@ point = sys.argv[2]
 
 # get the geometry
 reg = pg4.gdml.Reader(gdml).getRegistry()
-reg_tmp = pg4.geant4.Registry()
 detectors = list(reg.physicalVolumeDict.keys())
 
 detectors = [det for det in detectors if det[0] in ["V", "P", "B", "C"]]
 # Map uid to hpge
-det_map = {
-    det: {
+det_map = {}
+detector_origins = lh5.read("detector_origins/", outfile)
+for det in detectors:
+    det_idx = list(detector_origins["name"].nda).index(det.encode("utf-8"))
+
+    det_map[det] = {
         "uint": int(det[1:]),
-        "pos": reg.physicalVolumeDict[det].position.eval(),
+        "pos": [
+            detector_origins[loc][det_idx] * 1000 for loc in ("xloc", "yloc", "zloc")
+        ],
         "hpge": hpges.make_hpge(
-            get_sensvol_metadata(reg, det), name=det, registry=reg_tmp
+            get_sensvol_metadata(reg, det), name=det, registry=None
         ),
     }
-    for idx, det in enumerate(detectors)
-}
 
 steps = lh5.read_as("stp/germanium", outfile, "ak")
 # Transform the coordinates to the local detector frame

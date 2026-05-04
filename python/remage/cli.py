@@ -19,6 +19,7 @@ import argparse
 import contextlib
 import logging
 import os
+import random
 import shutil
 import signal
 import subprocess
@@ -26,6 +27,10 @@ import sys
 import threading
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pyg4ometry.geant4 as g4
 
 from . import logging as rmg_logging
 from . import utils
@@ -39,7 +44,7 @@ def _run_remage_cpp(
     args: Sequence[str] | None = None,
     is_cli: bool = False,
     num_procs: int | None = 0,
-) -> tuple[list[int], list[signal.Signals], IpcResult]:
+) -> tuple[list[int], list[signal.Signals | None], IpcResult]:
     """run the remage-cpp executable and return the exit code as seen in bash."""
     logger = logging.getLogger("remage")
 
@@ -52,9 +57,9 @@ def _run_remage_cpp(
 
     if args is None:
         argv = list(sys.argv)
-        exe_name = Path(argv[0]).name
+        exe_name: str | None = Path(argv[0]).name
     else:
-        argv = [remage_exe, *args]
+        argv = [str(remage_exe), *args]
         exe_name = Path(sys.argv[0]).name if is_cli else None
 
     if exe_name is not None and shutil.which(exe_name) == sys.argv[0]:
@@ -119,7 +124,7 @@ def _run_remage_cpp(
 
     # start a thread listening for IPC messages.
     # remage-cpp will only continue to do real work after we handled one sync message.
-    unhandled_ipc_messages = []
+    unhandled_ipc_messages: list = []
     ipc_thread = threading.Thread(
         target=ipc_thread_fn, args=(pipe_i_r, pipes_o, proc, unhandled_ipc_messages)
     )
@@ -186,10 +191,12 @@ def watchdog_thread_fn(proc: list[subprocess.Popen]) -> None:
         pass
 
 
-def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
+def _cleanup_tmp_files(
+    ipc_info: IpcResult, extra_tmp_files: Sequence[str | Path]
+) -> None:
     """Remove temporary files created by the C++ application, that might not have been cleaned up."""
     tmp_files = ipc_info.get("tmpfile")
-    for tmp_file in tmp_files:
+    for tmp_file in [*tmp_files, *extra_tmp_files]:
         p = Path(tmp_file)
         with contextlib.suppress(Exception):
             p.unlink(missing_ok=True)
@@ -198,7 +205,7 @@ def _cleanup_tmp_files(ipc_info: IpcResult) -> None:
 def remage_run(
     macros: Sequence[str] | str = (),
     *,
-    gdml_files: Sequence[str | Path] | str | Path = (),
+    gdml_files: Sequence[str | Path | g4.Registry] | str | Path | g4.Registry = (),
     output: str | Path | None = None,
     threads: int = 1,
     procs: int = 1,
@@ -258,11 +265,25 @@ def remage_run(
         post-processing will be run normally.
     """
     args = []
-    if not isinstance(gdml_files, str | Path):
+    extra_tmp_files = []
+
+    def _geom_to_file(geom_or_file: str | Path | g4.Registry) -> str:
+        # check for the type without actually importing.
+        if str(type(geom_or_file)) == "<class 'pyg4ometry.geant4.Registry.Registry'>":
+            from pygeomtools import write_pygeom
+
+            tmp_file = f".rmg-tmp-{random.randint(10000, 99999)}.geom.gdml"
+            write_pygeom(geom_or_file, tmp_file)
+            extra_tmp_files.append(tmp_file)
+            return tmp_file
+        return str(geom_or_file)
+
+    # hint: a string is also a sequence, so we need to exclude it here.
+    if isinstance(gdml_files, Sequence) and not isinstance(gdml_files, str):
         for gdml in gdml_files:
-            args.append(f"--gdml-files={gdml}")
+            args.append(f"--gdml-files={_geom_to_file(gdml)}")
     else:
-        args.append(f"--gdml-files={gdml_files}")
+        args.append(f"--gdml-files={_geom_to_file(gdml_files)}")
 
     if output is not None:
         args.append(f"--output-file={output!s}")
@@ -295,7 +316,10 @@ def remage_run(
     args.extend(["--", *utils.sanitize_macro_cmds(macros)])
 
     return remage_run_from_args(
-        args, raise_on_error=raise_on_error, raise_on_warning=raise_on_warning
+        args,
+        raise_on_error=raise_on_error,
+        raise_on_warning=raise_on_warning,
+        extra_tmp_files=extra_tmp_files,
     )
 
 
@@ -304,6 +328,7 @@ def remage_run_from_args(
     *,
     raise_on_error: bool = True,
     raise_on_warning: bool = False,
+    extra_tmp_files: Sequence[str | Path] = (),
 ) -> tuple[int, IpcResult]:
     """
     Run the remage simulation utility with the provided args.
@@ -363,14 +388,14 @@ def remage_run_from_args(
     )
     py_args, cpp_args = parser.parse_known_args(args)
 
-    ec, termsig, ipc_info = _run_remage_cpp(
+    ec_list, termsig, ipc_info = _run_remage_cpp(
         cpp_args, is_cli=args is None, num_procs=py_args.procs
     )
-    ec = 1 if 1 in ec else max(ec)
+    ec: int = 1 if 1 in ec_list else max(ec_list)
 
     # print an error message for the termination signal, similar to what bash does.
     for proc_num, t in enumerate(termsig):
-        if t not in (None, signal.SIGINT, signal.SIGPIPE):
+        if t is not None and t not in (signal.SIGINT, signal.SIGPIPE):
             logger.error(
                 "remage-cpp%s exited with signal %s (%s)",
                 f"[{proc_num}]" if len(termsig) > 1 else "",
@@ -379,7 +404,7 @@ def remage_run_from_args(
             )
 
     # clean-up should run always, irrespective of exit code.
-    _cleanup_tmp_files(ipc_info)
+    _cleanup_tmp_files(ipc_info, extra_tmp_files)
 
     if "-h" in cpp_args or "--help" in cpp_args:
         print("\n".join(parser.format_help().split("\n")[3:]))  # noqa: T201

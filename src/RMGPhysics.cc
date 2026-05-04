@@ -15,6 +15,9 @@
 
 #include "RMGPhysics.hh"
 
+#include <fstream>
+#include <iostream>
+
 #include "G4BaryonConstructor.hh"
 #include "G4BosonConstructor.hh"
 #include "G4Cerenkov.hh"
@@ -191,9 +194,9 @@ void RMGPhysics::ConstructProcess() {
   // e+/e- nuclear interactions
   RMGLog::Out(RMGLog::detail, "Adding extra electromagnetic physics");
   auto em_extra_physics = new G4EmExtraPhysics(G4VModularPhysicsList::verboseLevel);
-  em_extra_physics->Synch(true);
-  em_extra_physics->GammaNuclear(true);
-  em_extra_physics->MuonNuclear(true);
+  em_extra_physics->Synch(true);        // _not_ default
+  em_extra_physics->GammaNuclear(true); // already default
+  em_extra_physics->MuonNuclear(true);  // already default
   em_extra_physics->ConstructProcess();
 
   // G4EmExtraPhysics does not propagate the verbose level...
@@ -214,13 +217,15 @@ void RMGPhysics::ConstructProcess() {
   G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(1.0e+27 * u::ns);
 
   /*
-  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false );
-  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
-  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
-  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false );
+  // TODO: ?
+  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false ); // default
+  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true ); // _not_ default
+  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true ); // _not_ default
+  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false ); // default
+  // default, except for Shielding
   G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( false );
-  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false );
-  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false );
+  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false ); // default
+  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false ); // default
   */
 
   if (fHadronicPhysicsListOption != HadronicPhysicsListOption::kNone) {
@@ -362,9 +367,10 @@ void RMGPhysics::ConstructOptical() {
   RMGLog::Out(RMGLog::detail, "Adding optical physics");
 
   G4OpticalParameters* op_par = G4OpticalParameters::Instance();
-  op_par->SetScintTrackSecondariesFirst(true);
-  op_par->SetScintByParticleType(true);
-  op_par->SetBoundaryInvokeSD(true);
+  op_par->SetScintTrackSecondariesFirst(true); // default
+  op_par->SetScintByParticleType(true);        // not default
+  op_par->SetBoundaryInvokeSD(true);           // not default
+  op_par->SetWLSTimeProfile("exponential");    // not default
 
   // scintillation process
   auto scint_proc = new G4Scintillation("Scintillation");
@@ -381,6 +387,7 @@ void RMGPhysics::ConstructOptical() {
   absorption_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   boundary_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
   wls_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+  cerenkov_proc->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
 
   if (fUseOpticalCustomWLS) {
     auto wls_proc_wrapped = new RMGOpWLSProcess();
@@ -502,6 +509,52 @@ void RMGPhysics::SetHadronicPhysicsListOptionString(std::string option) {
   } catch (const std::bad_cast&) { return; }
 }
 
+void RMGPhysics::DumpProcessesForParticles(std::string file_name) {
+  std::ofstream out(file_name);
+  std::streambuf* coutbuf = std::cout.rdbuf();
+  std::cout.rdbuf(out.rdbuf());
+
+  const std::vector<std::string> types =
+      {"lepton", "gamma", "baryon", "nucleus", "anti_nucleus", "opticalphoton"};
+  for (const auto& type_to_show : types) {
+    GetParticleIterator()->reset();
+    while ((*GetParticleIterator())()) {
+      auto particle = GetParticleIterator()->value();
+      auto proc_manager = particle->GetProcessManager();
+      auto list = *proc_manager->GetProcessList();
+      auto type = particle->GetParticleType();
+      auto particle_name = particle->GetParticleName();
+      // skip some particle types to avoid verbose output.
+      if (type != type_to_show ||
+          (type == "baryon" && particle_name != "proton" && particle_name != "anti_proton" &&
+           particle_name != "neutron") ||
+          particle_name.find("hyper") != std::string::npos) {
+        continue;
+      }
+
+      std::vector<std::string> procs;
+      for (size_t i = 0; i < list.size(); i++) {
+        const auto& proc_name = list[static_cast<int>(i)]->GetProcessName();
+        if (proc_name != "Transportation" && proc_name != "UserSpecialCut" &&
+            proc_name != "StepLimiter")
+          procs.push_back(proc_name);
+      }
+      // skip particles that only have a basic set of processes.
+      if (procs.empty()) { continue; }
+
+      std::cout << particle->GetParticleName() << std::endl;
+      for (size_t counter = 0; counter < procs.size(); counter++) {
+        if (counter % 4 != 0) std::cout << ",";
+        std::cout << std::setw(19) << procs[counter];
+        if ((counter) % 4 == 3) std::cout << std::endl;
+      }
+      std::cout << std::endl;
+    }
+  }
+
+  std::cout.rdbuf(coutbuf);
+}
+
 void RMGPhysics::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
@@ -617,6 +670,10 @@ void RMGPhysics::DefineCommands() {
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareMethod("DumpProcessesForParticles", &RMGPhysics::DumpProcessesForParticles)
+      .SetGuidance("Dump registered processes for important particles")
+      .SetStates(G4State_Idle);
 }
 
 // vim: shiftwidth=2 tabstop=2 expandtab

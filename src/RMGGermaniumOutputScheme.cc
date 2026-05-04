@@ -99,15 +99,8 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       );
     }
     auto pv = *volumes.begin();
-    auto trees = RMGNavigationTools::FindGlobalPositions(pv);
-    if (trees.size() > 1) {
-      RMGLog::Out(
-          RMGLog::fatal,
-          "more than one way to reach world volume from detector ",
-          det.second.name
-      );
-    }
-    fDetectorOrigins.insert({det.second.name, trees[0].vol_global_translation});
+    auto tree = RMGNavigationTools::FindGlobalPosition(pv);
+    fDetectorOrigins.insert({det.second.name, tree.vol_global_translation});
 
     auto ntuple_name = this->GetNtupleName(det.second);
     auto ntuple_reg = registered_ntuples.find(ntuple_name);
@@ -154,6 +147,10 @@ void RMGGermaniumOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
       CreateNtupleFOrDColumn(ana_man, id, "yloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "zloc_post_in_m", fStoreSinglePrecisionPosition);
       CreateNtupleFOrDColumn(ana_man, id, "dist_to_surf_post_in_m", fStoreSinglePrecisionPosition);
+    }
+    if (fStoreVelocity) {
+      CreateNtupleFOrDColumn(ana_man, id, "v_pre_in_m\\ns", fStoreSinglePrecisionPosition);
+      CreateNtupleFOrDColumn(ana_man, id, "v_post_in_m\\ns", fStoreSinglePrecisionPosition);
     }
     ana_man->FinishNtuple(id);
   }
@@ -231,7 +228,7 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
 
   std::shared_ptr<RMGDetectorHitsCollection> _clustered_hits;
   if (fPreClusterHits) {
-    _clustered_hits = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, false);
+    _clustered_hits = RMGOutputTools::pre_cluster_hits(hit_coll, fPreClusterPars, true, fStoreVelocity);
     hit_coll = _clustered_hits.get(); // get an unmanaged ptr for use in this function
   }
 
@@ -353,6 +350,22 @@ void RMGGermaniumOutputScheme::StoreEvent(const G4Event* event) {
         FillNtupleFOrDColumn(ana_man, ntupleid, col_id++, distance / u::m, fStoreSinglePrecisionPosition);
       }
 
+      if (fStoreVelocity) {
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            hit->velocity_pre / u::m * u::ns,
+            fStoreSinglePrecisionPosition
+        );
+        FillNtupleFOrDColumn(
+            ana_man,
+            ntupleid,
+            col_id++,
+            hit->velocity_post / u::m * u::ns,
+            fStoreSinglePrecisionPosition
+        );
+      }
       // NOTE: must be called here for hit-oriented output
       ana_man->AddNtupleRow(ntupleid);
     }
@@ -423,12 +436,14 @@ void RMGGermaniumOutputScheme::DefineCommands() {
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutLow", "keV", &RMGGermaniumOutputScheme::SetEdepCutLow)
       .SetGuidance("Set a lower energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy \\leq threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
   fMessengers.back()
       ->DeclareMethodWithUnit("EdepCutHigh", "keV", &RMGGermaniumOutputScheme::SetEdepCutHigh)
       .SetGuidance("Set an upper energy cut that has to be met for this event to be stored.")
+      .SetGuidance("This removes events with {math}`energy > threshold`.")
       .SetParameterName("threshold", false)
       .SetStates(G4State_Idle);
 
@@ -483,6 +498,14 @@ void RMGGermaniumOutputScheme::DefineCommands() {
       .SetGuidance(
           std::string("This is ") + (fDiscardZeroEnergyHits ? "enabled" : "disabled") + " by default"
       )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fMessengers.back()
+      ->DeclareProperty("StoreParticleVelocities", fStoreVelocity)
+      .SetGuidance("Store velocities of particle in the output file.")
+      .SetGuidance(std::string("This is ") + (fStoreVelocity ? "enabled" : "disabled") + " by default")
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);

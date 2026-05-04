@@ -44,6 +44,7 @@ class RMGSteppingAction : public G4UserSteppingAction {
     RMGRunAction* fRunAction;
 
     bool fSkipTracking = false;
+    bool fKillSecondaries = false;
     double fDaughterKillLifetime = -1;
 
     std::unique_ptr<G4GenericMessenger> fMessenger;

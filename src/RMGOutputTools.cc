@@ -41,8 +41,9 @@ G4ThreeVector RMGOutputTools::get_position(RMGDetectorHit* hit, RMGOutputTools::
     position = hit->global_position_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     position = hit->global_position_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     position = hit->global_position_average;
   } else
@@ -64,8 +65,9 @@ double RMGOutputTools::get_distance(RMGDetectorHit* hit, RMGOutputTools::Positio
     distance = hit->distance_to_surface_poststep;
   } else if (mode == RMGOutputTools::PositionMode::kPreStep) {
     distance = hit->distance_to_surface_prestep;
-  } else if (mode == RMGOutputTools::PositionMode::kAverage or
-             mode == RMGOutputTools::PositionMode::kBoth) {
+  } else if (
+      mode == RMGOutputTools::PositionMode::kAverage or mode == RMGOutputTools::PositionMode::kBoth
+  ) {
 
     distance = hit->distance_to_surface_average;
   } else
@@ -222,80 +224,101 @@ void RMGOutputTools::redistribute_gamma_energy(
 
 
 std::map<int, std::vector<RMGDetectorHit*>> RMGOutputTools::combine_low_energy_tracks(
-    std::map<int, std::vector<RMGDetectorHit*>> hits_map,
-    RMGOutputTools::ClusterPars cluster_pars,
+    const std::map<int, std::vector<RMGDetectorHit*>>& hits_map,
+    const RMGOutputTools::ClusterPars& cluster_pars,
     bool has_distance_to_surface
 ) {
 
   RMGLog::Out(RMGLog::debug_event, "Merging low energy electron tracks ");
 
-
-  // for tracks below an energy threshold look for a close neighbour to merge it with
-  // only done for e-.
+  // output copy (this is the only intentional copy)
   std::map<int, std::vector<RMGDetectorHit*>> output_hits = hits_map;
 
-  for (const auto& [trackid, input_hits] : hits_map) {
+  // caches
+  std::unordered_map<int, double> track_energy;
+  track_energy.reserve(hits_map.size());
 
-    // only apply to e-
-    if (input_hits.front()->particle_type != G4Electron::ElectronDefinition()->GetPDGEncoding())
-      continue;
+  std::unordered_map<int, RMGDetectorHit*> front_hit;
+  front_hit.reserve(hits_map.size());
 
-    // compute energy of each track
-    double energy = 0;
-    for (auto hit : input_hits) { energy += hit->energy_deposition; }
+  std::vector<int> low_energy_tracks;
+  low_energy_tracks.reserve(hits_map.size());
 
-    // continue for high energy tracks
-    if (energy > cluster_pars.track_energy_threshold) continue;
+  // precompute energies + classify low-energy e-
+  for (const auto& [trackid, hits] : hits_map) {
+    double sum = 0.0;
+    for (const auto* h : hits) sum += h->energy_deposition;
 
-    // distance threshold to merge tracks
-    double threshold = (not has_distance_to_surface) or
-                               ((input_hits.front()->distance_to_surface_prestep) >
-                                cluster_pars.surface_thickness)
-                           ? cluster_pars.cluster_distance
-                           : cluster_pars.cluster_distance_surface;
+    track_energy.emplace(trackid, sum);
 
-    // now search for another track to merge it with
+    RMGDetectorHit* fh = hits.front();
+    front_hit.emplace(trackid, fh);
+
+    if (fh->particle_type == G4Electron::ElectronDefinition()->GetPDGEncoding() &&
+        sum <= cluster_pars.track_energy_threshold) {
+      low_energy_tracks.push_back(trackid);
+    }
+  }
+
+  // map out the mergings to do
+  std::unordered_map<int, int> track_to_merge; // low -> target
+  track_to_merge.reserve(low_energy_tracks.size());
+
+  for (int trackid : low_energy_tracks) {
+
+    const auto* input_front = front_hit.at(trackid);
+    const double this_energy = track_energy.at(trackid);
+
+    const double threshold = (!has_distance_to_surface || input_front->distance_to_surface_prestep >
+                                                              cluster_pars.surface_thickness)
+                                 ? cluster_pars.cluster_distance
+                                 : cluster_pars.cluster_distance_surface;
+
     int cluster_trackid = -1;
-    double cluster_energy = 0;
 
-    // loop over secondary tracks
-    for (const auto& [second_trackid, second_input_hits] : hits_map) {
+    for (const auto& [second_trackid, second_hits] : hits_map) {
       if (second_trackid == trackid) continue;
 
-      // only cluster into high energy tracks
-      energy = 0;
-      for (auto hit : second_input_hits) { energy += hit->energy_deposition; }
+      const double second_energy = track_energy.at(second_trackid);
 
+      // only merge into higher-energy tracks
+      if (second_energy <= this_energy) continue;
 
-      // compute distance between the first step of this track and that of the
-      // other track.
-      if (energy > cluster_energy && (input_hits.front()->global_position_prestep -
-                                      second_input_hits.front()->global_position_prestep)
-                                             .mag() < threshold) {
+      const auto* second_front = front_hit.at(second_trackid);
 
-        cluster_energy = energy;
+      const double distance = (input_front->global_position_prestep -
+                               second_front->global_position_prestep)
+                                  .mag();
+
+      // first match wins (chain merging handles transitivity)
+      // there might be some tracks missed if the order happens to be unlucky
+      // but has negligible impact overall
+      if (distance < threshold) {
         cluster_trackid = second_trackid;
+        break;
       }
     }
 
-    if (cluster_trackid != -1) {
-
-      // change all the track-ids
-      for (auto hit : output_hits[trackid]) { hit->track_id = cluster_trackid; }
-
-      // add these elements to the start of the second track
-      output_hits[cluster_trackid].insert(
-          output_hits[cluster_trackid].begin(),
-          output_hits[trackid].begin(),
-          output_hits[trackid].end()
-      );
-
-      output_hits.erase(trackid);
-      RMGLog::Out(RMGLog::debug_event, "Removing trackid ", trackid);
-    }
+    if (cluster_trackid != -1) track_to_merge.emplace(trackid, cluster_trackid);
   }
+
+  // apply merges
+  for (const auto& [low_id, target_id] : track_to_merge) {
+
+    auto& low_hits = output_hits[low_id];
+    for (auto* h : low_hits) h->track_id = target_id;
+
+    auto& target_hits = output_hits[target_id];
+    target_hits.insert(target_hits.begin(), low_hits.begin(), low_hits.end());
+
+    output_hits.erase(low_id);
+
+    RMGLog::Out(RMGLog::debug_event, "Removing trackid ", low_id);
+  }
+
   return output_hits;
 }
+
 
 std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
     const RMGDetectorHitsCollection* hits,
@@ -399,30 +422,21 @@ std::shared_ptr<RMGDetectorHitsCollection> RMGOutputTools::pre_cluster_hits(
 
 double RMGOutputTools::distance_to_surface(const G4VPhysicalVolume* pv, const G4ThreeVector& position) {
 
-  // get logical volume and solid
-  auto pv_name = pv->GetName();
-  const auto lv = pv->GetLogicalVolume();
-  const auto sv = lv->GetSolid();
-
-  // get translation
-  G4AffineTransform tf(pv->GetRotation(), pv->GetTranslation());
-  tf.Invert();
+  // get solid and cached data.
+  const auto sv = pv->GetLogicalVolume()->GetSolid();
+  const auto cache_entry = (*RMGNavigationTools::GetVolumeCacheEntry(pv)).second;
 
   // Get distance to surface.
   // First transform coordinates into local system
-
-  double dist = sv->DistanceToOut(tf.TransformPoint(position));
+  double dist = sv->DistanceToOut(cache_entry.inverse_transform.TransformPoint(position));
 
   // Also check distance to daughters if there are any. Analogue to G4NormalNavigation.cc
-  auto local_no_daughters = lv->GetNoDaughters();
 
   // increase by one to keep positive in reverse loop.
-  for (auto sample_no = local_no_daughters; sample_no >= 1; sample_no--) {
-    const auto sample_physical = lv->GetDaughter(sample_no - 1);
-    G4AffineTransform sample_tf(sample_physical->GetRotation(), sample_physical->GetTranslation());
-    sample_tf.Invert();
-    const auto sample_point = sample_tf.TransformPoint(position);
-    const auto sample_solid = sample_physical->GetLogicalVolume()->GetSolid();
+  for (auto sample_no = cache_entry.num_daughters; sample_no >= 1; sample_no--) {
+    const auto sample_point = cache_entry.daughter_transforms[sample_no].TransformPoint(position);
+    const auto sample_solid = cache_entry.daughter_solids[sample_no];
+
     const double sample_dist = sample_solid->DistanceToIn(sample_point);
     if (sample_dist < dist) { dist = sample_dist; }
   }

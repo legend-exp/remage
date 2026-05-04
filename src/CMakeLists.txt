@@ -33,6 +33,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGOpticalOutputScheme.hh
     ${_root}/include/RMGOpWLSProcess.hh
     ${_root}/include/RMGParticleFilterScheme.hh
+    ${_root}/include/RMGPrimaryTransformer.hh
     ${_root}/include/RMGOutputManager.hh
     ${_root}/include/RMGOutputTools.hh
     ${_root}/include/RMGPhysics.hh
@@ -53,6 +54,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGVGenerator.hh
     ${_root}/include/RMGVOutputScheme.hh
     ${_root}/include/RMGVVertexGenerator.hh
+    ${_root}/include/RMGVolumeDistanceStacker.hh
     ${_root}/include/RMGVertexOutputScheme.hh
     ${_root}/include/RMGWorkerInitialization.hh)
 
@@ -99,7 +101,8 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc
     ${_root}/src/RMGVertexFromPoint.cc
-    ${_root}/src/RMGVertexOutputScheme.cc)
+    ${_root}/src/RMGVertexOutputScheme.cc
+    ${_root}/src/RMGVolumeDistanceStacker.cc)
 
 # Write RMGConfig.hh
 # no need to install, it is included in the header list above
@@ -121,12 +124,6 @@ if(RMG_HAS_HDF5)
 endif()
 
 add_library(remage SHARED ${PROJECT_PUBLIC_HEADERS} ${PROJECT_SOURCES})
-
-if(RMG_BUILD_EXAMPLES)
-  # add an alias to support building examples both stand-alone as well as a part of the
-  # main project.
-  add_library(RMG::remage ALIAS remage)
-endif()
 
 # Ensure clients are aware of the minimum C++ standard we were compiled with
 target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})

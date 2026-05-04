@@ -24,6 +24,11 @@ cmap = plt.get_cmap("cividis")
 def plot_tracks(_data, idx, savename=None):
     _fig, ax = plt.subplots(figsize=(6, 6))
 
+    unit = "mm"
+    unit_fact = 1000
+    for name in ["xloc", "yloc", "zloc"]:
+        assert ak.parameters(_data[name])["units"] == "m"
+
     data = _data[_data.evtid == idx]
 
     data_tmp = ak.Array(
@@ -36,8 +41,8 @@ def plot_tracks(_data, idx, savename=None):
         label = "tracks" if _id == 0 else None
 
         ax.plot(
-            1000 * data_tmp[data_tmp.trackid == track].xloc - 1000 * x0,
-            1000 * data_tmp[data_tmp.trackid == track].zloc - 1000 * z0,
+            unit_fact * data_tmp[data_tmp.trackid == track].xloc - unit_fact * x0,
+            unit_fact * data_tmp[data_tmp.trackid == track].zloc - unit_fact * z0,
             alpha=1,
             linewidth=2,
             label=label,
@@ -45,16 +50,15 @@ def plot_tracks(_data, idx, savename=None):
         )
 
     ax.scatter(
-        1000 * data_tmp.xloc - 1000 * x0,
-        1000 * data_tmp.zloc - 1000 * z0,
+        unit_fact * data_tmp.xloc - unit_fact * x0,
+        unit_fact * data_tmp.zloc - unit_fact * z0,
         s=20,
         label="steps",
         color="tab:red",
     )
 
-    prefix = "m"
-    ax.set_xlabel(f"x - x0 [{prefix}m]")
-    ax.set_ylabel(f"z -z0 [{prefix}m]")
+    ax.set_xlabel(f"x - x0 [{unit}]")
+    ax.set_ylabel(f"z -z0 [{unit}]")
 
     ax.legend(fontsize=14)
 
@@ -79,8 +83,8 @@ def plot_hist2d(
 
     # Add colorbar
     plt.colorbar(h[3], ax=ax, label="Counts")
-    ax.set_xlabel("Distance to Surface [um]")
-    ax.set_ylabel("Step length [um]")
+    ax.set_xlabel("Distance to Surface [mm]")
+    ax.set_ylabel("Step length [mm]")
 
     if savename is not None:
         plt.savefig(savename)
@@ -101,7 +105,7 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
 
 path = sys.argv[1]
 name = sys.argv[2]
-shaped = lh5.read("stp/germanium", path).view_as("ak")
+shaped = lh5.read("stp/germanium", path).view_as("ak", with_units=True)
 
 plot_tracks(shaped, 0, f"{name}.tracks.out0.png")
 plot_tracks(shaped, 1, f"{name}.tracks.out1.png")
@@ -115,20 +119,22 @@ cluster_idx = cluster_by_step_length(
     shaped.zloc,
     shaped.dist_to_surf,
     surf_cut=0,
-    threshold=100,
-    threshold_surf=0,
-).view_as("ak")
-
-cluster_x = apply_cluster(cluster_idx, shaped.xloc).view_as("ak")
-cluster_y = apply_cluster(cluster_idx, shaped.yloc).view_as("ak")
-cluster_z = apply_cluster(cluster_idx, shaped.zloc).view_as("ak")
-
-cluster_dist_to_surf = apply_cluster(cluster_idx, shaped.dist_to_surf).view_as("ak")
-
-step_len = ak.flatten(
-    1e6 * ak.flatten(step_lengths(cluster_x, cluster_y, cluster_z).view_as("ak"))
+    threshold_in_mm=100,
+    threshold_surf_in_mm=0,
 )
 
+cluster_x = apply_cluster(cluster_idx, shaped.xloc)
+cluster_y = apply_cluster(cluster_idx, shaped.yloc)
+cluster_z = apply_cluster(cluster_idx, shaped.zloc)
+
+cluster_dist_to_surf = apply_cluster(cluster_idx, shaped.dist_to_surf)
+assert ak.parameters(cluster_dist_to_surf)["units"] == "m"
+
+step_len = step_lengths(cluster_x, cluster_y, cluster_z)
+assert ak.parameters(step_len)["units"] == "mm"
+step_len = ak.flatten(1e3 * ak.flatten(step_len))
+
+assert ak.parameters(shaped.dist_to_surf)["units"] == "m"
 distance_to_surface = 1e6 * shaped.dist_to_surf
 dist = 1e6 * ak.flatten(ak.flatten(cluster_dist_to_surf[:, :, :-1], axis=-2), axis=-1)
 

@@ -41,9 +41,9 @@ def post_proc(
     time_window_in_us: float,
 ) -> None:
     remage_files: list[str] = ipc_info.get("output")
-    main_output_file: str = ipc_info.get_single("output_main", None)
+    main_output_file: str | None = ipc_info.get_single("output_main")
     overwrite_output: bool = ipc_info.get_single("overwrite_output", "0") == "1"
-    det_tables_path: str = ipc_info.get_single("ntuple_output_directory", None)
+    det_tables_path: str | None = ipc_info.get_single("ntuple_output_directory")
 
     ipc_info.remove("output_main")
 
@@ -83,6 +83,7 @@ def post_proc(
     lh5_links_group_name: str = (
         det_tables_path + "/" + ipc_info.get("lh5_links_group_name")[0]
     )
+    lh5_event_number_name: str = "/" + ipc_info.get("lh5_event_number_name")[0]
 
     time_start = time.time()
 
@@ -128,6 +129,7 @@ def post_proc(
             # we do this here and not in reboost, as the links require special syntax
             # NOTE: using just the first original file since the links are always the same
             copy_links(original_files[0], output_files, lh5_links_group_name)
+            update_number_of_events(original_files, output_files, lh5_event_number_name)
 
         # add a time-coincidence map to the output file(s)
         msg = "Computing and storing the TCM as /tcm"
@@ -161,12 +163,16 @@ def post_proc(
                 lh5_files=original_files,
                 output=main_output_file,
                 overwrite=overwrite_output,
-                exclude_list=[f"{lh5_links_group_name}/*"],
+                exclude_list=[
+                    f"{lh5_links_group_name}/*",
+                    f"{lh5_event_number_name}/*",
+                ],
             )
             # also copy __by_uid__ group to the output files
             # we do this here and not in reboost, as lh5concat does not copy links correctly.
             # NOTE: using just the first original file since the links are always the same
             copy_links(original_files[0], main_output_file, lh5_links_group_name)
+            update_number_of_events(original_files, output_files, lh5_event_number_name)
 
         ipc_info.set("output", main_output_file)
 
@@ -208,6 +214,35 @@ def copy_links(
                         del links_group[link_name]
 
 
+def update_number_of_events(
+    original_files: list[str], output_files: str | list[str], lh5_event_number_name: str
+) -> None:
+    output_files = utils._to_list(output_files)
+    original_files = utils._to_list(original_files)
+
+    # we can either handle the case of one single output file, or the same number of input/output files.
+    if len(output_files) != len(original_files):
+        assert len(output_files) == 1
+        output_files = output_files * len(original_files)
+    assert len(output_files) == len(original_files)
+
+    if lh5.ls(original_files[0], lh5_event_number_name) == []:
+        return
+
+    # add up the number of events from the input files.
+    output_n_ev = {}
+    for f_in, f_out in zip(original_files, output_files, strict=True):
+        n_ev = lh5.read(lh5_event_number_name, f_in).value
+        assert isinstance(n_ev, np.int64)
+
+        if f_out not in output_n_ev:
+            output_n_ev[f_out] = 0
+        output_n_ev[f_out] += n_ev
+
+    for file, total_n_ev in output_n_ev.items():
+        lh5.write(Scalar(total_n_ev), lh5_event_number_name, file, wo_mode="overwrite")
+
+
 def deduplicate_table(
     file: str, table_name: str, unique_col: str, to_struct: bool
 ) -> None:
@@ -224,11 +259,14 @@ def deduplicate_table(
         keys = list(set(table.keys()) - {unique_col})
         d = {}
         for idx in range(table.size):
-            obj = (
-                Struct({col: Scalar(table[col].nda[idx]) for col in keys})
-                if len(keys) > 1
-                else Scalar(table[keys[0]].nda[idx])
-            )
+            scalars = {}
+            for col in keys:
+                attrs = {}
+                if "units" in table[col].attrs:
+                    attrs = {"units": table[col].attrs["units"]}
+                scalars[col] = Scalar(table[col].nda[idx], attrs=attrs)
+
+            obj = Struct(scalars) if len(keys) > 1 else scalars[keys[0]]
             d[table[unique_col].nda[idx].decode("utf-8")] = obj
 
         lh5.write(Struct(d), table_name, file, wo_mode="overwrite")
@@ -258,7 +296,7 @@ def get_reboost_config(
     -------
     config file as a dictionary.
     """
-    config = {}
+    config: dict = {}
 
     # get the config for tables to be reshaped
     config["processing_groups"] = [

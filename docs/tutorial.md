@@ -25,7 +25,7 @@ declaring a geometry registry and specifying the dimensions and types of the two
 detectors as dictionaries:
 
 ```python
-import legendhpges as hpges
+import pygeomhpges as hpges
 import pyg4ometry as pg4
 from numpy import pi
 import pygeomtools
@@ -100,15 +100,11 @@ coax_pv = pg4.geant4.PhysicalVolume(
 
 # register them as sensitive in remage
 # this also saves the metadata into the files for later use
-bege_pv.pygeom_active_detector = pygeomtools.RemageDetectorInfo(
-    "germanium",
-    1,
-    bege_meta,
+bege_pv.set_pygeom_active_detector(
+    pygeomtools.RemageDetectorInfo("germanium", 1, bege_meta)
 )
-coax_pv.pygeom_active_detector = pygeomtools.RemageDetectorInfo(
-    "germanium",
-    2,
-    coax_meta,
+coax_pv.set_pygeom_active_detector(
+    pygeomtools.RemageDetectorInfo("germanium", 2, coax_meta)
 )
 
 # finally create a small radioactive source
@@ -126,14 +122,11 @@ Now we can quickly visualize the result, still with _pyg4ometry_:
 
 ```python
 # start an interactive VTK viewer instance
-viewer = pg4.visualisation.VtkViewerColoured(
-    materialVisOptions={"G4_lAr": [0, 0, 1, 0.1]}
-)
-viewer.addLogicalVolume(reg.getWorldVolume())
-viewer.view()
+lar_l.pygeom_color_rgba = (0, 0, 1, 0.1)
+pygeomtools.viewer.visualize(reg)
 ```
 
-![Geometry visualization](_img/tutorial-pyg4-view.jpg)
+![Geometry visualization](_img/tutorial-pyg4-view.png)
 
 We can also easily save the geometry as a geometry description markup language
 (GDML) file. This format allows us to input the geometry to `remage`.
@@ -262,13 +255,12 @@ and look at the result!
 $ remage --interactive --gdml-files geometry.gdml -- vis-gammas.mac
   _ __ ___ _ __ ___   __ _  __ _  ___
  | '__/ _ \ '_ ` _ \ / _` |/ _` |/ _ \
- | | |  __/ | | | | | (_| | (_| |  __/
- |_|  \___|_| |_| |_|\__,_|\__, |\___| v0.3.0
+ | | |  __/ | | | | | (_| | (_| |  __/ v0.19.5
+ |_|  \___|_| |_| |_|\__,_|\__, |\___| using geant4-11-03-patch-02 [MT]
                            |___/
 
-[Summary -> Realm set to DoubleBetaDecay
-[Summary -> CLHEP::HepRandom seed set to: 647993209
-[Summary -> Loading macro file: vis-gammas.mac
+[Summary -> CLHEP::HepRandom seed changed to: 1366165609 (from system entropy)
+[Summary -> Entering interactive mode
 ...
 ```
 
@@ -285,27 +277,23 @@ Interactions in HPGes and in LAr are marked in red and blue, respectively.
 
 :::{tip}
 
-With Apptainer, additional tweaks are required in order to allow for graphics to
-be displayed, e.g.
+- With Apptainer, additional tweaks are required in order to allow for graphics
+  to be displayed, e.g.
 
-```console
-$ apptainer run \
-    --env DISPLAY=$DISPLAY \
-    --env XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
-    --env XAUTHORITY=$XAUTHORITY \
-    -B $XDG_RUNTIME_DIR \
-    path/to/remage_latest.sif --interactive [...]
-```
+  ```console
+  $ apptainer run \
+      --env DISPLAY=$DISPLAY \
+      --env XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
+      --env XAUTHORITY=$XAUTHORITY \
+      -B $XDG_RUNTIME_DIR \
+      path/to/remage_latest.sif --interactive [...]
+  ```
 
-and similarly with Docker.
+  and similarly with Docker.
 
-:::
-
-:::{tip}
-
-If `remage` from the Apptainer image refuses to run simulations, this might be
-due to some of your environment variables from outside the container. Give
-`--cleanenv` a try.
+- If `remage` from the Apptainer image refuses to run simulations, this might be
+  due to some of your environment variables from outside the container. Give
+  `--cleanenv` a try.
 
 :::
 
@@ -321,6 +309,8 @@ commands:
 /RMG/Geometry/RegisterDetector Germanium BEGe 001
 /RMG/Geometry/RegisterDetector Germanium Coax 002
 /RMG/Geometry/RegisterDetector Scintillator LAr 003
+
+/RMG/Output/NtupleUseVolumeName true
 
 /run/initialize
 
@@ -356,6 +346,15 @@ with the `lh5ls` utility:
 ```console
 $ lh5ls -d3 -a output.lh5
 /
+├── detector_origins · struct{BEGe,Coax}
+│   ├── BEGe · struct{xloc,yloc,zloc}
+│   │   ├── xloc · real
+│   │   ├── yloc · real
+│   │   └── zloc · real
+│   └── Coax · struct{xloc,yloc,zloc}
+│       ├── xloc · real
+│       ├── yloc · real
+│       └── zloc · real
 ├── stp · struct{BEGe,Coax,LAr}
 │   ├── BEGe · table{dist_to_surf,edep,evtid,particle,t0,time,xloc,yloc,zloc}
 │   │   ├── dist_to_surf · array<1>{array<1>{real}}
@@ -392,7 +391,11 @@ $ lh5ls -d3 -a output.lh5
 │       └── det003 -> /stp/LAr
 ├── tcm · table{row_in_table,table_key} ── {'hash_func': '(?<=stp/__by_uid__/det)\\d+', 'tables': "['stp/__by_uid__/det001', 'stp/__by_uid__/det002', 'stp/__by_uid__/det003']"}
 │   ├── row_in_table · array<1>{array<1>{real}}
+│   │   ├── cumulative_length · array<1>{real}
+│   │   └── flattened_data · array<1>{real}
 │   └── table_key · array<1>{array<1>{real}}
+│       ├── cumulative_length · array<1>{real}
+│       └── flattened_data · array<1>{real}
 └── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
     ├── evtid · array<1>{real}
     ├── n_part · array<1>{real}
@@ -401,6 +404,13 @@ $ lh5ls -d3 -a output.lh5
     ├── yloc · array<1>{real} ── {'units': 'm'}
     └── zloc · array<1>{real} ── {'units': 'm'}
 ```
+
+:::{note}
+
+The units on the `time/xloc/yloc/zloc` fields are present (nanoseconds and
+meter), but not shown by above output of the `lh5ls` tool.
+
+:::
 
 The step information is organized into data tables, one per sensitive detector.
 The table format is specified by the detector type (`Germanium` or
@@ -420,7 +430,7 @@ import glob
 import hist
 import matplotlib.pyplot as plt
 
-plt.rcParams["figure.figsize"] = (10, 3)
+plt.rcParams["figure.figsize"] = (9, 3)
 
 
 def plot_edep(detid):
@@ -441,14 +451,14 @@ plt.yscale("log")
 plt.legend()
 ```
 
-![plot](./_img/hpge-edep.jpg)
+![plot](./_img/hpge-edep.png)
 
 The expected spectrum, composed by full-energy peak at 1 MeV and Compton
 shoulder. We can also plot the interaction points:
 
 ```python
 def plot_hits(detid):
-    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")[:20_000]
+    data = lh5.read_as(f"stp/{detid}", "output.lh5", "ak")[:1_000]
     plt.scatter(
         ak.flatten(data.xloc), ak.flatten(data.yloc), marker="o", s=1, label=detid
     )
@@ -456,13 +466,13 @@ def plot_hits(detid):
 
 plot_hits("BEGe")
 plot_hits("Coax")
-plt.xlabel("[mm]")
-plt.ylabel("[mm]")
+plt.xlabel("[m]")
+plt.ylabel("[m]")
 plt.legend()
 plt.axis("equal")
 ```
 
-![plot](./_img/hpge-hits.jpg)
+![plot](./_img/hpge-hits.png)
 
 ## Advanced usage
 

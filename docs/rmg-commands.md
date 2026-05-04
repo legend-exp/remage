@@ -1,10 +1,26 @@
 Macro commands
-===============================
+==============
 
 ```{contents} Command table
-:class: this-will-duplicate-information-and-it-is-still-useful-here
 :local:
+:class: admonition this-will-duplicate-information-and-it-is-still-useful-here
 ```
+
+Also refer to the [documentation on the built-in Geant4 commands][geant-commands]
+which can also be used in _remage_ macro file.
+
+[geant-commands]: https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Control/commands.html
+
+:::{note}
+
+This documentation refers to "allowed states" for the commands. These refer to
+specific phases in the execution of the macro program/the simulation:
+
+- `PreInit`: before running `/run/initialize`
+- `Idle`: after running `/run/initialize`, but before starting the run
+- `GeomClosed`, `EventProc` and `Abort` are typically not so useful to users
+
+:::
 
 ## `/RMG/`
 
@@ -144,6 +160,7 @@ Commands for controlling physics processes
 * `StoreICLevelData` – Store e- internal conversion data
 * `UseGrabmayrsGammaCascades` – Use custom RMGNeutronCapture to apply Grabmayrs gamma cascades.
 * `EnableInnerBremsstrahlung` – Enable Inner Bremsstrahlung generation for beta decays
+* `DumpProcessesForParticles` – Dump registered processes for important particles
 
 ### `/RMG/Processes/DefaultProductionCut`
 
@@ -291,6 +308,15 @@ This is disabled by default
   * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
+### `/RMG/Processes/DumpProcessesForParticles`
+
+Dump registered processes for important particles
+
+* **Parameter** – `arg0`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `Idle`
+
 ## `/RMG/Processes/Stepping/`
 
 Commands for controlling physics processes
@@ -300,6 +326,7 @@ Commands for controlling physics processes
 
 * `DaughterNucleusMaxLifetime` – Determines which unstable daughter nuclei will be killed, if they are at rest, depending on their lifetime.
 * `SkipTracking` – Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
+* `KillSecondaries` – Kill all secondary particles (tracks with parent ID > 0) at their first step.
 * `ResetInitialDecayTime` – If the initial step is a radioactive decay, reset the global time of all its secondary tracks to 0.
 * `LargeGlobalTimeUncertaintyWarning` – Warn if the global times of tracks get too large to provide the requested time uncertainty.
 
@@ -327,6 +354,18 @@ Uses -1 ns  us by default
 ### `/RMG/Processes/Stepping/SkipTracking`
 
 Immediately discard tracks after primary particle generation. This feature is meant for debugging primary generation.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Processes/Stepping/KillSecondaries`
+
+Kill all secondary particles (tracks with parent ID > 0) at their first step.
 
 This is disabled by default
 
@@ -567,6 +606,8 @@ Commands for controlling primary confinement
 
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
+* `SampleWeightByMass` – If true (or omitted argument), weigh the different volumes by mass and not by volume
+* `SampleWeightByMassIsotope` – Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
 * `SamplingMode` – Select sampling mode for volume confinement
 * `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
@@ -589,6 +630,28 @@ This is disabled by default
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/SampleWeightByMass`
+
+If true (or omitted argument), weigh the different volumes by mass and not by volume
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/SampleWeightByMassIsotope`
+
+Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
+
+* **Parameter** – `Z`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Parameter** – `N`
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/Confinement/SamplingMode`
@@ -1016,6 +1079,7 @@ Commands for controlling the µ generator
 * `SkyPlaneHeight` – Height of the sky, if it has a planar shape
 * `MomentumMin` – Minimum momentum of the generated muon
 * `MomentumMax` – Maximum momentum of the generated muon
+* `SkyHSphereRadius` – Radius of the hemi-sphere, if it has a spherical shape.
 * `ThetaMin` – Minimum azimutal angle of the generated muon momentum
 * `ThetaMax` – Maximum azimutal angle of the generated muon momentum
 * `PhiMin` – Minimum zenith angle of the generated muon momentum
@@ -1093,6 +1157,21 @@ Maximum momentum of the generated muon
   * **Omittable** – `True`
   * **Default value** – `GeV/c`
   * **Candidates** – `eV/c keV/c MeV/c GeV/c TeV/c eV/c keV/c MeV/c GeV/c TeV/c`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/CosmicMuons/SkyHSphereRadius`
+
+Radius of the hemi-sphere, if it has a spherical shape.
+
+* **Range of parameters** – `l > 0`
+* **Parameter** – `l`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `m`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
 ### `/RMG/Generator/CosmicMuons/ThetaMin`
@@ -1487,12 +1566,15 @@ Commands for controlling output from hits in germanium detectors.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
+* `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
 * `StepPositionMode` – Select which position of the step to store
 
 ### `/RMG/Output/Germanium/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy \leq threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1507,6 +1589,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 ### `/RMG/Output/Germanium/EdepCutHigh`
 
 Set an upper energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy > threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1572,6 +1656,18 @@ This is disabled by default
 Discard hits with zero energy.
 
 This is enabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Germanium/StoreParticleVelocities`
+
+Store velocities of particle in the output file.
+
+This is disabled by default
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`
@@ -1764,7 +1860,7 @@ Commands for controlling output of primary vertices.
 **Commands:**
 
 * `StorePrimaryParticleInformation` – Store information on primary particle details (not only vertex data).
-* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data.
+* `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data (except the evtid column).
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 
@@ -1782,7 +1878,7 @@ This is disabled by default
 
 ### `/RMG/Output/Vertex/SkipPrimaryVertexOutput`
 
-Do not store vertex/primary particle data.
+Do not store vertex/primary particle data (except the evtid column).
 
 This is disabled by default
 
@@ -1829,7 +1925,7 @@ Commands for controlling output from hits in scintillator detectors.
 
 * `EdepCutLow` – Set a lower energy cut that has to be met for this event to be stored.
 * `EdepCutHigh` – Set an upper energy cut that has to be met for this event to be stored.
-* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold.
+* `AddDetectorForEdepThreshold` – Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 * `DiscardZeroEnergyHits` – Discard hits with zero energy.
 * `StoreParticleVelocities` – Store velocities of particle in the output file.
 * `StoreTrackID` – Store Track IDs for hits in the output file.
@@ -1840,6 +1936,8 @@ Commands for controlling output from hits in scintillator detectors.
 ### `/RMG/Output/Scintillator/EdepCutLow`
 
 Set a lower energy cut that has to be met for this event to be stored.
+
+This removes events with {math}`energy \leq threshold`.
 
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
@@ -1855,6 +1953,8 @@ Set a lower energy cut that has to be met for this event to be stored.
 
 Set an upper energy cut that has to be met for this event to be stored.
 
+This removes events with {math}`energy > threshold`.
+
 * **Parameter** – `threshold`
   * **Parameter type** – `d`
   * **Omittable** – `False`
@@ -1867,7 +1967,7 @@ Set an upper energy cut that has to be met for this event to be stored.
 
 ### `/RMG/Output/Scintillator/AddDetectorForEdepThreshold`
 
-Take this detector into account for the filtering by /EdepThreshold.
+Take this detector into account for the filtering by /EdepThreshold. If this is not set all detectors are used.
 
 * **Parameter** – `det_uid`
   * **Parameter type** – `i`
@@ -2091,6 +2191,7 @@ Commands for controlling output of track vertices.
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
 * `StoreAlways` – Always store track data, even if event should be discarded.
+* `StoreOpticalPhotons` – Store optical photons in the track table.
 
 ### `/RMG/Output/Track/AddProcessFilter`
 
@@ -2146,6 +2247,22 @@ This is disabled by default
 ### `/RMG/Output/Track/StoreAlways`
 
 Always store track data, even if event should be discarded.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Track/StoreOpticalPhotons`
+
+Store optical photons in the track table.
+
+:::{note}
+this will typically increase the output file size significantly.
+:::
 
 This is disabled by default
 

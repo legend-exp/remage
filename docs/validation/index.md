@@ -17,8 +17,14 @@ bxdecay0
 confinement
 distances
 nist
+neutrons
 observables-ge
+processes
 processes-ib
+gammacorr
+optics
+performance
+gespectrum
 ```
 
 ```{toctree}

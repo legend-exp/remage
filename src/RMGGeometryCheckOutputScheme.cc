@@ -55,8 +55,9 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
     if (poststep == nullptr && prestep == hw->GetDefinedWorldVolume()) {
       // exit the world from inside the world volume.
       info->fVolumeStack.pop_back();
-    } else if (info->fVolumeStack.size() >= 2 &&
-               info->fVolumeStack[info->fVolumeStack.size() - 2] == poststep) {
+    } else if (
+        info->fVolumeStack.size() >= 2 && info->fVolumeStack[info->fVolumeStack.size() - 2] == poststep
+    ) {
       // exit again into a previous volume.
       info->fVolumeStack.pop_back();
     } else {

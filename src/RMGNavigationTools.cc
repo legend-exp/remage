@@ -29,6 +29,12 @@
 
 #include "RMGLog.hh"
 
+/// \cond this triggers a sphinx error or creates weird namespaces @<long number>
+namespace RMGNavigationTools {
+  G4ThreadLocal std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry> volume_cache;
+} // namespace RMGNavigationTools
+/// \endcond
+
 std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
     std::string name,
     std::string copy_nr
@@ -90,7 +96,7 @@ G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
   return *result;
 }
 
-G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volume) {
+G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(const G4VPhysicalVolume* volume) {
 
   auto ancestors = RMGNavigationTools::FindDirectMothers(volume);
 
@@ -105,7 +111,7 @@ G4VPhysicalVolume* RMGNavigationTools::FindDirectMother(G4VPhysicalVolume* volum
   return *ancestors.begin();
 }
 
-std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(G4VPhysicalVolume* volume) {
+std::set<G4VPhysicalVolume*> RMGNavigationTools::FindDirectMothers(const G4VPhysicalVolume* volume) {
 
   std::set<G4VPhysicalVolume*> ancestors;
   for (const auto& v : *G4PhysicalVolumeStore::GetInstance()) {
@@ -197,7 +203,7 @@ void RMGNavigationTools::PrintListOfPhysicalVolumes() {
 
 
 std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalPositions(
-    G4VPhysicalVolume* pv
+    const G4VPhysicalVolume* pv
 ) {
   auto world_volume = G4TransportationManager::GetTransportationManager()
                           ->GetNavigatorForTracking()
@@ -266,6 +272,62 @@ std::vector<RMGNavigationTools::VolumeTreeEntry> RMGNavigationTools::FindGlobalP
     RMGLog::OutDev(RMGLog::fatal, "No path to world volume found, that should not be!");
 
   return trees;
+}
+
+RMGNavigationTools::VolumeTreeEntry RMGNavigationTools::FindGlobalPosition(
+    const G4VPhysicalVolume* pv
+) {
+  auto trees = RMGNavigationTools::FindGlobalPositions(pv);
+  if (trees.size() > 1) {
+    RMGLog::Out(RMGLog::fatal, "more than one way to reach world volume from volume ", pv->GetName());
+  }
+  return trees[0];
+}
+
+std::unordered_map<const G4VPhysicalVolume*, RMGNavigationTools::VolumeCacheEntry>::iterator RMGNavigationTools::GetVolumeCacheEntry(
+    const G4VPhysicalVolume* pv
+) {
+
+  auto cache_it = volume_cache.find(pv);
+  if (cache_it == volume_cache.end()) {
+
+    VolumeCacheEntry cache;
+
+    auto global_pos = RMGNavigationTools::FindGlobalPosition(pv);
+    cache.inverse_transform = G4AffineTransform(
+                                  global_pos.vol_global_rotation,
+                                  global_pos.vol_global_translation
+    )
+                                  .Inverse();
+
+    const auto lv = pv->GetLogicalVolume();
+    cache.solid = lv->GetSolid();
+    cache.num_daughters = lv->GetNoDaughters();
+
+    cache.daughter_transforms.reserve(cache.num_daughters);
+    cache.daughter_solids.reserve(cache.num_daughters);
+
+    for (size_t i = 0; i < cache.num_daughters; ++i) {
+      const auto daughter = lv->GetDaughter(i);
+      global_pos = RMGNavigationTools::FindGlobalPosition(pv);
+      cache.daughter_transforms.emplace_back(
+          G4AffineTransform(global_pos.vol_global_rotation, global_pos.vol_global_translation).Inverse()
+      );
+      const auto daughter_solid = daughter->GetLogicalVolume()->GetSolid();
+      cache.daughter_solids.push_back(daughter_solid);
+    }
+
+    RMGLog::OutFormatDev(
+        RMGLog::debug_event,
+        "Added volume '{}' (copy nr. {}) to cache with {} daughters",
+        pv->GetName(),
+        pv->GetCopyNo(),
+        cache.num_daughters
+    );
+    return volume_cache.emplace(pv, std::move(cache)).first;
+  }
+
+  return cache_it;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

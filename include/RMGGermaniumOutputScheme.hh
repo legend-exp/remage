@@ -38,7 +38,8 @@ class G4Event;
  *  - time,
  *  - position,
  *  - energy deposition,
- *  - distance to detector surface.
+ *  - distance to detector surface,
+ *  - velocity of the particle (optional).
  *
  * Optionally, the track ID and parent track ID can be stored as well as the
  * detector ID for the single table output mode.
@@ -137,6 +138,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
 
     bool fStoreTrackID = false;
     bool fPreClusterHits = true;
+    bool fStoreVelocity = false;
 
     /** @brief Parameters for pre-clustering. */
     RMGOutputTools::ClusterPars fPreClusterPars{};

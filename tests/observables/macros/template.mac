@@ -16,4 +16,4 @@ $STEP_POINT
 
 $GENERATOR
 
-/run/beamOn 20000
+/run/beamOn {NEVENTS}

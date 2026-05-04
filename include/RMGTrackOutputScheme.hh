@@ -93,6 +93,7 @@ class RMGTrackOutputScheme : public RMGVOutputScheme {
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
     bool fStoreAlways = false;
+    bool fStoreOpticalPhotons = false;
 
     std::map<std::string, uint32_t> fProcessMap;
     std::set<int> fStoredProcessIDs; // This set keeps track of the process IDs that have not been discarded.

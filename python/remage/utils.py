@@ -25,8 +25,10 @@ def _to_list(thing):
 
 
 def sanitize_macro_cmds(text: str | Iterable[str]) -> list[str]:
-    if not isinstance(text, list | tuple):
+    if isinstance(text, str):
         text = [text]
+    elif not isinstance(text, list | tuple):
+        text = list(text)
 
     output = []
     for item in text:

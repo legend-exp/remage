@@ -188,6 +188,8 @@ function returning `true`, like the `RMGTrackOutputScheme` or the
 
 :::
 
+Similar commands are available for the scintillator output scheme.
+
 Similarly, for simulations involving optical photons it is possible to discard
 all optical photon tracks before simulating them if no energy was deposited in
 germanium. This can be enabled with
@@ -651,13 +653,13 @@ struct (or in a table if reshaping is off) called `detector_origins`:
 /
 ├── detector_origins · struct{B00000C,B00000D,...}
 │   ├── B00000C · struct{xloc,yloc,zloc}
-│   │   ├── xloc · real
-│   │   ├── yloc · real
-│   │   └── zloc · real
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   ├── B00000D · struct{xloc,yloc,zloc}
-│   │   ├── xloc · real
-│   │   ├── yloc · real
-│   │   └── zloc · real
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   └── ...
 └── ...
 ```
@@ -710,6 +712,22 @@ always equal to the number of simulated events.
 The vertex table is useful to reconstruct the event vertex of hits recorded in
 sensitive detectors by matching the information stored in the `evtid` column.
 
+## Run metadata
+
+The output file will also contain the total number of simulated Geant4 events in
+the `number_of_events` field:
+
+```
+/
+├── number_of_events · real
+├── ...
+└── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
+    └── ...
+```
+
+This number will also be produced when the vertex table is not created and can
+be used to normalize detected hit counts without having to read the `vtx` table.
+
 ## The track output scheme
 
 Information about tracks simulated by Geant4 can be often beneficial to
@@ -720,6 +738,14 @@ the command:
 ```geant4
 /RMG/Output/ActivateOutputScheme Track
 ```
+
+:::{important}
+
+Optical photon tracks are not written out by default, since their number in a
+typical simulation is often extremely large. You will need to enable the option
+<project:../rmg-commands.md#rmgoutputtrackstoreopticalphotons> to include them.
+
+:::
 
 A new table named `tracks` is created in the output file, with columns:
 
@@ -741,7 +767,8 @@ A new table named `tracks` is created in the output file, with columns:
 :::{tip}
 
 Use [scikit-hep/particle](https://github.com/scikit-hep/particle) to identify
-particles based on their PDG ID.
+particles based on their PDG ID. If included, optical photons will use a
+non-standard encoding of -22.
 
 :::
 

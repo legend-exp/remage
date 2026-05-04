@@ -129,6 +129,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetGammaTwoJMAX(int max_two_j);
     void SetStoreICLevelData(bool);
 
+    void DumpProcessesForParticles(std::string file_name);
 
   protected:
 

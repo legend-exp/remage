@@ -47,7 +47,7 @@ jobs:
 
           mkdir build
           cd build
-          cmake -DRMG_BUILD_EXAMPLES=1 -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
+          cmake -DBUILD_TESTING=ON -DRMG_BUILD_DOCS=OFF .. | tee -a build.log
           make -j$(nproc) | tee -a build.log
           make install | tee -a build.log
 
@@ -93,14 +93,14 @@ jobs:
         run: |
           cd build
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
-          ctest --label-exclude mt -j$(nproc) --output-on-failure
+          ctest --label-exclude 'mt|val-only' -j$(nproc) --output-on-failure
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
-          ctest --label-regex mt -j1 --output-on-failure
+          ctest --label-regex mt --label-exclude val-only -j1 --output-on-failure
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
 
       - name: Upload test suite outputs to GitHub
         if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: remage-test-output-g4flavor-${{ matrix.container_version }}
           # artifacts must have a ".output*" extension
@@ -110,8 +110,8 @@ jobs:
         if: ${{ matrix.container_version == 'slim' }}
         run: |
           cd build
-          ctest --label-exclude 'extra|vis|mt' -j$(nproc) --output-on-failure
-          ctest --label-regex mt --label-exclude 'extra|vis' -j --output-on-failure
+          ctest --label-exclude 'extra|vis|mt|val-only' -j$(nproc) --output-on-failure
+          ctest --label-regex mt --label-exclude 'extra|vis|val-only' -j --output-on-failure
 
       - name: Test docs building
         if: ${{ matrix.container_version != 'slim' }}
@@ -119,15 +119,7 @@ jobs:
           cd build
           cmake -DRMG_BUILD_DOCS=ON ..
           make sphinx
-          make sphinx-validation
           echo "free space: $(df --output=avail -h -- $(pwd) | tail -n1)"
-
-      - name: Upload validation report to GitHub
-        if: ${{ always() && matrix.container_version != 'slim' }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: remage-validation-report-g4flavor-${{ matrix.container_version }}
-          path: build/docs/validation/_build/
 
       - name: Minimally test installed executable
         run: |
@@ -151,7 +143,7 @@ jobs:
           fetch-tags: true
           ref: ${{ github.event.pull_request && github.event.pull_request.head.sha || github.ref }}
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           miniforge-version: latest
           activate-environment: "geant4-env"
@@ -176,7 +168,6 @@ jobs:
           cmake \
             -D CMAKE_INSTALL_PREFIX=../local \
             -D Python3_EXECUTABLE="$(command -v python)" \
-            -D RMG_BUILD_EXAMPLES=1 \
             -D BUILD_TESTING=ON \
             -D RMG_BUILD_DOCS=OFF \
             ..
@@ -186,8 +177,8 @@ jobs:
       - name: Run full test suite
         run: |
           cd build
-          ctest --label-exclude mt -j$(nproc) --output-on-failure
-          ctest --label-regex mt -j1 --output-on-failure
+          ctest --label-exclude 'mt|val-only' -j$(nproc) --output-on-failure
+          ctest --label-regex mt --label-exclude val-only -j1 --output-on-failure
 
       - name: Minimally test installed executable
         run: |
@@ -196,36 +187,4 @@ jobs:
           export DYLD_FALLBACK_LIBRARY_PATH="$PWD/local/lib:$CONDA_PREFIX/lib:$DYLD_FALLBACK_LIBRARY_PATH"
           REMAGE_ASSERT_CPP_ORIGIN="config" remage --version
 
-  deploy_validation_report:
-    name: Deploy validation report to legend-exp.github.io/remage/validation
-    if: github.event_name != 'pull_request'
-    needs: test_on_linux
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: remage-validation-report-g4flavor-stable
-          path: output/
-
-      - name: Determine target directory
-        id: target
-        run: |
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            echo "dir=$(echo '${{ github.event.release.tag_name }}')" >> $GITHUB_ENV
-          else
-            echo "dir=latest" >> $GITHUB_ENV
-          fi
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.PUSH_ACCESS_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: output
-          destination_dir: validation/${{ env.dir }}
 # vim: expandtab tabstop=2 shiftwidth=2

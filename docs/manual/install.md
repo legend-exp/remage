@@ -21,8 +21,29 @@ $ conda install conda-forge::remage
 
 :::{note}
 
-The conda-forge provided binaries do not support the ROOT output format, but
-fully supports LH5/HDF5.
+- The conda-forge provided binaries do not support the ROOT output format, but
+  fully supports LH5/HDF5.
+- Make sure that you don't have the anacoda channels enabled in your conda
+  environment, otherwise incompatibilities can arise with the conda-forge repo
+  [(see upstream docs)](https://conda-forge.org/docs/user/transitioning_from_defaults/).
+  You can directly create an environment with only the conda-forge channel
+  enabled:
+  ```console
+  $ conda create -n remage-env --channel conda-forge --override-channels python=3.13
+  $ conda activate remage-env
+  $ conda config --env --add channels conda-forge
+  $ conda config --env --remove channels defaults
+  $ conda config --env --set channel_priority strict
+  $ conda install remage
+  ```
+- To **install _remage_ on an arm64 Mac**, you need to perform special set-up
+  steps at environment creation time:
+  ```console
+  $ CONDA_SUBDIR=osx-64 conda create [...]
+  $ conda activate remage-env
+  $ conda config --env --set subdir osx-64
+  $ # ... continue with the additional steps above
+  ```
 
 :::
 
@@ -61,13 +82,15 @@ dependencies.
 
 The build system is based on CMake.
 
-```{important}
+:::{important}
+
 It is important that you **use a unique install prefix** for remage. **Do not
-use a location that is controlled by your linux package manager** (i.e.
-`/usr`). The default value of `/usr/local` is also dangerous if you install
-other software into that prefix. Failing to do so might create conflicts with
-other python packages or might even render your system unusable.
-```
+use a location that is controlled by your linux package manager** (i.e. `/usr`).
+The default value of `/usr/local` is also dangerous if you install other
+software into that prefix. Failing to do so might create conflicts with other
+python packages or might even render your system unusable.
+
+:::
 
 ```console
 $ git clone https://github.com/legend-exp/remage
@@ -86,7 +109,7 @@ the installation on a fresh system.
 
 :::
 
-## Setting up Jupyter
+## Setting up Jupyter with a container
 
 To set up a _remage_-aware Jupyter kernel, you only have to provide the correct
 `kernel.json` file to your Jupyter installation.

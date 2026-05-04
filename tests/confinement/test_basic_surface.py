@@ -40,8 +40,9 @@ select_sides = {
     "tubby": {
         "func": [
             lambda x, y, z: (abs(z - 30) < tol) & (np.sqrt(x**2 + y**2) < 60),  # bottom
-            lambda x, y, z: (abs(np.sqrt(x**2 + y**2) - 60) < tol)
-            & (abs(z) < 30 - tol),  # side
+            lambda x, y, z: (
+                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 - tol)
+            ),  # side
             lambda x, y, z: (abs(z + 30) < tol) & (np.sqrt(x**2 + y**2) < 60),  # top
         ],
         "area": [
@@ -54,16 +55,22 @@ select_sides = {
     },
     "sub": {
         "func": [
-            lambda x, y, z: (abs(z + 30) < tol)
-            & (np.sqrt(x**2 + y**2) < 60)
-            & (np.sqrt(x**2 + y**2) > 20),  # bottom
-            lambda x, y, z: (abs(z - 30) < tol)
-            & (np.sqrt(x**2 + y**2) < 60)
-            & (np.sqrt(x**2 + y**2) > 20),  # top
-            lambda x, y, z: (abs(np.sqrt(x**2 + y**2) - 60) < tol)
-            & (abs(z) < 30 - tol),  # outside
-            lambda x, y, z: (abs(np.sqrt(x**2 + y**2) - 20) < tol)
-            & (abs(z) < 30 - tol),  # inside
+            lambda x, y, z: (
+                (abs(z + 30) < tol)
+                & (np.sqrt(x**2 + y**2) < 60)
+                & (np.sqrt(x**2 + y**2) > 20)
+            ),  # bottom
+            lambda x, y, z: (
+                (abs(z - 30) < tol)
+                & (np.sqrt(x**2 + y**2) < 60)
+                & (np.sqrt(x**2 + y**2) > 20)
+            ),  # top
+            lambda x, y, z: (
+                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 - tol)
+            ),  # outside
+            lambda x, y, z: (
+                (abs(np.sqrt(x**2 + y**2) - 20) < tol) & (abs(z) < 30 - tol)
+            ),  # inside
         ],
         "area": [
             np.pi * (60**2 - 20**2),  # bottom
@@ -77,8 +84,10 @@ select_sides = {
     "con": {
         "func": [
             lambda x, y, z: (abs(z + 50) < tol) & (np.sqrt(x**2 + y**2) < 60),  # bottom
-            lambda x, y, z: (abs(z + 100 * (np.sqrt(x**2 + y**2) / 60) - 50) < tol)
-            & (abs(z) < 50 - tol),  # side,
+            lambda x, y, z: (
+                (abs(z + 100 * (np.sqrt(x**2 + y**2) / 60) - 50) < tol)
+                & (abs(z) < 50 - tol)
+            ),  # side,
         ],
         "area": [
             np.pi * 60**2,  # bottom
@@ -90,9 +99,9 @@ select_sides = {
     "box": {
         "func": [
             lambda x, y, z: (abs(z - 50) < tol) & (abs(x) < 25) & (abs(y) < 25),  # top
-            lambda x, y, z: (abs(x - 25) < tol)
-            & (abs(y) < 25)
-            & (abs(z) < 50 - tol),  # sides
+            lambda x, y, z: (
+                (abs(x - 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol)
+            ),  # sides
             lambda x, y, z: (abs(y - 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
             lambda x, y, z: (abs(x + 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol),
             lambda x, y, z: (abs(y + 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
@@ -104,22 +113,24 @@ select_sides = {
     },
     "uni": {
         "func": [
-            lambda x, y, z: (abs(z + 50) < tol)
-            & (abs(x) < 25)
-            & (abs(y) < 25),  # bottom
-            lambda x, y, z: (abs(x - 25) < tol)
-            & (abs(y) < 25)
-            & (abs(z) < 50 - tol),  # sides
+            lambda x, y, z: (
+                (abs(z + 50) < tol) & (abs(x) < 25) & (abs(y) < 25)
+            ),  # bottom
+            lambda x, y, z: (
+                (abs(x - 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol)
+            ),  # sides
             lambda x, y, z: (abs(y - 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
             lambda x, y, z: (abs(x + 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol),
             lambda x, y, z: (abs(y + 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(z - 50) < tol)
-            & (abs(x) < 25)
-            & (abs(y) < 25)
-            & ((abs(x) > 10) | (abs(y) > 10)),  # top
-            lambda x, y, z: (abs(x - 10) < tol)
-            & (abs(y) < 10)
-            & (abs(z - 75) < 25),  # small sides
+            lambda x, y, z: (
+                (abs(z - 50) < tol)
+                & (abs(x) < 25)
+                & (abs(y) < 25)
+                & ((abs(x) > 10) | (abs(y) > 10))
+            ),  # top
+            lambda x, y, z: (
+                (abs(x - 10) < tol) & (abs(y) < 10) & (abs(z - 75) < 25)
+            ),  # small sides
             lambda x, y, z: (abs(y - 10) < tol) & (abs(x) < 10) & (abs(z - 75) < 25),
             lambda x, y, z: (abs(x + 10) < tol) & (abs(y) < 10) & (abs(z - 75) < 25),
             lambda x, y, z: (abs(y + 10) < tol) & (abs(x) < 10) & (abs(z - 75) < 25),
@@ -145,26 +156,18 @@ select_sides = {
         "func": [
             lambda x, y, z: (abs(z + 50) < tol) & (abs(x) < 25) & (abs(y) < 25),  # base
             lambda x, y, z: (abs(z - 50) < tol) & (abs(x) < 5) & (abs(y) < 5),  # top
-            lambda x, y, z: (y > 5)
-            & (y < 25)
-            & (y > x)
-            & (y > -x)
-            & (abs(z) < 50 - tol),  # sides
-            lambda x, y, z: (-y > 5)
-            & (-y < 25)
-            & (-y > x)
-            & (-y > -x)
-            & (abs(z) < 50 - tol),
-            lambda x, y, z: (x > 5)
-            & (x < 25)
-            & (x > y)
-            & (x > -y)
-            & (abs(z) < 50 - tol),
-            lambda x, y, z: (-x > 5)
-            & (-x < 25)
-            & (-x > y)
-            & (-x > -y)
-            & (abs(z) < 50 - tol),
+            lambda x, y, z: (
+                (y > 5) & (y < 25) & (y > x) & (y > -x) & (abs(z) < 50 - tol)
+            ),  # sides
+            lambda x, y, z: (
+                (-y > 5) & (-y < 25) & (-y > x) & (-y > -x) & (abs(z) < 50 - tol)
+            ),
+            lambda x, y, z: (
+                (x > 5) & (x < 25) & (x > y) & (x > -y) & (abs(z) < 50 - tol)
+            ),
+            lambda x, y, z: (
+                (-x > 5) & (-x < 25) & (-x > y) & (-x > -y) & (abs(z) < 50 - tol)
+            ),
         ],
         "area": [
             50 * 50.0,

@@ -1,13 +1,14 @@
 /
 ├── detector_origins · struct{det1,det2} 
 │   ├── det1 · struct{xloc,yloc,zloc} 
-│   │   ├── xloc · real 
-│   │   ├── yloc · real 
-│   │   └── zloc · real 
+│   │   ├── xloc · real ── {'units': 'm'}
+│   │   ├── yloc · real ── {'units': 'm'}
+│   │   └── zloc · real ── {'units': 'm'}
 │   └── det2 · struct{xloc,yloc,zloc} 
-│       ├── xloc · real 
-│       ├── yloc · real 
-│       └── zloc · real 
+│       ├── xloc · real ── {'units': 'm'}
+│       ├── yloc · real ── {'units': 'm'}
+│       └── zloc · real ── {'units': 'm'}
+├── number_of_events · real 
 ├── stp · struct{det1,det2,optdet1,optdet2,scint1,scint2} 
 │   ├── __by_uid__ · struct{det001,det002,det011,det012,det101,det102} 
 │   │   ├── det001 -> /stp/scint1

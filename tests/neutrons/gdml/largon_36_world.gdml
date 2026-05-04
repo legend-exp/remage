@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+	<define/>
+	<materials>
+		<isotope name="Argon36" Z="18" N="36">
+			<atom value="35.97"/>
+		</isotope>
+		<element name="Argon" formula="Ar">
+			<fraction ref="Argon36" n="1.0"/>
+		</element>
+		<material name="LiquidArgon36" state="liquid">
+			<T value="88.8" unit="K"/>
+			<P value="100000.0" unit="pascal"/>
+			<D value="1.396"/>
+			<fraction ref="Argon" n="1.0"/>
+		</material>
+	</materials>
+	<solids>
+		<orb name="world" r="2000" lunit="m"/>
+		<orb name="material" r="1999.99" lunit="m"/>
+	</solids>
+	<structure>
+		<volume name="material">
+			<materialref ref="LiquidArgon36"/>
+			<solidref ref="material"/>
+		</volume>
+		<volume name="world">
+			<materialref ref="G4_Galactic"/>
+			<solidref ref="world"/>
+			<physvol name="material">
+				<volumeref ref="material"/>
+			</physvol>
+		</volume>
+	</structure>
+	<userinfo>
+		<auxiliary auxtype="RMG_detector_meta" auxvalue=""/>
+	</userinfo>
+	<setup name="Default" version="1.0">
+		<world ref="world"/>
+	</setup>
+</gdml>
