@@ -22,12 +22,12 @@
 #include <vector>
 
 #include "G4AnalysisManager.hh"
+#include "G4GenericMessenger.hh"
 #include "G4Threading.hh"
 #include "globals.hh"
 
 #include "RMGLog.hh"
 
-class G4GenericMessenger;
 /**
  * @brief Manages output operations including ntuple registration and persistent storage.
  *
