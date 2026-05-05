@@ -128,6 +128,10 @@ namespace RMGNavigationTools {
       size_t num_daughters{};
       std::vector<G4AffineTransform> daughter_transforms;
       std::vector<const G4VSolid*> daughter_solids;
+      std::vector<bool> daughter_is_multiunion;
+      std::vector<G4ThreeVector> daughter_centers; // bounding sphere centers in parent local coords
+      std::vector<double> daughter_radii;          // bounding sphere radii
+      std::vector<bool> daughter_is_germanium; // whether daughter is registered as Germanium detector
   };
 
   /// \cond this triggers a sphinx error
@@ -144,6 +148,9 @@ namespace RMGNavigationTools {
   std::unordered_map<const G4VPhysicalVolume*, VolumeCacheEntry>::iterator GetVolumeCacheEntry(
       const G4VPhysicalVolume* pv
   );
+
+  /** @brief Clear cached volume geometry data for the current thread. */
+  void ClearVolumeCache();
 
 } // namespace RMGNavigationTools
 

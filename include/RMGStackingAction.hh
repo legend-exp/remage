@@ -36,6 +36,8 @@ class RMGStackingAction : public G4UserStackingAction {
     void NewStage() override;
     void PrepareNewEvent() override;
 
+    int GetCurrentStage() const { return fStage; }
+
   private:
 
     int fStage = 0;

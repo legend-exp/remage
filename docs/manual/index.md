@@ -13,6 +13,7 @@ confinement.md
 generators.md
 input.md
 output.md
+staging.md
 visualization.md
 analysis.md
 extend.md

@@ -74,8 +74,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     std::optional<bool> StackingActionNewStage(int) override;
 
     /** @brief Wraps @c G4UserStackingAction::StackingActionClassify
-     *  @details This is used to classify all optical photon tracks as @c fWaiting if
-     * @c fDiscardPhotonsIfNoGermaniumEdep is true.
+     *  @details Optical-photon defer-to-waiting behavior is configured in @c RMGStagingScheme.
      */
     std::optional<G4ClassificationOfNewTrack> StackingActionClassify(const G4Track*, int) override;
 
@@ -130,7 +129,7 @@ class RMGGermaniumOutputScheme : public RMGVOutputScheme {
     double fEdepCutHigh = -1;
     std::set<int> fEdepCutDetectors;
 
-    bool fDiscardPhotonsIfNoGermaniumEdep = false;
+    bool fDiscardWaitingTracksUnlessGermaniumEdep = false;
     bool fDiscardZeroEnergyHits = true;
 
     bool fStoreSinglePrecisionEnergy = false;
