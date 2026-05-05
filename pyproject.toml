@@ -35,7 +35,7 @@ dynamic = ["version"]
 dependencies = [
   "legend-pydataobj >=2",
   "legend-lh5io >=0.2",
-  "reboost >=0.11.0a1",
+  "reboost >=0.11.0",
   "pygama >=2.2.3",
   "colorlog",
   "rich",
