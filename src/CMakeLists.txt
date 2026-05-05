@@ -98,6 +98,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGTrackingAction.cc
     ${_root}/src/RMGTrackOutputScheme.cc
     ${_root}/src/RMGUserAction.cc
+    ${_root}/src/RMGUserInit.cc
     ${_root}/src/RMGVertexConfinement.cc
     ${_root}/src/RMGVertexFromFile.cc
     ${_root}/src/RMGVertexFromPoint.cc

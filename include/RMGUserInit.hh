@@ -26,15 +26,9 @@
 #include "G4UserSteppingAction.hh"
 #include "G4UserTrackingAction.hh"
 
-#include "RMGGeomBenchOutputScheme.hh"
-#include "RMGGeometryCheckOutputScheme.hh"
-#include "RMGIsotopeFilterScheme.hh"
 #include "RMGLog.hh"
-#include "RMGParticleFilterScheme.hh"
-#include "RMGTrackOutputScheme.hh"
 #include "RMGVGenerator.hh"
 #include "RMGVOutputScheme.hh"
-#include "RMGVolumeDistanceStacker.hh"
 
 /**
  * @brief User initialization class.
@@ -152,14 +146,7 @@ class RMGUserInit {
      *
      * This includes schemes for isotope filtering, particle filtering, and track output.
      */
-    void RegisterDefaultOptionalOutputSchemes() {
-      AddOptionalOutputScheme<RMGIsotopeFilterScheme>("IsotopeFilter");
-      AddOptionalOutputScheme<RMGParticleFilterScheme>("ParticleFilter");
-      AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
-      AddOptionalOutputScheme<RMGGeometryCheckOutputScheme>("GeometryCheck");
-      AddOptionalOutputScheme<RMGGeomBenchOutputScheme>("GeomBench");
-      AddOptionalOutputScheme<RMGVolumeDistanceStacker>("VolumeStacker");
-    }
+    void RegisterDefaultOptionalOutputSchemes();
 
     /**
      * @brief Activates an optional output scheme by its name.
@@ -168,13 +155,13 @@ class RMGUserInit {
      *
      * @param name The name of the optional output scheme to activate.
      */
-    void ActivateOptionalOutputScheme(std::string name) {
-      auto it = fOptionalOutputSchemes.find(name);
-      if (it == fOptionalOutputSchemes.end()) {
-        RMGLog::Out(RMGLog::fatal, "Optional output scheme '", name, "' not found!");
-      }
-      fOutputSchemes.emplace_back((*it).second);
-    }
+    void ActivateOptionalOutputScheme(std::string name);
+
+    /**
+     * @brief Check whether the optional output scheme is activated
+     * @param name The name of the optional output scheme to check for.
+     */
+    bool IsOptionalOutputSchemeActivated(std::string name);
 
   private:
 
@@ -220,6 +207,8 @@ class RMGUserInit {
     late_init_vec<RMGVOutputScheme> fOutputSchemes;
     late_init_map<std::string, RMGVOutputScheme> fOptionalOutputSchemes;
     late_init_fn<RMGVGenerator> fUserGenerator;
+
+    std::vector<std::string> fActivatedOutputScheme;
 };
 
 #endif

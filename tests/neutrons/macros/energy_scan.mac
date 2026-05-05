@@ -2,8 +2,7 @@
 /RMG/Processes/HadronicPhysics Shielding
 /RMG/Manager/Randomization/Seed 1234
 
-/RMG/Geometry/RegisterDetector Optical material 001 # workaround to get the vertexoutputscheme
-
+/RMG/Output/ActivateOutputScheme Vertex
 /RMG/Output/ActivateOutputScheme Track
 /RMG/Output/ActivateOutputScheme ParticleFilter
 

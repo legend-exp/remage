@@ -40,7 +40,6 @@ namespace fs = std::filesystem;
 #include "RMGScintillatorDetector.hh"
 #include "RMGScintillatorOutputScheme.hh"
 #include "RMGTools.hh"
-#include "RMGVertexOutputScheme.hh"
 
 #if RMG_HAS_GDML
 #include "G4GDMLParser.hh"
@@ -350,14 +349,13 @@ void RMGHardware::ConstructSDandField() {
   }
 
   // also store primary vertex data, if we have any other output.
-  if (!fActiveOutputSchemes.empty()) {
-    fActiveOutputSchemes.emplace_back(std::make_shared<RMGVertexOutputScheme>());
+  const auto user_init = RMGManager::Instance()->GetUserInit();
+  if (!fActiveOutputSchemes.empty() && !user_init->IsOptionalOutputSchemeActivated("Vertex")) {
+    user_init->ActivateOptionalOutputScheme("Vertex");
   }
 
   // Also add user-provided output schemes.
-  for (const auto& os : RMGManager::Instance()->GetUserInit()->GetOutputSchemes()) {
-    fActiveOutputSchemes.emplace_back(os());
-  }
+  for (const auto& os : user_init->GetOutputSchemes()) { fActiveOutputSchemes.emplace_back(os()); }
 
   std::string vec_repr;
   for (const auto& d : fActiveDetectors) vec_repr += std::string(magic_enum::enum_name(d)) + ", ";
