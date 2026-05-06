@@ -21,6 +21,7 @@ neutrons
 observables-ge
 processes
 processes-ib
+muon_physics
 gammacorr
 optics
 performance

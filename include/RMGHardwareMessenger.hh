@@ -45,14 +45,19 @@ class RMGHardwareMessenger : public G4UImessenger {
     /** @brief Define the commands to set the step limits. */
     void DefineStepLimits();
 
+    /** @brief Define the commands to set particle-selective minimum kinetic energy limits. */
+    void DefineSelectiveEminLimits();
+
   private:
 
     RMGHardware* fHardware;
     G4UIcommand* fRegisterCmd = nullptr;
     G4UIcmdWithADoubleAndUnit* fStepLimitsCmd = nullptr;
+    G4UIcommand* fSelectiveEminLimitCmd = nullptr;
 
     void RegisterDetectorCmd(const std::string& parameters);
     void StepLimitsCmd(const std::string& parameters);
+    void SelectiveEminLimitCmd(const std::string& parameters);
 };
 
 #endif

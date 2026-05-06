@@ -81,6 +81,28 @@ set(TESTS_IMAGES
     confinement/lar-sub-check-xz.output.png
     confinement/lar-int-and-sub-check-xy.output.png
     confinement/lar-int-and-sub-check-xz.output.png
+    cosmogenics/muon/energy_loss_lar_energy_range.output.png
+    cosmogenics/muon/energy_loss_water_energy_range.output.png
+    cosmogenics/muon/neutron_production_processes_100.0_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_production_processes_280.0_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_yield_energy_scan_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_yield_energy_scan_water_Shielding_Livermore_30_8.045.output.png
+    cosmogenics/muon/neutron_yield_had_physics_scan_100.0_lar_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_yield_material_scan_100.0_Shielding_Livermore_30.output.png
+    cosmogenics/muon/shower_dimensions_100.0_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/shower_dimensions_100.0_rock_Shielding_Livermore_30_8.045.output.png
+    cosmogenics/muon/shower_dimensions_100.0_water_Shielding_Livermore_30_8.045.output.png
+    cosmogenics/muon/neutron_production_particle_hadronic_100.0_lar_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_production_particle_100.0_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/isotope_production_remage_lar_100.0_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/isotope_production_fluka_lar_100.0_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/isotope_production_diff_lar_100.0_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/isotope_production_comp_lar_100.0_Shielding_Livermore_30_9.869.output.png
+    cosmogenics/muon/isotope_production_remage_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+    cosmogenics/muon/isotope_production_fluka_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+    cosmogenics/muon/isotope_production_diff_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
+    cosmogenics/muon/isotope_production_comp_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
     distances/distance-ge-poststep.output.png
     distances/distance-ge-prestep.output.png
     distances/distance-ge-average.output.png

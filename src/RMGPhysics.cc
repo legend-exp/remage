@@ -70,6 +70,7 @@
 #include "G4StepLimiterPhysics.hh"
 #include "G4StoppingPhysics.hh"
 #include "G4ThermalNeutrons.hh"
+#include "G4UserSpecialCuts.hh"
 #include "G4Version.hh"
 
 #include "RMGConfig.hh"
@@ -77,6 +78,7 @@
 #include "RMGLog.hh"
 #include "RMGNeutronCaptureProcess.hh"
 #include "RMGOpWLSProcess.hh"
+#include "RMGSelectiveEkinMinCutProcess.hh"
 #include "RMGTools.hh"
 
 namespace u = CLHEP;
@@ -360,6 +362,21 @@ void RMGPhysics::ConstructProcess() {
   // add step limits
   auto step_limits = new G4StepLimiterPhysics();
   step_limits->ConstructProcess();
+
+  // replace generic UserSpecialCuts with particle-selective variant used by
+  // /RMG/Geometry/SetEkinMinForParticle.
+  GetParticleIterator()->reset();
+  while ((*GetParticleIterator())()) {
+    auto particle = GetParticleIterator()->value();
+    auto proc_manager = particle->GetProcessManager();
+    if (!proc_manager) continue;
+
+    auto user_special_cut = proc_manager->GetProcess("UserSpecialCut");
+    if (!user_special_cut) continue;
+
+    proc_manager->RemoveProcess(user_special_cut);
+    proc_manager->AddDiscreteProcess(new RMGSelectiveEkinMinCutProcess());
+  }
 }
 
 void RMGPhysics::ConstructOptical() {

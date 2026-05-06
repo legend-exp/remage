@@ -41,6 +41,7 @@ set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGRun.hh
     ${_root}/include/RMGScintillatorDetector.hh
     ${_root}/include/RMGScintillatorOutputScheme.hh
+    ${_root}/include/RMGSelectiveEkinMinCutProcess.hh
     ${_root}/include/RMGStackingAction.hh
     ${_root}/include/RMGSteppingAction.hh
     ${_root}/include/RMGTools.hh
@@ -93,6 +94,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGRunAction.cc
     ${_root}/src/RMGScintillatorDetector.cc
     ${_root}/src/RMGScintillatorOutputScheme.cc
+    ${_root}/src/RMGSelectiveEkinMinCutProcess.cc
     ${_root}/src/RMGStackingAction.cc
     ${_root}/src/RMGSteppingAction.cc
     ${_root}/src/RMGTrackingAction.cc

@@ -21,3 +21,7 @@ set_tests_properties(
 
 add_test(NAME processes/dump-physics COMMAND ${PYTHONPATH} ./dump_physics.py ${REMAGE_PYEXE})
 set_tests_properties(processes/dump-physics PROPERTIES LABELS val)
+
+add_test(NAME processes/selective-ekin-min COMMAND ${PYTHONPATH} -m pytest -s -vvv
+                                                   selective_ekin_min.py)
+set_tests_properties(processes/selective-ekin-min PROPERTIES LABELS extra)
