@@ -9,9 +9,9 @@ formats:
   - pdf
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-24.04
   tools:
-    python: mambaforge-23.11
+    python: miniforge3-25.11
   jobs:
     post_checkout: # for setuptools_scm to work correctly.
       - git fetch --unshallow || true
