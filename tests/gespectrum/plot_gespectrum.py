@@ -23,7 +23,7 @@ qc_survival = qc_info[1] / qc_info[0]  # ratio of QC accepted / total
 run_time = 3600 * 17  # s, already includes DAQ dead-time
 n_decays = activity * run_time * qc_survival
 
-n_sim = lh5.read("/number_of_events", "hades-sim.lh5").value
+n_sim = lh5.read("/number_of_simulated_events", "hades-sim.lh5").value
 factor = n_decays / n_sim
 
 # load data histograms and its binning.

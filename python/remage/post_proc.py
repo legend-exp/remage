@@ -130,7 +130,9 @@ def post_proc(
             # we do this here and not in reboost, as the links require special syntax
             # NOTE: using just the first original file since the links are always the same
             copy_links(original_files[0], output_files, lh5_links_group_name)
-            update_number_of_events(original_files, output_files, lh5_event_number_name)
+            update_number_of_simulated_events(
+                original_files, output_files, lh5_event_number_name
+            )
 
         # add a time-coincidence map to the output file(s)
         msg = "Computing and storing the TCM as /tcm"
@@ -173,7 +175,9 @@ def post_proc(
             # we do this here and not in reboost, as lh5concat does not copy links correctly.
             # NOTE: using just the first original file since the links are always the same
             copy_links(original_files[0], main_output_file, lh5_links_group_name)
-            update_number_of_events(original_files, output_files, lh5_event_number_name)
+            update_number_of_simulated_events(
+                original_files, output_files, lh5_event_number_name
+            )
 
         ipc_info.set("output", main_output_file)
 
@@ -215,7 +219,7 @@ def copy_links(
                         del links_group[link_name]
 
 
-def update_number_of_events(
+def update_number_of_simulated_events(
     original_files: list[str], output_files: str | list[str], lh5_event_number_name: str
 ) -> None:
     output_files = utils._to_list(output_files)

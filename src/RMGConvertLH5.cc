@@ -308,7 +308,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   bool ntuple_success = true;
 
   const std::string links_group_name = "__by_uid__";
-  const std::string n_ev_name = "number_of_events";
+  const std::string n_ev_name = "number_of_simulated_events";
   std::vector<std::string> links;
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_links_group_name", links_group_name));
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("lh5_event_number_name", n_ev_name));

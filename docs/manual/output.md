@@ -715,11 +715,11 @@ sensitive detectors by matching the information stored in the `evtid` column.
 ## Run metadata
 
 The output file will also contain the total number of simulated Geant4 events in
-the `number_of_events` field:
+the `number_of_simulated_events` field:
 
 ```
 /
-├── number_of_events · real
+├── number_of_simulated_events · real
 ├── ...
 └── vtx · table{evtid,n_part,time,xloc,yloc,zloc}
     └── ...

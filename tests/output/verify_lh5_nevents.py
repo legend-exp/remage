@@ -8,7 +8,7 @@ file = sys.argv[2]
 expected = int(sys.argv[1])
 
 try:
-    n_ev = lh5.read("/number_of_events", file)
+    n_ev = lh5.read("/number_of_simulated_events", file)
     if n_ev.value != expected:
         msg = f"event count {n_ev.value} in file {file} does not match expectation {expected}"
         raise RuntimeError(msg)
