@@ -49,6 +49,9 @@ if "kin2" in macro:
     # when we have two particles per event, we only have half of the events.
     n_events //= 2
 
+# special mode, in which we get each vertex twice
+multi_vertex = "multivertex" in macro
+
 # run remage, produce lh5 output.
 files = remage_run(
     f"macros/{macro}.mac",
@@ -71,18 +74,26 @@ if "pos" in macro:
     output_pos = output_pos.sort_values("xloc")  # sort by linear column.
     output_pos = output_pos[["xloc", "yloc", "zloc"]]
     uniq, cnt = np.unique(output_pos["xloc"], return_counts=True)
-    if not np.all(cnt <= 1):
+    max_count = 1 if not multi_vertex else 2
+    if not np.all(cnt <= max_count):
         msg = f"non-unique pos 'indices' {uniq[cnt > 1]}"
         raise ValueError(msg)
 
+    output_pos = output_pos.to_numpy()
+
     input_pos = input_pos.iloc[0 : len(output_pos)]
     input_pos = input_pos[["xloc", "yloc", "zloc"]]
+    input_pos = input_pos.to_numpy()
 
     # re-scale to accommodate for different units.
     if "vtx-pos-mm.lh5" in pos_input_file:
         input_pos /= 1000
 
-    assert np.all(np.isclose(output_pos.to_numpy(), input_pos.to_numpy()))
+    if not multi_vertex:
+        assert np.all(np.isclose(output_pos, input_pos))
+    else:
+        assert np.all(np.isclose(output_pos[0::2], input_pos))
+        assert np.all(np.isclose(output_pos[1::2], input_pos))
 
 if "kin" in macro:
     kin_input_file = kin_input_file.replace(".hdf5", ".lh5")

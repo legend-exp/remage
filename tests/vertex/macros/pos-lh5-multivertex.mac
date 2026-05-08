@@ -1,0 +1,19 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine FromFile
+
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-pos.lh5
+
+/RMG/Generator/Select GPS
+/gps/particle     e-
+/gps/energy       100 keV
+/gps/ang/type     iso
+
+/gps/source/add 1
+/gps/particle gamma
+/gps/energy 100 keV
+/gps/ang/type iso
+
+/gps/source/multiplevertex true
+
+/run/beamOn {events}
