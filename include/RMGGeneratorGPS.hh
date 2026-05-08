@@ -41,7 +41,11 @@ class RMGGeneratorGPS : public RMGVGenerator {
       // the GPS is inherently thread-unsafe. only one source can be manipulated/used at a time.
       // all threads share the same internal global state.
       if (fVertexPositionSet) {
-        fParticleSource->GetCurrentSource()->GetPosDist()->SetCentreCoords(fVertexPosition);
+        auto n_source = fParticleSource->GetNumberofSource();
+        for (auto i = 0; i < n_source; i++) {
+          fParticleSource->SetCurrentSourceto(i);
+          fParticleSource->GetCurrentSource()->GetPosDist()->SetCentreCoords(fVertexPosition);
+        }
       }
       fParticleSource->GeneratePrimaryVertex(event);
     }
