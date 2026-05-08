@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.append(Path("../_extensions").resolve().as_posix())
@@ -46,7 +46,7 @@ html_theme_options = {
 html_title = f"remage {version} validation suite"
 
 myst_substitutions = {
-    "today": datetime.now(timezone.utc).strftime("%d %B %Y"),
+    "today": datetime.now(UTC).strftime("%d %B %Y"),
     "remage_version": f"`v{version}`",
     "geant4_version": "`v@Geant4_VERSION@`",
     "bxdecay0_version": "`v@BxDecay0_VERSION@`",
