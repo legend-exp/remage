@@ -11,6 +11,12 @@ on:
     paths-ignore:
       - "**.md"
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
   release:
 
 concurrency:
@@ -21,6 +27,24 @@ jobs:
   run_validation:
     name: Run validation suite
     runs-on: self-hosted # ubuntu-latest
+
+    # Run rules:
+    # - always run for releases
+    # - for PRs: only when label "run validation" exists
+    # - for pushes to main: skip when commit message contains "[skip val]"
+    if: >
+      github.event_name == 'release' ||
+      (
+        github.event_name == 'pull_request' &&
+        contains(
+          join(github.event.pull_request.labels.*.name, ','),
+          'run-validation'
+        )
+      ) ||
+      (
+        github.event_name == 'push' &&
+        !contains(github.event.head_commit.message, '[skip val]')
+      )
 
     container: docker://legendexp/remage-base:stable
 
