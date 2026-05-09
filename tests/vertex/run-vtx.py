@@ -81,7 +81,6 @@ if "pos" in macro:
 
     output_pos = output_pos.to_numpy()
 
-    input_pos = input_pos.iloc[0 : len(output_pos)]
     input_pos = input_pos[["xloc", "yloc", "zloc"]]
     input_pos = input_pos.to_numpy()
 
@@ -89,11 +88,16 @@ if "pos" in macro:
     if "vtx-pos-mm.lh5" in pos_input_file:
         input_pos /= 1000
 
+    def _compare_input_output(output_pos, input_pos):
+        return np.all(np.isclose(output_pos, input_pos[0 : len(output_pos)]))
+
     if not multi_vertex:
-        assert np.all(np.isclose(output_pos, input_pos))
+        assert _compare_input_output(output_pos, input_pos)
     else:
-        assert np.all(np.isclose(output_pos[0::2], input_pos))
-        assert np.all(np.isclose(output_pos[1::2], input_pos))
+        # the first and second particle emitted in each event are interleaved in the
+        # output file and should have the same position.
+        assert _compare_input_output(output_pos[0::2], input_pos)
+        assert _compare_input_output(output_pos[1::2], input_pos)
 
 if "kin" in macro:
     kin_input_file = kin_input_file.replace(".hdf5", ".lh5")
