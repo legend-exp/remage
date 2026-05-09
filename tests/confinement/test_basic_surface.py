@@ -39,11 +39,14 @@ tol = 1e-6  # mm
 select_sides = {
     "tubby": {
         "func": [
-            lambda x, y, z: (abs(z - 30) < tol) & (np.sqrt(x**2 + y**2) < 60),  # bottom
+            # bottom:
+            lambda x, y, z: (abs(z - 30) < tol) & (np.sqrt(x**2 + y**2) < 60 + tol),
+            # side:
             lambda x, y, z: (
-                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 - tol)
-            ),  # side
-            lambda x, y, z: (abs(z + 30) < tol) & (np.sqrt(x**2 + y**2) < 60),  # top
+                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 + tol)
+            ),
+            # top:
+            lambda x, y, z: (abs(z + 30) < tol) & (np.sqrt(x**2 + y**2) < 60 + tol),
         ],
         "area": [
             np.pi * 60**2,
@@ -55,39 +58,45 @@ select_sides = {
     },
     "sub": {
         "func": [
+            # bottom:
             lambda x, y, z: (
                 (abs(z + 30) < tol)
-                & (np.sqrt(x**2 + y**2) < 60)
-                & (np.sqrt(x**2 + y**2) > 20)
-            ),  # bottom
+                & (np.sqrt(x**2 + y**2) < 60 + tol)
+                & (np.sqrt(x**2 + y**2) > 20 - tol)
+            ),
+            # top:
             lambda x, y, z: (
                 (abs(z - 30) < tol)
-                & (np.sqrt(x**2 + y**2) < 60)
-                & (np.sqrt(x**2 + y**2) > 20)
-            ),  # top
+                & (np.sqrt(x**2 + y**2) < 60 + tol)
+                & (np.sqrt(x**2 + y**2) > 20 - tol)
+            ),
+            # outside:
             lambda x, y, z: (
-                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 - tol)
-            ),  # outside
+                (abs(np.sqrt(x**2 + y**2) - 60) < tol) & (abs(z) < 30 + tol)
+            ),
+            # inside:
             lambda x, y, z: (
-                (abs(np.sqrt(x**2 + y**2) - 20) < tol) & (abs(z) < 30 - tol)
-            ),  # inside
+                (abs(np.sqrt(x**2 + y**2) - 20) < tol) & (abs(z) < 30 + tol)
+            ),
         ],
         "area": [
             np.pi * (60**2 - 20**2),  # bottom
             np.pi * (60**2 - 20**2),  # top
             2 * np.pi * 60 * 60,  # outside
-            2 * np.pi * 60 * 20,
-        ],  # inside
+            2 * np.pi * 60 * 20,  # inside
+        ],
         "order": [1, 2, 3, 0],
         "nice_name": "subtraction of two G4Tubs",
     },
     "con": {
         "func": [
-            lambda x, y, z: (abs(z + 50) < tol) & (np.sqrt(x**2 + y**2) < 60),  # bottom
+            # bottom:
+            lambda x, y, z: (abs(z + 50) < tol) & (np.sqrt(x**2 + y**2) < 60 + tol),
+            # side:
             lambda x, y, z: (
                 (abs(z + 100 * (np.sqrt(x**2 + y**2) / 60) - 50) < tol)
-                & (abs(z) < 50 - tol)
-            ),  # side,
+                & (abs(z) < 50 + tol)
+            ),
         ],
         "area": [
             np.pi * 60**2,  # bottom
@@ -98,43 +107,74 @@ select_sides = {
     },
     "box": {
         "func": [
-            lambda x, y, z: (abs(z - 50) < tol) & (abs(x) < 25) & (abs(y) < 25),  # top
+            # top:
             lambda x, y, z: (
-                (abs(x - 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol)
-            ),  # sides
-            lambda x, y, z: (abs(y - 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(x + 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(y + 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(z + 50) < tol) & (abs(x) < 25) & (abs(y) < 25),
-        ],  # bottom
+                (abs(z - 50) < tol) & (abs(x) < 25 + tol) & (abs(y) < 25 + tol)
+            ),
+            # sides:
+            lambda x, y, z: (
+                (abs(x - 25) < tol) & (abs(y) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y - 25) < tol) & (abs(x) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(x + 25) < tol) & (abs(y) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y + 25) < tol) & (abs(x) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            # bottom:
+            lambda x, y, z: (
+                (abs(z + 50) < tol) & (abs(x) < 25 + tol) & (abs(y) < 25 + tol)
+            ),
+        ],
         "area": [50**2, 100 * 50, 100 * 50, 100 * 50, 100 * 50, 50**2],
         "order": [0, 1, 2, 3, 4, 5],
         "nice_name": "G4Box",
     },
     "uni": {
         "func": [
+            # bottom:
             lambda x, y, z: (
-                (abs(z + 50) < tol) & (abs(x) < 25) & (abs(y) < 25)
-            ),  # bottom
+                (abs(z + 50) < tol) & (abs(x) < 25 + tol) & (abs(y) < 25 + tol)
+            ),
+            # sides:
             lambda x, y, z: (
-                (abs(x - 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol)
-            ),  # sides
-            lambda x, y, z: (abs(y - 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(x + 25) < tol) & (abs(y) < 25) & (abs(z) < 50 - tol),
-            lambda x, y, z: (abs(y + 25) < tol) & (abs(x) < 25) & (abs(z) < 50 - tol),
+                (abs(x - 25) < tol) & (abs(y) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y - 25) < tol) & (abs(x) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(x + 25) < tol) & (abs(y) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y + 25) < tol) & (abs(x) < 25 + tol) & (abs(z) < 50 + tol)
+            ),
+            # top:
             lambda x, y, z: (
                 (abs(z - 50) < tol)
-                & (abs(x) < 25)
-                & (abs(y) < 25)
-                & ((abs(x) > 10) | (abs(y) > 10))
-            ),  # top
+                & (abs(x) < 25 + tol)
+                & (abs(y) < 25 + tol)
+                & ((abs(x) > 10 - tol) | (abs(y) > 10 - tol))
+            ),
+            # small sides:
             lambda x, y, z: (
-                (abs(x - 10) < tol) & (abs(y) < 10) & (abs(z - 75) < 25)
-            ),  # small sides
-            lambda x, y, z: (abs(y - 10) < tol) & (abs(x) < 10) & (abs(z - 75) < 25),
-            lambda x, y, z: (abs(x + 10) < tol) & (abs(y) < 10) & (abs(z - 75) < 25),
-            lambda x, y, z: (abs(y + 10) < tol) & (abs(x) < 10) & (abs(z - 75) < 25),
-            lambda x, y, z: (abs(z - 100) < tol) & (abs(x) < 10) & (abs(y) < 10),
+                (abs(x - 10) < tol) & (abs(y) < 10 + tol) & (abs(z - 75) < 25 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y - 10) < tol) & (abs(x) < 10 + tol) & (abs(z - 75) < 25 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(x + 10) < tol) & (abs(y) < 10 + tol) & (abs(z - 75) < 25 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(y + 10) < tol) & (abs(x) < 10 + tol) & (abs(z - 75) < 25 + tol)
+            ),
+            lambda x, y, z: (
+                (abs(z - 100) < tol) & (abs(x) < 10 + tol) & (abs(y) < 10 + tol)
+            ),
         ],
         "area": [
             50 * 50.0,
@@ -152,32 +192,55 @@ select_sides = {
         "order": [5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 0],
         "nice_name": "Union of two G4Boxs",
     },
-    "trd": {
+    "trd": {  # TODO: the x/y comparisons
         "func": [
-            lambda x, y, z: (abs(z + 50) < tol) & (abs(x) < 25) & (abs(y) < 25),  # base
-            lambda x, y, z: (abs(z - 50) < tol) & (abs(x) < 5) & (abs(y) < 5),  # top
+            # top:
             lambda x, y, z: (
-                (y > 5) & (y < 25) & (y > x) & (y > -x) & (abs(z) < 50 - tol)
-            ),  # sides
+                (abs(z - 50) < tol) & (abs(x) < 5 + tol) & (abs(y) < 5 + tol)
+            ),
+            # sides:
             lambda x, y, z: (
-                (-y > 5) & (-y < 25) & (-y > x) & (-y > -x) & (abs(z) < 50 - tol)
+                (y > 5 - tol)
+                & (y < 25 + tol)
+                & (y > x)
+                & (y > -x)
+                & (abs(z) < 50 + tol)
             ),
             lambda x, y, z: (
-                (x > 5) & (x < 25) & (x > y) & (x > -y) & (abs(z) < 50 - tol)
+                (-y > 5 - tol)
+                & (-y < 25 + tol)
+                & (-y > x)
+                & (-y > -x)
+                & (abs(z) < 50 + tol)
             ),
             lambda x, y, z: (
-                (-x > 5) & (-x < 25) & (-x > y) & (-x > -y) & (abs(z) < 50 - tol)
+                (x > 5 - tol)
+                & (x < 25 + tol)
+                & (x > y)
+                & (x > -y)
+                & (abs(z) < 50 + tol)
+            ),
+            lambda x, y, z: (
+                (-x > 5 - tol)
+                & (-x < 25 + tol)
+                & (-x > y)
+                & (-x > -y)
+                & (abs(z) < 50 + tol)
+            ),
+            # base:
+            lambda x, y, z: (
+                (abs(z + 50) < tol) & (abs(x) < 25 + tol) & (abs(y) < 25 + tol)
             ),
         ],
         "area": [
-            50 * 50.0,
             10 * 10.0,
             np.sqrt(20 * 20 + 100 * 100) * (10 + 50) / 2.0,
             np.sqrt(20 * 20 + 100 * 100) * (10 + 50) / 2.0,
             np.sqrt(20 * 20 + 100 * 100) * (10 + 50) / 2.0,
             np.sqrt(20 * 20 + 100 * 100) * (10 + 50) / 2.0,
+            50 * 50.0,
         ],
-        "order": [1, 2, 4, 3, 5, 0],
+        "order": [0, 1, 3, 2, 4, 5],
         "nice_name": "G4Trapezoid",
     },
 }
