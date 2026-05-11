@@ -7,6 +7,7 @@ import lh5
 import numpy as np
 import pyg4ometry as pg4
 from matplotlib import pyplot as plt
+from remage import remage_run
 from scipy import stats
 
 plt.rcParams["lines.linewidth"] = 1
@@ -18,6 +19,15 @@ parser.add_argument("det", type=str, help="detector type")
 
 args = parser.parse_args()
 
+remage_run(
+    "macros/gen-surface.mac",
+    gdml_files="gdml/simple-solids.gdml",
+    macro_substitutions={"det": args.det},
+    overwrite_output=True,
+    log_level="detail",
+    flat_output=True,
+    output=f"test-confine-surface-{args.det}-out.lh5",
+)
 
 gdml = "gdml/simple-solids.gdml"
 

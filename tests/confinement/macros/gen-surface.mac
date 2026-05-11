@@ -1,5 +1,5 @@
 /RMG/Output/NtuplePerDetector false
-/RMG/Geometry/RegisterDetector Germanium ${det} 001
+/RMG/Geometry/RegisterDetector Germanium {det} 001
 
 /run/initialize
 
@@ -8,7 +8,7 @@
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/SampleOnSurface true
 
-/RMG/Generator/Confinement/Physical/AddVolume ${det}
+/RMG/Generator/Confinement/Physical/AddVolume {det}
 /RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
 
 /gps/particle e-
