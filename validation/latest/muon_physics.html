@@ -1,0 +1,846 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Gamma correlations" href="gammacorr.html"><link rel="prev" title="Internal Bremsstrahlung in Ar-39 decay" href="processes-ib.html">
+        <link rel="prefetch" href="_static/remage-logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Muon physics validation - remage 0.23.1.dev9+g906e81c00 validation suite</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     <em>Work in progress:</em> we are currently populating the validation report, come back at a later point! 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">remage 0.23.1.dev9+g906e81c00 validation suite</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">remage 0.23.1.dev9+g906e81c00 validation suite</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="versioninfo.html">About this validation report</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bxdecay0.html">Double-beta decay physics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="confinement.html">Vertex confinement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distances.html">HPGe detector distance to surface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nist.html">Comparison with NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="neutrons.html">Neutron transport and capture spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="observables-ge.html">HPGe tracking and observables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Physics lists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes-ib.html">Internal Bremsstrahlung in Ar-39 decay</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Muon physics validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gammacorr.html">Gamma correlations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optics.html">Optical physics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gespectrum.html">Germanium spectra</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://remage.readthedocs.io">remage documentation</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/blob/main/docs/validation/muon_physics.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/legend-exp/remage/edit/main/docs/validation/muon_physics.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="muon-physics-validation">
+<h1>Muon physics validation<a class="headerlink" href="#muon-physics-validation" title="Link to this heading">¶</a></h1>
+<p>This page focuses on validating the physics of muons in remage, with a
+particular emphasis on muon-induced neutron production and its relevance for
+cosmogenic backgrounds in LEGEND.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>Atmospheric muons are a relevant background source for underground
+low-background experiments. For LEGEND at the Gran Sasso underground laboratory,
+two classes of muon-induced backgrounds are important: prompt backgrounds from
+direct energy deposition by muons and their secondaries, and delayed backgrounds
+from radioactive isotopes produced in muon-induced showers.</p>
+<p>For delayed backgrounds in LEGEND, one of the most relevant isotopes is
+<span class="math notranslate nohighlight">\(^{77}\)</span>Ge, produced via neutron capture on <span class="math notranslate nohighlight">\(^{76}\)</span>Ge,
+<span class="math notranslate nohighlight">\(^{76}\mathrm{Ge}(n,\gamma){}^{77}\mathrm{Ge}\)</span> <a class="footnote-reference brackets" href="#ge77-2018" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#ge77-2025" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>
+<a class="footnote-reference brackets" href="#moritz-thesis" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. In particular, its isomeric state at 160 keV,
+<span class="math notranslate nohighlight">\(^{77\mathrm{m}}\mathrm{Ge}\)</span>, is a concern for LEGEND-1000 because it likely
+decays as a pure beta emitter, mimicking the neutrinoless double-beta decay
+signal. To suppress it, delayed-tagging mechanisms have been developed to
+identify the production of <span class="math notranslate nohighlight">\(^{77\mathrm{m}}\mathrm{Ge}\)</span>, though this requires a
+robust understanding of muon-induced neutron production and transport in the
+simulation.</p>
+<p>To model muons, one first has to understand their initial energy distribution.
+At sea level, the muon spectrum is commonly described by the Gaisser
+parameterization <a class="footnote-reference brackets" href="#gaisser" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>, while underground spectra are typically obtained by
+propagating muons through rock with tools such as MUSIC/MUSUN <a class="footnote-reference brackets" href="#music-musun" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.
+This leads to a broad underground spectrum, which motivates testing across wide
+energy intervals. At Gran Sasso, muon energies range from tens of GeV to several
+TeV with an average around 273 GeV. In addition, muons traverse different
+materials in the LEGEND setup, in particular rock, water, and liquid argon. A
+meaningful validation of muon physics in remage therefore has to cover both a
+broad energy range and multiple materials.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Limitations</strong>: These tests use simplified configurations, such as
+mono-energetic muons, idealized pure materials, reduced electron/gamma tracking
+thresholds (≈8 MeV), and limited statistics (≈20k events per configuration).
+They are intended to detect large discrepancies and assess model consistency
+(remage vs. FLUKA / literature), not to provide quantitative predictions of
+LEGEND’s in‑situ background rates. Interpret results comparatively. Do not
+extrapolate them to experimental backgrounds without a dedicated, site‑specific
+study.</p>
+</div>
+</section>
+<section id="validation-approach">
+<h2>Validation approach<a class="headerlink" href="#validation-approach" title="Link to this heading">¶</a></h2>
+<p>Two separate setups are used in this validation: one for the energy-loss
+measurements (Section 1) and a second for neutron yield, isotope production and
+shower dimensions (Sections 2–4).</p>
+<ul class="simple">
+<li><p>Energy-loss setup: mono-energetic muons are shot through a block of material.
+The block length is chosen such that the muon loses about 5% of its initial
+energy (this keeps the effective energy-averaging window small while providing
+sufficient statistics for the mean loss measurement).</p></li>
+<li><p>Neutron/isotope/shower setup: mono-energetic muons are shot through a cylinder
+of material with length <span class="math notranslate nohighlight">\(2000\,g/cm^2\\cdot\\rho\)</span> and radius 1.25 m (chosen
+for containment). Electrons and gammas are tracked down to the lowest neutron
+separation energy in the material (slightly below 10 MeV in these setups).
+Each configuration is limited to ≈20k events due to computational cost. This
+test setups were designed to be as close as possible to the setup in
+<a class="footnote-reference brackets" href="#manukovsky" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>, which provides a useful baseline for cross-version consistency
+checks.</p></li>
+</ul>
+<p>This validation page focuses on four observables. For prompt backgrounds, the
+key observable is the mean muon energy loss (1) in matter, compared to PDG
+reference tables <a class="footnote-reference brackets" href="#pdg-energy-loss" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>. For delayed backgrounds, the key observable
+is the muon-induced neutron yield (2), compared to both parameterizations and
+previous simulations <a class="footnote-reference brackets" href="#wang" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#kudryavtsev" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#agafonova" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#manukovsky" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>. In
+addition, the individual contribution from different production channels and the
+multiplicity of neutrons per interaction. This allows for more meanigful
+comparison between different physics lists or simulation frameworks.
+Furthermore, the production of radioactive isotopes in the shower (3) is of
+interest to understand the contribution from not only neutron capture but also
+from spallation processes, which usually have high systematic uncertainties.
+Finally, the development of the shower profile as a function of penetration
+depth (4) allows for a cross-check of the whole muon shower physics and to
+identify general issues in the physics model.</p>
+<p>In addition, the Neutron/isotope/shower setup also were used to generate
+reference FLUKA simulations (v4.5.1) for comparison. The workflow for these
+FLUKA simulations can be found,
+[<a class="reference external" href="https://github.com/MoritzNeuberger/remage_fluka_muon_validation/tree/main">here</a>]
+and uses the following physics settings: PRECISIO, PHOTONUC, EVAPORAT, COALESCE,
+EM-DISSO, IONTRANS and JEFF-3.3 for neutron cross-sections. FLUKA is a
+well-studied Monte Carlo simulation tool for hadronic interactions and is widely
+adopted to estimate production of particles.</p>
+<p>Finally, whenever possible, the generated observables are also compared to
+literature experimental measurements and to reference simulations from Geant4
+and FLUKA.</p>
+</section>
+<section id="energy-loss-of-muons-in-matter">
+<h2>1.) Energy loss of muons in matter<a class="headerlink" href="#energy-loss-of-muons-in-matter" title="Link to this heading">¶</a></h2>
+<p>The energy loss of muons in matter consists of four main processes: ionization,
+bremsstrahlung, pair production, and photonuclear interactions. Ionization is a
+continuous process and dominates at lower energies, while the latter three are
+stochastic and become increasingly relevant at higher energies. In water and
+liquid argon, the transition between the two regimes is around 100 GeV.</p>
+<p>In Geant4, ionization is implemented using three different models according to
+the energy of the muon
+<a class="reference external" href="https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/electromagnetic/muon_incident/muion.html">[Muon Ionisation]</a>,
+while the other three processes are implemented using ultrarelativistic
+approximation models
+<a class="reference external" href="https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/electromagnetic/muon_incident/mubrem.html">[Muon Bremsstrahlung]</a>,
+<a class="reference external" href="https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/electromagnetic/muon_incident/pair.html">[Muon Pair Production]</a>,
+<a class="reference external" href="https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/electromagnetic/muon_incident/munu.html">[Muon Photonuclear Interaction]</a>.</p>
+<p>The mean energy loss from the individual processes is tabulated in the PDG
+<a class="footnote-reference brackets" href="#pdg-energy-loss" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>, and the total energy loss is given by their sum. At high
+energies, event-by-event energy loss fluctuations are large because stochastic
+processes dominate. A full reconstruction of single-muon loss spectra (energy
+straggling) and a clean decomposition of process-by-process contributions would
+be interesting, but are complex to model and beyond the scope of this
+validation.</p>
+<p>The plots below show the mean energy loss of muons in water and liquid argon as
+a function of the muon energy. The simulation estimates were generated by
+shooting mono-energetic muons through a block of material, with the block length
+chosen such that the muon loses about 5% of its initial energy. The simulated
+mean values are then compared to the tabulated PDG expectation. Agreement should
+be good over the full energy range.</p>
+<a class="reference internal image-reference" href="_images/energy_loss_water_energy_range.output.png"><img alt="Energy loss of muons in water compared to DOI: 10.1006/adnd.2001.0861" src="_images/energy_loss_water_energy_range.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Energy loss of muons in water compared to DOI: 10.1006/adnd.2001.0861</p>
+<a class="reference internal image-reference" href="_images/energy_loss_lar_energy_range.output.png"><img alt="Energy loss of muons in liquid argon compared to DOI: 10.1006/adnd.2001.0861" src="_images/energy_loss_lar_energy_range.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Energy loss of muons in liquid argon compared to DOI:
+10.1006/adnd.2001.0861</p>
+</section>
+<section id="muon-induced-neutron-yield">
+<h2>2.) Muon induced neutron yield<a class="headerlink" href="#muon-induced-neutron-yield" title="Link to this heading">¶</a></h2>
+<p>The muon-induced neutron yield is one the most relevant observables to validate
+the delayed cosmogenic backgrounds in LEGEND, but it is also one of the most
+difficult to model robustly.</p>
+<p>Following <a class="footnote-reference brackets" href="#wang" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>, the dominant neutron-production mechanisms are:</p>
+<ul class="simple">
+<li><p>Muon spallation via virtual-photon exchange. This channel is a major source of
+theoretical uncertainty.</p></li>
+<li><p>Muon elastic scattering on bound neutrons, summarized as <span class="math notranslate nohighlight">\((\mu,\mu n)\)</span>.</p></li>
+<li><p>Photonuclear reactions from electromagnetic showers, <span class="math notranslate nohighlight">\((\gamma,Xn)\)</span>.</p></li>
+<li><p>Secondary neutron multiplication following the primary channels, dominated by
+inelastic neutron reactions <span class="math notranslate nohighlight">\((n,Xn)\)</span>.</p></li>
+</ul>
+<p>In the following test, neutron yields are compared to three different types of
+references:</p>
+<ul class="simple">
+<li><p><strong>Experimental estimates</strong> from water based experiments such as
+Super-Kamiokande <a class="footnote-reference brackets" href="#sk" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a> and SNO+ <a class="footnote-reference brackets" href="#sno" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a>.</p></li>
+<li><p><strong>Parameterizations</strong> based on experimental and simulation data from
+literature, such as <a class="footnote-reference brackets" href="#agafonova" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#wang" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#kudryavtsev" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>, and <a class="footnote-reference brackets" href="#manukovsky" id="id19" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>.</p></li>
+<li><p><strong>Dedicated FLUKA simulations</strong> performed with the same geometry and physics
+settings as the remage simulations.</p></li>
+</ul>
+<p>The experimental values are the most robust references, however, they are scarce
+since neutron-yield measurements require large detectors with good containment
+and high detection efficiency. Thus, such measurements are available for water
+and liquid scintillator, but (to the knowledge of the author) not for liquid
+argon at relevant muon energies. In addition, since the initial muon energy is
+not known in the relevant experiments, the neutron yield is associated with the
+average muon energy for the corresponding experiment.</p>
+<p>Parameterizations of the neutron yield assume a power-law dependence on the muon
+energy <span class="math notranslate nohighlight">\(E_\mu\)</span> and the target material mass <span class="math notranslate nohighlight">\(A\)</span>. A <strong>general parameterization</strong>
+based entirely on experimental data is given by <a class="footnote-reference brackets" href="#agafonova" id="id20" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a> depending both
+<span class="math notranslate nohighlight">\(E_\mu\)</span> and <span class="math notranslate nohighlight">\(A\)</span>, while <strong>material-specific parameterizations</strong>, i.e., only
+dependent on <span class="math notranslate nohighlight">\(E_\mu\)</span> generated for specific <span class="math notranslate nohighlight">\(A\)</span>, based on FLUKA simulations
+<a class="footnote-reference brackets" href="#wang" id="id21" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#kudryavtsev" id="id22" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>, as well as Geant4 simulations <a class="footnote-reference brackets" href="#manukovsky" id="id23" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>. The
+matter-specific parameterizations are expected to be more accurate since they
+can better consider unique characteristics of the target such as the neutron
+separation energy and cross-sections.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Geant4 version (9.4) and G4NDL library (ENDF/B-V) used in <a class="footnote-reference brackets" href="#manukovsky" id="id24" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> are
+outdated compared to current production versions. Deviations can be expected.</p>
+</div>
+<p>Since the FLUKA simulations used in <a class="footnote-reference brackets" href="#wang" id="id25" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#kudryavtsev" id="id26" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> only covered
+water and liquid scintillator and are already quite dated, dedicated FLUKA
+simulations were performed for all test cases presented here to provide a more
+direct comparison.</p>
+<p>In the simulation, mono-energetic muons are shot through a cylinder of material
+with a length of <span class="math notranslate nohighlight">\(2000 g/cm^2 \cdot \rho\)</span> similar to <a class="footnote-reference brackets" href="#manukovsky" id="id27" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>. The radius
+was not reported in <a class="footnote-reference brackets" href="#manukovsky" id="id28" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>, but was chosen to be 1.25 m to ensure good
+containment of the resulting showers. The neutron yield is then calculated as
+the number of neutrons produced per muon per g/cm<span class="math notranslate nohighlight">\(^2\)</span> after the burn-in depth
+(see the shower dimensions section below).</p>
+<p>The following tests are useful to identify large discrepancies between
+simulation and expectation.</p>
+<section id="material-dependence">
+<h3>Material dependence<a class="headerlink" href="#material-dependence" title="Link to this heading">¶</a></h3>
+<p>The following plot shows the muon-induced neutron yield in different materials
+at 100 GeV. The agreement between the remage estimates, the FLUKA estimates and
+the material-specific expectation should be good for all materials, the
+generalized parameterization should give a rough estimate, though it is not
+expected to precisely match the simulated values. Especially, in rock remage is
+expected to result in a higher value compared to FLUKA.</p>
+<a class="reference internal image-reference" href="_images/neutron_yield_material_scan_100.0_Shielding_Livermore_30.output.png"><img alt="Muon induced neutron yield in different materials at 100 GeV. Compared to DOI: 10.1134/S106377881603011X" src="_images/neutron_yield_material_scan_100.0_Shielding_Livermore_30.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron yield in different materials at 100 GeV. Compared
+to DOI: 10.1134/S106377881603011X</p>
+</section>
+<section id="energy-dependence">
+<h3>Energy dependence<a class="headerlink" href="#energy-dependence" title="Link to this heading">¶</a></h3>
+<p>As mentioned above, in underground experiments, the initial muon energy is not
+known and can vary up to several TeV. Instead, usually the neutron yield in
+experiments is associated with the average muon energy for the corresponding
+experiment. This is related to the overburden of the underground site resulting
+in Super-Kamiokande at about 2.7 km.w.e. having a lower mean energy of 259 GeV
+<a class="footnote-reference brackets" href="#sk" id="id29" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a> compared to SNO+ with 364 GeV located at 6 km.w.e. <a class="footnote-reference brackets" href="#sno" id="id30" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a>.</p>
+<p>The following plots show the muon-induced neutron yield at 100 GeV and 280 GeV
+(similar to <a class="footnote-reference brackets" href="#manukovsky" id="id31" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>), the latter roughly corresponding to the mean muon
+energy at Gran Sasso.</p>
+<p>The first plot compares the remage estimated value for water with the
+experimental values and parameterizations. The remage estimate should be
+consistent with the FLUKA estimate and the material-specific parameterization
+lines, the latter in turn should be consistent with measurements. Again, the
+generalized parameterization is expected to deviate significantly from the
+simulated values.</p>
+<a class="reference internal image-reference" href="_images/neutron_yield_energy_scan_water_Shielding_Livermore_30_8.045.output.png"><img alt="Muon induced neutron yield at different energies in water. Compared to DOI: 10.1134/S106377881603011X" src="_images/neutron_yield_energy_scan_water_Shielding_Livermore_30_8.045.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron yield at different energies in water. Compared to
+DOI: 10.1134/S106377881603011X</p>
+<p>The second plot compares the remage estimated value for liquid argon. Since only
+parameterizations from <a class="footnote-reference brackets" href="#manukovsky" id="id32" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#agafonova" id="id33" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a> are available, only these
+are shown. The remage estimate should be consistent with the <a class="footnote-reference brackets" href="#manukovsky" id="id34" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>
+estimate and the FLUKA estimate, while lying above that of <a class="footnote-reference brackets" href="#agafonova" id="id35" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>.</p>
+<a class="reference internal image-reference" href="_images/neutron_yield_energy_scan_lar_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced neutron yield at different energies in liquid argon. Compared to DOI: 10.1134/S106377881603011X" src="_images/neutron_yield_energy_scan_lar_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron yield at different energies in liquid argon.
+Compared to DOI: 10.1134/S106377881603011X</p>
+</section>
+<section id="hadronic-physics-list">
+<h3>Hadronic physics list<a class="headerlink" href="#hadronic-physics-list" title="Link to this heading">¶</a></h3>
+<p>Geant4 offers different default hadronic physics lists using different models at
+different energy ranges. Depending on the model chosen, there might be
+differences in the resulting neutron yield. From previous estimates
+<a class="footnote-reference brackets" href="#moritz-thesis" id="id36" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, differences in isotope production depending on the physics
+lists are <span class="math notranslate nohighlight">\(&lt;10\%\)</span> with QGSP_BIC_HP expected to produce lower neutron yield.</p>
+<p>In the following plot, the neutron yield for liquid argon at 100 GeV is compared
+for different hadronic physics lists, with Shielding being the default used so
+far. With the exposure simulated in this setup, no significant difference should
+be visible.</p>
+<a class="reference internal image-reference" href="_images/neutron_yield_had_physics_scan_100.0_lar_Livermore_30_9.869.output.png"><img alt="Muon induced neutron yield for different hadronic physics lists at 100 GeV in liquid argon." src="_images/neutron_yield_had_physics_scan_100.0_lar_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron yield for different hadronic physics lists at 100
+GeV in liquid argon.</p>
+<p>To understand the reason for the differences between physics lists, it is useful
+to look at the individual contribution of the different incoming particles
+producing the neutrons, which is shown in the following plots together with the
+results for the FLUKA simulations. In addition, the multiplicity of the neutrons
+emitted in the interactions is indicated by color.</p>
+<p>The following plot shows the individual contributions for liquid argon at 100
+GeV. The dominant contribution is expected to come from photonuclear
+interactions <span class="math notranslate nohighlight">\((\gamma,Xn)\)</span> and neutron inelastic interactions <span class="math notranslate nohighlight">\((n,Xn)\)</span>. The
+individual contributions should be consistent among all physics lists and
+particles, with potentially the exception of QGSP_BIC_HP which predicts slightly
+lower neutron yield from neutron inelastic interactions. Conversely, all
+estimates should also be consistent with the FLUKA estimates, with the exception
+of the neutron inelastic interactions, which are expected to be significnatly
+lower in FLUKA any Geant4 physics list.</p>
+<a class="reference internal image-reference" href="_images/neutron_production_particle_hadronic_100.0_lar_Livermore_30_9.869.output.png"><img alt="Muon induced neutron production processes for different hadronic physics lists at 100 GeV in liquid argon." src="_images/neutron_production_particle_hadronic_100.0_lar_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron production processes for different hadronic physics
+lists at 100 GeV in liquid argon.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A caveat regarding inelastic neutron interactions is that in Geant4 the incoming
+neutron track is terminated at these interactions and replaced by one or more
+new outgoing neutron tracks with new track IDs. To avoid double counting, the
+number of outgoing neutrons in these interactions is reduced by one. This
+correction has already been applied in the results shown here.</p>
+</div>
+</section>
+</section>
+<section id="neutron-production-processes">
+<h2>Neutron production processes<a class="headerlink" href="#neutron-production-processes" title="Link to this heading">¶</a></h2>
+<p>In addition to comparing hadronic physics lists, it is also interesting to look
+at the individual contribution of the different incoming particles for different
+material. The following plots show the individual contributions for the
+Shielding physics list for liquid argon (first) and water (second) at 100 GeV,
+as well as for liquid argon at 280 GeV (third).</p>
+<p>Compared to liquid argon, in water, the neutron production is less dominantly
+driven by photonuclear interactions and neutron inelastic interactions, and is
+more evenly distributed. Conversely, at higher energies, in liquid argon, the
+contributions from neutron inelastic interactions and photonuclear interactions
+become even more dominant.</p>
+<a class="reference internal image-reference" href="_images/neutron_production_particle_100.0_lar_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced neutron production processes in liquid argon at 100 GeV." src="_images/neutron_production_particle_100.0_lar_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron production processes in liquid argon at 100 GeV.</p>
+<a class="reference internal image-reference" href="_images/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced neutron production processes in water at 100 GeV." src="_images/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron production processes in water at 100 GeV.</p>
+<a class="reference internal image-reference" href="_images/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced neutron production processes in liquid argon at 280 GeV." src="_images/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced neutron production processes in liquid argon at 280 GeV.</p>
+</section>
+<section id="isotope-production">
+<h2>3.) Isotope production<a class="headerlink" href="#isotope-production" title="Link to this heading">¶</a></h2>
+<p>While the production of <span class="math notranslate nohighlight">\(^{77}\)</span>Ge in LEGEND is driven by neutron capture on
+<span class="math notranslate nohighlight">\(^{76}\)</span>Ge and thus depends on the neutron yield, it is also important to
+understand the production of other isotopes via spallation processes. To this
+end, using the simulations performed in 2.), the production yield per muon was
+calculated for all isotopes produced in the showers in liquid argon and enriched
+germanium at 100 GeV. The following plots show heatmaps of the isotope
+production yield for the two materials in remage and FLUKA, as well as a
+relative comparison between the two. Isotopes identified as potential background
+sources in LEGEND are highlighted in the plots and their production yields
+separately plotted below. In general, the isotope production yields should be
+consistent between remage and FLUKA up to a factor of 2x for the isotopes of
+interest, i.e., the potential background isotopes. In general, the remage
+estimates show slight overproduction compared to FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_remage_lar_100.0_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced isotope production in liquid argon at 100 GeV in remage." src="_images/isotope_production_remage_lar_100.0_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced isotope production in liquid argon at 100 GeV in remage.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_fluka_lar_100.0_Shielding_Livermore_30_9.869.output.png"><img alt="Muon induced isotope production in liquid argon at 100 GeV in FLUKA." src="_images/isotope_production_fluka_lar_100.0_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced isotope production in liquid argon at 100 GeV in FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_diff_lar_100.0_Shielding_Livermore_30_9.869.output.png"><img alt="Relative isotope production in liquid argon at 100 GeV in remage / FLUKA." src="_images/isotope_production_diff_lar_100.0_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Relative isotope production in liquid argon at 100 GeV in remage /
+FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_comp_lar_100.0_Shielding_Livermore_30_9.869.output.png"><img alt="Comparison for relevant isotopes in liquid argon at 100 GeV in remage and FLUKA." src="_images/isotope_production_comp_lar_100.0_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Comparison for relevant isotopes in liquid argon at 100 GeV in remage
+and FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_remage_enrGe_100.0_Shielding_Livermore_30_6.0.output.png"><img alt="Muon induced isotope production in enriched germanium at 100 GeV in remage." src="_images/isotope_production_remage_enrGe_100.0_Shielding_Livermore_30_6.0.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced isotope production in enriched germanium at 100 GeV in
+remage.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_fluka_enrGe_100.0_Shielding_Livermore_30_6.0.output.png"><img alt="Muon induced isotope production in enriched germanium at 100 GeV in FLUKA." src="_images/isotope_production_fluka_enrGe_100.0_Shielding_Livermore_30_6.0.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon induced isotope production in enriched germanium at 100 GeV in
+FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_diff_enrGe_100.0_Shielding_Livermore_30_6.0.output.png"><img alt="Relative isotope production in enriched germanium at 100 GeV in remage / FLUKA." src="_images/isotope_production_diff_enrGe_100.0_Shielding_Livermore_30_6.0.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Relative isotope production in enriched germanium at 100 GeV in remage /
+FLUKA.</p>
+<a class="reference internal image-reference" href="_images/isotope_production_comp_enrGe_100.0_Shielding_Livermore_30_6.0.output.png"><img alt="Comparison for relevant isotopes in enriched germanium at 100 GeV in remage and FLUKA." src="_images/isotope_production_comp_enrGe_100.0_Shielding_Livermore_30_6.0.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Comparison for relevant isotopes in enriched germanium at 100 GeV in
+remage and FLUKA.</p>
+</section>
+<section id="muon-shower-dimensions">
+<h2>4.) Muon shower dimensions<a class="headerlink" href="#muon-shower-dimensions" title="Link to this heading">¶</a></h2>
+<p>To compare muon shower physics across materials, it is useful to study the
+development of the shower profile as a function of penetration depth.</p>
+<p>First, it is important to estimate the “burn-in” depth at which the muon showers
+have fully developed, i.e., the average particle flux and thus the average
+energy deposition along the penetration depth stabilize. This is relevant
+because, in deep-underground simulations, it is desirable to propagate muons
+through the surrounding rock only as far as needed. The minimum simulation depth
+is therefore set by the burn-in depth, after which the resulting particle flux
+in the cavern no longer changes significantly. Since neutrons are the most
+relevant particles for LEGEND, we also evaluate neutron production locations
+along the depth.</p>
+<p>The following plots were generated by summing all simulated muon events in both
+the energy and neutron production profiles. The energy envelope is defined as
+the radius from the beam axis that contains 99.5% of the total energy deposited
+at each depth. The neutron production profile shows the locations of all
+generated neutrons in the simulations as a function of depth and radius from the
+beam axis.</p>
+<p>The shower stabilization depth was estimated as follows: the individual energy
+envelope points were plotted in a histogram according to their radius from the
+beam axis. The mode and FWHM parameters were extracted to estimate the
+stabilized shower width. Based on this, the first energy envelope point above
+the threshold (mode - FWHM/2.335) was assumed to be the depth at which the
+shower stabilizes. This metric is somewhat arbitrary and prone to statistical
+fluctuations, but it is sufficiently robust for the purpose of this validation.</p>
+<p>To the author’s knowledge, there are no direct experimental measurements of this
+burn-in depth or of the detailed neutron production profile. However, previous
+estimates from stable versions of remage indicate that the burn-in depth at 100
+GeV should be roughly 3-4 m in water, 1-2 m in liquid argon, and 1 m in rock.
+The estimated burn-in depth should be consistent across both the energy
+containment envelope and the neutron production profile.</p>
+<p>A second point of interest is the width of the average shower after
+stabilization. This parameter, like the burn-in depth, is material-dependent and
+can signal changes in the underlying physics models if it shifts suddenly
+between Geant4/remage versions. The stabilized width should be roughly 40 cm in
+water, 30 cm in liquid argon, and 20 cm in rock.</p>
+<a class="reference internal image-reference" href="_images/shower_dimensions_100.0_lar_Shielding_Livermore_30_9.869.output.png"><img alt="Muon shower profile in liquid argon at 100 GeV." src="_images/shower_dimensions_100.0_lar_Shielding_Livermore_30_9.869.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon shower profile in liquid argon at 100 GeV.</p>
+<a class="reference internal image-reference" href="_images/shower_dimensions_100.0_rock_Shielding_Livermore_30_8.045.output.png"><img alt="Muon shower profile in rock at 100 GeV." src="_images/shower_dimensions_100.0_rock_Shielding_Livermore_30_8.045.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon shower profile in rock at 100 GeV.</p>
+<a class="reference internal image-reference" href="_images/shower_dimensions_100.0_water_Shielding_Livermore_30_8.045.output.png"><img alt="Muon shower profile in water at 100 GeV." src="_images/shower_dimensions_100.0_water_Shielding_Livermore_30_8.045.output.png" style="height: 300px;" />
+</a>
+<p>Figure: Muon shower profile in water at 100 GeV.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The burn-in depth also depends on energy. Considering the wide muon energy range
+up to several TeV, it is recommended to use burn-in depths of up to ~3 m in
+rock. More thorough estimates should be added here in the future.</p>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="ge77-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Virtual depth by active background suppression: revisiting the cosmic muon
+induced background of GERDA Phase II, Christoph Wiesinger, Luciano Pandola,
+and Stefan Schoenert, Eur. Phys. J. C 78, 597 (2018),
+<a class="reference external" href="https://doi.org/10.1140/epjc/s10052-018-6079-3">10.1140/epjc/s10052-018-6079-3</a>.</p>
+</aside>
+<aside class="footnote brackets" id="ge77-2025" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Search for the in-situ production of Ge in the GERDA neutrinoless
+double-beta decay experiment, GERDA Collaboration, Eur. Phys. J. C 85, 809
+(2025),
+<a class="reference external" href="https://doi.org/10.1140/epjc/s10052-025-14445-x">10.1140/epjc/s10052-025-14445-x</a>.</p>
+</aside>
+<aside class="footnote brackets" id="moritz-thesis" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id36">2</a>)</span>
+<p>Moritz Neuberger, None of the above - A comprehensive study of the
+muon-induced backgrounds in the LEGEND experiment.</p>
+</aside>
+<aside class="footnote brackets" id="gaisser" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>T. K. Gaisser, Cosmic Rays and Particle Physics, Cambridge University Press,
+<a class="reference external" href="https://doi.org/10.1017/CBO9781139192194">10.1017/CBO9781139192194</a>.</p>
+</aside>
+<aside class="footnote brackets" id="music-musun" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Muon simulation codes MUSIC and MUSUN for underground physics, V. A.
+Kudryavtsev, Computer Physics Communications, Volume 180, Issue 3, 2009,
+Pages 339-346,
+<a class="reference external" href="https://doi.org/10.1016/j.cpc.2008.10.013">10.1016/j.cpc.2008.10.013</a>.</p>
+</aside>
+<aside class="footnote brackets" id="manukovsky" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id6">1</a>,<a role="doc-backlink" href="#id11">2</a>,<a role="doc-backlink" href="#id19">3</a>,<a role="doc-backlink" href="#id23">4</a>,<a role="doc-backlink" href="#id24">5</a>,<a role="doc-backlink" href="#id27">6</a>,<a role="doc-backlink" href="#id28">7</a>,<a role="doc-backlink" href="#id31">8</a>,<a role="doc-backlink" href="#id32">9</a>,<a role="doc-backlink" href="#id34">10</a>)</span>
+<p>K. V. Manukovsky, O. G. Ryazhskaya, N. M. Sobolevsky &amp; A. V. Yudin, Neutron
+production by cosmic-ray muons in various materials, Phys. Atom. Nuclei 79,
+631–640 (2016),
+<a class="reference external" href="https://doi.org/10.1134/S106377881603011X">10.1134/S106377881603011X</a>.</p>
+</aside>
+<aside class="footnote brackets" id="pdg-energy-loss" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id7">1</a>,<a role="doc-backlink" href="#id12">2</a>)</span>
+<p>DONALD E. GROOM, NIKOLAI V. MOKHOV, SERGEI I. STRIGANOV, MUON STOPPING POWER
+AND RANGE TABLES 10 MeV–100 TeV, Atomic Data and Nuclear Data Tables, Volume
+78, Issue 2, 2001, Pages 183-356,
+<a class="reference external" href="https://doi.org/10.1006/adnd.2001.0861">10.1006/adnd.2001.0861</a>.</p>
+</aside>
+<aside class="footnote brackets" id="wang" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id8">1</a>,<a role="doc-backlink" href="#id13">2</a>,<a role="doc-backlink" href="#id17">3</a>,<a role="doc-backlink" href="#id21">4</a>,<a role="doc-backlink" href="#id25">5</a>)</span>
+<p>Y.-F. Wang, V. Balic, G. Gratta, A. Fassò, S. Roesler, and A. Ferrari,
+Predicting neutron production from cosmic-ray muons, Physical Review D 64,
+013012 (2001),
+<a class="reference external" href="https://doi.org/10.1103/physrevd.64.013012">10.1103/physrevd.64.013012</a>.</p>
+</aside>
+<aside class="footnote brackets" id="kudryavtsev" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id18">2</a>,<a role="doc-backlink" href="#id22">3</a>,<a role="doc-backlink" href="#id26">4</a>)</span>
+<p>V. A. Kudryavtsev, N. J. C. Spooner, and J. E. McMillan, Simulations of
+muon-induced neutron flux at large depths underground, Nuclear Instruments
+and Methods in Physics Research Section A: Accelerators, Spectrometers,
+Detectors and Associated Equipment, Volume 505, Issues 3, 2003, Pages
+688-698,
+<a class="reference external" href="https://doi.org/10.1016/S0168-9002(03)00983-5">10.1016/S0168-9002(03)00983-5</a>.</p>
+</aside>
+<aside class="footnote brackets" id="agafonova" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id10">1</a>,<a role="doc-backlink" href="#id16">2</a>,<a role="doc-backlink" href="#id20">3</a>,<a role="doc-backlink" href="#id33">4</a>,<a role="doc-backlink" href="#id35">5</a>)</span>
+<p>N. Yu. Agafonova and A. S. Malgin, Universal formula for the muon-induced
+neutron yield, Phys. Rev. D 87, 113013 – Published 27 June, 2013,
+<a class="reference external" href="https://doi.org/10.1103/physrevd.87.113013">10.1103/physrevd.87.113013</a>.</p>
+</aside>
+<aside class="footnote brackets" id="sk" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id14">1</a>,<a role="doc-backlink" href="#id29">2</a>)</span>
+<p>Super-Kamiokande Collaboration, Measurement of the cosmogenic neutron yield
+in Super-Kamiokande with gadolinium loaded water,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevD.107.092009">10.1103/PhysRevD.107.092009</a>.</p>
+</aside>
+<aside class="footnote brackets" id="sno" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id15">1</a>,<a role="doc-backlink" href="#id30">2</a>)</span>
+<p>SNO+ Collaboration, Cosmogenic Neutron Production in Water at SNO+,
+<a class="reference external" href="https://doi.org/10.1103/vs3y-sbb2">10.1103/vs3y-sbb2</a>.</p>
+</aside>
+</aside>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="gammacorr.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Gamma correlations</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="processes-ib.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Internal Bremsstrahlung in Ar-39 decay</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2020, the LEGEND Collaboration
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Muon physics validation</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#validation-approach">Validation approach</a></li>
+<li><a class="reference internal" href="#energy-loss-of-muons-in-matter">1.) Energy loss of muons in matter</a></li>
+<li><a class="reference internal" href="#muon-induced-neutron-yield">2.) Muon induced neutron yield</a><ul>
+<li><a class="reference internal" href="#material-dependence">Material dependence</a></li>
+<li><a class="reference internal" href="#energy-dependence">Energy dependence</a></li>
+<li><a class="reference internal" href="#hadronic-physics-list">Hadronic physics list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#neutron-production-processes">Neutron production processes</a></li>
+<li><a class="reference internal" href="#isotope-production">3.) Isotope production</a></li>
+<li><a class="reference internal" href="#muon-shower-dimensions">4.) Muon shower dimensions</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/tabs.js?v=3ee01567"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>
