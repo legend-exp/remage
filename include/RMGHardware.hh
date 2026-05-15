@@ -20,6 +20,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "G4GenericMessenger.hh"
@@ -33,6 +34,7 @@
 #include "RMGVOutputScheme.hh"
 
 /** @brief Class to handle the detector geometry hardware, extends @c G4VUserDetectorConstruction. */
+class G4LogicalVolume;
 class G4VPhysicalVolume;
 class RMGHardware : public G4VUserDetectorConstruction {
 
@@ -158,6 +160,23 @@ class RMGHardware : public G4VUserDetectorConstruction {
      */
     void SetMaxStepLimit(double max_step, std::string name);
 
+    /** @brief Set a minimum kinetic energy cut for one selected particle in a volume.
+     *
+     * @details This sets @c G4UserLimits::SetUserMinEkine on matching logical volumes, but the
+     * corresponding cut process is applied only to registered particles.
+     *
+     * @param ekin_min Minimum kinetic energy.
+     * @param name Physical volume name or regex.
+     * @param particle_name Geant4 particle name.
+     */
+    void SetEminLimitForParticle(double ekin_min, std::string name, std::string particle_name);
+
+    /** @brief Check if selective EkinMin should be applied for the current track context. */
+    static bool IsEminLimitParticleSelected(
+        const G4LogicalVolume* logical,
+        const std::string& particle_name
+    );
+
     void PrintListOfLogicalVolumes() { RMGNavigationTools::PrintListOfLogicalVolumes(); }
     void PrintListOfPhysicalVolumes() { RMGNavigationTools::PrintListOfPhysicalVolumes(); }
 
@@ -175,6 +194,13 @@ class RMGHardware : public G4VUserDetectorConstruction {
     bool fGDMLDisableXmlCheck = false;
     /// Mapping between physical volume names and maximum (user) step size to apply
     std::map<std::string, double> fPhysVolStepLimits;
+
+    struct RMGSelectiveEminLimit {
+        double ekin_min;
+        std::set<std::string> particles;
+    };
+    std::map<std::string, RMGSelectiveEminLimit> fPhysVolEminLimits;
+    static std::unordered_map<const G4LogicalVolume*, std::set<std::string>> fLogicalVolEminParticles;
 
     // one element for each sensitive detector physical volume
     std::map<std::pair<std::string, int>, RMGDetectorMetadata> fDetectorMetadata;

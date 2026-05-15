@@ -15,6 +15,7 @@
 
 #include "RMGHardware.hh"
 
+#include <algorithm>
 #include <filesystem>
 #include <format>
 namespace fs = std::filesystem;
@@ -41,6 +42,8 @@ namespace fs = std::filesystem;
 #include "RMGScintillatorOutputScheme.hh"
 #include "RMGTools.hh"
 
+#include "fmt/ranges.h"
+
 #if RMG_HAS_GDML
 #include "G4GDMLParser.hh"
 #endif
@@ -50,6 +53,9 @@ namespace fs = std::filesystem;
 G4ThreadLocal std::vector<std::shared_ptr<RMGVOutputScheme>> RMGHardware::fActiveOutputSchemes = {};
 
 G4ThreadLocal bool RMGHardware::fActiveDetectorsInitialized = false;
+
+std::unordered_map<const G4LogicalVolume*, std::set<std::string>>
+    RMGHardware::fLogicalVolEminParticles = {};
 
 RMGHardware::RMGHardware() { this->DefineCommands(); }
 
@@ -165,8 +171,62 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       );
     } else {
       for (const auto& vol : volumes) {
-        vol->GetLogicalVolume()->SetUserLimits(new G4UserLimits(el.second));
+        G4LogicalVolume* logical = vol->GetLogicalVolume();
+        auto userLimits = logical->GetUserLimits();
+        if (!userLimits) { userLimits = new G4UserLimits(); }
+        userLimits->SetMaxAllowedStep(el.second);
+        logical->SetUserLimits(userLimits);
       }
+    }
+  }
+
+  // attach particle-selective user min kinetic energy cuts to logical volumes
+  fLogicalVolEminParticles.clear();
+  std::unordered_map<const G4LogicalVolume*, double> logical_ekin_limits;
+  for (const auto& [vol_name, cfg] : fPhysVolEminLimits) {
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "Setting selective min user kinetic energy for volume '{}' to {} ({})",
+        vol_name,
+        cfg.ekin_min,
+        fmt::join(cfg.particles, ",")
+    );
+    auto volumes = RMGNavigationTools::FindPhysicalVolume(vol_name);
+    if (volumes.empty()) {
+      RMGLog::Out(
+          RMGLog::error,
+          "No matching volumes for '{}' found, skipping selective user ekin min limit setting",
+          vol_name
+      );
+      continue;
+    }
+
+    for (const auto& vol : volumes) {
+      G4LogicalVolume* logical = vol->GetLogicalVolume();
+
+      const auto ekin_it = logical_ekin_limits.find(logical);
+      if (ekin_it != logical_ekin_limits.end() && ekin_it->second != cfg.ekin_min) {
+        RMGLog::OutFormat(
+            RMGLog::error,
+            "Conflicting selective ekin min limits for logical volume {} ({} vs {} MeV), "
+            "skipping registration from pattern '{}'",
+            logical->GetName(),
+            ekin_it->second,
+            cfg.ekin_min,
+            vol_name
+        );
+        continue;
+      }
+
+      auto userLimits = logical->GetUserLimits();
+      if (!userLimits) userLimits = new G4UserLimits();
+      userLimits->SetUserMinEkine(cfg.ekin_min);
+      logical->SetUserLimits(userLimits);
+
+      logical_ekin_limits.emplace(logical, cfg.ekin_min);
+
+      auto [it, inserted] = fLogicalVolEminParticles.try_emplace(logical, cfg.particles);
+      if (!inserted) { it->second.insert(cfg.particles.begin(), cfg.particles.end()); }
     }
   }
 
@@ -485,6 +545,48 @@ void RMGHardware::SetMaxStepLimit(double max_step, std::string name) {
   fPhysVolStepLimits.insert_or_assign(name, max_step);
 
   RMGLog::OutFormat(RMGLog::detail, "Set step limits for {:s} to {:.2f} mm", name, max_step);
+}
+
+void RMGHardware::SetEminLimitForParticle(double ekin_min, std::string name, std::string particle_name) {
+  if (particle_name.empty()) {
+    RMGLog::Out(
+        RMGLog::error,
+        "No particle name was provided for selective ekin min limit, ignoring command"
+    );
+    return;
+  }
+
+  auto [it, inserted] = fPhysVolEminLimits.try_emplace(name, RMGSelectiveEminLimit{ekin_min, {}});
+  if (!inserted && it->second.ekin_min != ekin_min) {
+    RMGLog::OutFormat(
+        RMGLog::error,
+        "Conflicting selective ekin min limit for volume {:s}: existing {:.2f} MeV, requested "
+        "{:.2f} MeV",
+        name,
+        it->second.ekin_min,
+        ekin_min
+    );
+    return;
+  }
+
+  it->second.particles.insert(particle_name);
+  RMGLog::OutFormat(
+      RMGLog::detail,
+      "Set selective ekin min limit for {:s} to {:.2f} MeV (particle: {})",
+      name,
+      ekin_min,
+      particle_name
+  );
+}
+
+bool RMGHardware::IsEminLimitParticleSelected(
+    const G4LogicalVolume* logical,
+    const std::string& particle_name
+) {
+  if (!logical) return false;
+  const auto it = fLogicalVolEminParticles.find(logical);
+  if (it == fLogicalVolEminParticles.end()) return false;
+  return it->second.find(particle_name) != it->second.end();
 }
 
 void RMGHardware::RegisterDetectorsFromGDML(std::string s) {

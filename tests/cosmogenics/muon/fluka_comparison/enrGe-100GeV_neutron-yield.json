@@ -1,0 +1,26 @@
+{
+  "yield_accepted": { "val": 0.0, "unc": 0.0 },
+  "yield_total": { "val": 0.0009368337515681622, "unc": 1.5937440935881798e-5 },
+  "raw": [
+    { "yield_accepted": -0.0, "yield_total": 0.001090425001825258 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008887250014876331 },
+    { "yield_accepted": -0.0, "yield_total": 0.000913650001529355 },
+    { "yield_accepted": -0.0, "yield_total": 0.0009774250016361076 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008530250014278751 },
+    { "yield_accepted": -0.0, "yield_total": 0.000931500001559234 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008847250014809375 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008584000014368723 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008907500014910227 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008825750014773387 },
+    { "yield_accepted": -0.0, "yield_total": 0.0010153250016995484 },
+    { "yield_accepted": -0.0, "yield_total": 0.0009722750016274871 },
+    { "yield_accepted": -0.0, "yield_total": 0.0009128750015280577 },
+    { "yield_accepted": -0.0, "yield_total": 0.0010943250018317862 },
+    { "yield_accepted": -0.0, "yield_total": 0.0009823000016442678 },
+    { "yield_accepted": -0.0, "yield_total": 0.000907750001519479 },
+    { "yield_accepted": -0.0, "yield_total": 0.0009580750016037178 },
+    { "yield_accepted": -0.0, "yield_total": 0.0010032000016792523 },
+    { "yield_accepted": -0.0, "yield_total": 0.0008648500014476688 },
+    { "yield_accepted": -0.0, "yield_total": 0.000854500001430344 }
+  ]
+}

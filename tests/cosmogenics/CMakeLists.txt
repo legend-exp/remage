@@ -1,6 +1,7 @@
 add_subdirectory(surface)
 add_subdirectory(MUSUN)
 add_subdirectory(NeutronCapture)
+add_subdirectory(muon)
 
 set(_tests surface-cosmogenic MUSUN NeutronCapture)
 

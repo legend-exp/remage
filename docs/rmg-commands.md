@@ -438,6 +438,7 @@ Commands for controlling geometry definitions
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
 * `SetMaxStepSize` – Sets maximum step size for a certain detector
+* `SetEkinMinForParticle` – Sets minimum kinetic energy for one selected particle in a detector volume
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -547,6 +548,29 @@ Sets maximum step size for a certain detector
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Parameter** – `pv_name`
     – Detector physical volume, accepts regex patterns
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/SetEkinMinForParticle`
+
+Sets minimum kinetic energy for one selected particle in a detector volume
+
+* **Parameter** – `ekin_min`
+    – minimum kinetic energy
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `unit`
+    – energy unit
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `eV keV MeV GeV TeV`
+* **Parameter** – `pv_name`
+    – Detector physical volume, accepts regex patterns
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Parameter** – `particle_name`
+    – Geant4 particle name, e.g. e-, e+, gamma
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit`
