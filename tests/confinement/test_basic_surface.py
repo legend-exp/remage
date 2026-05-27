@@ -1,3 +1,15 @@
+"""Surface-confinement test for a set of simple G4 solids.
+
+For each detector type the test:
+  1. runs remage with surface confinement on that solid,
+  2. classifies every generated vertex into one of the solid's faces using
+     the predicates in ``select_sides[det]["func"]``,
+  3. checks that every vertex was assigned to exactly one face,
+  4. compares the fraction of vertices per face against the expected
+     area-weighted fraction via a Poisson likelihood ratio (chi2, N-1 dof)
+     and asserts the resulting significance is < 5 sigma.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -46,6 +58,26 @@ def add_local_pos(vertices, pos):
 
 
 tol = 1e-6  # mm
+#  - Perpendicular-to-face checks (the coordinate that pins the point to the
+#    face plane, e.g. ``abs(z - 50) < tol``) use a tight ``< tol`` window:
+#    vertices must lie ON the face within floating-point precision.
+#  - In-plane extent checks (e.g. ``abs(x) < 25 + tol``) are *widened* by
+#    ``tol`` so that points landing on an edge shared by two faces satisfy
+#    BOTH adjacent predicates. The classification loop below then assigns
+#    such edge points to the face that appears later in the ``func`` list
+#    (later-wins overwrite), guaranteeing exactly one assignment per vertex
+#    and avoiding flaky "unclassified vertex" failures.
+#  - Inner-bound checks on annular/cutout faces (e.g. ``r > 20 - tol``) are
+#    likewise relaxed so inner edges count.
+
+# Per-detector face definitions. For each detector type:
+#   "func":      list of predicates (one per face) taking local (x, y, z) in mm
+#                and returning a boolean mask of vertices ON that face.
+#   "area":      analytic area of each face, in the same order as "func".
+#                Used to compute the expected fraction per face.
+#   "order":     plot z-order for the 3D/2D scatter plots only (not used for
+#                the statistical test).
+#   "nice_name": label used in plot titles/captions.
 select_sides = {
     "tubby": {
         "func": [
@@ -202,39 +234,41 @@ select_sides = {
         "order": [5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 0],
         "nice_name": "Union of two G4Boxs",
     },
-    "trd": {  # TODO: the x/y comparisons
+    "trd": {
         "func": [
             # top:
             lambda x, y, z: (
                 (abs(z - 50) < tol) & (abs(x) < 5 + tol) & (abs(y) < 5 + tol)
             ),
-            # sides:
+            # sides: diagonal ridges (|x| == |y|) are claimed by both incident
+            # faces via the `- tol` slack; the loop's later-wins rule assigns
+            # each ridge point to exactly one face.
             lambda x, y, z: (
                 (y > 5 - tol)
                 & (y < 25 + tol)
-                & (y > x)
-                & (y > -x)
+                & (y > x - tol)
+                & (y > -x - tol)
                 & (abs(z) < 50 + tol)
             ),
             lambda x, y, z: (
                 (-y > 5 - tol)
                 & (-y < 25 + tol)
-                & (-y > x)
-                & (-y > -x)
+                & (-y > x - tol)
+                & (-y > -x - tol)
                 & (abs(z) < 50 + tol)
             ),
             lambda x, y, z: (
                 (x > 5 - tol)
                 & (x < 25 + tol)
-                & (x > y)
-                & (x > -y)
+                & (x > y - tol)
+                & (x > -y - tol)
                 & (abs(z) < 50 + tol)
             ),
             lambda x, y, z: (
                 (-x > 5 - tol)
                 & (-x < 25 + tol)
-                & (-x > y)
-                & (-x > -y)
+                & (-x > y - tol)
+                & (-x > -y - tol)
                 & (abs(z) < 50 + tol)
             ),
             # base:
@@ -282,6 +316,8 @@ for idx, fun in enumerate(funcs):
         np.array(vertices.ylocal.to_numpy()),
         np.array(vertices.zlocal.to_numpy()),
     )
+    # Later-wins: if a vertex (typically on an edge) satisfies multiple
+    # predicates, it ends up assigned to the face with the highest idx.
     indices[is_close] = idx
 
 if len(indices[indices == -1]) > 0:
