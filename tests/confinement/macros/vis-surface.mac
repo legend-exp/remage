@@ -1,5 +1,5 @@
 /RMG/Output/NtuplePerDetector false
-/RMG/Geometry/RegisterDetector Germanium ${det} 001
+/RMG/Geometry/RegisterDetector Germanium {det} 001
 
 /run/initialize
 
@@ -44,7 +44,7 @@
 /RMG/Generator/Confinement/ForceContainmentCheck true
 
 
-/RMG/Generator/Confinement/Physical/AddVolume ${det}
+/RMG/Generator/Confinement/Physical/AddVolume {det}
 /RMG/Generator/Confinement/SurfaceSampleMaxIntersections 6
 
 /gps/particle e-
@@ -53,4 +53,4 @@
 /gps/energy 1 eV
 /run/beamOn 2000
 
-/control/alias export-fn vis-surface-${det}.output
+/control/alias export-fn vis-surface-{det}.output

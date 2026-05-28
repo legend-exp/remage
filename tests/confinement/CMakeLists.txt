@@ -176,53 +176,24 @@ set(_solids tubby box con uni sub trd)
 
 foreach(det ${_solids})
 
-  add_test(
-    NAME confinement-surface/gen-vis-macro-${det}
-    COMMAND /bin/sh -c
-            "sed 's/\${det}/${det}/g' macros/vis-surface.mac > macros/vis-surface-${det}.mac")
-
-  set_tests_properties(
-    confinement-surface/gen-vis-macro-${det}
-    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-vis-macro-${det}-fixture
-               FIXTURES_REQUIRED confine-surface-gdml-fixture)
-
   add_test(NAME confinement-surface/${det}-vis
-           COMMAND ${REMAGE_PYEXE} macros/vis-surface-${det}.mac macros/_vis-export.mac -g
+           COMMAND ${REMAGE_PYEXE} macros/vis-surface.mac macros/_vis-export.mac -s det=${det} -g
                    gdml/simple-solids.gdml -o none -l detail)
 
   set_tests_properties(
     confinement-surface/${det}-vis PROPERTIES LABELS "extra;vis;val" FIXTURES_REQUIRED
-                                              confine-surface-vis-macro-${det}-fixture)
+                                              confine-surface-gdml-fixture)
 endforeach()
 
 # run simulations and check
 foreach(det ${_solids})
-
-  add_test(
-    NAME confinement-surface/gen-macro-${det}
-    COMMAND /bin/sh -c
-            "sed 's/\${det}/${det}/g' macros/gen-surface.mac > macros/gen-surface-${det}.mac")
-
-  set_tests_properties(
-    confinement-surface/gen-macro-${det}
-    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-macro-${det}-fixture
-               FIXTURES_REQUIRED confine-surface-gdml-fixture)
-
-  add_test(NAME confinement-surface/${det}-gen
-           COMMAND ${REMAGE_PYEXE} macros/gen-surface-${det}.mac -g gdml/simple-solids.gdml -w -l
-                   detail --flat-output -o test-confine-surface-${det}-out.lh5)
-
-  set_tests_properties(
-    confinement-surface/${det}-gen
-    PROPERTIES LABELS "extra;val" FIXTURES_SETUP confine-surface-${det} FIXTURES_REQUIRED
-               confine-surface-macro-${det}-fixture)
 
   add_test(NAME confinement-surface/relative-fractions-${det}
            COMMAND ${PYTHONPATH} ./test_basic_surface.py ${det})
 
   set_tests_properties(
     confinement-surface/relative-fractions-${det}
-    PROPERTIES LABELS "extra;val;flaky" FIXTURES_REQUIRED confine-surface-${det})
+    PROPERTIES LABELS "extra;val;flaky" FIXTURES_REQUIRED confine-surface-gdml-fixture)
 
 endforeach()
 
