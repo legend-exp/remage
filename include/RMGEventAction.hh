@@ -22,6 +22,13 @@
 #include "G4UserEventAction.hh"
 
 class RMGRunAction;
+/**
+ * @brief Per-event user action driving the output schemes.
+ *
+ * Dispatches begin/end-of-event hooks to all output schemes registered on the owning
+ * @ref RMGRunAction, takes care of clearing per-event buffers and decides whether to write
+ * the event ntuple based on the schemes' filtering criteria.
+ */
 class RMGEventAction : public G4UserEventAction {
 
   public:
@@ -34,7 +41,9 @@ class RMGEventAction : public G4UserEventAction {
     RMGEventAction(RMGEventAction&&) = delete;
     RMGEventAction& operator=(RMGEventAction&&) = delete;
 
+    /** @brief Clear per-event output buffers and notify schemes that a new event has started. */
     void BeginOfEventAction(const G4Event*) override;
+    /** @brief Run filtering schemes and, if the event is kept, fill the output ntuples. */
     void EndOfEventAction(const G4Event*) override;
 
   private:

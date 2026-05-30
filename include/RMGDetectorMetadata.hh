@@ -18,12 +18,16 @@
 
 #include <string>
 
+/** @brief Kind of sensitive detector backing an @ref RMGDetectorMetadata entry. */
 enum RMGDetectorType {
   kGermanium,
   kOptical,
   kScintillator,
 };
 
+/**
+ * @brief Metadata describing one detector instance registered with @ref RMGHardware.
+ */
 struct RMGDetectorMetadata {
     /** @brief detector type */
     RMGDetectorType type;

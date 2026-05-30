@@ -18,6 +18,13 @@
 
 #include "G4PrimaryTransformer.hh"
 
+/**
+ * @brief @c G4PrimaryTransformer with the zero-polarization warning suppressed.
+ *
+ * Bumps @c nWarn past the warning threshold to silence the noisy "ZeroPolarization"
+ * messages that Geant4 emits for optical-photon primaries, which arise legitimately when
+ * the polarization vector is not set by the user.
+ */
 class RMGPrimaryTransformer : public G4PrimaryTransformer {
   public:
 

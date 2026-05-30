@@ -24,13 +24,22 @@
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
+/**
+ * @brief Output scheme writing the primary vertices (and optionally primary particles).
+ *
+ * Always stores its rows even when other schemes mark the event for discard, so that
+ * normalization quantities (e.g. number of generated primaries) remain unbiased. Optional
+ * fields for primary-particle kinematics are toggled through messenger commands.
+ */
 class RMGVertexOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGVertexOutputScheme();
 
+    /** @brief Register vertex (and, if enabled, primary-particle) ntuple columns. */
     void AssignOutputNames(G4AnalysisManager*) override;
+    /** @brief Fill one row per primary vertex of the event. */
     void StoreEvent(const G4Event*) override;
 
     // always store vertex data, so that results are not skewed if events are discarded.

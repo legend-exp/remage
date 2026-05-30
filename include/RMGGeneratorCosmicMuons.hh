@@ -28,14 +28,24 @@
 class EcoMug;
 
 namespace u = CLHEP;
-/* @brief Generate cosmic muons, based on https://doi.org/10.1016/j.nima.2021.165732 */
+/**
+ * @brief Cosmic-muon primary generator backed by the EcoMug sampler.
+ *
+ * Generates atmospheric muons sampled either from a horizontal plane or from the upper
+ * hemisphere of a sphere (see @ref SkyShape). Momentum, zenith/azimuth and source-position
+ * ranges are configurable through messenger commands. Vertex position is sampled internally
+ * by EcoMug, so @ref SetParticlePosition is a no-op.
+ *
+ * Based on EcoMug, Pagano et al., NIM A 1014 (2021) 165732, https://doi.org/10.1016/j.nima.2021.165732.
+ */
 class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
   public:
 
+    /** @brief Geometric shape of the surface from which muons are sampled. */
     enum class SkyShape {
-      kPlane,
-      kSphere
+      kPlane, ///< Horizontal square plane at a fixed height.
+      kSphere ///< Upper hemisphere of a sphere centred at the origin.
     };
 
     RMGGeneratorCosmicMuons();
@@ -46,9 +56,12 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
     RMGGeneratorCosmicMuons(RMGGeneratorCosmicMuons&&) = delete;
     RMGGeneratorCosmicMuons& operator=(RMGGeneratorCosmicMuons&&) = delete;
 
+    /** @brief Sample a muon from EcoMug and fire it through the internal particle gun. */
     void GeneratePrimaries(G4Event*) override;
+    /** @brief No-op: vertex sampling is owned by EcoMug. */
     void SetParticlePosition(G4ThreeVector) override {}
 
+    /** @brief Configure EcoMug with the user-supplied sky shape and kinematic ranges. */
     void BeginOfRunAction(const G4Run*) override;
     void EndOfRunAction(const G4Run*) override {}
 

@@ -25,6 +25,12 @@
 
 class G4Event;
 class G4ParticleGun;
+/**
+ * @brief Thin @ref RMGVGenerator wrapper around Geant4's @c G4ParticleGun.
+ *
+ * Vertex sampling is delegated to a vertex generator via @ref SetParticlePosition; particle
+ * type and kinematics are configured through the standard @c /gun/ macro commands.
+ */
 class RMGGeneratorG4Gun : public RMGVGenerator {
 
   public:
@@ -39,7 +45,9 @@ class RMGGeneratorG4Gun : public RMGVGenerator {
     RMGGeneratorG4Gun(RMGGeneratorG4Gun&&) = delete;
     RMGGeneratorG4Gun& operator=(RMGGeneratorG4Gun&&) = delete;
 
+    /** @brief Fire the configured particle gun into @p event. */
     void GeneratePrimaries(G4Event* event) override { fParticleGun->GeneratePrimaryVertex(event); }
+    /** @brief Set the vertex position used by the next call to @ref GeneratePrimaries. */
     void SetParticlePosition(G4ThreeVector vec) override { fParticleGun->SetParticlePosition(vec); }
 
   private:

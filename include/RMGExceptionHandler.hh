@@ -18,6 +18,12 @@
 
 #include "G4ExceptionHandler.hh"
 
+/**
+ * @brief Geant4 exception handler that records whether warnings/errors have occurred.
+ *
+ * Forwards all exceptions to the standard Geant4 reporting path while keeping flags that
+ * @ref RMGManager can query at the end of the job to set the process exit status.
+ */
 class RMGExceptionHandler : public G4ExceptionHandler {
 
   public:
@@ -28,6 +34,10 @@ class RMGExceptionHandler : public G4ExceptionHandler {
     RMGExceptionHandler(const RMGExceptionHandler&) = delete;
     RMGExceptionHandler& operator=(const RMGExceptionHandler&) = delete;
 
+    /**
+     * @brief Record the severity and delegate the exception to @c G4ExceptionHandler.
+     * @return The abort flag returned by the base implementation.
+     */
     bool Notify(
         const char* originOfException,
         const char* exceptionCode,
@@ -35,7 +45,9 @@ class RMGExceptionHandler : public G4ExceptionHandler {
         const char* description
     ) override;
 
+    /** @brief Whether at least one warning-level exception has been raised. */
     [[nodiscard]] bool HadWarning() const { return fHadWarning; }
+    /** @brief Whether at least one error-level (or higher) exception has been raised. */
     [[nodiscard]] bool HadError() const { return fHadError; }
 
   private:

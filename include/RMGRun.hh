@@ -20,13 +20,21 @@
 
 #include "G4Run.hh"
 
+/**
+ * @brief Per-run object extending @c G4Run with bookkeeping needed by remage.
+ *
+ * Currently stores the wall-clock start time of the run, used by @ref RMGRunAction to
+ * report run duration.
+ */
 class RMGRun : public G4Run {
 
   public:
 
     using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
+    /** @brief Wall-clock time at which the run was started. */
     [[nodiscard]] const TimePoint& GetStartTime() const { return fStartTime; }
+    /** @brief Record the wall-clock time at which the run was started. */
     void SetStartTime(TimePoint t) { fStartTime = t; }
 
   private:

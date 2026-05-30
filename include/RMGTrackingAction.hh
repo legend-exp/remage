@@ -22,6 +22,14 @@
 #include "G4UserTrackingAction.hh"
 
 class RMGRunAction;
+/**
+ * @brief Tracking action delegating to output schemes and guarding global-time precision.
+ *
+ * Beyond forwarding pre/post hooks to the registered output schemes, this action resets
+ * the global time of secondaries emitted by an initial radioactive decay (so that decay
+ * chains start at t=0) and issues a warning once the global time grows large enough that
+ * @c double precision degrades the timing resolution below 1 us.
+ */
 class RMGTrackingAction : public G4UserTrackingAction {
 
   public:
@@ -34,8 +42,14 @@ class RMGTrackingAction : public G4UserTrackingAction {
     RMGTrackingAction(RMGTrackingAction&&) = delete;
     RMGTrackingAction& operator=(RMGTrackingAction&&) = delete;
 
+    /** @brief Forward the track to all output schemes for pre-tracking bookkeeping. */
     void PreUserTrackingAction(const G4Track*) override;
+    /**
+     * @brief Run post-tracking output bookkeeping, reset initial-decay times and emit a
+     * one-shot warning when global time grows large enough to spoil sub-us precision.
+     */
     void PostUserTrackingAction(const G4Track*) override;
+    /** @brief Access the underlying Geant4 tracking manager (for output-scheme integration). */
     G4TrackingManager* GetTrackingManager() { return G4UserTrackingAction::fpTrackingManager; };
 
   private:

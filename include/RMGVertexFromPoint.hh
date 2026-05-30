@@ -23,6 +23,12 @@
 
 #include "RMGVVertexGenerator.hh"
 
+/**
+ * @brief Trivial vertex generator returning a single user-configured point.
+ *
+ * The vertex coordinates are set through the @c /RMG/Generator/Confine/FromPoint/ messenger
+ * commands. Useful for debugging and for sources with a well-defined fixed location.
+ */
 class RMGVertexFromPoint : public RMGVVertexGenerator {
 
   public:
@@ -35,6 +41,7 @@ class RMGVertexFromPoint : public RMGVVertexGenerator {
     RMGVertexFromPoint(RMGVertexFromPoint&&) = delete;
     RMGVertexFromPoint& operator=(RMGVertexFromPoint&&) = delete;
 
+    /** @brief Return the configured fixed point; always succeeds. */
     bool GenerateVertex(G4ThreeVector& vertex) override {
       vertex = fVertex;
       return true;

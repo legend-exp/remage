@@ -25,6 +25,11 @@
 #include "G4VHit.hh"
 #include "G4VSensitiveDetector.hh"
 
+/**
+ * @brief Hit produced by @ref RMGOpticalDetector when an optical photon is absorbed.
+ *
+ * Holds the detector identifier, the photon wavelength and the global absorption time.
+ */
 class RMGOpticalDetectorHit : public G4VHit {
 
   public:
@@ -43,12 +48,13 @@ class RMGOpticalDetectorHit : public G4VHit {
     inline void operator delete(void*);
 
     void Print() override;
+    /** @brief Color the detector volume if hit. */
     void Draw() override;
 
-    G4TouchableHandle detector_touchable; // for Draw()
-    int detector_uid = -1;
-    double photon_wavelength = 0.;
-    double global_time = -1;
+    G4TouchableHandle detector_touchable; ///< Touchable of the absorbing volume, used by @ref Draw.
+    int detector_uid = -1;                ///< Remage unique identifier of the absorbing detector.
+    double photon_wavelength = 0.;        ///< Absorbed-photon wavelength (Geant4 length units).
+    double global_time = -1;              ///< Global time at absorption (Geant4 time units).
 };
 
 using RMGOpticalDetectorHitsCollection = G4THitsCollection<RMGOpticalDetectorHit>;
@@ -56,6 +62,12 @@ using RMGOpticalDetectorHitsCollection = G4THitsCollection<RMGOpticalDetectorHit
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
+/**
+ * @brief Sensitive detector for optical photon absorption.
+ *
+ * Emits one @ref RMGOpticalDetectorHit per absorbed @c opticalphoton track and kills the
+ * track. Hits are persisted by the optical detector output scheme.
+ */
 class RMGOpticalDetector : public G4VSensitiveDetector {
 
   public:
@@ -68,7 +80,9 @@ class RMGOpticalDetector : public G4VSensitiveDetector {
     RMGOpticalDetector(RMGOpticalDetector&&) = delete;
     RMGOpticalDetector& operator=(RMGOpticalDetector&&) = delete;
 
+    /** @brief Allocate and register the hit collection for the current event. */
     void Initialize(G4HCofThisEvent* hit_coll) override;
+    /** @brief Record an absorbed optical photon as a hit. */
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
 

@@ -26,6 +26,12 @@
 #include "RMGAnalysisReader.hh"
 #include "RMGVVertexGenerator.hh"
 
+/**
+ * @brief Vertex generator that reads positions sequentially from an ntuple file.
+ *
+ * Each row of the ntuple supplies one @c (x, y, z) triplet. Used to replay vertices
+ * produced by an external sampler (e.g. an MC truth file) into a remage run.
+ */
 class RMGVertexFromFile : public RMGVVertexGenerator {
 
   public:
@@ -38,11 +44,18 @@ class RMGVertexFromFile : public RMGVVertexGenerator {
     RMGVertexFromFile(RMGVertexFromFile&&) = delete;
     RMGVertexFromFile& operator=(RMGVertexFromFile&&) = delete;
 
+    /**
+     * @brief Read the next position row from the file.
+     * @return False if the input has been exhausted (which aborts the run gracefully).
+     */
     bool GenerateVertex(G4ThreeVector&) override;
 
+    /** @brief Open the input file and bind the position columns. */
     void BeginOfRunAction(const G4Run*) override;
+    /** @brief Close the input file. */
     void EndOfRunAction(const G4Run*) override;
 
+    /** @brief Set the path of the input ntuple file. */
     void OpenFile(std::string& name);
 
   private:

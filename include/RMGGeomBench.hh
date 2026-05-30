@@ -33,6 +33,13 @@
 
 namespace u = CLHEP;
 
+/**
+ * @brief Primary generator that benchmarks geometry navigation on a regular 3D grid.
+ *
+ * Shoots geantinos from pixels of three orthogonal sampling planes covering the world
+ * volume and measures how long the geometry navigator takes to step through each pixel.
+ * Per-pixel timings are aggregated and written by @ref RMGGeomBenchOutputScheme.
+ */
 class RMGGeomBench : public RMGVGenerator {
 
   public:
@@ -45,12 +52,18 @@ class RMGGeomBench : public RMGVGenerator {
     RMGGeomBench(RMGGeomBench&&) = delete;
     RMGGeomBench& operator=(RMGGeomBench&&) = delete;
 
+    /** @brief Shoot a geantino from the pixel currently being benchmarked. */
     void GeneratePrimaries(G4Event* event) override;
+    /** @brief No-op: vertex sampling is driven by the benchmark grid. */
     void SetParticlePosition(G4ThreeVector) override{};
+    /** @brief Append a batch timing to the running median for the given pixel. */
     void RecordBatchTime(int pixel_idx, double batch_time);
+    /** @brief Flush per-pixel median timings to the benchmark output scheme. */
     void SaveAllPixels();
 
+    /** @brief Compute the sampling grid from the user-specified increments and widths. */
     void BeginOfRunAction(const G4Run* r) override;
+    /** @brief Save aggregated timings to the output scheme. */
     void EndOfRunAction(const G4Run* r) override;
 
   private:

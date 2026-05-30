@@ -23,6 +23,14 @@
 
 class G4Step;
 class RMGRunAction;
+/**
+ * @brief Stepping action driving output schemes and optional kill heuristics.
+ *
+ * In addition to forwarding each step to the registered output schemes, this action can
+ * be configured to drop secondary tracks and to kill long-lived daughter nuclei (see
+ * @ref SetDaughterKillLifetime) — useful e.g. to truncate decay chains that would otherwise
+ * extend over long timescales.
+ */
 class RMGSteppingAction : public G4UserSteppingAction {
 
   public:
@@ -35,8 +43,18 @@ class RMGSteppingAction : public G4UserSteppingAction {
     RMGSteppingAction(RMGSteppingAction&&) = delete;
     RMGSteppingAction& operator=(RMGSteppingAction&&) = delete;
 
+    /**
+     * @brief Forward the step to all output schemes and apply tracking-control of long-lived isotopes.
+     */
     void UserSteppingAction(const G4Step*) override;
 
+    /**
+     * @brief Kill daughter nuclei whose PDG lifetime exceeds @p max_lifetime.
+     * @details Applies to ground-state nuclei produced as secondaries; the cut is on the
+     * tabulated half-life of the species, not on the sampled decay time. Set to a
+     * non-positive value to disable.
+     * @param max_lifetime Maximum allowed lifetime, in Geant4 units of time.
+     */
     void SetDaughterKillLifetime(double max_lifetime);
 
   private:
