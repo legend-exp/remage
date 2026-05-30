@@ -74,7 +74,7 @@ class RMGIsotopeFilterScheme : public RMGVOutputScheme {
 
     std::set<std::pair<int, int>> fIsotopes;
 
-    bool fDiscardPhotonsIfIsotopeNotProduced = false;
+    bool fDiscardWaitingTracksUnlessIsotopeProduced = false;
 };
 
 #endif
