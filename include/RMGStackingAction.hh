@@ -20,6 +20,12 @@
 
 class G4Track;
 class RMGRunAction;
+/**
+ * @brief Stacking action delegating track classification to the registered output schemes.
+ *
+ * Iterates over the output schemes attached to the owning @ref RMGRunAction so that they can,
+ * for instance, defer secondary tracks to a later processing stage.
+ */
 class RMGStackingAction : public G4UserStackingAction {
 
   public:
@@ -32,8 +38,15 @@ class RMGStackingAction : public G4UserStackingAction {
     RMGStackingAction(RMGStackingAction&&) = delete;
     RMGStackingAction& operator=(RMGStackingAction&&) = delete;
 
+    /**
+     * @brief Classify a newly created track by consulting the registered output schemes.
+     * @details Schemes may return a classification different from @c fUrgent to defer
+     * processing to a later stage (e.g. for two-pass optical photon handling).
+     */
     G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack) override;
+    /** @brief Advance to the next stacking stage; called when the current stack is empty. */
     void NewStage() override;
+    /** @brief Reset the stage counter before tracking a new event. */
     void PrepareNewEvent() override;
 
   private:

@@ -18,6 +18,14 @@
 
 #include "G4VUserActionInitialization.hh"
 
+/**
+ * @brief Action initialization assembling all remage user actions.
+ *
+ * Instantiates and registers @ref RMGRunAction, @ref RMGEventAction, @ref RMGTrackingAction,
+ * @ref RMGSteppingAction, @ref RMGStackingAction and the primary generator @ref
+ * RMGMasterGenerator on the worker threads, and the run action on the master thread.
+ * Extra user-supplied actions are pulled from @ref RMGUserInit.
+ */
 class RMGUserAction : public G4VUserActionInitialization {
 
   public:
@@ -30,7 +38,9 @@ class RMGUserAction : public G4VUserActionInitialization {
     RMGUserAction(RMGUserAction&&) = delete;
     RMGUserAction& operator=(RMGUserAction&&) = delete;
 
+    /** @brief Instantiate and register worker-thread user actions. */
     void Build() const override;
+    /** @brief Instantiate and register the master-thread run action. */
     void BuildForMaster() const override;
 };
 

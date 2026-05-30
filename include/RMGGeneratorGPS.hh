@@ -25,6 +25,14 @@
 #include "RMGVGenerator.hh"
 
 class G4Event;
+/**
+ * @brief @ref RMGVGenerator wrapper around Geant4's General Particle Source.
+ *
+ * If a vertex position has been provided via @ref SetParticlePosition, it is propagated to
+ * the centre of every GPS source before generating the primary vertex. Calls into the GPS
+ * are serialized through a class-wide mutex because @c G4GeneralParticleSource is not
+ * thread-safe (all worker threads share the same global state).
+ */
 class RMGGeneratorGPS : public RMGVGenerator {
 
   public:
@@ -35,6 +43,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
     ~RMGGeneratorGPS() = default;
 
+    /** @brief Generate a primary vertex from the GPS, optionally overriding the vertex position. */
     void GeneratePrimaries(G4Event* event) override {
       G4AutoLock lock(&fMutex);
 
@@ -50,6 +59,7 @@ class RMGGeneratorGPS : public RMGVGenerator {
       fParticleSource->GeneratePrimaryVertex(event);
     }
 
+    /** @brief Override the centre coordinates of every GPS source for the next primary vertex. */
     void SetParticlePosition(G4ThreeVector vec) override {
       fVertexPosition = vec;
       fVertexPositionSet = true;

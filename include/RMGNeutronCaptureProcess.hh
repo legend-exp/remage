@@ -20,6 +20,15 @@
 #include "G4HadronicProcess.hh"
 #include "globals.hh"
 
+/**
+ * @brief Neutron-capture process replacing the secondaries with a tabulated gamma cascade.
+ *
+ * Falls back to the standard @c G4HadronicProcess cross-section selection to determine
+ * whether a capture happens, but overrides the final-state generation by drawing a cascade
+ * from @ref RMGGrabmayrGCReader for the captured @c (Z, A). The missing-energy of the
+ * cascade is deposited locally at the capture vertex. If no cascade table is registered
+ * for the isotope, the standard final state is used.
+ */
 class RMGNeutronCaptureProcess : public G4HadronicProcess {
   public:
 
@@ -27,9 +36,12 @@ class RMGNeutronCaptureProcess : public G4HadronicProcess {
 
     virtual ~RMGNeutronCaptureProcess() = default;
 
+    /** @brief True for neutrons only. */
     G4bool IsApplicable(const G4ParticleDefinition& aParticleType) final;
 
-    // Override PostStepDoIt from G4HadronicProcess
+    /**
+     * @brief Sample a capture and replace the final state with a tabulated gamma cascade.
+     */
     G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep) final;
 };
 #endif

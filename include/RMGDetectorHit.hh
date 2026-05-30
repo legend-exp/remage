@@ -64,24 +64,27 @@ class RMGDetectorHit : public G4VHit {
     /** @brief PDG particle code for the track. */
     int particle_type = -1;
 
-
+    /** @brief Energy deposited in this step (Geant4 energy units). */
     double energy_deposition = -1;
+    /** @brief Distance from the pre-step point to the closest surface of the sensitive volume. */
     double distance_to_surface_prestep = -1;
+    /** @brief Distance from the step-midpoint to the closest surface of the sensitive volume. */
     double distance_to_surface_average = -1;
+    /** @brief Distance from the post-step point to the closest surface of the sensitive volume. */
     double distance_to_surface_poststep = -1;
 
-    G4ThreeVector global_position_poststep;
-    G4ThreeVector global_position_prestep;
-    G4ThreeVector global_position_average;
+    G4ThreeVector global_position_poststep; ///< Step post-point in world coordinates.
+    G4ThreeVector global_position_prestep;  ///< Step pre-point in world coordinates.
+    G4ThreeVector global_position_average;  ///< Step midpoint in world coordinates.
 
-    double global_time = -1;
-    int track_id = -1;
-    int parent_track_id = -1;
+    double global_time = -1;  ///< Global time at the pre-step point.
+    int track_id = -1;        ///< Geant4 track id of the step.
+    int parent_track_id = -1; ///< Track id of the parent (0 for primaries).
 
-    G4VPhysicalVolume* physical_volume = nullptr;
+    G4VPhysicalVolume* physical_volume = nullptr; ///< Physical volume the step took place in.
 
-    double velocity_pre = -1;
-    double velocity_post = -1;
+    double velocity_pre = -1;  ///< Velocity at the pre-step point.
+    double velocity_post = -1; ///< Velocity at the post-step point.
 
     G4Colour fDrawColour = G4Colour(0, 0, 1);
 };

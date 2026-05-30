@@ -38,8 +38,11 @@ class RMGGeometryCheckOutputScheme : public RMGVOutputScheme {
 
     RMGGeometryCheckOutputScheme() = default;
 
+    /** @brief Record the physical volume traversed by the geantino in this step. */
     void SteppingAction(const G4Step*) override;
+    /** @brief Attach a fresh @c GeantinoUserTrackInformation to the geantino track. */
     void TrackingActionPre(const G4Track* aTrack) override;
+    /** @brief Log the volume sequence traversed by the geantino and flag overlaps. */
     void TrackingActionPost(const G4Track* aTrack) override;
 
   private:

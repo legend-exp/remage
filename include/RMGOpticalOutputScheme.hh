@@ -24,13 +24,18 @@
 #include "RMGVOutputScheme.hh"
 
 class G4Event;
+/**
+ * @brief Output scheme writing optical photon detector hits.
+ */
 class RMGOpticalOutputScheme : public RMGVOutputScheme {
 
   public:
 
     RMGOpticalOutputScheme();
 
+    /** @brief Register the columns of the @c optical ntuple with the analysis manager. */
     void AssignOutputNames(G4AnalysisManager*) override;
+    /** @brief Fill one row with the optical photon counts. */
     void StoreEvent(const G4Event*) override;
 
   protected:

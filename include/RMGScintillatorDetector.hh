@@ -31,8 +31,12 @@
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
-/** @brief Class to describe the scintillator detector, mainly handles processing of the detected
- * hits. Extends @c G4VSensitiveDetector */
+/**
+ * @brief Sensitive detector producing @ref RMGDetectorHit instances for scintillator volumes.
+ *
+ * Hits are emitted at every step depositing energy in a logical volume registered as
+ * scintillator with @ref RMGHardware, and are persisted by @ref RMGScintillatorOutputScheme.
+ */
 class RMGScintillatorDetector : public G4VSensitiveDetector {
 
   public:
@@ -45,7 +49,9 @@ class RMGScintillatorDetector : public G4VSensitiveDetector {
     RMGScintillatorDetector(RMGScintillatorDetector&&) = delete;
     RMGScintillatorDetector& operator=(RMGScintillatorDetector&&) = delete;
 
+    /** @brief Allocate and register the hit collection for the current event. */
     void Initialize(G4HCofThisEvent* hit_coll) override;
+    /** @brief Build an @ref RMGDetectorHit from @p step and add it to the hits collection. */
     bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
     void EndOfEvent(G4HCofThisEvent* hit_coll) override;
 

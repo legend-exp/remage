@@ -28,25 +28,46 @@
 #include "globals.hh"
 
 // Modified from WLGDPetersGammaCascadeReader originally contributed by Moritz Neuberger
+/**
+ * @brief One pre-computed neutron-capture gamma cascade.
+ *
+ * All energies are in keV. @c em is the energy not accounted for by the listed @c eg
+ * photons (e.g. carried away by internal conversion electrons or unresolved low-energy
+ * transitions); it is intended to be deposited locally by @ref RMGNeutronCaptureProcess.
+ */
 struct GammaCascadeLine {
-    G4int en;              // neutron energy [keV]
-    G4int ex;              // excitation energy [keV]
-    G4int m;               // multiplicity of gamma cascade
-    G4int em;              // missing energy [keV]
-    std::vector<G4int> eg; // energies of photons [keV]
+    G4int en;              ///< Neutron kinetic energy bin [keV].
+    G4int ex;              ///< Capture-state excitation energy [keV].
+    G4int m;               ///< Cascade multiplicity (number of @c eg entries).
+    G4int em;              ///< Missing energy not carried by the listed photons [keV].
+    std::vector<G4int> eg; ///< Photon energies of the cascade [keV].
 };
 
 
+/**
+ * @brief Thread-local reader of pre-computed (n,gamma) cascade tables.
+ *
+ * Loads per-isotope cascade files registered through messenger commands and serves them
+ * to @ref RMGNeutronCaptureProcess one cascade at a time. The reader is a thread-local
+ * singleton: every worker keeps its own file handles and its own read position.
+ */
 class RMGGrabmayrGCReader {
   public:
 
+    /** @brief Thread-local singleton accessor. */
     static RMGGrabmayrGCReader* GetInstance();
     ~RMGGrabmayrGCReader();
     // RMGGrabmayrGCReader& operator=(const RMGGrabmayrGCReader&) = delete;
 
+    /** @brief Whether a cascade file has been registered for the @c (Z, A) isotope. */
     G4bool IsApplicable(G4int z, G4int a);
+    /** @brief Close all open cascade files held by this thread. */
     void CloseFiles();
 
+    /**
+     * @brief Read and return the next cascade entry for the @c (Z, A) isotope.
+     * @details The reader cycles back to the beginning when the file is exhausted.
+     */
     GammaCascadeLine GetNextEntry(G4int z, G4int a);
 
   private:

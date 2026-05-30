@@ -30,6 +30,14 @@ namespace {
 } // namespace
 /// \endcond
 
+/**
+ * @brief Worker-thread initialization that honours remage's RNG configuration.
+ *
+ * Mixin template parameterized on a Geant4 worker initialization (e.g. @c
+ * G4UserWorkerThreadInitialization or @c G4UserTaskThreadInitialization). When the user has
+ * explicitly selected a random engine through @ref RMGManager, that engine is installed on
+ * the worker thread; otherwise Geant4's default per-thread seeding strategy is used.
+ */
 template<typename ThreadInitialization>
 class RMGWorkerInitialization : public ThreadInitialization {
     static_assert(std::is_base_of_v<G4UserWorkerThreadInitialization, ThreadInitialization>);
@@ -39,6 +47,9 @@ class RMGWorkerInitialization : public ThreadInitialization {
     RMGWorkerInitialization() = default;
     ~RMGWorkerInitialization() = default;
 
+    /**
+     * @brief Install the user-selected random engine on this worker, or fall back to Geant4's.
+     */
     void SetupRNGEngine(const CLHEP::HepRandomEngine* aRNGEngine) const override {
       G4AutoLock l(&RMGWorkerInitializationRNGMutex);
 

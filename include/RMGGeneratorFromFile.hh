@@ -28,6 +28,15 @@
 namespace u = CLHEP;
 
 class G4Event;
+/**
+ * @brief Primary generator reading particle kinematics row-by-row from an ntuple file.
+ *
+ * Each row of the input ntuple (LH5/HDF5/ROOT, opened through @ref RMGAnalysisReader)
+ * specifies a Geant4 PDG id, kinetic energy, momentum direction and global time. The vertex
+ * position is supplied externally by the configured vertex generator via
+ * @ref SetParticlePosition. The @c fNpart column allows several consecutive rows to be
+ * combined into a single multi-particle primary vertex.
+ */
 class RMGGeneratorFromFile : public RMGVGenerator {
 
   public:
@@ -40,12 +49,17 @@ class RMGGeneratorFromFile : public RMGVGenerator {
     RMGGeneratorFromFile(RMGGeneratorFromFile&&) = delete;
     RMGGeneratorFromFile& operator=(RMGGeneratorFromFile&&) = delete;
 
+    /** @brief Read the next row(s) from the input ntuple and create the primary vertex. */
     void GeneratePrimaries(G4Event*) override;
+    /** @brief Set the vertex position for the next call to @ref GeneratePrimaries. */
     void SetParticlePosition(G4ThreeVector pos) override { fParticlePosition = pos; }
 
+    /** @brief Open the input file and bind the row reader to the configured ntuple columns. */
     void BeginOfRunAction(const G4Run*) override;
+    /** @brief Close the input file. */
     void EndOfRunAction(const G4Run*) override;
 
+    /** @brief Set the path of the input ntuple file. */
     void OpenFile(std::string& name);
 
   private:

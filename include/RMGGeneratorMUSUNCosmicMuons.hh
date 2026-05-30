@@ -29,6 +29,12 @@
 
 namespace u = CLHEP;
 
+/**
+ * @brief Row schema for the MUSUN input ntuple consumed by @ref RMGGeneratorMUSUNCosmicMuons.
+ *
+ * Position is in Geant4 length units; energy in MeV; angles in radians. Momentum is provided
+ * either in Cartesian (@c fPx, @c fPy, @c fPz) or in spherical (@c fTheta, @c fPhi) form.
+ */
 struct RMGGeneratorMUSUNCosmicMuons_Data {
     G4int fID;
     G4int fType;
@@ -45,6 +51,13 @@ struct RMGGeneratorMUSUNCosmicMuons_Data {
 
 
 class G4Event;
+/**
+ * @brief Primary generator reading pre-sampled cosmic-muon kinematics from a MUSUN file.
+ *
+ * The input file (an ASCII MUSUN dump) is converted to a temporary Geant4 CSV ntuple at the
+ * beginning of the run and read row-by-row by @ref RMGAnalysisReader. Vertex sampling is
+ * controlled by the input file, so @ref SetParticlePosition is a no-op.
+ */
 class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
 
   public:
@@ -57,10 +70,14 @@ class RMGGeneratorMUSUNCosmicMuons : public RMGVGenerator {
     RMGGeneratorMUSUNCosmicMuons(RMGGeneratorMUSUNCosmicMuons&&) = delete;
     RMGGeneratorMUSUNCosmicMuons& operator=(RMGGeneratorMUSUNCosmicMuons&&) = delete;
 
+    /** @brief Read the next muon entry from the temporary file and shoot it. */
     void GeneratePrimaries(G4Event*) override;
+    /** @brief No-op: vertex sampling is fixed by the input MUSUN file. */
     void SetParticlePosition(G4ThreeVector) override{};
 
+    /** @brief Convert the MUSUN ASCII input to Geant4 CSV and open it for reading. */
     void BeginOfRunAction(const G4Run*) override;
+    /** @brief Close the input file and clean up the temporary directory. */
     void EndOfRunAction(const G4Run*) override;
 
   private:
