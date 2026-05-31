@@ -31,12 +31,12 @@ dynamic = ["version"]
 dependencies = [
   "legend-pydataobj >=2",
   "legend-lh5io >=0.2",
-  "reboost >=0.11.0",
   "pygama >=2.2.3",
   "colorlog",
   "rich",
   "mplhep",
-  "hist"
+  "hist",
+  "pyg4ometry",
 ]
 
 [tool.hatch.metadata]
@@ -57,6 +57,7 @@ test = [
   "matplotlib",
   "numpy",
   "pyg4ometry",
+  "reboost >=0.11.0",
   "numba", # without this, uv somehow fails to pick a good numba version
 ]
 docs = [
