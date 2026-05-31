@@ -17,18 +17,26 @@ from __future__ import annotations
 
 import logging
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
+import awkward as ak
 import h5py
 import lh5
 import numpy as np
 import pygama.evt
-import reboost
 from lgdo import Array, Scalar, Struct
 from lh5.io.concat import lh5concat
+from reboost.iterator import GLMIterator
+from reboost.shape.group import group_by_time
+from reboost.units import move_units_to_flattened_data
+from reboost.utils import (
+    get_wo_mode,
+    get_wo_mode_forwarded,
+    is_new_hit_file,
+    write_lh5,
+)
 
 from . import utils
 from .ipc import IpcResult
@@ -58,9 +66,8 @@ def post_proc(
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
     }
 
-    # these are mappings: <output scheme name> -> [<table name 1>, <table name 2>, ...]
-    detector_info = ipc_info.get_as_dict("output_ntuple")
-    detector_info_aux = ipc_info.get_as_dict("output_ntuple_aux")
+    detector_info: list[str] = ipc_info.get("output_ntuple", 2)
+    detector_info_aux: list[str] = ipc_info.get("output_ntuple_aux", 2)
 
     assert len(output_file_exts) == 1
 
@@ -103,24 +110,22 @@ def post_proc(
         )
         log.info(msg)
 
-        with tmp_renamed_files(remage_files) as original_files:
-            # also get the additional tables to forward
-            config = get_reboost_config(
-                detector_info,
-                detector_info_aux,
-                time_window=time_window_in_us,
-            )
-            msg = f"Reboost config: {config}"
-            log.debug(msg)
+        # registered scintillator or germanium detectors
+        registered_detectors = list({det[1] for det in detector_info})
 
-            # use reboost to post-process outputs
-            reboost.build_hit(
-                config,
-                {},
+        # extract the additional tables in the output file (not detectors)
+        extra_tables = list({det[1] for det in detector_info_aux})
+
+        with tmp_renamed_files(remage_files) as original_files:
+            # post-process outputs: reshape detector tables by time-grouping
+            # and forward auxiliary tables unchanged
+            build_hit(
                 stp_files=original_files,
-                glm_files=None,
                 hit_files=output_files,
+                reshape_tables=registered_detectors,
+                forward_tables=extra_tables,
                 out_field=det_tables_path,
+                time_window_in_us=time_window_in_us,
                 overwrite=overwrite_output,
             )
 
@@ -277,89 +282,118 @@ def deduplicate_table(
         lh5.write(table, table_name, file, wo_mode="overwrite")
 
 
-def get_reboost_config(
-    detector_info: Mapping[str, Sequence[str]],
-    detector_info_aux: Mapping[str, Sequence[str]],
+def build_hit(
+    stp_files: list[str],
+    hit_files: list[str] | str,
     *,
-    time_window: float = 10,
-) -> dict:
-    """Get the config file to run reboost.
+    reshape_tables: Sequence[str],
+    forward_tables: Sequence[str],
+    out_field: str,
+    time_window_in_us: float,
+    overwrite: bool = False,
+    buffer: int = int(5e6),
+) -> None:
+    """Post-process remage step files into hit files using reboost.
+
+    For each detector listed in ``reshape_tables``, steps are grouped by event
+    id and time (window in microseconds), producing per-hit ``t0`` and ``evtid``
+    columns. Tables listed in ``forward_tables`` are copied unchanged.
 
     Parameters
     ----------
-    detector_info
-        a mapping of tables in the remage file that need to be reshaped, keyed
-        by output scheme name (i.e. RMGGermaniumOutputScheme).
-    detector_info_aux
-        same as `detector_info`, but holds non-standard tables.
-    time_window
-        time window to use for building hits (in us).
-
-    Returns
-    -------
-    config file as a dictionary.
+    stp_files
+        list of remage step files.
+    hit_files
+        list of output hit files (one per stp file) or a single file when all
+        inputs should be merged into the same output.
+    reshape_tables
+        detector tables to reshape via time-grouping.
+    forward_tables
+        auxiliary tables to forward to the output unchanged.
+    out_field
+        lh5 group under which reshaped detector tables are written.
+    time_window_in_us
+        coincidence time window in microseconds for hit grouping.
+    overwrite
+        whether to overwrite the output files.
+    buffer
+        buffer size (in rows) for the lh5 iterator.
     """
-    config: dict = {}
-
-    # build a default config for all tables (exclude calorimeter tables).
-    # deduplicate table names: in the single-table layout several detectors of the
-    # same type map to the same output table, so the same name shows up multiple
-    # times. reboost must reshape each output table only once.
-    table_list = list(
-        dict.fromkeys(
-            v
-            for k, vals in detector_info.items()
-            if k != "RMGCalorimeterOutputScheme"
-            for v in vals
-        )
+    hit_files_list = (
+        [hit_files] * len(stp_files) if isinstance(hit_files, str) else list(hit_files)
     )
+    if len(hit_files_list) != len(stp_files):
+        msg = "hit_files must be a single path or match stp_files in length"
+        raise ValueError(msg)
 
-    default_config: dict[str, Any] = {
-        "name": "default",
-        "detector_mapping": [{"output": table} for table in table_list],
-        "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
-        "operations": {
-            "t0": {
-                "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
-                "units": "ns",
-            },
-            "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
-        },
-    }
-    config["processing_groups"] = [default_config]
+    files_like = type("Files", (), {"hit": hit_files_list})()
 
-    if "RMGCalorimeterOutputScheme" in detector_info:
-        # the calorimeter already accumulates exactly one hit (the total energy
-        # deposit) per detector per event in the C++ stage, so its table is
-        # already in final, flat form: one row per detector per event. it must
-        # not go through the step-grouping reshaping used for the other schemes,
-        # which (in the single-table layout) would merge rows of different
-        # detectors that share an event id. we therefore omit `hit_table_layout`,
-        # making reboost take the table as-is, and only rename the time column to
-        # `t0` so the detector can take part in the time-coincidence map like the
-        # others.
-        tables = list(dict.fromkeys(detector_info["RMGCalorimeterOutputScheme"]))
+    for file_idx, (stp_file, hit_file) in enumerate(
+        zip(stp_files, hit_files_list, strict=True)
+    ):
+        msg = f"processing {stp_file} -> {hit_file}"
+        log.info(msg)
 
-        calo_config = {
-            "name": "RMGCalorimeterOutputScheme",
-            "detector_mapping": [{"output": table} for table in tables],
-            "operations": {
-                "t0": {"expression": "HITS.time", "units": "ns"},
-            },
-            # det_uid is only present in the single-table layout; listing it here
-            # is harmless when it is absent (per-detector layout).
-            "outputs": ["evtid", "det_uid", "edep", "t0"],
-        }
+        new_file = is_new_hit_file(files_like, file_idx)
+        written_tables: set[str] = set()
 
-        config["processing_groups"].append(calo_config)
+        for in_det_idx, detector in enumerate(reshape_tables):
+            table = f"stp/{detector}"
+            if lh5.ls(stp_file, table) == []:
+                continue
 
-    # forward other tables as they are (deduplicated: the same aux table is
-    # announced once per worker thread/process, so names repeat in MT/MP runs).
-    config["forward"] = list(
-        dict.fromkeys(v for vals in detector_info_aux.values() for v in vals)
-    )
+            iterator = GLMIterator(
+                glm_file=None,
+                stp_file=stp_file,
+                lh5_group=detector,
+                start_row=0,
+                n_rows=None,
+                stp_field="stp",
+                buffer=buffer,
+                reshaped_files=False,
+            )
 
-    return config
+            for stps, chunk_idx, _ in iterator:
+                if stps is None:
+                    continue
+
+                hit_table = group_by_time(
+                    stps.view_as("ak", with_units=True),
+                    window=time_window_in_us,
+                )
+                # move units from the VoV to its flattened_data, matching the
+                # convention used elsewhere by reboost
+                for data in hit_table.values():
+                    move_units_to_flattened_data(data)
+
+                hits_ak = hit_table.view_as("ak")
+                t0 = ak.fill_none(ak.firsts(hits_ak.time, axis=-1), 0)
+                evtid = ak.fill_none(ak.firsts(hits_ak.evtid, axis=-1), 0)
+                hit_table.add_field("t0", Array(np.asarray(t0), attrs={"units": "ns"}))
+                hit_table.add_field("evtid", Array(np.asarray(evtid)))
+
+                wo_mode = get_wo_mode(
+                    group=0,
+                    out_det=0,
+                    in_det=in_det_idx,
+                    chunk=chunk_idx,
+                    new_hit_file=new_file,
+                    overwrite=overwrite,
+                )
+                write_lh5(
+                    hit_table,
+                    hit_file,
+                    time_dict=None,
+                    out_field=out_field,
+                    out_detector=detector,
+                    wo_mode=wo_mode,
+                )
+                written_tables.add(detector)
+
+        for obj in forward_tables:
+            wo_mode = get_wo_mode_forwarded(written_tables, new_file, overwrite)
+            lh5.write(lh5.read(obj, stp_file), obj, hit_file, wo_mode=wo_mode)
+            written_tables.add(obj)
 
 
 def make_tmp(files: list[str] | str) -> list[str]:

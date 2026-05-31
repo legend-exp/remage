@@ -94,4 +94,10 @@ diff -u \
 
 "$python_path" ./verify_lh5_nevents.py "$expected_count" "$output_lh5_jag"
 
+# verify data conservation between the flat and post-processed lh5 outputs:
+# every value in the flat detector tables must appear (exactly once) in the
+# corresponding reshaped table, and the derived t0/evtid columns must match
+# the grouping.
+"$python_path" ./verify_lh5_pproc.py "$output_lh5" "$output_lh5_jag"
+
 set +vx
