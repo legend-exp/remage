@@ -23,7 +23,6 @@ import lh5
 import numpy as np
 from lgdo import Array
 from lgdo.types import LGDO, Struct, Table, VectorOfVectors
-from reboost.iterator import GLMIterator
 
 log = logging.getLogger("remage")
 
@@ -88,21 +87,9 @@ def reshape_output(
             if lh5.ls(stp_file, table) == []:
                 continue
 
-            iterator = GLMIterator(
-                glm_file=None,
-                stp_file=stp_file,
-                lh5_group=detector,
-                start_row=0,
-                n_rows=None,
-                stp_field="stp",
-                buffer=buffer,
-                reshaped_files=False,
-            )
-
-            for stps, chunk_idx, _ in iterator:
-                if stps is None:
-                    continue
-
+            for chunk_idx, stps in enumerate(
+                _iter_event_aligned_chunks(stp_file, table, buffer)
+            ):
                 hit_table = _group_by_time(
                     stps.view_as("ak", with_units=True),
                     window_us=time_window_in_us,
@@ -168,6 +155,32 @@ def _write_lh5(
         lh5.write(Struct({out_detector: hit_table}), out_field, file, wo_mode=wo_mode)
     else:
         lh5.write(hit_table, f"{out_field}/{out_detector}", file, wo_mode=wo_mode)
+
+
+def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
+    """Yield ``buffer``-sized chunks of ``table`` aligned to evtid boundaries.
+
+    All steps of a given evtid stay in the same chunk, so each chunk can be
+    grouped into hits independently. The full evtid column is read once up front
+    to compute the split points.
+    """
+    n_total = lh5.read_n_rows(f"{table}/evtid", stp_file) or 0
+    if n_total == 0:
+        return
+
+    evtids = lh5.read(f"{table}/evtid", stp_file).nda
+    event_starts = np.concatenate(([0], np.flatnonzero(np.diff(evtids)) + 1, [n_total]))
+
+    start = 0
+    while start < n_total:
+        target = start + buffer
+        pos = int(np.searchsorted(event_starts, target, side="right")) - 1
+        end = int(event_starts[pos])
+        if end <= start:
+            # buffer smaller than a single event - take the whole event
+            end = int(event_starts[pos + 1])
+        yield lh5.read(table, stp_file, start_row=start, n_rows=end - start)
+        start = end
 
 
 def _group_by_time(obj: ak.Array, *, window_us: float) -> Table:
