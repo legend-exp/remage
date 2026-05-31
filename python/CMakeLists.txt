@@ -14,6 +14,8 @@ set(PYTHON_SOURCES
     ${_r}/python/remage/ipc.py
     ${_r}/python/remage/logging.py
     ${_r}/python/remage/post_proc.py
+    ${_r}/python/remage/reshaping.py
+    ${_r}/python/remage/utils.py
     ${_r}/python/remage/geombench/__init__.py
     ${_r}/python/remage/geombench/__main__.py
     ${_r}/python/remage/geombench/cli.py
