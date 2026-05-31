@@ -24,7 +24,6 @@ import numpy as np
 from lgdo import Array
 from lgdo.types import LGDO, Struct, Table, VectorOfVectors
 from reboost.iterator import GLMIterator
-from reboost.shape.group import group_by_time
 
 log = logging.getLogger("remage")
 
@@ -104,9 +103,9 @@ def reshape_output(
                 if stps is None:
                     continue
 
-                hit_table = group_by_time(
+                hit_table = _group_by_time(
                     stps.view_as("ak", with_units=True),
-                    window=time_window_in_us,
+                    window_us=time_window_in_us,
                 )
                 # move units from the VoV down to its flattened_data, matching
                 # the convention used elsewhere
@@ -169,6 +168,47 @@ def _write_lh5(
         lh5.write(Struct({out_detector: hit_table}), out_field, file, wo_mode=wo_mode)
     else:
         lh5.write(hit_table, f"{out_field}/{out_detector}", file, wo_mode=wo_mode)
+
+
+def _group_by_time(obj: ak.Array, *, window_us: float) -> Table:
+    """Group steps into hits by ``evtid`` and a coincidence time window.
+
+    A new hit starts whenever ``evtid`` changes, or ``time`` jumps by more than
+    ``window_us`` microseconds within the same evtid. Returns an :class:`lgdo.Table`
+    of :class:`VectorOfVectors`, one per field of ``obj``, preserving each
+    field's ``units`` parameter.
+
+    ``time`` is assumed to be in nanoseconds (the unit remage writes).
+    """
+    fields = obj.fields
+    units_dict = {f: ak.parameters(obj[f]).get("units") for f in fields}
+    if units_dict.get("time") != "ns":
+        msg = f"expected time field in 'ns', got {units_dict.get('time')!r}"
+        raise ValueError(msg)
+
+    # sort first by evtid, then by time within each evtid
+    by_evtid = obj[ak.argsort(obj["evtid"])]
+    grouped = ak.unflatten(by_evtid, ak.run_lengths(by_evtid["evtid"]))
+    time_order = ak.argsort(grouped["time"], axis=-1)
+    sorted_cols = {f: np.asarray(ak.flatten(grouped[f][time_order])) for f in fields}
+
+    window_ns = window_us * 1000.0
+    time = sorted_cols["time"]
+    evtid = sorted_cols["evtid"]
+    dt = np.diff(time)
+    de = np.diff(evtid)
+    boundary = ((dt > window_ns) & (de == 0)) | (de > 0)
+    cumulative_length = np.append(np.where(boundary)[0] + 1, len(time))
+
+    out = Table(size=len(cumulative_length))
+    for f in fields:
+        vov = VectorOfVectors(
+            cumulative_length=cumulative_length, flattened_data=sorted_cols[f]
+        )
+        if units_dict[f] is not None:
+            vov.attrs["units"] = units_dict[f]
+        out.add_field(f, vov)
+    return out
 
 
 def _move_units_to_flattened_data(data: LGDO) -> None:
