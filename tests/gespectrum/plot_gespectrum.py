@@ -85,9 +85,7 @@ smeared_energy = gauss_smear(
 
 def plot_hist(add_before: bool = False):
     h_sim = np.histogram(smeared_energy, bins)[0]
-    h_sim = h_sim / widths
-    h_norm2 = h / factor
-    ha_norm2 = ha / factor
+    h_sim = h_sim / widths * factor
 
     fig, (ax0, ax1) = plt.subplots(
         2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3)
@@ -97,29 +95,25 @@ def plot_hist(add_before: bool = False):
 
     if add_before:
         ax0.stairs(
-            ha_norm2,
+            ha,
             bins,
             fill=True,
             color="tab:blue",
             label="before QC scaled",
             alpha=0.2,
         )
-    ax0.stairs(
-        h_norm2, bins, fill=True, color="tab:blue", alpha=0.6, label="Data scaled"
-    )
+    ax0.stairs(h, bins, fill=True, color="tab:blue", alpha=0.6, label="Data")
 
     ax0.stairs(h_sim, bins, label="MC", color="tab:red")
 
     ax0.set_yscale("log")
     ax0.set_xlim(500, 3000)
     ax0.set_ylim(1, 3e4)
-    ax0.set_ylabel("counts / keV [a.u.]")
+    ax0.set_ylabel("counts / keV")
     ax0.legend()
 
     ax1.axhline(1, color="gray", zorder=0)
-    ax1.scatter(
-        (bins[:-1] + bins[1:]) / 2, h_sim / h_norm2, color="black", s=2, zorder=100
-    )
+    ax1.scatter((bins[:-1] + bins[1:]) / 2, h_sim / h, color="black", s=2, zorder=100)
     ax1.set_ylim(0.5, 1.5)
     ax1.set_xlabel("energy [keV]")
     ax1.set_ylabel("MC/Data")
