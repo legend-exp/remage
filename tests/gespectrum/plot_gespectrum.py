@@ -33,6 +33,9 @@ widths = np.diff(bins)
 h = np.load("data/hades-data-var.npy") / widths
 ha = np.load("data/hades-data-all-var.npy") / widths
 
+bkg_live_time = 190800  # s, background run0001
+h_bkg = np.load("data/hades-data-bkg-var.npy") / widths * (run_time / bkg_live_time)
+
 
 def gauss_smear(arr_true: ak.Array, arr_reso: ak.Array) -> ak.Array:
     """Smear values with expected resolution.
@@ -85,10 +88,10 @@ smeared_energy = gauss_smear(
 
 def plot_hist(add_before: bool = False):
     h_sim = np.histogram(smeared_energy, bins)[0]
-    h_sim = h_sim / widths * factor
+    h_sim = h_sim / widths * factor + h_bkg
 
     fig, (ax0, ax1) = plt.subplots(
-        2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3)
+        2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3), layout="constrained"
     )
     fig.get_layout_engine().set(hspace=0)
     ax0.tick_params(labelbottom=False)
