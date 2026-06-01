@@ -46,7 +46,7 @@ repos:
         args: ["--prose-wrap=always"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.12"
+    rev: "v0.15.15"
     hooks:
       - id: ruff
         types_or: [file]
@@ -114,13 +114,13 @@ repos:
         types_or: [c++]
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.4
+    rev: v22.1.5
     hooks:
       - id: clang-format
         types_or: [c++]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.20.2"
+    rev: "v2.1.0"
     hooks:
       - id: mypy
         files: "^python/"
