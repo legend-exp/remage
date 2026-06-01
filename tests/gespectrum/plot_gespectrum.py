@@ -112,11 +112,15 @@ def plot_hist(add_before: bool = False):
     ax0.set_ylabel("counts / keV")
     ax0.legend()
 
-    ax1.axhline(1, color="gray", zorder=0)
-    ax1.scatter((bins[:-1] + bins[1:]) / 2, h_sim / h, color="black", s=2, zorder=100)
-    ax1.set_ylim(0.5, 1.5)
+    z_score = np.where(h > 0, (h_sim - h) * widths / np.sqrt(h * widths), np.nan)
+
+    ax1.axhline(0, color="gray", zorder=0)
+    for n, alpha in zip([3, 2, 1], [0.15, 0.3, 0.5], strict=True):
+        ax1.axhspan(-n, n, color="tab:green", alpha=alpha, zorder=1)
+    ax1.scatter((bins[:-1] + bins[1:]) / 2, z_score, color="black", s=2, zorder=100)
+    ax1.set_ylim(-5, 5)
     ax1.set_xlabel("energy [keV]")
-    ax1.set_ylabel("MC/Data")
+    ax1.set_ylabel(r"(MC$-$Data)/$\sigma$")
 
     return ax0, ax1, fig
 
