@@ -34,7 +34,9 @@ h = np.load("data/hades-data-var.npy") / widths
 ha = np.load("data/hades-data-all-var.npy") / widths
 
 bkg_live_time = 190800  # s, background run0001
-h_bkg = np.load("data/hades-data-bkg-var.npy") / widths * (run_time / bkg_live_time)
+bkg_scale = run_time / bkg_live_time
+n_bkg_raw = np.load("data/hades-data-bkg-var.npy")
+h_bkg = n_bkg_raw / widths * bkg_scale
 
 
 def gauss_smear(arr_true: ak.Array, arr_reso: ak.Array) -> ak.Array:
@@ -87,8 +89,8 @@ smeared_energy = gauss_smear(
 
 
 def plot_hist(add_before: bool = False):
-    h_sim = np.histogram(smeared_energy, bins)[0]
-    h_sim = h_sim / widths * factor + h_bkg
+    k_sim = np.histogram(smeared_energy, bins)[0]
+    h_sim = k_sim / widths * factor + h_bkg
 
     fig, (ax0, ax1) = plt.subplots(
         2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3), layout="constrained"
@@ -110,18 +112,20 @@ def plot_hist(add_before: bool = False):
     ax0.stairs(h_sim, bins, label="MC", color="tab:red")
 
     ax0.set_yscale("log")
-    ax0.set_xlim(500, 3000)
-    ax0.set_ylim(1, 3e4)
+    ax0.set_xlim(500, 3100)
+    ax0.set_ylim(bottom=0.1)
     ax0.set_ylabel("counts / keV")
     ax0.legend()
 
-    z_score = np.where(h > 0, (h_sim - h) * widths / np.sqrt(h * widths), np.nan)
+    n_data = h * widths
+    sigma = np.sqrt(n_data + factor**2 * k_sim + bkg_scale**2 * n_bkg_raw)
+    z_score = np.where(n_data > 0, (h_sim - h) * widths / sigma, np.nan)
 
     ax1.axhline(0, color="gray", zorder=0)
-    for n, alpha in zip([3, 2, 1], [0.15, 0.3, 0.5], strict=True):
+    for n, alpha in zip([5, 3], [0.15, 0.4], strict=True):
         ax1.axhspan(-n, n, color="tab:green", alpha=alpha, zorder=1)
     ax1.scatter((bins[:-1] + bins[1:]) / 2, z_score, color="black", s=2, zorder=100)
-    ax1.set_ylim(-5, 5)
+    ax1.set_ylim(-7, 7)
     ax1.set_xlabel("energy [keV]")
     ax1.set_ylabel(r"(MC$-$Data)/$\sigma$")
 
@@ -129,9 +133,9 @@ def plot_hist(add_before: bool = False):
 
 
 ax0, ax1, fig = plot_hist()
-ax0.set_xlim(10, 3500)
+ax0.set_xlim(10, 3100)
 fig.savefig("hades-spectrum-full.output.png")
 
 ax0.set_yscale("linear")
-ax0.set_ylim(0, 250)
+ax0.set_ylim(0, 1.5e5)
 fig.savefig("hades-spectrum-linear.output.png")
