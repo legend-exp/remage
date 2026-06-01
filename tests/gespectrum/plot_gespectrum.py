@@ -90,21 +90,25 @@ def plot_hist(add_before: bool = False):
     ha_norm2 = ha / factor
 
     fig, (ax0, ax1) = plt.subplots(
-        2, 1, sharex=True, height_ratios=(1, 0.2), layout="constrained", figsize=(10, 3)
+        2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3)
     )
+    fig.get_layout_engine().set(hspace=0)
+    ax0.tick_params(labelbottom=False)
 
     if add_before:
         ax0.stairs(
             ha_norm2,
             bins,
             fill=True,
-            color="#ff0000",
+            color="tab:blue",
             label="before QC scaled",
             alpha=0.2,
         )
-    ax0.stairs(h_norm2, bins, fill=True, color="#ff0000", label="Data scaled")
+    ax0.stairs(
+        h_norm2, bins, fill=True, color="tab:blue", alpha=0.6, label="Data scaled"
+    )
 
-    ax0.stairs(h_sim, bins, label="MC", color="#0b5394")
+    ax0.stairs(h_sim, bins, label="MC", color="tab:red")
 
     ax0.set_yscale("log")
     ax0.set_xlim(500, 3000)
@@ -124,12 +128,9 @@ def plot_hist(add_before: bool = False):
 
 
 ax0, ax1, fig = plot_hist()
-fig.savefig("hades-spectrum.output.png")
-
-ax0.set_xlim(10, 2800)
+ax0.set_xlim(10, 3500)
 fig.savefig("hades-spectrum-full.output.png")
 
 ax0.set_yscale("linear")
 ax0.set_ylim(0, 250)
-ax0.set_xlim(500, 2800)
 fig.savefig("hades-spectrum-linear.output.png")
