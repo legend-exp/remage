@@ -93,10 +93,16 @@ def plot_hist(add_before: bool = False):
     h_sim = k_sim / widths * factor + h_bkg
 
     fig, (ax0, ax1) = plt.subplots(
-        2, 1, sharex=True, height_ratios=(1, 0.2), figsize=(10, 3), layout="constrained"
+        2,
+        1,
+        sharex=True,
+        height_ratios=(1, 0.2),
+        figsize=(10, 3.6),
+        layout="none",
+        gridspec_kw={"hspace": 0.0345},
     )
-    fig.get_layout_engine().set(hspace=0)
-    ax0.tick_params(labelbottom=False)
+    ax0.tick_params(bottom=False, labelbottom=False)
+    ax1.tick_params(top=True, which="both")
 
     if add_before:
         ax0.stairs(
@@ -107,13 +113,13 @@ def plot_hist(add_before: bool = False):
             label="before QC scaled",
             alpha=0.2,
         )
-    ax0.stairs(h, bins, fill=True, color="tab:blue", alpha=0.6, label="Data")
+    ax0.stairs(h, bins, fill=True, color="tab:blue", alpha=0.6, label="data")
 
-    ax0.stairs(h_sim, bins, label="MC", color="tab:red")
+    ax0.stairs(h_sim, bins, label="remage", color="tab:red")
 
     ax0.set_yscale("log")
     ax0.set_xlim(500, 3100)
-    ax0.set_ylim(bottom=0.1)
+    ax0.set_ylim(bottom=10)
     ax0.set_ylabel("counts / keV")
     ax0.legend()
 
@@ -127,15 +133,18 @@ def plot_hist(add_before: bool = False):
     ax1.scatter((bins[:-1] + bins[1:]) / 2, z_score, color="black", s=2, zorder=100)
     ax1.set_ylim(-7, 7)
     ax1.set_xlabel("energy [keV]")
-    ax1.set_ylabel(r"(MC$-$Data)/$\sigma$")
+    ax1.set_ylabel("pulls")
 
     return ax0, ax1, fig
 
 
 ax0, ax1, fig = plot_hist()
 ax0.set_xlim(10, 3100)
-fig.savefig("hades-spectrum-full.output.png")
+with plt.rc_context({"figure.constrained_layout.use": False}):
+    fig.savefig("hades-spectrum-full.output.png")
 
 ax0.set_yscale("linear")
-ax0.set_ylim(0, 1.5e5)
-fig.savefig("hades-spectrum-linear.output.png")
+ax0.set_xlim(700, 3100)
+ax0.set_ylim(0, 5000)
+with plt.rc_context({"figure.constrained_layout.use": False}):
+    fig.savefig("hades-spectrum-linear.output.png")
