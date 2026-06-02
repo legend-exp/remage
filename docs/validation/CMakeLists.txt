@@ -106,7 +106,6 @@ set(TESTS_IMAGES
     distances/distance-ge-poststep.output.png
     distances/distance-ge-prestep.output.png
     distances/distance-ge-average.output.png
-    gespectrum/hades-spectrum.output.png
     gespectrum/hades-spectrum-full.output.png
     gespectrum/hades-spectrum-linear.output.png
     nist/e-range-ge-distributions.output.png

@@ -33,6 +33,11 @@ widths = np.diff(bins)
 h = np.load("data/hades-data-var.npy") / widths
 ha = np.load("data/hades-data-all-var.npy") / widths
 
+bkg_live_time = 190800  # s, background run0001
+bkg_scale = run_time / bkg_live_time
+n_bkg_raw = np.load("data/hades-data-bkg-var.npy")
+h_bkg = n_bkg_raw / widths * bkg_scale
+
 
 def gauss_smear(arr_true: ak.Array, arr_reso: ak.Array) -> ak.Array:
     """Smear values with expected resolution.
@@ -84,52 +89,62 @@ smeared_energy = gauss_smear(
 
 
 def plot_hist(add_before: bool = False):
-    h_sim = np.histogram(smeared_energy, bins)[0]
-    h_sim = h_sim / widths
-    h_norm2 = h / factor
-    ha_norm2 = ha / factor
+    k_sim = np.histogram(smeared_energy, bins)[0]
+    h_sim = k_sim / widths * factor + h_bkg
 
     fig, (ax0, ax1) = plt.subplots(
-        2, 1, sharex=True, height_ratios=(1, 0.2), layout="constrained", figsize=(10, 3)
+        2,
+        1,
+        sharex=True,
+        height_ratios=(1, 0.2),
+        figsize=(10, 3.6),
+        layout="none",
+        gridspec_kw={"hspace": 0.0345},
     )
+    ax0.tick_params(bottom=False, labelbottom=False)
+    ax1.tick_params(top=True, which="both")
 
     if add_before:
         ax0.stairs(
-            ha_norm2,
+            ha,
             bins,
             fill=True,
-            color="#ff0000",
+            color="tab:blue",
             label="before QC scaled",
             alpha=0.2,
         )
-    ax0.stairs(h_norm2, bins, fill=True, color="#ff0000", label="Data scaled")
+    ax0.stairs(h, bins, fill=True, color="tab:blue", alpha=0.6, label="data")
 
-    ax0.stairs(h_sim, bins, label="MC", color="#0b5394")
+    ax0.stairs(h_sim, bins, label="remage", color="tab:red")
 
     ax0.set_yscale("log")
-    ax0.set_xlim(500, 3000)
-    ax0.set_ylim(1, 3e4)
-    ax0.set_ylabel("counts / keV [a.u.]")
+    ax0.set_xlim(500, 3100)
+    ax0.set_ylim(bottom=10)
+    ax0.set_ylabel("counts / keV")
     ax0.legend()
 
-    ax1.axhline(1, color="gray", zorder=0)
-    ax1.scatter(
-        (bins[:-1] + bins[1:]) / 2, h_sim / h_norm2, color="black", s=2, zorder=100
-    )
-    ax1.set_ylim(0.5, 1.5)
+    n_data = h * widths
+    sigma = np.sqrt(n_data + factor**2 * k_sim + bkg_scale**2 * n_bkg_raw)
+    z_score = np.where(n_data > 0, (h_sim - h) * widths / sigma, np.nan)
+
+    ax1.axhline(0, color="gray", zorder=0)
+    for n, alpha in zip([5, 3], [0.15, 0.4], strict=True):
+        ax1.axhspan(-n, n, color="tab:green", alpha=alpha, zorder=1)
+    ax1.scatter((bins[:-1] + bins[1:]) / 2, z_score, color="black", s=2, zorder=100)
+    ax1.set_ylim(-7, 7)
     ax1.set_xlabel("energy [keV]")
-    ax1.set_ylabel("MC/Data")
+    ax1.set_ylabel("pulls")
 
     return ax0, ax1, fig
 
 
 ax0, ax1, fig = plot_hist()
-fig.savefig("hades-spectrum.output.png")
-
-ax0.set_xlim(10, 2800)
-fig.savefig("hades-spectrum-full.output.png")
+ax0.set_xlim(10, 3100)
+with plt.rc_context({"figure.constrained_layout.use": False}):
+    fig.savefig("hades-spectrum-full.output.png")
 
 ax0.set_yscale("linear")
-ax0.set_ylim(0, 250)
-ax0.set_xlim(500, 2800)
-fig.savefig("hades-spectrum-linear.output.png")
+ax0.set_xlim(700, 3100)
+ax0.set_ylim(0, 5000)
+with plt.rc_context({"figure.constrained_layout.use": False}):
+    fig.savefig("hades-spectrum-linear.output.png")
