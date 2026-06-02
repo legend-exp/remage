@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Germanium spectra - remage 0.23.1.dev15+g74f29bfe9 validation suite</title>
+        <title>Th-228 HPGe energy spectrum - remage 0.23.1.dev25+g47a689217 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.23.1.dev15+g74f29bfe9 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.23.1.dev25+g47a689217 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -176,7 +176,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -189,7 +189,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.23.1.dev15+g74f29bfe9 validation suite</span>
+  <span class="sidebar-brand-text">remage 0.23.1.dev25+g47a689217 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -214,7 +214,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gammacorr.html">Gamma correlations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optics.html">Optical physics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="performance.html">Performance Benchmarks</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Germanium spectra</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Th-228 HPGe energy spectrum</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
@@ -256,49 +256,90 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="germanium-spectra">
-<h1>Germanium spectra<a class="headerlink" href="#germanium-spectra" title="Link to this heading">¶</a></h1>
-<p>This test is modeled after a real-world example of a characterization test stand
-used for LEGEND (HADES). It simulates a BEGe detector with a very simple
-geometry next to a Th-228 source and copares the resulting spectrum with
-experimental data. The test uses a simplified geometry of the chosen BEGe
-detector.</p>
-<p>The data is scaled by the expected source activity at the point of measurement,
-and to match the simulated decay count. The efficiency of the applied quality
-cuts is accounted for.</p>
-<p>In the simulation post-processing, an piecewise activeness model and a variable
-energy resolution is applied. The binning of the spectrum is widened around the
-gamma line peaks, so that we do not compare the detailed peak shape.</p>
-<p>A good agreement for higher energies is found:</p>
-<figure class="align-default" id="id1">
-<a class="reference internal image-reference" href="_images/hades-spectrum.output.png"><img alt="_images/hades-spectrum.output.png" src="_images/hades-spectrum.output.png" style="width: 800px;" />
-</a>
-<figcaption>
-<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector.</em></span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>In the lower-energy spectrum (&lt;200 keV), some minor deviations can be observed:</p>
-<figure class="align-default" id="id2">
+          <section class="tex2jax_ignore mathjax_ignore" id="th-228-hpge-energy-spectrum">
+<h1>Th-228 HPGe energy spectrum<a class="headerlink" href="#th-228-hpge-energy-spectrum" title="Link to this heading">¶</a></h1>
+<p>This validation test compares a <em>remage</em> simulation against experimental data
+collected at the HADES<a class="footnote-reference brackets" href="#heroica" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#begechar" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> underground laboratory, which hosts
+a HPGe detector characterization test stand used by the
+<a class="reference external" href="https://legend-exp.org">LEGEND</a> experiment. A BEGe detector is exposed to a
+Th-228 calibration source and the recorded energy spectrum is compared to the
+<em>remage</em> prediction, providing an end-to-end check of the simulation chain from
+particle transport to spectrum generation.</p>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<p><strong>Detector.</strong> The simulated detector (B00000B) is a BEGe with a height of 29 mm
+and a radius of 37 mm. The geometry is simplified: it omits the p+ contact,
+groove, and taper.</p>
+<p><strong>Source.</strong> A Th-228 point source is placed on the detector symmetry axis, 41 mm
+above the detector face. The source activity at the time of measurement
+(2021-01-18) was ~6.3 kBq.</p>
+<p><strong>Experimental data.</strong> The data were recorded in a 17-hour run (including DAQ
+dead-time). Quality cuts targeting pile-up and unphysical events retain ~84% of
+events. The measured spectrum is normalised to the expected number of source
+decays during the live-time, accounting for the QC survival fraction.</p>
+</section>
+<section id="simulation-and-post-processing">
+<h2>Simulation and post-processing<a class="headerlink" href="#simulation-and-post-processing" title="Link to this heading">¶</a></h2>
+<p>Th-228 decays are simulated with the GPS ion generator confined to the source
+volume. In the post-processing step:</p>
+<ul class="simple">
+<li><p>a piecewise-linear activeness model is applied using the distance of each
+energy deposition to the n+ contact surface, with FCCD = 1.3 mm and a
+dead-layer fraction (DLF) of 0.5;</p></li>
+<li><p>a Gaussian energy resolution smearing is applied with FWHM = 2.5 √(E / 2039
+keV) keV;</p></li>
+<li><p>variable-width binning (wider around gamma-line peaks) is used so that the
+comparison is not sensitive to the detailed peak shape.</p></li>
+</ul>
+<p>The simulated spectrum is normalised by the ratio of expected source decays to
+simulated primary events. The active volume model and energy resolution are not
+the focus of this comparison and are only applied to obtain a realistic-looking
+spectrum.</p>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">¶</a></h2>
+<figure class="align-default" id="id3">
 <a class="reference internal image-reference" href="_images/hades-spectrum-full.output.png"><img alt="_images/hades-spectrum-full.output.png" src="_images/hades-spectrum-full.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (full range).</em></span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (log scale).</em></span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<hr class="docutils" />
-<figure class="align-default" id="id3">
+<figure class="align-default" id="id4">
 <a class="reference internal image-reference" href="_images/hades-spectrum-linear.output.png"><img alt="_images/hades-spectrum-linear.output.png" src="_images/hades-spectrum-linear.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (linear scale).</em></span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Energy spectrum of a Th-228 source recorded in a germanium detector (linear scale).</em></span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
+<p>Simulation and analysis scripts are available in
+<a class="reference external" href="https://github.com/legend-exp/remage/tree/main/tests/gespectrum"><code class="docutils literal notranslate"><span class="pre">tests/gespectrum</span></code></a>.</p>
 </section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="heroica" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>E. Andreotti et al., HEROICA: an Underground Facility for the Fast Screening
+of Germanium Detectors, JINST 8 (2013) P06012,
+<a class="reference external" href="https://doi.org/10.1088/1748-0221/8/06/P06012">10.1088/1748-0221/8/06/P06012</a>.</p>
+</aside>
+<aside class="footnote brackets" id="begechar" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>M. Agostini et al. (GERDA Collaboration), Characterization of 30 ⁷⁶Ge
+enriched Broad Energy Ge detectors for GERDA Phase II, Eur. Phys. J. C 79,
+978 (2019),
+<a class="reference external" href="https://doi.org/10.1140/epjc/s10052-019-7353-8">10.1140/epjc/s10052-019-7353-8</a>.</p>
+</aside>
+</aside>
 
         </article>
       </div>
@@ -335,8 +376,30 @@ gamma line peaks, so that we do not compare the detailed peak shape.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Th-228 HPGe energy spectrum</a><ul>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#simulation-and-post-processing">Simulation and post-processing</a></li>
+<li><a class="reference internal" href="#results">Results</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
