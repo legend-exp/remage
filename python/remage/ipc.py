@@ -131,7 +131,7 @@ def handle_ipc_message(
 
         # handle blocking messages, if necessary.
         if fields[0] == "ipc_available":
-            if fields[1] != __version__:
+            if fields[1] != __version__ and os.getenv("REMAGE_CPP_PATH") is None:
                 log.error(
                     "remage-cpp version %s does not match python-wrapper version %s",
                     fields[1],

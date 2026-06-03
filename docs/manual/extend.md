@@ -89,3 +89,28 @@ manager.Run();
 This means after {cpp:func}`RMGManager::Run` you can add more custom C++ code
 that you wish to be run after finishing the simulation. For some examples check
 the examples folder.
+
+## Using a custom `remage-cpp` with the stock Python wrapper
+
+When you build your own application as described above, you produce a
+replacement for the `remage-cpp` executable (see
+[That `remage` executable...](../developer.md#that-remage-executable)), but you
+usually still want to drive it through the stock `remage` Python wrapper to keep
+its input pre-processing, LH5 conversion and process-parallel orchestration.
+
+Point the `REMAGE_CPP_PATH` environment variable directly at your executable;
+when set and existing, it takes precedence over the app path burnt into the
+python wrapper:
+
+```console
+$ export REMAGE_CPP_PATH=/path/to/your/build/myapp
+$ remage [options...] macro.mac
+```
+
+Normally the wrapper aborts if the version announced by `remage-cpp` over the
+IPC channel does not exactly match its own. This check is intentionally
+**disabled** when `REMAGE_CPP_PATH` is set, since your application will
+generally report a different version. You are therefore responsible for pairing
+compatible halves: neither the IPC protocol nor the on-disk output layout are
+stable APIs, so build your application against the same _remage_ version as the
+wrapper you drive it with, and update both together.

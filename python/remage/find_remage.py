@@ -30,10 +30,21 @@ def _find_remage_from_config() -> tuple[Path, str] | None:
 
 
 def find_remage_cpp() -> Path:
-    """Find the remage executable, either by using the config stored into the package
-    at build-time or by using the system PATH."""
+    """Find the remage executable to wrap.
 
-    path = _find_remage_from_config()
+    It uses (in order of precedence) the following methods:
+    - the REMAGE_CPP_PATH environment variable pointing to the remage-cpp executable,
+    - the config stored into the package at build-time, or
+    - the system PATH.
+    """
+    path = None
+
+    env_path = os.getenv("REMAGE_CPP_PATH")
+    if env_path is not None and Path(env_path).exists():
+        path = (Path(env_path), "env")
+
+    if path is None:
+        path = _find_remage_from_config()
 
     if path is None:
         which_result = shutil.which("remage-cpp")
