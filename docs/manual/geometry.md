@@ -10,7 +10,7 @@ user must provide a geometry definition. There are two supported approaches:
   <project:../rmg-commands.md#rmggeometryincludegdmlfile>.
 - Override {cpp:func}`RMGHardware::DefineGeometry` in a subclass of
   `RMGHardware` and register it using {cpp:func}`RMGManager::SetUserInit`. A
-  practical example is in `examples/02-hpge`.
+  practical example is in `tests/cosmogenics/surface`.
 
 :::{seealso}
 
@@ -19,7 +19,7 @@ powerful tools for building Monte Carlo geometries and exporting them as GDML.
 Relevant pyg4ometry-based packages include:
 
 - [legend-pygeom-tools](https://legend-pygeom-tools.readthedocs.io) – general
-  geometry routines and extensions
+  geometry routines and GDML extensions for detector registration
 - [legend-pygeom-hpges](https://legend-pygeom-hpges.readthedocs.io) –
   high-purity germanium detector models
 - [legend-pygeom-optics](https://legend-pygeom-optics.readthedocs.io) – optical

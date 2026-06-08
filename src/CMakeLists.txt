@@ -6,6 +6,7 @@ set(_root ${PROJECT_SOURCE_DIR})
 set(PROJECT_PUBLIC_HEADERS
     ${_root}/include/RMGAnalysisReader.hh
     ${_root}/include/RMGGeomBenchOutputScheme.hh
+    ${_root}/include/RMGDefaultCli.hh
     ${_root}/include/RMGDetectorHit.hh
     ${_root}/include/RMGDetectorMetadata.hh
     ${_root}/include/RMGExceptionHandler.hh
@@ -63,6 +64,7 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGAnalysisReader.cc
     ${_root}/src/RMGGeomBenchOutputScheme.cc
     ${_root}/src/RMGDetectorHit.cc
+    ${_root}/src/RMGDefaultCli.cc
     ${_root}/src/RMGExceptionHandler.cc
     ${_root}/src/RMGHardware.cc
     ${_root}/src/RMGHardwareMessenger.cc
@@ -141,7 +143,7 @@ target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR
 target_link_libraries(
   remage
   PUBLIC ${Geant4_LIBRARIES} fmt::fmt
-  PRIVATE magic_enum::magic_enum)
+  PRIVATE CLI11::CLI11 magic_enum::magic_enum)
 
 if(BxDecay0_FOUND)
   target_link_libraries(remage PRIVATE BxDecay0::BxDecay0_Geant4 BxDecay0::BxDecay0)
