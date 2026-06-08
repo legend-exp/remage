@@ -38,7 +38,7 @@ def reshape_output(
     overwrite: bool = False,
     buffer: int = int(5e6),
 ) -> None:
-    """Post-process remage step files into hit files using reboost.
+    """Post-process remage step files into reshaped hit files.
 
     For each detector listed in ``reshape_tables``, steps are grouped by event
     id and time (window in microseconds), producing per-hit ``t0`` and ``evtid``
@@ -163,13 +163,23 @@ def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
     All steps of a given evtid stay in the same chunk, so each chunk can be
     grouped into hits independently. The full evtid column is read once up front
     to compute the split points.
+
+    This relies on remage writing evtids monotonically increasing.
     """
     n_total = lh5.read_n_rows(f"{table}/evtid", stp_file) or 0
     if n_total == 0:
         return
 
     evtids = lh5.read(f"{table}/evtid", stp_file).nda
-    event_starts = np.concatenate(([0], np.flatnonzero(np.diff(evtids)) + 1, [n_total]))
+    diffs = np.diff(evtids)
+    if np.any(diffs < 0):
+        msg = (
+            f"evtids in {table} of {stp_file} are not monotonically increasing: "
+            "an event's steps would span separate blocks, breaking per-chunk "
+            "hit grouping"
+        )
+        raise ValueError(msg)
+    event_starts = np.concatenate(([0], np.flatnonzero(diffs) + 1, [n_total]))
 
     start = 0
     while start < n_total:

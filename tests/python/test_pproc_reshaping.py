@@ -4,6 +4,7 @@ import copy
 
 import awkward as ak
 import lh5
+import numpy as np
 import pytest
 from lgdo import Array, Table, VectorOfVectors
 from remage.reshaping import reshape_output
@@ -194,3 +195,115 @@ def test_unit_convention_matches_manual_grouping(stp_file, tmptestdir):
     assert isinstance(edep, VectorOfVectors)
     assert "units" not in edep.attrs
     assert edep.flattened_data.attrs["units"] == "keV"
+
+
+@pytest.fixture(scope="module")
+def big_stp_file(tmptestdir):
+    """A larger step file spanning many events with a few steps each.
+
+    Used to exercise the chunked (multi-buffer) reshaping path: with a small
+    ``buffer`` the iterator splits the table across several chunks, each grouped
+    and appended independently.
+    """
+    stp_path = str(tmptestdir / "big.lh5")
+    rng = np.random.default_rng(0)
+
+    n_events = 500
+    # 1-4 steps per event, contiguous evtids as remage writes them
+    counts = rng.integers(1, 5, size=n_events)
+    evtid = np.repeat(np.arange(n_events), counts)
+    n = len(evtid)
+    # times within an event spread across/within the coincidence window (ns)
+    time = np.cumsum(rng.uniform(0, 4000, size=n)).astype(float)
+
+    data = {
+        "evtid": Array(evtid),
+        "edep": Array(rng.uniform(0, 1000, size=n), attrs={"units": "keV"}),
+        "time": Array(time, attrs={"units": "ns"}),
+    }
+    lh5.write(Table(data), "stp/det1", stp_path, wo_mode="of")
+    lh5.write(
+        Table({"evtid": Array(np.arange(n_events))}), "vtx", stp_path, wo_mode="append"
+    )
+
+    return stp_path
+
+
+@pytest.mark.parametrize("buffer", [7, 13, 100, int(5e6)])
+def test_chunked_reshape_conserves_data(big_stp_file, tmptestdir, buffer):
+    """Reshaping is independent of ``buffer``: no step is lost or duplicated.
+
+    A small buffer forces many event-aligned chunks, each written with an
+    ``append`` mode. The reshaped hit table must be identical regardless of
+    buffer size, and must contain exactly the input steps (same multiset).
+    """
+    outfile = f"{tmptestdir}/big_hit_buf{buffer}.lh5"
+
+    reshape_output(
+        stp_files=[big_stp_file],
+        hit_files=outfile,
+        reshape_tables=["det1"],
+        forward_tables=["vtx"],
+        out_field="stp",
+        time_window_in_us=1,
+        overwrite=True,
+        buffer=buffer,
+    )
+
+    flat_in = lh5.read("stp/det1", big_stp_file).view_as("ak")
+    hits = lh5.read("stp/det1", outfile).view_as("ak")
+
+    # every step value is conserved (no loss, no duplication) for each field
+    for field in ("edep", "time"):
+        np.testing.assert_array_equal(
+            np.sort(ak.flatten(hits[field]).to_numpy()),
+            np.sort(flat_in[field].to_numpy()),
+        )
+
+    # evtids are conserved as a set, and t0 is the first time of each hit group
+    assert set(hits.evtid.to_list()) == set(flat_in.evtid.to_list())
+    np.testing.assert_array_equal(
+        hits.t0.to_numpy(), ak.firsts(hits.time, axis=-1).to_numpy()
+    )
+
+    # the full hit structure is byte-for-byte independent of the buffer size
+    ref_file = f"{tmptestdir}/big_hit_ref.lh5"
+    reshape_output(
+        stp_files=[big_stp_file],
+        hit_files=ref_file,
+        reshape_tables=["det1"],
+        forward_tables=["vtx"],
+        out_field="stp",
+        time_window_in_us=1,
+        overwrite=True,
+        buffer=int(5e6),
+    )
+    assert hits.to_list() == lh5.read("stp/det1", ref_file).view_as("ak").to_list()
+
+
+def test_nonmonotonic_evtids_raises(tmptestdir):
+    """A non-monotonic evtid column (event split across blocks) is rejected loudly."""
+    stp_path = str(tmptestdir / "noncontig.lh5")
+    # evtid 0 reappears after evtid 1 - not monotonically increasing
+    lh5.write(
+        Table(
+            {
+                "evtid": Array([0, 0, 1, 0]),
+                "time": Array([0.0, 1.0, 2.0, 3.0], attrs={"units": "ns"}),
+            }
+        ),
+        "stp/det1",
+        stp_path,
+        wo_mode="of",
+    )
+
+    with pytest.raises(ValueError, match="not monotonically increasing"):
+        reshape_output(
+            stp_files=[stp_path],
+            hit_files=f"{tmptestdir}/noncontig_out.lh5",
+            reshape_tables=["det1"],
+            forward_tables=[],
+            out_field="stp",
+            time_window_in_us=1,
+            overwrite=True,
+        )
