@@ -147,15 +147,16 @@ void RMGDefaultCli::SetupLoggingAndIpc() {
   if (quiet) RMGLog::SetLogLevel(RMGLog::warning);
 
   // check that we have the same version when we are running under the python wrapper.
-  if (char* version_s = std::getenv("RMG_WRAPPER_VERSION")) {
-    if (std::string(version_s) != RMG_PROJECT_VERSION_FULL) {
-      RMGLog::OutFormat(
-          RMGLog::fatal,
-          "remage-cpp version {} does not match python-wrapper version %s",
-          RMG_PROJECT_VERSION_FULL,
-          version_s
-      );
-    }
+  // if the user sets REMAGE_CPP_PATH, they are responsible for managing the versions.
+  const char* version_s = std::getenv("RMG_WRAPPER_VERSION");
+  if (version_s && std::getenv("REMAGE_CPP_PATH") &&
+      std::string(version_s) != RMG_PROJECT_VERSION_FULL) {
+    RMGLog::OutFormat(
+        RMGLog::fatal,
+        "remage-cpp version {} does not match python-wrapper version %s",
+        RMG_PROJECT_VERSION_FULL,
+        version_s
+    );
   }
 
   // handle signal to abort the current run.
