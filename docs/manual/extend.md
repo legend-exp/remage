@@ -87,10 +87,39 @@ manager.Run();
 ```
 
 This means after {cpp:func}`RMGManager::Run` you can add more custom C++ code
-that you wish to be run after finishing the simulation. For some examples check
-the examples folder.
+that you wish to be run after finishing the simulation.
 
-## Using a custom `remage-cpp` with the stock Python wrapper
+## Inheriting from the default CLI
+
+The easiest way to do all this while changing some detail is to inherit from the
+default CLI.
+
+```c++
+#include "RMGDefaultCli.hh"
+
+class MyCLI : public RMGDefaultCli {
+
+  public:
+
+    void SetupRuntime(RMGManager& manager) override {
+      RMGDefaultCli::SetupRuntime(manager);
+      manager.SetUserInit(...); // for custom physics etc.
+    }
+    void SetupGeometry(RMGManager& manager) override {
+      manager.SetUserInit(...); // for custom C++-based geometries.
+    }
+};
+
+int main(int argc, char** argv) {
+
+  MyCLI app;
+  app.ParseCliArgs(argc, argv);
+  app.SetupLoggingAndIpc();
+  return app.RunSimulation(argc, argv);
+}
+```
+
+### Using a custom `remage-cpp` with the stock Python wrapper
 
 When you build your own application as described above, you produce a
 replacement for the `remage-cpp` executable (see

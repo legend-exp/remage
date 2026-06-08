@@ -28,9 +28,9 @@ approach slightly complicates the build system, it significantly reduces the
 amount of code to write and maintain.
 
 The C++ code resides in the `src` directory, with the `remage-cpp` executable
-built from `src/remage.cc`. The Python code is organized as a package under the
-`python` directory, where the `cli.py` module provides the _remage_ command-line
-interface.
+built from `src/remage.cc` and `src/RMGDefaultCli.cc`. The Python code is
+organized as a package under the `python` directory, where the `cli.py` module
+provides the _remage_ command-line interface.
 
 At build time, CMake compiles `remage-cpp` and installs the Python package in
 the build area. The Python package and its dependencies (see `pyproject.toml`)
