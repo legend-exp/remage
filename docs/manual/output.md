@@ -122,7 +122,14 @@ example: `velocity_in_m\s`).
 ## Built-in output schemes
 
 _remage_ currently implements schemes to read out `Germanium`, `Scintillator`
-and `Optical` detector types.
+and `Optical` detector types. The columns recorded by each scheme are described
+below.
+
+For all detector output schemes, an additional integer `det_uid` column, holding
+the unique identifier of the detector each hit belongs to, is added to the
+output tables when the single-table layout is selected (see
+{ref}`manual-output-table-layout`). In the default per-detector layout this
+column is omitted, since the UID is encoded in the table name.
 
 ### `Germanium`: Germanium (HPGe) detectors
 
@@ -256,6 +263,8 @@ useful:
 
 :::
 
+(manual-output-table-layout)=
+
 ## Single- versus multi-detector table layout
 
 _remage_ will store sensitive volume hits in separate output tables by default,
@@ -265,7 +274,10 @@ table can be more beneficial. The multi-table layout can be disabled by setting
 <project:../rmg-commands.md#rmgoutputntupleperdetector> to false. In this
 scenario, _remage_ will organize hits by detector type in separate tables (a
 table named `germanium` for the `Germanium` detectors, `scintillator` for
-`Scintillator`s, etc.).
+`Scintillator`s, etc.). In this layout an additional integer `det_uid` column is
+added to each table to record the unique identifier of the detector each hit
+belongs to (this column is omitted in the default per-detector layout, where the
+UID is encoded in the table name).
 
 (manual-output-table-naming)=
 
