@@ -386,3 +386,55 @@ def test_flat_hit_table_calorimeter(calo_stp_file, tmptestdir):
     det1 = lh5.read("stp/det1", outfile).view_as("ak")
     assert det1.edep.to_list() == [[100.0, 200.0], [300.0]]
     assert det1.t0.to_list() == [0.0, 2.0]
+
+
+@pytest.fixture(scope="module")
+def big_calo_stp_file(tmptestdir):
+    """A larger flat calorimeter table, to exercise chunked (iterator) writing."""
+    stp_path = str(tmptestdir / "big_calo.lh5")
+    n = 1000
+    rng = np.arange(n)
+    lh5.write(
+        Table(
+            {
+                "evtid": Array(rng),
+                "det_uid": Array(1001 + (rng % 3)),
+                "edep": Array(rng.astype(float), attrs={"units": "keV"}),
+                "time": Array(rng.astype(float) * 0.5, attrs={"units": "ns"}),
+            }
+        ),
+        "stp/calorimeter",
+        stp_path,
+        wo_mode="of",
+    )
+    return stp_path
+
+
+@pytest.mark.parametrize("buffer", [1, 7, 333, 1000, int(5e6)])
+def test_chunked_flat_hit_table_conserves_data(big_calo_stp_file, tmptestdir, buffer):
+    outfile = f"{tmptestdir}/big_calo_hit_{buffer}.lh5"
+
+    reshape_output(
+        stp_files=[big_calo_stp_file],
+        hit_files=outfile,
+        reshape_tables=[],
+        forward_tables=[],
+        flat_hit_tables=["calorimeter"],
+        out_field="stp",
+        time_window_in_us=10,
+        overwrite=True,
+        buffer=buffer,
+    )
+
+    flat_in = lh5.read("stp/calorimeter", big_calo_stp_file).view_as("ak")
+    out = lh5.read("stp/calorimeter", outfile)
+    out_ak = out.view_as("ak")
+
+    # chunking must not change the (flat) result: same rows, same order
+    assert out_ak.evtid.to_list() == flat_in.evtid.to_list()
+    assert out_ak.det_uid.to_list() == flat_in.det_uid.to_list()
+    assert out_ak.edep.to_list() == flat_in.edep.to_list()
+    assert out_ak.t0.to_list() == flat_in.time.to_list()
+    assert "time" not in out_ak.fields
+    assert out["edep"].attrs["units"] == "keV"
+    assert out["t0"].attrs["units"] == "ns"

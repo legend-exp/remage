@@ -133,13 +133,20 @@ def reshape_output(
             if lh5.ls(stp_file, table) == []:
                 continue
 
-            # already one hit per detector per event: forward as-is, only
-            # renaming the time column so it can join the coincidence map
-            hit_table = _calorimeter_hit_table(lh5.read(table, stp_file))
-            wo_mode = _get_wo_mode(n_det_written == 0, 0, new_file, overwrite)
-            _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
-            written_tables.add(detector)
-            n_det_written += 1
+            wrote_any = False
+            for chunk_idx, stps in enumerate(_iter_chunks(stp_file, table, buffer)):
+                # already one hit per detector per event: forward as-is, only
+                # renaming the time column so it can join the coincidence map
+                hit_table = _calorimeter_hit_table(stps)
+                wo_mode = _get_wo_mode(
+                    n_det_written == 0, chunk_idx, new_file, overwrite
+                )
+                _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
+                wrote_any = True
+
+            if wrote_any:
+                written_tables.add(detector)
+                n_det_written += 1
 
         for obj in forward_tables:
             wo_mode = _get_wo_mode_forwarded(written_tables, new_file, overwrite)
@@ -199,6 +206,25 @@ def _calorimeter_hit_table(stps: Table) -> Table:
     for field in stps:
         out.add_field("t0" if field == "time" else field, stps[field])
     return out
+
+
+def _iter_chunks(stp_file: str, table: str, buffer: int):
+    """Yield ``buffer``-sized row chunks of ``table``.
+
+    Used for flat hit tables (e.g. calorimeter) where every row is an
+    independent hit, so no evtid alignment is needed and the table can be
+    streamed in fixed-size blocks to bound memory.
+    """
+    # read_n_rows returns None for a Table group, so count rows on a column
+    columns = lh5.ls(stp_file, f"{table}/*")
+    if not columns:
+        return
+    n_total = lh5.read_n_rows(columns[0], stp_file) or 0
+    start = 0
+    while start < n_total:
+        n_rows = min(buffer, n_total - start)
+        yield lh5.read(table, stp_file, start_row=start, n_rows=n_rows)
+        start += n_rows
 
 
 def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
