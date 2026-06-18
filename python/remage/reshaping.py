@@ -35,6 +35,7 @@ def reshape_output(
     forward_tables: Sequence[str],
     out_field: str,
     time_window_in_us: float,
+    flat_hit_tables: Sequence[str] = (),
     overwrite: bool = False,
     buffer: int = int(5e6),
 ) -> None:
@@ -42,7 +43,10 @@ def reshape_output(
 
     For each detector listed in ``reshape_tables``, steps are grouped by event
     id and time (window in microseconds), producing per-hit ``t0`` and ``evtid``
-    columns. Tables listed in ``forward_tables`` are copied unchanged.
+    columns. Detectors in ``flat_hit_tables`` already hold one hit per detector
+    per event and are written alongside the reshaped detectors with their
+    ``time`` column renamed to ``t0`` (no step-grouping). Tables listed in
+    ``forward_tables`` are copied unchanged.
 
     Parameters
     ----------
@@ -59,6 +63,11 @@ def reshape_output(
         lh5 group under which reshaped detector tables are written.
     time_window_in_us
         coincidence time window in microseconds for hit grouping.
+    flat_hit_tables
+        detector tables that already contain one hit per detector per event
+        (e.g. calorimeter output) and must not be step-grouped. They are written
+        next to the reshaped detectors under ``out_field`` with ``time`` renamed
+        to ``t0`` so they can join the time-coincidence map.
     overwrite
         whether to overwrite the output files.
     buffer
@@ -81,12 +90,16 @@ def reshape_output(
             file_idx == 0 or hit_files_list[file_idx] != hit_files_list[file_idx - 1]
         )
         written_tables: set[str] = set()
+        # number of detector tables already written to this hit file; drives the
+        # "first write creates the file, the rest append a column" logic
+        n_det_written = 0
 
-        for in_det_idx, detector in enumerate(reshape_tables):
+        for detector in reshape_tables:
             table = f"stp/{detector}"
             if lh5.ls(stp_file, table) == []:
                 continue
 
+            wrote_any = False
             for chunk_idx, stps in enumerate(
                 _iter_event_aligned_chunks(stp_file, table, buffer)
             ):
@@ -105,9 +118,28 @@ def reshape_output(
                 hit_table.add_field("t0", Array(np.asarray(t0), attrs={"units": "ns"}))
                 hit_table.add_field("evtid", Array(np.asarray(evtid)))
 
-                wo_mode = _get_wo_mode(in_det_idx, chunk_idx, new_file, overwrite)
+                wo_mode = _get_wo_mode(
+                    n_det_written == 0, chunk_idx, new_file, overwrite
+                )
                 _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
+                wrote_any = True
+
+            if wrote_any:
                 written_tables.add(detector)
+                n_det_written += 1
+
+        for detector in flat_hit_tables:
+            table = f"stp/{detector}"
+            if lh5.ls(stp_file, table) == []:
+                continue
+
+            # already one hit per detector per event: forward as-is, only
+            # renaming the time column so it can join the coincidence map
+            hit_table = _calorimeter_hit_table(lh5.read(table, stp_file))
+            wo_mode = _get_wo_mode(n_det_written == 0, 0, new_file, overwrite)
+            _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
+            written_tables.add(detector)
+            n_det_written += 1
 
         for obj in forward_tables:
             wo_mode = _get_wo_mode_forwarded(written_tables, new_file, overwrite)
@@ -116,9 +148,9 @@ def reshape_output(
 
 
 def _get_wo_mode(
-    in_det_idx: int, chunk_idx: int, new_file: bool, overwrite: bool
+    first_write: bool, chunk_idx: int, new_file: bool, overwrite: bool
 ) -> str:
-    """LH5 write mode for a reshaped detector table chunk.
+    """LH5 write mode for a detector table chunk.
 
     For the first chunk of the first detector in a new hit file we (over)write
     the whole file; for the first chunk of a further detector we append a new
@@ -126,7 +158,7 @@ def _get_wo_mode(
     table.
     """
     if chunk_idx == 0 and new_file:
-        if in_det_idx == 0:
+        if first_write:
             return "overwrite_file" if overwrite else "write_safe"
         return "append_column"
     return "append"
@@ -155,6 +187,18 @@ def _write_lh5(
         lh5.write(Struct({out_detector: hit_table}), out_field, file, wo_mode=wo_mode)
     else:
         lh5.write(hit_table, f"{out_field}/{out_detector}", file, wo_mode=wo_mode)
+
+
+def _calorimeter_hit_table(stps: Table) -> Table:
+    """Build a flat hit table from an already per-hit detector table.
+
+    Calorimeter-like output accumulates exactly one hit per event. It must not be
+    step-grouped; we only rename the ``time`` column to ``t0`` for the TCM.
+    """
+    out = Table(size=stps.size)
+    for field in stps:
+        out.add_field("t0" if field == "time" else field, stps[field])
+    return out
 
 
 def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):

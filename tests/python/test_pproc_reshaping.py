@@ -307,3 +307,82 @@ def test_nonmonotonic_evtids_raises(tmptestdir):
             time_window_in_us=1,
             overwrite=True,
         )
+
+
+@pytest.fixture(scope="module")
+def calo_stp_file(tmptestdir):
+    """A step file with a calorimeter table already in per-hit (flat) form.
+
+    The calorimeter scheme accumulates one hit (total edep) per detector per
+    event in the C++ stage, so its table is flat: one row per detector per
+    event, with ``det_uid`` as in the single-table layout.
+    """
+    stp_path = str(tmptestdir / "calo.lh5")
+
+    lh5.write(
+        Table(
+            {
+                "evtid": Array([0, 0, 1]),
+                "det_uid": Array([1001, 1002, 1001]),
+                "edep": Array([10.0, 20.0, 30.0], attrs={"units": "keV"}),
+                "time": Array([0.5, 1.5, 2.5], attrs={"units": "ns"}),
+            }
+        ),
+        "stp/calorimeter",
+        stp_path,
+        wo_mode="of",
+    )
+    # a reshaped detector alongside, to exercise mixed reshape + flat output
+    lh5.write(
+        Table(
+            {
+                "evtid": Array([0, 0, 1]),
+                "edep": Array([100.0, 200.0, 300.0], attrs={"units": "keV"}),
+                "time": Array([0.0, 1.0, 2.0], attrs={"units": "ns"}),
+            }
+        ),
+        "stp/det1",
+        stp_path,
+        wo_mode="append",
+    )
+    lh5.write(Table({"evtid": Array([0, 1])}), "vtx", stp_path, wo_mode="append")
+
+    return stp_path
+
+
+def test_flat_hit_table_calorimeter(calo_stp_file, tmptestdir):
+    outfile = f"{tmptestdir}/calo_hit.lh5"
+
+    reshape_output(
+        stp_files=[calo_stp_file],
+        hit_files=outfile,
+        reshape_tables=["det1"],
+        forward_tables=["vtx"],
+        flat_hit_tables=["calorimeter"],
+        out_field="stp",
+        time_window_in_us=10,
+        overwrite=True,
+    )
+
+    assert lh5.ls(outfile) == ["stp", "vtx"]
+
+    calo = lh5.read("stp/calorimeter", outfile)
+    calo_ak = calo.view_as("ak")
+
+    # the calorimeter table stays flat (not step-grouped): one row per input row
+    assert calo_ak.evtid.to_list() == [0, 0, 1]
+    assert calo_ak.det_uid.to_list() == [1001, 1002, 1001]
+    assert calo_ak.edep.to_list() == [10.0, 20.0, 30.0]
+
+    # time is renamed to t0 (and only that); no `time` column remains
+    assert "time" not in calo_ak.fields
+    assert calo_ak.t0.to_list() == [0.5, 1.5, 2.5]
+
+    # units are forwarded unchanged (flat Arrays keep units directly)
+    assert calo["edep"].attrs["units"] == "keV"
+    assert calo["t0"].attrs["units"] == "ns"
+
+    # the reshaped detector alongside is still grouped into hits
+    det1 = lh5.read("stp/det1", outfile).view_as("ak")
+    assert det1.edep.to_list() == [[100.0, 200.0], [300.0]]
+    assert det1.t0.to_list() == [0.0, 2.0]

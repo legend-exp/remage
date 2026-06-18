@@ -56,8 +56,9 @@ def post_proc(
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
     }
 
-    detector_info: list[str] = ipc_info.get("output_ntuple", 2)
-    detector_info_aux: list[str] = ipc_info.get("output_ntuple_aux", 2)
+    # these are mappings: <output scheme name> -> [<table name 1>, <table name 2>, ...]
+    detector_info = ipc_info.get_as_dict("output_ntuple")
+    detector_info_aux = ipc_info.get_as_dict("output_ntuple_aux")
 
     assert len(output_file_exts) == 1
 
@@ -100,20 +101,42 @@ def post_proc(
         )
         log.info(msg)
 
-        # registered scintillator or germanium detectors
-        registered_detectors = list({det[1] for det in detector_info})
+        # detector tables that get step-grouped into hits (Germanium,
+        # Scintillator, Optical), deduplicated while preserving order: in the
+        # single-table layout several detectors of the same type map to the same
+        # output table, so the same name shows up multiple times.
+        reshape_detectors = list(
+            dict.fromkeys(
+                table
+                for scheme, tables in detector_info.items()
+                if scheme != "RMGCalorimeterOutputScheme"
+                for table in tables
+            )
+        )
 
-        # extract the additional tables in the output file (not detectors)
-        extra_tables = list({det[1] for det in detector_info_aux})
+        # calorimeter tables already hold one hit per detector per event and
+        # must not be step-grouped; they are forwarded as flat hit tables
+        flat_hit_detectors = list(
+            dict.fromkeys(detector_info.get("RMGCalorimeterOutputScheme", []))
+        )
+
+        # additional (non-detector) tables in the output file, forwarded as-is
+        extra_tables = list(
+            dict.fromkeys(
+                table for tables in detector_info_aux.values() for table in tables
+            )
+        )
 
         with tmp_renamed_files(remage_files) as original_files:
-            # post-process outputs: reshape detector tables by time-grouping
-            # and forward auxiliary tables unchanged
+            # post-process outputs: reshape detector tables by time-grouping,
+            # forward calorimeter tables as flat hits and auxiliary tables
+            # unchanged
             reshape_output(
                 stp_files=original_files,
                 hit_files=output_files,
-                reshape_tables=registered_detectors,
+                reshape_tables=reshape_detectors,
                 forward_tables=extra_tables,
+                flat_hit_tables=flat_hit_detectors,
                 out_field=det_tables_path,
                 time_window_in_us=time_window_in_us,
                 overwrite=overwrite_output,

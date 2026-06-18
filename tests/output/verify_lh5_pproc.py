@@ -28,6 +28,27 @@ def _list_stp_tables(file: str) -> set[str]:
     }
 
 
+def _check_flat_table(tbl, flat, pproc, flat_fields, pproc_fields):
+    """Check a calorimeter-like table forwarded as flat hits.
+
+    These already hold one hit per detector per event, so the only change is
+    the ``time`` -> ``t0`` rename; every field must be conserved.
+    """
+    checks = 0
+    for f in flat_fields:
+        target = "t0" if f == "time" else f
+        if target not in pproc_fields:
+            msg = f"{tbl}: field {f} (-> {target}) missing from post-processed output"
+            raise RuntimeError(msg)
+        flat_arr = np.sort(np.asarray(flat[f]))
+        pproc_arr = np.sort(np.asarray(pproc[target]))
+        if flat_arr.shape != pproc_arr.shape or not np.array_equal(flat_arr, pproc_arr):
+            msg = f"{tbl}: flat field {f} values differ between flat and post-processed"
+            raise RuntimeError(msg)
+        checks += 1
+    return checks
+
+
 flat_tables = _list_stp_tables(flat_file)
 pproc_tables = _list_stp_tables(pproc_file)
 common = sorted(flat_tables & pproc_tables)
@@ -44,6 +65,12 @@ for tbl in common:
 
     flat_fields = set(flat.fields)
     pproc_fields = set(pproc.fields)
+
+    # calorimeter-like tables are forwarded as flat hits (one row per detector
+    # per event, only time -> t0): no reshaped VoV field is present
+    if all(pproc[f].ndim == 1 for f in pproc_fields):
+        n_checks += _check_flat_table(tbl, flat, pproc, flat_fields, pproc_fields)
+        continue
 
     missing = flat_fields - pproc_fields
     if missing:
