@@ -72,16 +72,25 @@ class RMGGeneratorFromFile : public RMGVGenerator {
         double fPz = NAN;
         double fTime = NAN;
         int fNpart = -1;
+        double fXpos = NAN;
+        double fYpos = NAN;
+        double fZpos = NAN;
         RowData() {}; // NOLINT(modernize-use-equals-default)
 
-        [[nodiscard]] bool IsValid() const {
-          return fG4Pid != -1 && !std::isnan(fEkin) && !std::isnan(fPx) && !std::isnan(fPy) &&
-                 !std::isnan(fPz) && !std::isnan(fTime) && fNpart != -1;
+        [[nodiscard]] bool IsValid(bool include_pos) const {
+          bool kin_valid = fG4Pid != -1 && !std::isnan(fEkin) && !std::isnan(fPx) &&
+                           !std::isnan(fPy) && !std::isnan(fPz) && !std::isnan(fTime) &&
+                           fNpart != -1;
+          bool pos_valid = !include_pos ||
+                           (!std::isnan(fXpos) && !std::isnan(fYpos) && !std::isnan(fZpos));
+          return kin_valid && pos_valid;
         }
     };
 
     static RMGAnalysisReader* fReader;
     inline static RowData fRowData{};
+
+    bool fIncludePosition = false;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();

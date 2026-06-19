@@ -33,14 +33,17 @@ rng = np.random.default_rng(123456)
 # position input
 
 
-def _create_pos_input(dtype, vtx_pos_file: str, units: str, wo_mode: str = "of"):
+def _get_pos_input(dtype, units: str):
     attrs = {"units": units}
     xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
     yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
     zloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
+    return {"xloc": xloc, "yloc": yloc, "zloc": zloc}
 
+
+def _create_pos_input(dtype, vtx_pos_file: str, units: str, wo_mode: str = "of"):
     lh5.write(
-        Table({"xloc": xloc, "yloc": yloc, "zloc": zloc}),
+        Table(_get_pos_input(dtype, units)),
         "vtx/pos",
         lh5_file=vtx_pos_file,
         wo_mode=wo_mode,
@@ -55,9 +58,7 @@ _create_pos_input(np.float64, "macros/vtx-pos-mm.lh5", "mm")
 # kinetics input.
 
 
-def _create_kin_input(
-    vtx_kin_file: str, wo_mode: str = "of", multiple_particles: bool = False
-):
+def _get_kin_input(multiple_particles: bool = False):
     p_theta = np.acos(rng.uniform(-1, 1, INPUT_FILE_ROWS))
     p_phi = rng.uniform(0, 2 * np.pi, INPUT_FILE_ROWS)
 
@@ -74,18 +75,22 @@ def _create_kin_input(
         n_part.nda[1::2] = 0
         n_part.nda *= 2
 
+    return {
+        "g4_pid": pdg,
+        "ekin": ekin,
+        "px": px,
+        "py": py,
+        "pz": pz,
+        "time": time,
+        "n_part": n_part,
+    }
+
+
+def _create_kin_input(
+    vtx_kin_file: str, wo_mode: str = "of", multiple_particles: bool = False
+):
     lh5.write(
-        Table(
-            {
-                "g4_pid": pdg,
-                "ekin": ekin,
-                "px": px,
-                "py": py,
-                "pz": pz,
-                "time": time,
-                "n_part": n_part,
-            }
-        ),
+        Table(_get_kin_input(multiple_particles)),
         "vtx/kin",
         lh5_file=vtx_kin_file,
         wo_mode=wo_mode,
@@ -98,7 +103,26 @@ _create_kin_input("macros/vtx-kin2.lh5", multiple_particles=True)
 
 
 # ==================================================
-# combined input in one file.
+# combined input in one file (two tables).
 
 _create_pos_input(np.float64, "macros/vtx-combined.lh5", "m")
 _create_kin_input("macros/vtx-combined.lh5", wo_mode="write_safe")
+
+# ==================================================
+# combined input in one file (one tables).
+
+
+def _create_singletable_input(
+    vtx_file: str, wo_mode: str = "of", multiple_particles: bool = False
+):
+    lh5.write(
+        Table(_get_kin_input(multiple_particles) | _get_pos_input(np.float64, "m")),
+        "vtx/kin",
+        lh5_file=vtx_file,
+        wo_mode=wo_mode,
+    )
+    _convert_lh5_to_hdf5(vtx_file)
+
+
+_create_singletable_input("macros/vtx-singletable.lh5")
+_create_singletable_input("macros/vtx-singletable2.lh5", multiple_particles=True)

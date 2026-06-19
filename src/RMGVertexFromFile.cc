@@ -44,7 +44,13 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
   const auto yunit = reader.GetUnit("yloc");
   const auto zunit = reader.GetUnit("zloc");
   if (xunit != yunit || xunit != zunit) {
-    RMGLog::OutFormat(RMGLog::fatal, " ('{}', '{}', '{}')", xunit, yunit, zunit);
+    RMGLog::OutFormat(
+        RMGLog::fatal,
+        "position columns xloc/yloc/zloc must share the same unit, got ('{}', '{}', '{}')",
+        xunit,
+        yunit,
+        zunit
+    );
   }
 }
 

@@ -51,6 +51,26 @@ void RMGGeneratorFromFile::OpenFile(std::string& name) {
   reader.SetNtupleDColumn("pz", fRowData.fPz, {""});
   reader.SetNtupleDColumn("time", fRowData.fTime, {"ns", "ms", "s"});
   reader.SetNtupleIColumn("n_part", fRowData.fNpart, {""});
+
+  if (fIncludePosition) {
+    // bind the static variables once here, and only use them later.
+    reader.SetNtupleDColumn("xloc", fRowData.fXpos, {"nm", "um", "mm", "cm", "m"});
+    reader.SetNtupleDColumn("yloc", fRowData.fYpos, {"nm", "um", "mm", "cm", "m"});
+    reader.SetNtupleDColumn("zloc", fRowData.fZpos, {"nm", "um", "mm", "cm", "m"});
+
+    const auto xunit = reader.GetUnit("xloc");
+    const auto yunit = reader.GetUnit("yloc");
+    const auto zunit = reader.GetUnit("zloc");
+    if (xunit != yunit || xunit != zunit) {
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "position columns xloc/yloc/zloc must share the same unit, got ('{}', '{}', '{}')",
+          xunit,
+          yunit,
+          zunit
+      );
+    }
+  }
 }
 
 void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
@@ -77,7 +97,7 @@ void RMGGeneratorFromFile::BeginOfRunAction(const G4Run*) {
         break;
       }
 
-      if (!fRowData.IsValid()) {
+      if (!fRowData.IsValid(fIncludePosition)) {
         RMGLog::Out(
             RMGLog::fatal,
             "[initial seek] At least one of the columns does not exist or of wrong type"
@@ -125,7 +145,7 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
       return;
     }
 
-    if (!fRowData.IsValid()) {
+    if (!fRowData.IsValid(fIncludePosition)) {
       is_valid = false;
       break;
     }
@@ -147,6 +167,7 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
   // exit critical section.
   auto unit_ekin = locked_reader.GetUnit("ekin");
   auto unit_time = locked_reader.GetUnit("time");
+  auto unit_pos = fIncludePosition ? locked_reader.GetUnit("xloc") : "";
   locked_reader.unlock();
 
   // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
@@ -163,6 +184,8 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
       {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV}, {"MeV", u::MeV}, {"GeV", u::GeV}};
   const std::map<std::string, double> time_units =
       {{"", u::ns}, {"ns", u::ns}, {"ms", u::ms}, {"s", u::s}};
+  const std::map<std::string, double> pos_units =
+      {{"", u::m}, {"nm", u::nm}, {"um", u::um}, {"mm", u::mm}, {"cm", u::cm}, {"m", u::m}};
 
   for (const auto& row_data : particles) {
 
@@ -186,7 +209,13 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
     G4ThreeVector momentum{row_data.fPx, row_data.fPy, row_data.fPz};
 
     fGun->SetParticleDefinition(particle);
-    fGun->SetParticlePosition(fParticlePosition);
+    if (!fIncludePosition) {
+      fGun->SetParticlePosition(fParticlePosition);
+    } else {
+      fGun->SetParticlePosition(
+          G4ThreeVector{row_data.fXpos, row_data.fYpos, row_data.fZpos} * pos_units.at(unit_pos)
+      );
+    }
     fGun->SetParticleTime(row_data.fTime * time_units.at(unit_time));
     fGun->SetParticleMomentumDirection(momentum);
     fGun->SetParticleEnergy(row_data.fEkin * energy_units.at(unit_ekin));
@@ -214,8 +243,16 @@ void RMGGeneratorFromFile::DefineCommands() {
   fMessenger->DeclareProperty("NtupleDirectory", fNtupleDirectoryName)
       .SetGuidance("Change the default input directory/group for ntuples.")
       .SetGuidance("note: this option only has an effect for LH5 or HDF5 input files.")
+      .SetGuidance("note: this option only takes effect when set before /FileName.")
       .SetParameterName("nt_directory", false)
       .SetDefaultValue(fNtupleDirectoryName)
+      .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareProperty("IncludePosition", fIncludePosition)
+      .SetGuidance("Also load vertex position data from the file.")
+      .SetGuidance("note: this option only takes effect when set before /FileName.")
+      .SetParameterName("include_pos", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit, G4State_Idle);
 }
 

@@ -1,0 +1,7 @@
+/control/execute macros/_init.mac
+
+/RMG/Generator/Select FromFile
+/RMG/Generator/FromFile/IncludePosition
+/RMG/Generator/FromFile/FileName macros/vtx-singletable.lh5
+
+/run/beamOn {events}
