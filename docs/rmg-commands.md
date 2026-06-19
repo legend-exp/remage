@@ -1472,6 +1472,7 @@ Commands for controlling reading event data from file
 
 * `FileName` – Set name of the file containing vertex kinetics for the next run. See the documentation for a specification of the format.
 * `NtupleDirectory` – Change the default input directory/group for ntuples.
+* `IncludePosition` – Also load vertex position data from the file.
 
 ### `/RMG/Generator/FromFile/FileName`
 
@@ -1490,10 +1491,28 @@ Change the default input directory/group for ntuples.
 this option only has an effect for LH5 or HDF5 input files.
 :::
 
+:::{note}
+this option only takes effect when set before /FileName.
+:::
+
 * **Parameter** – `nt_directory`
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `vtx`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/FromFile/IncludePosition`
+
+Also load vertex position data from the file.
+
+:::{note}
+this option only takes effect when set before /FileName.
+:::
+
+* **Parameter** – `include_pos`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit Idle`
 
 ## `/RMG/Output/`

@@ -94,21 +94,6 @@ generator using the macro command
 
 Where `{FILE_PATH}` is the path to the input LH5 file.
 
-## Combining vertex and kinematics input
-
-Combining vertex and kinetics input is possible, even from the same file.
-However, by design, each event can only have a single vertex, that will be
-shared between all particles for an event from the kinetics file.
-
-:::{warning}
-
-In a multithreaded run, the consistent iteration between vertex and kinetic
-input files is not guaranteed. The events from the files might be mixed up in
-the simulation, i.e., it is not possible to simulate particle properties
-statistically dependent on their location.
-
-:::
-
 :::{tip}
 
 When you want to simulate kinetics from a file at a specific point instead of
@@ -123,3 +108,37 @@ however use
 to set a constant position for all events.
 
 :::
+
+## Combining vertex and kinematics input
+
+Combining vertex and kinetics input **loaded from two tables** is possible, even
+from the same file. However, by design, each event can only have a single
+vertex, that will be shared between all particles for an event from the kinetics
+file.
+
+However, in a multithreaded run, the consistent iteration between vertex and
+kinetic input files is not guaranteed. The events from the files might be mixed
+up in the simulation, i.e., it is not possible to simulate particle properties
+statistically dependent on their location.
+
+You can also load a **combined position/kinematics** table with the following
+structure; enable
+<project:../rmg-commands.md#rmggeneratorfromfileincludeposition> to use it.
+Consistent iteration in the multithreaded case is guaranteed in this case. This
+format also allows to generate multiple particles different vertex positions.
+
+```
+/
+└── vtx
+    └── kin · table{ekin,g4_pid,n_part,px,py,pz,time,xloc,yloc,zloc}
+        ├── ekin · array<1>{real} ── {'units': 'keV'}
+        ├── g4_pid · array<1>{real}
+        ├── px · array<1>{real}
+        ├── py · array<1>{real}
+        ├── pz · array<1>{real}
+        ├── time · array<1>{real} ── {'units': 'ns'}
+        ├── n_part · array<1>{real}
+        ├── xloc · array<1>{real} ── {'units': 'm'}
+        ├── yloc · array<1>{real} ── {'units': 'm'}
+        └── zloc · array<1>{real} ── {'units': 'm'}
+```

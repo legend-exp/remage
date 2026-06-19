@@ -45,7 +45,7 @@ else:
     extra_args["procs"] = nthread
     n_events = int(10000 / nthread)
 
-if "kin2" in macro:
+if "kin2" in macro or "singletable2" in macro:
     # when we have two particles per event, we only have half of the events.
     n_events //= 2
 
