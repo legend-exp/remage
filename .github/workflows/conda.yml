@@ -36,7 +36,7 @@ jobs:
           conda config --env --set channel_priority strict
           conda config --show
           python -c "import platform;print(platform.machine())"
-          conda config --env --set subdir osx-64
+          #conda config --env --set subdir osx-64
           conda install conda-forge::remage
 
       - name: Minimally test installed executable
