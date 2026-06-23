@@ -19,9 +19,9 @@
 #include "RMGGeometryCheckOutputScheme.hh"
 #include "RMGIsotopeFilterScheme.hh"
 #include "RMGParticleFilterScheme.hh"
+#include "RMGStagingScheme.hh"
 #include "RMGTrackOutputScheme.hh"
 #include "RMGVertexOutputScheme.hh"
-#include "RMGVolumeDistanceStacker.hh"
 
 void RMGUserInit::RegisterDefaultOptionalOutputSchemes() {
   AddOptionalOutputScheme<RMGVertexOutputScheme>("Vertex");
@@ -30,7 +30,7 @@ void RMGUserInit::RegisterDefaultOptionalOutputSchemes() {
   AddOptionalOutputScheme<RMGTrackOutputScheme>("Track");
   AddOptionalOutputScheme<RMGGeometryCheckOutputScheme>("GeometryCheck");
   AddOptionalOutputScheme<RMGGeomBenchOutputScheme>("GeomBench");
-  AddOptionalOutputScheme<RMGVolumeDistanceStacker>("VolumeStacker");
+  AddOptionalOutputScheme<RMGStagingScheme>("Staging");
 }
 
 void RMGUserInit::ActivateOptionalOutputScheme(std::string name) {

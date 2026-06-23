@@ -49,6 +49,8 @@ class RMGStackingAction : public G4UserStackingAction {
     /** @brief Reset the stage counter before tracking a new event. */
     void PrepareNewEvent() override;
 
+    [[nodiscard]] int GetCurrentStage() const { return fStage; }
+
   private:
 
     int fStage = 0;
