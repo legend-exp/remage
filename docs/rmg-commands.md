@@ -2460,6 +2460,7 @@ Commands for staging electron tracks.
 **Commands:**
 
 * `DeferToWaitingStage` – Defer secondary electrons to the waiting stack during stage 0.
+* `IncludePositrons` – Also defer secondary positrons to the waiting stack during stage 0.
 * `VolumeSafety` – Set the minimum distance to a Germanium detector surface for this electron to be staged.
 * `AddVolumeName` – Add a volume name in which electron staging is active.
 * `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e- tracks to be considered for staging.
@@ -2469,6 +2470,20 @@ Commands for staging electron tracks.
 ### `/RMG/Staging/Electrons/DeferToWaitingStage`
 
 Defer secondary electrons to the waiting stack during stage 0.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/IncludePositrons`
+
+Also defer secondary positrons to the waiting stack during stage 0.
+
+Positrons are subject to the same staging conditions as electrons (energy thresholds, volume safety and volume names).
 
 This is disabled by default.
 

@@ -17,6 +17,7 @@
 
 #include "G4Electron.hh"
 #include "G4OpticalPhoton.hh"
+#include "G4Positron.hh"
 #include "G4Step.hh"
 
 #include "RMGOutputTools.hh"
@@ -32,7 +33,12 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
     return Classify_OpticalPhoton(aTrack);
   } else if (aTrack->GetDefinition() == G4Electron::Definition()) {
-    return Classify_Electron(aTrack);
+    if (!fDeferElectronsToWaitingStage) return std::nullopt;
+    return Classify_ElectronLike(aTrack);
+  } else if (aTrack->GetDefinition() == G4Positron::Definition()) {
+    // positrons follow the exact same staging conditions as electrons.
+    if (!fDeferPositronsToWaitingStage) return std::nullopt;
+    return Classify_ElectronLike(aTrack);
   }
   return std::nullopt;
 }
@@ -47,7 +53,11 @@ void RMGStagingScheme::SteppingAction(const G4Step* step) {
 
   if (track->GetTrackStatus() != fAlive) return;
 
-  if (track->GetDefinition() != G4Electron::Definition()) return;
+  // positrons follow the same energy-drop suspension as electrons, but only when explicitly enabled.
+  const auto* def = track->GetDefinition();
+  const bool is_electron = def == G4Electron::Definition();
+  const bool is_positron = def == G4Positron::Definition() && fDeferPositronsToWaitingStage;
+  if (!is_electron && !is_positron) return;
 
   const bool suspend_on_drop = fSuspendElectronsOnEnergyDrop;
   const double threshold = fElectronMaxEnergyThresholdForStacking;
@@ -77,11 +87,9 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_OpticalPhot
   return std::nullopt;
 }
 
-std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_Electron(
+std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::Classify_ElectronLike(
     const G4Track* aTrack
 ) const {
-  if (!fDeferElectronsToWaitingStage) return std::nullopt;
-
   // do not touch the primary track of an event.
   if (aTrack->GetParentID() == 0) return std::nullopt;
 
@@ -152,6 +160,20 @@ void RMGStagingScheme::DefineCommands() {
       .SetGuidance("Defer secondary electrons to the waiting stack during stage 0.")
       .SetGuidance(
           std::string("This is ") + (fDeferElectronsToWaitingStage ? "enabled" : "disabled") +
+          " by default."
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fElectronStagingMessengers->DeclareProperty("IncludePositrons", fDeferPositronsToWaitingStage)
+      .SetGuidance("Also defer secondary positrons to the waiting stack during stage 0.")
+      .SetGuidance(
+          "Positrons are subject to the same staging conditions as electrons "
+          "(energy thresholds, volume safety and volume names)."
+      )
+      .SetGuidance(
+          std::string("This is ") + (fDeferPositronsToWaitingStage ? "enabled" : "disabled") +
           " by default."
       )
       .SetParameterName("boolean", true)

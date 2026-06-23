@@ -25,7 +25,8 @@ are then halted and moved to the waiting stack under certain conditions.
 At the moment, _remage_ supports staging and suspension for:
 
 - optical photons,
-- secondary electrons.
+- secondary electrons,
+- secondary positrons (optional, reusing the electron staging conditions).
 
 Staging of optical photons is a common use case, since they are at the end of
 the physics simulation chain and do not carry energy that would typically alter
@@ -136,10 +137,18 @@ optical photons.
 
 - `/RMG/Staging/Electrons/DeferToWaitingStage` enables deferral of secondary
   electrons.
+- `/RMG/Staging/Electrons/IncludePositrons` additionally applies electron
+  staging to secondary positrons. Disabled by default. When enabled, positrons
+  are subject to the exact same conditions as electrons (energy thresholds,
+  volume safety and volume names) and are also suspended on energy drop if
+  `SuspendOnEnergyDrop` is enabled.
 - `/RMG/Staging/Electrons/VolumeSafety` sets a minimum distance to a Germanium
   detector surface condition.
 - `/RMG/Staging/Electrons/MaxEnergyThresholdForStacking` limits deferred
-  electrons by kinetic energy.
+  electrons to those with kinetic energy below the threshold.
+- `/RMG/Staging/Electrons/MinEnergyThresholdForStacking` limits deferred
+  electrons to those with kinetic energy above the threshold, e.g. to skip
+  low-energy electrons below the Cherenkov threshold.
 - `/RMG/Staging/Electrons/AddVolumeName` restricts deferral to named logical
   volumes.
 - `/RMG/Staging/Electrons/SuspendOnEnergyDrop` enables stepping-time suspension
@@ -225,6 +234,7 @@ tracks after they cross below the configured energy threshold.
 
 /RMG/Staging/OpticalPhotons/DeferToWaitingStage true
 /RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/IncludePositrons true
 /RMG/Staging/Electrons/MaxEnergyThresholdForStacking 8.0 MeV
 /RMG/Staging/Electrons/SuspendOnEnergyDrop true
 /RMG/Staging/Electrons/AddVolumeName world_vol

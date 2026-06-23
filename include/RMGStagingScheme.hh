@@ -78,11 +78,12 @@ class RMGStagingScheme : public RMGVOutputScheme {
     void DefineCommands();
 
     std::optional<G4ClassificationOfNewTrack> Classify_OpticalPhoton(const G4Track* aTrack) const;
-    std::optional<G4ClassificationOfNewTrack> Classify_Electron(const G4Track* aTrack) const;
+    std::optional<G4ClassificationOfNewTrack> Classify_ElectronLike(const G4Track* aTrack) const;
 
     bool fDeferOpticalPhotonsToWaitingStage = false;
 
     bool fDeferElectronsToWaitingStage = false;
+    bool fDeferPositronsToWaitingStage = false;
     double fElectronMaxEnergyThresholdForStacking = -1;
     double fElectronMinEnergyThresholdForStacking = -1;
     bool fSuspendElectronsOnEnergyDrop = false;
