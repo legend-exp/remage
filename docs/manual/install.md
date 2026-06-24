@@ -36,6 +36,23 @@ $ conda install conda-forge::remage
   $ conda config --env --set channel_priority strict
   $ conda install remage
   ```
+- No special workaround for **arm64 Mac** should be necessary when installing
+  from conda.
+
+  <details><summary>(old instructions for reference)</summary>
+
+  To **install _remage_ on an arm64 Mac** you previously had to perform special
+  set-up steps at environment creation time. Starting June 2026 this workaround
+  should not be required any more.
+
+  ```console
+  $ CONDA_SUBDIR=osx-64 conda create [...]
+  $ conda activate remage-env
+  $ conda config --env --set subdir osx-64
+  $ # ... continue with the additional steps above
+  ```
+
+  </details>
 
 :::
 
