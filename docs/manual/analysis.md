@@ -3,9 +3,10 @@
 # Analyzing simulation output
 
 By default, the _remage_ output files are already reshaped in a hit-like
-structure and contains a time-coincidence-map for easy event-building. In a lot
-of cases, this is sufficient for analysis. In some cases, further
-post-processing with _reboost_ is required.
+structure and contain a time-coincidence-map for easy event-building. In a lot
+of cases, this is sufficient for analysis. For more advanced workflows (HPGe
+pulse-shape emulation, optical-map application, ...), further post-processing
+with an external toolkit such as _reboost_ can be applied on top.
 
 ## Event building with the time-coincidence-map
 
@@ -133,9 +134,10 @@ We find the event structure expected from the TCM.
 ## Post-processing with _reboost_
 
 [_reboost_](https://github.com/legend-exp/reboost) is the general
-post-processing and analysis toolkit for remage output. _remage_ internally uses
-reboost for the output reshaping, but does not apply any further user-defined
-post-processing.
+post-processing and analysis toolkit for remage output. _remage_ does the
+built-in hit-table reshaping on its own (without depending on reboost), but does
+not apply any further user-defined post-processing — that is where reboost comes
+in.
 
 _reboost_ supports various processors for output tables from remage: HPGe
 pulse-shape emulation or heuristics, optical map application for scintillators,

@@ -17,21 +17,19 @@ from __future__ import annotations
 
 import logging
 import time
-from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
 import h5py
 import lh5
 import numpy as np
 import pygama.evt
-import reboost
 from lgdo import Array, Scalar, Struct
 from lh5.io.concat import lh5concat
 
 from . import utils
 from .ipc import IpcResult
+from .reshaping import reshape_output
 
 log = logging.getLogger("remage")
 
@@ -103,24 +101,44 @@ def post_proc(
         )
         log.info(msg)
 
-        with tmp_renamed_files(remage_files) as original_files:
-            # also get the additional tables to forward
-            config = get_reboost_config(
-                detector_info,
-                detector_info_aux,
-                time_window=time_window_in_us,
+        # detector tables that get step-grouped into hits (Germanium,
+        # Scintillator, Optical), deduplicated while preserving order: in the
+        # single-table layout several detectors of the same type map to the same
+        # output table, so the same name shows up multiple times.
+        reshape_detectors = list(
+            dict.fromkeys(
+                table
+                for scheme, tables in detector_info.items()
+                if scheme != "RMGCalorimeterOutputScheme"
+                for table in tables
             )
-            msg = f"Reboost config: {config}"
-            log.debug(msg)
+        )
 
-            # use reboost to post-process outputs
-            reboost.build_hit(
-                config,
-                {},
+        # calorimeter tables already hold one hit per detector per event and
+        # must not be step-grouped; they are forwarded as flat hit tables
+        flat_hit_detectors = list(
+            dict.fromkeys(detector_info.get("RMGCalorimeterOutputScheme", []))
+        )
+
+        # additional (non-detector) tables in the output file, forwarded as-is
+        extra_tables = list(
+            dict.fromkeys(
+                table for tables in detector_info_aux.values() for table in tables
+            )
+        )
+
+        with tmp_renamed_files(remage_files) as original_files:
+            # post-process outputs: reshape detector tables by time-grouping,
+            # forward calorimeter tables as flat hits and auxiliary tables
+            # unchanged
+            reshape_output(
                 stp_files=original_files,
-                glm_files=None,
                 hit_files=output_files,
+                reshape_tables=reshape_detectors,
+                forward_tables=extra_tables,
+                flat_hit_tables=flat_hit_detectors,
                 out_field=det_tables_path,
+                time_window_in_us=time_window_in_us,
                 overwrite=overwrite_output,
             )
 
@@ -142,7 +160,7 @@ def post_proc(
                 # use tables keyed by UID in the __by_uid__ group.  in this way, the
                 # TCM will index tables by UID.  the coincidence criterium is based
                 # on Geant4 event identifier and time of the hits
-                # NOTE: uses the same time window as in build_hit() reshaping
+                # NOTE: uses the same time window as in reshape_output() reshaping
                 pygama.evt.build_tcm(
                     [(file, rf"{lh5_links_group_name}/*")],  # input_tables
                     ["evtid", "t0"],  # coin_cols
@@ -275,91 +293,6 @@ def deduplicate_table(
         lh5.write(Struct(d), table_name, file, wo_mode="overwrite")
     else:
         lh5.write(table, table_name, file, wo_mode="overwrite")
-
-
-def get_reboost_config(
-    detector_info: Mapping[str, Sequence[str]],
-    detector_info_aux: Mapping[str, Sequence[str]],
-    *,
-    time_window: float = 10,
-) -> dict:
-    """Get the config file to run reboost.
-
-    Parameters
-    ----------
-    detector_info
-        a mapping of tables in the remage file that need to be reshaped, keyed
-        by output scheme name (i.e. RMGGermaniumOutputScheme).
-    detector_info_aux
-        same as `detector_info`, but holds non-standard tables.
-    time_window
-        time window to use for building hits (in us).
-
-    Returns
-    -------
-    config file as a dictionary.
-    """
-    config: dict = {}
-
-    # build a default config for all tables (exclude calorimeter tables).
-    # deduplicate table names: in the single-table layout several detectors of the
-    # same type map to the same output table, so the same name shows up multiple
-    # times. reboost must reshape each output table only once.
-    table_list = list(
-        dict.fromkeys(
-            v
-            for k, vals in detector_info.items()
-            if k != "RMGCalorimeterOutputScheme"
-            for v in vals
-        )
-    )
-
-    default_config: dict[str, Any] = {
-        "name": "default",
-        "detector_mapping": [{"output": table} for table in table_list],
-        "hit_table_layout": f"reboost.shape.group.group_by_time(STEPS, {time_window})",
-        "operations": {
-            "t0": {
-                "expression": "ak.fill_none(ak.firsts(HITS.time, axis=-1), 0)",
-                "units": "ns",
-            },
-            "evtid": "ak.fill_none(ak.firsts(HITS.evtid, axis=-1), 0)",
-        },
-    }
-    config["processing_groups"] = [default_config]
-
-    if "RMGCalorimeterOutputScheme" in detector_info:
-        # the calorimeter already accumulates exactly one hit (the total energy
-        # deposit) per detector per event in the C++ stage, so its table is
-        # already in final, flat form: one row per detector per event. it must
-        # not go through the step-grouping reshaping used for the other schemes,
-        # which (in the single-table layout) would merge rows of different
-        # detectors that share an event id. we therefore omit `hit_table_layout`,
-        # making reboost take the table as-is, and only rename the time column to
-        # `t0` so the detector can take part in the time-coincidence map like the
-        # others.
-        tables = list(dict.fromkeys(detector_info["RMGCalorimeterOutputScheme"]))
-
-        calo_config = {
-            "name": "RMGCalorimeterOutputScheme",
-            "detector_mapping": [{"output": table} for table in tables],
-            "operations": {
-                "t0": {"expression": "HITS.time", "units": "ns"},
-            },
-            # det_uid is only present in the single-table layout; listing it here
-            # is harmless when it is absent (per-detector layout).
-            "outputs": ["evtid", "det_uid", "edep", "t0"],
-        }
-
-        config["processing_groups"].append(calo_config)
-
-    # forward other tables as they are (deduplicated: the same aux table is
-    # announced once per worker thread/process, so names repeat in MT/MP runs).
-    config["forward"] = list(
-        dict.fromkeys(v for vals in detector_info_aux.values() for v in vals)
-    )
-
-    return config
 
 
 def make_tmp(files: list[str] | str) -> list[str]:
