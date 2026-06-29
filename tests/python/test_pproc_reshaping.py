@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 
 import awkward as ak
+import h5py
 import lh5
 import numpy as np
 import pytest
@@ -90,6 +91,18 @@ def test_reshape(stp_file, tmptestdir):
 
     # t0 is a flat Array carrying its unit directly
     assert output["t0"].attrs["units"] == "ns"
+
+    # hdf5plugin 7.0.0 changed the name of the Zstandard filter.
+    zstd_filters = [
+        b"Zstandard compression: http://www.zstd.net",
+        b"HDF5 zstd filter; see https://github.com/HDFGroup/hdf5_plugins/blob/master/docs/RegisteredFilterPlugins.md",
+    ]
+
+    with h5py.File(outfile) as h5f:
+        assert (
+            h5f["/stp/det1/edep/flattened_data"].id.get_create_plist().get_filter(0)[3]
+            in zstd_filters
+        )
 
 
 def test_only_forward(stp_file, tmptestdir):

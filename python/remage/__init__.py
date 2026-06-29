@@ -15,7 +15,12 @@
 
 from __future__ import annotations
 
+import hdf5plugin
+import lh5
+
 from .cli import remage_run, remage_run_from_args
 from .ipc import IpcResult
 
 __all__ = ["IpcResult", "remage_run", "remage_run_from_args"]
+
+lh5.io.settings.DEFAULT_HDF5_SETTINGS = {"compression": hdf5plugin.Zstd()}
