@@ -43,7 +43,7 @@ class RMGCalorimeterOutputScheme : public RMGVOutputScheme {
 
   public:
 
-    RMGCalorimeterOutputScheme() {};
+    RMGCalorimeterOutputScheme() = default;
 
     /** @brief Sets the names of the output columns, invoked in @c RMGRunAction::SetupAnalysisManager */
     void AssignOutputNames(G4AnalysisManager* ana_man) override;
