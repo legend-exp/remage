@@ -291,6 +291,9 @@ The following properties of each hit are recorded:
 - `edep`: the total deposited energy,
 - `time`: the global time of the first energy deposit.
 
+The `edep` field is always stored with 32-bit (float) precision, while `time` is
+kept at 64-bit (double) precision, as in the other output schemes.
+
 Since there is already exactly one hit per detector per event, the output table
 is in its final, flat form and is _not_ run through the step-grouping
 [reshaping](#reshaping-output-tables) applied to the other schemes (which would,
