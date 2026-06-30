@@ -102,8 +102,8 @@ void RMGCalorimeterOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     ana_man->CreateNtupleIColumn(id, "evtid");
     if (!fNtuplePerDetector) { ana_man->CreateNtupleIColumn(id, "det_uid"); }
 
-    // store the floating points values
-    ana_man->CreateNtupleDColumn(id, "edep_in_keV");
+    // store the floating point values (energy always float32, time always float64)
+    ana_man->CreateNtupleFColumn(id, "edep_in_keV");
     ana_man->CreateNtupleDColumn(id, "time_in_ns");
     ana_man->FinishNtuple(id);
   }
@@ -163,7 +163,11 @@ void RMGCalorimeterOutputScheme::StoreEvent(const G4Event* event) {
         ana_man->FillNtupleIColumn(ntupleid, col_id++, hit->detector_uid);
       }
 
-      ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->energy_deposition / u::keV);
+      ana_man->FillNtupleFColumn(
+          ntupleid,
+          col_id++,
+          hit->energy_deposition / u::keV
+      ); // NOLINT(cppcoreguidelines-narrowing-conversions)
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
       // NOTE: must be called here for hit-oriented output
