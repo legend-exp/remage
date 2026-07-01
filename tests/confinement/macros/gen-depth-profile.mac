@@ -1,0 +1,25 @@
+/RMG/Output/NtuplePerDetector false
+/RMG/Geometry/RegisterDetector Germanium {det} 001
+
+/run/initialize
+
+# generate primaries on the surface, displaced inward by a depth profile
+/RMG/Generator/Select GPS
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/Physical/AddVolume {det}
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 2
+
+# depth profile. Parameters not used by the selected type are set to harmless
+# valid dummy values so the messenger range checks pass.
+/RMG/Generator/Confinement/DepthProfile/Type {profile}
+/RMG/Generator/Confinement/DepthProfile/Mean {mean} mm
+/RMG/Generator/Confinement/DepthProfile/Sigma {sigma} mm
+/RMG/Generator/Confinement/DepthProfile/RangeLow {lo} mm
+/RMG/Generator/Confinement/DepthProfile/RangeHigh {hi} mm
+
+/gps/particle e-
+/gps/ang/type iso
+/gps/energy 1 eV
+
+/run/beamOn {nevents}

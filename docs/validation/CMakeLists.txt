@@ -81,6 +81,10 @@ set(TESTS_IMAGES
     confinement/lar-sub-check-xz.output.png
     confinement/lar-int-and-sub-check-xy.output.png
     confinement/lar-int-and-sub-check-xz.output.png
+    confinement/depth-profile-exponential.output.png
+    confinement/depth-profile-uniform.output.png
+    confinement/depth-profile-truncated-gaussian.output.png
+    confinement/depth-profile-containment.output.png
     cosmogenics/muon/energy_loss_lar_energy_range.output.png
     cosmogenics/muon/energy_loss_water_energy_range.output.png
     cosmogenics/muon/neutron_production_processes_100.0_lar_Shielding_Livermore_30_9.869.output.png
