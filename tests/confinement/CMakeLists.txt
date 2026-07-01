@@ -203,3 +203,17 @@ endforeach()
 
 add_test(NAME confinement/weighting COMMAND ${PYTHONPATH} test_weighting.py)
 set_tests_properties(confinement/weighting PROPERTIES LABELS extra)
+
+# depth-profile validation: sample on the surface of a box with a depth profile,
+# check the depth distribution and that no vertex is generated outside the volume
+
+# generate the GDML file
+add_test(NAME confinement-depth/gen-gdml COMMAND ${PYTHONPATH} make_depth_box_gdml.py)
+set_tests_properties(confinement-depth/gen-gdml PROPERTIES LABELS "extra;val" FIXTURES_SETUP
+                                                           confine-depth-gdml-fixture)
+
+# run simulations and validate
+add_test(NAME confinement-depth/validate COMMAND ${PYTHONPATH} ./test_depth_profile.py)
+set_tests_properties(
+  confinement-depth/validate PROPERTIES LABELS "extra;val;flaky" FIXTURES_REQUIRED
+                                        confine-depth-gdml-fixture)
