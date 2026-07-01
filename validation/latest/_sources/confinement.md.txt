@@ -276,6 +276,54 @@ fluctuations.
 :::
 ```
 
+## Depth profiles
+
+When sampling on a surface, _remage_ can displace each vertex inward into the
+material by a depth drawn from a configurable distribution (exponential, uniform
+or truncated Gaussian). This models sub-surface contamination. These tests
+sample on the surface of a large cube and reconstruct the inward depth of each
+vertex (its distance to the nearest face).
+
+The following figures compare the reconstructed depth distribution to the
+configured probability density for each supported profile. Only vertices near
+the centre of a face are used, so that the over-counting at edges and corners
+does not bias the spectrum. You should see the sampled histogram follow the
+overlaid theoretical curve, with only statistical fluctuations.
+
+```{subfigure} ABC
+:subcaptions: above
+
+:::{image} ./_img/confinement/depth-profile-exponential.output.png
+:width: 300px
+:alt: Exponential depth profile.
+:::
+
+:::{image} ./_img/confinement/depth-profile-uniform.output.png
+:width: 300px
+:alt: Uniform depth profile.
+:::
+
+:::{image} ./_img/confinement/depth-profile-truncated-gaussian.output.png
+:width: 300px
+:alt: Truncated Gaussian depth profile.
+:::
+
+Depth distribution of surface-sampled vertices versus the configured PDF.
+```
+
+&nbsp;
+
+The sampled depth is clamped to the distance to the far boundary of the solid,
+so a displaced vertex can never cross to the other side or leave the volume. The
+figure below shows the projection of the generated vertices with an exponential
+profile: they all lie inside the box outline, and no vertex is generated outside
+the volume.
+
+```{figure} ./_img/confinement/depth-profile-containment.output.png
+:width: 500px
+:alt: All depth-displaced vertices lie inside the box.
+```
+
 ## Dedicated simulations for Ge in LAr
 
 The last sub-section of this part of the validation report contains a more

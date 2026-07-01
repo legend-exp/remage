@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Vertex confinement - remage 0.24.1.dev16+ga4414e1c6 validation suite</title>
+        <title>Vertex confinement - remage 0.24.1.dev18+gf015ce458 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.24.1.dev16+ga4414e1c6 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 0.24.1.dev18+gf015ce458 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.24.1.dev16+ga4414e1c6 validation suite</span>
+  <span class="sidebar-brand-text">remage 0.24.1.dev18+gf015ce458 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -544,6 +544,51 @@ fluctuations.</p>
 </figure>
 </section>
 </section>
+<section id="depth-profiles">
+<h2>Depth profiles<a class="headerlink" href="#depth-profiles" title="Link to this heading">¶</a></h2>
+<p>When sampling on a surface, <em>remage</em> can displace each vertex inward into the
+material by a depth drawn from a configurable distribution (exponential, uniform
+or truncated Gaussian). This models sub-surface contamination. These tests
+sample on the surface of a large cube and reconstruct the inward depth of each
+vertex (its distance to the nearest face).</p>
+<p>The following figures compare the reconstructed depth distribution to the
+configured probability density for each supported profile. Only vertices near
+the centre of a face are used, so that the over-counting at edges and corners
+does not bias the spectrum. You should see the sampled histogram follow the
+overlaid theoretical curve, with only statistical fluctuations.</p>
+<figure class="sphinx-subfigure align-default" id="id7">
+<div class="sphinx-subfigure-grid ss-layout-default-ABC" style="display: grid;">
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
+<span class="caption">Exponential depth profile.</span>
+<a class="reference internal image-reference" href="_images/depth-profile-exponential.output.png"><img alt="Exponential depth profile." src="_images/depth-profile-exponential.output.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: B;">
+<span class="caption">Uniform depth profile.</span>
+<a class="reference internal image-reference" href="_images/depth-profile-uniform.output.png"><img alt="Uniform depth profile." src="_images/depth-profile-uniform.output.png" style="width: 300px;" />
+</a>
+</div>
+<div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: C;">
+<span class="caption">Truncated Gaussian depth profile.</span>
+<a class="reference internal image-reference" href="_images/depth-profile-truncated-gaussian.output.png"><img alt="Truncated Gaussian depth profile." src="_images/depth-profile-truncated-gaussian.output.png" style="width: 300px;" />
+</a>
+</div>
+</div>
+<figcaption>
+<p><span class="caption-text">Depth distribution of surface-sampled vertices versus the configured PDF.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p> </p>
+<p>The sampled depth is clamped to the distance to the far boundary of the solid,
+so a displaced vertex can never cross to the other side or leave the volume. The
+figure below shows the projection of the generated vertices with an exponential
+profile: they all lie inside the box outline, and no vertex is generated outside
+the volume.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/depth-profile-containment.output.png"><img alt="All depth-displaced vertices lie inside the box." src="_images/depth-profile-containment.output.png" style="width: 500px;" />
+</a>
+</figure>
+</section>
 <section id="dedicated-simulations-for-ge-in-lar">
 <h2>Dedicated simulations for Ge in LAr<a class="headerlink" href="#dedicated-simulations-for-ge-in-lar" title="Link to this heading">¶</a></h2>
 <p>The last sub-section of this part of the validation report contains a more
@@ -673,6 +718,7 @@ strings.</p>
 <li><a class="reference internal" href="#statistical-tests-of-uniformity">Statistical tests of uniformity</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#depth-profiles">Depth profiles</a></li>
 <li><a class="reference internal" href="#dedicated-simulations-for-ge-in-lar">Dedicated simulations for Ge in LAr</a><ul>
 <li><a class="reference internal" href="#relative-fraction-of-events-per-hpge-volume">Relative fraction of events per HPGe volume</a></li>
 <li><a class="reference internal" href="#generation-in-parts-of-the-lar-volume">Generation in parts of the LAr volume</a></li>
