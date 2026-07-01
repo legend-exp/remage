@@ -10,6 +10,7 @@
 /docs/api
 /docs/extra
 /build
+/docker_build
 install
 .local
 .vscode
