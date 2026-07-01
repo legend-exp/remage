@@ -168,6 +168,44 @@ All sampling modes described above are available, with few notes/limitations:
   with a small but usually acceptable performance cost, however very large
   values can significantly slow down the simulation.
 
+## Depth profiles
+
+Surface-sampled vertices can optionally be displaced inward into the material,
+to model sub-surface contamination (e.g. implanted or diffused activity). When a
+depth profile is configured, a depth is drawn from the chosen distribution and
+the vertex is moved from the surface along the inward normal by that amount.
+This only applies when surface sampling is active
+(<project:../rmg-commands.md#rmggeneratorconfinementsampleonsurface>).
+
+The distribution is selected with
+`/RMG/Generator/Confinement/DepthProfile/Type`, which accepts:
+
+- `None` (default): no displacement, vertices stay on the surface.
+- `Exponential`: exponential with mean depth `Mean` (physically motivated for
+  surface contamination).
+- `Uniform`: flat over `[RangeLow, RangeHigh]`.
+- `TruncatedGaussian`: Gaussian of centre `Mean` and width `Sigma`, restricted
+  to `[RangeLow, RangeHigh]`.
+
+The parameters are set with the `Mean`, `Sigma`, `RangeLow` and `RangeHigh`
+commands under `/RMG/Generator/Confinement/DepthProfile/` (all lengths, default
+unit mm). Parameters are validated at the start of the run: `Exponential`
+requires `Mean > 0`, the range-based profiles require
+`RangeHigh > RangeLow >= 0`, and `TruncatedGaussian` additionally requires
+`Sigma > 0`.
+
+The sampled depth is clamped to the distance from the surface point to the far
+boundary of the solid, so a displaced vertex can never cross to the other side
+or leave the solid. For thin volumes this means an over-large sampled depth is
+silently reduced; choose parameters consistent with the local wall thickness to
+keep the resulting depth distribution meaningful.
+
+```
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/DepthProfile/Type Exponential
+/RMG/Generator/Confinement/DepthProfile/Mean 0.1 um
+```
+
 ## Weighting modes
 
 For the sampling in volumes, _remage_ by default weights the probability to find

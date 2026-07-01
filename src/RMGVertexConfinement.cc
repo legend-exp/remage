@@ -15,6 +15,9 @@
 
 #include "RMGVertexConfinement.hh"
 
+#include <cmath>
+#include <limits>
+
 #include "G4AutoLock.hh"
 #include "G4Box.hh"
 #include "G4GenericMessenger.hh"
@@ -99,6 +102,91 @@ void RMGVertexConfinement::SampleableObject::RecalcMass(int z, int n) {
     }
   }
   this->mass = this->volume * mfrac * mat->GetDensity();
+}
+
+double RMGVertexConfinement::DepthProfile::Sample() const {
+  switch (type) {
+    case Type::kNone: return 0;
+
+    case Type::kExponential: {
+      // Inverse-CDF: X = -mean * ln(U), U ~ Uniform(0,1).
+      // Guard against U=0 with a minimum positive value.
+      const double u = std::max(G4UniformRand(), std::numeric_limits<double>::min());
+      return -mean * std::log(u);
+    }
+
+    case Type::kTruncatedGaussian: {
+      // Box-Muller transform with rejection sampling to enforce [range_lo, range_hi].
+      double d = 0;
+      const size_t kMaxAttempts = 10000;
+      for (size_t attempt = 0; attempt < kMaxAttempts; ++attempt) {
+        // Box-Muller: need u1 > 0 to avoid log(0)
+        const double u1 = std::max(G4UniformRand(), std::numeric_limits<double>::min());
+        const double u2 = G4UniformRand();
+        const double z = std::sqrt(-2.0 * std::log(u1)) * std::cos(CLHEP::twopi * u2);
+        d = mean + sigma * z;
+        if (d >= range_lo && d <= range_hi) return d;
+      }
+      RMGLog::Out(
+          RMGLog::fatal,
+          "TruncatedGaussian depth profile: exceeded ",
+          kMaxAttempts,
+          " rejection-sampling attempts. "
+          "The range [range_lo, range_hi] lies too far in the tail of the Gaussian "
+          "defined by (mean, sigma); adjust the parameters so acceptance is feasible."
+      );
+      return range_lo;
+    }
+
+    case Type::kUniform: {
+      return range_lo + (range_hi - range_lo) * G4UniformRand();
+    }
+
+    default: RMGLog::Out(RMGLog::error, "Unknown DepthProfile::Type, returning 0"); return 0;
+  }
+}
+
+void RMGVertexConfinement::DepthProfile::Validate() const {
+  switch (type) {
+    case Type::kNone: return;
+
+    case Type::kExponential:
+      if (mean <= 0)
+        RMGLog::Out(RMGLog::fatal, "Exponential depth profile requires a strictly positive Mean");
+      return;
+
+    case Type::kUniform:
+      if (range_lo < 0) RMGLog::Out(RMGLog::fatal, "Uniform depth profile requires RangeLow >= 0");
+      if (range_hi <= range_lo)
+        RMGLog::Out(RMGLog::fatal, "Uniform depth profile requires RangeHigh > RangeLow");
+      return;
+
+    case Type::kTruncatedGaussian:
+      if (sigma <= 0)
+        RMGLog::Out(RMGLog::fatal, "TruncatedGaussian depth profile requires a strictly positive Sigma");
+      if (range_lo < 0)
+        RMGLog::Out(RMGLog::fatal, "TruncatedGaussian depth profile requires RangeLow >= 0");
+      if (range_hi <= range_lo)
+        RMGLog::Out(RMGLog::fatal, "TruncatedGaussian depth profile requires RangeHigh > RangeLow");
+      return;
+  }
+}
+
+void RMGVertexConfinement::SampleableObject::ApplyDepthProfile(
+    G4ThreeVector& local_vertex,
+    const G4VSolid* solid
+) const {
+  if (this->depth_profile.type == DepthProfile::Type::kNone) return;
+
+  const G4ThreeVector normal = solid->SurfaceNormal(local_vertex);
+  double depth = this->depth_profile.Sample();
+
+  // Clamp the depth to the distance to the far boundary along the inward normal, so the
+  // displaced vertex can never cross to the other side of the solid or leave it.
+  const double max_depth = solid->DistanceToOut(local_vertex, -normal);
+  if (depth > max_depth) depth = max_depth;
+
+  local_vertex -= depth * normal;
 }
 
 const RMGVertexConfinement::SampleableObject& RMGVertexConfinement::SampleableObjectCollection::SurfaceWeightedRand() const {
@@ -350,8 +438,12 @@ bool RMGVertexConfinement::SampleableObject::Sample(
   // 3) general surface sampling
 
   if (this->native_sample) {
-    vertex = this->translation +
-             this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, this->surface_sample);
+    auto local_vertex = RMGGeneratorUtil::rand(this->sampling_solid, this->surface_sample);
+
+    // Displace inward from the surface when a depth profile is configured.
+    if (this->surface_sample) this->ApplyDepthProfile(local_vertex, this->sampling_solid);
+
+    vertex = this->translation + this->rotation * local_vertex;
     RMGLog::OutDev(RMGLog::debug_event, "Generated vertex: ", vertex / CLHEP::cm, " cm");
     if (force_containment_check && !this->IsInside(vertex)) {
 
@@ -364,8 +456,13 @@ bool RMGVertexConfinement::SampleableObject::Sample(
     }
   } else if (this->surface_sample) {
     bool success = this->GenerateSurfacePoint(vertex, max_attempts, this->max_num_intersections);
-    vertex = this->translation + this->rotation * vertex;
     if (not success) return false;
+
+    // Displace inward from the surface when a depth profile is configured.
+    // At this point `vertex` is still in the solid's local coordinate system.
+    this->ApplyDepthProfile(vertex, this->physical_volume->GetLogicalVolume()->GetSolid());
+
+    vertex = this->translation + this->rotation * vertex;
 
     if (force_containment_check && !this->IsInside(vertex)) {
       auto local_pos = this->rotation.inverse() * vertex - this->translation;
@@ -645,6 +742,9 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
       );
     }
 
+    // Propagate global depth profile configuration to this volume.
+    el.depth_profile = fDepthProfile;
+
     // determine solid transformation w.r.t. world volume reference
 
     // found paths to the mother volume.
@@ -666,6 +766,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           el.native_sample,
           el.surface_sample
       );
+      new_obj_from_inspection.back().depth_profile = el.depth_profile;
     }
   }
 
@@ -761,6 +862,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
 
     volume_solids.back().native_sample = true;
     volume_solids.back().surface_sample = fOnSurface;
+    volume_solids.back().depth_profile = fDepthProfile;
 
     RMGLog::OutFormat(
         RMGLog::detail,
@@ -805,6 +907,7 @@ void RMGVertexConfinement::Reset() {
 
   fOnSurface = false;
   fForceContainmentCheck = false;
+  fDepthProfile = {};
 }
 
 bool RMGVertexConfinement::GenerateVertex(G4ThreeVector& vertex) {
@@ -826,6 +929,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
   if (!fVolumesInitialized) {
     G4AutoLock lock(&fGeometryMutex);
     if (!fVolumesInitialized) {
+      fDepthProfile.Validate();
       this->InitializePhysicalVolumes();
       this->InitializeGeometricalVolumes(true);
       this->InitializeGeometricalVolumes(false);
@@ -1069,6 +1173,12 @@ void RMGVertexConfinement::SetSamplingModeString(std::string mode) {
 void RMGVertexConfinement::SetFirstSamplingVolumeTypeString(std::string type) {
   try {
     this->SetFirstSamplingVolumeType(RMGTools::ToEnum<VolumeType>(type, "volume type"));
+  } catch (const std::bad_cast&) { return; }
+}
+
+void RMGVertexConfinement::SetDepthProfileTypeString(std::string type) {
+  try {
+    fDepthProfile.type = RMGTools::ToEnum<DepthProfile::Type>(type, "depth profile type");
   } catch (const std::bad_cast&) { return; }
 }
 
@@ -1414,6 +1524,70 @@ void RMGVertexConfinement::DefineCommands() {
       .SetParameterName("L", false)
       .SetRange("L > 0")
       .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessengers.push_back(
+      std::make_unique<G4GenericMessenger>(
+          this,
+          "/RMG/Generator/Confinement/DepthProfile/",
+          "Commands for configuring a depth profile that displaces surface-sampled vertices "
+          "inward into the material. Only active when SampleOnSurface is true."
+      )
+  );
+
+  fMessengers.back()
+      ->DeclareMethod("Type", &RMGVertexConfinement::SetDepthProfileTypeString)
+      .SetGuidance(
+          "Set the depth profile distribution type. "
+          "Use 'None' to disable (default), 'Exponential', 'TruncatedGaussian', or 'Uniform'."
+      )
+      .SetParameterName("type", false)
+      .SetCandidates(RMGTools::GetCandidates<DepthProfile::Type>())
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("Mean", "mm", &RMGVertexConfinement::SetDepthProfileMean)
+      .SetGuidance(
+          "Mean depth for Exponential (1/λ) and TruncatedGaussian distributions. "
+          "Value is in Geant4 length units."
+      )
+      .SetParameterName("depth", false)
+      .SetRange("depth >= 0")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("Sigma", "mm", &RMGVertexConfinement::SetDepthProfileSigma)
+      .SetGuidance(
+          "Standard deviation for the TruncatedGaussian distribution. "
+          "Value is in Geant4 length units."
+      )
+      .SetParameterName("sigma", false)
+      .SetRange("sigma > 0")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("RangeLow", "mm", &RMGVertexConfinement::SetDepthProfileRangeLo)
+      .SetGuidance(
+          "Lower bound of the depth range for Uniform and TruncatedGaussian distributions. "
+          "Value is in Geant4 length units."
+      )
+      .SetParameterName("depth", false)
+      .SetRange("depth >= 0")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
+
+  fMessengers.back()
+      ->DeclareMethodWithUnit("RangeHigh", "mm", &RMGVertexConfinement::SetDepthProfileRangeHi)
+      .SetGuidance(
+          "Upper bound of the depth range for Uniform and TruncatedGaussian distributions. "
+          "Value is in Geant4 length units."
+      )
+      .SetParameterName("depth", false)
+      .SetRange("depth > 0")
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -624,6 +624,7 @@ Commands for controlling primary confinement
 
 * `/RMG/Generator/Confinement/Physical/` – Commands for setting physical volumes up for primary confinement
 * `/RMG/Generator/Confinement/Geometrical/` – Commands for setting geometrical volumes up for primary confinement
+* `/RMG/Generator/Confinement/DepthProfile/` – Commands for configuring a depth profile that displaces surface-sampled vertices inward into the material. Only active when SampleOnSurface is true.
 * `/RMG/Generator/Confinement/FromFile/` – Commands for controlling reading event vertex positions from file
 * `/RMG/Generator/Confinement/FromPoint/` – Commands for controlling vertex positions at fixed point
 
@@ -1012,6 +1013,89 @@ Set Z length
   * **Parameter type** – `s`
   * **Omittable** – `True`
   * **Default value** – `cm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+## `/RMG/Generator/Confinement/DepthProfile/`
+
+Commands for configuring a depth profile that displaces surface-sampled vertices inward into the material. Only active when SampleOnSurface is true.
+
+
+**Commands:**
+
+* `Type` – Set the depth profile distribution type. Use 'None' to disable (default), 'Exponential', 'TruncatedGaussian', or 'Uniform'.
+* `Mean` – Mean depth for Exponential (1/λ) and TruncatedGaussian distributions. Value is in Geant4 length units.
+* `Sigma` – Standard deviation for the TruncatedGaussian distribution. Value is in Geant4 length units.
+* `RangeLow` – Lower bound of the depth range for Uniform and TruncatedGaussian distributions. Value is in Geant4 length units.
+* `RangeHigh` – Upper bound of the depth range for Uniform and TruncatedGaussian distributions. Value is in Geant4 length units.
+
+### `/RMG/Generator/Confinement/DepthProfile/Type`
+
+Set the depth profile distribution type. Use 'None' to disable (default), 'Exponential', 'TruncatedGaussian', or 'Uniform'.
+
+* **Parameter** – `type`
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+  * **Candidates** – `None Exponential TruncatedGaussian Uniform`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/DepthProfile/Mean`
+
+Mean depth for Exponential (1/λ) and TruncatedGaussian distributions. Value is in Geant4 length units.
+
+* **Range of parameters** – `depth >= 0`
+* **Parameter** – `depth`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/DepthProfile/Sigma`
+
+Standard deviation for the TruncatedGaussian distribution. Value is in Geant4 length units.
+
+* **Range of parameters** – `sigma > 0`
+* **Parameter** – `sigma`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/DepthProfile/RangeLow`
+
+Lower bound of the depth range for Uniform and TruncatedGaussian distributions. Value is in Geant4 length units.
+
+* **Range of parameters** – `depth >= 0`
+* **Parameter** – `depth`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
+  * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/Generator/Confinement/DepthProfile/RangeHigh`
+
+Upper bound of the depth range for Uniform and TruncatedGaussian distributions. Value is in Geant4 length units.
+
+* **Range of parameters** – `depth > 0`
+* **Parameter** – `depth`
+  * **Parameter type** – `d`
+  * **Omittable** – `False`
+* **Parameter** – `Unit`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
+  * **Default value** – `mm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
 
