@@ -51,7 +51,7 @@ void RMGConvertLH5::SetStringAttribute(H5::H5Object& obj, std::string attr_name,
 }
 
 std::optional<std::string> RMGConvertLH5::GetStringAttribute(H5::H5Object& obj, std::string attr_name) {
-  if (!obj.attrExists("datatype")) return std::nullopt;
+  if (!obj.attrExists(attr_name)) return std::nullopt;
   auto att_writer = obj.openAttribute(attr_name);
   if (att_writer.getDataType().getClass() != H5T_STRING) return std::nullopt;
   std::string writer;
@@ -62,7 +62,7 @@ std::optional<std::string> RMGConvertLH5::GetStringAttribute(H5::H5Object& obj, 
 void RMGConvertLH5::CreateUIntDataset(H5::Group& obj, std::string dset_name, uint64_t attr_value) {
   H5::DataSpace scalar(H5S_SCALAR);
   auto att = obj.createDataSet(dset_name, H5::PredType::STD_I64LE, scalar);
-  att.write(&attr_value, H5::PredType::STD_I32LE);
+  att.write(&attr_value, H5::PredType::STD_I64LE);
 }
 
 void RMGConvertLH5::CreateStringDataset(H5::Group& obj, std::string dset_name, std::string attr_value) {
