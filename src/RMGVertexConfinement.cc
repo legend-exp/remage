@@ -24,6 +24,7 @@
 #include "G4Orb.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4Run.hh"
+#include "G4SolidStore.hh"
 #include "G4Sphere.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4TransportationManager.hh"
@@ -43,8 +44,10 @@ G4Mutex RMGVertexConfinement::fGeometryMutex = G4MUTEX_INITIALIZER;
 RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fGeomVolumeSolids = {};
 RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fExcludedGeomVolumeSolids = {};
 RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fPhysicalVolumes = {};
+RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fUnionVolumes = {};
+std::vector<G4VSolid*> RMGVertexConfinement::fOwnedSolids = {};
 
-bool RMGVertexConfinement::fVolumesInitialized = false;
+std::atomic<bool> RMGVertexConfinement::fVolumesInitialized = false;
 
 RMGVertexConfinement::SampleableObject::SampleableObject(
     G4VPhysicalVolume* physvol,
@@ -730,6 +733,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
           bb_y,
           bb_z
       );
+      fOwnedSolids.push_back(el.sampling_solid);
     } // sampling_solid and native_sample and surface_sample must hold a valid value at this point
 
     if (el.surface_sample && !el.native_sample && el.max_num_intersections < 2) {
@@ -809,49 +813,38 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
 
   // Initialize volumes based on the data
   for (const auto& d : volume_data) {
+    G4VSolid* solid = nullptr;
     if (d.solid_type == GeometricalSolidType::kSphere) {
-      volume_solids.emplace_back(
-          nullptr,
-          G4RotationMatrix(),
-          d.volume_center,
-          new G4Sphere(
-              "RMGVertexConfinement::SamplingShape::Sphere/" +
-                  std::to_string(volume_solids.size() + 1),
-              d.sphere_inner_radius,
-              d.sphere_outer_radius,
-              0,
-              CLHEP::twopi,
-              0,
-              CLHEP::pi
-          )
+      solid = new G4Sphere(
+          "RMGVertexConfinement::SamplingShape::Sphere/" + std::to_string(volume_solids.size() + 1),
+          d.sphere_inner_radius,
+          d.sphere_outer_radius,
+          0,
+          CLHEP::twopi,
+          0,
+          CLHEP::pi
       );
     } else if (d.solid_type == GeometricalSolidType::kCylinder) {
-      volume_solids.emplace_back(
-          nullptr,
-          G4RotationMatrix(),
-          d.volume_center,
-          new G4Tubs(
-              "RMGVertexConfinement::SamplingShape::Cylinder/" +
-                  std::to_string(volume_solids.size() + 1),
-              d.cylinder_inner_radius,
-              d.cylinder_outer_radius,
-              0.5 * d.cylinder_height,
-              d.cylinder_starting_angle,
-              d.cylinder_spanning_angle
-          )
+      solid = new G4Tubs(
+          "RMGVertexConfinement::SamplingShape::Cylinder/" + std::to_string(volume_solids.size() + 1),
+          d.cylinder_inner_radius,
+          d.cylinder_outer_radius,
+          0.5 * d.cylinder_height,
+          d.cylinder_starting_angle,
+          d.cylinder_spanning_angle
       );
     } else if (d.solid_type == GeometricalSolidType::kBox) {
-      volume_solids.emplace_back(
-          nullptr,
-          G4RotationMatrix(),
-          d.volume_center,
-          new G4Box(
-              "RMGVertexConfinement::SamplingShape::Box/" + std::to_string(volume_solids.size() + 1),
-              0.5 * d.box_x_length,
-              0.5 * d.box_y_length,
-              0.5 * d.box_z_length
-          )
+      solid = new G4Box(
+          "RMGVertexConfinement::SamplingShape::Box/" + std::to_string(volume_solids.size() + 1),
+          0.5 * d.box_x_length,
+          0.5 * d.box_y_length,
+          0.5 * d.box_z_length
       );
+    }
+
+    if (solid) {
+      fOwnedSolids.push_back(solid);
+      volume_solids.emplace_back(nullptr, G4RotationMatrix(), d.volume_center, solid);
     } else {
       RMGLog::OutFormat(
           RMGLog::error,
@@ -892,10 +885,19 @@ void RMGVertexConfinement::Reset() {
   // take lock, just not to race with the fVolumesInitialized flag elsewhere.
 
   G4AutoLock lock(&fGeometryMutex);
-  fVolumesInitialized = true;
+  fVolumesInitialized = false;
   fPhysicalVolumes.clear();
   fGeomVolumeSolids.clear();
   fExcludedGeomVolumeSolids.clear();
+  fUnionVolumes.clear();
+
+  // de-register and free the solids we allocated ourselves (bounding boxes and geometrical
+  // sampling shapes); otherwise reconfiguring leaks them and their auto-generated names collide.
+  for (auto* solid : fOwnedSolids) {
+    G4SolidStore::DeRegister(solid);
+    delete solid;
+  }
+  fOwnedSolids.clear();
 
   fPhysicalVolumeNameRegexes.clear();
   fPhysicalVolumeCopyNrRegexes.clear();
@@ -933,6 +935,11 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       this->InitializePhysicalVolumes();
       this->InitializeGeometricalVolumes(true);
       this->InitializeGeometricalVolumes(false);
+
+      // cache the merged collection used by kUnionAll, so it is not rebuilt every event.
+      fUnionVolumes.clear();
+      fUnionVolumes.insert(fGeomVolumeSolids);
+      fUnionVolumes.insert(fPhysicalVolumes);
 
       fVolumesInitialized = true;
     }
@@ -1127,13 +1134,9 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
     }
 
     case SamplingMode::kUnionAll: {
-      // strategy: just sample uniformly in/on all geometrical and physical volumes
+      // strategy: just sample uniformly in/on all geometrical and physical volumes.
 
-      // merge everything in a single container and use that
-      auto all_volumes = fGeomVolumeSolids;
-      all_volumes.insert(fPhysicalVolumes);
-
-      if (all_volumes.empty()) {
+      if (fUnionVolumes.empty()) {
         RMGLog::Out(
             RMGLog::fatal,
             "'UnionAll' mode is set but ",
@@ -1142,8 +1145,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       }
 
       // chose a volume to sample from
-      const auto choice = fOnSurface ? all_volumes.SurfaceWeightedRand()
-                                     : all_volumes.VolumeWeightedRand(fWeightByMass);
+      const auto choice = fOnSurface ? fUnionVolumes.SurfaceWeightedRand()
+                                     : fUnionVolumes.VolumeWeightedRand(fWeightByMass);
 
       // do the sampling
       bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
