@@ -227,19 +227,17 @@ void RMGPhysics::ConstructProcess() {
   // a macro command.
   G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(1.0e+27 * u::ns);
 
-  /*
-  // TODO: ?
-  G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( false ); // default
-  G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true ); // _not_ default
-  G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true ); // _not_ default
-  G4ParticleHPManager::GetInstance()->SetNeglectDoppler( false ); // default
-  // default, except for Shielding
-  G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( false );
-  G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( false ); // default
-  G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( false ); // default
-  */
-
   if (fHadronicPhysicsListOption != HadronicPhysicsListOption::kNone) {
+
+    G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes(false);    // default
+    G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState(true);   // _not_ default
+    G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation(true); // _not_ default
+    G4ParticleHPManager::GetInstance()->SetNeglectDoppler(false);         // default
+    // default, except for Shielding
+    G4ParticleHPManager::GetInstance()->SetProduceFissionFragments(false);
+    G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel(false); // default
+    G4ParticleHPManager::GetInstance()->SetUseNRESP71Model(false);      // default
+
     RMGLog::Out(RMGLog::detail, "Adding hadronic elastic physics");
     G4VPhysicsConstructor* hElasticPhysics = new G4HadronElasticPhysicsHP(
         G4VModularPhysicsList::verboseLevel
