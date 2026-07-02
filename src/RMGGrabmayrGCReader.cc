@@ -162,7 +162,8 @@ void RMGGrabmayrGCReader::DefineCommands() {
       .SetGuidance("1 = do")
       .SetCandidates("0 1")
       .SetDefaultValue("0")
-      .SetStates(G4State_PreInit, G4State_Idle);
+      .SetStates(G4State_PreInit, G4State_Idle)
+      .SetToBeBroadcasted(true);
 
   // SetGammaCascadeFile cannot be defined with the G4GenericMessenger (it has too many parameters).
   fUIMessenger = std::make_unique<GCMessenger>(this);

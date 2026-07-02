@@ -30,7 +30,7 @@ void RMGVertexFromPoint::DefineCommands() {
   );
 
   fMessenger->DeclareProperty("Position", fVertex)
-      .SetGuidance("Change the default input directory/group for ntuples.")
+      .SetGuidance("Set the fixed vertex position.")
       .SetParameterName("pos", false)
       .SetStates(G4State_PreInit, G4State_Idle);
 }

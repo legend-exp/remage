@@ -260,7 +260,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         /**
          * @brief Check if the vertex is inside the solid.
          * @param vertex The sampled vertex.
-         * @returns Boolean flag of whether the vertexx is inside the solid.
+         * @returns Boolean flag of whether the vertex is inside the solid.
          */
         [[nodiscard]] bool IsInside(const G4ThreeVector& vertex) const;
 
@@ -313,7 +313,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * start with direction @c dir.
          *
          * @details This is used in the generic surface sampling algorithm. This function makes use
-         * of the methods @c GetDistanceToIn(p,v) and @c GetDistanceToOut(p,v) of @c G4VSolid .
+         * of the methods @c DistanceToIn(p,v) and @c DistanceToOut(p,v) of @c G4VSolid .
          * It continually looks for the distance to the next boundary (along the line)
          * until this becomes zero indicating there are no more intersections.
          *

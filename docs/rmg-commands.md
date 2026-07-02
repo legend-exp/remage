@@ -1141,11 +1141,11 @@ Commands for controlling vertex positions at fixed point
 
 **Commands:**
 
-* `Position` – Change the default input directory/group for ntuples.
+* `Position` – Set the fixed vertex position.
 
 ### `/RMG/Generator/Confinement/FromPoint/Position`
 
-Change the default input directory/group for ntuples.
+Set the fixed vertex position.
 
 * **Parameter** – `pos`
   * **Parameter type** – `d`

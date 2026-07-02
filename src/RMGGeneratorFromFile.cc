@@ -129,7 +129,7 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
   auto locked_reader = fReader->GetLockedReader();
 
   if (!locked_reader) {
-    RMGLog::Out(RMGLog::error, "Ntuple named 'pos' could not be found in input file!");
+    RMGLog::Out(RMGLog::error, "Ntuple named 'kin' could not be found in input file!");
     return;
   }
 
@@ -180,11 +180,11 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  const std::map<std::string, double> energy_units =
+  static const std::map<std::string, double> energy_units =
       {{"", u::MeV}, {"eV", u::eV}, {"keV", u::keV}, {"MeV", u::MeV}, {"GeV", u::GeV}};
-  const std::map<std::string, double> time_units =
+  static const std::map<std::string, double> time_units =
       {{"", u::ns}, {"ns", u::ns}, {"ms", u::ms}, {"s", u::s}};
-  const std::map<std::string, double> pos_units =
+  static const std::map<std::string, double> pos_units =
       {{"", u::m}, {"nm", u::nm}, {"um", u::um}, {"mm", u::mm}, {"cm", u::cm}, {"m", u::m}};
 
   for (const auto& row_data : particles) {
