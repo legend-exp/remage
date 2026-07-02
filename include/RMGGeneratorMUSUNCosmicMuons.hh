@@ -32,8 +32,9 @@ namespace u = CLHEP;
 /**
  * @brief Row schema for the MUSUN input ntuple consumed by @ref RMGGeneratorMUSUNCosmicMuons.
  *
- * Position is in Geant4 length units; energy in MeV; angles in radians. Momentum is provided
- * either in Cartesian (@c fPx, @c fPy, @c fPz) or in spherical (@c fTheta, @c fPhi) form.
+ * Raw file values follow native MUSUN output: position in cm, energy in GeV; angles in radians.
+ * Momentum is provided either in Cartesian (@c fPx, @c fPy, @c fPz) or in spherical
+ * (@c fTheta, @c fPhi) form.
  */
 struct RMGGeneratorMUSUNCosmicMuons_Data {
     G4int fID;

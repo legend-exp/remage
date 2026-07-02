@@ -1269,7 +1269,7 @@ void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
       "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% "
       "efficiency)",
       avg_iter,
-      100 / avg_iter
+      avg_iter > 0 ? 100 / avg_iter : 100.0
   );
   RMGLog::OutFormat(
       RMGLog::summary,

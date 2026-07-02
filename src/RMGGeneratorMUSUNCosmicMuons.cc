@@ -211,7 +211,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
     fGun->SetParticleMomentumDirection(d_cart);
     RMGLog::OutFormat(
         RMGLog::debug_event,
-        "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g}) deg",
+        "...direction (px,py,pz) = ({:.4g}, {:.4g}, {:.4g})",
         input_data.fPx,
         input_data.fPy,
         input_data.fPz

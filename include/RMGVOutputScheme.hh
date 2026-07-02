@@ -177,7 +177,7 @@ class RMGVOutputScheme {
       return GetNtupleNameFlat();
     }
     [[nodiscard]] virtual std::string GetNtupleNameFlat() const {
-      throw new std::logic_error("GetNtupleNameFlat not implemented");
+      throw std::logic_error("GetNtupleNameFlat not implemented");
     }
 
     // helper functions for output schemes.
