@@ -16,6 +16,7 @@
 #ifndef _RMG_VERTEX_CONFINEMENT_HH_
 #define _RMG_VERTEX_CONFINEMENT_HH_
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <optional>
@@ -401,7 +402,12 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         template<typename... Args> void emplace_back(Args&&... args);
         [[nodiscard]] bool empty() const { return data.empty(); }
         SampleableObject& back() { return data.back(); }
-        void clear() { data.clear(); }
+        void clear() {
+          data.clear();
+          total_volume = 0;
+          total_mass = 0;
+          total_surface = 0;
+        }
         void insert(SampleableObjectCollection& other) {
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
           this->total_volume += other.total_volume;
@@ -437,8 +443,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     static SampleableObjectCollection fPhysicalVolumes;
     static SampleableObjectCollection fGeomVolumeSolids;
     static SampleableObjectCollection fExcludedGeomVolumeSolids;
+    // cached merged collection used by the default kUnionAll mode.
+    static SampleableObjectCollection fUnionVolumes;
 
-    static bool fVolumesInitialized;
+    // solids allocated by this class (bounding boxes and geometrical sampling shapes). They are
+    // registered in the G4SolidStore and must be de-registered and freed on Reset().
+    static std::vector<G4VSolid*> fOwnedSolids;
+
+    static std::atomic<bool> fVolumesInitialized;
 
     SamplingMode fSamplingMode = SamplingMode::kUnionAll;
     VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
