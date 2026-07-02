@@ -56,39 +56,44 @@ void RMGVertexFromFile::OpenFile(std::string& name) {
 
 bool RMGVertexFromFile::GenerateVertex(G4ThreeVector& vertex) {
 
+  static const std::map<std::string, double> units =
+      {{"", CLHEP::m},
+       {"nm", CLHEP::nm},
+       {"um", CLHEP::um},
+       {"mm", CLHEP::mm},
+       {"cm", CLHEP::cm},
+       {"m", CLHEP::m}};
+
   auto reader = fReader->GetLockedReader();
 
-  if (reader) {
-    fXpos = fYpos = fZpos = NAN; // initialize sentinel values.
-
-    if (reader.GetNtupleRow()) {
-      // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
-      if (std::isnan(fXpos) || std::isnan(fYpos) || std::isnan(fZpos)) {
-        RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
-        vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-        return false;
-      }
-
-      const auto unit_name = reader.GetUnit("xloc");
-      const std::map<std::string, double> units =
-          {{"", CLHEP::m},
-           {"nm", CLHEP::nm},
-           {"um", CLHEP::um},
-           {"mm", CLHEP::mm},
-           {"cm", CLHEP::cm},
-           {"m", CLHEP::m}};
-
-      vertex = G4ThreeVector{fXpos, fYpos, fZpos} * units.at(unit_name);
-      return true;
-    }
-
-    RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
-  } else {
+  if (!reader) {
     RMGLog::Out(RMGLog::error, "Ntuple named 'pos' could not be found in input file!");
+    vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+    return false;
   }
 
-  vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
-  return false;
+  fXpos = fYpos = fZpos = NAN; // initialize sentinel values.
+
+  if (!reader.GetNtupleRow()) {
+    RMGLog::Out(RMGLog::error, "No more vertices available in input file!");
+    vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+    return false;
+  }
+
+  // copy the needed data to locals and end the critical section before creating the vertex.
+  const double xpos = fXpos, ypos = fYpos, zpos = fZpos;
+  const auto unit_name = reader.GetUnit("xloc");
+  reader.unlock();
+
+  // check for NaN sentinel values - i.e. non-existing columns (there is no error message).
+  if (std::isnan(xpos) || std::isnan(ypos) || std::isnan(zpos)) {
+    RMGLog::Out(RMGLog::error, "At least one of the columns does not exist");
+    vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
+    return false;
+  }
+
+  vertex = G4ThreeVector{xpos, ypos, zpos} * units.at(unit_name);
+  return true;
 }
 
 void RMGVertexFromFile::BeginOfRunAction(const G4Run*) {
