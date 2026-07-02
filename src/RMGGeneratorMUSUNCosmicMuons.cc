@@ -22,13 +22,15 @@
 #include <vector>
 
 #include "G4GenericMessenger.hh"
+#include "G4MuonMinus.hh"
+#include "G4MuonPlus.hh"
 #include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
 #include "G4ThreeVector.hh"
 #include "Randomize.hh"
 
 #include "RMGHardware.hh"
 #include "RMGLog.hh"
+#include "RMGManager.hh"
 #include "RMGVGenerator.hh"
 
 namespace u = CLHEP;
@@ -51,10 +53,12 @@ bool RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
   To determine the header format, we need to determine the number of columns.
   */
 
-  // Define fPathToTmpFile
+  // Define fPathToTmpFile. Make it unique per process so that concurrent remage processes
+  // reading the same MUSUN input do not clobber each other's temp file.
   std::filesystem::path originalFilePath(pathToFile);
-  std::filesystem::path fileName = originalFilePath.filename();
-  fPathToTmpFile = fPathToTmpFolder / fileName;
+  auto proc_suffix = "_p" + std::to_string(RMGManager::Instance()->GetProcessNumberOffset());
+  fPathToTmpFile = fPathToTmpFolder / (originalFilePath.stem().string() + proc_suffix +
+                                       originalFilePath.extension().string());
 
   // Check if the original file exists / the tmp file does not exist
   std::ifstream originalFile(pathToFile);
@@ -157,8 +161,27 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
 void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
   if (!G4Threading::IsMasterThread()) return;
 
-  auto reader = fAnalysisReader->GetLockedReader();
-  if (reader) { std::filesystem::remove(fPathToTmpFile); }
+  {
+    auto reader = fAnalysisReader->GetLockedReader();
+    if (!reader) return;
+
+    // remove the temporary CSV file (it is not flagged as temp in the reader, so CloseFile
+    // below will not do it for us).
+    std::error_code ec;
+    std::filesystem::remove(fPathToTmpFile, ec);
+    if (ec) {
+      RMGLog::Out(
+          RMGLog::warning,
+          "Could not remove temporary MUSUN file ",
+          fPathToTmpFile.string(),
+          ": ",
+          ec.message()
+      );
+    }
+  } // release the reader lock before CloseFile(), which takes the same mutex.
+
+  // reset the reader state so a subsequent /run/beamOn re-opens the input cleanly.
+  fAnalysisReader->CloseFile();
 }
 
 
@@ -181,9 +204,8 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
   bool has_cartesian = fHasCartesianMomentum;
   reader.unlock();
 
-  auto theParticleTable = G4ParticleTable::GetParticleTable();
-  if (input_data.fType == 10) fGun->SetParticleDefinition(theParticleTable->FindParticle("mu-"));
-  else fGun->SetParticleDefinition(theParticleTable->FindParticle("mu+"));
+  if (input_data.fType == 10) fGun->SetParticleDefinition(G4MuonMinus::Definition());
+  else fGun->SetParticleDefinition(G4MuonPlus::Definition());
 
   RMGLog::OutFormat(
       RMGLog::debug_event,
