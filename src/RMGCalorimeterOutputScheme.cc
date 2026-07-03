@@ -166,8 +166,8 @@ void RMGCalorimeterOutputScheme::StoreEvent(const G4Event* event) {
       ana_man->FillNtupleFColumn(
           ntupleid,
           col_id++,
-          hit->energy_deposition / u::keV
-      ); // NOLINT(cppcoreguidelines-narrowing-conversions)
+          hit->energy_deposition / u::keV // NOLINT(cppcoreguidelines-narrowing-conversions)
+      );
       ana_man->FillNtupleDColumn(ntupleid, col_id++, hit->global_time / u::ns);
 
       // NOTE: must be called here for hit-oriented output
