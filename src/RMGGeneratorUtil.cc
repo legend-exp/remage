@@ -60,7 +60,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Box* box, bool on_surface) {
   if (on_surface) {
     std::array<double, 3> A = {4 * dx * dy, 4 * dx * dz, 4 * dy * dz};
 
-    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
+    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0.0);
     auto face_sign = _g4rand() <= 0.5 ? -1 : 1;
     double x = NAN, y = NAN, z = NAN;
 
@@ -166,7 +166,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
         delta_a * (r2 * r2 - r1 * r1),                    // top/bottom, (twice)
         (delta_a != CLHEP::twopi) ? 2 * (r2 - r1) * h : 0 // sides (twice) (might not be there)
     };
-    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0);
+    auto face = _g4rand() * std::accumulate(A.begin(), A.end(), 0.0);
 
     if (face <= A[0]) { // inner
       return s1_point * r1 + G4ThreeVector(0, 0, z);
