@@ -18,20 +18,18 @@
 
 #include <memory>
 
-#include "G4AutoLock.hh"
+#include "G4Event.hh"
 #include "G4GeneralParticleSource.hh"
 #include "G4ThreeVector.hh"
 
 #include "RMGVGenerator.hh"
 
-class G4Event;
 /**
  * @brief @ref RMGVGenerator wrapper around Geant4's General Particle Source.
  *
- * If a vertex position has been provided via @ref SetParticlePosition, it is propagated to
- * the centre of every GPS source before generating the primary vertex. Calls into the GPS
- * are serialized through a class-wide mutex because @c G4GeneralParticleSource is not
- * thread-safe (all worker threads share the same global state).
+ * If a vertex position has been provided via @ref SetParticlePosition, the primary vertices
+ * produced by the GPS are translated by it after generation. The GPS position configuration
+ * will not be used in this case.
  */
 class RMGGeneratorGPS : public RMGVGenerator {
 
@@ -45,29 +43,28 @@ class RMGGeneratorGPS : public RMGVGenerator {
 
     /** @brief Generate a primary vertex from the GPS, optionally overriding the vertex position. */
     void GeneratePrimaries(G4Event* event) override {
-      G4AutoLock lock(&fMutex);
+      // the GPS is inherently thread-unsafe: only one source can be used at a time, and all
+      // threads share the same internal global state. do not mutate that shared state (e.g.
+      // via SetCentreCoords) — instead translate the resulting vertices below.
+      auto first_vertex = event->GetNumberOfPrimaryVertex();
+      fParticleSource->GeneratePrimaryVertex(event);
 
-      // the GPS is inherently thread-unsafe. only one source can be manipulated/used at a time.
-      // all threads share the same internal global state.
       if (fVertexPositionSet) {
-        auto n_source = fParticleSource->GetNumberofSource();
-        for (auto i = 0; i < n_source; i++) {
-          fParticleSource->SetCurrentSourceto(i);
-          fParticleSource->GetCurrentSource()->GetPosDist()->SetCentreCoords(fVertexPosition);
+        auto n_vertex = event->GetNumberOfPrimaryVertex();
+        for (auto i = first_vertex; i < n_vertex; i++) {
+          auto vertex = event->GetPrimaryVertex(i);
+          vertex->SetPosition(fVertexPosition.x(), fVertexPosition.y(), fVertexPosition.z());
         }
       }
-      fParticleSource->GeneratePrimaryVertex(event);
     }
 
-    /** @brief Override the centre coordinates of every GPS source for the next primary vertex. */
+    /** @brief Translate every GPS primary vertex to @p vec for the next event. */
     void SetParticlePosition(G4ThreeVector vec) override {
       fVertexPosition = vec;
       fVertexPositionSet = true;
     }
 
   private:
-
-    inline static G4Mutex fMutex = G4MUTEX_INITIALIZER;
 
     bool fVertexPositionSet = false;
     G4ThreeVector fVertexPosition;
