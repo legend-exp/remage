@@ -16,6 +16,7 @@
 #ifndef _RMG_GENERATOR_COSMIC_MUONS_HH_
 #define _RMG_GENERATOR_COSMIC_MUONS_HH_
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -69,6 +70,9 @@ class RMGGeneratorCosmicMuons : public RMGVGenerator {
 
     std::unique_ptr<EcoMug> fEcoMug;
     std::unique_ptr<G4ParticleGun> fGun = nullptr;
+
+    // EcoMug owns its own RNG stream that is seeded lazily on our first generated event.
+    bool fSeeded = false;
 
     std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
