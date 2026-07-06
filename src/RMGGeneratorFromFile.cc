@@ -176,7 +176,9 @@ void RMGGeneratorFromFile::GeneratePrimaries(G4Event* event) {
     return;
   }
   if (!is_valid_particle || particles.empty()) {
-    RMGLog::Out(RMGLog::error, "Event particle count not valid in input file");
+    // We have already consumed a row belonging to the next event from the shared reader,
+    // leaving its cursor mid-event; we cannot resynchronize safely!
+    RMGLog::Out(RMGLog::fatal, "Event particle count not valid in input file");
     return;
   }
 
