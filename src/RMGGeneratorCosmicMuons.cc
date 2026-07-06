@@ -16,6 +16,7 @@
 #include "RMGGeneratorCosmicMuons.hh"
 
 #include <cmath>
+#include <cstdint>
 
 #include "G4GenericMessenger.hh"
 #include "G4ParticleGun.hh"
@@ -94,12 +95,29 @@ void RMGGeneratorCosmicMuons::BeginOfRunAction(const G4Run*) {
   fEcoMug->SetMinimumPhi(fPhiMin / u::rad);
   fEcoMug->SetMaximumPhi(fPhiMax / u::rad);
 
-  // FIXME: somehow this always sets the same seed
-  // RMGLog::OutFormat(RMGLog::debug, "EcoMug random seed: {}", CLHEP::HepRandom::getTheSeed());
-  // fEcoMug->SetSeed(CLHEP::HepRandom::getTheSeed());
+  // (re-)seed EcoMug lazily on the first event of this run, see GeneratePrimaries().
+  fSeeded = false;
 }
 
 void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
+
+  // EcoMug uses its own RNG. Seed it from the current G4 engine so that cosmic-muon runs are
+  // reproducible with a user-set seed and distinct across worker threads. We must do this here
+  // rather than in BeginOfRunActio, at this point the engine is at its reproducible,
+  // thread-distinct state.
+  if (!fSeeded) {
+    auto* engine = CLHEP::HepRandom::getTheEngine();
+    // draw a nonzero 64-bit seed: EcoMug sets s[0]=s[1]=seed and xoroshiro128+ degenerates to a
+    // stuck all-zero state for seed==0.
+    std::uint64_t seed = 0;
+    while (seed == 0) {
+      seed = (static_cast<std::uint64_t>(engine->operator unsigned int()) << 32) |
+             static_cast<std::uint64_t>(engine->operator unsigned int());
+    }
+    RMGLog::OutFormat(RMGLog::debug, "Seeding EcoMug with {}", seed);
+    fEcoMug->SetSeed(seed);
+    fSeeded = true;
+  }
 
   fEcoMug->Generate();
 

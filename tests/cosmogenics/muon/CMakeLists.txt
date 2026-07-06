@@ -18,3 +18,8 @@ add_test(NAME cosmogenics/muon/particle-yield COMMAND ${PYTHONPATH} -m pytest -s
                                                       test_particle_yield.py)
 set_tests_properties(cosmogenics/muon/particle-yield PROPERTIES LABELS "extra;val;val-only"
                                                                 TIMEOUT 3600 PROCESSORS 16)
+
+add_test(NAME cosmogenics/muon/reproducibility COMMAND ${PYTHONPATH} -m pytest -s -vvv
+                                                       test_reproducibility.py)
+set_tests_properties(cosmogenics/muon/reproducibility PROPERTIES LABELS extra TIMEOUT 600
+                                                                 PROCESSORS 4)
