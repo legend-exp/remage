@@ -19,12 +19,13 @@ import argparse
 import contextlib
 import logging
 import os
-import random
 import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import threading
+import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -272,7 +273,8 @@ def remage_run(
         if str(type(geom_or_file)) == "<class 'pyg4ometry.geant4.Registry.Registry'>":
             from pygeomtools import write_pygeom
 
-            tmp_file = f".rmg-tmp-{random.randint(10000, 99999)}.geom.gdml"
+            fd, tmp_file = tempfile.mkstemp(suffix=".geom.gdml", dir=".")
+            os.close(fd)
             write_pygeom(geom_or_file, tmp_file)
             extra_tmp_files.append(tmp_file)
             return tmp_file
