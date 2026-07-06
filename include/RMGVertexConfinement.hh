@@ -409,6 +409,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
           total_surface = 0;
         }
         void insert(SampleableObjectCollection& other) {
+          data.reserve(this->size() + other.size());
           for (size_t i = 0; i < other.size(); ++i) this->emplace_back(other.at(i));
           this->total_volume += other.total_volume;
           this->total_mass += other.total_mass;

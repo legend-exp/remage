@@ -36,7 +36,7 @@ namespace RMGGeneratorUtil {
    * @param g4_solid_type A string representing the Geant4 solid type.
    * @return true if the solid type is sampleable; false otherwise.
    */
-  bool IsSampleable(std::string g4_solid_type);
+  bool IsSampleable(const std::string& g4_solid_type);
 
   /**
    * @brief Generate a random 3D point within or on the surface of the given solid.

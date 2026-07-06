@@ -27,7 +27,7 @@
 #define _g4rand() ::G4UniformRand()
 #endif
 
-bool RMGGeneratorUtil::IsSampleable(std::string g4_solid_type) {
+bool RMGGeneratorUtil::IsSampleable(const std::string& g4_solid_type) {
   return g4_solid_type == "G4Box" or g4_solid_type == "G4Orb" or g4_solid_type == "G4Sphere" or
          g4_solid_type == "G4Tubs";
 }

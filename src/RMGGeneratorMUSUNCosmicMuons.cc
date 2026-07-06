@@ -105,7 +105,7 @@ bool RMGGeneratorMUSUNCosmicMuons::PrepareCopy(std::string pathToFile) {
   } else
     RMGLog::Out(
         RMGLog::fatal,
-        "MUSUN format not identified! It has " + to_string(numColumns) + " columns. Exit."
+        "MUSUN format not identified! It has " + std::to_string(numColumns) + " columns. Exit."
     );
 
 
@@ -220,7 +220,7 @@ void RMGGeneratorMUSUNCosmicMuons::GeneratePrimaries(G4Event* event) {
     G4ThreeVector d_cart(1, 1, 1);
     d_cart.setTheta(input_data.fTheta); // in rad
     d_cart.setPhi(input_data.fPhi);     // in rad
-    d_cart.setMag(1 * u::m);
+    d_cart.setMag(1);
     fGun->SetParticleMomentumDirection(d_cart);
     RMGLog::OutFormat(
         RMGLog::debug_event,
