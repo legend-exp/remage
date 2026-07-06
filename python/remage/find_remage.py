@@ -44,7 +44,11 @@ def find_remage_cpp() -> Path:
         path = (Path(env_path), "env")
 
     if path is None:
-        path = _find_remage_from_config()
+        cfg = _find_remage_from_config()
+        # only accept the build-time config path if it still exists, otherwise
+        # fall through to the documented PATH lookup below.
+        if cfg is not None and cfg[0].exists():
+            path = cfg
 
     if path is None:
         which_result = shutil.which("remage-cpp")

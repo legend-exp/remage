@@ -68,8 +68,11 @@ def _run_remage_cpp(
         # but is is expanded (by the kernel?), so find out if we are in $PATH.
         argv[0] = exe_name
 
-    if any("--pipe-fd" in av for av in argv[1:]):
-        msg = "cannot pass internal argument --pipe-fd"
+    if any(
+        av.startswith(("--pipe-o-fd", "--pipe-i-fd", "--proc-num-offset"))
+        for av in argv[1:]
+    ):
+        msg = "cannot pass internal arguments --pipe-o-fd/--pipe-i-fd/--proc-num-offset"
         raise RuntimeError(msg)
 
     # add our own version so that remage-cpp can check for it.
@@ -121,34 +124,51 @@ def _run_remage_cpp(
         signal.SIGWINCH,
     ]
 
-    old_signal_handlers = [signal.signal(sig, new_signal_handler) for sig in signals]
+    # signal.signal() can only be called from the main thread
+    install_signal_handlers = threading.current_thread() is threading.main_thread()
+    if not install_signal_handlers:
+        logger.warning(
+            "not running on the main thread; OS signals will not be propagated to remage-cpp"
+        )
 
-    # start a thread listening for IPC messages.
+    # setup a thread listening for IPC messages.
     # remage-cpp will only continue to do real work after we handled one sync message.
     unhandled_ipc_messages: list = []
     ipc_thread = threading.Thread(
         target=ipc_thread_fn, args=(pipe_i_r, pipes_o, proc, unhandled_ipc_messages)
     )
-    ipc_thread.start()
 
     enable_watchdog_thread = (
         len(proc) > 1 and os.getenv("RMG_IPC_DISABLE_WATCHDOG") != "1"
     )
-    if enable_watchdog_thread:
-        watchdog_thread = threading.Thread(target=watchdog_thread_fn, args=(proc,))
-        watchdog_thread.start()
+    watchdog_thread = (
+        threading.Thread(target=watchdog_thread_fn, args=(proc,))
+        if enable_watchdog_thread
+        else None
+    )
 
-    # wait for C++ executable to finish.
-    for p in proc:
-        p.wait()
+    old_signal_handlers: list = []
+    try:
+        if install_signal_handlers:
+            old_signal_handlers = [
+                signal.signal(sig, new_signal_handler) for sig in signals
+            ]
 
-    # restore signal handlers again, before running more python code.
-    for sig, handler in zip(signals, old_signal_handlers, strict=True):
-        signal.signal(sig, handler)
+        ipc_thread.start()
+        if watchdog_thread is not None:
+            watchdog_thread.start()
+
+        # wait for C++ executable to finish.
+        for p in proc:
+            p.wait()
+    finally:
+        # restore signal handlers again, before running more python code.
+        for sig, handler in zip(signals, old_signal_handlers, strict=False):
+            signal.signal(sig, handler)
 
     # close the IPC pipe and end IPC handling.
     ipc_thread.join()
-    if enable_watchdog_thread:
+    if watchdog_thread is not None:
         watchdog_thread.join()
 
     ec = [128 - p.returncode if p.returncode < 0 else p.returncode for p in proc]
@@ -393,7 +413,12 @@ def remage_run_from_args(
     ec_list, termsig, ipc_info = _run_remage_cpp(
         cpp_args, is_cli=args is None, num_procs=py_args.procs
     )
-    ec: int = 1 if 1 in ec_list else max(ec_list)
+    # aggregate worker exit codes by severity: any real failure (a code other
+    # than 0 "success" or 2 "warnings only") dominates, and among those we keep
+    # the largest (e.g. 134/SIGABRT over 1). Otherwise fall back to the largest
+    # of the benign codes (2 "warnings" over 0 "success").
+    severe = [e for e in ec_list if e not in (0, 2)]
+    ec: int = max(severe) if severe else max(ec_list)
 
     # print an error message for the termination signal, similar to what bash does.
     for proc_num, t in enumerate(termsig):
@@ -409,7 +434,12 @@ def remage_run_from_args(
     _cleanup_tmp_files(ipc_info, extra_tmp_files)
 
     if "-h" in cpp_args or "--help" in cpp_args:
-        print("\n".join(parser.format_help().split("\n")[3:]))  # noqa: T201
+        # append the python-wrapper-only options to remage-cpp's own --help
+        # output. Drop argparse's leading "usage:" block (everything up to the
+        # first blank line)
+        help_text = parser.format_help()
+        _, sep, options_text = help_text.partition("\n\n")
+        print(options_text if sep else help_text, end="")  # noqa: T201
 
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)
