@@ -967,7 +967,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         calls++;
 
         // choose a volume
-        SampleableObject choice_nonconst;
+        const SampleableObject* choice_nonconst{};
         bool physical_first = true;
 
         // for surface events the user has to chose which volume type to sample first
@@ -982,8 +982,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
 
           physical_first = fFirstSamplingVolumeType == VolumeType::kPhysical;
-          choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
-                                           : fGeomVolumeSolids.SurfaceWeightedRand();
+          choice_nonconst = physical_first ? &fPhysicalVolumes.SurfaceWeightedRand()
+                                           : &fGeomVolumeSolids.SurfaceWeightedRand();
         } else {
           // for volume sampling the user can specify the volume to sample first else the set
           // with smaller total volume is used
@@ -991,11 +991,12 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
                                ? fGeomVolumeSolids.total_volume > fPhysicalVolumes.total_volume
                                : fFirstSamplingVolumeType == VolumeType::kPhysical;
 
-          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
-                                           : fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
+          choice_nonconst = physical_first ? &fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
+                                           : &fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
         }
 
-        const auto& choice = choice_nonconst;
+        const auto& choice = *choice_nonconst;
+        choice_nonconst = nullptr;
 
         // generate a candidate vertex
         bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
@@ -1054,7 +1055,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         calls++;
 
         // choose a volume
-        SampleableObject choice_nonconst;
+        const SampleableObject* choice_nonconst{};
         bool physical_first = true;
 
         if (fOnSurface) {
@@ -1069,8 +1070,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           physical_first = fFirstSamplingVolumeType == VolumeType::kPhysical;
 
 
-          choice_nonconst = physical_first ? fPhysicalVolumes.SurfaceWeightedRand()
-                                           : fGeomVolumeSolids.SurfaceWeightedRand();
+          choice_nonconst = physical_first ? &fPhysicalVolumes.SurfaceWeightedRand()
+                                           : &fGeomVolumeSolids.SurfaceWeightedRand();
         } else {
           // if both physical and geometrical volumes are present and order is
           // not set choose based on the total volume
@@ -1080,11 +1081,12 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
           else if (has_geometrical && not has_physical) physical_first = false;
           else physical_first = (fFirstSamplingVolumeType == VolumeType::kPhysical);
 
-          choice_nonconst = physical_first ? fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
-                                           : fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
+          choice_nonconst = physical_first ? &fPhysicalVolumes.VolumeWeightedRand(fWeightByMass)
+                                           : &fGeomVolumeSolids.VolumeWeightedRand(fWeightByMass);
         }
 
-        const auto& choice = choice_nonconst;
+        const auto& choice = *choice_nonconst;
+        choice_nonconst = nullptr;
 
         // generate a candidate vertex
         bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
@@ -1145,8 +1147,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
       }
 
       // chose a volume to sample from
-      const auto choice = fOnSurface ? fUnionVolumes.SurfaceWeightedRand()
-                                     : fUnionVolumes.VolumeWeightedRand(fWeightByMass);
+      const auto& choice = fOnSurface ? fUnionVolumes.SurfaceWeightedRand()
+                                      : fUnionVolumes.VolumeWeightedRand(fWeightByMass);
 
       // do the sampling
       bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
