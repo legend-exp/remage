@@ -177,14 +177,14 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         buffer_fraction=args.buffer_fraction,
         object_name=object_name,
     )
-    args.geometry = str(tmp_gdml_file)
-
-    macro_content = generate_macro(args, output_file_stem=output_file_stem)
-
-    if args.dry_run:
-        return 0
-
     try:
+        args.geometry = str(tmp_gdml_file)
+
+        macro_content = generate_macro(args, output_file_stem=output_file_stem)
+
+        if args.dry_run:
+            return 0
+
         # run remage
         ec, _ = remage_run(macros=macro_content)
 
