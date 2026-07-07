@@ -17,6 +17,8 @@
 
 #include "RMGGrabmayrGCReader.hh"
 
+#include <cstdlib>
+
 #include "G4Tokenizer.hh"
 #include "Randomize.hh"
 
@@ -70,14 +72,26 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
   } while (line[0] == '%' || (line.find("version") !=
                               std::string::npos)); // This could be outsourced to SetStartLocation
 
-  // parse line and return as struct
+  // parse line and return as struct. All fields are integers.
   GammaCascadeLine gamma_cascade{};
-  std::istringstream iss(line);
-  iss >> gamma_cascade.en >> gamma_cascade.ex >> gamma_cascade.m >> gamma_cascade.em;
+  const char* pos = line.c_str();
+  auto next_int = [&pos](G4int& out) {
+    char* endptr = nullptr;
+    const long val = std::strtol(pos, &endptr, 10);
+    if (endptr == pos) return false; // no digits consumed
+    pos = endptr;
+    out = static_cast<G4int>(val);
+    return true;
+  };
+
+  if (!next_int(gamma_cascade.en) || !next_int(gamma_cascade.ex) || !next_int(gamma_cascade.m) ||
+      !next_int(gamma_cascade.em)) {
+    RMGLog::Out(RMGLog::fatal, "Failed to parse gamma cascade header fields. Exit!");
+  }
   gamma_cascade.eg.reserve(gamma_cascade.m);
-  int eg_value = 0;
   for (int i = 0; i < gamma_cascade.m; i++) {
-    if (!(iss >> eg_value)) {
+    G4int eg_value = 0;
+    if (!next_int(eg_value)) {
       RMGLog::Out(RMGLog::fatal, "Failed to read gamma energy from file. Exit!");
     }
     gamma_cascade.eg.push_back(eg_value);
