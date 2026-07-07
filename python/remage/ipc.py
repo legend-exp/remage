@@ -105,6 +105,7 @@ def handle_ipc_message(
     """
     is_blocking = False
     msg = msg[0:-1]  # strip trailing ASCII GS ("group separator")
+    assert msg  # should be guaranteed from call site
     if msg[-1] == "\x05":  # ASCII ENQ ("enquiry")
         msg = msg[0:-1]
         is_blocking = True
@@ -117,9 +118,20 @@ def handle_ipc_message(
     ]
 
     # first field is process number.
-    assert len(fields) > 1
-    assert isinstance(fields[0], str)  # proc_id is always a single string, not a tuple
-    proc_num = int(fields[0])
+    if len(fields) < 2:
+        msg_err = f"malformed IPC message with too few records: {fields!r}"
+        raise ValueError(msg_err)
+    if not isinstance(fields[0], str):
+        # proc_id is always a single string, not a tuple
+        msg_err = f"malformed IPC message, process index is not scalar: {fields[0]!r}"
+        raise ValueError(msg_err)
+    try:
+        proc_num = int(fields[0])
+    except ValueError as e:
+        msg_err = (
+            f"malformed IPC message, process index is not an integer: {fields[0]!r}"
+        )
+        raise ValueError(msg_err) from e
     fields = fields[1:]
 
     msg_ret: list | None = fields
@@ -131,33 +143,40 @@ def handle_ipc_message(
             for p in proc:
                 p.send_signal(signal.SIGSTOP)
 
-        # handle blocking messages, if necessary.
-        if fields[0] == "ipc_available":
-            if fields[1] != __version__ and os.getenv("REMAGE_CPP_PATH") is None:
-                log.error(
-                    "remage-cpp version %s does not match python-wrapper version %s",
-                    fields[1],
-                    __version__,
-                )
-                is_fatal = True
-            msg_ret = None
-        elif fields[0] == "gdml":
-            from xml.dom.minidom import parse as minidom_parse
+        try:
+            # handle blocking messages, if necessary.
+            if fields[0] == "ipc_available":
+                if len(fields) < 2:
+                    msg_err = f"malformed 'ipc_available' message: {fields!r}"
+                    raise ValueError(msg_err)
+                if fields[1] != __version__ and os.getenv("REMAGE_CPP_PATH") is None:
+                    log.error(
+                        "remage-cpp version %s does not match python-wrapper version %s",
+                        fields[1],
+                        __version__,
+                    )
+                    is_fatal = True
+                msg_ret = None
+            elif fields[0] == "gdml":
+                from xml.dom.minidom import parse as minidom_parse
 
-            assert isinstance(fields[1], str)
-            try:
-                minidom_parse(fields[1])
-            except BaseException as pe:
-                log.error("invalid GDML file %s: %s", fields[1], pe)
-                is_fatal = True
-            msg_ret = None
-        else:
-            log.warning("Unhandled blocking IPC message %s", str(fields))
-
-        if len(proc) > 1:
-            # resume all C++ processes in multi-process mode.
-            for p in proc:
-                p.send_signal(signal.SIGCONT)
+                if len(fields) < 2 or not isinstance(fields[1], str):
+                    msg_err = f"malformed 'gdml' message: {fields!r}"
+                    raise ValueError(msg_err)
+                try:
+                    minidom_parse(fields[1])
+                except Exception as pe:
+                    log.error("invalid GDML file %s: %s", fields[1], pe)
+                    is_fatal = True
+                msg_ret = None
+            else:
+                log.warning("Unhandled blocking IPC message %s", str(fields))
+        finally:
+            if len(proc) > 1:
+                # resume all C++ processes in multi-process mode. Always runs,
+                # so an exception above cannot leave the workers stopped.
+                for p in proc:
+                    p.send_signal(signal.SIGCONT)
     return is_blocking, msg_ret, is_fatal, proc_num
 
 
@@ -212,15 +231,27 @@ def ipc_thread_fn(
                 # handle message buffer.
                 for _ in range(msg_buf.count(b"\x1d")):
                     msg_end = msg_buf.index(b"\x1d") + 1
+                    if msg_end < 1:
+                        msg_err = "received empty message"
+                        raise ValueError(msg_err)
                     # note: switching between binary and strting mode is safe here. ASCII
                     # bytes are binary equal to their utf-8 encoding, and their bytes will
                     # not be part of any utf-8 multibyte sequence.
                     msg = msg_buf[0:msg_end].decode("utf-8")
                     msg_buf = msg_buf[msg_end:]
 
-                    is_blocking, unhandled_msg, is_fatal, proc_id = handle_ipc_message(
-                        msg, proc
-                    )
+                    try:
+                        is_blocking, unhandled_msg, is_fatal, proc_id = (
+                            handle_ipc_message(msg, proc)
+                        )
+                    except Exception:
+                        # a malformed message must not silently kill this thread
+                        # and hang the run waiting for an ACK that never comes.
+                        log.exception(
+                            "failed to handle IPC message %r; terminating remage-cpp",
+                            msg,
+                        )
+                        is_fatal = True
                     if unhandled_msg is not None:
                         unhandled_ipc_messages.append(unhandled_msg)
                     if is_fatal:

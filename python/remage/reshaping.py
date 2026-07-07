@@ -80,15 +80,14 @@ def reshape_output(
         msg = "hit_files must be a single path or match stp_files in length"
         raise ValueError(msg)
 
-    for file_idx, (stp_file, hit_file) in enumerate(
-        zip(stp_files, hit_files_list, strict=True)
-    ):
+    # physical output paths that have already received at least one write.
+    written_files: set[str] = set()
+
+    for stp_file, hit_file in zip(stp_files, hit_files_list, strict=True):
         msg = f"processing {stp_file} -> {hit_file}"
         log.info(msg)
 
-        new_file = (
-            file_idx == 0 or hit_files_list[file_idx] != hit_files_list[file_idx - 1]
-        )
+        new_file = str(hit_file) not in written_files
         written_tables: set[str] = set()
         # number of detector tables already written to this hit file; drives the
         # "first write creates the file, the rest append a column" logic
@@ -152,6 +151,11 @@ def reshape_output(
             wo_mode = _get_wo_mode_forwarded(written_tables, new_file, overwrite)
             lh5.write(lh5.read(obj, stp_file), obj, hit_file, wo_mode=wo_mode)
             written_tables.add(obj)
+
+        # mark this output path as created once anything was written to it, so a
+        # later stp file merging into the same hit file appends.
+        if written_tables:
+            written_files.add(str(hit_file))
 
 
 def _get_wo_mode(

@@ -19,12 +19,13 @@ import argparse
 import contextlib
 import logging
 import os
-import random
 import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import threading
+import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -67,8 +68,11 @@ def _run_remage_cpp(
         # but is is expanded (by the kernel?), so find out if we are in $PATH.
         argv[0] = exe_name
 
-    if any("--pipe-fd" in av for av in argv[1:]):
-        msg = "cannot pass internal argument --pipe-fd"
+    if any(
+        av.startswith(("--pipe-o-fd", "--pipe-i-fd", "--proc-num-offset"))
+        for av in argv[1:]
+    ):
+        msg = "cannot pass internal arguments --pipe-o-fd/--pipe-i-fd/--proc-num-offset"
         raise RuntimeError(msg)
 
     # add our own version so that remage-cpp can check for it.
@@ -120,34 +124,51 @@ def _run_remage_cpp(
         signal.SIGWINCH,
     ]
 
-    old_signal_handlers = [signal.signal(sig, new_signal_handler) for sig in signals]
+    # signal.signal() can only be called from the main thread
+    install_signal_handlers = threading.current_thread() is threading.main_thread()
+    if not install_signal_handlers:
+        logger.warning(
+            "not running on the main thread; OS signals will not be propagated to remage-cpp"
+        )
 
-    # start a thread listening for IPC messages.
+    # setup a thread listening for IPC messages.
     # remage-cpp will only continue to do real work after we handled one sync message.
     unhandled_ipc_messages: list = []
     ipc_thread = threading.Thread(
         target=ipc_thread_fn, args=(pipe_i_r, pipes_o, proc, unhandled_ipc_messages)
     )
-    ipc_thread.start()
 
     enable_watchdog_thread = (
         len(proc) > 1 and os.getenv("RMG_IPC_DISABLE_WATCHDOG") != "1"
     )
-    if enable_watchdog_thread:
-        watchdog_thread = threading.Thread(target=watchdog_thread_fn, args=(proc,))
-        watchdog_thread.start()
+    watchdog_thread = (
+        threading.Thread(target=watchdog_thread_fn, args=(proc,))
+        if enable_watchdog_thread
+        else None
+    )
 
-    # wait for C++ executable to finish.
-    for p in proc:
-        p.wait()
+    old_signal_handlers: list = []
+    try:
+        if install_signal_handlers:
+            old_signal_handlers = [
+                signal.signal(sig, new_signal_handler) for sig in signals
+            ]
 
-    # restore signal handlers again, before running more python code.
-    for sig, handler in zip(signals, old_signal_handlers, strict=True):
-        signal.signal(sig, handler)
+        ipc_thread.start()
+        if watchdog_thread is not None:
+            watchdog_thread.start()
+
+        # wait for C++ executable to finish.
+        for p in proc:
+            p.wait()
+    finally:
+        # restore signal handlers again, before running more python code.
+        for sig, handler in zip(signals, old_signal_handlers, strict=False):
+            signal.signal(sig, handler)
 
     # close the IPC pipe and end IPC handling.
     ipc_thread.join()
-    if enable_watchdog_thread:
+    if watchdog_thread is not None:
         watchdog_thread.join()
 
     ec = [128 - p.returncode if p.returncode < 0 else p.returncode for p in proc]
@@ -174,21 +195,29 @@ def watchdog_thread_fn(proc: list[subprocess.Popen]) -> None:
     if len(proc) <= 1:
         return
 
-    try:
-        while True:
-            os.waitid(os.P_ALL, 0, os.WEXITED | os.WNOWAIT)
+    while True:
+        alive = False
+        failed = False
+        # poll the tracked workers only, so unrelated children of the host
+        # process cannot make us busy-spin or hang forever.
+        for p in proc:
+            rc = p.poll()
+            if rc is None:
+                alive = True
+            elif rc not in (0, 2):
+                failed = True
 
-            # determine which process exited. This calls wait again (I guess)
+        if failed:
             for p in proc:
-                p.poll()
-                if p.returncode is not None and p.returncode < 0:
-                    for p2 in proc:
-                        if p2.returncode is None:
-                            p2.send_signal(signal.SIGTERM)
-                    break
-    except ChildProcessError:
-        # error ECHILD means that we have no children left to wait for.
-        pass
+                if p.poll() is None:
+                    p.send_signal(signal.SIGTERM)
+            return
+
+        if not alive:
+            # all workers have exited (all successfully / with warnings only).
+            return
+
+        time.sleep(0.05)
 
 
 def _cleanup_tmp_files(
@@ -267,12 +296,17 @@ def remage_run(
     args = []
     extra_tmp_files = []
 
+    def _is_pyg4_registry(obj: object) -> bool:
+        # A Registry can only exist if the caller already imported pyg4ometry
+        g4 = sys.modules.get("pyg4ometry.geant4")
+        return g4 is not None and isinstance(obj, g4.Registry)
+
     def _geom_to_file(geom_or_file: str | Path | g4.Registry) -> str:
-        # check for the type without actually importing.
-        if str(type(geom_or_file)) == "<class 'pyg4ometry.geant4.Registry.Registry'>":
+        if _is_pyg4_registry(geom_or_file):
             from pygeomtools import write_pygeom
 
-            tmp_file = f".rmg-tmp-{random.randint(10000, 99999)}.geom.gdml"
+            fd, tmp_file = tempfile.mkstemp(suffix=".geom.gdml", dir=".")
+            os.close(fd)
             write_pygeom(geom_or_file, tmp_file)
             extra_tmp_files.append(tmp_file)
             return tmp_file
@@ -391,7 +425,12 @@ def remage_run_from_args(
     ec_list, termsig, ipc_info = _run_remage_cpp(
         cpp_args, is_cli=args is None, num_procs=py_args.procs
     )
-    ec: int = 1 if 1 in ec_list else max(ec_list)
+    # aggregate worker exit codes by severity: any real failure (a code other
+    # than 0 "success" or 2 "warnings only") dominates, and among those we keep
+    # the largest (e.g. 134/SIGABRT over 1). Otherwise fall back to the largest
+    # of the benign codes (2 "warnings" over 0 "success").
+    severe = [e for e in ec_list if e not in (0, 2)]
+    ec: int = max(severe) if severe else max(ec_list)
 
     # print an error message for the termination signal, similar to what bash does.
     for proc_num, t in enumerate(termsig):
@@ -407,7 +446,12 @@ def remage_run_from_args(
     _cleanup_tmp_files(ipc_info, extra_tmp_files)
 
     if "-h" in cpp_args or "--help" in cpp_args:
-        print("\n".join(parser.format_help().split("\n")[3:]))  # noqa: T201
+        # append the python-wrapper-only options to remage-cpp's own --help
+        # output. Drop argparse's leading "usage:" block (everything up to the
+        # first blank line)
+        help_text = parser.format_help()
+        _, sep, options_text = help_text.partition("\n\n")
+        print(options_text if sep else help_text, end="")  # noqa: T201
 
     if ec not in [0, 2]:
         # remage had an error (::fatal -> ec==134 (SIGABRT); ::error -> ec==1)

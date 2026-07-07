@@ -22,14 +22,11 @@ import sys
 import colorlog
 from rich.traceback import install as install_rich_traceback
 
-_ORIGINAL_EXCEPTHOOK = sys.excepthook
 _TRACEBACK_INSTALLED = False
+# excepthook that was in place immediately before we installed rich's, so we can
+# restore exactly that (and not clobber a hook the host app installed later).
+_SAVED_EXCEPTHOOK: object = None
 DETAIL = 11
-
-# monkey-patch Logger to add the .detail(...) method
-logging.Logger.detail = lambda self, msg, *args, **kwargs: self.log(  # type: ignore[attr-defined]
-    DETAIL, msg, *args, **kwargs
-)
 
 
 LEVELS_RMG_TO_PY = {
@@ -64,6 +61,13 @@ def setup_log() -> logging.Logger:
     logger = logging.getLogger("remage")
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
+
+    # add a .detail(...) helper to the remage logger instance only, rather than
+    # monkey-patching the stdlib logging.Logger class for the whole process.
+    if not hasattr(logger, "detail"):
+        logger.detail = lambda msg, *args, **kwargs: logger.log(  # type: ignore[attr-defined]
+            DETAIL, msg, *args, **kwargs
+        )
 
     # Avoid adding duplicate handlers if setup_log() is called multiple times.
     if not any(getattr(h, "_remage_default_handler", False) for h in logger.handlers):
@@ -111,16 +115,22 @@ def supports_color() -> bool:
 
 
 def set_logging_level(logger, rmg_log_level):
-    global _TRACEBACK_INSTALLED  # noqa: PLW0603
+    global _TRACEBACK_INSTALLED, _SAVED_EXCEPTHOOK  # noqa: PLW0603
 
     log_level = LEVELS_RMG_TO_PY[rmg_log_level.capitalize()]
     logger.setLevel(log_level)
 
     if log_level <= logging.DEBUG and not _TRACEBACK_INSTALLED:
+        # snapshot the current hook right before overriding it, so we restore
+        # whatever was active (possibly a host app's hook) rather than a stale
+        # snapshot taken at import time.
+        _SAVED_EXCEPTHOOK = sys.excepthook
         install_rich_traceback(show_locals=True, suppress=[logging])
         _TRACEBACK_INSTALLED = True
 
-    # if back above DEBUG → restore original hook
+    # if back above DEBUG → restore the hook we replaced
     if log_level > logging.DEBUG and _TRACEBACK_INSTALLED:
-        sys.excepthook = _ORIGINAL_EXCEPTHOOK
+        if _SAVED_EXCEPTHOOK is not None:
+            sys.excepthook = _SAVED_EXCEPTHOOK
+        _SAVED_EXCEPTHOOK = None
         _TRACEBACK_INSTALLED = False
