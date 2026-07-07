@@ -113,12 +113,15 @@ set(PROJECT_SOURCES
     ${_root}/src/RMGVertexOutputScheme.cc
     ${_root}/src/RMGStagingScheme.cc)
 
-# Write RMGConfig.hh
-# no need to install, it is included in the header list above
+# Write generated headers into the build tree (not the source tree) so that
+# multiple out-of-source builds sharing one checkout don't clobber each other
+# and the source tree stays clean. They are added to the build include path and
+# installed explicitly below.
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGConfig.hh.in
-               ${PROJECT_SOURCE_DIR}/include/RMGConfig.hh @ONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/include/RMGConfig.hh @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/RMGVersion.hh.in
-               ${PROJECT_SOURCE_DIR}/include/RMGVersion.hh @ONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/include/RMGVersion.hh @ONLY)
 
 if(BxDecay0_FOUND)
   list(APPEND PROJECT_PUBLIC_HEADERS ${_root}/include/RMGGeneratorDecay0.hh)
@@ -140,8 +143,11 @@ target_compile_features(remage PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 # for initial C++20 compatibility with a C++17 compiled ROOT image. TODO: remove later
 target_compile_options(remage PRIVATE -Wno-cpp)
 
-target_include_directories(remage PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-                                         $<INSTALL_INTERFACE:include/remage>)
+target_include_directories(
+  remage
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
+         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+         $<INSTALL_INTERFACE:include/remage>)
 
 # link against dependent libraries
 target_link_libraries(
@@ -223,6 +229,11 @@ install(
   DIRECTORY ../include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/remage
   PATTERN EcoMug EXCLUDE)
+
+# install generated headers (written into the build tree, see above)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/RMGConfig.hh
+              ${CMAKE_CURRENT_BINARY_DIR}/include/RMGVersion.hh
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/remage)
 
 # install CLI binaries
 install(TARGETS remage-cli-cpp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
