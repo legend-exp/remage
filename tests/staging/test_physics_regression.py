@@ -78,7 +78,7 @@ def _run_macros_in_parallel(jobs: list[tuple[str, str]]) -> None:
     # Use spawn to avoid inheriting fragile state from the parent test process.
     context = mp.get_context("spawn")
     max_workers = (
-        int(min(len(jobs), (mp.cpu_count() / 2) // 10)) if mp.cpu_count() > 1 else 1
+        int(min(len(jobs), (mp.cpu_count() / 2) // 10)) if mp.cpu_count() > 20 else 1
     )
     with ProcessPoolExecutor(max_workers=max_workers, mp_context=context) as executor:
         futures = {executor.submit(_run_macro_job, job): job[0] for job in jobs}

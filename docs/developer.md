@@ -159,7 +159,7 @@ the page.
 ```console
 $ ctest --print-labels # see all defined test labels
 $ ctest -L vis # run only tests with label "vis"
-$ ctest -R basics-mt/print-volumes.mac # run only this test
+$ ctest -R hades-mt/print-volumes.mac # run only this test
 $ ctest -V # show test output
 $ ctest --output-on-failure # show test output only if test fails
 ```

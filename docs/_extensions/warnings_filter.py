@@ -69,7 +69,7 @@ def configure(app: Sphinx) -> None:
     with Path(app.config.warnings_filter_config).open() as f:
         expressions = []
         for line in f.readlines():
-            if not line.startswith("#"):
+            if line.strip() and not line.startswith("#"):
                 expressions.append(line.rstrip())
 
     # install warnings filter to all the Sphinx logger handlers
