@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "**.md"
   release:
     types:
       - published
@@ -13,6 +15,9 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   FORCE_COLOR: 3
