@@ -22,6 +22,7 @@ RUN mkdir -p src build /opt/remage && \
             | tar --strip-components 1 -C src --strip=1 -x -z; \
     fi && \
     cd build && \
+    export SETUPTOOLS_SCM_PRETEND_VERSION="${REMAGE_VERSION_SET}" && \
     cmake \
         -DCMAKE_INSTALL_PREFIX="/opt/remage" \
         -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" \
