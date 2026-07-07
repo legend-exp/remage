@@ -7,9 +7,12 @@ set(_supported_components @remage_components@)
 foreach(_comp ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
   if (NOT _comp IN_LIST _supported_components)
     set(@CMAKE_PROJECT_NAME@_FOUND False)
-    set(@CMAKE_PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}. Recompile remage with the corresponding option.")
+    list(APPEND _unsupported_components ${_comp})
   endif()
 endforeach()
+if(_unsupported_components)
+  set(@CMAKE_PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component(s): ${_unsupported_components}. Recompile remage with the corresponding option(s).")
+endif()
 
 # now look for remage dependencies as well, with the correct components remage was compiled with
 include(CMakeFindDependencyMacro)
@@ -24,7 +27,10 @@ if(@BxDecay0_FOUND@)
     find_dependency(BxDecay0 @RMG_BXDECAY0_MINIMUM_VERSION@ REQUIRED COMPONENTS Geant4)
 endif()
 
-find_dependency(fmt REQUIRED)
+# remage's public headers use fmt, which is vendored via FetchContent at build
+# time (pinned to 11.2.0) but not installed. Require downstream consumers to
+# supply at least that version so the public API stays ABI/API-compatible.
+find_dependency(fmt 11.2.0 REQUIRED)
 
 # finally import targets.
 include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")

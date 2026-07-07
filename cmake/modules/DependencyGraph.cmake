@@ -82,7 +82,7 @@ function(gen_dep_graph OUTPUT_TYPE)
       COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
               --graphviz=${CMAKE_CURRENT_BINARY_DIR}/graphviz/${target_name}.dot
       COMMAND ${DOT_EXE} -T${OUTPUT_TYPE} ${CMAKE_CURRENT_BINARY_DIR}/graphviz/${target_name}.dot
-              -o $ {out_file})
+              -o ${out_file})
 
     add_custom_command(
       TARGET ${target_name}

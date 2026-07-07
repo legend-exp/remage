@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 
 if(WIN32)
   message(FATAL_ERROR "remage is not supported on Windows")
@@ -39,8 +39,6 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(STATUS "and run CMake from there")
   message(FATAL_ERROR "in-source build detected")
 endif()
-
-include(Colors)
 
 # get install directories names
 include(GNUInstallDirs)
@@ -106,10 +104,7 @@ if(Geant4_hdf5_FOUND)
   list(APPEND remage_components HDF5)
   # need to find HDF5 with CXX again, as Geant4 does not initialize this before,
   # even when built with HDF5 enabled.
-  find_package(
-    HDF5
-    COMPONENTS CXX
-    REQUIRED)
+  find_package(HDF5 COMPONENTS CXX)
   if(NOT HDF5_FOUND)
     message(STATUS "HDF5 lacks C++ support - disabling feature")
     set(RMG_HAS_HDF5 0)
@@ -237,13 +232,8 @@ if(RMG_BUILD_DOCS)
   add_subdirectory(docs/validation)
 endif()
 
-if(Geant4_VERSION VERSION_LESS_EQUAL "11.1.0" AND BUILD_TESTING)
-  message(WARNING "full support for the test suite is available with Geant4 >= 11.1 , "
-                  "set BUILD_TESTING=OFF to suppress this warning")
-endif()
-
-message(STATUS "Test/validation suite support: BUILD_TESTING=${BUILD_TESTING}")
 include(CTest)
+message(STATUS "Test/validation suite support: BUILD_TESTING=${BUILD_TESTING}")
 add_subdirectory(tests)
 
 # export targets for dependent projects

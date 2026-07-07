@@ -1,8 +1,5 @@
-# create the virtual environment with python-venv and install setuptools-scm
-option(RMG_VERSION_SCM_USE_VENV "use venv and uv for setuptools-scm" ON)
-
-set(_scm_python_cmd "python")
-
+# get the project version from setuptools-scm. If no system setuptools-scm is
+# available, bootstrap it into a dedicated virtual environment via pip.
 find_program(PROG_SETUPTOOLS_SCM setuptools-scm)
 
 if(NOT PROG_SETUPTOOLS_SCM)
