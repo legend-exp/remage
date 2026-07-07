@@ -107,25 +107,27 @@ void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
   file.seekg(0, std::ios::beg); // move to beginning of file
   // Skip Header
   std::string line;
-  int header_length = 0;
   do { // NOLINT(cppcoreguidelines-avoid-do-while)
     std::getline(file, line);
-    header_length++;
   } while (line[0] == '%' || (line.find("version") != std::string::npos));
 
   // In case the Random start location macro is set
   if (fGammaCascadeRandomStartLocation) {
-    int n_entries_in_file = 0;
-    // Seems excessiv to read through the entire file, there has to be a quicker way?
-    while (std::getline(file, line)) n_entries_in_file++;
+    // Single pass over the remaining entries, recording each line's stream offset, so we can
+    // seek straight to a random entry instead of rewinding and re-reading from the top.
+    std::vector<std::streampos> entry_offsets;
+    std::streampos offset = file.tellg();
+    while (std::getline(file, line)) {
+      entry_offsets.push_back(offset);
+      offset = file.tellg();
+    }
+    file.clear(); // clear EOF flag
 
-    file.clear();                 // clear EOF flag
-    file.seekg(0, std::ios::beg); // move to beginning of file
-
-    int start_location = (int)(n_entries_in_file * G4UniformRand() + header_length);
-
-    RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
-    for (int j = 0; j < start_location; j++) std::getline(file, line);
+    if (!entry_offsets.empty()) {
+      const std::size_t start_location = (std::size_t)(entry_offsets.size() * G4UniformRand());
+      RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
+      file.seekg(entry_offsets[start_location]);
+    }
   }
 }
 
