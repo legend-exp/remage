@@ -195,21 +195,29 @@ def watchdog_thread_fn(proc: list[subprocess.Popen]) -> None:
     if len(proc) <= 1:
         return
 
-    try:
-        while True:
-            os.waitid(os.P_ALL, 0, os.WEXITED | os.WNOWAIT)
+    while True:
+        alive = False
+        failed = False
+        # poll the tracked workers only, so unrelated children of the host
+        # process cannot make us busy-spin or hang forever.
+        for p in proc:
+            rc = p.poll()
+            if rc is None:
+                alive = True
+            elif rc not in (0, 2):
+                failed = True
 
-            # determine which process exited. This calls wait again (I guess)
+        if failed:
             for p in proc:
-                p.poll()
-                if p.returncode is not None and p.returncode < 0:
-                    for p2 in proc:
-                        if p2.returncode is None:
-                            p2.send_signal(signal.SIGTERM)
-                    break
-    except ChildProcessError:
-        # error ECHILD means that we have no children left to wait for.
-        pass
+                if p.poll() is None:
+                    p.send_signal(signal.SIGTERM)
+            return
+
+        if not alive:
+            # all workers have exited (all successfully / with warnings only).
+            return
+
+        time.sleep(0.05)
 
 
 def _cleanup_tmp_files(
