@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> file_names;
   std::string ntuple_group_name = "stp";
 
-  CLI::App app{"remage-from-lh5: convert HDF5 file output files in-place to LH5"};
+  CLI::App app{"remage-from-lh5: convert LH5 files in-place to the Geant4 HDF5 format"};
   app.add_flag("-v", verbosity, "Increase verbosity");
   app.add_flag("-n,--dry-run", dry_run, "Do not modify the on-disk files, only test the changes (on a full in-memory copy of the file)");
   app.add_option("--ntuple-group", ntuple_group_name, "HDF5 group name that remage was instructed to use")
