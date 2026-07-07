@@ -204,7 +204,7 @@ def watchdog_thread_fn(proc: list[subprocess.Popen]) -> None:
             rc = p.poll()
             if rc is None:
                 alive = True
-            elif rc not in (0, 2):
+            elif rc < 0:  # fatal errors have SIGABRT.
                 failed = True
 
         if failed:
