@@ -296,9 +296,13 @@ def remage_run(
     args = []
     extra_tmp_files = []
 
+    def _is_pyg4_registry(obj: object) -> bool:
+        # A Registry can only exist if the caller already imported pyg4ometry
+        g4 = sys.modules.get("pyg4ometry.geant4")
+        return g4 is not None and isinstance(obj, g4.Registry)
+
     def _geom_to_file(geom_or_file: str | Path | g4.Registry) -> str:
-        # check for the type without actually importing.
-        if str(type(geom_or_file)) == "<class 'pyg4ometry.geant4.Registry.Registry'>":
+        if _is_pyg4_registry(geom_or_file):
             from pygeomtools import write_pygeom
 
             fd, tmp_file = tempfile.mkstemp(suffix=".geom.gdml", dir=".")
