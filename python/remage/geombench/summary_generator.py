@@ -72,8 +72,6 @@ class SummaryGenerator:
         Reconstruct 3D using multiplication of normalized projections.
         This assumes independence and that hotspots must appear in all views.
         """
-        map_3d = np.ones((self.n_x_gridpoint, self.n_y_gridpoint, self.n_z_gridpoint))
-
         # Normalize each projection
         xy_norm = np.array(self.data_xy["time"]).reshape(
             self.n_y_gridpoint, self.n_x_gridpoint
@@ -90,13 +88,17 @@ class SummaryGenerator:
         )
         yz_norm = yz_norm / np.max(yz_norm) if np.max(yz_norm) > 0 else yz_norm
 
-        # Multiply projections (back-project and multiply)
-        for ix in range(self.n_x_gridpoint):
-            for iy in range(self.n_y_gridpoint):
-                for iz in range(self.n_z_gridpoint):
-                    map_3d[ix, iy, iz] = (
-                        xy_norm[iy, ix] * xz_norm[iz, ix] * yz_norm[iz, iy]
-                    )
+        # Multiply projections (back-project and multiply) via broadcasting.
+        # Result axes are (ix, iy, iz); each projection is transposed so its two
+        # active axes line up and the missing axis is added as a length-1 dim:
+        #   xy_norm[iy, ix] -> (ix, iy, 1)
+        #   xz_norm[iz, ix] -> (ix, 1, iz)
+        #   yz_norm[iz, iy] -> (1, iy, iz)
+        map_3d = (
+            xy_norm.T[:, :, np.newaxis]
+            * xz_norm.T[:, np.newaxis, :]
+            * yz_norm.T[np.newaxis, :, :]
+        )
 
         self.mult_map_3d = map_3d
 
