@@ -5,7 +5,6 @@ import sys
 import h5py
 
 dump_lh5_datatype = len(sys.argv) > 2 and sys.argv[2] == "--dump-attrs"
-hfile = h5py.File(sys.argv[1], "r")
 
 
 def visit(name: str):
@@ -15,4 +14,5 @@ def visit(name: str):
         print(name)
 
 
-hfile.visit(visit)
+with h5py.File(sys.argv[1], "r") as hfile:
+    hfile.visit(visit)

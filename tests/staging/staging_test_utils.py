@@ -6,6 +6,7 @@ import time
 import awkward as ak
 import lh5
 import numpy as np
+from lh5.io.exceptions import LH5DecodeError
 from remage import remage_run
 
 
@@ -40,14 +41,16 @@ def run_macro(
 def read_tracks(output: str):
     try:
         return lh5.read_as("tracks", output, library="ak")
-    except Exception:
+    except LH5DecodeError:
+        # table absent from the output (e.g. no such stage recorded)
         return None
 
 
 def read_detector_steps(output: str, detector: str = "detector_phys"):
     try:
         return lh5.read_as(f"stp/{detector}", output, library="ak")
-    except Exception:
+    except LH5DecodeError:
+        # table absent from the output (e.g. no such stage recorded)
         return None
 
 

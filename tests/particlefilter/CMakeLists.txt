@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh run-test-*.py)
+  macros/* gdml/*.gdml gdml/*.xml run-test-*.sh run-test-*.py particlefilter_utils.py)
 
 # copy them to the build area
 foreach(_file ${_aux})
