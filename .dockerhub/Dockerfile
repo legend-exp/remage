@@ -14,7 +14,8 @@ WORKDIR /root
 RUN mkdir -p src build /opt/remage && \
     if [ "${REMAGE_VERSION}" = "dev" ]; then \
         rm -rf src && \
-        git clone "https://github.com/legend-exp/remage" src && \
+        git clone -b main --single-branch "https://github.com/legend-exp/remage.git" src && \
+        git -C src fetch --tags && \
         REMAGE_VERSION_SET="$(git -C src describe --tags | sed 's/^v//')"; \
     else \
         REMAGE_VERSION_SET="$(echo $REMAGE_VERSION | sed 's/^v//')" && \
@@ -22,7 +23,6 @@ RUN mkdir -p src build /opt/remage && \
             | tar --strip-components 1 -C src --strip=1 -x -z; \
     fi && \
     cd build && \
-    export SETUPTOOLS_SCM_PRETEND_VERSION="${REMAGE_VERSION_SET}" && \
     cmake \
         -DCMAKE_INSTALL_PREFIX="/opt/remage" \
         -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" \
