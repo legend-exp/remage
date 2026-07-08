@@ -99,7 +99,11 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
   G4IonTable* theTable = G4IonTable::GetIonTable();
 
   auto particleDef_nuc = theTable->GetIon(z, a + 1, (double)(input.em * u::keV));
-  auto particle_nuc = new G4DynamicParticle(particleDef_nuc, G4RandomDirection());
+  auto particle_nuc = new G4DynamicParticle(
+      particleDef_nuc,
+      /* aMomentumDirection */ G4RandomDirection(),
+      /* aKineticEnergy */ 0.0
+  );
   auto secondary_nuc = new G4Track(particle_nuc, time, location);
 
   // secondary_nuc->SetCreatorModelID(idModel); No idea what this should be. Not relevant?
@@ -109,11 +113,14 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
 
   auto particleDef_gamma = G4Gamma::Gamma();
   for (const G4int energy : input.eg) {
-    auto particle_gamma = new G4DynamicParticle(particleDef_gamma, energy * u::keV, G4RandomDirection());
+    auto particle_gamma = new G4DynamicParticle(
+        particleDef_gamma,
+        /* aMomentumDirection */ G4RandomDirection(),
+        /* aKineticEnergy */ energy * u::keV
+    );
     auto secondary_gamma = new G4Track(particle_gamma, time, location);
     secondary_gamma->SetWeight(fWeight);
     secondary_gamma->SetTouchableHandle(aTrack.GetTouchableHandle());
-    secondary_gamma->SetKineticEnergy(energy * u::keV);
     theTotalResult->AddSecondary(secondary_gamma);
   }
 
