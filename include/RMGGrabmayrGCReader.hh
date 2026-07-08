@@ -33,7 +33,8 @@
  *
  * All energies are in keV. @c em is the energy not accounted for by the listed @c eg
  * photons (e.g. carried away by internal conversion electrons or unresolved low-energy
- * transitions); it is intended to be deposited locally by @ref RMGNeutronCaptureProcess.
+ * transitions). @ref RMGNeutronCaptureProcess assigns it as the initial nuclear excitation
+ * energy of the recoil ion, so it is subsequently released by the Geant4 de-excitation model.
  */
 struct GammaCascadeLine {
     G4int en;              ///< Neutron kinetic energy bin [keV].
