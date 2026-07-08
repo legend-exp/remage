@@ -315,6 +315,22 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     }
   }
 
+  // copy birks constant from material properties, as it cannot be specified in GDML.
+  for (G4Material* mat : *G4Material::GetMaterialTable()) {
+    auto mpt = mat->GetMaterialPropertiesTable();
+    if (!mpt) continue;
+    if (!mpt->ConstPropertyExists("BIRKSCONSTANT")) continue;
+
+    G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
+    mat->GetIonisation()->SetBirksConstant(bc);
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "Birks constant of material {} set to {} mm/MeV from GDML",
+        mat->GetName(),
+        bc / (CLHEP::mm / CLHEP::MeV)
+    );
+  }
+
   return fWorld;
 }
 
@@ -432,22 +448,6 @@ void RMGHardware::ConstructSDandField() {
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
 
   fActiveDetectorsInitialized = true;
-
-  // copy birks constant from material properties, as it cannot be specified in GDML
-  for (G4Material* mat : *G4Material::GetMaterialTable()) {
-    auto mpt = mat->GetMaterialPropertiesTable();
-    if (!mpt) continue;
-    if (!mpt->ConstPropertyExists("BIRKSCONSTANT")) continue;
-
-    G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
-    mat->GetIonisation()->SetBirksConstant(bc);
-    RMGLog::OutFormat(
-        RMGLog::debug,
-        "Birks constant of material {} set to {} mm/MeV from GDML",
-        mat->GetName(),
-        bc / (CLHEP::mm / CLHEP::MeV)
-    );
-  }
 }
 
 void RMGHardware::StageDetector(
