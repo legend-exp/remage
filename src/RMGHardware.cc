@@ -92,6 +92,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         had_mapping = true;
 
         auto det_type_str = aux.value;
+        if (det_type_str.empty()) {
+          RMGLog::Out(RMGLog::fatal, "empty RMG_detector type value in GDML aux structure");
+        }
         det_type_str[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
         const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
 
@@ -140,8 +143,8 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // Check for overlaps, but with no verbose output.
     if (!fGDMLDisableOverlapCheck) {
       RMGLog::Out(RMGLog::summary, "Checking for overlaps in GDML geometry...");
-      auto test_vol = new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
-      test_vol->TestOverlapInTree();
+      G4GeomTestVolume test_vol(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
+      test_vol.TestOverlapInTree();
     }
 #else
     RMGLog::OutDev(RMGLog::fatal, "GDML support is not available!");
@@ -312,6 +315,22 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     }
   }
 
+  // copy birks constant from material properties, as it cannot be specified in GDML.
+  for (G4Material* mat : *G4Material::GetMaterialTable()) {
+    auto mpt = mat->GetMaterialPropertiesTable();
+    if (!mpt) continue;
+    if (!mpt->ConstPropertyExists("BIRKSCONSTANT")) continue;
+
+    G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
+    mat->GetIonisation()->SetBirksConstant(bc);
+    RMGLog::OutFormat(
+        RMGLog::debug,
+        "Birks constant of material {} set to {} mm/MeV from GDML",
+        mat->GetName(),
+        bc / (CLHEP::mm / CLHEP::MeV)
+    );
+  }
+
   return fWorld;
 }
 
@@ -429,22 +448,6 @@ void RMGHardware::ConstructSDandField() {
   RMGLog::OutFormat(RMGLog::debug, "List of activated detectors: [{}]", vec_repr);
 
   fActiveDetectorsInitialized = true;
-
-  // copy birks constant from material properties, as it cannot be specified in GDML
-  for (G4Material* mat : *G4Material::GetMaterialTable()) {
-    auto mpt = mat->GetMaterialPropertiesTable();
-    if (!mpt) continue;
-    if (!mpt->ConstPropertyExists("BIRKSCONSTANT")) continue;
-
-    G4double bc = mpt->GetConstProperty("BIRKSCONSTANT");
-    mat->GetIonisation()->SetBirksConstant(bc);
-    RMGLog::OutFormat(
-        RMGLog::debug,
-        "Birks constant of material {} set to {} mm/MeV from GDML",
-        mat->GetName(),
-        bc / (CLHEP::mm / CLHEP::MeV)
-    );
-  }
 }
 
 void RMGHardware::StageDetector(

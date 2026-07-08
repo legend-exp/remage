@@ -16,6 +16,8 @@
 #ifndef _RMG_EXCEPTION_HANDLER_HH_
 #define _RMG_EXCEPTION_HANDLER_HH_
 
+#include <atomic>
+
 #include "G4ExceptionHandler.hh"
 
 /**
@@ -52,8 +54,9 @@ class RMGExceptionHandler : public G4ExceptionHandler {
 
   private:
 
-    bool fHadWarning = false;
-    bool fHadError = false;
+    // shared for all threads.
+    inline static std::atomic<bool> fHadWarning = false;
+    inline static std::atomic<bool> fHadError = false;
 };
 
 #endif

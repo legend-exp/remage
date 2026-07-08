@@ -39,7 +39,7 @@
 
 // ---------------------------------------------------------
 
-#include <cstdarg>
+#include <atomic>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -186,15 +186,15 @@ class RMGLog {
 
     /**
      * Specifies whether there were output printouts already */
-    static bool fFirstOutputDone;
+    static std::atomic<bool> fFirstOutputDone;
 
     /**
      * Specifies whether there was any warning logged yet */
-    static bool fHadWarning;
+    static std::atomic<bool> fHadWarning;
 
     /**
      * Specifies whether there was any error logged yet */
-    static bool fHadError;
+    static std::atomic<bool> fHadError;
 
     /**
      * Include a prefix before each message? */

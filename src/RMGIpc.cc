@@ -15,6 +15,7 @@
 
 #include "RMGIpc.hh"
 
+#include <mutex>
 #include <poll.h>
 #include <unistd.h>
 
@@ -60,10 +61,25 @@ bool RMGIpc::SendIpcBlocking(std::string msg) {
   // wait for result.
   pollfd pfd{.fd = fIpcFdIn, .events = POLLIN, .revents = 0};
 
-  const int timeout = 10000; // microseconds
-  int ready = 0;
-  ready = poll(&pfd, 1, timeout);
-  while ((ready == -1 && errno == EINTR) || ready == 0) { ready = poll(&pfd, 1, timeout); }
+  const int timeout_ms = 10000; // milliseconds (poll() takes ms)
+  // bound the total wait: give up after this many consecutive timeouts, so an unresponsive
+  // python-wrapper peer cannot hang the (master) process forever.
+  const int max_timeouts = 6;
+  int timeouts = 0;
+  while (true) {
+    int ready = poll(&pfd, 1, timeout_ms);
+    if (ready > 0) break; // ACK data is available to read.
+    if (ready < 0) {
+      if (errno == EINTR) continue; // interrupted by a signal, retry.
+      RMGLog::Out(RMGLog::error, "IPC error: poll failed with errno=", errno);
+      return false;
+    }
+    // ready == 0: genuine timeout.
+    if (++timeouts >= max_timeouts) {
+      RMGLog::Out(RMGLog::error, "IPC error: timed out waiting for ACK from python wrapper");
+      return false;
+    }
+  }
   char ack[2] = "";
   auto acklen = read(fIpcFdIn, ack, sizeof(ack));
   if (acklen != 1 || ack[0] != '\x06') {
@@ -84,17 +100,22 @@ bool RMGIpc::SendIpcNonBlocking(std::string msg) {
     return false;
   }
 
-  auto len = write(fIpcFdOut, msg.c_str(), msg.size());
+  // Serialize writes: multiple worker threads may share the same IPC fd, and a message is only
+  // valid as a whole (framed by a trailing \x1d). Interleaving would corrupt the stream.
+  static std::mutex write_mutex;
+  std::lock_guard<std::mutex> lock(write_mutex);
 
-  if (len < 0) {
-    RMGLog::Out(RMGLog::error, "IPC message transmit failed with errno=", errno);
-    return false;
-  }
-
-  if ((size_t)len != msg.size()) {
-    // TODO: better handle this case.
-    RMGLog::Out(RMGLog::error, "IPC message not fully transmitted. missing=", msg.size() - len);
-    return false;
+  // Loop until all bytes are written: a short write would otherwise permanently desync the
+  // \x1d-framed stream. Retry on EINTR/EAGAIN.
+  size_t written = 0;
+  while (written < msg.size()) {
+    auto len = write(fIpcFdOut, msg.c_str() + written, msg.size() - written);
+    if (len < 0) {
+      if (errno == EINTR || errno == EAGAIN) continue;
+      RMGLog::Out(RMGLog::error, "IPC message transmit failed with errno=", errno);
+      return false;
+    }
+    written += static_cast<size_t>(len);
   }
 
   return true;

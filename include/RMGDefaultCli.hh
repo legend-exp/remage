@@ -69,7 +69,7 @@ class RMGDefaultCli {
 
   protected:
 
-    int verbose = false;
+    bool verbose = false;
     bool quiet = false;
     bool version = false;
     bool version_rich = false;

@@ -274,7 +274,9 @@ void RMGManager::SetLogLevel(std::string level) {
     RMGIpc::SendIpcNonBlocking(
         RMGIpc::CreateMessage("loglevel", std::string(magic_enum::enum_name(RMGLog::GetLogLevel())))
     );
-  } catch (const std::bad_cast&) { return; }
+  } catch (const std::bad_cast&) {
+    RMGLog::Out(RMGLog::warning, "Invalid logging level '", level, "', keeping the current level");
+  }
 }
 
 void RMGManager::SetRandEngine(std::string name) {

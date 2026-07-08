@@ -54,10 +54,13 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
   );
 
   bool found = false;
+  // compile the patterns once, outside the scan loop.
+  const std::regex name_re(name);
+  const std::regex copy_nr_re(copy_nr);
   // scan the volume store for matches
   for (auto&& it = volume_store->begin(); it != volume_store->end(); it++) {
-    if (std::regex_match((*it)->GetName(), std::regex(name)) and
-        std::regex_match(std::to_string((*it)->GetCopyNo()), std::regex(copy_nr))) {
+    if (std::regex_match((*it)->GetName(), name_re) and
+        std::regex_match(std::to_string((*it)->GetCopyNo()), copy_nr_re)) {
 
       // insert it in our collection
       result.insert(*it);

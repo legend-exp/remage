@@ -28,6 +28,9 @@ bool RMGExceptionHandler::Notify(
   // the UI manager aborts batch mode, but only emits warnings. Mark them as errors accordingly.
   if (code.starts_with("UIMAN")) { severity = FatalException; }
 
+  // new warning in Geant4 11.4; sometimes happens in geometry optimization.
+  if (code == "G4GeomMgr099") { severity = IgnoreTheIssue; }
+
   // do our remage-internal bookkeeping after changing severities.
   if (severity == JustWarning) {
     fHadWarning = true;

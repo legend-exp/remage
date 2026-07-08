@@ -49,6 +49,7 @@ void RMGSteppingAction::UserSteppingAction(const G4Step* step) {
     if (particle_type == "nucleus" && track->GetParentID() > 0 &&
         track->GetKineticEnergy() < 0.1 * CLHEP::keV) {
       auto ion = dynamic_cast<G4Ions*>(track->GetDefinition());
+      if (!ion) return;
       double lifetime = ion->GetPDGLifeTime();
       double excitation = ion->GetExcitationEnergy();
 
@@ -102,7 +103,7 @@ void RMGSteppingAction::DefineCommands() {
       )
       .SetGuidance("Set to -1 to disable this feature.")
       .SetGuidance(
-          std::string("Uses ") + std::string(G4BestUnit(fDaughterKillLifetime, "Time")) + " us by default"
+          std::string("Uses ") + std::string(G4BestUnit(fDaughterKillLifetime, "Time")) + " by default"
       )
       .SetParameterName("max_lifetime", false)
       .SetDefaultValue("-1")

@@ -339,7 +339,7 @@ This applies to the defined lifetime of the nucleus, and not on the sampled actu
 
 Set to -1 to disable this feature.
 
-Uses -1 ns  us by default
+Uses -1 ns  by default
 
 * **Parameter** – `max_lifetime`
   * **Parameter type** – `d`
