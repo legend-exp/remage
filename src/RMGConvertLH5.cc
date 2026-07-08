@@ -92,14 +92,14 @@ std::pair<std::string, std::vector<std::string>> RMGConvertLH5::ReadNullSepDatas
   // data type (nul-terminated string vs. nul-padded string).
   size_t storage_size = dset.getStorageSize();
   std::vector<char> buf(storage_size);
-  dset.read(&buf[0], dset.getStrType());
+  dset.read(buf.data(), dset.getStrType());
 
   // the last two bytes of the buffer will be NUL.
   if (storage_size < 2 || buf[storage_size - 1] != '\0' || buf[storage_size - 2] != '\0') {
     LH5Log(RMGLog::error, ntuple_log_prefix, "invalid ", dset_name, " dataset");
     return {"", vec};
   }
-  std::string s(&buf[0], storage_size - 2);
+  std::string s(buf.data(), storage_size - 2);
 
   // split on null bytes.
   std::istringstream is(s);

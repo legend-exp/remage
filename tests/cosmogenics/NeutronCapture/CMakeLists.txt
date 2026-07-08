@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 add_executable(test-NeutronCapture EXCLUDE_FROM_ALL main.cc HPGeTestStand.hh HPGeTestStand.cc
                                                     IsotopeOutputScheme.cc IsotopeOutputScheme.hh)
 target_link_libraries(test-NeutronCapture PUBLIC remage)

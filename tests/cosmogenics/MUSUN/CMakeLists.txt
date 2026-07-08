@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 add_executable(test-MUSUN EXCLUDE_FROM_ALL main.cc HPGeTestStand.hh HPGeTestStand.cc)
 target_link_libraries(test-MUSUN PUBLIC remage)
 
