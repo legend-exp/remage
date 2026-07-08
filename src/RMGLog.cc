@@ -120,44 +120,51 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
 }
 
 // https://github.com/agauniyal/rang/blob/master/include/rang.hpp
+namespace {
+  bool stream_supports_colors(FILE* the_stream) {
+    // check that we are on a tty
+    if (!::isatty(::fileno(the_stream))) return false;
+
+    // check the value of the TERM variable
+    const std::vector<std::string> terms =
+        {"ansi",
+         "color",
+         "console",
+         "cygwin",
+         "gnome",
+         "konsole",
+         "kterm",
+         "linux",
+         "msys",
+         "putty",
+         "rxvt",
+         "screen",
+         "vt100",
+         "xterm"};
+
+    auto env_p = std::getenv("TERM");
+    if (env_p == nullptr) return false;
+    std::string env_s{env_p};
+
+    return std::any_of(std::begin(terms), std::end(terms), [&](const auto term) {
+      return env_s.find(term) != std::string::npos;
+    });
+  }
+} // namespace
+
 bool RMGLog::SupportsColors(const std::ostream& os) {
 
-  // determine whether the stream refers to a file or a screen
+  // determine whether the stream refers to a file or a screen. The tty/TERM detection does not
+  // change over the lifetime of the process, so cache the answer per stream.
   auto osbuf = os.rdbuf();
-  FILE* the_stream = nullptr;
   if (osbuf == coutbuf) {
-    the_stream = stdout;
+    static const bool cout_supports = stream_supports_colors(stdout);
+    return cout_supports;
   } else if (osbuf == cerrbuf) {
-    the_stream = stderr;
-  } else return false;
-
-  // check that we are on a tty
-  if (!::isatty(::fileno(the_stream))) return false;
-
-  // check the value of the TERM variable
-  const std::vector<std::string> terms =
-      {"ansi",
-       "color",
-       "console",
-       "cygwin",
-       "gnome",
-       "konsole",
-       "kterm",
-       "linux",
-       "msys",
-       "putty",
-       "rxvt",
-       "screen",
-       "vt100",
-       "xterm"};
-
-  auto env_p = std::getenv("TERM");
-  if (env_p == nullptr) return false;
-  std::string env_s{env_p};
-
-  return std::any_of(std::begin(terms), std::end(terms), [&](const auto term) {
-    return env_s.find(term) != std::string::npos;
-  });
+    static const bool cerr_supports = stream_supports_colors(stderr);
+    return cerr_supports;
+  }
+  return false;
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
