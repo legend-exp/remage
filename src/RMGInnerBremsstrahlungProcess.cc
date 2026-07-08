@@ -21,14 +21,12 @@
 
 #include "G4DynamicParticle.hh"
 #include "G4Electron.hh"
-#include "G4EventManager.hh"
 #include "G4Gamma.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4Positron.hh"
+#include "G4RandomDirection.hh"
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
 #include "G4Track.hh"
-#include "G4TrackingManager.hh"
 #include "G4VParticleChange.hh"
 #include "Randomize.hh"
 
@@ -120,33 +118,20 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
     // Sample photon energy from IB spectrum
     auto gamma_energy = SamplePhotonEnergy(omegas, cdf);
 
-    // Generate random direction for the gamma (isotropic)
-    double cos_theta = 2.0 * G4UniformRand() - 1.0;
-    double sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
-    double phi = twopi * G4UniformRand();
-
-    G4ThreeVector direction;
-    direction.setX(sin_theta * std::cos(phi));
-    direction.setY(sin_theta * std::sin(phi));
-    direction.setZ(cos_theta);
-
     // Get position and time from the decay location
     auto position = secondary_track->GetPosition();
     auto time = secondary_track->GetGlobalTime();
     auto touchable = secondary_track->GetTouchableHandle();
 
     // Create the IB gamma ray as an additional secondary
-    auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), direction, gamma_energy);
+    auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), G4RandomDirection(), gamma_energy);
     auto ib_gamma_track = new G4Track(dyn_particle, time, position);
     ib_gamma_track->SetTouchableHandle(touchable);
     ib_gamma_track->SetParentID(parent_track.GetTrackID()); // Same parent as decay
     ib_gamma_track->SetTrackStatus(fAlive);
 
-    // Add the IB gamma to the stepping manager's secondary stack
-    auto stepping_manager = G4EventManager::GetEventManager()
-                                ->GetTrackingManager()
-                                ->GetSteppingManager();
-    stepping_manager->GetfSecondary()->push_back(ib_gamma_track);
+    // Add the IB gamma through as additional secondary.
+    particle_change->AddSecondary(ib_gamma_track);
 
     RMGLog::OutFormat(
         RMGLog::debug_event,
