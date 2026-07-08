@@ -94,6 +94,7 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
 
     /**
      * @brief Sets a scaling factor for IB probability (for systematic studies).
+     * @details The factor is shared across all per-isotope process instances.
      *
      * @param factor Probability scaling factor (default 1.0).
      */
@@ -162,12 +163,13 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      */
     bool IsBetaElectron(G4Track* track);
 
-    bool fEnabled = true;
-    double fBiasingFactor = 1.0;
-
-    // messenger stuff
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    // messenger stuff. Static so that only one messenger is registered at the shared command path,
+    // regardless of how many per-isotope process instances are constructed.
+    inline static std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
+
+    inline static bool fEnabled = true;
+    inline static double fBiasingFactor = 1.0;
 };
 
 #endif

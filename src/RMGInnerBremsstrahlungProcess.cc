@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <mutex>
 #include <vector>
 
 #include "G4DynamicParticle.hh"
@@ -79,8 +80,11 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
 
   std::vector<double> omegas, cdf;
 
+  // Snapshot the count before appending secondaries below.
+  const int num_secondaries = particle_change->GetNumberOfSecondaries();
+
   // Loop through all secondaries to find beta electrons
-  for (int i = 0; i < particle_change->GetNumberOfSecondaries(); i++) {
+  for (int i = 0; i < num_secondaries; i++) {
     auto secondary_track = particle_change->GetSecondary(i);
 
     if (!IsBetaElectron(secondary_track)) continue;
@@ -229,14 +233,20 @@ double RMGInnerBremsstrahlungProcess::SamplePhotonEnergy(
 
 void RMGInnerBremsstrahlungProcess::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(
-      this,
-      "/RMG/Processes/InnerBremsstrahlung/",
-      "Commands for controlling the inner bremsstrahlung process"
-  );
+  // One process instance is constructed per radioactive nucleus, but the biasing factor and its
+  // messenger are shared. Register the messenger only once, otherwise hundreds of
+  // messengers would be created at the same command path.
+  static std::once_flag messenger_flag;
+  std::call_once(messenger_flag, [] {
+    fMessenger = std::make_unique<G4GenericMessenger>(
+        nullptr,
+        "/RMG/Processes/InnerBremsstrahlung/",
+        "Commands for controlling the inner bremsstrahlung process"
+    );
 
-  fMessenger->DeclareMethod("BiasingFactor", &RMGInnerBremsstrahlungProcess::SetBiasingFactor)
-      .SetGuidance("Sets a biasing factor for IB probability")
-      .SetParameterName("factor", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
+    fMessenger->DeclareProperty("BiasingFactor", fBiasingFactor)
+        .SetGuidance("Sets a biasing factor for IB probability")
+        .SetParameterName("factor", false)
+        .SetStates(G4State_PreInit, G4State_Idle);
+  });
 }
