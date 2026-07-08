@@ -19,9 +19,11 @@
 #include <type_traits>
 
 #include "G4AutoLock.hh"
+#include "G4StateManager.hh"
 #include "G4UserTaskThreadInitialization.hh"
 #include "Randomize.hh"
 
+#include "RMGExceptionHandler.hh"
 #include "RMGManager.hh"
 
 /// \cond this creates weird namespaces @<long number>
@@ -51,6 +53,12 @@ class RMGWorkerInitialization : public ThreadInitialization {
      * @brief Install the user-selected random engine on this worker, or fall back to Geant4's.
      */
     void SetupRNGEngine(const CLHEP::HepRandomEngine* aRNGEngine) const override {
+      // Install our exception handler on this worker thread, mirroring the master-thread setup.
+      // G4StateManager is thread-local in MT mode.
+      if (G4StateManager::GetStateManager()->GetExceptionHandler() == nullptr) {
+        G4StateManager::GetStateManager()->SetExceptionHandler(new RMGExceptionHandler());
+      }
+
       G4AutoLock l(&RMGWorkerInitializationRNGMutex);
 
       auto rmg_man = RMGManager::Instance();

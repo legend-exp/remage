@@ -40,7 +40,7 @@
 #endif
 
 #include <algorithm>
-#include <cstdarg>
+#include <atomic>
 #include <cstdio>
 #include <iomanip>
 #include <memory>
@@ -51,9 +51,9 @@
 
 RMGLog::LogLevel RMGLog::fMinimumLogLevel = RMGLog::summary;
 
-bool RMGLog::fFirstOutputDone = false;
-bool RMGLog::fHadWarning = false;
-bool RMGLog::fHadError = false;
+std::atomic<bool> RMGLog::fFirstOutputDone = false;
+std::atomic<bool> RMGLog::fHadWarning = false;
+std::atomic<bool> RMGLog::fHadError = false;
 
 bool RMGLog::fUsePrefix = true;
 int RMGLog::fProcNum = -1;
