@@ -83,6 +83,31 @@ namespace RMGTools {
     auto name = s[0] == 'k' ? s.substr(1, std::string::npos) : s;
     return std::string(name);
   }
+
+  /** @brief A duration broken down into days, hours, minutes and seconds. */
+  struct ElapsedTime {
+      long days;
+      long hours;
+      long minutes;
+      long seconds;
+  };
+
+  /**
+   * @brief Break a total number of seconds into days, hours, minutes and seconds.
+   *
+   * @param tot_seconds Total elapsed time in seconds.
+   * @return The equivalent @ref ElapsedTime breakdown.
+   */
+  inline ElapsedTime BreakDownElapsedTime(long tot_seconds) {
+    ElapsedTime t{};
+    t.days = tot_seconds / 86400;
+    tot_seconds -= t.days * 86400;
+    t.hours = tot_seconds / 3600;
+    tot_seconds -= t.hours * 3600;
+    t.minutes = tot_seconds / 60;
+    t.seconds = tot_seconds - t.minutes * 60;
+    return t;
+  }
 } // namespace RMGTools
 
 #endif
