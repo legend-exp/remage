@@ -17,6 +17,8 @@
 
 #include "RMGGrabmayrGCReader.hh"
 
+#include <cstdlib>
+
 #include "G4Tokenizer.hh"
 #include "Randomize.hh"
 
@@ -70,14 +72,26 @@ GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
   } while (line[0] == '%' || (line.find("version") !=
                               std::string::npos)); // This could be outsourced to SetStartLocation
 
-  // parse line and return as struct
+  // parse line and return as struct. All fields are integers.
   GammaCascadeLine gamma_cascade{};
-  std::istringstream iss(line);
-  iss >> gamma_cascade.en >> gamma_cascade.ex >> gamma_cascade.m >> gamma_cascade.em;
+  const char* pos = line.c_str();
+  auto next_int = [&pos](G4int& out) {
+    char* endptr = nullptr;
+    const long val = std::strtol(pos, &endptr, 10);
+    if (endptr == pos) return false; // no digits consumed
+    pos = endptr;
+    out = static_cast<G4int>(val);
+    return true;
+  };
+
+  if (!next_int(gamma_cascade.en) || !next_int(gamma_cascade.ex) || !next_int(gamma_cascade.m) ||
+      !next_int(gamma_cascade.em)) {
+    RMGLog::Out(RMGLog::fatal, "Failed to parse gamma cascade header fields. Exit!");
+  }
   gamma_cascade.eg.reserve(gamma_cascade.m);
-  int eg_value = 0;
   for (int i = 0; i < gamma_cascade.m; i++) {
-    if (!(iss >> eg_value)) {
+    G4int eg_value = 0;
+    if (!next_int(eg_value)) {
       RMGLog::Out(RMGLog::fatal, "Failed to read gamma energy from file. Exit!");
     }
     gamma_cascade.eg.push_back(eg_value);
@@ -93,25 +107,27 @@ void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
   file.seekg(0, std::ios::beg); // move to beginning of file
   // Skip Header
   std::string line;
-  int header_length = 0;
   do { // NOLINT(cppcoreguidelines-avoid-do-while)
     std::getline(file, line);
-    header_length++;
   } while (line[0] == '%' || (line.find("version") != std::string::npos));
 
   // In case the Random start location macro is set
   if (fGammaCascadeRandomStartLocation) {
-    int n_entries_in_file = 0;
-    // Seems excessiv to read through the entire file, there has to be a quicker way?
-    while (std::getline(file, line)) n_entries_in_file++;
+    // Single pass over the remaining entries, recording each line's stream offset, so we can
+    // seek straight to a random entry instead of rewinding and re-reading from the top.
+    std::vector<std::streampos> entry_offsets;
+    std::streampos offset = file.tellg();
+    while (std::getline(file, line)) {
+      entry_offsets.push_back(offset);
+      offset = file.tellg();
+    }
+    file.clear(); // clear EOF flag
 
-    file.clear();                 // clear EOF flag
-    file.seekg(0, std::ios::beg); // move to beginning of file
-
-    int start_location = (int)(n_entries_in_file * G4UniformRand() + header_length);
-
-    RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
-    for (int j = 0; j < start_location; j++) std::getline(file, line);
+    if (!entry_offsets.empty()) {
+      const std::size_t start_location = (std::size_t)(entry_offsets.size() * G4UniformRand());
+      RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
+      file.seekg(entry_offsets[start_location]);
+    }
   }
 }
 
