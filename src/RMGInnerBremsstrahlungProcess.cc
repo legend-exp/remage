@@ -48,7 +48,7 @@ G4VParticleChange* RMGInnerBremsstrahlungProcess::AtRestDoIt(const G4Track& aTra
   // If IB is disabled or no secondaries produced, return unchanged
   if (!fEnabled || particle_change->GetNumberOfSecondaries() == 0) { return particle_change; }
 
-  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay at rest", GetProcessName());
+  RMGLog::OutFormat(RMGLog::debug_event, "{}: Processing decay at rest", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particle_change, aTrack);
@@ -66,7 +66,7 @@ G4VParticleChange* RMGInnerBremsstrahlungProcess::PostStepDoIt(
   // If IB is disabled or no secondaries produced, return unchanged
   if (!fEnabled || particle_change->GetNumberOfSecondaries() == 0) { return particle_change; }
 
-  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay", GetProcessName());
+  RMGLog::OutFormat(RMGLog::debug_event, "{}: Processing decay", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particle_change, aTrack);
@@ -107,7 +107,7 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
     }
 
     RMGLog::OutFormat(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "{}: Beta electron energy: {:.3f} keV, IB probability: {:.6f}",
         GetProcessName(),
         electron_energy / CLHEP::keV,
@@ -149,7 +149,7 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
     stepping_manager->GetfSecondary()->push_back(ib_gamma_track);
 
     RMGLog::OutFormat(
-        RMGLog::debug,
+        RMGLog::debug_event,
         "{}: Generated IB photon {:.3f} keV from beta {:.3f} keV",
         GetProcessName(),
         gamma_energy / CLHEP::keV,
