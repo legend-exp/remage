@@ -153,7 +153,7 @@ void RMGDefaultCli::SetupLoggingAndIpc() {
       std::string(version_s) != RMG_PROJECT_VERSION_FULL) {
     RMGLog::OutFormat(
         RMGLog::fatal,
-        "remage-cpp version {} does not match python-wrapper version %s",
+        "remage-cpp version {} does not match python-wrapper version {}",
         RMG_PROJECT_VERSION_FULL,
         version_s
     );

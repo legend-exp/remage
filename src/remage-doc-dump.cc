@@ -104,7 +104,10 @@ int main(int argc, char** argv) {
 
   auto ui = G4UImanager::GetUIpointer();
   auto rmg_tree = ui->GetTree()->FindCommandTree("/RMG/");
-  if (!rmg_tree) {}
+  if (!rmg_tree) {
+    RMGLog::Out(RMGLog::fatal, "Could not find the /RMG/ command tree");
+    return 1;
+  }
 
   if (!html_dir.empty()) {
     RMGLog::Out(RMGLog::summary, "Export HTML to ", html_dir);

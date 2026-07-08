@@ -92,6 +92,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         had_mapping = true;
 
         auto det_type_str = aux.value;
+        if (det_type_str.empty()) {
+          RMGLog::Out(RMGLog::fatal, "empty RMG_detector type value in GDML aux structure");
+        }
         det_type_str[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
         const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
 
@@ -140,8 +143,8 @@ G4VPhysicalVolume* RMGHardware::Construct() {
     // Check for overlaps, but with no verbose output.
     if (!fGDMLDisableOverlapCheck) {
       RMGLog::Out(RMGLog::summary, "Checking for overlaps in GDML geometry...");
-      auto test_vol = new G4GeomTestVolume(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
-      test_vol->TestOverlapInTree();
+      G4GeomTestVolume test_vol(fWorld, 0, fGDMLOverlapCheckNumPoints, /* verbosity = */ false);
+      test_vol.TestOverlapInTree();
     }
 #else
     RMGLog::OutDev(RMGLog::fatal, "GDML support is not available!");

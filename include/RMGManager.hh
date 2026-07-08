@@ -283,7 +283,12 @@ class RMGManager {
      * @brief Set a flag to gracefully aborts the simulation run at the next possible time.
      */
     static void AbortRunGracefully() {
-      if (!fAbortRun.is_lock_free()) return;
+      if (!fAbortRun.is_lock_free()) {
+        // A non-lock-free atomic cannot be safely set from the signal handler that calls this.
+        // Should not happen for bool on real platforms.
+        RMGLog::Out(RMGLog::error, "cannot abort run gracefully: abort flag is not lock-free");
+        return;
+      }
       fAbortRun = true;
     }
     /**
