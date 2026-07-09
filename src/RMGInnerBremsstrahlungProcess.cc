@@ -122,13 +122,30 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
     // Sample photon energy from IB spectrum
     auto gamma_energy = SamplePhotonEnergy(omegas, cdf);
 
+    // The IB photon carries away part of the beta's energy, so it must be taken from the electron
+    // rather than created from nothing. The spectrum is bounded below the electron kinetic energy
+    // (see ComputeIBSpectrum's max_omega margin), but guard against edge cases regardless.
+    if (gamma_energy >= electron_energy) continue;
+
+    // Give the photon a random direction and rebalance the electron kinematics so that both energy
+    // and momentum direction are conserved: the electron loses gamma_energy of kinetic energy and
+    // recoils.
+    auto gamma_direction = G4RandomDirection();
+    auto electron_momentum = secondary_track->GetMomentum();
+    auto residual_momentum = electron_momentum - gamma_energy * gamma_direction;
+
+    secondary_track->SetKineticEnergy(electron_energy - gamma_energy);
+    if (residual_momentum.mag2() > 0.0) {
+      secondary_track->SetMomentumDirection(residual_momentum.unit());
+    }
+
     // Get position and time from the decay location
     auto position = secondary_track->GetPosition();
     auto time = secondary_track->GetGlobalTime();
     auto touchable = secondary_track->GetTouchableHandle();
 
     // Create the IB gamma ray as an additional secondary
-    auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), G4RandomDirection(), gamma_energy);
+    auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), gamma_direction, gamma_energy);
     auto ib_gamma_track = new G4Track(dyn_particle, time, position);
     ib_gamma_track->SetTouchableHandle(touchable);
     ib_gamma_track->SetParentID(parent_track.GetTrackID()); // Same parent as decay
