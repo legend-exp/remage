@@ -16,6 +16,9 @@
 #ifndef _RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
 #define _RMG_INNER_BREMSSTRAHLUNG_PROCESS_HH
 
+#include <memory>
+#include <vector>
+
 #include "G4GenericMessenger.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4Positron.hh"
@@ -91,6 +94,7 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
 
     /**
      * @brief Sets a scaling factor for IB probability (for systematic studies).
+     * @details The factor is shared across all per-isotope process instances.
      *
      * @param factor Probability scaling factor (default 1.0).
      */
@@ -115,20 +119,30 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
     double PhiFunction(double W_prime, double omega);
 
     /**
-     * @brief Calculates the total Inner Bremsstrahlung probability for a given electron energy.
+     * @brief Computes the Inner Bremsstrahlung spectrum for a given electron energy.
+     * @details Fills @p omegas (dimensionless photon-energy grid) and @p cdf (cumulative
+     * trapezoidal integral of the spectrum up to each grid point). The same arrays are reused for
+     * photon-energy sampling, so the spectrum is integrated only once per emission.
      *
      * @param electron_energy Kinetic energy of the beta electron.
-     * @return Total IB probability (0 to 1).
+     * @param omegas Output: dimensionless photon-energy grid.
+     * @param cdf Output: cumulative (unnormalized) distribution over @p omegas.
+     * @return Total IB probability (integral of the spectrum).
      */
-    double CalculateIBProbability(double electron_energy);
+    double ComputeIBSpectrum(
+        double electron_energy,
+        std::vector<double>& omegas,
+        std::vector<double>& cdf
+    );
 
     /**
-     * @brief Samples a photon energy from the Inner Bremsstrahlung spectrum.
+     * @brief Samples a photon energy from a precomputed Inner Bremsstrahlung spectrum.
      *
-     * @param electron_energy Kinetic energy of the beta electron.
+     * @param omegas Dimensionless photon-energy grid, as filled by @c ComputeIBSpectrum.
+     * @param cdf Cumulative distribution over @p omegas.
      * @return Sampled IB photon energy.
      */
-    double SamplePhotonEnergy(double electron_energy);
+    double SamplePhotonEnergy(const std::vector<double>& omegas, const std::vector<double>& cdf);
 
     /**
      * @brief Generates IB photons for beta electrons in the decay secondaries.
@@ -149,12 +163,13 @@ class RMGInnerBremsstrahlungProcess : public G4WrapperProcess {
      */
     bool IsBetaElectron(G4Track* track);
 
-    bool fEnabled = true;
-    double fBiasingFactor = 1.0;
-
-    // messenger stuff
-    std::unique_ptr<G4GenericMessenger> fMessenger;
+    // messenger stuff. Static so that only one messenger is registered at the shared command path,
+    // regardless of how many per-isotope process instances are constructed.
+    inline static std::unique_ptr<G4GenericMessenger> fMessenger = nullptr;
     void DefineCommands();
+
+    inline static bool fEnabled = true;
+    inline static double fBiasingFactor = 1.0;
 };
 
 #endif

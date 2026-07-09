@@ -17,18 +17,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <mutex>
 #include <vector>
 
 #include "G4DynamicParticle.hh"
 #include "G4Electron.hh"
-#include "G4EventManager.hh"
 #include "G4Gamma.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4Positron.hh"
+#include "G4RandomDirection.hh"
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
 #include "G4Track.hh"
-#include "G4TrackingManager.hh"
 #include "G4VParticleChange.hh"
 #include "Randomize.hh"
 
@@ -48,7 +47,7 @@ G4VParticleChange* RMGInnerBremsstrahlungProcess::AtRestDoIt(const G4Track& aTra
   // If IB is disabled or no secondaries produced, return unchanged
   if (!fEnabled || particle_change->GetNumberOfSecondaries() == 0) { return particle_change; }
 
-  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay at rest", GetProcessName());
+  RMGLog::OutFormat(RMGLog::debug_event, "{}: Processing decay at rest", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particle_change, aTrack);
@@ -66,7 +65,7 @@ G4VParticleChange* RMGInnerBremsstrahlungProcess::PostStepDoIt(
   // If IB is disabled or no secondaries produced, return unchanged
   if (!fEnabled || particle_change->GetNumberOfSecondaries() == 0) { return particle_change; }
 
-  RMGLog::OutFormat(RMGLog::debug, "{}: Processing decay", GetProcessName());
+  RMGLog::OutFormat(RMGLog::debug_event, "{}: Processing decay", GetProcessName());
 
   // Generate Inner Bremsstrahlung for any beta electrons in the secondaries
   GenerateInnerBremsstrahlungForSecondaries(particle_change, aTrack);
@@ -79,86 +78,72 @@ void RMGInnerBremsstrahlungProcess::GenerateInnerBremsstrahlungForSecondaries(
     const G4Track& parent_track
 ) {
 
-  // First check if this decay actually produces electrons/positrons (beta decay)
-  bool has_beta_particles = false;
-  for (int i = 0; i < particle_change->GetNumberOfSecondaries(); i++) {
-    auto track = particle_change->GetSecondary(i);
-    if (IsBetaElectron(track)) {
-      has_beta_particles = true;
-      break;
-    }
-  }
+  std::vector<double> omegas, cdf;
 
-  if (!has_beta_particles) {
-    RMGLog::OutFormat(
-        RMGLog::debug,
-        "{}: No beta particles found, skipping IB generation",
-        GetProcessName()
-    );
-    return;
-  }
+  // Snapshot the count before appending secondaries below.
+  const int num_secondaries = particle_change->GetNumberOfSecondaries();
 
   // Loop through all secondaries to find beta electrons
-  for (int i = 0; i < particle_change->GetNumberOfSecondaries(); i++) {
+  for (int i = 0; i < num_secondaries; i++) {
     auto secondary_track = particle_change->GetSecondary(i);
 
-    if (IsBetaElectron(secondary_track)) {
-      auto electron_energy = secondary_track->GetKineticEnergy();
-      if (electron_energy < 0.0 * CLHEP::keV) { continue; }
+    if (!IsBetaElectron(secondary_track)) continue;
 
-      // Calculate IB probability (with optional scaling)
-      auto ib_probability = CalculateIBProbability(electron_energy) * fBiasingFactor;
+    auto electron_energy = secondary_track->GetKineticEnergy();
+    if (electron_energy < 0.0 * CLHEP::keV) continue;
 
+    // Compute the IB spectrum once and reuse it for both the emission probability and the
+    // photon-energy sampling.
+    auto ib_probability = ComputeIBSpectrum(electron_energy, omegas, cdf) * fBiasingFactor;
+
+    // the biasing factor is user-settable and unbounded, so the scaled probability can exceed 1.
+    if (ib_probability > 1.0) {
       RMGLog::OutFormat(
-          RMGLog::debug,
-          "{}: Beta electron energy: {:.3f} keV, IB probability: {:.6f}",
+          RMGLog::warning,
+          "{}: IB probability {:.6f} exceeds 1 (biasing factor {:.3g}); clamping to 1",
           GetProcessName(),
-          electron_energy / CLHEP::keV,
-          ib_probability
+          ib_probability,
+          fBiasingFactor
       );
-
-      // Sample whether IB occurs
-      if (G4UniformRand() < ib_probability) {
-        // Sample photon energy from IB spectrum
-        auto gamma_energy = SamplePhotonEnergy(electron_energy);
-
-        // Generate random direction for the gamma (isotropic)
-        double cos_theta = 2.0 * G4UniformRand() - 1.0;
-        double sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
-        double phi = twopi * G4UniformRand();
-
-        G4ThreeVector direction;
-        direction.setX(sin_theta * std::cos(phi));
-        direction.setY(sin_theta * std::sin(phi));
-        direction.setZ(cos_theta);
-
-        // Get position and time from the decay location
-        auto position = secondary_track->GetPosition();
-        auto time = secondary_track->GetGlobalTime();
-        auto touchable = secondary_track->GetTouchableHandle();
-
-        // Create the IB gamma ray as an additional secondary
-        auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), direction, gamma_energy);
-        auto ib_gamma_track = new G4Track(dyn_particle, time, position);
-        ib_gamma_track->SetTouchableHandle(touchable);
-        ib_gamma_track->SetParentID(parent_track.GetTrackID()); // Same parent as decay
-        ib_gamma_track->SetTrackStatus(fAlive);
-
-        // Add the IB gamma to the stepping manager's secondary stack
-        auto stepping_manager = G4EventManager::GetEventManager()
-                                    ->GetTrackingManager()
-                                    ->GetSteppingManager();
-        stepping_manager->GetfSecondary()->push_back(ib_gamma_track);
-
-        RMGLog::OutFormat(
-            RMGLog::debug,
-            "{}: Generated IB photon {:.3f} keV from beta {:.3f} keV",
-            GetProcessName(),
-            gamma_energy / CLHEP::keV,
-            electron_energy / CLHEP::keV
-        );
-      }
+      ib_probability = 1.0;
     }
+
+    RMGLog::OutFormat(
+        RMGLog::debug_event,
+        "{}: Beta electron energy: {:.3f} keV, IB probability: {:.6f}",
+        GetProcessName(),
+        electron_energy / CLHEP::keV,
+        ib_probability
+    );
+
+    // Sample whether IB occurs
+    if (G4UniformRand() >= ib_probability) continue;
+
+    // Sample photon energy from IB spectrum
+    auto gamma_energy = SamplePhotonEnergy(omegas, cdf);
+
+    // Get position and time from the decay location
+    auto position = secondary_track->GetPosition();
+    auto time = secondary_track->GetGlobalTime();
+    auto touchable = secondary_track->GetTouchableHandle();
+
+    // Create the IB gamma ray as an additional secondary
+    auto dyn_particle = new G4DynamicParticle(G4Gamma::Definition(), G4RandomDirection(), gamma_energy);
+    auto ib_gamma_track = new G4Track(dyn_particle, time, position);
+    ib_gamma_track->SetTouchableHandle(touchable);
+    ib_gamma_track->SetParentID(parent_track.GetTrackID()); // Same parent as decay
+    ib_gamma_track->SetTrackStatus(fAlive);
+
+    // Add the IB gamma through as additional secondary.
+    particle_change->AddSecondary(ib_gamma_track);
+
+    RMGLog::OutFormat(
+        RMGLog::debug_event,
+        "{}: Generated IB photon {:.3f} keV from beta {:.3f} keV",
+        GetProcessName(),
+        gamma_energy / CLHEP::keV,
+        electron_energy / CLHEP::keV
+    );
   }
 }
 
@@ -187,76 +172,57 @@ double RMGInnerBremsstrahlungProcess::PhiFunction(double W_prime, double omega) 
   return std::max(0.0, result); // Ensure non-negative results
 }
 
-double RMGInnerBremsstrahlungProcess::CalculateIBProbability(double electron_energy) {
+double RMGInnerBremsstrahlungProcess::ComputeIBSpectrum(
+    double electron_energy,
+    std::vector<double>& omegas,
+    std::vector<double>& cdf
+) {
+  omegas.clear();
+  cdf.clear();
+
   // Convert electron energy to dimensionless units
   double W_prime = electron_energy / CLHEP::electron_mass_c2 + 1.0;
-
   if (W_prime <= 1.0) return 0.0;
 
   // Integration parameters
   const int num_points = 100;
   double max_omega = W_prime - 1.0 - 0.01; // Leave some margin
-
   if (max_omega <= 0.01) return 0.0;
 
   double delta_omega = max_omega / num_points;
 
-  // Simple numerical integration (trapezoidal rule)
-  double totalProb = 0.0;
-  for (int i = 0; i < num_points; i++) {
-    double omega1 = 0.01 + i * delta_omega;
-    double omega2 = 0.01 + (i + 1) * delta_omega;
+  omegas.reserve(num_points);
+  cdf.reserve(num_points);
 
-    if (omega1 < 0.01) omega1 = 0.01;
-
-    double phi1 = PhiFunction(W_prime, omega1);
-    double phi2 = PhiFunction(W_prime, omega2);
-
-    totalProb += 0.5 * (phi1 + phi2) * delta_omega;
-  }
-
-  return totalProb;
-}
-
-double RMGInnerBremsstrahlungProcess::SamplePhotonEnergy(double electron_energy) {
-  // Convert electron energy to dimensionless units
-  double W_prime = electron_energy / CLHEP::electron_mass_c2 + 1.0;
-
-  // Create a cumulative distribution function (CDF) for sampling
-  const int num_points = 100;
-  double max_omega = W_prime - 1.0 - 0.01; // Leave some margin
-
-  if (max_omega <= 0.01) return 0.01 * CLHEP::electron_mass_c2;
-
-  double delta_omega = max_omega / num_points;
-
-  std::vector<double> omegas;
-  std::vector<double> cdf;
-
-  double sum = 0.0;
-
-  // Calculate the spectrum values and construct the CDF
+  // Cumulative trapezoidal integral of the spectrum. cdf[i] holds the integral up to omegas[i],
+  // so cdf.back() is the total emission probability, and the same array is directly usable for
+  // inverse-CDF sampling in SamplePhotonEnergy().
+  double total = 0.0;
+  double prev_phi = 0.0;
   for (int i = 0; i < num_points; i++) {
     double omega = 0.01 + i * delta_omega;
-    double value = PhiFunction(W_prime, omega);
-
+    double phi = PhiFunction(W_prime, omega);
+    if (i > 0) total += 0.5 * (prev_phi + phi) * delta_omega;
     omegas.push_back(omega);
-    sum += value;
-    cdf.push_back(sum);
+    cdf.push_back(total);
+    prev_phi = phi;
   }
 
-  // Normalize the CDF
-  if (sum > 0.0) {
-    for (double& i : cdf) { i /= sum; }
-  } else {
-    return 0.01 * CLHEP::electron_mass_c2; // Fallback
-  }
+  return total;
+}
 
-  // Sample from the CDF
+double RMGInnerBremsstrahlungProcess::SamplePhotonEnergy(
+    const std::vector<double>& omegas,
+    const std::vector<double>& cdf
+) {
+  double total = cdf.empty() ? 0.0 : cdf.back();
+  if (total <= 0.0) return 0.01 * CLHEP::electron_mass_c2; // Fallback
+
+  // Sample from the (normalized) CDF
   double r = G4UniformRand();
   for (size_t i = 0; i < cdf.size(); i++) {
-    if (r <= cdf[i]) {
-      // Convert back to energy in keV
+    if (r <= cdf[i] / total) {
+      // Convert back to energy
       return omegas[i] * CLHEP::electron_mass_c2;
     }
   }
@@ -267,14 +233,20 @@ double RMGInnerBremsstrahlungProcess::SamplePhotonEnergy(double electron_energy)
 
 void RMGInnerBremsstrahlungProcess::DefineCommands() {
 
-  fMessenger = std::make_unique<G4GenericMessenger>(
-      this,
-      "/RMG/Processes/InnerBremsstrahlung/",
-      "Commands for controlling the inner bremsstrahlung process"
-  );
+  // One process instance is constructed per radioactive nucleus, but the biasing factor and its
+  // messenger are shared. Register the messenger only once, otherwise hundreds of
+  // messengers would be created at the same command path.
+  static std::once_flag messenger_flag;
+  std::call_once(messenger_flag, [] {
+    fMessenger = std::make_unique<G4GenericMessenger>(
+        nullptr,
+        "/RMG/Processes/InnerBremsstrahlung/",
+        "Commands for controlling the inner bremsstrahlung process"
+    );
 
-  fMessenger->DeclareMethod("BiasingFactor", &RMGInnerBremsstrahlungProcess::SetBiasingFactor)
-      .SetGuidance("Sets a biasing factor for IB probability")
-      .SetParameterName("factor", false)
-      .SetStates(G4State_PreInit, G4State_Idle);
+    fMessenger->DeclareProperty("BiasingFactor", fBiasingFactor)
+        .SetGuidance("Sets a biasing factor for IB probability")
+        .SetParameterName("factor", false)
+        .SetStates(G4State_PreInit, G4State_Idle);
+  });
 }
