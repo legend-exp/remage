@@ -88,29 +88,30 @@ bool RMGCalorimeterDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*his
 
   const auto edep = step->GetTotalEnergyDeposit();
 
-  // accumulate energy into one hit per detector. the first step in a detector
-  // creates the hit (fixing its physical volume); subsequent steps only add
-  // their energy deposit.
+  // a step may cross the detector without depositing energy; such steps carry
+  // no information, so ignore them and in particular do not emit an empty hit
+  // for a detector that is only traversed.
+  if (edep == 0) return false;
+
+  // accumulate energy into one hit per detector. the first energy-depositing
+  // step in a detector creates the hit (fixing its physical volume and time);
+  // subsequent steps only add their energy deposit.
   auto it = fDetectorHits.find(det_uid);
   if (it == fDetectorHits.end()) {
     auto* new_hit = new RMGDetectorHit();
     new_hit->detector_uid = det_uid;
     new_hit->physical_volume = pv;
     new_hit->energy_deposition = 0;
-    // sentinel: replaced below by the time of the first energy-depositing step.
-    new_hit->global_time = std::numeric_limits<double>::max();
+    new_hit->global_time = prestep->GetGlobalTime();
     fHitsCollection->insert(new_hit);
     it = fDetectorHits.emplace(det_uid, new_hit).first;
   }
 
   it->second->energy_deposition += edep;
 
-  // Geant4 does not process steps in time order, and a step may cross the
-  // detector without depositing energy. Use the earliest time among the steps
-  // that actually deposit energy as the hit time.
-  if (edep > 0) {
-    it->second->global_time = std::min(it->second->global_time, prestep->GetGlobalTime());
-  }
+  // Geant4 does not process steps in time order. Use the earliest time among
+  // the steps that deposit energy as the hit time.
+  it->second->global_time = std::min(it->second->global_time, prestep->GetGlobalTime());
 
   return true;
 }
