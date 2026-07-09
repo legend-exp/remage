@@ -25,3 +25,7 @@ set_tests_properties(processes/dump-physics PROPERTIES LABELS val)
 add_test(NAME processes/selective-ekin-min COMMAND ${PYTHONPATH} -m pytest -s -vvv
                                                    selective_ekin_min.py)
 set_tests_properties(processes/selective-ekin-min PROPERTIES LABELS extra)
+
+add_test(NAME processes/innerbrem-conservation COMMAND ${PYTHONPATH} -m pytest -s -vvv
+                                                       innerbrem_conservation.py)
+set_tests_properties(processes/innerbrem-conservation PROPERTIES LABELS extra)
