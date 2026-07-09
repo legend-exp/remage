@@ -86,7 +86,8 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
 
   int proc_id = -1;
   if (proc) {
-    if (fProcessMap.find(proc_name) == fProcessMap.end()) {
+    auto [it, inserted] = fProcessMap.try_emplace(proc_name, 0);
+    if (inserted) {
       // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
       // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
       // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
@@ -97,9 +98,9 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
       }
       // xor-fold down to 16 bit.
       proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
-      fProcessMap.emplace(proc_name, proc_name_hash);
+      it->second = proc_name_hash;
     }
-    proc_id = static_cast<int>(fProcessMap[proc_name]);
+    proc_id = static_cast<int>(it->second);
   }
 
   int stage_id = 0;

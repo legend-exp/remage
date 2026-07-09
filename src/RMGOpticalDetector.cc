@@ -104,7 +104,7 @@ bool RMGOpticalDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*history
   // hit when the photon reaches the boundary we need to check the
   // PostStepPoint here
   auto touchable = step->GetPostStepPoint()->GetTouchableHandle();
-  const auto pv_name = touchable->GetVolume()->GetName();
+  const auto& pv_name = touchable->GetVolume()->GetName();
   const auto pv_copynr = touchable->GetCopyNumber();
 
   // check if physical volume is registered as optical detector

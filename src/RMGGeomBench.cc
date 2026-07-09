@@ -236,6 +236,19 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
     RMGLog::Out(RMGLog::fatal, "Total number of pixels is zero or negative! Exiting...");
   }
 
+  // The pixel/batch bookkeeping in GeneratePrimaries assumes event IDs are a
+  // dense, per-thread sequential counter. Geant4 does not hand contiguous IDs
+  // to a single worker under multithreading, so refuse to run with >1 thread.
+  if (RMGManager::Instance()->GetNumberOfThreads() > 1) {
+    RMGLog::Out(
+        RMGLog::fatal,
+        "The geometry benchmark generator does not support multithreading; "
+        "run with a single thread (-t 1). Exiting..."
+    );
+  }
+
+  // integer division truncates: warn (below) if it does not divide evenly
+  const bool uneven_split = (totalnevents % totalnpixels) != 0;
   neventsperpixel = totalnevents / totalnpixels;
 
   // Calculate events per bunch (1% of events per pixel)
@@ -260,7 +273,7 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
   // Safeties
 
   // Could maybe downgrade this from a warning to a summary...
-  if (neventsperpixel != floor(neventsperpixel)) {
+  if (uneven_split) {
     RMGLog::OutFormat(
         RMGLog::warning,
         "Specified number of primaries({}) doesn't divide evenly into the specified number of "
@@ -270,7 +283,6 @@ void RMGGeomBench::BeginOfRunAction(const G4Run* r) {
     );
     RMGLog::Out(RMGLog::warning, "Rounding down to nearest integer number of primaries per pixel.");
   }
-  neventsperpixel = floor(neventsperpixel);
 
   // Having a single event sampled per pixel breaks the generator algorithm
   // Doing this would also be completely useless from a benchmarking perspective

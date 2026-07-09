@@ -172,6 +172,10 @@ class RMGManager {
      */
     void SetNumberOfThreads(int nthreads) { fNThreads = nthreads; }
     /**
+     * @brief Returns the number of threads.
+     */
+    [[nodiscard]] int GetNumberOfThreads() const { return fNThreads; }
+    /**
      * @brief Sets the print modulo value.
      * @param n_ev Number of events for modulo printing.
      */

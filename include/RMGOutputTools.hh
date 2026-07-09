@@ -195,7 +195,7 @@ namespace RMGOutputTools {
    * local energy deposit too, this can avoid writing out the gamma tracks in the output scheme.
    */
   void redistribute_gamma_energy(
-      std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+      const std::map<int, std::vector<RMGDetectorHit*>>& hits_map,
       ClusterPars cluster_pars,
       bool has_distance_to_surface
   );

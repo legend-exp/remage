@@ -184,7 +184,7 @@ void RMGAnalysisReader::CloseFile() {
   fFileIsTemp = false;
   fNtupleId = -1;
   fHasUnits = false;
-  fHasUnits = {};
+  fUnits = {};
 }
 
 RMGAnalysisReader::Access RMGAnalysisReader::GetLockedReader() const {

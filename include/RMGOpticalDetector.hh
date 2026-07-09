@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef _MUG_OPTICAL_DETECTOR_HH_
-#define _MUG_OPTICAL_DETECTOR_HH_
+#ifndef _RMG_OPTICAL_DETECTOR_HH_
+#define _RMG_OPTICAL_DETECTOR_HH_
 
 #include <memory>
 #include <string>
