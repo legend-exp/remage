@@ -82,9 +82,11 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
   if (fParticles.find(pdg) == fParticles.end()) return std::nullopt;
 
   const auto pv = aTrack->GetTouchableHandle()->GetVolume();
-  // I am not 100% sure the physical volume will exist at this point. Can remove after some tests
+  // The physical volume may not exist at this point (e.g. a track leaving the
+  // world). Keep the track.
   if (!pv) {
     RMGLog::OutDev(RMGLog::debug_event, "Physical volume does not exist in ParticleFilter!");
+    return std::nullopt;
   }
   const auto pv_name = pv->GetName();
   // If a kill volume is specified only kill if in the kill volume.
