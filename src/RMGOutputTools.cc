@@ -193,7 +193,7 @@ bool RMGOutputTools::check_step_point_containment(
 ) {
 
   const auto pv = step_point->GetTouchableHandle()->GetVolume();
-  auto pv_name = pv->GetName();
+  const auto& pv_name = pv->GetName();
   const auto pv_copynr = step_point->GetTouchableHandle()->GetCopyNumber();
 
   // check if physical volume is registered as germanium detector
@@ -223,7 +223,7 @@ bool RMGOutputTools::check_step_point_containment(
 }
 
 void RMGOutputTools::redistribute_gamma_energy(
-    std::map<int, std::vector<RMGDetectorHit*>> hits_map,
+    const std::map<int, std::vector<RMGDetectorHit*>>& hits_map,
     RMGOutputTools::ClusterPars cluster_pars,
     bool has_distance_to_surface
 ) {

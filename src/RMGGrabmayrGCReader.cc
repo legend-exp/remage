@@ -124,7 +124,7 @@ void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
     file.clear(); // clear EOF flag
 
     if (!entry_offsets.empty()) {
-      const std::size_t start_location = (std::size_t)(entry_offsets.size() * G4UniformRand());
+      const auto start_location = (std::size_t)(entry_offsets.size() * G4UniformRand());
       RMGLog::Out(RMGLog::detail, "Random start location: ", start_location);
       file.seekg(entry_offsets[start_location]);
     }

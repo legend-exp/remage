@@ -64,7 +64,7 @@ bool RMGScintillatorDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*hi
   const auto poststep = step->GetPostStepPoint();
 
   // locate us
-  const auto pv_name = prestep->GetTouchableHandle()->GetVolume()->GetName();
+  const auto& pv_name = prestep->GetTouchableHandle()->GetVolume()->GetName();
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
   // check if physical volume is registered as sermanium detector

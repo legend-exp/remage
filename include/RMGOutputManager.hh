@@ -190,13 +190,13 @@ class RMGOutputManager {
      * @param det_uid Unique identifier for the detector.
      * @return The ntuple identifier.
      */
-    int GetNtupleID(int det_uid) { return fNtupleIDs[det_uid].first; }
+    int GetNtupleID(int det_uid) { return fNtupleIDs.at(det_uid).first; }
     /**
      * @brief Gets the auxiliary ntuple identifier for a given key.
      * @param det_uid Key for the auxiliary ntuple.
      * @return The auxiliary ntuple identifier.
      */
-    int GetAuxNtupleID(std::string det_uid) { return fNtupleAuxIDs[det_uid]; }
+    int GetAuxNtupleID(std::string det_uid) { return fNtupleAuxIDs.at(det_uid); }
 
     /**
      * @brief Activates an optional output scheme.

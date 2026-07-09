@@ -33,6 +33,13 @@ void RMGGeometryCheckOutputScheme::SteppingAction(const G4Step* step) {
   const auto prestep = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   const auto poststep = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
   auto info = dynamic_cast<GeantinoUserTrackInformation*>(step->GetTrack()->GetUserInformation());
+  if (!info) {
+    RMGLog::OutDev(
+        RMGLog::error,
+        "did not get correct user information class (attached by another output scheme?)"
+    );
+    return;
+  }
   if (info->fIsOutside) return;
 
   const auto last = info->fVolumeStack.back();
@@ -104,6 +111,14 @@ void RMGGeometryCheckOutputScheme::TrackingActionPre(const G4Track* aTrack) {
 void RMGGeometryCheckOutputScheme::TrackingActionPost(const G4Track* aTrack) {
 
   auto info = dynamic_cast<GeantinoUserTrackInformation*>(aTrack->GetUserInformation());
+  // another output scheme may have attached different user info to the track
+  if (!info) {
+    RMGLog::OutDev(
+        RMGLog::error,
+        "did not get correct user information class (attached by another output scheme?)"
+    );
+    return;
+  }
   if (!info->fVolumeStack.empty() && info->fVolumeStack.back() != nullptr) {
     auto event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
     RMGLog::Out(

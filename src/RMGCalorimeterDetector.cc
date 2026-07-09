@@ -16,7 +16,6 @@
 #include "RMGCalorimeterDetector.hh"
 
 #include <algorithm>
-#include <limits>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -79,7 +78,7 @@ bool RMGCalorimeterDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*his
   // retrieve unique id for persistency, take from the prestep
   const auto pv = prestep->GetTouchableHandle()->GetVolume();
 
-  auto pv_name = pv->GetName();
+  const auto& pv_name = pv->GetName();
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();

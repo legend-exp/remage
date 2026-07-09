@@ -79,7 +79,7 @@ bool RMGGermaniumDetector::ProcessHits(G4Step* step, G4TouchableHistory* /*histo
   // retrieve unique id for persistency, take from the prestep
   const auto pv = prestep->GetTouchableHandle()->GetVolume();
 
-  auto pv_name = pv->GetName();
+  const auto& pv_name = pv->GetName();
   const auto pv_copynr = prestep->GetTouchableHandle()->GetCopyNumber();
 
   const auto det_cons = RMGManager::Instance()->GetDetectorConstruction();
