@@ -162,8 +162,10 @@ RMGDetectorHit* RMGOutputTools::average_hits(
 
   // check if the average point is inside
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-  if (navigator->LocateGlobalPointAndSetup(hit->global_position_average) != hit->physical_volume)
+  if (navigator->LocateGlobalPointAndSetup(hit->global_position_average) != hit->physical_volume) {
+    delete hit;
     return nullptr;
+  }
 
 
   // compute the distance to the surface, for the pre/post step this is already done
