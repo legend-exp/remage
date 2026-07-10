@@ -119,6 +119,17 @@ std::string RMGLog::GetPrefix(RMGLog::LogLevel loglevel, std::ostream& os) {
   }
 }
 
+bool RMGLog::ShouldPrintWithLevel(RMGLog::LogLevel loglevel) {
+  if (loglevel >= RMGLog::error) {
+    fHadError = true;
+  } else if (loglevel == RMGLog::warning) {
+    fHadWarning = true;
+  }
+
+  // write message to screen
+  return loglevel >= RMGLog::fMinimumLogLevel;
+}
+
 // https://github.com/agauniyal/rang/blob/master/include/rang.hpp
 namespace {
   bool stream_supports_colors(FILE* the_stream) {
