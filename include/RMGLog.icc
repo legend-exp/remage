@@ -32,27 +32,22 @@
 
 template <typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed, bool do_flush) {
-  if (loglevel >= RMGLog::error) {
-    fHadError = true;
-  } else if (loglevel == RMGLog::warning) {
-    fHadWarning = true;
-  }
+  if (!ShouldPrintWithLevel(loglevel)) return;
 
-  // write message to screen
-  if (loglevel >= RMGLog::fMinimumLogLevel) {
-    std::ostream& strm = loglevel > RMGLog::LogLevel::warning ? G4cout : G4cerr;
-    if (prefixed) strm << RMGLog::GetPrefix(loglevel, strm);
-    strm << msg;
-    if (do_flush) strm << std::flush;
-  }
+  std::ostream& strm = loglevel > RMGLog::LogLevel::warning ? G4cout : G4cerr;
+  if (prefixed) strm << RMGLog::GetPrefix(loglevel, strm);
+  strm << msg;
+  if (do_flush) strm << std::flush;
 }
 
 // ---------------------------------------------------------
 
 template <typename T>
 inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
+  if (!ShouldPrintWithLevel(loglevel)) return;
+
   // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
+  if (!RMGLog::fFirstOutputDone) [[unlikely]] RMGLog::StartupInfo();
 
   RMGLog::Print(loglevel, message, true);
   RMGLog::Print(loglevel, "\n", false);
@@ -65,9 +60,10 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
 
 template <typename T, typename... Args>
 inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... args) {
+  if (!ShouldPrintWithLevel(loglevel)) return;
 
   // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) RMGLog::StartupInfo();
+  if (!RMGLog::fFirstOutputDone) [[unlikely]] RMGLog::StartupInfo();
 
   RMGLog::Print(loglevel, t, true, false);
   (RMGLog::Print(loglevel, args, false, false), ...);
@@ -81,6 +77,8 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... ar
 
 template <typename... Args>
 inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
+    if (!ShouldPrintWithLevel(loglevel)) return;
+
     try {
         RMGLog::Out(loglevel, fmt::format(fmt::runtime(fmt), args...));
     }

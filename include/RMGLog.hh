@@ -177,6 +177,11 @@ class RMGLog {
     static std::string GetPrefix(RMGLog::LogLevel, std::ostream& os);
 
     /**
+     * Decides whether to print a message with the given level; and globally records warnings and
+     * error flags. */
+    static bool ShouldPrintWithLevel(RMGLog::LogLevel loglevel);
+
+    /**
      * BAT version number */
     static std::string fVersion;
 
