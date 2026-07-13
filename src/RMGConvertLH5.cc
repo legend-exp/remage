@@ -584,6 +584,7 @@ bool RMGConvertLH5::ConvertFromLH5Internal(
   auto ntuples = GetChildren(ntuples_group);
   bool ntuple_success = true;
   for (auto& ntuple : ntuples) {
+    if (!ExistsByType(ntuples_group, ntuple, H5O_TYPE_GROUP)) continue;
     auto det_group = ntuples_group.openGroup(ntuple);
     units_map[ntuple] = {};
     ntuple_success &= ConvertTableToNTuple(det_group, units_map[ntuple]);
