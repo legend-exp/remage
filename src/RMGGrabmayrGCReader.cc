@@ -17,7 +17,9 @@
 
 #include "RMGGrabmayrGCReader.hh"
 
+#include <algorithm>
 #include <cstdlib>
+#include <sstream>
 
 #include "G4Tokenizer.hh"
 #include "Randomize.hh"
@@ -39,7 +41,9 @@ RMGGrabmayrGCReader::~RMGGrabmayrGCReader() { CloseFiles(); }
 void RMGGrabmayrGCReader::CloseFiles() {
   RMGLog::Out(RMGLog::detail, "Closing gamma cascade files");
   for (const auto& el : fCascadeFiles) {
-    if (el.second->is_open()) { el.second->close(); }
+    for (const auto& entry : el.second) {
+      if (entry.file && entry.file->is_open()) { entry.file->close(); }
+    }
   }
 }
 
@@ -50,27 +54,62 @@ G4bool RMGGrabmayrGCReader::IsApplicable(G4int z, G4int a) {
   return it != fCascadeFiles.end();
 }
 
-// Returns the next cascade for the Isotope Z, A.
-GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a) {
-  // Find the corresponding file
+// Returns the next cascade for the Isotope Z, A, drawing from the cascade file whose neutron
+// kinetic-energy range contains neutron_energy_keV.
+GammaCascadeLine RMGGrabmayrGCReader::GetNextEntry(G4int z, G4int a, G4double neutron_energy_keV) {
+  // Find the corresponding isotope
   std::pair<G4int, G4int> key = std::make_pair(z, a);
   auto it = fCascadeFiles.find(key);
   if (it == fCascadeFiles.end())
     RMGLog::OutFormat(RMGLog::fatal, "Isotope Z: {} A: {} does not exist.", z, a);
+  auto& entries = it->second; // vector<GammaCascadeFileEntry>, non-empty, sorted ascending
+
+  // Select the cascade file for this neutron energy.
+  GammaCascadeFileEntry* selected = nullptr;
+  if (entries.size() == 1) {
+    // Legacy single-file case: use it for all neutron energies (energy range ignored).
+    selected = &entries.front();
+  } else {
+    for (auto& entry : entries) {
+      if (neutron_energy_keV >= entry.en_low && neutron_energy_keV < entry.en_high) {
+        selected = &entry;
+        break;
+      }
+    }
+    // Out of range: clamp to the nearest (first/last) bin and warn once per isotope.
+    if (selected == nullptr) {
+      selected = (neutron_energy_keV < entries.front().en_low) ? &entries.front() : &entries.back();
+      if (fOutOfRangeWarned.insert(key).second) {
+        RMGLog::OutFormat(
+            RMGLog::warning,
+            "Neutron kinetic energy {} keV is outside the registered cascade ranges for isotope "
+            "Z: {} A: {}; clamping to the [{}, {}) keV file.",
+            neutron_energy_keV,
+            z,
+            a,
+            selected->en_low,
+            selected->en_high
+        );
+      }
+    }
+  }
+  std::ifstream& stream = *selected->file;
+
   // read next line from file
   std::string line;
   do { // NOLINT(cppcoreguidelines-avoid-do-while)
-    if (!std::getline(*(it->second), line)) {
+    if (!std::getline(stream, line)) {
       // if end-of-file is reached, reset file and read first line
       RMGLog::Out(RMGLog::debug_event, "Gamma cascade file EOF reached, re-opening the file");
-      it->second->clear();                 // clear EOF flag
-      it->second->seekg(0, std::ios::beg); // move to beginning of file
-      if (!std::getline(*(it->second), line)) {
+      stream.clear();                 // clear EOF flag
+      stream.seekg(0, std::ios::beg); // move to beginning of file
+      if (!std::getline(stream, line)) {
         RMGLog::Out(RMGLog::fatal, "Failed to read next line after re-opening the file. Exit!");
       }
     }
-  } while (line[0] == '%' || (line.find("version") !=
-                              std::string::npos)); // This could be outsourced to SetStartLocation
+  } while (
+      line.empty() || line[0] == '%' ||
+      (line.find("version") != std::string::npos)); // This could be outsourced to SetStartLocation
 
   // parse line and return as struct. All fields are integers.
   GammaCascadeLine gamma_cascade{};
@@ -131,8 +170,13 @@ void RMGGrabmayrGCReader::SetStartLocation(std::ifstream& file) const {
   }
 }
 
-void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, const G4String file_name) {
-
+void RMGGrabmayrGCReader::RegisterCascadeFile(
+    const G4int z,
+    const G4int a,
+    const G4String& file_name,
+    const G4double en_low,
+    const G4double en_high
+) {
   RMGLog::Out(RMGLog::detail, "Opening file ", file_name);
   std::unique_ptr<std::ifstream> file = std::make_unique<std::ifstream>(file_name);
 
@@ -143,12 +187,93 @@ void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, cons
 
   SetStartLocation(*file);
 
-  fCascadeFiles.insert(std::make_pair(std::make_pair(z, a), std::move(file)));
+  fCascadeFiles[std::make_pair(z, a)].push_back(
+      GammaCascadeFileEntry{en_low, en_high, std::move(file)}
+  );
+}
+
+void RMGGrabmayrGCReader::SetGammaCascadeFile(const G4int z, const G4int a, const G4String file_name) {
+  // Legacy single file case
+  const auto key = std::make_pair(z, a);
+  fCascadeFiles.erase(key);
+  fOutOfRangeWarned.erase(key);
+
+  RegisterCascadeFile(z, a, file_name, 0.0, 0.0);
+}
+
+void RMGGrabmayrGCReader::SetGammaCascadeFilelist(
+    const G4int z,
+    const G4int a,
+    const G4String filelist_name
+) {
+  const auto key = std::make_pair(z, a);
+  fCascadeFiles.erase(key);
+  fOutOfRangeWarned.erase(key);
+
+  // The filelist maps a neutron kinetic-energy range to the cascade file to use for that range.
+  // Each row is "<cascade filename> <E_low> <E_high>" (keV, interval [E_low, E_high)); cascade
+  // filenames are resolved relative to the directory containing the filelist.
+  const std::filesystem::path filelist_path(filelist_name.c_str());
+  const std::filesystem::path base_dir = filelist_path.parent_path();
+
+  std::ifstream filelist(filelist_path);
+  if (!filelist.is_open())
+    RMGLog::Out(RMGLog::fatal, "Gamma cascade filelist: " + filelist_name + " not found! Exit.");
+
+  std::size_t n_entries = 0;
+  std::string line;
+  while (std::getline(filelist, line)) {
+    if (line.empty() || line[0] == '%' || line[0] == '#') continue; // blank / comment
+
+    std::istringstream iss(line);
+    std::string file_name;
+    G4double en_low = 0.0;
+    G4double en_high = 0.0;
+    if (!(iss >> file_name >> en_low >> en_high)) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Malformed gamma cascade filelist line: '" + line +
+              "'. Expected: <file> <E_low> <E_high>. Exit."
+      );
+    }
+
+    if (en_high <= en_low)
+      RMGLog::OutFormat(
+          RMGLog::fatal,
+          "Invalid gamma cascade filelist range: E_low={} keV, E_high={} keV (require E_high > "
+          "E_low). Exit.",
+          en_low,
+          en_high
+      );
+
+    const std::filesystem::path cascade_path = base_dir / file_name;
+    RegisterCascadeFile(z, a, cascade_path.string(), en_low, en_high);
+    n_entries++;
+  }
+
+  if (n_entries == 0)
+    RMGLog::OutFormat(
+        RMGLog::fatal,
+        "Gamma cascade filelist {} contained no valid entries. Exit.",
+        filelist_name
+    );
+
+  // Keep the per-isotope entries sorted ascending by lower energy bound
+  auto& entries = fCascadeFiles[std::make_pair(z, a)];
+  std::sort(
+      entries.begin(),
+      entries.end(),
+      [](const GammaCascadeFileEntry& l, const GammaCascadeFileEntry& r) {
+        return l.en_low < r.en_low;
+      }
+  );
 }
 
 void RMGGrabmayrGCReader::RandomizeFiles() {
   RMGLog::Out(RMGLog::detail, "(Un)-Randomizing start locations");
-  for (auto& el : fCascadeFiles) { SetStartLocation(*el.second); }
+  for (auto& el : fCascadeFiles) {
+    for (auto& entry : el.second) { SetStartLocation(*entry.file); }
+  }
 }
 
 void RMGGrabmayrGCReader::SetGammaCascadeRandomStartLocation(const int answer) {
@@ -188,7 +313,11 @@ void RMGGrabmayrGCReader::DefineCommands() {
 
 RMGGrabmayrGCReader::GCMessenger::GCMessenger(RMGGrabmayrGCReader* reader) : fReader(reader) {
   fGammaFileCmd = new G4UIcommand("/RMG/GrabmayrGammaCascades/SetGammaCascadeFile", this);
-  fGammaFileCmd->SetGuidance("Set a gamma cascade file for neutron capture on a specified isotope");
+  fGammaFileCmd->SetGuidance(
+      "Set a gamma cascade file for neutron capture on a specified isotope. It is applied "
+      "independent of the kinetic energy of the incoming neutron. Resets any already registered "
+      "gamma cascades for the specific isotope."
+  );
 
   auto p_Z = new G4UIparameter("Z", 'i', false);
   p_Z->SetGuidance("Z of isotope");
@@ -203,12 +332,40 @@ RMGGrabmayrGCReader::GCMessenger::GCMessenger(RMGGrabmayrGCReader* reader) : fRe
   fGammaFileCmd->SetParameter(p_file);
 
   fGammaFileCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  fGammaFilelistCmd = new G4UIcommand("/RMG/GrabmayrGammaCascades/SetGammaCascadeFilelist", this);
+  fGammaFilelistCmd->SetGuidance(
+      "Set a file that lists a set of gamma cascade files for neutron capture on a specified "
+      "isotope depending on the kinetic energy of the incoming neutron. remage selects the file "
+      "matching the incoming neutron energy at runtime. Resets any already registered gamma "
+      "cascade for the specific isotope."
+  );
+
+  auto q_Z = new G4UIparameter("Z", 'i', false);
+  q_Z->SetGuidance("Z of isotope");
+  fGammaFilelistCmd->SetParameter(q_Z);
+
+  auto q_A = new G4UIparameter("A", 'i', false);
+  q_A->SetGuidance("A of isotope");
+  fGammaFilelistCmd->SetParameter(q_A);
+
+  auto q_filelist = new G4UIparameter("filelist", 's', false);
+  q_filelist->SetGuidance(
+      "/path/to/<isotope>_ncapture_filelist.txt (cascade paths are relative to it)"
+  );
+  fGammaFilelistCmd->SetParameter(q_filelist);
+
+  fGammaFilelistCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
-RMGGrabmayrGCReader::GCMessenger::~GCMessenger() { delete fGammaFileCmd; }
+RMGGrabmayrGCReader::GCMessenger::~GCMessenger() {
+  delete fGammaFileCmd;
+  delete fGammaFilelistCmd;
+}
 
 void RMGGrabmayrGCReader::GCMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   if (command == fGammaFileCmd) GammaFileCmd(newValues);
+  else if (command == fGammaFilelistCmd) GammaFilelistCmd(newValues);
 }
 
 void RMGGrabmayrGCReader::GCMessenger::GammaFileCmd(const std::string& parameters) {
@@ -219,4 +376,14 @@ void RMGGrabmayrGCReader::GCMessenger::GammaFileCmd(const std::string& parameter
   auto file = next();
 
   fReader->SetGammaCascadeFile(Z, A, file);
+}
+
+void RMGGrabmayrGCReader::GCMessenger::GammaFilelistCmd(const std::string& parameters) {
+  G4Tokenizer next(parameters);
+
+  auto Z = std::stoi(next());
+  auto A = std::stoi(next());
+  auto filelist = next();
+
+  fReader->SetGammaCascadeFilelist(Z, A, filelist);
 }

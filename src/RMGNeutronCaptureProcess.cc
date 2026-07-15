@@ -84,8 +84,8 @@ G4VParticleChange* RMGNeutronCaptureProcess::PostStepDoIt(const G4Track& aTrack,
 
   // Can skip all of the Checks for illegal track status, as in that case no Applicable isotope would have been produced!
 
-  // Do our Physics.
-  GammaCascadeLine input = CascadeReader->GetNextEntry(z, a);
+  // Do our Physics. (aTrack.GetKineticEnergy() is in Geant4 internal units; the cascade ranges are in keV).
+  GammaCascadeLine input = CascadeReader->GetNextEntry(z, a, aTrack.GetKineticEnergy() / u::keV);
   G4ThreeVector location = aTrack.GetPosition();
   G4double time = aTrack.GetGlobalTime();
 

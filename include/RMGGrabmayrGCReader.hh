@@ -18,10 +18,14 @@
 #define _RMG_GRABMAYR_GC_READER_HH_
 
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "G4GenericMessenger.hh"
@@ -42,6 +46,22 @@ struct GammaCascadeLine {
     G4int m;               ///< Cascade multiplicity (number of @c eg entries).
     G4int em;              ///< Missing energy not carried by the listed photons [keV].
     std::vector<G4int> eg; ///< Photon energies of the cascade [keV].
+};
+
+
+/**
+ * @brief One cascade file valid for a neutron kinetic-energy interval @c [en_low, en_high) keV.
+ *
+ * A given isotope @c (Z, A) may register several of these, each generated at a representative
+ * neutron energy, tiling the neutron-energy axis. The right one is chosen at runtime from the
+ * incoming neutron's kinetic energy. The stream is held by @c unique_ptr because
+ * @c std::ifstream is non-copyable. Entries live in a @c std::vector, which only requires
+ * move-constructibility.
+ */
+struct GammaCascadeFileEntry {
+    G4double en_low;                     ///< Inclusive lower neutron KE bound [keV].
+    G4double en_high;                    ///< Exclusive upper neutron KE bound [keV].
+    std::unique_ptr<std::ifstream> file; ///< Open handle to the cascade file for this bin.
 };
 
 
@@ -67,21 +87,27 @@ class RMGGrabmayrGCReader {
 
     /**
      * @brief Read and return the next cascade entry for the @c (Z, A) isotope.
-     * @details The reader cycles back to the beginning when the file is exhausted.
+     * @details Selects the cascade file whose neutron kinetic-energy range contains
+     * @c neutron_energy_keV (or the single registered file, if only one). If the energy falls
+     * outside every registered range it is clamped to the nearest bin (a one-time warning is
+     * emitted per isotope). The reader cycles back to the beginning when the file is exhausted.
      */
-    GammaCascadeLine GetNextEntry(G4int z, G4int a);
+    GammaCascadeLine GetNextEntry(G4int z, G4int a, G4double neutron_energy_keV);
 
   private:
 
     static G4ThreadLocal RMGGrabmayrGCReader* instance;
     RMGGrabmayrGCReader();
-    // std::vector<std::unique_ptr<std::ifstream>> files;
-    //  map holding the corresponding file for each isotope
-    std::map<std::pair<G4int, G4int>, std::unique_ptr<std::ifstream>> fCascadeFiles;
+    // map holding the cascade file(s) for each isotope, keyed by (Z, A). Each isotope may have
+    // several files covering disjoint neutron kinetic-energy ranges (sorted ascending by en_low).
+    std::map<std::pair<G4int, G4int>, std::vector<GammaCascadeFileEntry>> fCascadeFiles;
+    std::set<std::pair<G4int, G4int>> fOutOfRangeWarned;
     std::unique_ptr<G4GenericMessenger> fGenericMessenger;
     G4int fGammaCascadeRandomStartLocation = 0;
 
     void SetGammaCascadeFile(G4int z, G4int a, G4String file_name);
+    void SetGammaCascadeFilelist(G4int z, G4int a, G4String filelist_name);
+    void RegisterCascadeFile(G4int z, G4int a, const G4String& file_name, G4double en_low, G4double en_high);
     void SetGammaCascadeRandomStartLocation(int answer);
     void SetStartLocation(std::ifstream& file) const;
 
@@ -101,8 +127,10 @@ class RMGGrabmayrGCReader {
 
         RMGGrabmayrGCReader* fReader;
         G4UIcommand* fGammaFileCmd;
+        G4UIcommand* fGammaFilelistCmd;
 
         void GammaFileCmd(const std::string& parameters);
+        void GammaFilelistCmd(const std::string& parameters);
     };
 
     std::unique_ptr<GCMessenger> fUIMessenger;
