@@ -19,3 +19,12 @@ foreach(_t ${_tests})
   set_tests_properties(cosmogenics/${_t} PROPERTIES LABELS extra FIXTURES_REQUIRED
                                                     test-${_t}-fixture)
 endforeach()
+
+# Energy-dependent gamma cascade file selection: exercise the SetGammaCascadeFilelist command and
+# the runtime, neutron-energy-based file selection in the neutron capture executable.
+add_test(
+  NAME cosmogenics/NeutronCapture-CascadeFilelist
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:test-NeutronCapture>
+  COMMAND test-NeutronCapture runRMGnCascadeFilelist.mac)
+set_tests_properties(cosmogenics/NeutronCapture-CascadeFilelist
+                     PROPERTIES LABELS extra FIXTURES_REQUIRED test-NeutronCapture-fixture)

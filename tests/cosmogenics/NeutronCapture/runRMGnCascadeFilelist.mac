@@ -1,0 +1,24 @@
+/RMG/Manager/Logging/LogLevel summary
+
+/RMG/Processes/HadronicPhysics Shielding
+/RMG/Processes/EnableNeutronThermalScattering 1
+/RMG/Processes/UseGrabmayrsGammaCascades true
+
+/RMG/Output/ActivateOutputScheme IsotopeOutputScheme
+
+# Register energy-dependent gamma cascade files via a filelist. remage selects the file whose
+# neutron kinetic-energy range contains the incoming neutron's energy at capture time.
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFilelist 64 155 GammaCascades/156Gd_ncapture_filelist.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeFilelist 64 157 GammaCascades/156Gd_ncapture_filelist.txt
+/RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation 1
+/run/initialize
+
+/RMG/Output/NtuplePerDetector false
+/RMG/Output/FileName Custom-filelist.root
+
+/RMG/Generator/Select GPS
+/gps/particle neutron
+/gps/ang/type iso
+/gps/energy 0.5 MeV
+
+/run/beamOn 10000

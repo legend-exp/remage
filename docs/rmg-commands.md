@@ -2472,7 +2472,8 @@ Control Peters gamma cascade model
 **Commands:**
 
 * `SetGammaCascadeRandomStartLocation` – Set the whether the start location in the gamma cascade file is random or not
-* `SetGammaCascadeFile` – Set a gamma cascade file for neutron capture on a specified isotope
+* `SetGammaCascadeFile` – Set a gamma cascade file for neutron capture on a specified isotope. It is applied independent of the kinetic energy of the incoming neutron. Resets any already registered gamma cascades for the specific isotope.
+* `SetGammaCascadeFilelist` – Set a file that lists a set of gamma cascade files for neutron capture on a specified isotope depending on the kinetic energy of the incoming neutron. remage selects the file matching the incoming neutron energy at runtime. Resets any already registered gamma cascade for the specific isotope.
 
 ### `/RMG/GrabmayrGammaCascades/SetGammaCascadeRandomStartLocation`
 
@@ -2491,7 +2492,7 @@ Set the whether the start location in the gamma cascade file is random or not
 
 ### `/RMG/GrabmayrGammaCascades/SetGammaCascadeFile`
 
-Set a gamma cascade file for neutron capture on a specified isotope
+Set a gamma cascade file for neutron capture on a specified isotope. It is applied independent of the kinetic energy of the incoming neutron. Resets any already registered gamma cascades for the specific isotope.
 
 * **Parameter** – `Z`
     – Z of isotope
@@ -2503,6 +2504,24 @@ Set a gamma cascade file for neutron capture on a specified isotope
   * **Omittable** – `False`
 * **Parameter** – `file`
     – /path/to/file of gamma cascade
+  * **Parameter type** – `s`
+  * **Omittable** – `False`
+* **Allowed states** – `PreInit Idle`
+
+### `/RMG/GrabmayrGammaCascades/SetGammaCascadeFilelist`
+
+Set a file that lists a set of gamma cascade files for neutron capture on a specified isotope depending on the kinetic energy of the incoming neutron. remage selects the file matching the incoming neutron energy at runtime. Resets any already registered gamma cascade for the specific isotope.
+
+* **Parameter** – `Z`
+    – Z of isotope
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Parameter** – `A`
+    – A of isotope
+  * **Parameter type** – `i`
+  * **Omittable** – `False`
+* **Parameter** – `filelist`
+    – /path/to/<isotope>_ncapture_filelist.txt (cascade paths are relative to it)
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`
