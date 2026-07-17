@@ -303,6 +303,17 @@ class RMGManager {
 
   private:
 
+    /**
+     * @brief Derives a seed specific to this worker process from a user-supplied seed.
+     * @details In process-based parallelization all workers receive an identical command line and
+     * macro. Deterministically derive a distinct seed per process from that, keeping the whole run
+     * reproducible for a given user seed. The process with offset 0 (and any run without
+     * multiprocessing) uses the user seed unchanged.
+     * @param seed The user-supplied seed.
+     * @return The seed to be used by this process.
+     */
+    [[nodiscard]] long DeriveProcessSeed(long seed) const;
+
     void SetUpDefaultG4RunManager(G4RunManagerType type = G4RunManagerType::Default);
     void SetUpDefaultG4VisManager();
     void SetUpDefaultDetectorConstruction();

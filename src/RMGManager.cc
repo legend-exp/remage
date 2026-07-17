@@ -307,6 +307,18 @@ bool RMGManager::ApplyRandEngineForCurrentThread() {
   return true;
 }
 
+long RMGManager::DeriveProcessSeed(long seed) const {
+  if (!fMultiProcessing || fProcessNumber == 0) return seed;
+
+  // draw the fProcessNumber-th seed from a generator seeded with the user value. Using a generator
+  // independent of the CLHEP engine keeps the derivation stable across engine choices.
+  std::mt19937_64 rng(static_cast<std::uint64_t>(seed));
+  std::uniform_int_distribution<long> dist(0, std::numeric_limits<int>::max());
+  long derived = seed;
+  for (int i = 0; i < fProcessNumber; ++i) derived = dist(rng);
+  return derived;
+}
+
 void RMGManager::CheckRandEngineMTState() {
   if (fG4RunManager == nullptr || IsExecSequential() || GetRandIsControlled() ||
       fIsRandControlledAtEngineChange || fRandEngineName.empty())
@@ -331,8 +343,24 @@ void RMGManager::SetRandEngineSeed(int seed) {
         ". Setting seed to 0."
     );
     CLHEP::HepRandom::setTheSeed(0);
-  } else CLHEP::HepRandom::setTheSeed(seed);
-  RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed changed to: ", seed, " (user value)");
+  } else {
+    auto proc_seed = DeriveProcessSeed(seed);
+    CLHEP::HepRandom::setTheSeed(proc_seed);
+    if (proc_seed != seed) {
+      RMGLog::Out(
+          RMGLog::summary,
+          "CLHEP::HepRandom seed changed to: ",
+          proc_seed,
+          " (derived from user value ",
+          seed,
+          " for process ",
+          fProcessNumber,
+          ")"
+      );
+    } else {
+      RMGLog::Out(RMGLog::summary, "CLHEP::HepRandom seed changed to: ", seed, " (user value)");
+    }
+  }
 
   fIsRandControlled = true;
 }
@@ -344,12 +372,14 @@ void RMGManager::SetRandEngineInternalSeed(int index) {
   CLHEP::HepRandom::getTheTableSeeds(seeds, table_index);
 
   int array_index = index % 2;
-  CLHEP::HepRandom::setTheSeed(seeds[array_index]);
+  auto proc_seed = DeriveProcessSeed(seeds[array_index]);
+  CLHEP::HepRandom::setTheSeed(proc_seed);
   RMGLog::Out(
       RMGLog::summary,
       "CLHEP::HepRandom seed changed to: ",
-      seeds[array_index],
-      " (from the internal seed table)"
+      proc_seed,
+      proc_seed != seeds[array_index] ? " (derived from the internal seed table for this process)"
+                                      : " (from the internal seed table)"
   );
 
   fIsRandControlled = true;
