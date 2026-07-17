@@ -1,4 +1,4 @@
-# executable for converting remage output HDF5 with ntuples to LH5 tables
+# executable for testing RNG propagation to worker threads.
 add_executable(test-random EXCLUDE_FROM_ALL test-random.cc)
 target_link_libraries(test-random PUBLIC remage)
 add_test(NAME internals/build-test-random COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}"
