@@ -114,7 +114,8 @@ do_surf = True
 energy = 1000
 
 generators = {}
-cuts = [10, 20, 50, 100, 200, None]
+all_step_limits = [10, 20, 50, 100, 200, None]
+all_prod_cuts = [0.01, 0.02, 0.05, 0.3, 0.5, 0.7, 1, None]
 
 
 # define some generator commands
@@ -139,38 +140,47 @@ if do_bulk:
 
 jobs = []
 for generator, config in generators.items():
-    for step_limits in cuts:
-        jobs.append((generator, config, step_limits))
+    for limit in all_step_limits:
+        jobs.append((generator, config, limit, None, "step_limits"))
+    for cut in all_prod_cuts:
+        jobs.append((generator, config, None, cut, "prod_cuts"))
 
 
 def run_sim_and_pproc(gen):
-    generator, config, step_limits = gen
+    generator, config, step_limits, prod_cuts, mode = gen
 
-    command = (
+    step_limits_command = (
         f"/RMG/Geometry/SetMaxStepSize {step_limits} um germanium"
         if step_limits is not None
         else ""
     )
+    prod_cuts_command = (
+        f"/RMG/Processes/SensitiveProductionCut {prod_cuts} mm"
+        if prod_cuts is not None
+        else ""
+    )
+
+    name_kwargs = {"name": "step_limits", "val": step_limits}
+    if mode == "prod_cuts":
+        name_kwargs = {"name": "prod_cuts", "val": prod_cuts}
 
     # run the simulation
     run_sim(
         generator_name=generator,
-        name="step_limits",
-        val=step_limits,
-        step_limits=command,
-        prod_cuts="",
+        step_limits=step_limits_command,
+        prod_cuts=prod_cuts_command,
         proc="",
         step_points="/RMG/Output/Germanium/StepPositionMode Both",
         generator=config,
         register_lar=False,
+        **name_kwargs,
     )
 
     # post-process it
     run_reboost(
         generator_name=generator,
-        name="step_limits",
-        val=step_limits,
         reboost_config="config/hit_config.yaml",
+        **name_kwargs,
     )
 
 

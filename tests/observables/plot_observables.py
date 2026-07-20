@@ -140,7 +140,7 @@ def norm_histo(histo, bins):
 def plot(
     generator,
     xrange,
-    cuts,
+    values,
     names,
     fields,
     scale="log",
@@ -155,6 +155,7 @@ def plot(
     label="Energy [keV]",
     save_spec_name="spec.png",
     save_eff_name="eff.png",
+    unit="um",
 ):
     bins_tmp = np.linspace(xrange[0], xrange[1], n_bins) if n_bins is not None else bins
 
@@ -235,14 +236,14 @@ def plot(
                     fill=True,
                     alpha=0.2,
                     color="tab:blue",
-                    label="No limits",
+                    label="No limits" if names == ["step_limits"] else "Default",
                 )
 
             effs[field][name] = []
             steps[field][name] = []
             n_sels[field][name] = []
 
-            for idx, val in enumerate(cuts):
+            for idx, val in enumerate(values):
                 ak_obj, n_sel = get_lh5(
                     generator, name, val, dist_low=dist_low, dist_high=dist_high
                 )
@@ -260,9 +261,9 @@ def plot(
                 if idx == 0:
                     low_counts = counts
 
-                if idx == 0 or idx == len(cuts) - 2:
+                if idx == 0 or idx == len(values) - 2:
                     for a in axes_list:
-                        hist_tmp.plot(ax=a, **style, label=f"{val} um ")
+                        hist_tmp.plot(ax=a, **style, label=f"{val} {unit} ")
 
                     if legend:
                         axs[0].legend(loc="upper right")
@@ -362,7 +363,7 @@ def plot(
                 color=colors[idx],
             )
 
-    ax.set_xlabel(f"{name} [um]")
+    ax.set_xlabel(f"{name} [{unit}]")
     ax.set_ylabel("Fraction of events [%]")
     ax.set_title(f"Fraction of events in {eff_range[0]} - {eff_range[1]} ({label})")
 
@@ -374,111 +375,122 @@ bins = get_bins(
     [(-2, 2), (2, 10), (10, 50), (50, 950), (950, 980), (980, 998), (998, 1002)],
     [0.5, 2, 10, 50, 10, 2, 0.5],
 )
-cuts = [10, 20, 50, 100, 200, None]
+all_step_limits = [10, 20, 50, 100, 200, None]
+all_prod_cuts = [0.01, 0.02, 0.05, 0.3, 0.5, 0.7, 1, None]
 
 plot_name = sys.argv[1]
 
 # plots for the bulk
 
-plot(
-    "beta_bulk",
-    (-1, 1020),
-    cuts=cuts,
-    names=["step_limits"],
-    fields=["truth_energy"],
-    doeff=True,
-    save_spec_name=f"{plot_name}.bulk-total-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.bulk-total-energy.eff.output.png",
-)
+for lim, names, unit, suffix in (
+    (all_prod_cuts, "prod_cuts", "mm", ".cuts"),
+    (all_step_limits, "step_limits", "um", ""),
+):
+    plot(
+        "beta_bulk",
+        (-1, 1020),
+        values=lim,
+        names=[names],
+        fields=["truth_energy"],
+        doeff=True,
+        unit=unit,
+        save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
+    )
 
-plot(
-    "beta_bulk",
-    (-1, 1020),
-    cuts=cuts,
-    names=["step_limits"],
-    fields=["active_energy_avg"],
-    doeff=True,
-    save_spec_name=f"{plot_name}.bulk-active-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.bulk-active-energy.eff.output.png",
-)
+    plot(
+        "beta_bulk",
+        (-1, 1020),
+        values=lim,
+        names=[names],
+        fields=["active_energy_avg"],
+        doeff=True,
+        unit=unit,
+        save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
+    )
 
-plot(
-    "beta_bulk",
-    (-1, 1020),
-    cuts=cuts,
-    dist_range=(0, 1),
-    names=["step_limits"],
-    fields=["active_energy_avg"],
-    doeff=True,
-    save_spec_name=f"{plot_name}.tl-active-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.tl-active-energy.eff.output.png",
-)
+    plot(
+        "beta_bulk",
+        (-1, 1020),
+        values=lim,
+        dist_range=(0, 1),
+        names=[names],
+        fields=["active_energy_avg"],
+        doeff=True,
+        unit=unit,
+        save_spec_name=f"{plot_name}.tl-active-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.tl-active-energy{suffix}.eff.output.png",
+    )
 
+    plot(
+        "beta_bulk",
+        (-1, 1020),
+        values=lim,
+        dist_range=(1, np.inf),
+        names=[names],
+        fields=["active_energy_avg"],
+        doeff=True,
+        unit=unit,
+        save_spec_name=f"{plot_name}.not-tl-active-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.not-tl-active-energy{suffix}.eff.output.png",
+    )
 
-plot(
-    "beta_bulk",
-    (-1, 1020),
-    cuts=cuts,
-    dist_range=(1, np.inf),
-    names=["step_limits"],
-    fields=["active_energy_avg"],
-    doeff=True,
-    save_spec_name=f"{plot_name}.not-tl-active-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.not-tl-active-energy.eff.output.png",
-)
+    plot(
+        "beta_bulk",
+        (0, 2),
+        values=lim,
+        eff_range=(1, np.inf),
+        names=[names],
+        fields=["r90_avg"],
+        doeff=True,
+        n_bins=200,
+        range_zoom=None,
+        label="r90 [mm]",
+        unit=unit,
+        save_spec_name=f"{plot_name}.bulk-r90{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.bulk-r90{suffix}.eff.output.png",
+    )
 
+    # plots the surface
+    plot(
+        "beta_surf",
+        (-1, 1020),
+        values=lim,
+        names=[names],
+        fields=["truth_energy"],
+        doeff=True,
+        unit=unit,
+        save_spec_name=f"{plot_name}.surf-total-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.surf-total-energy{suffix}.eff.output.png",
+    )
 
-plot(
-    "beta_bulk",
-    (0, 2),
-    cuts=cuts,
-    eff_range=(1, np.inf),
-    names=["step_limits"],
-    fields=["r90_avg"],
-    doeff=True,
-    n_bins=200,
-    range_zoom=None,
-    label="r90 [mm]",
-    save_spec_name=f"{plot_name}.bulk-r90.spec.output.png",
-    save_eff_name=f"{plot_name}.bulk-r90.eff.output.png",
-)
+    plot(
+        "beta_surf",
+        (-1, 1020),
+        values=lim,
+        names=[names],
+        fields=["active_energy_avg"],
+        doeff=True,
+        range_zoom=None,
+        eff_range=(300, np.inf),
+        unit=unit,
+        save_spec_name=f"{plot_name}.surf-active-energy{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.surf-active-energy{suffix}.eff.output.png",
+    )
 
-# plots the surface
-plot(
-    "beta_surf",
-    (-1, 1020),
-    cuts=cuts,
-    names=["step_limits"],
-    fields=["truth_energy"],
-    doeff=True,
-    save_spec_name=f"{plot_name}.surf-total-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.surf-total-energy.eff.output.png",
-)
-
-plot(
-    "beta_surf",
-    (-1, 1020),
-    cuts=cuts,
-    names=["step_limits"],
-    fields=["active_energy_avg"],
-    doeff=True,
-    range_zoom=None,
-    eff_range=(300, np.inf),
-    save_spec_name=f"{plot_name}.surf-active-energy.spec.output.png",
-    save_eff_name=f"{plot_name}.surf-active-energy.eff.output.png",
-)
-
-plot(
-    "beta_surf",
-    (0, 2),
-    cuts=cuts,
-    eff_range=(1, np.inf),
-    names=["step_limits"],
-    fields=["max_z_avg"],
-    doeff=True,
-    n_bins=200,
-    range_zoom=None,
-    label="Range [mm]",
-    save_spec_name=f"{plot_name}.surf-max-z.spec.output.png",
-    save_eff_name=f"{plot_name}.surf-max-z.eff.output.png",
-)
+    plot(
+        "beta_surf",
+        (0, 2),
+        values=lim,
+        eff_range=(1, np.inf),
+        names=[names],
+        fields=["max_z_avg"],
+        doeff=True,
+        n_bins=200,
+        range_zoom=None,
+        label="Range [mm]",
+        unit=unit,
+        save_spec_name=f"{plot_name}.surf-max-z{suffix}.spec.output.png",
+        save_eff_name=f"{plot_name}.surf-max-z{suffix}.eff.output.png",
+    )

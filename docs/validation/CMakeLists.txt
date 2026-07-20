@@ -163,20 +163,36 @@ set(TESTS_IMAGES
     observables/tracks-bulk-no-limit.step-vs-dist-zoom.png
     observables/beta-observables.bulk-active-energy.eff.output.png
     observables/beta-observables.bulk-active-energy.spec.output.png
+    observables/beta-observables.bulk-active-energy.cuts.eff.output.png
+    observables/beta-observables.bulk-active-energy.cuts.spec.output.png
     observables/beta-observables.bulk-r90.eff.output.png
     observables/beta-observables.bulk-r90.spec.output.png
+    observables/beta-observables.bulk-r90.cuts.eff.output.png
+    observables/beta-observables.bulk-r90.cuts.spec.output.png
     observables/beta-observables.bulk-total-energy.eff.output.png
     observables/beta-observables.bulk-total-energy.spec.output.png
+    observables/beta-observables.bulk-total-energy.cuts.eff.output.png
+    observables/beta-observables.bulk-total-energy.cuts.spec.output.png
     observables/beta-observables.not-tl-active-energy.eff.output.png
     observables/beta-observables.not-tl-active-energy.spec.output.png
+    observables/beta-observables.not-tl-active-energy.cuts.eff.output.png
+    observables/beta-observables.not-tl-active-energy.cuts.spec.output.png
     observables/beta-observables.tl-active-energy.eff.output.png
     observables/beta-observables.tl-active-energy.spec.output.png
+    observables/beta-observables.tl-active-energy.cuts.eff.output.png
+    observables/beta-observables.tl-active-energy.cuts.spec.output.png
     observables/beta-observables.surf-total-energy.eff.output.png
     observables/beta-observables.surf-total-energy.spec.output.png
+    observables/beta-observables.surf-total-energy.cuts.eff.output.png
+    observables/beta-observables.surf-total-energy.cuts.spec.output.png
     observables/beta-observables.surf-active-energy.eff.output.png
     observables/beta-observables.surf-active-energy.spec.output.png
+    observables/beta-observables.surf-active-energy.cuts.eff.output.png
+    observables/beta-observables.surf-active-energy.cuts.spec.output.png
     observables/beta-observables.surf-max-z.eff.output.png
     observables/beta-observables.surf-max-z.spec.output.png
+    observables/beta-observables.surf-max-z.cuts.eff.output.png
+    observables/beta-observables.surf-max-z.cuts.spec.output.png
     optics/photon-detection.output.png
     optics/photon-wls.output.png
     optics/photon-wls-times-delta.output.png
