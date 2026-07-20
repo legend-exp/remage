@@ -163,16 +163,12 @@ simulation.
 ### Bulk electrons
 
 We generate 1 MeV electrons in the bulk of the Germanium detector varying the
-step limits and production cuts. This is relevant both for the simulation of
-neutrinoless double beta decay but also any gamma's depositing energy in the
-HPGe. This is since a change in the fraction of electrons with fully
-reconstructed energy will change the peak-to-continuum ratio for the gamma
-simulation.
+step limits. This is relevant both for the simulation of neutrinoless double
+beta decay but also any gamma's depositing energy in the HPGe. This is since a
+change in the fraction of electrons with fully reconstructed energy will change
+the peak-to-continuum ratio for the gamma simulation.
 
 #### Total energy
-
-We extract the total energy deposited in the Germanium detector, the energy
-spectra are plotted below:
 
 ```{figure} ./_img/observables/beta-observables.bulk-total-energy.spec.output.png
 :width: 800px
@@ -356,8 +352,8 @@ keV deposited. This is relevant for the background induced by surface events.
 &nbsp; &nbsp;
 
 Again it is possible you may see differences relating to the step limits.
-However, it should be kept in mind that for simulations of beta's, which is a
-continuous spectrum this detector response function will be conolved with the
+However, it should be kept in mind that for simulations of betas, which is a
+continuous spectrum this detector response function will be convolved with the
 spectrum shape minimising the effect.
 
 #### Range
@@ -384,3 +380,239 @@ To quantify this we extract the fraction of events with a range > 1 mm.
 &nbsp; &nbsp;
 
 ## Production cuts effect on observables
+
+The next section of the validation report again describes the calculation of
+observables of interest relevant for Germanium detectors, as above.
+
+We compare the simulated observables with the production cuts used in the
+simulations.
+
+Most of the quantities should not significantly change with the production cut
+value. No energy is lost, as the energy of not-produced secondaries will just be
+deposited at the point where they would have been otherwise created. So any
+observable should only be affected by a slight shift of energy depositions of
+the order of the cut value. Furthermore, the production cut is not applied when
+the distance to the next surface is smaller than the cut value; so also the
+observables close to the surface should not be affected.
+
+### Bulk electrons
+
+We generate 1 MeV electrons in the bulk of the Germanium detector varying the
+production cuts. This is relevant both for the simulation of neutrinoless double
+beta decay but also any gamma's depositing energy in the HPGe. This is since a
+change in the fraction of electrons with fully reconstructed energy will change
+the peak-to-continuum ratio for the gamma simulation.
+
+#### Total energy
+
+We extract the total energy deposited in the Germanium detector, the energy
+spectra are plotted below:
+
+```{figure} ./_img/observables/beta-observables.bulk-total-energy.cuts.spec.output.png
+:width: 800px
+*Spectrum of total energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+To quantify this we count the fraction of events within 1 keV of the full energy
+peak.
+
+```{figure} ./_img/observables/beta-observables.bulk-total-energy.cuts.eff.output.png
+:width: 800px
+*Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the production cuts.*
+```
+
+&nbsp; &nbsp;
+
+We do not expect differences based on the production cuts, since the energy of
+not produced particles should be deposited locally.
+
+#### Active volume corrected energy
+
+Next, we again compute the energy after active volume correction as above. The
+next plots show the spectrum and fraction of full energy peak events after this
+active volume correction.
+
+```{figure} ./_img/observables/beta-observables.bulk-active-energy.cuts.spec.output.png
+:width: 800px
+*Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+```{figure} ./_img/observables/beta-observables.bulk-active-energy.cuts.eff.output.png
+:width: 800px
+*Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the production cuts.*
+```
+
+&nbsp; &nbsp;
+
+It is possible we may see differences due to the introduction of the inactive
+region of the HPGe detector meaning the Geant4 default stepping is not
+necessarily high enough in this region.
+
+However, the overall trends are driven by the fraction of events with vertices
+sampled in the partially active region. To decouple this effect from the
+variations due to production cuts, we select the energies corresponding to
+vertices in the partially active region (distance to surface less than 1 mm) and
+in the bulk (distance greater than one mm).
+
+```{subfigure} AB
+:subcaptions: above
+
+:::{image} ./_img/observables/beta-observables.tl-active-energy.cuts.spec.output.png
+:width: 400px
+:alt: Vertices sampled inside the transition layer (distance less than 1 mm).
+:::
+
+:::{image} ./_img/observables/beta-observables.not-tl-active-energy.cuts.spec.output.png
+:width: 400px
+:alt: Vertices sampled inside the transition layer (distance greater than 1 mm).
+:::
+
+Energy spectra for 1 MeV electrons in Germanium, selecting vertices in the
+transition region and the detector bulk.
+```
+
+&nbsp;&nbsp;
+
+Similar to the previous tests we also plot the fraction of events with energy
+within 1 keV of the full energy peak.
+
+```{subfigure} AB
+
+:::{image} ./_img/observables/beta-observables.tl-active-energy.cuts.eff.output.png
+:width: 400px
+:alt: Vertices sampled inside the transition layer (distance less than 1 mm).
+:::
+
+:::{image} ./_img/observables/beta-observables.not-tl-active-energy.cuts.eff.output.png
+:width: 400px
+:alt: Vertices sampled inside the transition layer (distance greater than 1 mm).
+:::
+
+Fraction of generated electrons with fully reconstructed active energy (within 1
+keV), as a function of the production cuts.
+```
+
+&nbsp; &nbsp;
+
+You should observe that very few of the events from the transition layer deposit
+their full energy in the Germanium. You may also be able to observe some
+dependence on the efficiency for the vertices sampled inside the bulk of the
+detector
+
+#### Pulse-shape heuristics
+
+We again focus on "r90" defined as the smallest radius (centered on the energy
+weighted center) or the event containing at-least 90% of the deposited energy.
+The spectrum of r90 for 1 MeV electrons in bulk is shown below:
+
+```{figure} ./_img/observables/beta-observables.bulk-r90.cuts.spec.output.png
+:width: 800px
+*Spectrum of r90 in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+To quantify the effect of the production cuts on our observable of interest (the
+fraction of multisite events), we compute the fraction of events with > 1 mm
+r90.
+
+```{figure} ./_img/observables/beta-observables.bulk-r90.cuts.eff.output.png
+:width: 800px
+*Fraction of generated electrons with r90 greater than 1 mm, as a function of the production cuts.*
+```
+
+&nbsp; &nbsp;
+
+### Surface electrons
+
+#### Total energy
+
+Next we generate events on the surface of the HPGe detector. This is relevant
+for beta decays on the surface of the detector (eg. from Potassium-42) but also
+gives us a way to study more generally the surface effects.
+
+We generated 1 MeV electrons on the center of the bottom surface of the
+detector, all pointing upwards. As before we extract the total deposited energy:
+
+```{figure} ./_img/observables/beta-observables.surf-total-energy.cuts.spec.output.png
+:width: 800px
+*Spectrum of total energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+```{figure} ./_img/observables/beta-observables.surf-total-energy.cuts.eff.output.png
+:width: 800px
+*Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the production cuts.*
+```
+
+&nbsp; &nbsp;
+
+This fraction will increase with increasing cut value: for lower cut values,
+more secondaries will be produced that _could_ still escape the detector volume.
+For larger cut values, this is not possible as the locally deposited energy in
+the detector will never escape.
+
+#### Active volume corrected energy
+
+Next we plot the spectrum after the active volume correction:
+
+```{figure} ./_img/observables/beta-observables.surf-active-energy.cuts.spec.output.png
+:width: 800px
+*Spectrum of active energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+It is not expected to observe many events with 1 MeV deposited in the active
+volume. So as an observable we count the fraction of events with more than 300
+keV deposited. This is relevant for the background induced by surface events.
+
+```{figure} ./_img/observables/beta-observables.surf-active-energy.cuts.eff.output.png
+:width: 800px
+*Fraction of generated electrons with more than 300 keV active energy, as a function of the production cuts.*
+```
+
+&nbsp; &nbsp;
+
+This now follows the inverse trend compared to the last fractional plot. In this
+situation, smaller cut values lead to more secondaries being produced. These can
+shift the position of the energy deposition toward the fully active region, thus
+increasing the found active volume. The previously described effect at the outer
+surface will not have an impact here, as the dead layer will lead to any
+depositions close to the surface will not be accounted, irrespective of cut
+value.
+
+However, it should be kept in mind that for simulations of betas, which is a
+continuous spectrum this detector response function will be convolved with the
+spectrum shape minimising the effect.
+
+#### Range
+
+Finally, we can extract the maximum z position of the electron, this gives a
+measurement of the range of the electrons. The spectrum of this parameter (not
+really an observable) is shown below:
+
+```{figure} ./_img/observables/beta-observables.surf-max-z.cuts.spec.output.png
+:width: 800px
+*Distribution of the range of the electrons in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
+```
+
+&nbsp; &nbsp;
+
+To quantify this we extract the fraction of events with a range > 1 mm.
+
+```{figure} ./_img/observables/beta-observables.surf-max-z.cuts.eff.output.png
+:width: 800px
+*Fraction of 1 MeV electrons travelling more than 1 mm as a function of the production cuts.*
+```
