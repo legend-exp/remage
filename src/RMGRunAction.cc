@@ -19,7 +19,9 @@
 #include <ctime>
 #include <fmt/chrono.h>
 #include <limits>
+#include <map>
 #include <random>
+#include <typeinfo>
 #include <unistd.h>
 
 #include "G4AnalysisManager.hh"
@@ -82,6 +84,28 @@ void RMGRunAction::SetupAnalysisManager() {
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
   else ana_man->SetVerboseLevel(0);
+
+  // Reject configurations in which two active output schemes decide the stacking fate of the same
+  // particle.
+  std::map<int, const RMGVOutputScheme*> claimed_by;
+  for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {
+    for (const int pdg : oscheme->GetClaimedParticles()) {
+      const auto [it, inserted] = claimed_by.emplace(pdg, oscheme.get());
+      if (!inserted) {
+        RMGLog::Out(
+            RMGLog::fatal,
+            "output schemes '",
+            typeid(*it->second).name(),
+            "' and '",
+            typeid(*oscheme).name(),
+            "' both act on particles with PDG code ",
+            pdg,
+            ". They cannot be combined for the same particle - restrict one of them to other "
+            "particles."
+        );
+      }
+    }
+  }
 
   // do it only for activated detectors
   for (const auto& oscheme : det_cons->GetAllActiveOutputSchemes()) {

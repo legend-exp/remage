@@ -68,8 +68,16 @@ void RMGStackingAction::NewStage() {
       stack_man->GetNUrgentTrack()
   );
 
-  if (should_do_stage.has_value() && !should_do_stage.value()) { stack_man->clear(); }
   fStage++;
+  const bool discard_stage = should_do_stage.has_value() && !should_do_stage.value();
+  if (discard_stage) {
+    stack_man->clear();
+  } else {
+    // Let output schemes re-inject tracks they staged out of the Geant4 stacks
+    // runs after fStage++ so re-pushed tracks are not classified by OutputSchemes again.
+    for (auto& el : fRunAction->GetAllOutputDataFields()) el->ReinjectStagedTracks();
+  }
+  // After this function G4 checks for empty stacks. If not empty, we will end back here again.
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab
