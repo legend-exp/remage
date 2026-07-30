@@ -2554,6 +2554,9 @@ Commands for staging optical photon tracks.
 **Commands:**
 
 * `DeferToWaitingStage` – Defer optical photons to the waiting stack during stage 0.
+* `RMGDeferring` – Use the minimalistic remage custom staging, which reduces memory usage.
+* `LimitMemory` – Set the allowed size of the staging vector (for each thread), before flushed to a temp file, in MB.
+* `StorePath` – Set the directory in which the temp files for optical photons are stored.
 
 ### `/RMG/Staging/OpticalPhotons/DeferToWaitingStage`
 
@@ -2565,6 +2568,41 @@ This is disabled by default.
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/OpticalPhotons/RMGDeferring`
+
+Use the minimalistic remage custom staging, which reduces memory usage.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/OpticalPhotons/LimitMemory`
+
+Set the allowed size of the staging vector (for each thread), before flushed to a temp file, in MB.
+
+This is 510 MB by default.
+
+* **Parameter** – `integer`
+  * **Parameter type** – `i`
+  * **Omittable** – `True`
+  * **Default value** – `510`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/OpticalPhotons/StorePath`
+
+Set the directory in which the temp files for optical photons are stored.
+
+If not specified, no temp files are created and memory consumption is uncapped.
+
+* **Parameter** – `string`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
 * **Allowed states** – `Idle`
 
 ## `/RMG/Staging/Electrons/`
@@ -2581,6 +2619,9 @@ Commands for staging electron tracks.
 * `MaxEnergyThresholdForStacking` – Set the maximum kinetic energy for e- tracks to be considered for staging.
 * `MinEnergyThresholdForStacking` – Set the minimum kinetic energy for e- tracks to be considered for staging.
 * `SuspendOnEnergyDrop` – Suspend secondary electrons when they cross from above to below the configured kinetic-energy threshold.
+* `RMGDeferring` – Use the minimalistic remage custom staging for electrons, which reduces memory usage.
+* `LimitMemory` – Set the allowed size of the electron staging vector (for each thread), before flushed to a temp file, in MB.
+* `StorePath` – Set the directory in which the temp files for staged electrons are stored.
 
 ### `/RMG/Staging/Electrons/DeferToWaitingStage`
 
@@ -2677,4 +2718,41 @@ This is disabled by default.
   * **Parameter type** – `b`
   * **Omittable** – `True`
   * **Default value** – `false`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/RMGDeferring`
+
+Use the minimalistic remage custom staging for electrons, which reduces memory usage.
+
+When disabled, staged electrons are deferred to the waiting stack instead.
+
+This is disabled by default.
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/LimitMemory`
+
+Set the allowed size of the electron staging vector (for each thread), before flushed to a temp file, in MB.
+
+This is 120 MB by default.
+
+* **Parameter** – `integer`
+  * **Parameter type** – `i`
+  * **Omittable** – `True`
+  * **Default value** – `120`
+* **Allowed states** – `Idle`
+
+### `/RMG/Staging/Electrons/StorePath`
+
+Set the directory in which the temp files for staged electrons are stored.
+
+If not specified, no temp files are created and the staging vector ignores the memory limit.
+
+* **Parameter** – `string`
+  * **Parameter type** – `s`
+  * **Omittable** – `True`
 * **Allowed states** – `Idle`

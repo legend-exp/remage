@@ -519,7 +519,7 @@ void RMGStagingScheme::DefineCommands() {
       .SetDefaultValue("true")
       .SetStates(G4State_Idle);
 
-  fOpticalPhotonStagingMessengers->DeclareProperty("RMGdeferring", fRMGOpticaldeferring)
+  fOpticalPhotonStagingMessengers->DeclareProperty("RMGDeferring", fRMGOpticaldeferring)
       .SetGuidance("Use the minimalistic remage custom staging, which reduces memory usage.")
       .SetGuidance(
           std::string("This is ") + (fRMGOpticaldeferring ? "enabled" : "disabled") + " by default."
@@ -620,7 +620,7 @@ void RMGStagingScheme::DefineCommands() {
       .SetDefaultValue("false")
       .SetStates(G4State_Idle);
 
-  fElectronStagingMessengers->DeclareProperty("RMGdeferring", fRMGElectrondeferring)
+  fElectronStagingMessengers->DeclareProperty("RMGDeferring", fRMGElectrondeferring)
       .SetGuidance(
           "Use the minimalistic remage custom staging for electrons, which reduces memory usage."
       )
