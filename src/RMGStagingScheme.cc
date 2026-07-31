@@ -122,8 +122,12 @@ std::set<int> RMGStagingScheme::GetClaimedParticles() const {
 }
 
 void RMGStagingScheme::ClearBeforeEvent() {
-  fPhotonStates.clear();
-  fElectronStates.clear();
+  // With a scratch file the buffer is reserved to the memory limit and kept at that capacity for
+  // the whole run, otherwise we clear and shrink to free memory.
+  if (fPhotonScratch.is_open()) fPhotonStates.clear();
+  else std::vector<RMGPhotonState>().swap(fPhotonStates);
+  if (fElectronScratch.is_open()) fElectronStates.clear();
+  else std::vector<RMGElectronState>().swap(fElectronStates);
   // Truncate and rewind the scratch files so the previous event's disk blocks are released.
   ResetScratch(fPhotonScratch, fPhotonScratchFd, fPhotonScratchBytes, fPhotonScratchRead);
   ResetScratch(fElectronScratch, fElectronScratchFd, fElectronScratchBytes, fElectronScratchRead);
