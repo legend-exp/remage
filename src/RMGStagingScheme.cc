@@ -36,9 +36,6 @@
 #include "RMGOutputManager.hh"
 #include "RMGOutputTools.hh"
 
-// Warn below this much free space in a staging directory: staged tracks routinely need several GB
-static constexpr std::uintmax_t kMinScratchSpace = 10ULL * 1024 * 1024 * 1024;
-
 RMGStagingScheme::RMGStagingScheme() { this->DefineCommands(); }
 
 RMGStagingScheme::~RMGStagingScheme() {
@@ -70,6 +67,8 @@ void RMGStagingScheme::AssignOutputNames(G4AnalysisManager*) {
 
   // Warn about a nearly full scratch directory.
   if (G4Threading::IsMasterThread()) {
+    // Warn below this much free space in a staging directory: staged tracks routinely need several GB.
+    constexpr std::uintmax_t kMinScratchSpace = 10ULL * 1024 * 1024 * 1024;
     std::set<std::string> dirs;
     if (photons_spill) dirs.insert(fOpticalStorePath);
     if (electrons_spill) dirs.insert(fElectronStorePath);
@@ -444,6 +443,8 @@ inline void RMGStagingScheme::FlushToTempFile(
   const size_t n_bytes = buffer.size() * sizeof(T);
   // Geant4 just swallows exceptions, so catch it ourselves.
   try {
+    // Raw byte dump of the trivially-copyable POD records; char aliasing is always well-defined.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     stream.write(reinterpret_cast<const char*>(buffer.data()), static_cast<std::streamsize>(n_bytes));
   } catch (const std::exception& e) {
     RMGLog::OutDev(RMGLog::fatal, "Error while flushing to scratch file. Likely full disk: ", e.what());
@@ -492,6 +493,8 @@ bool RMGStagingScheme::ReinjectBatch(
     // Seeking is also what allows the stream to switch from writing to reading, and it flushes the
     // pending output on the way. Geant4 would swallow any exception thrown here.
     scratch.seekg(static_cast<std::streamoff>(read_bytes));
+    // Raw byte read-back into the trivially-copyable POD records; char aliasing is well-defined.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     scratch.read(reinterpret_cast<char*>(mem.data()), static_cast<std::streamsize>(n * sizeof(State)));
   } catch (const std::exception& e) {
     RMGLog::OutDev(RMGLog::fatal, "Error while reading back the staging scratch file: ", e.what());

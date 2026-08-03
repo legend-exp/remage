@@ -174,9 +174,9 @@ class RMGStagingScheme : public RMGVOutputScheme {
     bool fDeferPositronsToWaitingStage = false;
     bool fRMGElectrondeferring = false;
     size_t fOpticalSize = 510; // size of the staging vector before spilling in a scratch file, in MB
-    size_t fElectronSize = 120; // This only applies if an associated scratch path is specified.
-    std::string fOpticalStorePath = ""; // If specified, the staging vector can spill to a scratch file
-    std::string fElectronStorePath = ""; // generated in this directory.
+    size_t fElectronSize = 120;     // This only applies if an associated scratch path is specified.
+    std::string fOpticalStorePath;  // If specified, the staging vector can spill to a scratch file
+    std::string fElectronStorePath; // generated in this directory.
     double fElectronMaxEnergyThresholdForStacking = -1;
     double fElectronMinEnergyThresholdForStacking = -1;
     bool fSuspendElectronsOnEnergyDrop = false;

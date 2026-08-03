@@ -92,12 +92,14 @@ void RMGRunAction::SetupAnalysisManager() {
     for (const int pdg : oscheme->GetClaimedParticles()) {
       const auto [it, inserted] = claimed_by.emplace(pdg, oscheme.get());
       if (!inserted) {
+        const RMGVOutputScheme& existing = *it->second;
+        const RMGVOutputScheme& current = *oscheme;
         RMGLog::Out(
             RMGLog::fatal,
             "output schemes '",
-            typeid(*it->second).name(),
+            typeid(existing).name(),
             "' and '",
-            typeid(*oscheme).name(),
+            typeid(current).name(),
             "' both act on particles with PDG code ",
             pdg,
             ". They cannot be combined for the same particle - restrict one of them to other "
