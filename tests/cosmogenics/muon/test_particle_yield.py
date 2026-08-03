@@ -184,7 +184,7 @@ def simulate_worker(
             output_file,
         )
         result_queue.put(("ok", key, output, events))
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         result_queue.put(("error", case, str(exc), events))
 
 
