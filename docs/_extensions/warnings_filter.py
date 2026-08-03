@@ -68,7 +68,7 @@ def configure(app: Sphinx) -> None:
     # load expressions from configuration file
     with Path(app.config.warnings_filter_config).open() as f:
         expressions = []
-        for line in f.readlines():
+        for line in f:
             if line.strip() and not line.startswith("#"):
                 expressions.append(line.rstrip())
 

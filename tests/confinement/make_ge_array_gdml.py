@@ -121,12 +121,10 @@ lines_exclude = [line.replace("AddSolid", "AddExcludedSolid") for line in lines]
 
 # write the coordinates of the lar volumes
 with Path("macros/lar-in-coordinates.mac").open("w") as f:
-    for line in lines:
-        f.write(line + "\n")
+    f.writelines(line + "\n" for line in lines)
 
 with Path("macros/lar-out-coordinates.mac").open("w") as f:
-    for line in lines_exclude:
-        f.write(line + "\n")
+    f.writelines(line + "\n" for line in lines_exclude)
 
 pytools.detectors.write_detector_auxvals(reg)
 pytools.geometry.check_registry_sanity(reg, reg)
