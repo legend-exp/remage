@@ -15,12 +15,14 @@
 
 #include "RMGPhysics.hh"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 
 #include "G4BaryonConstructor.hh"
 #include "G4BosonConstructor.hh"
 #include "G4Cerenkov.hh"
+#include "G4CrossSectionDataStore.hh"
 #include "G4DecayPhysics.hh"
 #include "G4DeexPrecoParameters.hh"
 #include "G4EmExtraPhysics.hh"
@@ -40,6 +42,7 @@
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
 #include "G4HadronPhysicsShielding.hh"
 #include "G4HadronicParameters.hh"
+#include "G4HadronicProcess.hh"
 #include "G4HadronicProcessStore.hh"
 #include "G4IonConstructor.hh"
 #include "G4IonPhysics.hh"
@@ -268,6 +271,30 @@ void RMGPhysics::ConstructProcess() {
     }
     RMGLog::Out(RMGLog::detail, "Adding hadronic inelastic physics");
     hPhysics->ConstructProcess();
+
+#if G4VERSION_NUMBER >= 1140
+    // the issue only affects the NeutronHPCaptureXS cross-section data, so inspect the data sets
+    // actually attached to the neutron capture process instead of guessing from the selected
+    // hadronic physics list
+    if (const auto capture_process = dynamic_cast<G4HadronicProcess*>(
+            G4Neutron::Neutron()->GetProcessManager()->GetProcess("nCapture")
+        )) {
+      const auto& data_sets = capture_process->GetCrossSectionDataStore()->GetDataSetList();
+      const auto uses_hp_capture_xs = std::any_of(
+          data_sets.begin(),
+          data_sets.end(),
+          [](const G4VCrossSectionDataSet* ds) { return ds->GetName() == "NeutronHPCaptureXS"; }
+      );
+      if (uses_hp_capture_xs) {
+        RMGLog::Out(
+            RMGLog::warning,
+            "Be cautious: neutron capture cross-sections in Geant4 11.4.0 and above are wrong for "
+            "some isotopes in the NeutronHPCaptureXS model. See https://geant4-forum.web.cern.ch/t/"
+            "capture-cross-section-issues-using-shielding-in-g4-11-4/15082 for more details."
+        );
+      }
+    }
+#endif
 
     if (fUseGrabmayrGammaCascades) {
       // Apply RMG custom neutron capture
