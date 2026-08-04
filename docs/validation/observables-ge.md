@@ -616,3 +616,40 @@ To quantify this we extract the fraction of events with a range > 1 mm.
 :width: 800px
 *Fraction of 1 MeV electrons travelling more than 1 mm as a function of the production cuts.*
 ```
+
+&nbsp; &nbsp;
+
+## Computational cost
+
+Both step limits and production cuts trade accuracy against simulation speed and
+output file size. To quantify this, the CPU time of each `remage` run is
+measured (with the resource usage of the simulation subprocess, which is
+insensitive to the load of the machine running the tests), together with the
+size of the produced output file, both normalised to the number of simulated
+events. These plots should be compared with the observable distributions above
+to select the loosest settings that still give an accurate result.
+
+```{figure} ./_img/observables/beta-observables.timing.output.png
+:width: 600px
+*CPU time (left axis, solid) and output file size (right axis, dotted) per simulated event as a function of the step limit, for
+electrons generated in the bulk and on the surface of the detector. The dashed lines give the values without step limits.*
+```
+
+You should observe the CPU time increasing steeply for tight step limits, since
+the number of steps per track grows accordingly. The output file size follows
+the same trend, since every step is written to the output file.
+
+&nbsp; &nbsp;
+
+```{figure} ./_img/observables/beta-observables.timing.cuts.output.png
+:width: 600px
+*CPU time (left axis, solid) and output file size (right axis, dotted) per simulated event as a function of the production cut,
+for electrons generated in the bulk and on the surface of the detector. The dashed lines give the values with the default
+production cuts.*
+```
+
+&nbsp; &nbsp;
+
+You should observe the CPU time increasing slightly for small production cuts,
+since more secondaries are generated and tracked, with a corresponding increase
+of the output file size.
