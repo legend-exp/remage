@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+import datetime as dt
 
 import awkward as ak
 import dbetto
@@ -13,8 +13,8 @@ import reboost.math.functions
 import reboost.math.stats
 from pygeomhpges import make_hpge
 
-d1 = datetime.strptime("2013-11-01", "%Y-%m-%d").replace(tzinfo=datetime.UTC)
-d2 = datetime.strptime("2021-01-18", "%Y-%m-%d").replace(tzinfo=datetime.UTC)
+d1 = dt.datetime.strptime("2013-11-01", "%Y-%m-%d").replace(tzinfo=dt.UTC)
+d2 = dt.datetime.strptime("2021-01-18", "%Y-%m-%d").replace(tzinfo=dt.UTC)
 time = (d2 - d1).days
 activity = 87.0e3 * 2 ** (-abs(time) / 365 / 1.9116)  # Bq
 
