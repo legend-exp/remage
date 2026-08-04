@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
+import resource
 import sys
+import time
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -99,6 +102,14 @@ def run_sim(
     replace_lines(
         "macros/template.mac", macro_directory / Path(macro_file), replacements
     )
+
+    # the simulation runs in a child process, so its CPU time can be extracted
+    # from the resource usage of the children of this worker process. Contrary
+    # to the wall-clock time this is insensitive to the machine load, i.e. to
+    # how many jobs of this test are running in parallel.
+    rusage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
+    wall_start = time.perf_counter()
+
     remage_run(
         str(macro_directory / macro_file),
         macro_substitutions={"NEVENTS": str(n_events)},
@@ -107,6 +118,32 @@ def run_sim(
         overwrite_output=True,
         threads=1,
     )
+
+    wall_time = time.perf_counter() - wall_start
+    rusage_end = resource.getrusage(resource.RUSAGE_CHILDREN)
+    cpu_time = (rusage_end.ru_utime - rusage_start.ru_utime) + (
+        rusage_end.ru_stime - rusage_start.ru_stime
+    )
+
+    output_size = sum(f.stat().st_size for f in stp_directory.glob("out*.lh5"))
+
+    with (Path(f"out/{dir_string}") / "timing.json").open(
+        "w", encoding="utf-8"
+    ) as timing_file:
+        json.dump(
+            {
+                "generator": generator_name,
+                "name": name,
+                "val": val,
+                "n_events": n_events,
+                "cpu_time": cpu_time,
+                "wall_time": wall_time,
+                "output_size": output_size,
+                "n_parallel_jobs": n_proc,
+            },
+            timing_file,
+            indent=2,
+        )
 
 
 do_bulk = True

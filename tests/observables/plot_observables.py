@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 
@@ -9,6 +10,7 @@ import hist
 import lh5
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from scipy.stats import beta, norm, poisson
 
@@ -77,6 +79,76 @@ def get_lh5(generator, name, val, dist_low=None, dist_high=None):
         ]
 
     return data, n_sel
+
+
+def get_timing(generator, name, val):
+    """Read the timing information stored by ``run_sim.py`` for one simulation."""
+    path = Path(f"{generator}/{name}/max_{val}/")
+
+    with (Path("out") / path / "timing.json").open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def plot_timing(generators, name, values, unit, save_name):
+    """Plot CPU time and output file size per simulated event vs. the setting.
+
+    The CPU time is shown on the left axis (solid) and the size of the output
+    file on the right one (dotted), the color encodes the generator. The
+    horizontal dashed lines give the values obtained with the Geant4 defaults.
+    """
+    _fig, ax_cpu = plt.subplots(figsize=(7, 4))
+    ax_size = ax_cpu.twinx()
+
+    colors = ["tab:blue", "tab:orange", "tab:purple", "tab:green"]
+
+    # None corresponds to the Geant4 default, which has no position on the x axis
+    settings = [val for val in values if val is not None]
+
+    for idx, generator in enumerate(generators):
+        timings = {val: get_timing(generator, name, val) for val in values}
+
+        def cpu_per_event(val, timings=timings):
+            return 1000 * timings[val]["cpu_time"] / timings[val]["n_events"]
+
+        def size_per_event(val, timings=timings):
+            return timings[val]["output_size"] / timings[val]["n_events"]
+
+        for axis, metric, linestyle, marker in (
+            (ax_cpu, cpu_per_event, "-", "."),
+            (ax_size, size_per_event, ":", "s"),
+        ):
+            axis.axhline(y=metric(None), linestyle="--", color=colors[idx])
+            axis.plot(
+                settings,
+                [metric(val) for val in settings],
+                marker=marker,
+                markersize=4,
+                linestyle=linestyle,
+                color=colors[idx],
+                label=generator,
+            )
+
+    ax_cpu.set_xscale("log")
+    ax_cpu.set_xlabel(f"{name} [{unit}]")
+    ax_cpu.set_ylabel("CPU time [ms / event]")
+    ax_size.set_ylabel("Output size [B / event]")
+    ax_cpu.set_ylim(bottom=0)
+    ax_size.set_ylim(bottom=0)
+
+    # one legend for the generators (colors), one for the metrics (line styles)
+    handles = [
+        Line2D([], [], color=colors[idx], label=generator)
+        for idx, generator in enumerate(generators)
+    ]
+    handles += [
+        Line2D([], [], color="black", linestyle="-", marker=".", label="CPU time"),
+        Line2D([], [], color="black", linestyle=":", marker="s", label="Output size"),
+        Line2D([], [], color="black", linestyle="--", label="Geant4 default"),
+    ]
+    ax_cpu.legend(handles=handles, fontsize=10, loc="best")
+
+    plt.tight_layout()
+    plt.savefig(save_name)
 
 
 def get_bins(list_range, list_binning, e_max=1000):
@@ -386,6 +458,14 @@ for lim, names, unit, suffix in (
     (all_prod_cuts, "prod_cuts", "mm", ".cuts"),
     (all_step_limits, "step_limits", "um", ""),
 ):
+    plot_timing(
+        ["beta_bulk", "beta_surf"],
+        names,
+        lim,
+        unit,
+        save_name=f"{plot_name}.timing{suffix}.output.png",
+    )
+
     plot(
         "beta_bulk",
         (-1, 1020),

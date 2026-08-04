@@ -193,6 +193,8 @@ set(TESTS_IMAGES
     observables/beta-observables.surf-max-z.spec.output.png
     observables/beta-observables.surf-max-z.cuts.eff.output.png
     observables/beta-observables.surf-max-z.cuts.spec.output.png
+    observables/beta-observables.timing.output.png
+    observables/beta-observables.timing.cuts.output.png
     optics/photon-detection.output.png
     optics/photon-wls.output.png
     optics/photon-wls-times-delta.output.png
