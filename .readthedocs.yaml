@@ -24,7 +24,7 @@ build:
       # prepare Doxyfile, run Doxygen, prepare Sphinx
       # TODO: revert this temporary "fix" for the untrusted certificate
       - cd docs && wget --quiet --no-check-certificate https://geant4.kek.jp/Reference/11.3.0/geant4.tag
-      - echo "79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c  geant4.tag" | sha256sum --check --status
+      - echo "79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c  docs/geant4.tag" | sha256sum --check --status
       - export DOXYGEN_DOT_PATH=$(which dot)
       - sed s/@DOXYGEN_INPUT_DIR@/../g\;s/@DOXYGEN_OUTPUT_DIR@/_doxygen/g
         docs/Doxyfile.in > docs/Doxyfile
