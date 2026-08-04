@@ -124,7 +124,7 @@ def handle_ipc_message(
     if not isinstance(fields[0], str):
         # proc_id is always a single string, not a tuple
         msg_err = f"malformed IPC message, process index is not scalar: {fields[0]!r}"
-        raise ValueError(msg_err)
+        raise ValueError(msg_err)  # noqa: TRY004
     try:
         proc_num = int(fields[0])
     except ValueError as e:
@@ -165,7 +165,7 @@ def handle_ipc_message(
                     raise ValueError(msg_err)
                 try:
                     minidom_parse(fields[1])
-                except Exception as pe:
+                except Exception as pe:  # noqa: BLE001 (minidom throws a multitude of exceptions...)
                     log.error("invalid GDML file %s: %s", fields[1], pe)
                     is_fatal = True
                 msg_ret = None
@@ -265,7 +265,7 @@ def ipc_thread_fn(
     except OSError as e:
         if e.errno in (9, 32):  # bad file descriptor or broken pipe.
             return
-        raise e
+        raise
 
 
 class IpcResult:

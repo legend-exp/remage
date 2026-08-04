@@ -224,7 +224,7 @@ ax[0].set_xticks(
 )
 ax[1].axhline(y=0, color="red")
 ax[1].grid()
-fig.suptitle(f"Intersection check ({sigma:.1f} $\sigma$)")
+fig.suptitle(rf"Intersection check ({sigma:.1f} $\sigma$)")
 
 caption = "The fraction of the vertices found inside each cylinder. This is compared to the expectation which is that the number "
 caption += "should be proportional to the volume of the cylinder minus the total HPGe volume. The top panel shows the fraction in each string "

@@ -10,14 +10,12 @@ def _throughput_macro(*, mode: str, seed: int, events: int, distance_cm: float) 
     if mode == "optical_stacking":
         electron_staging_logic = ""
     elif mode == "electron_stacking":
-        electron_staging_logic = "\n".join(
-            [
-                "/RMG/Staging/Electrons/DeferToWaitingStage true",
-                "/RMG/Staging/Electrons/VolumeSafety 20.0 cm",
-                "/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 3.0 MeV",
-                "/RMG/Staging/Electrons/AddVolumeName world_vol",
-            ]
-        )
+        electron_staging_logic = """
+/RMG/Staging/Electrons/DeferToWaitingStage true
+/RMG/Staging/Electrons/VolumeSafety 20.0 cm
+/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 3.0 MeV
+/RMG/Staging/Electrons/AddVolumeName world_vol
+"""
     else:
         msg = f"Unsupported mode: {mode}"
         raise ValueError(msg)
