@@ -7,34 +7,74 @@ import sys
 import matplotlib.pyplot as plt
 
 
-def _muon_macro(*, mode: str, seed: int, events: int) -> str:
-    staging_activation = "/RMG/Output/ActivateOutputScheme Staging"
-    if mode == "optical_stacking":
-        electron_staging_logic = ""
-    elif mode == "electron_stacking":
-        electron_staging_logic = """
-/RMG/Staging/Electrons/DeferToWaitingStage true
-/RMG/Staging/Electrons/VolumeSafety 1.0 cm
-/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 10.0 MeV
-/RMG/Staging/Electrons/AddVolumeName world_vol
-"""
-    else:
+def _muon_macro(*, mode: str, backend: str, seed: int, events: int) -> str:
+    """1 GeV muon fired through the liquid-argon world (OpticalPhysics on), keeping only events
+    with a Germanium energy deposit. ``mode`` selects which secondaries are deferred, ``backend``
+    how they are held during stage 0 -- the one thing the staging optimisation changes.
+
+    ``mode``:
+      * ``"optical"``  -> defer every optical photon.
+      * ``"electron"`` -> defer every optical photon *and* every secondary electron/positron.
+        Deferring the leptons keeps their sub-showers out of stage 0, so fewer photons pile up.
+
+    ``backend`` (applied to every deferred species):
+      * ``"g4"``    -> native Geant4 waiting stack: deferred tracks stay as full G4Tracks.
+      * ``"ram"``   -> remage custom staging: each track recorded into a small POD struct
+        (52 B per photon, 44 B per electron) kept in memory.
+      * ``"spill"`` -> remage custom staging spilling records to a scratch file past
+        LimitMemory, capping the in-memory footprint.
+
+    The muon passes 0.5 m from the Germanium, so every event is discarded: this exercises the
+    staging classification, recording and (for spill) the scratch-file write path -- including
+    the electron path in "electron" mode -- under a heavy load. Re-injection correctness is
+    covered separately by the optical round-trip test.
+    """
+    species = ["OpticalPhotons"]
+    species_logic = ["/RMG/Staging/OpticalPhotons/DeferToWaitingStage true"]
+    if mode == "electron":
+        species.append("Electrons")
+        species_logic += [
+            "/RMG/Staging/Electrons/DeferToWaitingStage true",
+            "/RMG/Staging/Electrons/IncludePositrons true",
+            "/RMG/Staging/Electrons/VolumeSafety 1.0 cm",
+            "/RMG/Staging/Electrons/MaxEnergyThresholdForStacking 10.0 MeV",
+            "/RMG/Staging/Electrons/AddVolumeName world_vol",
+        ]
+    elif mode != "optical":
         msg = f"Unsupported mode: {mode}"
         raise ValueError(msg)
+
+    backend_logic = []
+    for s in species:
+        if backend == "g4":
+            backend_logic.append(f"/RMG/Staging/{s}/RMGDeferring false")
+        elif backend == "ram":
+            backend_logic.append(f"/RMG/Staging/{s}/RMGDeferring true")
+        elif backend == "spill":
+            limit_mb = 50 if s == "OpticalPhotons" else 1
+            backend_logic += [
+                f"/RMG/Staging/{s}/RMGDeferring true",
+                f"/RMG/Staging/{s}/StorePath .",
+                f"/RMG/Staging/{s}/LimitMemory {limit_mb}",
+            ]
+        else:
+            msg = f"Unsupported backend: {backend}"
+            raise ValueError(msg)
+
+    staging_logic = "\n".join(species_logic + backend_logic)
 
     return f"""
 /random/setSeeds {seed} {seed}
 /RMG/Geometry/RegisterDetector Germanium detector_phys 0
-{staging_activation}
+/RMG/Output/ActivateOutputScheme Staging
 
 /RMG/Processes/OpticalPhysics true
 
 /run/initialize
 
 /RMG/Output/Germanium/EdepCutLow 0 keV
-/RMG/Staging/OpticalPhotons/DeferToWaitingStage true
+{staging_logic}
 /RMG/Output/Germanium/DiscardWaitingTracksUnlessGermaniumEdep true
-{electron_staging_logic}
 
 /RMG/Output/NtuplePerDetector true
 /RMG/Output/NtupleUseVolumeName true
@@ -103,50 +143,109 @@ print(json.dumps({
     raise AssertionError(msg)
 
 
-def test_muon_memory_and_rate_directionality():
-    """Test that electron stacking reduces the peak RSS for muon events compared to optical stacking, while improving the processing rate."""
+def _grouped_bar(ax, backends, values, *, ylabel, title, log=False):
+    """Two bars (optical / optical+e±) per backend."""
+    width = 0.38
+    x = list(range(len(backends)))
+    ax.bar(
+        [i - width / 2 for i in x],
+        [values[("optical", b)] for b in backends],
+        width,
+        label="optical",
+        color="tab:blue",
+    )
+    ax.bar(
+        [i + width / 2 for i in x],
+        [values[("electron", b)] for b in backends],
+        width,
+        label="optical + e±",
+        color="tab:orange",
+    )
+    ax.set_xticks(x)
+    ax.set_xticklabels(["G4 waiting stack", "Custom (RAM)", "Custom (spill)"])
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    if log:
+        ax.set_yscale("log")
+    ax.legend()
+    ax.grid(ls=":", color="gray", alpha=0.5)
+
+
+def test_muon_staging_backend_memory():
+    """Peak RSS (and rate) of the staging backends on a heavy muon shower, for optical-photon
+    staging alone and with electron/positron staging added, over the g4/ram/spill backends.
+
+    The custom struct staging holds far less than full G4Tracks and spilling caps it further;
+    additionally deferring the leptons keeps their sub-showers out of stage 0, which lowers the
+    native waiting-stack peak too. The "electron" mode also exercises the RMGElectronState
+    recording and scratch-file path under load."""
     events = 4
+    modes = ["optical", "electron"]
+    backends = ["g4", "ram", "spill"]
+    seeds = {
+        ("optical", "g4"): 601,
+        ("optical", "ram"): 602,
+        ("optical", "spill"): 603,
+        ("electron", "g4"): 611,
+        ("electron", "ram"): 612,
+        ("electron", "spill"): 613,
+    }
 
     metrics = {}
-    for mode, seed in (("optical_stacking", 601), ("electron_stacking", 602)):
-        output = f"muon-stress-{mode}.lh5"
-        macro = _muon_macro(mode=mode, seed=seed, events=events)
-        mode_metrics = _run_in_subprocess(macro, output)
-        mode_metrics["rate_evt_s"] = events / mode_metrics["elapsed_s"]
-        metrics[mode] = mode_metrics
+    for mode in modes:
+        for backend in backends:
+            output = f"muon-stress-{mode}-{backend}.lh5"
+            macro = _muon_macro(
+                mode=mode, backend=backend, seed=seeds[(mode, backend)], events=events
+            )
+            m = _run_in_subprocess(macro, output)
+            m["rate_evt_s"] = events / m["elapsed_s"]
+            metrics[(mode, backend)] = m
 
-    optical = metrics["optical_stacking"]
-    electron = metrics["electron_stacking"]
+    rss_mb = {k: m["maxrss_kb"] / 1024 for k, m in metrics.items()}
+    rate = {k: m["rate_evt_s"] for k, m in metrics.items()}
 
-    # memory consumption example
     fig, ax = plt.subplots()
-    ax.bar(
-        ["Optical Stacking", "Electron Stacking"],
-        [optical["maxrss_kb"] / 1024, electron["maxrss_kb"] / 1024],
-        color=["tab:blue", "tab:orange"],
+    _grouped_bar(
+        ax,
+        backends,
+        rss_mb,
+        ylabel="Peak RSS (MB)",
+        title="Muon Shower Peak Memory by Staging Backend",
+        log=True,
     )
-    ax.set_ylabel("Peak RSS (GB)")
-    ax.set_title("Muon Event Peak Memory Usage")
-    ax.grid(ls=":", color="gray", alpha=0.5)
-    fig.savefig("muon_stress_memory.png", dpi=300, bbox_inches="tight")
+    fig.savefig("muon_stress_backend_memory.png", dpi=300, bbox_inches="tight")
     fig.clf()
 
-    # time per event example
     fig, ax = plt.subplots()
-    ax.bar(
-        ["Optical Stacking", "Electron Stacking"],
-        [optical["rate_evt_s"], electron["rate_evt_s"]],
-        color=["tab:blue", "tab:orange"],
+    _grouped_bar(
+        ax,
+        backends,
+        rate,
+        ylabel="Processing Rate (events/s)",
+        title="Muon Shower Processing Rate by Staging Backend",
     )
-    ax.set_ylabel("Processing Rate (events/s)")
-    ax.set_title("Muon Event Processing Rate")
-    ax.grid(ls=":", color="gray", alpha=0.5)
-    fig.savefig("muon_stress_rate.png", dpi=300, bbox_inches="tight")
+    fig.savefig("muon_stress_backend_rate.png", dpi=300, bbox_inches="tight")
     fig.clf()
 
-    assert electron["maxrss_kb"] < optical["maxrss_kb"], (
-        f"Electron stacking did not reduce muon peak RSS enough: "
-        f"optical={optical['maxrss_kb']} KB, electron={electron['maxrss_kb']} KB, "
-        f"optical_children={optical.get('maxrss_children_kb')} KB, "
-        f"electron_children={electron.get('maxrss_children_kb')} KB"
+    def rss(mode, backend):
+        return metrics[(mode, backend)]["maxrss_kb"]
+
+    # In both modes: the small structs hold far less than full G4Tracks, and spilling caps the
+    # in-memory footprint below keeping every struct in RAM.
+    for mode in modes:
+        assert rss(mode, "ram") < rss(mode, "g4"), (
+            f"{mode}: custom RAM staging did not reduce peak RSS: "
+            f"ram={rss(mode, 'ram')} KB, g4={rss(mode, 'g4')} KB"
+        )
+        assert rss(mode, "spill") < rss(mode, "ram"), (
+            f"{mode}: spilling did not reduce peak RSS below RAM: "
+            f"spill={rss(mode, 'spill')} KB, ram={rss(mode, 'ram')} KB"
+        )
+
+    # Deferring the leptons keeps their sub-showers out of stage 0, lowering the native
+    # waiting-stack peak compared with staging only the optical photons.
+    assert rss("electron", "g4") < rss("optical", "g4"), (
+        f"electron staging did not lower the waiting-stack peak: "
+        f"electron={rss('electron', 'g4')} KB, optical={rss('optical', 'g4')} KB"
     )
