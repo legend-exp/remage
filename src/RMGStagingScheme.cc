@@ -490,6 +490,7 @@ bool RMGStagingScheme::ReinjectBatch(
 
   mem.resize(n);
   try {
+    scratch.clear();
     // Seeking is also what allows the stream to switch from writing to reading, and it flushes the
     // pending output on the way. Geant4 would swallow any exception thrown here.
     scratch.seekg(static_cast<std::streamoff>(read_bytes));
@@ -501,6 +502,13 @@ bool RMGStagingScheme::ReinjectBatch(
   }
 
   const size_t got = static_cast<size_t>(scratch.gcount()) / sizeof(State);
+  if (got == 0)
+    RMGLog::Out(
+        RMGLog::fatal,
+        "Staging scratch read-back returned no records with ",
+        valid_bytes - read_bytes,
+        " bytes still pending; refusing to silently drop staged tracks."
+    );
   read_bytes += got * sizeof(State);
   for (size_t i = 0; i < got; ++i) push(mem[i]);
   mem.clear();
