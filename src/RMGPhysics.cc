@@ -445,7 +445,9 @@ void RMGPhysics::ConstructOptical() {
     auto proc_manager = particle->GetProcessManager();
     auto particle_name = particle->GetParticleName();
 
-    if (scint_proc->IsApplicable(*particle)) {
+    // Since Geant4 11.4, G4Scintillation::IsApplicable returns true for optical photons (it used to
+    // exclude them explicitly)
+    if (scint_proc->IsApplicable(*particle) && particle_name != "opticalphoton") {
       proc_manager->AddProcess(scint_proc);
       proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxAtRest);
       proc_manager->SetProcessOrderingToLast(scint_proc, G4ProcessVectorDoItIndex::idxPostStep);
