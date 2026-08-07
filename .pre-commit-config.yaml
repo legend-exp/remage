@@ -111,13 +111,17 @@ repos:
           ]]; then run-clang-tidy -fix -quiet -p=build; fi'
         language: system
         pass_filenames: false
-        types_or: [c++]
+        # identify does not tag .icc as c++, so match on the extension too
+        types_or: [c++, text]
+        files: \.(c|cc|cpp|cxx|h|hh|hpp|icc)$
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
     rev: v22.1.8
     hooks:
       - id: clang-format
-        types_or: [c++]
+        # identify does not tag .icc as c++, so match on the extension too
+        types_or: [c++, text]
+        files: \.(c|cc|cpp|cxx|h|hh|hpp|icc)$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v2.3.0"
