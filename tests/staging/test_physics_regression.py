@@ -93,7 +93,7 @@ def _run_macros_in_parallel(jobs: list[tuple[str, str]]) -> None:
 
 def test_energy_consistency_is_safety_independent():
     """Smoke test exercising electron staging across a range of source distances
-    and volume-safety values, against an optical-only stacking baseline.
+    and volume-safety values, against a no stacking baseline. (named optical here, but there is no optics activated.)
 
     For each distance the recorded Germanium energy spectra (baseline vs. each
     safety value) are plotted for visual inspection. The runs are only asserted
@@ -112,7 +112,7 @@ def test_energy_consistency_is_safety_independent():
             baseline_output.format(d=d),
             _physics_macro(
                 mode="optical_stacking",
-                seed=701,
+                seed=702,
                 events=int(events * (d / distances[0])),
                 safety_cm=0.0,
                 threshold_mev=threshold_mev,
@@ -216,10 +216,10 @@ def test_energy_consistency_is_safety_independent():
                 color=mpl.colormaps["tab10"](i),
             )
         ax[1].set_xlabel("Energy (keV)")
-        ax[1].set_ylabel("Residual")
+        ax[1].set_ylabel("Residual (in standard deviations)")
         ax[1].grid()
 
         fig.savefig(
-            f"energy_spectrum_comparison_{d}cm.png", dpi=300, bbox_inches="tight"
+            f"energy_spectrum_comparison_{d}cm.output.png", dpi=300, bbox_inches="tight"
         )
         fig.clf()

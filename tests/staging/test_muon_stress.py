@@ -212,7 +212,7 @@ def test_muon_staging_backend_memory():
         title="Muon Shower Peak Memory by Staging Backend",
         log=True,
     )
-    fig.savefig("muon_stress_backend_memory.png", dpi=300, bbox_inches="tight")
+    fig.savefig("muon_stress_backend_memory.output.png", dpi=300, bbox_inches="tight")
     fig.clf()
 
     fig, ax = plt.subplots()
@@ -223,7 +223,7 @@ def test_muon_staging_backend_memory():
         ylabel="Processing Rate (events/s)",
         title="Muon Shower Processing Rate by Staging Backend",
     )
-    fig.savefig("muon_stress_backend_rate.png", dpi=300, bbox_inches="tight")
+    fig.savefig("muon_stress_backend_rate.output.png", dpi=300, bbox_inches="tight")
     fig.clf()
 
     def rss(mode, backend):
