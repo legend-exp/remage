@@ -1,16 +1,6 @@
-"""Byte-exact round-trip test for the custom (struct-based) optical-photon staging.
-
-Only optical photons are checked here, on purpose: the flush/re-injection code
-(``FlushToTempFile`` / ``ReinjectBatch`` / ``OpenScratchFile`` / ``ResetScratch``) is
-templated over the record struct, so exercising it byte-exact for ``RMGPhotonState`` also
-covers the ``RMGElectronState`` instantiation -- the only electron-specific difference is the
-44-byte layout and ``push_electron``'s pdg->definition mapping. A separate byte-exact electron
-test would re-run the same machinery for little added confidence. The electron staging path is
-instead exercised under load (recording + scratch-file write) by the "electron" mode of
-``test_muon_stress.py``.
-"""
-
 from __future__ import annotations
+
+import random
 
 import awkward as ak
 import numpy as np
@@ -83,9 +73,7 @@ def _reinjected_photons(output: str):
     """Per-photon creation records of the re-injected optical photons.
 
     Every optical photon is deferred and killed/parked in stage 0, so all of them are
-    re-injected and carry ``stageid >= 1`` (none is tracked in stage 0). The track output
-    stores one row per track at creation, so these are exactly the values restored on
-    re-injection, before any stage-1 tracking.
+    re-injected and carry ``stageid >= 1`` (none is tracked in stage 0).
 
     Returned as a tuple ``(evtid, ekin, time, pos)`` sorted by the exact fields
     ``(evtid, ekin, time)``, so the same photon lands on the same row in every backend
@@ -161,20 +149,12 @@ def test_custom_staging_reproduces_native_g4_staging():
     checks the scratch-file round-trip is exact; comparing both against the native run
     checks the float32 struct faithfully reconstructs the real tracks.
 
-    Exactly one event, on purpose: the comparison is byte-exact (at float32), not
-    statistical. A smaller memory limit re-injects across more stages, tracking the
-    stage-1 photons in a different order and thus drawing differently from the shared event
-    RNG; in sequential mode the engine is not re-seeded per event, so with more than one
-    event a later shower would diverge between backends even though the re-injection
-    round-trip is exact. The creation records compared here are written before any stage-1
-    tracking, so within one event they are backend-independent.
-
-    Optical photons are terminal in this WLS-free liquid argon (they Rayleigh-scatter and
-    leave the world without re-emitting), so every re-injected photon stays a single track:
-    there are no re-injection-stage-born daughters whose number would depend on order.
+    Optical photons are terminal in this WLS-free liquid argon. This test will fail if
+    somehow a photon is created in stage > 0 (which means by other optical photon), due
+    to the random engine going out-of-sync.
     """
     events = 1
-    seed = 573137
+    seed = random.randrange(1, 2**31 - 1)
     energy_mev = (
         2.0  # ~50k scintillation photons/event, well past the 1 MB spill threshold
     )

@@ -24,10 +24,8 @@ def _muon_macro(*, mode: str, backend: str, seed: int, events: int) -> str:
       * ``"spill"`` -> remage custom staging spilling records to a scratch file past
         LimitMemory, capping the in-memory footprint.
 
-    The muon passes 0.5 m from the Germanium, so every event is discarded: this exercises the
-    staging classification, recording and (for spill) the scratch-file write path -- including
-    the electron path in "electron" mode -- under a heavy load. Re-injection correctness is
-    covered separately by the optical round-trip test.
+    The muon passes 0.5 m away from the Germanium, so every event is likely discarded:
+    Re-injection correctness is covered separately by the optical round-trip test.
     """
     species = ["OpticalPhotons"]
     species_logic = ["/RMG/Staging/OpticalPhotons/DeferToWaitingStage true"]
