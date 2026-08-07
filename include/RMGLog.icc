@@ -75,16 +75,31 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... ar
 
 // ---------------------------------------------------------
 
-template <typename... Args>
-inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args) {
-    if (!ShouldPrintWithLevel(loglevel)) return;
+template<typename... Args>
+inline void RMGLog::OutFormat(RMGLog::LogLevel loglevel, std::string_view fmt, const Args&... args) {
+  if (!ShouldPrintWithLevel(loglevel)) return;
 
-    try {
-        RMGLog::Out(loglevel, fmt::format(fmt::runtime(fmt), args...));
-    }
-    catch (fmt::format_error& e) {
-        RMGLog::Out(RMGLog::error, "fmt library exception caught: ", e.what());
-    }
+  try {
+    RMGLog::Out(loglevel, fmt::format(fmt::runtime(fmt), args...));
+  } catch (fmt::format_error& e) {
+    RMGLog::Out(RMGLog::error, "fmt library exception caught: ", e.what());
+  }
+}
+
+template<typename... Args>
+inline void RMGLog::OutFormatDevImpl(
+    RMGLog::LogLevel loglevel,
+    const char* func,
+    std::string_view fmt,
+    const Args&... args
+) {
+  if (!ShouldPrintWithLevel(loglevel)) return;
+
+  std::string prefixed_fmt;
+  prefixed_fmt.reserve(std::strlen(func) + fmt.size() + 4);
+  prefixed_fmt.append("[").append(func).append("] ").append(fmt);
+
+  RMGLog::OutFormat(loglevel, prefixed_fmt, args...);
 }
 
 // ---------------------------------------------------------

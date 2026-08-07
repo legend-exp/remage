@@ -40,9 +40,11 @@
 // ---------------------------------------------------------
 
 #include <atomic>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include "globals.hh"
 
@@ -51,7 +53,7 @@
 #define OutDev(loglevel, ...) RMGLog::Out(loglevel, "[", __PRETTY_FUNCTION__, "] ", __VA_ARGS__)
 
 #define OutFormatDev(loglevel, fmt, ...)                                                           \
-  RMGLog::OutFormat(loglevel, "[" + std::string(__PRETTY_FUNCTION__) + "] " + fmt, __VA_ARGS__)
+  RMGLog::OutFormatDevImpl(loglevel, __PRETTY_FUNCTION__, fmt, __VA_ARGS__)
 
 // ---------------------------------------------------------
 
@@ -142,7 +144,18 @@ class RMGLog {
     static void Out(RMGLog::LogLevel loglevel, const T& msg_first, const Args&... args);
 
     template<typename... Args>
-    static void OutFormat(RMGLog::LogLevel loglevel, const std::string& fmt, const Args&... args);
+    static void OutFormat(RMGLog::LogLevel loglevel, std::string_view fmt, const Args&... args);
+
+    /**
+     * Implementation of the @c OutFormatDev macro. @c `func` should always be @c `__PRETTY_FUNCTION__`.
+     */
+    template<typename... Args>
+    static void OutFormatDevImpl(
+        RMGLog::LogLevel loglevel,
+        const char* func,
+        std::string_view fmt,
+        const Args&... args
+    );
 
     template<typename T, typename... Args>
     static void Out(RMGLog::LogLevel loglevel, T& msg_first, Args... msg_other) {
