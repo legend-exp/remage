@@ -25,12 +25,12 @@
  * For documentation see http://mpp.mpg.de/bat
  */
 
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 #include "globals.hh"
 
-template <typename T>
+template<typename T>
 inline void RMGLog::Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed, bool do_flush) {
   if (!ShouldPrintWithLevel(loglevel)) return;
 
@@ -42,12 +42,12 @@ inline void RMGLog::Print(RMGLog::LogLevel loglevel, const T& msg, bool prefixed
 
 // ---------------------------------------------------------
 
-template <typename T>
-inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
+template<typename T> inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
   if (!ShouldPrintWithLevel(loglevel)) return;
 
   // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) [[unlikely]] RMGLog::StartupInfo();
+  if (!RMGLog::fFirstOutputDone) [[unlikely]]
+    RMGLog::StartupInfo();
 
   RMGLog::Print(loglevel, message, true);
   RMGLog::Print(loglevel, "\n", false);
@@ -58,12 +58,13 @@ inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& message) {
 
 // ---------------------------------------------------------
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 inline void RMGLog::Out(RMGLog::LogLevel loglevel, const T& t, const Args&... args) {
   if (!ShouldPrintWithLevel(loglevel)) return;
 
   // if this is the first call to Out(), call StartupInfo() first
-  if (!RMGLog::fFirstOutputDone) [[unlikely]] RMGLog::StartupInfo();
+  if (!RMGLog::fFirstOutputDone) [[unlikely]]
+    RMGLog::StartupInfo();
 
   RMGLog::Print(loglevel, t, true, false);
   (RMGLog::Print(loglevel, args, false, false), ...);
@@ -104,7 +105,7 @@ inline void RMGLog::OutFormatDevImpl(
 
 // ---------------------------------------------------------
 
-template <RMGLog::Ansi color, typename T>
+template<RMGLog::Ansi color, typename T>
 inline std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
 
   // check terminal capabilities before
@@ -112,11 +113,10 @@ inline std::string RMGLog::Colorize(const T& msg, std::ostream& os, bool bold) {
 
   std::ostringstream ss;
   if (color == RMGLog::Ansi::unspecified) {
-      if (bold) ss << "\033[1m" << msg << "\033[0m";
-      else ss << msg;
-  }
-  else {
-      ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
+    if (bold) ss << "\033[1m" << msg << "\033[0m";
+    else ss << msg;
+  } else {
+    ss << "\033[" << (bold ? "1;" : "") << color << "m" << msg << "\033[0m";
   }
   return ss.str();
 }
