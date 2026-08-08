@@ -215,9 +215,10 @@ command:
 
 - by the mass of the volumes can with the command
   <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymass>.
-- by the mass of a given isotope (specified by the pair of proton and neutron
-  number) in the materials with the command
+- by the mass of a given isotope in the materials with the command
   <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymassisotope>.
+  The isotope is specified by its atomic number $Z$ (number of protons) followed
+  by its mass number $A$ (number of nucleons), e.g. `32 76` for $^{76}$Ge.
 
 ## Vertices from external files
 
