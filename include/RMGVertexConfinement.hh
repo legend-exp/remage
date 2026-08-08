@@ -210,10 +210,16 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     void SetSamplingMode(SamplingMode mode) { fSamplingMode = mode; }
     void SetFirstSamplingVolumeType(VolumeType type) { fFirstSamplingVolumeType = type; }
     void SetWeightByMass(bool mode) { fWeightByMass = mode; }
-    void SetWeightByMassIsotope(int z, int n) {
+    /**
+     * @brief Weigh volumes by the mass of a single isotope in their material.
+     *
+     * @param z atomic number (number of protons).
+     * @param a mass number (number of nucleons).
+     */
+    void SetWeightByMassIsotope(int z, int a) {
       fWeightByMass = true;
       fWeightByMassIsotopeZ = z;
-      fWeightByMassIsotopeN = n;
+      fWeightByMassIsotopeA = a;
     }
 
     std::vector<GenericGeometricalSolidData>& GetGeometricalSolidDataList() {
@@ -353,7 +359,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          */
         void ApplyDepthProfile(G4ThreeVector& local_vertex, const G4VSolid* solid) const;
 
-        void RecalcMass(int z, int n);
+        /**
+         * @brief Recompute @c mass, optionally restricted to a single isotope.
+         *
+         * @param z atomic number (number of protons). Zero disables the isotope
+         * selection, i.e. the full material mass is used.
+         * @param a mass number (number of nucleons).
+         */
+        void RecalcMass(int z, int a);
 
         G4VPhysicalVolume* physical_volume = nullptr;
         G4VSolid* sampling_solid = nullptr;
@@ -416,7 +429,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
           this->total_surface += other.total_surface;
         }
 
-        void recalc_total(bool weigh_by_mass, int mass_isotope_z, int mass_istotope_n);
+        void recalc_total(bool weigh_by_mass, int mass_isotope_z, int mass_isotope_a);
 
         std::vector<SampleableObject> data;
         double total_volume = 0;
@@ -457,7 +470,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     VolumeType fFirstSamplingVolumeType = VolumeType::kUnset;
     bool fWeightByMass = false;
     int fWeightByMassIsotopeZ = 0;
-    int fWeightByMassIsotopeN = 0;
+    int fWeightByMassIsotopeA = 0;
 
     bool fOnSurface = false;
     bool fForceContainmentCheck = false;

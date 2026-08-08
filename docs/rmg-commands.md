@@ -633,7 +633,7 @@ Commands for controlling primary confinement
 * `Reset` – Reset all parameters of vertex confinement, so that it can be reconfigured.
 * `SampleOnSurface` – If true (or omitted argument), sample on the surface of solids
 * `SampleWeightByMass` – If true (or omitted argument), weigh the different volumes by mass and not by volume
-* `SampleWeightByMassIsotope` – Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
+* `SampleWeightByMassIsotope` – Weigh the different volumes by mass of the given isotope
 * `SamplingMode` – Select sampling mode for volume confinement
 * `FirstSamplingVolume` – Select the type of volume which will be sampled first for intersections
 * `MaxSamplingTrials` – Set maximum number of attempts for sampling primary positions in a volume
@@ -670,12 +670,14 @@ If true (or omitted argument), weigh the different volumes by mass and not by vo
 
 ### `/RMG/Generator/Confinement/SampleWeightByMassIsotope`
 
-Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)
+Weigh the different volumes by mass of the given isotope
+
+The isotope is specified by its atomic number Z (number of protons) and its mass number A (number of nucleons), e.g. '32 76' for Ge-76
 
 * **Parameter** – `Z`
   * **Parameter type** – `i`
   * **Omittable** – `False`
-* **Parameter** – `N`
+* **Parameter** – `A`
   * **Parameter type** – `i`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit Idle`

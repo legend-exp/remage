@@ -87,7 +87,7 @@ RMGVertexConfinement::SampleableObject::SampleableObject(
   this->surface = solid->GetSurfaceArea();
 }
 
-void RMGVertexConfinement::SampleableObject::RecalcMass(int z, int n) {
+void RMGVertexConfinement::SampleableObject::RecalcMass(int z, int a) {
   if (!this->physical_volume) return;
 
   auto mat = this->physical_volume->GetLogicalVolume()->GetMaterial();
@@ -98,7 +98,9 @@ void RMGVertexConfinement::SampleableObject::RecalcMass(int z, int n) {
       auto elm = mat->GetElement(static_cast<int>(i));
       for (size_t j = 0; j < elm->GetNumberOfIsotopes(); j++) {
         auto iso = elm->GetIsotope(static_cast<int>(j));
-        if (iso->GetZ() == z && iso->GetN() == n) {
+        // NOTE: despite its name, G4Isotope::GetN() returns the number of nucleons, i.e. the
+        // mass number A.
+        if (iso->GetZ() == z && iso->GetN() == a) {
           mfrac += mat->GetFractionVector()[i] * elm->GetRelativeAbundanceVector()[j];
         }
       }
@@ -529,7 +531,7 @@ void RMGVertexConfinement::SampleableObjectCollection::emplace_back(Args&&... ar
 void RMGVertexConfinement::SampleableObjectCollection::recalc_total(
     bool weigh_by_mass,
     int mass_isotope_z,
-    int mass_istotope_n
+    int mass_isotope_a
 ) {
 
   this->total_volume = 0;
@@ -547,7 +549,7 @@ void RMGVertexConfinement::SampleableObjectCollection::recalc_total(
       );
     }
 
-    v.RecalcMass(mass_isotope_z, mass_istotope_n);
+    v.RecalcMass(mass_isotope_z, mass_isotope_a);
     this->total_mass += v.mass;
     if (v.mass <= 0 && weigh_by_mass) {
       RMGLog::Out(
@@ -779,7 +781,7 @@ void RMGVertexConfinement::InitializePhysicalVolumes() {
   for (const auto& s : new_obj_from_inspection) { fPhysicalVolumes.emplace_back(s); }
 
   // calculate the total volume/surface/mass.
-  fPhysicalVolumes.recalc_total(fWeightByMass, fWeightByMassIsotopeZ, fWeightByMassIsotopeN);
+  fPhysicalVolumes.recalc_total(fWeightByMass, fWeightByMassIsotopeZ, fWeightByMassIsotopeA);
 
   if (!fWeightByMass) {
     RMGLog::OutFormat(
@@ -868,7 +870,7 @@ void RMGVertexConfinement::InitializeGeometricalVolumes(bool use_excluded_volume
   }
 
   // calculate the total volume/surface/mass.
-  volume_solids.recalc_total(fWeightByMass, fWeightByMassIsotopeZ, fWeightByMassIsotopeN);
+  volume_solids.recalc_total(fWeightByMass, fWeightByMassIsotopeZ, fWeightByMassIsotopeA);
 
   RMGLog::Out(
       RMGLog::detail,
@@ -1320,9 +1322,13 @@ void RMGVertexConfinement::DefineCommands() {
 
   fMessengers.back()
       ->DeclareMethod("SampleWeightByMassIsotope", &RMGVertexConfinement::SetWeightByMassIsotope)
-      .SetGuidance("Weigh the different volumes by mass of the given isotope (specified by proton and neutron numbers)")
+      .SetGuidance("Weigh the different volumes by mass of the given isotope")
+      .SetGuidance(
+          "The isotope is specified by its atomic number Z (number of protons) and its "
+          "mass number A (number of nucleons), e.g. '32 76' for Ge-76"
+      )
       .SetParameterName(0, "Z", false, false)
-      .SetParameterName(1, "N", false, false)
+      .SetParameterName(1, "A", false, false)
       .SetStates(G4State_PreInit, G4State_Idle)
       .SetToBeBroadcasted(true);
 
