@@ -36,6 +36,11 @@ class G4Event;
  * position is supplied externally by the configured vertex generator via
  * @ref SetParticlePosition. The @c fNpart column allows several consecutive rows to be
  * combined into a single multi-particle primary vertex.
+ *
+ * @details The reader instance and the row buffer are shared between all worker threads, with
+ * the same implications for parallel runs as described in @ref RMGVertexFromFile. Note that
+ * the seek performed by @ref BeginOfRunAction for multiprocessing runs counts events and not
+ * rows, i.e. it accounts for events spanning multiple rows.
  */
 class RMGGeneratorFromFile : public RMGVGenerator {
 

@@ -53,6 +53,8 @@ The most useful options include:
 - `-s, --macro-substitutions` – provide `key=value` pairs that will be expanded
   as Geant4 aliases in macros.
 
+(manual-parallel)=
+
 ## Parallel execution
 
 _remage_ supports two ways of parallelising simulations, each with its own

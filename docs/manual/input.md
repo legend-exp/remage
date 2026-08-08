@@ -154,3 +154,28 @@ format also allows to generate multiple particles different vertex positions.
         ├── yloc · array<1>{real} ── {'units': 'm'}
         └── zloc · array<1>{real} ── {'units': 'm'}
 ```
+
+(manual-input-parallel)=
+
+## Behavior in parallel runs
+
+In both {ref}`parallel modes <manual-parallel>` every entry of the input file is
+consumed exactly once, but the two modes differ in how entries are distributed
+over the events:
+
+- With `--threads`, the worker threads share a single file cursor and consume
+  entries in a non-deterministic order. The event identifier in the output does
+  not correspond to the row index in the input, and the assignment is not
+  reproducible from run to run, even with a fixed seed of the random number
+  generator. Vertex and kinematics tables are read independently and may be
+  paired inconsistently, as mentioned above.
+- With `--procs`, each process reads its own contiguous block of the file, which
+  preserves the correspondence between input row and output event identifier.
+  Since every process simulates the number of events requested in the macro, the
+  file must hold enough entries for all of them.
+
+If the input file is exhausted before the end of the run, an error is logged (a
+depleted vertex file additionally aborts the run).
+
+Refer to {cpp:class}`RMGVertexFromFile` and {cpp:class}`RMGGeneratorFromFile` in
+the API documentation for the details.
