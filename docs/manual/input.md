@@ -14,6 +14,18 @@ not support dynamic type conversions, as you would expect for example for python
 
 :::
 
+:::{warning}
+
+We strongly recommend the LH5 format documented below. Input files are read
+through the Geant4 analysis reader, so the other formats it understands (HDF5,
+ROOT, CSV, XML) are also accepted, but with caveats: they carry no unit
+metadata, so all columns are silently assumed to be in the default units (meters
+for positions, MeV for energies, nanoseconds for times), and only HDF5 (in the
+Geant4 ntuple layout, as produced by `remage-from-lh5`) is covered by the test
+suite.
+
+:::
+
 (manual-input-vertex)=
 
 ## Vertex input
