@@ -38,7 +38,7 @@ The vertex input file should be an LH5 table with the following columns:
 ```
 /
 └── vtx
-    └── vtx · table{xloc,yloc,zloc}
+    └── pos · table{xloc,yloc,zloc}
         ├── xloc · array<1>{real} ── {'units': 'm'}
         ├── yloc · array<1>{real} ── {'units': 'm'}
         └── zloc · array<1>{real} ── {'units': 'm'}
