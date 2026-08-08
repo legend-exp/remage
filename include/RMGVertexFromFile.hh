@@ -31,6 +31,22 @@
  *
  * Each row of the ntuple supplies one @c (x, y, z) triplet. Used to replay vertices
  * produced by an external sampler (e.g. an MC truth file) into a remage run.
+ *
+ * @details Both the @ref RMGAnalysisReader instance and the variables bound to the ntuple
+ * columns have static storage duration, i.e. they are shared between all worker threads. The
+ * consequences for parallel runs are:
+ * - In a multithreaded run all threads pull from the same file cursor, serialized by the
+ * reader mutex. Every row is still consumed exactly once, but the order in which the threads
+ * reach the reader is not deterministic. The event id in the output therefore does not
+ * correspond to the row index in the input, and the assignment is not reproducible from run
+ * to run, not even with a fixed random seed. @ref RMGGeneratorFromFile holds a second,
+ * independent reader instance, so vertices and kinematics read from two separate tables can
+ * be paired inconsistently; the combined position/kinematics table does not suffer from this.
+ * - In a multiprocessing run every process is sequential and @ref BeginOfRunAction seeks over
+ * the first @c p*N rows, with @c p the process number offset and @c N the number of events of
+ * the run. The processes hence consume disjoint, contiguous blocks of the file, which must
+ * hold at least @c K*N rows for @c K processes. Output event ids are offset by the same
+ * @c p*N, so the correspondence between input row index and output event id is preserved.
  */
 class RMGVertexFromFile : public RMGVVertexGenerator {
 
