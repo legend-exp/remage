@@ -82,14 +82,14 @@ void RMGHardwareMessenger::DefineRegisterDetector() {
 void RMGHardwareMessenger::DefineStepLimits() {
 
   fStepLimitsCmd = new G4UIcmdWithADoubleAndUnit("/RMG/Geometry/SetMaxStepSize", this);
-  fStepLimitsCmd->SetGuidance("Sets maximum step size for a certain detector");
+  fStepLimitsCmd->SetGuidance("Sets maximum step size for a certain volume");
 
   fStepLimitsCmd->SetParameterName("step_size", false);
   fStepLimitsCmd->SetDefaultValue(1);
   fStepLimitsCmd->SetUnitCategory("Length");
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
+  p_pv->SetGuidance("physical volume, accepts regex patterns");
   fStepLimitsCmd->SetParameter(p_pv);
 
   fStepLimitsCmd->AvailableForStates(G4State_PreInit);
@@ -99,7 +99,7 @@ void RMGHardwareMessenger::DefineSelectiveEminLimits() {
 
   fSelectiveEminLimitCmd = new G4UIcommand("/RMG/Geometry/SetEkinMinForParticle", this);
   fSelectiveEminLimitCmd->SetGuidance(
-      "Sets minimum kinetic energy for one selected particle in a detector volume"
+      "Sets minimum kinetic energy for one selected particle in a certain volume"
   );
 
   auto p_ekin = new G4UIparameter("ekin_min", 'd', false);
@@ -112,7 +112,7 @@ void RMGHardwareMessenger::DefineSelectiveEminLimits() {
   fSelectiveEminLimitCmd->SetParameter(p_unit);
 
   auto p_pv = new G4UIparameter("pv_name", 's', false);
-  p_pv->SetGuidance("Detector physical volume, accepts regex patterns");
+  p_pv->SetGuidance("physical volume, accepts regex patterns");
   fSelectiveEminLimitCmd->SetParameter(p_pv);
 
   auto p_particle = new G4UIparameter("particle_name", 's', false);
