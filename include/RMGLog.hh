@@ -147,7 +147,7 @@ class RMGLog {
     static void OutFormat(RMGLog::LogLevel loglevel, std::string_view fmt, const Args&... args);
 
     /**
-     * Implementation of the @c OutFormatDev macro. @c `func` should always be @c `__PRETTY_FUNCTION__`.
+     * Implementation of the @c OutFormatDev macro. @c func should always be @c __PRETTY_FUNCTION__.
      */
     template<typename... Args>
     static void OutFormatDevImpl(
