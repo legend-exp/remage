@@ -438,8 +438,8 @@ Commands for controlling geometry definitions
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
 * `PrintListOfPhysicalVolumes` – Print list of defined physical volumes
 * `RegisterDetector` – register a sensitive detector
-* `SetMaxStepSize` – Sets maximum step size for a certain detector
-* `SetEkinMinForParticle` – Sets minimum kinetic energy for one selected particle in a detector volume
+* `SetMaxStepSize` – Sets maximum step size for a certain volume
+* `SetEkinMinForParticle` – Sets minimum kinetic energy for one selected particle in a certain volume
 
 ### `/RMG/Geometry/GDMLDisableOverlapCheck`
 
@@ -537,7 +537,7 @@ register a sensitive detector
 
 ### `/RMG/Geometry/SetMaxStepSize`
 
-Sets maximum step size for a certain detector
+Sets maximum step size for a certain volume
 
 * **Parameter** – `step_size`
   * **Parameter type** – `d`
@@ -548,14 +548,14 @@ Sets maximum step size for a certain detector
   * **Omittable** – `False`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Parameter** – `pv_name`
-    – Detector physical volume, accepts regex patterns
+    – physical volume, accepts regex patterns
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Geometry/SetEkinMinForParticle`
 
-Sets minimum kinetic energy for one selected particle in a detector volume
+Sets minimum kinetic energy for one selected particle in a certain volume
 
 * **Parameter** – `ekin_min`
     – minimum kinetic energy
@@ -567,7 +567,7 @@ Sets minimum kinetic energy for one selected particle in a detector volume
   * **Omittable** – `False`
   * **Candidates** – `eV keV MeV GeV TeV`
 * **Parameter** – `pv_name`
-    – Detector physical volume, accepts regex patterns
+    – physical volume, accepts regex patterns
   * **Parameter type** – `s`
   * **Omittable** – `False`
 * **Parameter** – `particle_name`
