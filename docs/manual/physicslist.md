@@ -227,7 +227,7 @@ volume) and a sensitive region.
 
 - The default cuts are tuned for low-energy applications (≈ 100 keV in Ge)
 - The energy range for production cuts is explicitly set for low energy physics
-  (200 eV to 100 GeV).
+  (250 eV to 100 GeV).
 - All registered sensitive detectors will be automatically added to the
   sensitive region.
 
