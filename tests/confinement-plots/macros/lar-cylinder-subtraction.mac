@@ -1,0 +1,24 @@
+# subtraction: the argon *outside* the same cylinder used by
+# lar-cylinder-intersection.mac, i.e. the complement of that sampling region
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+
+# the sampling mode has to be set before the excluded solid is added
+/RMG/Generator/Confinement/SamplingMode SubtractGeometrical
+
+/RMG/Generator/Confinement/Physical/AddVolume LAr
+
+/RMG/Generator/Confinement/Geometrical/AddExcludedSolid Cylinder
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius 0 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 50 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/Height 70 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/StartingAngle 0 deg
+/RMG/Generator/Confinement/Geometrical/Cylinder/SpanningAngle 360 deg
+
+# the argon volume is much larger than the region shown in the plots, so a lot
+# of events are needed to fill the vicinity of the detectors
+/run/beamOn 500000

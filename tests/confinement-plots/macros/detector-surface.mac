@@ -1,0 +1,14 @@
+# sample on the surface of the two detectors
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SamplingMode UnionAll
+/RMG/Generator/Confinement/SampleOnSurface true
+
+# the BEGe is a polycone, so it is sampled with the generic surface sampler,
+# which needs an (over)estimate of how often a line can cross the surface
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 8
+
+/RMG/Generator/Confinement/Physical/AddVolume BEGe_.*
+
+/run/beamOn 20000

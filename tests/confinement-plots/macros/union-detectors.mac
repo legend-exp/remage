@@ -1,0 +1,10 @@
+# union of the two detectors: vertices uniformly in the germanium of both BEGes
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SamplingMode UnionAll
+
+# the regex matches both BEGe_top and BEGe_bottom
+/RMG/Generator/Confinement/Physical/AddVolume BEGe_.*
+
+/run/beamOn 20000

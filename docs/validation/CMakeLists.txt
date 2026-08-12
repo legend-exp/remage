@@ -85,6 +85,7 @@ set(TESTS_IMAGES
     confinement/depth-profile-uniform.output.png
     confinement/depth-profile-truncated-gaussian.output.png
     confinement/depth-profile-containment.output.png
+    confinement-plots/confinement.output.png
     cosmogenics/muon/energy_loss_lar_energy_range.output.png
     cosmogenics/muon/energy_loss_water_energy_range.output.png
     cosmogenics/muon/neutron_production_processes_100.0_lar_Shielding_Livermore_30_9.869.output.png

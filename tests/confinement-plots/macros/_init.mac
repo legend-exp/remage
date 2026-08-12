@@ -1,0 +1,12 @@
+# common preamble: register the two BEGes and initialize the run manager
+/RMG/Manager/Logging/LogLevel summary
+
+/RMG/Geometry/RegisterDetector Germanium BEGe_top 001
+/RMG/Geometry/RegisterDetector Germanium BEGe_bottom 002
+
+/run/initialize
+
+# geantinos do not interact: only the sampled vertices end up in the output
+/RMG/Generator/Select GPS
+/gps/particle geantino
+/gps/energy 1 eV

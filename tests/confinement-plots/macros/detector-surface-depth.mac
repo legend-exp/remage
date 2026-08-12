@@ -1,0 +1,28 @@
+# sample on the detector surface, then displace the vertices inwards according
+# to a depth profile. The mean depth is exaggerated (2 mm, i.e. ~1/15 of the
+# detector height) so that the effect is clearly visible in a plot; realistic
+# dead-layer/implantation depths are O(1 um) to O(1 mm).
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SamplingMode UnionAll
+/RMG/Generator/Confinement/SampleOnSurface true
+/RMG/Generator/Confinement/SurfaceSampleMaxIntersections 8
+
+/RMG/Generator/Confinement/Physical/AddVolume BEGe_.*
+
+# exponential profile with 1/lambda = 2 mm
+/RMG/Generator/Confinement/DepthProfile/Type Exponential
+/RMG/Generator/Confinement/DepthProfile/Mean 2 mm
+
+# alternatives (the unused parameters are simply ignored):
+#/RMG/Generator/Confinement/DepthProfile/Type Uniform
+#/RMG/Generator/Confinement/DepthProfile/RangeLow 0 mm
+#/RMG/Generator/Confinement/DepthProfile/RangeHigh 5 mm
+#/RMG/Generator/Confinement/DepthProfile/Type TruncatedGaussian
+#/RMG/Generator/Confinement/DepthProfile/Mean 5 mm
+#/RMG/Generator/Confinement/DepthProfile/Sigma 2 mm
+#/RMG/Generator/Confinement/DepthProfile/RangeLow 0 mm
+#/RMG/Generator/Confinement/DepthProfile/RangeHigh 10 mm
+
+/run/beamOn 20000
