@@ -1,0 +1,23 @@
+# common preamble: register the two BEGes and initialize the run manager
+/RMG/Manager/Logging/LogLevel summary
+
+/RMG/Geometry/RegisterDetector Germanium BEGe_top 001
+/RMG/Geometry/RegisterDetector Germanium BEGe_bottom 002
+
+/RMG/Output/ActivateOutputScheme Track
+
+/run/initialize
+
+# needed to draw the tracks in the plots
+/RMG/Output/Germanium/StoreTrackID true
+
+/RMG/Output/Germanium/StepPositionMode PostStep
+
+# 1 MeV gammas shot along z through the two detectors
+/RMG/Generator/Select GPS
+/gps/particle gamma
+/gps/energy 1000 keV
+/gps/position 0 0 0 mm
+/gps/direction 0 0 1
+
+/RMG/Generator/Confine UnConfined

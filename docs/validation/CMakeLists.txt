@@ -225,7 +225,8 @@ set(TESTS_IMAGES
     staging/throughput_distance_scan.output.png
     staging/energy_spectrum_comparison_10cm.output.png
     staging/energy_spectrum_comparison_21cm.output.png
-    staging/energy_spectrum_comparison_46cm.output.png)
+    staging/energy_spectrum_comparison_46cm.output.png
+    cluster-plots/clustering.output.pdf)
 
 # cmake-format: on
 

@@ -1,0 +1,6 @@
+# record every single step of the simulation
+/control/execute macros/_init.mac
+
+/RMG/Output/Germanium/Cluster/PreClusterOutputs false
+
+/run/beamOn 100
