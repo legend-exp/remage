@@ -112,7 +112,9 @@ set(TESTS_IMAGES
     distances/distance-ge-prestep.output.png
     distances/distance-ge-average.output.png
     gespectrum/hades-spectrum-full.output.png
+    gespectrum/hades-spectrum-full.output.pdf
     gespectrum/hades-spectrum-linear.output.png
+    gespectrum/hades-spectrum-linear.output.pdf
     nist/e-range-ge-distributions.output.png
     nist/e-range-ge-vs-estar.output.png
     nist/e-stopping-power-ge-vs-estar.output.png
