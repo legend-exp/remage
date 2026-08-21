@@ -89,7 +89,21 @@ def get_timing(generator, name, val):
         return json.load(f)
 
 
-def plot_timing(generators, name, values, unit, save_name):
+# line styles of the horizontal reference lines in plot_timing(). They have to be
+# distinguishable from each other, since both are drawn in the same axes.
+CPU_DEFAULT_LINESTYLE = (0, (5, 3))
+SIZE_DEFAULT_LINESTYLE = (0, (5, 1.5, 1, 1.5))
+
+
+def plot_timing(
+    generators,
+    name,
+    values,
+    unit,
+    save_name,
+    xlabel=None,
+    default_label="Geant4 default",
+):
     """Plot CPU time and output file size per simulated event vs. the setting.
 
     The CPU time is shown on the left axis (solid) and the size of the output
@@ -113,11 +127,11 @@ def plot_timing(generators, name, values, unit, save_name):
         def size_per_event(val, timings=timings):
             return timings[val]["output_size"] / timings[val]["n_events"]
 
-        for axis, metric, linestyle, marker in (
-            (ax_cpu, cpu_per_event, "-", "."),
-            (ax_size, size_per_event, ":", "s"),
+        for axis, metric, linestyle, marker, default_linestyle in (
+            (ax_cpu, cpu_per_event, "-", ".", CPU_DEFAULT_LINESTYLE),
+            (ax_size, size_per_event, ":", "s", SIZE_DEFAULT_LINESTYLE),
         ):
-            axis.axhline(y=metric(None), linestyle="--", color=colors[idx])
+            axis.axhline(y=metric(None), linestyle=default_linestyle, color=colors[idx])
             axis.plot(
                 settings,
                 [metric(val) for val in settings],
@@ -129,7 +143,7 @@ def plot_timing(generators, name, values, unit, save_name):
             )
 
     ax_cpu.set_xscale("log")
-    ax_cpu.set_xlabel(f"{name} [{unit}]")
+    ax_cpu.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
     ax_cpu.set_ylabel("CPU time [ms / event]")
     ax_size.set_ylabel("Output size [B / event]")
     ax_cpu.set_ylim(bottom=0)
@@ -143,7 +157,20 @@ def plot_timing(generators, name, values, unit, save_name):
     handles += [
         Line2D([], [], color="black", linestyle="-", marker=".", label="CPU time"),
         Line2D([], [], color="black", linestyle=":", marker="s", label="Output size"),
-        Line2D([], [], color="black", linestyle="--", label="Geant4 default"),
+        Line2D(
+            [],
+            [],
+            color="black",
+            linestyle=CPU_DEFAULT_LINESTYLE,
+            label=f"{default_label} (CPU time)",
+        ),
+        Line2D(
+            [],
+            [],
+            color="black",
+            linestyle=SIZE_DEFAULT_LINESTYLE,
+            label=f"{default_label} (output size)",
+        ),
     ]
     ax_cpu.legend(handles=handles, fontsize=10, loc="best")
 
@@ -228,6 +255,9 @@ def plot(
     save_spec_name="spec.png",
     save_eff_name="eff.png",
     unit="um",
+    xlabel=None,
+    default_label=None,
+    legend_title=None,
 ):
     bins_tmp = np.linspace(xrange[0], xrange[1], n_bins) if n_bins is not None else bins
 
@@ -308,7 +338,8 @@ def plot(
                     fill=True,
                     alpha=0.2,
                     color="tab:blue",
-                    label="No limits" if names == ["step_limits"] else "Default",
+                    label=default_label
+                    or ("No limits" if names == ["step_limits"] else "Default"),
                 )
 
             effs[field][name] = []
@@ -340,7 +371,7 @@ def plot(
                     if legend:
                         axs[0].legend(loc="upper right")
                         axs[0].legend(ncol=1)
-                        axs[0].get_legend().set_title(name)
+                        axs[0].get_legend().set_title(legend_title or name)
 
                     axs[0].set_yscale(scale)
                     axs[0].set_xlabel(label)
@@ -435,7 +466,7 @@ def plot(
                 color=colors[idx],
             )
 
-    ax.set_xlabel(f"{name} [{unit}]")
+    ax.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
     ax.set_ylabel("Fraction of events [%]")
     ax.set_title(f"Fraction of events in {eff_range[0]} - {eff_range[1]} ({label})")
 
@@ -447,130 +478,131 @@ bins = get_bins(
     [(-2, 2), (2, 10), (10, 50), (50, 950), (950, 980), (980, 998), (998, 1002)],
     [0.5, 2, 10, 50, 10, 2, 0.5],
 )
-all_step_limits = [10, 20, 50, 100, 200, None]
-all_prod_cuts = [0.01, 0.02, 0.05, 0.3, 0.5, 0.7, 1, None]
+if __name__ == "__main__":
+    all_step_limits = [10, 20, 50, 100, 200, None]
+    all_prod_cuts = [0.01, 0.02, 0.05, 0.3, 0.5, 0.7, 1, None]
 
-plot_name = sys.argv[1]
+    plot_name = sys.argv[1]
 
-# plots for the bulk
+    # plots for the bulk
 
-for lim, names, unit, suffix in (
-    (all_prod_cuts, "prod_cuts", "mm", ".cuts"),
-    (all_step_limits, "step_limits", "um", ""),
-):
-    plot_timing(
-        ["beta_bulk", "beta_surf"],
-        names,
-        lim,
-        unit,
-        save_name=f"{plot_name}.timing{suffix}.output.png",
-    )
+    for lim, names, unit, suffix in (
+        (all_prod_cuts, "prod_cuts", "mm", ".cuts"),
+        (all_step_limits, "step_limits", "um", ""),
+    ):
+        plot_timing(
+            ["beta_bulk", "beta_surf"],
+            names,
+            lim,
+            unit,
+            save_name=f"{plot_name}.timing{suffix}.output.png",
+        )
 
-    plot(
-        "beta_bulk",
-        (-1, 1020),
-        values=lim,
-        names=[names],
-        fields=["truth_energy"],
-        doeff=True,
-        unit=unit,
-        save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_bulk",
+            (-1, 1020),
+            values=lim,
+            names=[names],
+            fields=["truth_energy"],
+            doeff=True,
+            unit=unit,
+            save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_bulk",
-        (-1, 1020),
-        values=lim,
-        names=[names],
-        fields=["active_energy_avg"],
-        doeff=True,
-        unit=unit,
-        save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_bulk",
+            (-1, 1020),
+            values=lim,
+            names=[names],
+            fields=["active_energy_avg"],
+            doeff=True,
+            unit=unit,
+            save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_bulk",
-        (-1, 1020),
-        values=lim,
-        dist_range=(0, 1),
-        names=[names],
-        fields=["active_energy_avg"],
-        doeff=True,
-        unit=unit,
-        save_spec_name=f"{plot_name}.tl-active-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.tl-active-energy{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_bulk",
+            (-1, 1020),
+            values=lim,
+            dist_range=(0, 1),
+            names=[names],
+            fields=["active_energy_avg"],
+            doeff=True,
+            unit=unit,
+            save_spec_name=f"{plot_name}.tl-active-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.tl-active-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_bulk",
-        (-1, 1020),
-        values=lim,
-        dist_range=(1, np.inf),
-        names=[names],
-        fields=["active_energy_avg"],
-        doeff=True,
-        unit=unit,
-        save_spec_name=f"{plot_name}.not-tl-active-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.not-tl-active-energy{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_bulk",
+            (-1, 1020),
+            values=lim,
+            dist_range=(1, np.inf),
+            names=[names],
+            fields=["active_energy_avg"],
+            doeff=True,
+            unit=unit,
+            save_spec_name=f"{plot_name}.not-tl-active-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.not-tl-active-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_bulk",
-        (0, 2),
-        values=lim,
-        eff_range=(1, np.inf),
-        names=[names],
-        fields=["r90_avg"],
-        doeff=True,
-        n_bins=200,
-        range_zoom=None,
-        label="r90 [mm]",
-        unit=unit,
-        save_spec_name=f"{plot_name}.bulk-r90{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.bulk-r90{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_bulk",
+            (0, 2),
+            values=lim,
+            eff_range=(1, np.inf),
+            names=[names],
+            fields=["r90_avg"],
+            doeff=True,
+            n_bins=200,
+            range_zoom=None,
+            label="r90 [mm]",
+            unit=unit,
+            save_spec_name=f"{plot_name}.bulk-r90{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.bulk-r90{suffix}.eff.output.png",
+        )
 
-    # plots the surface
-    plot(
-        "beta_surf",
-        (-1, 1020),
-        values=lim,
-        names=[names],
-        fields=["truth_energy"],
-        doeff=True,
-        unit=unit,
-        save_spec_name=f"{plot_name}.surf-total-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.surf-total-energy{suffix}.eff.output.png",
-    )
+        # plots the surface
+        plot(
+            "beta_surf",
+            (-1, 1020),
+            values=lim,
+            names=[names],
+            fields=["truth_energy"],
+            doeff=True,
+            unit=unit,
+            save_spec_name=f"{plot_name}.surf-total-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.surf-total-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_surf",
-        (-1, 1020),
-        values=lim,
-        names=[names],
-        fields=["active_energy_avg"],
-        doeff=True,
-        range_zoom=None,
-        eff_range=(300, np.inf),
-        unit=unit,
-        save_spec_name=f"{plot_name}.surf-active-energy{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.surf-active-energy{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_surf",
+            (-1, 1020),
+            values=lim,
+            names=[names],
+            fields=["active_energy_avg"],
+            doeff=True,
+            range_zoom=None,
+            eff_range=(300, np.inf),
+            unit=unit,
+            save_spec_name=f"{plot_name}.surf-active-energy{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.surf-active-energy{suffix}.eff.output.png",
+        )
 
-    plot(
-        "beta_surf",
-        (0, 2),
-        values=lim,
-        eff_range=(1, np.inf),
-        names=[names],
-        fields=["max_z_avg"],
-        doeff=True,
-        n_bins=200,
-        range_zoom=None,
-        label="Range [mm]",
-        unit=unit,
-        save_spec_name=f"{plot_name}.surf-max-z{suffix}.spec.output.png",
-        save_eff_name=f"{plot_name}.surf-max-z{suffix}.eff.output.png",
-    )
+        plot(
+            "beta_surf",
+            (0, 2),
+            values=lim,
+            eff_range=(1, np.inf),
+            names=[names],
+            fields=["max_z_avg"],
+            doeff=True,
+            n_bins=200,
+            range_zoom=None,
+            label="Range [mm]",
+            unit=unit,
+            save_spec_name=f"{plot_name}.surf-max-z{suffix}.spec.output.png",
+            save_eff_name=f"{plot_name}.surf-max-z{suffix}.eff.output.png",
+        )
