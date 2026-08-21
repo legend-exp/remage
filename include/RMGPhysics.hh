@@ -76,15 +76,12 @@ class RMGPhysics : public G4VModularPhysicsList {
 
         /** @brief Constructor setting the default production cut @c def_cut */
         ProdCutStore(double def_cut)
-            : gamma(def_cut), electron(def_cut), positron(def_cut), proton(def_cut), alpha(def_cut),
-              generic_ion(def_cut) {}
+            : gamma(def_cut), electron(def_cut), positron(def_cut), proton(def_cut) {}
 
         double gamma;
         double electron;
         double positron;
         double proton;
-        double alpha;
-        double generic_ion;
     };
 
     /** @brief Sets the production cut values, and energy range.
