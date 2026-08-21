@@ -29,258 +29,36 @@ foreach(_file ${SPHINX_IMAGES})
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${_file} ${SPHINX_SOURCE}/_img COPYONLY)
 endforeach()
 
-# now we want to add also images from the test suite. need to make an
-# (explicit) list of images to pick from the test suite
+# collect the plots (and text dumps) produced by the test suite, i.e. all files matching the common
+# *.output.* naming scheme. this happens at build time, since those files only exist after the
+# tests have been run.
 # note: the tests producing these files must be labeled "val"!
-# TODO: add new images here
-# cmake-format: off
-set(TESTS_IMAGES
-    bxdecay0/double-beta-e-combined-primary-energy.output.png
-    bxdecay0/double-beta-e-primary-opening-angle.output.png
-    confinement/native-surface.output.jpeg
-    confinement/native-volume.output.jpeg
-    confinement/complex-surface.output.jpeg
-    confinement/complex-volume.output.jpeg
-    confinement/geometrical.output.jpeg
-    confinement/geometrical-or-physical.output.jpeg
-    confinement/geometrical-and-physical.output.jpeg
-    confinement/surface-sample-bounding-box-simple.output.jpeg
-    confinement/surface-sample-bounding-box-subtraction.output.jpeg
-    confinement/surface-sample-bounding-box-union.output.jpeg
-    confinement/vis-surface-box.output.jpeg
-    confinement/vis-surface-con.output.jpeg
-    confinement/vis-surface-sub.output.jpeg
-    confinement/vis-surface-tubby.output.jpeg
-    confinement/vis-surface-uni.output.jpeg
-    confinement/vis-surface-trd.output.jpeg
-    confinement/with-daughters.output.jpeg
-    confinement/confinement.simple-solids-surface-box-3d.output.png
-    confinement/confinement.simple-solids-surface-con-3d.output.png
-    confinement/confinement.simple-solids-surface-sub-3d.output.png
-    confinement/confinement.simple-solids-surface-tubby-3d.output.png
-    confinement/confinement.simple-solids-surface-uni-3d.output.png
-    confinement/confinement.simple-solids-surface-trd-3d.output.png
-    confinement/confinement.simple-solids-surface-box-projections.output.png
-    confinement/confinement.simple-solids-surface-con-projections.output.png
-    confinement/confinement.simple-solids-surface-sub-projections.output.png
-    confinement/confinement.simple-solids-surface-tubby-projections.output.png
-    confinement/confinement.simple-solids-surface-uni-projections.output.png
-    confinement/confinement.simple-solids-surface-trd-projections.output.png
-    confinement/confinement.simple-solids-surface-box-ratios.output.png
-    confinement/confinement.simple-solids-surface-con-ratios.output.png
-    confinement/confinement.simple-solids-surface-sub-ratios.output.png
-    confinement/confinement.simple-solids-surface-tubby-ratios.output.png
-    confinement/confinement.simple-solids-surface-uni-ratios.output.png
-    confinement/confinement.simple-solids-surface-trd-ratios.output.png
-    confinement/vis-ge-array.output.jpeg
-    confinement/relative-ge.output.png
-    confinement/lar-in-check-ratios.output.png
-    confinement/lar-in-check-xy.output.png
-    confinement/lar-in-check-xz.output.png
-    confinement/lar-sub-check-xy.output.png
-    confinement/lar-sub-check-xz.output.png
-    confinement/lar-int-and-sub-check-xy.output.png
-    confinement/lar-int-and-sub-check-xz.output.png
-    confinement/depth-profile-exponential.output.png
-    confinement/depth-profile-uniform.output.png
-    confinement/depth-profile-truncated-gaussian.output.png
-    confinement/depth-profile-containment.output.png
-    confinement-plots/confinement.output.png
-    cosmogenics/muon/energy_loss_lar_energy_range.output.png
-    cosmogenics/muon/energy_loss_water_energy_range.output.png
-    cosmogenics/muon/neutron_production_processes_100.0_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_production_processes_280.0_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_yield_energy_scan_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_yield_energy_scan_water_Shielding_Livermore_30_8.045.output.png
-    cosmogenics/muon/neutron_yield_had_physics_scan_100.0_lar_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_yield_material_scan_100.0_Shielding_Livermore_30.output.png
-    cosmogenics/muon/shower_dimensions_100.0_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/shower_dimensions_100.0_rock_Shielding_Livermore_30_8.045.output.png
-    cosmogenics/muon/shower_dimensions_100.0_water_Shielding_Livermore_30_8.045.output.png
-    cosmogenics/muon/neutron_production_particle_hadronic_100.0_lar_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_production_particle_100.0_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/neutron_production_particle_280.0_lar_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/isotope_production_remage_lar_100.0_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/isotope_production_fluka_lar_100.0_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/isotope_production_diff_lar_100.0_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/isotope_production_comp_lar_100.0_Shielding_Livermore_30_9.869.output.png
-    cosmogenics/muon/isotope_production_remage_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
-    cosmogenics/muon/isotope_production_fluka_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
-    cosmogenics/muon/isotope_production_diff_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
-    cosmogenics/muon/isotope_production_comp_enrGe_100.0_Shielding_Livermore_30_6.0.output.png
-    distances/distance-ge-poststep.output.png
-    distances/distance-ge-prestep.output.png
-    distances/distance-ge-average.output.png
-    gespectrum/hades-spectrum-full.output.png
-    gespectrum/hades-spectrum-full.output.pdf
-    gespectrum/hades-spectrum-linear.output.png
-    gespectrum/hades-spectrum-linear.output.pdf
-    nist/e-range-ge-distributions.output.png
-    nist/e-range-ge-vs-estar.output.png
-    nist/e-stopping-power-ge-vs-estar.output.png
-    nist/e-range-ar-distributions.output.png
-    nist/e-range-ar-vs-estar.output.png
-    nist/e-stopping-power-ar-vs-estar.output.png
-    nist/e-range-cu-distributions.output.png
-    nist/e-range-cu-vs-estar.output.png
-    nist/e-stopping-power-cu-vs-estar.output.png
-    neutrons/neutron_argon_summary.output.png
-    neutrons/neutron_argon36_comparison.output.png
-    neutrons/neutron_argon38_comparison.output.png
-    neutrons/neutron_argon40_comparison.output.png
-    neutrons/neutron_jeff_vs_g4ndl.output.png
-    neutrons/neutron_capture_Ar_40.output.png
-    neutrons/neutron_capture_Cr_50.output.png
-    neutrons/neutron_capture_Cr_52.output.png
-    neutrons/neutron_capture_Cr_53.output.png
-    neutrons/neutron_capture_Fe_54.output.png
-    neutrons/neutron_capture_Fe_56.output.png
-    neutrons/neutron_capture_Fe_57.output.png
-    neutrons/neutron_capture_Gd_155.output.png
-    neutrons/neutron_capture_Gd_157.output.png
-    neutrons/neutron_capture_H_1.output.png
-    neutrons/neutron_capture_Ni_58.output.png
-    neutrons/neutron_capture_Ni_60.output.png
-    neutrons/neutron_capture_Ni_62.output.png
-    neutrons/neutron_complex_geometry.output.png
-    neutrons/neutron_gd_cross_section.output.png
-    neutrons/neutron_gd_G4NDL.output.png
-    neutrons/neutron_pie_chart_general.output.png
-    neutrons/neutron_pie_chart_normal.output.png
-    neutrons/neutron_pie_chart_rmgncapture.output.png
-    neutrons/neutron_pie_chart_steel.output.png
-    neutrons/neutron_spectrum_gd_shielding.output.png
-    neutrons/neutron_spectrum_steel_shielding.output.png
-    observables/vis-observables-ge-gdml.output.jpeg
-    observables/tracks-bulk-10um-limit.tracks.out0.png
-    observables/tracks-bulk-10um-limit.tracks.out1.png
-    observables/tracks-bulk-10um-limit.tracks.out2.png
-    observables/tracks-bulk-no-limit.tracks.out0.png
-    observables/tracks-bulk-no-limit.tracks.out1.png
-    observables/tracks-bulk-no-limit.tracks.out2.png
-    observables/tracks-bulk-10um-limit.step-hist.png
-    observables/tracks-bulk-10um-limit.step-vs-dist.png
-    observables/tracks-bulk-10um-limit.step-vs-dist-zoom.png
-    observables/tracks-bulk-no-limit.step-hist.png
-    observables/tracks-bulk-no-limit.step-vs-dist.png
-    observables/tracks-bulk-no-limit.step-vs-dist-zoom.png
-    observables/beta-observables.bulk-active-energy.eff.output.png
-    observables/beta-observables.bulk-active-energy.spec.output.png
-    observables/beta-observables.bulk-active-energy.cuts.eff.output.png
-    observables/beta-observables.bulk-active-energy.cuts.spec.output.png
-    observables/beta-observables.bulk-r90.eff.output.png
-    observables/beta-observables.bulk-r90.spec.output.png
-    observables/beta-observables.bulk-r90.cuts.eff.output.png
-    observables/beta-observables.bulk-r90.cuts.spec.output.png
-    observables/beta-observables.bulk-total-energy.eff.output.png
-    observables/beta-observables.bulk-total-energy.spec.output.png
-    observables/beta-observables.bulk-total-energy.cuts.eff.output.png
-    observables/beta-observables.bulk-total-energy.cuts.spec.output.png
-    observables/beta-observables.not-tl-active-energy.eff.output.png
-    observables/beta-observables.not-tl-active-energy.spec.output.png
-    observables/beta-observables.not-tl-active-energy.cuts.eff.output.png
-    observables/beta-observables.not-tl-active-energy.cuts.spec.output.png
-    observables/beta-observables.tl-active-energy.eff.output.png
-    observables/beta-observables.tl-active-energy.spec.output.png
-    observables/beta-observables.tl-active-energy.cuts.eff.output.png
-    observables/beta-observables.tl-active-energy.cuts.spec.output.png
-    observables/beta-observables.surf-total-energy.eff.output.png
-    observables/beta-observables.surf-total-energy.spec.output.png
-    observables/beta-observables.surf-total-energy.cuts.eff.output.png
-    observables/beta-observables.surf-total-energy.cuts.spec.output.png
-    observables/beta-observables.surf-active-energy.eff.output.png
-    observables/beta-observables.surf-active-energy.spec.output.png
-    observables/beta-observables.surf-active-energy.cuts.eff.output.png
-    observables/beta-observables.surf-active-energy.cuts.spec.output.png
-    observables/beta-observables.surf-max-z.eff.output.png
-    observables/beta-observables.surf-max-z.spec.output.png
-    observables/beta-observables.surf-max-z.cuts.eff.output.png
-    observables/beta-observables.surf-max-z.cuts.spec.output.png
-    observables/beta-observables.timing.output.png
-    observables/beta-observables.timing.cuts.output.png
-    optics/photon-detection.output.png
-    optics/photon-wls.output.png
-    optics/photon-wls-times-delta.output.png
-    optics/photon-wls-times-exponential.output.png
-    optics/photon-wls-photon-count.output.png
-    optics/photon-attenuation-30.output.png
-    optics/photon-attenuation-60.output.png
-    optics/scintillation-alpha.output.png
-    optics/scintillation-ion.output.png
-    optics/scintillation-e-.output.png
-    optics/scintillation-yield.output.png
-    optics/cerenkov-e-.output.png
-    optics/cerenkov-yield.output.png
-    gammacorr/gamma-angular-distribution-27-60.output.png
-    gammacorr/gamma-angular-distribution-81-208.output.png
-    processes/innerbrem-gamma-vertex-energy.output.png
-    processes/innerbrem-signal.output.png
-    processes/innerbrem-difference.output.png
-    processes/processes.default.output.txt
-    processes/processes.grabmayr.output.txt
-    processes/processes.hadr-shielding.output.txt
-    processes/processes.innerbrem.output.txt
-    processes/processes.optical.output.txt
-    performance/combine-tracks-benchmark.output.png
-    staging/muon_stress_backend_memory.output.png
-    staging/muon_stress_backend_rate.output.png
-    staging/throughput_distance_scan.output.png
-    staging/energy_spectrum_comparison_10cm.output.png
-    staging/energy_spectrum_comparison_21cm.output.png
-    staging/energy_spectrum_comparison_46cm.output.png
-    cluster-plots/clustering.output.pdf)
-
-# cmake-format: on
-
-# copy them over, but at build time!
-set(COPIED_IMGS)
-foreach(_file ${TESTS_IMAGES})
-  set(_src ${CMAKE_BINARY_DIR}/tests/${_file})
-  set(_dest ${CMAKE_CURRENT_BINARY_DIR}/_img/${_file})
-  add_custom_command(
-    OUTPUT ${_dest}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_src} ${_dest}
-    DEPENDS ${_src})
-  list(APPEND COPIED_IMGS ${_dest})
-endforeach()
-
-add_custom_target(
-  copy_files ALL
-  DEPENDS ${COPIED_IMGS}
-  COMMENT "Copying images from test suite")
+set(COPY_TESTS_IMAGES
+    ${CMAKE_COMMAND} -DTESTS_BINARY_DIR=${CMAKE_BINARY_DIR}/tests -DIMG_DIR=${SPHINX_SOURCE}/_img
+    -P ${PROJECT_SOURCE_DIR}/cmake/CopyTestImages.cmake)
 
 # configure conf.py
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py @ONLY)
 
 get_target_property(PYTHONPATH python-virtualenv PYTHONPATH)
 
-add_custom_command(
-  OUTPUT ${SPHINX_BUILD}/index.html
-  COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
-  WORKING_DIRECTORY ${SPHINX_SOURCE}
-  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${COPIED_IMGS}
-  MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
-
-# Nice named target so we can run the job easily
+# Nice named targets so we can run the job easily. they always re-run: Sphinx keeps its own
+# incremental build cache, and the set of test plots is only known at build time anyway.
 add_custom_target(
   sphinx-validation
-  DEPENDS ${SPHINX_BUILD}/index.html remage-cli
+  COMMAND ${COPY_TESTS_IMAGES}
+  COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
+  WORKING_DIRECTORY ${SPHINX_SOURCE}
+  DEPENDS remage-cli
   COMMENT "Generating validation report with Sphinx")
 
-add_custom_command(
-  OUTPUT ${SPHINX_BUILD}/latex/remagesvalidationsuite.tex
+add_custom_target(
+  sphinx-validation-latex
+  COMMAND ${COPY_TESTS_IMAGES}
   COMMAND ${PYTHONPATH} -m sphinx --fail-on-warning -q -b latex ${SPHINX_SOURCE}
           ${SPHINX_BUILD}/latex
   WORKING_DIRECTORY ${SPHINX_SOURCE}
-  DEPENDS ${SPHINX_SOURCES} ${SPHINX_IMAGES} ${COPIED_IMGS}
-  MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
-
-# Nice named target so we can run the job easily
-add_custom_target(
-  sphinx-validation-latex
-  DEPENDS ${SPHINX_BUILD}/latex/remagesvalidationsuite.tex
+  DEPENDS remage-cli
   COMMENT "Generating LaTeX validation report with Sphinx")
 
 # Add an install target to install the docs

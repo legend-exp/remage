@@ -107,9 +107,9 @@ path = sys.argv[1]
 name = sys.argv[2]
 shaped = lh5.read("stp/germanium", path).view_as("ak", with_units=True)
 
-plot_tracks(shaped, 0, f"{name}.tracks.out0.png")
-plot_tracks(shaped, 1, f"{name}.tracks.out1.png")
-plot_tracks(shaped, 2, f"{name}.tracks.out2.png")
+plot_tracks(shaped, 0, f"{name}.tracks-0.output.png")
+plot_tracks(shaped, 1, f"{name}.tracks-1.output.png")
+plot_tracks(shaped, 2, f"{name}.tracks-2.output.png")
 
 
 cluster_idx = cluster_by_step_length(
@@ -146,7 +146,7 @@ plot_hist2d(
     bins=100,
     high_dist=5000,
     high_stp=150,
-    savename=f"{name}.step-vs-dist.png",
+    savename=f"{name}.step-vs-dist.output.png",
 )
 plot_hist2d(
     dist,
@@ -155,9 +155,11 @@ plot_hist2d(
     bins=100,
     high_dist=100,
     high_stp=100,
-    savename=f"{name}.step-vs-dist-zoom.png",
+    savename=f"{name}.step-vs-dist-zoom.output.png",
 )
-plot_steps(step_len + 0.1, range=(0, 100), bins=500, savename=f"{name}.step-hist.png")
+plot_steps(
+    step_len + 0.1, range=(0, 100), bins=500, savename=f"{name}.step-hist.output.png"
+)
 
 
 # plot activeness

@@ -396,17 +396,11 @@ $ cd remage/build/
 $ make sphinx-validation
 ```
 
-CMake will copy images from the `build/tests` folder at build time and make them
-available for the report pages. To include new images to the report, you need to
-explicitly list them in the `TESTS_IMAGES` variable defined in
-`docs/validation/CMakeLists.txt`:
-
-```cmake
-set(TESTS_IMAGES
-    confinement/geometrical-and-physical.output.jpeg
-    basics/vis-co60.output.jpeg
-    ...)
-```
+CMake will copy all files below the `build/tests` folder that follow the common
+`*.output.*` naming scheme (images and `.txt` dumps) at build time and make them
+available for the report pages, preserving their directory layout. No
+registration is needed: a new plot written by a test (labelled `val`) can be
+referenced right away as `./_img/<test-dir>/<filename>.output.png`.
 
 :::{note}
 
