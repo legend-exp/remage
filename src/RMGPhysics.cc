@@ -25,6 +25,8 @@
 #include "G4CrossSectionDataStore.hh"
 #include "G4DecayPhysics.hh"
 #include "G4DeexPrecoParameters.hh"
+#include "G4Electron.hh"
+#include "G4EmCalculator.hh"
 #include "G4EmExtraPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
@@ -34,6 +36,7 @@
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "G4Gamma.hh"
 #include "G4HadronElasticPhysicsHP.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronPhysicsFTFP_BERT_HP.hh"
@@ -48,6 +51,7 @@
 #include "G4IonPhysics.hh"
 #include "G4IonTable.hh"
 #include "G4LeptonConstructor.hh"
+#include "G4Material.hh"
 #include "G4MesonConstructor.hh"
 #include "G4NeutronCaptureProcess.hh"
 #include "G4NuclearLevelData.hh"
@@ -62,8 +66,10 @@
 #include "G4ParticleHPElasticData.hh"
 #include "G4ParticleHPThermalScattering.hh"
 #include "G4ParticleHPThermalScatteringData.hh"
+#include "G4Positron.hh"
 #include "G4ProcessManager.hh"
 #include "G4ProcessTable.hh"
+#include "G4Proton.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4RegionStore.hh"
 #include "G4RunManagerKernel.hh"
@@ -601,6 +607,30 @@ void RMGPhysics::DumpProcessesForParticles(std::string file_name) {
   std::cout.rdbuf(coutbuf);
 }
 
+void RMGPhysics::PrintCalculatedCutsTable(bool sensitive_region) {
+
+  G4EmCalculator calc;
+  const auto& cuts = sensitive_region ? fProdCutsSensitive : fProdCuts;
+
+  for (G4Material* mat : *G4Material::GetMaterialTable()) {
+    auto gamma_cut = calc.ComputeEnergyCutFromRangeCut(cuts.gamma, G4Gamma::Definition(), mat);
+    auto electron_cut = calc.ComputeEnergyCutFromRangeCut(cuts.electron, G4Electron::Definition(), mat);
+    auto positron_cut = calc.ComputeEnergyCutFromRangeCut(cuts.positron, G4Positron::Definition(), mat);
+    auto proton_cut = calc.ComputeEnergyCutFromRangeCut(cuts.proton, G4Proton::Definition(), mat);
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "material {} E_gamma={:.2f} keV E_electron={:.2f} keV "
+        "E_positron={:.2f} keV E_proton={:.2f} keV",
+        mat->GetName(),
+        gamma_cut / CLHEP::keV,
+        electron_cut / CLHEP::keV,
+        positron_cut / CLHEP::keV,
+        proton_cut / CLHEP::keV
+    );
+  }
+}
+
+
 void RMGPhysics::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
@@ -626,6 +656,11 @@ void RMGPhysics::DefineCommands() {
       )
       .SetParameterName("cut", false)
       .SetStates(G4State_PreInit, G4State_Idle);
+
+  fMessenger->DeclareMethod("PrintCalculatedCutsTable", &RMGPhysics::PrintCalculatedCutsTable)
+      .SetGuidance("Print the calculated production cuts (in energy units) for each material.")
+      .SetParameterName("sensitive_region", true)
+      .SetStates(G4State_Idle);
 
   fMessenger->DeclareProperty("OpticalPhysics", fConstructOptical)
       .SetGuidance("Add optical processes to the physics list")

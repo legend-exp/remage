@@ -151,6 +151,7 @@ Commands for controlling physics processes
 
 * `DefaultProductionCut` – Set simulation production cuts, for default region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
 * `SensitiveProductionCut` – Set simulation production cuts, for sensitive region for electrons, positions, and gammas. Note: this does not apply to protons, alphas or generic ions.
+* `PrintCalculatedCutsTable` – Print the calculated production cuts (in energy units) for each material.
 * `OpticalPhysics` – Add optical processes to the physics list
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
@@ -190,6 +191,15 @@ Set simulation production cuts, for sensitive region for electrons, positions, a
   * **Default value** – `mm`
   * **Candidates** – `pc km m cm mm um nm Ang fm parsec kilometer meter centimeter millimeter micrometer nanometer angstrom fermi`
 * **Allowed states** – `PreInit Idle`
+
+### `/RMG/Processes/PrintCalculatedCutsTable`
+
+Print the calculated production cuts (in energy units) for each material.
+
+* **Parameter** – `sensitive_region`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+* **Allowed states** – `Idle`
 
 ### `/RMG/Processes/OpticalPhysics`
 
