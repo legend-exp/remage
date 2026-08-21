@@ -127,6 +127,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     void SetStoreICLevelData(bool);
 
     void DumpProcessesForParticles(std::string file_name);
+    void PrintCalculatedCutsTable(bool sensitive_region = false);
 
   protected:
 
