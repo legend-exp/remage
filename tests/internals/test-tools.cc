@@ -23,7 +23,11 @@
 #include "RMGTools.hh"
 
 namespace remage_test {
-  enum class Color { kRed, kGreen, kBlue };
+  enum class Color {
+    kRed,
+    kGreen,
+    kBlue
+  };
 } // namespace remage_test
 
 namespace {
