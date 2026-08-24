@@ -7,6 +7,9 @@ import hist
 import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
+
+# the PNG/PDF saving is shared with the other plotting scripts of this test
+from plot_observables import savefig
 from reboost.shape.cluster import apply_cluster, cluster_by_step_length, step_lengths
 
 plt.rcParams["lines.linewidth"] = 1
@@ -63,7 +66,7 @@ def plot_tracks(_data, idx, savename=None):
     ax.legend(fontsize=14)
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 def plot_hist2d(
@@ -87,7 +90,7 @@ def plot_hist2d(
     ax.set_ylabel("Step length [mm]")
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 def plot_steps(steps, bins=100, range=(0, 100), savename=None):
@@ -100,7 +103,7 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
     ax.set_yscale("linear")
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 path = sys.argv[1]

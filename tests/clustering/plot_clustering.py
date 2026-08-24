@@ -13,31 +13,47 @@ all_cluster_distances = [10, 20, 50, 100, 200, 500, 1000, None]  # um
 all_cluster_distances_surface = [1, 5, 10, 20, 50, 100, None]  # um
 all_cluster_times = [0.1, 10, 1000, None]  # us
 
-# `None` is the run without any pre-clustering, shown as a dashed reference
-NO_CLUSTER_LABEL = "No pre-clustering"
+# `None` is the run without any clustering, shown as a dashed reference
+NO_CLUSTER_LABEL = "No clustering"
 
 plot_name = sys.argv[1]
 
+# the remage defaults of the scanned settings (see docs/rmg-commands.md). They
+# are marked on the x axis: contrary to the reference simulation (no
+# clustering at all) they do have a position there.
 scans = (
     (
         "cluster_distance",
         all_cluster_distances,
         "um",
-        "Pre-cluster distance (bulk)",
+        "Cluster distance (bulk)",
         "",
+        50,
     ),
     (
         "cluster_distance_surface",
         all_cluster_distances_surface,
         "um",
-        "Pre-cluster distance (surface)",
+        "Cluster distance (surface)",
         ".surf-dist",
+        # the default disables the clustering of the steps in the surface
+        # layer altogether
+        0,
     ),
-    ("cluster_time", all_cluster_times, "us", "Pre-cluster time threshold", ".time"),
+    (
+        "cluster_time",
+        all_cluster_times,
+        "us",
+        "Cluster time threshold",
+        ".time",
+        10,
+    ),
 )
 
-for name, values, unit, title, suffix in scans:
-    xlabel = f"{title} [{'µm' if unit == 'um' else 'µs'}]"
+for name, values, unit, title, suffix, default in scans:
+    unit_pretty = "µm" if unit == "um" else "µs"
+    xlabel = f"{title} [{unit_pretty}]"
+    mark_label = f"remage default ({default} {unit_pretty})"
     # this is the interesting plot: CPU time and output size vs. the setting
     plot_timing(
         ["beta_bulk", "beta_surf"],
@@ -47,6 +63,24 @@ for name, values, unit, title, suffix in scans:
         save_name=f"{plot_name}.timing{suffix}.output.png",
         xlabel=xlabel,
         default_label=NO_CLUSTER_LABEL,
+        mark_x=default,
+        mark_label=mark_label,
+    )
+
+    # the same, but only for the bulk setup: this is the common case, and the
+    # reduced plot is the one meant for publications
+    plot_timing(
+        ["beta_bulk"],
+        name,
+        values,
+        unit,
+        save_name=f"{plot_name}.timing{suffix}.bulk.output.png",
+        xlabel=xlabel,
+        default_label=NO_CLUSTER_LABEL,
+        mark_x=default,
+        mark_label=mark_label,
+        color_by_metric=True,
+        title="Bulk events: simulation performance",
     )
 
     common = {
@@ -57,15 +91,18 @@ for name, values, unit, title, suffix in scans:
         "default_label": NO_CLUSTER_LABEL,
         "legend_title": title,
         "doeff": True,
+        "mark_x": default,
+        "mark_label": mark_label,
     }
 
-    # the observables, to check that the pre-clustering does not bias them
+    # the observables, to check that the clustering does not bias them
     plot(
         "beta_bulk",
         (-1, 1020),
         fields=["truth_energy"],
         save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
+        eff_title="Bulk: total energy in 1000 ± 1 keV",
         **common,
     )
 
@@ -75,6 +112,7 @@ for name, values, unit, title, suffix in scans:
         fields=["active_energy_avg"],
         save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
+        eff_title="Bulk: active energy in 1000 ± 1 keV",
         **common,
     )
 
@@ -86,6 +124,7 @@ for name, values, unit, title, suffix in scans:
         fields=["active_energy_avg"],
         save_spec_name=f"{plot_name}.tl-active-energy{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.tl-active-energy{suffix}.eff.output.png",
+        eff_title="Depth < 1 mm: active energy in 1000 ± 1 keV",
         **common,
     )
 
@@ -99,6 +138,7 @@ for name, values, unit, title, suffix in scans:
         label="r90 [mm]",
         save_spec_name=f"{plot_name}.bulk-r90{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.bulk-r90{suffix}.eff.output.png",
+        eff_title="Bulk: r90 > 1 mm",
         **common,
     )
 
@@ -111,6 +151,7 @@ for name, values, unit, title, suffix in scans:
         eff_range=(300, np.inf),
         save_spec_name=f"{plot_name}.surf-active-energy{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.surf-active-energy{suffix}.eff.output.png",
+        eff_title="Surface: active energy > 300 keV",
         **common,
     )
 
@@ -124,5 +165,6 @@ for name, values, unit, title, suffix in scans:
         label="Range [mm]",
         save_spec_name=f"{plot_name}.surf-max-z{suffix}.spec.output.png",
         save_eff_name=f"{plot_name}.surf-max-z{suffix}.eff.output.png",
+        eff_title="Surface: range > 1 mm",
         **common,
     )

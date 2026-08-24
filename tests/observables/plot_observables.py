@@ -39,6 +39,22 @@ def get_cylinder_dist(r, z, radius, height):
     return np.minimum(np.minimum(a, b), c)
 
 
+# geometry of the plots meant for publications: they should fit on half an A4
+# page without being scaled down further (which would shrink the fonts), and a
+# roughly square aspect ratio wastes less space there than a wide one
+PAPER_FIGSIZE = (5, 4.6)
+# font sizes of the annotations inside those figures, relative to the axis
+# labels (rcParams["font.size"])
+SMALL_FONTSIZE = 11
+TITLE_FONTSIZE = 13
+
+
+def savefig(save_name):
+    """Save the current figure, both as PNG and as PDF."""
+    plt.savefig(save_name)
+    plt.savefig(Path(save_name).with_suffix(".pdf"))
+
+
 def get_lh5(generator, name, val, dist_low=None, dist_high=None):
     path = f"{generator}/{name}/max_{val}/"
     hit_directory = Path(f"out/{path}/hit/")
@@ -95,6 +111,30 @@ CPU_DEFAULT_LINESTYLE = (0, (5, 3))
 SIZE_DEFAULT_LINESTYLE = (0, (5, 1.5, 1, 1.5))
 
 
+# color used for everything that refers to the reference simulation, i.e. to the
+# point of the scan the other ones are compared against
+DEFAULT_COLOR = "tab:red"
+# color used to point out where the remage default of the scanned setting lies.
+# Distinct from DEFAULT_COLOR: the reference simulation and the default value of
+# the setting are only the same thing if `default_x` is used.
+MARK_COLOR = "dimgrey"
+
+
+def mark_default_x(ax, default_x, label, color=DEFAULT_COLOR):
+    ax.axvline(default_x, color=color, linestyle="--", zorder=0)
+    ax.annotate(
+        label,
+        xy=(default_x, 0.02),
+        xycoords=("data", "axes fraction"),
+        xytext=(4, 0),
+        textcoords="offset points",
+        ha="left",
+        va="bottom",
+        fontsize=SMALL_FONTSIZE,
+        color=color,
+    )
+
+
 def plot_timing(
     generators,
     name,
@@ -103,79 +143,119 @@ def plot_timing(
     save_name,
     xlabel=None,
     default_label="Geant4 default",
+    default_x=None,
+    mark_x=None,
+    mark_label="remage default",
+    color_by_metric=False,
+    title=None,
 ):
-    """Plot CPU time and output file size per simulated event vs. the setting.
+    """Plot CPU/wall-clock time and output size per simulated event vs. the setting.
 
-    The CPU time is shown on the left axis (solid) and the size of the output
-    file on the right one (dotted), the color encodes the generator. The
-    horizontal dashed lines give the values obtained with the Geant4 defaults.
+    Both are shown relative to the reference simulation.
+
+    With ``color_by_metric`` the metrics get a color each instead of the line
+    style carrying that information. This only makes sense for a single
+    generator, since the color then no longer identifies the generator.
     """
-    _fig, ax_cpu = plt.subplots(figsize=(7, 4))
-    ax_size = ax_cpu.twinx()
+    if color_by_metric and len(generators) != 1:
+        msg = "color_by_metric only works for a single generator"
+        raise ValueError(msg)
+    _fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
 
     colors = ["tab:blue", "tab:orange", "tab:purple", "tab:green"]
+    # only used with color_by_metric, one per metric (see below)
+    metric_colors = ("tab:blue", "tab:green", "tab:orange")
 
-    # None corresponds to the Geant4 default, which has no position on the x axis
+    # None is the reference simulation, which has no position on the x axis
     settings = [val for val in values if val is not None]
 
+    handles = []
     for idx, generator in enumerate(generators):
         timings = {val: get_timing(generator, name, val) for val in values}
 
-        def cpu_per_event(val, timings=timings):
-            return 1000 * timings[val]["cpu_time"] / timings[val]["n_events"]
+        def per_event(val, key, scale=1, timings=timings):
+            return scale * timings[val][key] / timings[val]["n_events"]
 
-        def size_per_event(val, timings=timings):
-            return timings[val]["output_size"] / timings[val]["n_events"]
+        # (key in timing.json, scale, line style, marker, legend label). The
+        # wall-clock time is load-dependent, since several scan points run in
+        # parallel, so it is the CPU time that should be compared across plots
+        metrics = (
+            ("cpu_time", 1000, "-", ".", "CPU time"),
+            ("wall_time", 1000, "--", "^", "Wall-clock time"),
+            ("output_size", 1, ":", "s", "Output size"),
+        )
 
-        for axis, metric, linestyle, marker, default_linestyle in (
-            (ax_cpu, cpu_per_event, "-", ".", CPU_DEFAULT_LINESTYLE),
-            (ax_size, size_per_event, ":", "s", SIZE_DEFAULT_LINESTYLE),
-        ):
-            axis.axhline(y=metric(None), linestyle=default_linestyle, color=colors[idx])
-            axis.plot(
+        metric_handles = []
+        for m_idx, (key, scale, linestyle, marker, label) in enumerate(metrics):
+            reference = per_event(None, key, scale)
+            ax.plot(
                 settings,
-                [metric(val) for val in settings],
+                [100 * per_event(val, key, scale) / reference for val in settings],
                 marker=marker,
                 markersize=4,
                 linestyle=linestyle,
-                color=colors[idx],
-                label=generator,
+                color=metric_colors[m_idx] if color_by_metric else colors[idx],
+            )
+            metric_handles.append(
+                Line2D(
+                    [],
+                    [],
+                    color=metric_colors[m_idx] if color_by_metric else "black",
+                    linestyle=linestyle,
+                    marker=marker,
+                    label=label.format(reference),
+                )
             )
 
-    ax_cpu.set_xscale("log")
-    ax_cpu.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
-    ax_cpu.set_ylabel("CPU time [ms / event]")
-    ax_size.set_ylabel("Output size [B / event]")
-    ax_cpu.set_ylim(bottom=0)
-    ax_size.set_ylim(bottom=0)
+        if color_by_metric:
+            handles = metric_handles
+        else:
+            handles.append(Line2D([], [], color=colors[idx], label=f"{generator}"))
 
-    # one legend for the generators (colors), one for the metrics (line styles)
-    handles = [
-        Line2D([], [], color=colors[idx], label=generator)
-        for idx, generator in enumerate(generators)
-    ]
-    handles += [
-        Line2D([], [], color="black", linestyle="-", marker=".", label="CPU time"),
-        Line2D([], [], color="black", linestyle=":", marker="s", label="Output size"),
-        Line2D(
-            [],
-            [],
-            color="black",
-            linestyle=CPU_DEFAULT_LINESTYLE,
-            label=f"{default_label} (CPU time)",
-        ),
-        Line2D(
-            [],
-            [],
-            color="black",
-            linestyle=SIZE_DEFAULT_LINESTYLE,
-            label=f"{default_label} (output size)",
-        ),
-    ]
-    ax_cpu.legend(handles=handles, fontsize=10, loc="best")
+    # the reference is 100 % by construction, for both metrics
+    ax.axhline(100, color=DEFAULT_COLOR, linestyle="--", linewidth=1)
+    if default_x is None:
+        ax.annotate(
+            default_label,
+            xy=(0.01, 100),
+            xycoords=("axes fraction", "data"),
+            xytext=(0, -4),
+            textcoords="offset points",
+            ha="left",
+            va="top",
+            fontsize=SMALL_FONTSIZE,
+            color=DEFAULT_COLOR,
+        )
+    else:
+        mark_default_x(ax, default_x, default_label)
+    if mark_x is not None:
+        mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR)
+
+    ax.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
+    ax.set_ylabel(f"Relative to {default_label.split(' (')[0].lower()} [%]")
+    if title is not None:
+        ax.set_title(title, fontsize=TITLE_FONTSIZE)
+
+    # one legend entry per generator (colors) and one per metric (line styles)
+    if not color_by_metric:
+        handles += metric_handles
+    ax.legend(handles=handles, loc="best")
 
     plt.tight_layout()
-    plt.savefig(save_name)
+    savefig(save_name)
+
+
+def format_range(low, high, unit="keV"):
+    """Format a selection range for a plot title.
+
+    A closed interval is written as ``center ± half-width``, which is easier to
+    read than the two edges; an open one keeps the inequality.
+    """
+    if np.isinf(high):
+        return f"> {low:g} {unit}"
+    if np.isinf(low):
+        return f"< {high:g} {unit}"
+    return f"{(low + high) / 2:g} ± {(high - low) / 2:g} {unit}"
 
 
 def get_bins(list_range, list_binning, e_max=1000):
@@ -258,6 +338,10 @@ def plot(
     xlabel=None,
     default_label=None,
     legend_title=None,
+    default_x=None,
+    eff_title=None,
+    mark_x=None,
+    mark_label="remage default",
 ):
     bins_tmp = np.linspace(xrange[0], xrange[1], n_bins) if n_bins is not None else bins
 
@@ -413,12 +497,13 @@ def plot(
             -max(np.max(abs(resid)), 4.9) - 0.1, +max(np.max(abs(resid)), 4.9) + 0.1
         )
         plt.tight_layout()
-        plt.savefig(save_spec_name)
+        savefig(save_spec_name)
         if not doeff:
             return
 
     # plot the efficiency
-    _fig, ax = plt.subplots()
+    _fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
+    reference_label = default_label or "Default"
     for idx, field in enumerate(effs.keys()):
         eff_def_low = (
             100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[0]
@@ -426,24 +511,45 @@ def plot(
         eff_def_high = (
             100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[1]
         )
-        ax.axhline(
-            y=100 * eff_def[field] / n_sels[field]["def"],
-            linestyle="--",
-            color=colors[idx],
-        )
+        eff_def_val = 100 * eff_def[field] / n_sels[field]["def"]
 
-        ax.axhspan(
-            ymin=100 * eff_def[field] / n_sels[field]["def"] - eff_def_low,
-            ymax=100 * eff_def[field] / n_sels[field]["def"] + eff_def_high,
-            alpha=0.2,
-            color=colors[idx],
-            label="Without step limits",
-        )
-        ax.axhline(
-            y=100 * eff_def[field] / n_sels[field]["def"],
-            linestyle="--",
-            color=colors[idx],
-        )
+        if default_x is None:
+            # the reference has no position on the x axis (e.g. "no step limit
+            # at all"), so it can only be shown as a band spanning the whole
+            # axis. Give it a color of its own and label it in place, to make
+            # clear that it is not a scan point.
+            ax.axhline(y=eff_def_val, linestyle="--", color=DEFAULT_COLOR)
+            ax.axhspan(
+                ymin=eff_def_val - eff_def_low,
+                ymax=eff_def_val + eff_def_high,
+                alpha=0.2,
+                color=DEFAULT_COLOR,
+            )
+            ax.annotate(
+                reference_label,
+                xy=(0.01, eff_def_val),
+                xycoords=("axes fraction", "data"),
+                xytext=(0, -4),
+                textcoords="offset points",
+                ha="left",
+                va="top",
+                fontsize=SMALL_FONTSIZE,
+                color=DEFAULT_COLOR,
+            )
+        else:
+            # the reference is a scan point like any other, just draw it there
+            ax.errorbar(
+                [default_x],
+                [eff_def_val],
+                yerr=[[eff_def_low], [eff_def_high]],
+                fmt="o",
+                markersize=4,
+                linestyle="none",
+                capsize=3,
+                color=colors[idx],
+                label=reference_label,
+                zorder=3,
+            )
 
         for name in effs[field]:
             e = effs[field][name]
@@ -461,17 +567,31 @@ def plot(
                 s,
                 100 * np.array(e) / np.array(n_sels[field][name]),
                 yerr=[err_low, err_high],
-                fmt=".",
-                linestyle="--",
+                # markers with capped error bars, no line connecting the scan
+                # points: they are independent simulations, not a curve
+                fmt="o",
+                markersize=4,
+                linestyle="none",
+                capsize=3,
                 color=colors[idx],
             )
 
+    if default_x is not None:
+        mark_default_x(ax, default_x, reference_label)
+    if mark_x is not None:
+        mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR)
+
     ax.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
     ax.set_ylabel("Fraction of events [%]")
-    ax.set_title(f"Fraction of events in {eff_range[0]} - {eff_range[1]} ({label})")
+    title = (
+        eff_title
+        if eff_title is not None
+        else f"Fraction of events in {format_range(*eff_range)} ({label})"
+    )
+    ax.set_title(title, fontsize=TITLE_FONTSIZE)
 
     plt.tight_layout()
-    plt.savefig(save_eff_name)
+    savefig(save_eff_name)
 
 
 bins = get_bins(
@@ -486,16 +606,63 @@ if __name__ == "__main__":
 
     # plots for the bulk
 
-    for lim, names, unit, suffix in (
-        (all_prod_cuts, "prod_cuts", "mm", ".cuts"),
-        (all_step_limits, "step_limits", "um", ""),
-    ):
+    scans = (
+        (
+            all_prod_cuts,
+            "prod_cuts",
+            "mm",
+            ".cuts",
+            {
+                # remage sets 0.1 mm in the sensitive region (RMGPhysics.cc), so
+                # the reference simulation sits on the x axis like a scan point
+                "default_x": 0.1,
+                "default_label": "remage default (0.1 mm)",
+                "xlabel": "Production cut in the sensitive volume [mm]",
+                "legend_title": "Production cut",
+            },
+        ),
+        (
+            all_step_limits,
+            "step_limits",
+            "um",
+            "",
+            {
+                # the reference is "no step limit at all", which is not a value
+                # on the x axis
+                "default_label": "No step limit",
+                "xlabel": "Maximum step length in germanium [µm]",
+                "legend_title": "Max. step length",
+            },
+        ),
+    )
+
+    for lim, names, unit, suffix, scan_kwargs in scans:
+        timing_kwargs = {
+            k: v
+            for k, v in scan_kwargs.items()
+            if k in ("default_x", "default_label", "xlabel")
+        }
+
         plot_timing(
             ["beta_bulk", "beta_surf"],
             names,
             lim,
             unit,
             save_name=f"{plot_name}.timing{suffix}.output.png",
+            **timing_kwargs,
+        )
+
+        # the same, but only for the bulk setup: this is the common case, and
+        # the reduced plot is the one meant for publications
+        plot_timing(
+            ["beta_bulk"],
+            names,
+            lim,
+            unit,
+            save_name=f"{plot_name}.timing{suffix}.bulk.output.png",
+            color_by_metric=True,
+            title="Bulk events: simulation performance",
+            **timing_kwargs,
         )
 
         plot(
@@ -508,6 +675,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
+            eff_title="Bulk: total energy in 1000 ± 1 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -520,6 +689,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
+            eff_title="Bulk: active energy in 1000 ± 1 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -533,6 +704,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.tl-active-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.tl-active-energy{suffix}.eff.output.png",
+            eff_title="Depth < 1 mm: active energy in 1000 ± 1 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -546,6 +719,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.not-tl-active-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.not-tl-active-energy{suffix}.eff.output.png",
+            eff_title="Depth > 1 mm: active energy in 1000 ± 1 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -562,6 +737,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.bulk-r90{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.bulk-r90{suffix}.eff.output.png",
+            eff_title="Bulk: r90 > 1 mm",
+            **scan_kwargs,
         )
 
         # plots the surface
@@ -575,6 +752,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.surf-total-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.surf-total-energy{suffix}.eff.output.png",
+            eff_title="Surface: total energy in 1000 ± 1 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -589,6 +768,8 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.surf-active-energy{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.surf-active-energy{suffix}.eff.output.png",
+            eff_title="Surface: active energy > 300 keV",
+            **scan_kwargs,
         )
 
         plot(
@@ -605,4 +786,6 @@ if __name__ == "__main__":
             unit=unit,
             save_spec_name=f"{plot_name}.surf-max-z{suffix}.spec.output.png",
             save_eff_name=f"{plot_name}.surf-max-z{suffix}.eff.output.png",
+            eff_title="Surface: range > 1 mm",
+            **scan_kwargs,
         )
