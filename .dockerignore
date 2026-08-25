@@ -1,0 +1,13 @@
+# the whole repository is the build context: keep out everything that is not
+# needed to configure, build and install remage.
+.git
+.github
+build/
+docs/_build
+.local
+.venv
+**/__pycache__
+.mypy_cache
+.pytest_cache
+.ruff_cache
+*.patch
