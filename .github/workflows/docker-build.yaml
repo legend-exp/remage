@@ -17,7 +17,8 @@ jobs:
   # Docker Hub used to run one build per build rule, i.e. twice for every
   # pushed tag, with the build hook picking the --build-arg values out of
   # $DOCKER_TAG. Here that axis is a matrix instead: on a tag we build both the
-  # "stable"- and the "slim"-based image, on main only the dev one.
+  # "stable"- and the "slim"-based image (from the release tarball), on main
+  # only the dev one (from this checkout).
   configure:
     runs-on: ubuntu-latest
     outputs:
@@ -50,13 +51,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # setuptools-scm needs the full history and the tags to derive the
+          # version of the dev image below
+          fetch-depth: 0
 
-      - name: Compute image tags
+      - name: Compute image tags and version
         id: cfg
         run: |
           version="${{ matrix.version }}"
           if [[ "${{ matrix.variant }}" == "dev" ]]; then
             tags="${IMAGE}:dev"
+            # the dev image is built from this checkout, which is copied into
+            # the image without its git history: resolve the version here
+            scm_version="$(pipx run setuptools-scm)"
+            echo "scm_version=${scm_version}" >> "$GITHUB_OUTPUT"
+            echo "building dev image as version ${scm_version}"
           else
             tags="${IMAGE}:${version}${{ matrix.suffix }}"
             # "latest" only ever points at the full flavor, and the tag filter
@@ -88,8 +98,6 @@ jobs:
           build-args: |
             REMAGE_BASE_FLAVOR=${{ matrix.flavor }}
             REMAGE_VERSION=${{ matrix.version }}
-          # the dev image clones main inside the Dockerfile: a cache hit would
-          # happily serve a stale checkout, so never cache that one
-          no-cache: ${{ matrix.variant == 'dev' }}
+            REMAGE_VERSION_SET=${{ steps.cfg.outputs.scm_version }}
           cache-from: type=gha,scope=${{ matrix.variant }}
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
