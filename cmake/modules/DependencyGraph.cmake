@@ -87,7 +87,7 @@ function(gen_dep_graph OUTPUT_TYPE)
     add_custom_command(
       TARGET ${target_name}
       POST_BUILD
-      COMMAND ;
+      COMMAND ${CMAKE_COMMAND} -E true
       COMMENT "Dependency graph for ${target_name} generated and located at ${out_file}")
 
     if(gen_dep_graph_ADD_TO_DEP_GRAPH)
