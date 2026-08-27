@@ -148,8 +148,6 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
 
     logger = rmg_logging.setup_log()
 
-    tmp_gdml_file: str | Path = ""
-
     original_gdml_dict = load_gdml_geometry(Path(args.geometry))
     output_file_stem = Path(args.geometry).stem
 
@@ -172,12 +170,11 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         object_name = "object_lv"
 
     # Generate temporary GDML with buffered world volume
-    tmp_gdml_file = generate_tmp_gdml_geometry(
+    with generate_tmp_gdml_geometry(
         geometry_to_benchmark,
         buffer_fraction=args.buffer_fraction,
         object_name=object_name,
-    )
-    try:
+    ) as tmp_gdml_file:
         args.geometry = str(tmp_gdml_file)
 
         macro_content = generate_macro(args, output_file_stem=output_file_stem)
@@ -204,9 +201,5 @@ def remage_geombench_cli(external_args: list[str] | None = None) -> int:
         for key, value in analysis_results.items():
             msg = f"{key}: {value}"
             logger.info(msg)
-
-    finally:
-        if tmp_gdml_file:
-            Path(tmp_gdml_file).unlink(missing_ok=True)
 
     return 0

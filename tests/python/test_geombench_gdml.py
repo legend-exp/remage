@@ -14,9 +14,9 @@ def test_generate_tmp_gdml_geometry() -> None:
 
     loaded_gdml = load_gdml_geometry(geometry_path)
 
-    generated_file_path = generate_tmp_gdml_geometry(loaded_gdml)
-
-    with Path(generated_file_path).open("r") as f:
-        gdml_content = f.read()
+    with generate_tmp_gdml_geometry(loaded_gdml) as generated_file_path:
+        gdml_content = generated_file_path.read_text()
 
     assert f'name="{component_name}"' in gdml_content
+    # the context manager cleans up after itself
+    assert not generated_file_path.exists()

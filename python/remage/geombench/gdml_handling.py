@@ -17,6 +17,8 @@
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import pyg4ometry
@@ -100,13 +102,16 @@ def change_extent_of_world_volume(
     return {"object_lv": world_lv, "registry": registry}
 
 
+@contextmanager
 def generate_tmp_gdml_geometry(
     geometry: dict, buffer_fraction: float = 0.25, object_name: str = "object_lv"
-) -> Path:
+) -> Iterator[Path]:
     """Prepare a GDML geometry by wrapping it in a buffered world volume.
 
     Creates a new GDML file with the geometry positioned in a world volume
     that includes buffer space around it.
+
+    This is a context manager that deletes the temporary file on exit.
 
     Parameters
     ----------
@@ -119,10 +124,11 @@ def generate_tmp_gdml_geometry(
         Name to assign to the object logical volume when positioning.
         Default is "object_lv".
 
-    Returns
-    -------
+    Yields
+    ------
     Path
-        Path to the temporary GDML file with the adjusted geometry.
+        Path to the temporary GDML file with the adjusted geometry. Only valid
+        inside the ``with`` block.
     """
     positioned_geometry = change_extent_of_world_volume(
         geometry, buffer_fraction=buffer_fraction, object_name=object_name
@@ -131,8 +137,8 @@ def generate_tmp_gdml_geometry(
     writer = pyg4ometry.gdml.Writer()
     writer.addDetector(positioned_geometry["registry"])
 
-    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".gdml")  # noqa: SIM115
-    tempfile_path = Path(temp_file.name)
-    writer.write(tempfile_path)
-
-    return tempfile_path
+    # a whole directory, so that the file pyg4ometry writes is cleaned up too
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_gdml_file = Path(tmp_dir) / "geometry.gdml"
+        writer.write(tmp_gdml_file)
+        yield tmp_gdml_file
