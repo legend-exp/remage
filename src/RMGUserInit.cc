@@ -15,6 +15,8 @@
 
 #include "RMGUserInit.hh"
 
+#include <algorithm>
+
 #include "RMGGeomBenchOutputScheme.hh"
 #include "RMGGeometryCheckOutputScheme.hh"
 #include "RMGIsotopeFilterScheme.hh"
@@ -39,8 +41,7 @@ void RMGUserInit::ActivateOptionalOutputScheme(std::string name) {
     RMGLog::Out(RMGLog::fatal, "Optional output scheme '", name, "' not found!");
   }
 
-  if (std::find(fActivatedOutputScheme.begin(), fActivatedOutputScheme.end(), name) !=
-      fActivatedOutputScheme.end()) {
+  if (std::ranges::find(fActivatedOutputScheme, name) != fActivatedOutputScheme.end()) {
     RMGLog::Out(RMGLog::fatal, "Optional output scheme '", name, "' already activated!");
   }
 
@@ -49,8 +50,7 @@ void RMGUserInit::ActivateOptionalOutputScheme(std::string name) {
 }
 
 bool RMGUserInit::IsOptionalOutputSchemeActivated(std::string name) {
-  return std::find(fActivatedOutputScheme.begin(), fActivatedOutputScheme.end(), name) !=
-         fActivatedOutputScheme.end();
+  return std::ranges::find(fActivatedOutputScheme, name) != fActivatedOutputScheme.end();
 }
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -324,9 +324,9 @@ RMGRunAction::OutputFilePaths RMGRunAction::BuildOutputFile() const {
     std::string new_fn = ".rmg-tmp-" + std::to_string(dist(rd)) + "." + path.stem().string() +
                          ".hdf5";
     auto new_path = path.parent_path() / new_fn;
-    return OutputFilePaths{new_path, path};
+    return OutputFilePaths{.tmp = new_path, .original = path};
   }
-  return OutputFilePaths{path, path};
+  return OutputFilePaths{.tmp = path, .original = path};
 }
 
 /// \cond this creates weird namespaces @<long number>

@@ -15,6 +15,7 @@
 
 #include "RMGConvertLH5.hh"
 
+#include <algorithm>
 #include <cstdint>
 #include <fmt/ranges.h>
 #include <regex>
@@ -167,7 +168,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
   std::sregex_token_iterator it(names_string.begin(), names_string.end(), names_it_re, -1);
   std::vector<std::string> table_columns;
   std::copy(it, std::sregex_token_iterator(), std::back_inserter(table_columns));
-  std::sort(table_columns.begin(), table_columns.end());
+  std::ranges::sort(table_columns);
   // set the table lgdo datatype.
   SetStringAttribute(
       det_group,
@@ -204,7 +205,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       lgdo_name = column.substr(0, unit_sep_pos);
       lgdo_units = column.substr(unit_sep_pos + strlen("_in_"));
       // transform back the units, as they unfortunately cannot contain a forward slash in geant.
-      std::replace(lgdo_units.begin(), lgdo_units.end(), '\\', '/');
+      std::ranges::replace(lgdo_units, '\\', '/');
     }
 
     LH5Log(RMGLog::debug, ntuple_log_prefix, "column ", lgdo_name, ", with units ", lgdo_units);
@@ -216,10 +217,7 @@ bool RMGConvertLH5::ConvertNTupleToTable(H5::Group& det_group) {
       det_group.moveLink(column_tmp + "/pages", lgdo_name);
     } else {
       // create a new empty dataset, as we have none.
-      auto col_idx = std::distance(
-          names_parts.begin(),
-          std::find(names_parts.begin(), names_parts.end(), column)
-      );
+      auto col_idx = std::distance(names_parts.begin(), std::ranges::find(names_parts, column));
       LH5Log(
           RMGLog::debug,
           ntuple_log_prefix,
@@ -352,7 +350,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     }
 
     // if this is an auxiliary table, move it one level up out of the group
-    if (fAuxNtuples.find(ntuple) != fAuxNtuples.end()) {
+    if (fAuxNtuples.contains(ntuple)) {
       LH5Log(RMGLog::debug, "moving ntuple ", ntuple_group_name, "/", ntuple, " one group back");
       hfile.moveLink(std::string(ntuple_group_name).append("/").append(ntuple), ntuple);
     }
@@ -360,6 +358,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
 
   // remove aux ntuples from list of ntuples in the stp/ group
   for (auto& ntuple : fAuxNtuples)
+    // NOLINTNEXTLINE(modernize-use-ranges)
     ntuples.erase(std::remove(ntuples.begin(), ntuples.end(), ntuple), ntuples.end());
 
   // if the stp group is empty, remove it
@@ -375,7 +374,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     // make the root HDF5 group an LH5 struct.
     if (!ntuples_group.attrExists("datatype")) {
       LH5Log(RMGLog::debug, "making the root HDF5 group an LH5 struct");
-      std::sort(ntuples.begin(), ntuples.end());
+      std::ranges::sort(ntuples);
       SetStringAttribute(
           ntuples_group,
           "datatype",
@@ -388,7 +387,7 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   if (ExistsByType(ntuples_group, links_group_name, H5O_TYPE_GROUP)) {
     auto links_group = ntuples_group.openGroup(links_group_name);
     LH5Log(RMGLog::debug, "making the links HDF5 group an LH5 struct");
-    std::sort(links.begin(), links.end());
+    std::ranges::sort(links);
     SetStringAttribute(
         links_group,
         "datatype",

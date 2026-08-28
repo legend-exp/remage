@@ -103,7 +103,7 @@ bool RMGIpc::SendIpcNonBlocking(std::string msg) {
   // Serialize writes: multiple worker threads may share the same IPC fd, and a message is only
   // valid as a whole (framed by a trailing \x1d). Interleaving would corrupt the stream.
   static std::mutex write_mutex;
-  std::lock_guard<std::mutex> lock(write_mutex);
+  std::scoped_lock lock(write_mutex);
 
   // Loop until all bytes are written: a short write would otherwise permanently desync the
   // \x1d-framed stream. Retry on EINTR/EAGAIN.

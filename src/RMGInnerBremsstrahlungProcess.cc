@@ -161,12 +161,12 @@ double RMGInnerBremsstrahlungProcess::PhiFunction(double W_prime, double omega) 
   if (W <= 1.0) // Below rest mass energy
     return 0.0;
 
-  double p = std::sqrt(W * W - 1.0);                   // Momentum of electron after photon emission
-  double p_prime = std::sqrt(W_prime * W_prime - 1.0); // Momentum before photon emission
+  double p = std::sqrt((W * W) - 1.0); // Momentum of electron after photon emission
+  double p_prime = std::sqrt((W_prime * W_prime) - 1.0); // Momentum before photon emission
 
   if (p_prime <= 0.0 || omega <= 0.0) return 0.0;
 
-  double bracket_term = ((W * W + W_prime * W_prime) / (W_prime * p)) * std::log(W + p) - 2.0;
+  double bracket_term = (((W * W + W_prime * W_prime) / (W_prime * p)) * std::log(W + p)) - 2.0;
 
   double result = (CLHEP::fine_structure_const * p) / (pi * omega * p_prime) * bracket_term;
   return std::max(0.0, result); // Ensure non-negative results
@@ -181,7 +181,7 @@ double RMGInnerBremsstrahlungProcess::ComputeIBSpectrum(
   cdf.clear();
 
   // Convert electron energy to dimensionless units
-  double W_prime = electron_energy / CLHEP::electron_mass_c2 + 1.0;
+  double W_prime = (electron_energy / CLHEP::electron_mass_c2) + 1.0;
   if (W_prime <= 1.0) return 0.0;
 
   // Integration parameters
@@ -200,7 +200,7 @@ double RMGInnerBremsstrahlungProcess::ComputeIBSpectrum(
   double total = 0.0;
   double prev_phi = 0.0;
   for (int i = 0; i < num_points; i++) {
-    double omega = 0.01 + i * delta_omega;
+    double omega = 0.01 + (i * delta_omega);
     double phi = PhiFunction(W_prime, omega);
     if (i > 0) total += 0.5 * (prev_phi + phi) * delta_omega;
     omegas.push_back(omega);

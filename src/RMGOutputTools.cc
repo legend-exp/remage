@@ -15,6 +15,7 @@
 
 #include "RMGOutputTools.hh"
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -63,7 +64,7 @@ namespace {
     const G4ThreeVector sample_point = cache.daughter_transforms[i].TransformPoint(local_pos);
 
     if (cache.daughter_is_multiunion[i]) {
-      std::lock_guard<std::mutex> lock(multiunion_mutex);
+      std::scoped_lock lock(multiunion_mutex);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast, cppcoreguidelines-pro-type-const-cast)
       auto mu = const_cast<G4MultiUnion*>(static_cast<const G4MultiUnion*>(cache.daughter_solids[i]));
       mu->SetAccurateSafety(true);
@@ -492,7 +493,7 @@ double RMGOutputTools::distance_to_surface(
     }
 
     const double sample_dist = DistanceToDaughterSurface(cache, local_pos, i);
-    if (sample_dist < dist) dist = sample_dist;
+    dist = std::min(sample_dist, dist);
   }
 
   return dist;

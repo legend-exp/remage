@@ -31,7 +31,7 @@ void RMGIsotopeFilterScheme::TrackingActionPre(const G4Track* aTrack) {
   const int a = particle->GetAtomicMass();
   if (z == 0 || a == 0) return; // not an isotope, but any other particle.
 
-  if (fIsotopes.find({a, z}) == fIsotopes.end()) return;
+  if (!fIsotopes.contains({a, z})) return;
 
   auto event = G4EventManager::GetEventManager()->GetNonconstCurrentEvent();
   auto info = event->GetUserInformation();

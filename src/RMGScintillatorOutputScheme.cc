@@ -147,8 +147,7 @@ bool RMGScintillatorOutputScheme::ShouldDiscardEvent(const G4Event* event) {
 
   for (auto hit : *hit_coll->GetVector()) {
     if (!hit) continue;
-    if (fEdepCutDetectors.empty() or
-        (fEdepCutDetectors.find(hit->detector_uid) != fEdepCutDetectors.end()))
+    if (fEdepCutDetectors.empty() or (fEdepCutDetectors.contains(hit->detector_uid)))
       event_edep += hit->energy_deposition;
   }
 

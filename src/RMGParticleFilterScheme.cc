@@ -79,7 +79,7 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
 
   const int pdg = aTrack->GetDefinition()->GetPDGEncoding();
   // If the particle is not marked to kill, let it go
-  if (fParticles.find(pdg) == fParticles.end()) return std::nullopt;
+  if (!fParticles.contains(pdg)) return std::nullopt;
 
   const auto pv = aTrack->GetTouchableHandle()->GetVolume();
   // The physical volume may not exist at this point (e.g. a track leaving the
@@ -90,10 +90,9 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
   }
   const auto pv_name = pv->GetName();
   // If a kill volume is specified only kill if in the kill volume.
-  if (!fKillVolumes.empty() && fKillVolumes.find(pv_name) == fKillVolumes.end())
-    return std::nullopt;
+  if (!fKillVolumes.empty() && !fKillVolumes.contains(pv_name)) return std::nullopt;
   // If a keep volume is specified only keep particle if in that volume.
-  if (fKeepVolumes.find(pv_name) != fKeepVolumes.end()) return std::nullopt;
+  if (fKeepVolumes.contains(pv_name)) return std::nullopt;
 
   // If this is the primary particle we can not kill it without crashing the simulation
   if (aTrack->GetTrackID() == 0) {
@@ -109,11 +108,10 @@ std::optional<G4ClassificationOfNewTrack> RMGParticleFilterScheme::StackingActio
     auto proc = aTrack->GetCreatorProcess();
     if (proc) {
       // If a kill process is specified only kill if created by this process.
-      if (!fKillProcesses.empty() &&
-          fKillProcesses.find(proc->GetProcessName()) == fKillProcesses.end())
+      if (!fKillProcesses.empty() && !fKillProcesses.contains(proc->GetProcessName()))
         return std::nullopt;
       // If a keep process is specified only keep if created by this process.
-      if (fKeepProcesses.find(proc->GetProcessName()) != fKeepProcesses.end()) return std::nullopt;
+      if (fKeepProcesses.contains(proc->GetProcessName())) return std::nullopt;
     }
   }
 

@@ -98,9 +98,7 @@ G4VPhysicalVolume* RMGHardware::Construct() {
         det_type_str[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(det_type_str[0])));
         const auto det_type = RMGTools::ToEnum<RMGDetectorType>(det_type_str, "detector type");
 
-        if (fRegisterDetectorsFromGDML.find(det_type) == fRegisterDetectorsFromGDML.end()) {
-          continue;
-        }
+        if (!fRegisterDetectorsFromGDML.contains(det_type)) { continue; }
 
         for (const auto& det_aux : *aux.auxList) {
           int uid = -1;
@@ -244,9 +242,9 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       // Sort alphabetically by name
       std::vector<G4VPhysicalVolume*> sortedVolumes(volumes.begin(), volumes.end());
       // Sorts by name and copy number in ascending order
-      std::sort(
-          sortedVolumes.begin(),
-          sortedVolumes.end(),
+      std::ranges::sort(
+          sortedVolumes,
+
           [](G4VPhysicalVolume* a, G4VPhysicalVolume* b) {
             if (a->GetName() == b->GetName()) return a->GetCopyNo() < b->GetCopyNo();
             return a->GetName() < b->GetName();
@@ -349,7 +347,7 @@ void RMGHardware::ConstructSDandField() {
 
     // initialize a concrete detector, if not done yet
     // TODO: allow user to register custom detectors
-    if (active_dets.find(v.type) == active_dets.end()) {
+    if (!active_dets.contains(v.type)) {
       RMGLog::Out(
           RMGLog::debug,
           "Registering new sensitive detector of type ",
@@ -475,7 +473,13 @@ void RMGHardware::StageDetector(
   }
 
   auto r_value = fStagedDetectors.insert(
-      {{name, copy_nr}, {type, name, uid, copy_nr, allow_uid_reuse, ntuple_name}}
+      {{name, copy_nr},
+       {.type = type,
+        .name = name,
+        .uid = uid,
+        .copy_nr = copy_nr,
+        .allow_uid_reuse = allow_uid_reuse,
+        .ntuple_name = ntuple_name}}
   );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
@@ -521,7 +525,8 @@ void RMGHardware::RegisterDetector(
 
   // FIXME: can this be done with emplace?
   auto r_value = fDetectorMetadata.insert(
-      {{pv_name, copy_nr}, {type, uid, pv_name, copy_nr, ntuple_name}}
+      {{pv_name, copy_nr},
+       {.type = type, .uid = uid, .name = pv_name, .copy_nr = copy_nr, .ntuple_name = ntuple_name}}
   );
   if (!r_value.second) { // if insertion did not take place
     RMGLog::OutFormat(
@@ -565,7 +570,10 @@ void RMGHardware::SetEminLimitForParticle(double ekin_min, std::string name, std
     return;
   }
 
-  auto [it, inserted] = fPhysVolEminLimits.try_emplace(name, RMGSelectiveEminLimit{ekin_min, {}});
+  auto [it, inserted] = fPhysVolEminLimits.try_emplace(
+      name,
+      RMGSelectiveEminLimit{.ekin_min = ekin_min, .particles = {}}
+  );
   if (!inserted && it->second.ekin_min != ekin_min) {
     RMGLog::OutFormat(
         RMGLog::error,
@@ -595,7 +603,7 @@ bool RMGHardware::IsEminLimitParticleSelected(
   if (!logical) return false;
   const auto it = fLogicalVolEminParticles.find(logical);
   if (it == fLogicalVolEminParticles.end()) return false;
-  return it->second.find(particle_name) != it->second.end();
+  return it->second.contains(particle_name);
 }
 
 void RMGHardware::RegisterDetectorsFromGDML(std::string s) {

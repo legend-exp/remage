@@ -157,7 +157,7 @@ namespace {
     if (env_p == nullptr) return false;
     std::string env_s{env_p};
 
-    return std::any_of(std::begin(terms), std::end(terms), [&](const auto term) {
+    return std::ranges::any_of(terms, [&](const auto term) {
       return env_s.find(term) != std::string::npos;
     });
   }
