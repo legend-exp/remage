@@ -77,10 +77,8 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   if (proc) proc_name = proc->GetProcessName();
 
   auto write = true;
-  write &= (fFilterProcess.empty() || fFilterProcess.find(proc_name) != fFilterProcess.end());
-  write &=
-      (fFilterParticle.empty() ||
-       fFilterParticle.find(primary->GetPDGcode()) != fFilterParticle.end());
+  write &= (fFilterProcess.empty() || fFilterProcess.contains(proc_name));
+  write &= (fFilterParticle.empty() || fFilterParticle.contains(primary->GetPDGcode()));
   write &= (fFilterEnergy == -1 || track->GetKineticEnergy() >= fFilterEnergy);
   if (!write) return;
 

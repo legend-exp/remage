@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
+#include <utility>
 
 #include "G4AnalysisManager.hh"
 #include "G4GenericMessenger.hh"
@@ -314,7 +315,7 @@ void RMGGeomBench::RecordBatchTime(int pixel_idx, double batch_time) {
   }
 
   // Ensure the vector is large enough
-  if (static_cast<int>(pixel_batch_times.size()) <= pixel_idx) {
+  if (std::cmp_less_equal(pixel_batch_times.size(), pixel_idx)) {
     pixel_batch_times.resize(pixel_idx + 1);
   }
 
@@ -362,18 +363,18 @@ void RMGGeomBench::SaveAllPixels() {
 
         switch (plane) {
           case 0: // XZ plane
-            x_pos = limit.x() + i * increment.x();
+            x_pos = limit.x() + (i * increment.x());
             y_pos = limit.y();
-            z_pos = limit.z() + j * increment.z();
+            z_pos = limit.z() + (j * increment.z());
             break;
           case 1: // YZ plane
             x_pos = limit.x();
-            y_pos = limit.y() + i * increment.y();
-            z_pos = limit.z() + j * increment.z();
+            y_pos = limit.y() + (i * increment.y());
+            z_pos = limit.z() + (j * increment.z());
             break;
           case 2: // XY plane
-            x_pos = limit.x() + i * increment.x();
-            y_pos = limit.y() + j * increment.y();
+            x_pos = limit.x() + (i * increment.x());
+            y_pos = limit.y() + (j * increment.y());
             z_pos = limit.z();
             break;
         }
@@ -381,15 +382,15 @@ void RMGGeomBench::SaveAllPixels() {
         // Calculate median time from batch times
         double median_time_per_event = 0.0;
 
-        if (pixel_idx < static_cast<int>(pixel_batch_times.size()) &&
+        if (std::cmp_less(pixel_idx, pixel_batch_times.size()) &&
             !pixel_batch_times[pixel_idx].empty()) {
           std::vector<double> sorted_times = pixel_batch_times[pixel_idx];
-          std::sort(sorted_times.begin(), sorted_times.end());
+          std::ranges::sort(sorted_times);
 
           size_t n = sorted_times.size();
           double median_time = 0.0;
           if (n % 2 == 0) {
-            median_time = (sorted_times[n / 2 - 1] + sorted_times[n / 2]) / 2.0;
+            median_time = (sorted_times[(n / 2) - 1] + sorted_times[n / 2]) / 2.0;
           } else {
             median_time = sorted_times[n / 2];
           }
@@ -501,18 +502,18 @@ void RMGGeomBench::GeneratePrimaries(G4Event* event) {
   G4ThreeVector current_position;
   switch (plane) {
     case 0: // XZ plane
-      current_position.setX(limit.x() + i_index * increment.x());
+      current_position.setX(limit.x() + (i_index * increment.x()));
       current_position.setY(limit.y());
-      current_position.setZ(limit.z() + j_index * increment.z());
+      current_position.setZ(limit.z() + (j_index * increment.z()));
       break;
     case 1: // YZ plane
       current_position.setX(limit.x());
-      current_position.setY(limit.y() + i_index * increment.y());
-      current_position.setZ(limit.z() + j_index * increment.z());
+      current_position.setY(limit.y() + (i_index * increment.y()));
+      current_position.setZ(limit.z() + (j_index * increment.z()));
       break;
     case 2: // XY plane
-      current_position.setX(limit.x() + i_index * increment.x());
-      current_position.setY(limit.y() + j_index * increment.y());
+      current_position.setX(limit.x() + (i_index * increment.x()));
+      current_position.setY(limit.y() + (j_index * increment.y()));
       current_position.setZ(limit.z());
       break;
   }

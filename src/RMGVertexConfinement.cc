@@ -15,6 +15,7 @@
 
 #include "RMGVertexConfinement.hh"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -129,7 +130,7 @@ double RMGVertexConfinement::DepthProfile::Sample() const {
         const double u1 = std::max(G4UniformRand(), std::numeric_limits<double>::min());
         const double u2 = G4UniformRand();
         const double z = std::sqrt(-2.0 * std::log(u1)) * std::cos(CLHEP::twopi * u2);
-        d = mean + sigma * z;
+        d = mean + (sigma * z);
         if (d >= range_lo && d <= range_hi) return d;
       }
       RMGLog::Out(
@@ -144,7 +145,7 @@ double RMGVertexConfinement::DepthProfile::Sample() const {
     }
 
     case Type::kUniform: {
-      return range_lo + (range_hi - range_lo) * G4UniformRand();
+      return range_lo + ((range_hi - range_lo) * G4UniformRand());
     }
 
     default: RMGLog::Out(RMGLog::error, "Unknown DepthProfile::Type, returning 0"); return 0;
@@ -189,7 +190,7 @@ void RMGVertexConfinement::SampleableObject::ApplyDepthProfile(
   // Clamp the depth to the distance to the far boundary along the inward normal, so the
   // displaced vertex can never cross to the other side of the solid or leave it.
   const double max_depth = solid->DistanceToOut(local_vertex, -normal);
-  if (depth > max_depth) depth = max_depth;
+  depth = std::min(depth, max_depth);
 
   local_vertex -= depth * normal;
 }
@@ -342,7 +343,7 @@ void RMGVertexConfinement::SampleableObject::GetDirection(G4ThreeVector& dir, G4
   pos += G4ThreeVector(cos(disk_phi) * disk_r, sin(disk_phi) * disk_r, 0);
 
   // now rotate pos and dir by some random direction
-  G4double theta = acos(2.0 * G4UniformRand() - 1.0);
+  G4double theta = acos((2.0 * G4UniformRand()) - 1.0);
   G4double phi = 2.0 * CLHEP::pi * G4UniformRand();
 
   pos.rotateY(theta);
@@ -516,9 +517,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
 }
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
-  return std::any_of(data.begin(), data.end(), [&vertex](const auto& o) {
-    return o.IsInside(vertex);
-  });
+  return std::ranges::any_of(data, [&vertex](const auto& o) { return o.IsInside(vertex); });
 }
 
 

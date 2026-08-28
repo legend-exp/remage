@@ -178,7 +178,7 @@ class RMGUserInit {
 
     template<typename T, typename B, typename... Args>
     void Add(late_init_vec<B>* vec, Args&&... args) {
-      static_assert(std::is_base_of<B, T>::value);
+      static_assert(std::is_base_of_v<B, T>);
 
       // capture the passed arguments for the constructor to be called later.
       auto create = CreateInit<B, T>(std::forward<Args>(args)...);
@@ -186,7 +186,7 @@ class RMGUserInit {
     }
     template<typename T, typename B, typename K, typename... Args>
     void Add(late_init_map<K, B>* map, K k, Args&&... args) {
-      static_assert(std::is_base_of<B, T>::value);
+      static_assert(std::is_base_of_v<B, T>);
 
       // capture the passed arguments for the constructor to be called later.
       auto create = CreateInit<B, T>(std::forward<Args>(args)...);
@@ -194,7 +194,7 @@ class RMGUserInit {
     }
     template<typename T, typename B, typename... Args>
     void Set(late_init_fn<B>& fn, Args&&... args) {
-      static_assert(std::is_base_of<B, T>::value);
+      static_assert(std::is_base_of_v<B, T>);
 
       // capture the passed arguments for the constructor to be called later.
       auto create = CreateInit<B, T>(std::forward<Args>(args)...);

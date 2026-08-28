@@ -19,7 +19,7 @@
 #include <string>
 
 /** @brief Kind of sensitive detector backing an @ref RMGDetectorMetadata entry. */
-enum RMGDetectorType {
+enum class RMGDetectorType {
   kGermanium,
   kOptical,
   kScintillator,

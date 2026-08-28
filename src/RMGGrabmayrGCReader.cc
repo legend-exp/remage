@@ -188,7 +188,7 @@ void RMGGrabmayrGCReader::RegisterCascadeFile(
   SetStartLocation(*file);
 
   fCascadeFiles[std::make_pair(z, a)].push_back(
-      GammaCascadeFileEntry{en_low, en_high, std::move(file)}
+      GammaCascadeFileEntry{.en_low = en_low, .en_high = en_high, .file = std::move(file)}
   );
 }
 
@@ -260,9 +260,9 @@ void RMGGrabmayrGCReader::SetGammaCascadeFilelist(
 
   // Keep the per-isotope entries sorted ascending by lower energy bound
   auto& entries = fCascadeFiles[std::make_pair(z, a)];
-  std::sort(
-      entries.begin(),
-      entries.end(),
+  std::ranges::sort(
+      entries,
+
       [](const GammaCascadeFileEntry& l, const GammaCascadeFileEntry& r) {
         return l.en_low < r.en_low;
       }

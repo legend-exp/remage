@@ -153,7 +153,7 @@ void RMGGeneratorCosmicMuons::GeneratePrimaries(G4Event* event) {
   const auto p_tot = fEcoMug->GetGenerationMomentum() * u::GeV;
   RMGLog::OutFormat(RMGLog::debug_event, "...momentum {:.4g} GeV/c", p_tot / u::GeV);
   const auto mu_mass = G4MuonPlus::Definition()->GetPDGMass();
-  fGun->SetParticleEnergy(std::sqrt(p_tot * p_tot + mu_mass * mu_mass) - mu_mass);
+  fGun->SetParticleEnergy(std::sqrt((p_tot * p_tot) + (mu_mass * mu_mass)) - mu_mass);
 
   fGun->GeneratePrimaryVertex(event);
 }

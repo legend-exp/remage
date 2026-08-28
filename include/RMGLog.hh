@@ -65,6 +65,7 @@ class RMGLog {
 
     /**
      * Enumerator for the amount of details to put into the log */
+    // NOLINTNEXTLINE(cppcoreguidelines-use-enum-class)
     enum LogLevel {
       debug_event = 0, ///< Print everything, including debug info (also in the event loop)
       debug = 10,      ///< Print everything, including debug info (not in the event loop)
@@ -76,7 +77,7 @@ class RMGLog {
       nothing = 70     ///< Print nothing
     };
 
-    enum Ansi {
+    enum class Ansi {
       black = 30,
       red = 31,
       green = 32,
@@ -85,7 +86,7 @@ class RMGLog {
       magenta = 35,
       cyan = 36,
       grey = 37,
-      unspecified
+      unspecified = 100
     };
 
     /** \name Constructor and destructor */

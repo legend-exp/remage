@@ -105,7 +105,7 @@ namespace RMGTools {
     t.hours = tot_seconds / 3600;
     tot_seconds -= t.hours * 3600;
     t.minutes = tot_seconds / 60;
-    t.seconds = tot_seconds - t.minutes * 60;
+    t.seconds = tot_seconds - (t.minutes * 60);
     return t;
   }
 } // namespace RMGTools

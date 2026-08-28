@@ -97,9 +97,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
   auto cos_theta1 = sphere->GetCosStartTheta();
   auto delta_cos_theta = sphere->GetCosEndTheta() - cos_theta1;
 
-  auto phi = phi1 + delta_phi * _g4rand();                   // random phi
-  auto cos_theta = delta_cos_theta * _g4rand() + cos_theta1; // random cos(theta)
-  auto sin_theta = std::sqrt(1 - cos_theta * cos_theta);     // ...and sin(theta)
+  auto phi = phi1 + (delta_phi * _g4rand());                   // random phi
+  auto cos_theta = (delta_cos_theta * _g4rand()) + cos_theta1; // random cos(theta)
+  auto sin_theta = std::sqrt(1 - (cos_theta * cos_theta));     // ...and sin(theta)
   // the sampled 3D point on unit sphere
   auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
 
@@ -117,7 +117,7 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Sphere* sphere, bool on_surface) {
     else return s2_point * r2;
   } else {
     auto u = _g4rand();
-    auto R = std::cbrt(u * r2 * r2 * r2 + (1 - u) * r1 * r1 * r1); // random radius
+    auto R = std::cbrt((u * r2 * r2 * r2) + ((1 - u) * r1 * r1 * r1)); // random radius
     return s2_point * R;
   }
 }
@@ -128,9 +128,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Orb* orb, bool on_surface) {
 
   auto r = orb->GetRadius();
 
-  auto phi = CLHEP::twopi * _g4rand();                   // random phi
-  auto cos_theta = 2 * _g4rand() - 1;                    // random cos(theta)
-  auto sin_theta = std::sqrt(1 - cos_theta * cos_theta); // ...and sin(theta)
+  auto phi = CLHEP::twopi * _g4rand();                     // random phi
+  auto cos_theta = (2 * _g4rand()) - 1;                    // random cos(theta)
+  auto sin_theta = std::sqrt(1 - (cos_theta * cos_theta)); // ...and sin(theta)
   // the sampled 3D point on unit sphere
   auto s2_point = G4ThreeVector(sin_theta * std::cos(phi), sin_theta * std::sin(phi), cos_theta);
 
@@ -152,9 +152,9 @@ G4ThreeVector RMGGeneratorUtil::rand(const G4Tubs* tub, bool on_surface) {
   auto a = tub->GetStartPhiAngle();
   auto delta_a = tub->GetDeltaPhiAngle();
 
-  auto phi = a + delta_a * _g4rand();
+  auto phi = a + (delta_a * _g4rand());
   auto z = h * (_g4rand() - 0.5);
-  auto R = std::sqrt(_g4rand() * (r2 * r2 - r1 * r1) + r1 * r1);
+  auto R = std::sqrt((_g4rand() * (r2 * r2 - r1 * r1)) + (r1 * r1));
   auto s1_point = G4ThreeVector(std::cos(phi), std::sin(phi), 0);
 
   if (on_surface) {

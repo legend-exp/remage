@@ -15,6 +15,7 @@
 
 #include "RMGAnalysisReader.hh"
 
+#include <algorithm>
 #include <filesystem>
 #include <random>
 namespace fs = std::filesystem;
@@ -219,7 +220,7 @@ void RMGAnalysisReader::Access::AssertUnit(
     const std::vector<std::string>& allowed_units
 ) const {
   if (!fUnits) return;
-  if (std::find(allowed_units.begin(), allowed_units.end(), GetUnit(name)) == allowed_units.end()) {
+  if (std::ranges::find(allowed_units, GetUnit(name)) == allowed_units.end()) {
     RMGLog::Out(RMGLog::fatal, "invalid unit '", GetUnit(name), "' for column ", name);
   }
 }

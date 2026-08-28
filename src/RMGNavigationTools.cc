@@ -15,6 +15,7 @@
 
 #include "RMGNavigationTools.hh"
 
+#include <algorithm>
 #include <format>
 #include <map>
 #include <queue>
@@ -91,7 +92,7 @@ std::set<G4VPhysicalVolume*> RMGNavigationTools::FindPhysicalVolume(
 
 G4LogicalVolume* RMGNavigationTools::FindLogicalVolume(std::string name) {
   auto const& store = *G4LogicalVolumeStore::GetInstance();
-  auto result = std::find_if(store.begin(), store.end(), [&name](auto v) {
+  auto result = std::ranges::find_if(store, [&name](auto v) {
     return std::string(v->GetName()) == name;
   });
   if (result == store.end()) {
@@ -157,7 +158,7 @@ void RMGNavigationTools::PrintListOfLogicalVolumes() {
   std::set<std::pair<std::string, std::string>> volumes;
   for (const auto& v : *G4LogicalVolumeStore::GetInstance()) {
 
-    if (v->GetName().size() > max_length) max_length = v->GetName().size();
+    max_length = std::max(v->GetName().size(), max_length);
 
     volumes.insert(
         {v->GetName(),
@@ -195,7 +196,7 @@ void RMGNavigationTools::PrintListOfPhysicalVolumes() {
         +") // from logical: " + v->GetLogicalVolume()->GetName()
     );
   }
-  std::sort(volumes.begin(), volumes.end());
+  std::ranges::sort(volumes);
 
   RMGLog::Out(
       RMGLog::summary,
