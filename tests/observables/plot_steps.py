@@ -7,6 +7,9 @@ import hist
 import lh5
 from matplotlib import colors
 from matplotlib import pyplot as plt
+
+# the PNG/PDF saving is shared with the other plotting scripts of this test
+from plot_observables import savefig
 from reboost.shape.cluster import apply_cluster, cluster_by_step_length, step_lengths
 
 plt.rcParams["lines.linewidth"] = 1
@@ -63,7 +66,7 @@ def plot_tracks(_data, idx, savename=None):
     ax.legend(fontsize=14)
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 def plot_hist2d(
@@ -87,7 +90,7 @@ def plot_hist2d(
     ax.set_ylabel("Step length [mm]")
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 def plot_steps(steps, bins=100, range=(0, 100), savename=None):
@@ -100,16 +103,16 @@ def plot_steps(steps, bins=100, range=(0, 100), savename=None):
     ax.set_yscale("linear")
 
     if savename is not None:
-        plt.savefig(savename)
+        savefig(savename)
 
 
 path = sys.argv[1]
 name = sys.argv[2]
 shaped = lh5.read("stp/germanium", path).view_as("ak", with_units=True)
 
-plot_tracks(shaped, 0, f"{name}.tracks.out0.png")
-plot_tracks(shaped, 1, f"{name}.tracks.out1.png")
-plot_tracks(shaped, 2, f"{name}.tracks.out2.png")
+plot_tracks(shaped, 0, f"{name}.tracks-0.output.png")
+plot_tracks(shaped, 1, f"{name}.tracks-1.output.png")
+plot_tracks(shaped, 2, f"{name}.tracks-2.output.png")
 
 
 cluster_idx = cluster_by_step_length(
@@ -146,7 +149,7 @@ plot_hist2d(
     bins=100,
     high_dist=5000,
     high_stp=150,
-    savename=f"{name}.step-vs-dist.png",
+    savename=f"{name}.step-vs-dist.output.png",
 )
 plot_hist2d(
     dist,
@@ -155,9 +158,11 @@ plot_hist2d(
     bins=100,
     high_dist=100,
     high_stp=100,
-    savename=f"{name}.step-vs-dist-zoom.png",
+    savename=f"{name}.step-vs-dist-zoom.output.png",
 )
-plot_steps(step_len + 0.1, range=(0, 100), bins=500, savename=f"{name}.step-hist.png")
+plot_steps(
+    step_len + 0.1, range=(0, 100), bins=500, savename=f"{name}.step-hist.output.png"
+)
 
 
 # plot activeness

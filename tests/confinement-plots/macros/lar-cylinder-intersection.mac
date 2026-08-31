@@ -1,0 +1,25 @@
+# intersection of the surrounding volume (LAr) with a geometrical cylinder:
+# vertices fill the argon inside the cylinder only, and the two detectors are
+# carved out of it (daughter volumes are never sampled)
+/control/execute macros/_init.mac
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/SamplingMode IntersectPhysicalWithGeometrical
+
+/RMG/Generator/Confinement/Physical/AddVolume LAr
+
+# a cylindrical shell hugging the detector stack
+/RMG/Generator/Confinement/Geometrical/AddSolid Cylinder
+/RMG/Generator/Confinement/Geometrical/CenterPositionX 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionY 0 mm
+/RMG/Generator/Confinement/Geometrical/CenterPositionZ 0 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/InnerRadius 0 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/OuterRadius 50 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/Height 70 mm
+/RMG/Generator/Confinement/Geometrical/Cylinder/StartingAngle 0 deg
+/RMG/Generator/Confinement/Geometrical/Cylinder/SpanningAngle 360 deg
+
+# sample in the (small) geometrical solid first, then check LAr containment
+/RMG/Generator/Confinement/FirstSamplingVolume Geometrical
+
+/run/beamOn 20000

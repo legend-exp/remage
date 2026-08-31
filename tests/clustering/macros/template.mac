@@ -1,0 +1,14 @@
+/RMG/Output/NtuplePerDetector false
+/RMG/Geometry/RegisterDetector Germanium germanium 001
+
+/run/initialize
+
+/RMG/Processes/Stepping/ResetInitialDecayTime true
+/RMG/Output/Germanium/StepPositionMode Both
+/RMG/Output/Germanium/StoreTrackID true
+
+$CLUSTER_COMMANDS
+
+$GENERATOR
+
+/run/beamOn {NEVENTS}

@@ -353,38 +353,46 @@ of the primaries which should show gaps due to the HPGe detectors. And we
 compute the ratio of primaries in each cylinder, which should be proportional to
 the volume of the cylinder minus that of the Germanium.
 
-```{figure} ./_img/ confinement/lar-in-check-xy.output.png
+```{figure} ./_img/confinement/lar-in-check-xy.output.png
 :width: 700px
 ```
 
-```{figure} ./_img/ confinement/lar-in-check-xz.output.png
+```{figure} ./_img/confinement/lar-in-check-xz.output.png
 :width: 700px
 ```
 
-```{figure} ./_img/ confinement/lar-in-check-ratios.output.png
+```{figure} ./_img/confinement/lar-in-check-ratios.output.png
 :width: 700px
 ```
 
 Finally, we generate primaries in the subtraction of the LAr region and the
 cylinders around each string.
 
-```{figure} ./_img/ confinement/lar-sub-check-xy.output.png
+```{figure} ./_img/confinement/lar-sub-check-xy.output.png
 :width: 700px
 ```
 
-```{figure} ./_img/ confinement/lar-sub-check-xz.output.png
+```{figure} ./_img/confinement/lar-sub-check-xz.output.png
 :width: 700px
 ```
 
 Then also with an intersection of another cylinder with the height of the
 strings.
 
-```{figure} ./_img/ confinement/lar-int-and-sub-check-xy.output.png
+```{figure} ./_img/confinement/lar-int-and-sub-check-xy.output.png
 :width: 700px
 ```
 
-```{figure} ./_img/ confinement/lar-int-and-sub-check-xz.output.png
+```{figure} ./_img/confinement/lar-int-and-sub-check-xz.output.png
 :width: 700px
 ```
 
 &nbsp;
+
+## Summary plot
+
+This is a summary plot created for the _remage_ paper.
+
+```{figure} ./_img/confinement-plots/confinement.output.png
+:width: 700px
+```

@@ -13,18 +13,31 @@ import dbetto
 from reboost.build_hit import build_hit
 from remage import remage_run
 
-rmg = sys.argv[1]
+rmg = sys.argv[1] if len(sys.argv) > 1 else None
 n_proc = int(os.environ.get("RMG_STATS_FACTOR", "1"))
-n_events = 20000 * n_proc * (4 if n_proc > 1 else 1)
+n_events = 20000 * n_proc * (2 if n_proc > 1 else 1)
 
-# the step files are large and only needed to build the hit files, so they are
-# deleted as soon as reboost is done with them: keeping all of them fills up the
-# CI runner's disk. The two listed here are the ones plot_steps.py reads (see
-# CMakeLists.txt). Set RMG_KEEP_STP=1 to keep all of them around for debugging.
+# the step files of this scan are large (a run without pre-clustering writes
+# ~2.7 kB/event) and are only needed to build the hit files, so they are
+# deleted as soon as reboost is done with them. Set RMG_KEEP_STP=1 to keep
+# them around for debugging.
 keep_stp = os.environ.get("RMG_KEEP_STP", "") not in ("", "0")
-keep_stp_scan_points = {
-    ("beta_bulk", "step_limits", None),
-    ("beta_bulk", "step_limits", 10),
+
+# the germanium pre-clustering settings scanned here. ``None`` always means
+# "pre-clustering completely disabled" and is used as the reference point.
+all_cluster_distances = [10, 20, 50, 100, 200, 500, 1000, None]  # um
+all_cluster_distances_surface = [1, 5, 10, 20, 50, 100, None]  # um
+all_cluster_times = [0.1, 10, 1000, None]  # us
+
+energy = 1000  # keV
+
+# the macro snippet configuring the pre-clustering for a given scan point
+cluster_commands = {
+    "cluster_distance": "/RMG/Output/Germanium/Cluster/PreClusterDistance {} um",
+    "cluster_distance_surface": (
+        "/RMG/Output/Germanium/Cluster/PreClusterDistanceSurface {} um"
+    ),
+    "cluster_time": "/RMG/Output/Germanium/Cluster/PreClusterTimeThreshold {} us",
 }
 
 
@@ -77,17 +90,7 @@ def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yam
     )
 
 
-def run_sim(
-    generator_name="",
-    name="",
-    val="0",
-    step_limits="",
-    prod_cuts="",
-    step_points="",
-    proc="",
-    generator="",
-    register_lar=False,
-):
+def run_sim(generator_name="", name="", val="0", cluster="", generator=""):
     macro_file = "mac.mac"
     dir_string = f"{generator_name}/{name}/max_{val}/"
 
@@ -95,20 +98,12 @@ def run_sim(
     stp_directory = Path(f"out/{dir_string}/stp/")
     macro_directory = Path(f"macros/{dir_string}/")
 
-    lar_command = (
-        "/RMG/Geometry/RegisterDetector Scintillator LAr 002" if register_lar else ""
-    )
-
     stp_directory.mkdir(parents=True, exist_ok=True)
     macro_directory.mkdir(parents=True, exist_ok=True)
 
     replacements = {
-        "$STEP_LIMITS_COMMAND": step_limits,
-        "$PROD_CUTS_COMMAND": prod_cuts,
+        "$CLUSTER_COMMANDS": cluster,
         "$GENERATOR": generator,
-        "$STEP_POINT": step_points,
-        "$PROC": proc,
-        "$REGISTER_LAR": lar_command,
     }
     replace_lines(
         "macros/template.mac", macro_directory / Path(macro_file), replacements
@@ -157,89 +152,69 @@ def run_sim(
         )
 
 
-do_bulk = True
-do_surf = True
-energy = 1000
-
-generators = {}
-all_step_limits = [10, 20, 50, 100, 200, None]
-all_prod_cuts = [0.01, 0.02, 0.05, 0.3, 0.5, 0.7, 1, None]
-
-
-# define some generator commands
-if do_surf:
-    generators["beta_surf"] = f"""
+# the same generators as in the observables-ge test: electrons in the bulk of
+# the germanium and electrons impinging on its surface
+generators = {
+    "beta_surf": f"""
 /RMG/Generator/Select GPS
 /gps/position 0 0 -20 mm
 /gps/particle e-
 /gps/energy {energy} keV
 /gps/direction 0 0 1
-"""
-
-if do_bulk:
-    generators["beta_bulk"] = f"""
+""",
+    "beta_bulk": f"""
 /RMG/Generator/Confine Volume
 /RMG/Generator/Confinement/Physical/AddVolume germanium
 /RMG/Generator/Select GPS
 /gps/particle e-
 /gps/ang/type iso
 /gps/energy {energy} keV
-"""
+""",
+}
 
 jobs = []
 for generator, config in generators.items():
-    for limit in all_step_limits:
-        jobs.append((generator, config, limit, None, "step_limits"))
-    for cut in all_prod_cuts:
-        jobs.append((generator, config, None, cut, "prod_cuts"))
+    for name, values in (
+        ("cluster_distance", all_cluster_distances),
+        ("cluster_distance_surface", all_cluster_distances_surface),
+        ("cluster_time", all_cluster_times),
+    ):
+        for val in values:
+            jobs.append((generator, config, name, val))
 
 
-def run_sim_and_pproc(gen):
-    generator, config, step_limits, prod_cuts, mode = gen
+def run_sim_and_pproc(job):
+    generator, config, name, val = job
 
-    step_limits_command = (
-        f"/RMG/Geometry/SetMaxStepSize {step_limits} um germanium"
-        if step_limits is not None
-        else ""
+    # None means: do not pre-cluster the steps at all
+    cluster_command = (
+        cluster_commands[name].format(val)
+        if val is not None
+        else "/RMG/Output/Germanium/Cluster/PreClusterOutputs false"
     )
-    prod_cuts_command = (
-        f"/RMG/Processes/SensitiveProductionCut {prod_cuts} mm"
-        if prod_cuts is not None
-        else ""
-    )
-
-    name_kwargs = {"name": "step_limits", "val": step_limits}
-    if mode == "prod_cuts":
-        name_kwargs = {"name": "prod_cuts", "val": prod_cuts}
 
     # run the simulation
     run_sim(
         generator_name=generator,
-        step_limits=step_limits_command,
-        prod_cuts=prod_cuts_command,
-        proc="",
-        step_points="/RMG/Output/Germanium/StepPositionMode Both",
+        name=name,
+        val=val,
+        cluster=cluster_command,
         generator=config,
-        register_lar=False,
-        **name_kwargs,
     )
 
     # post-process it
     run_reboost(
         generator_name=generator,
+        name=name,
+        val=val,
         reboost_config="config/hit_config.yaml",
-        **name_kwargs,
     )
 
     # the output size has already been recorded in timing.json above, so the
-    # step file can go unless something downstream still reads it
-    scan_point = (generator, name_kwargs["name"], name_kwargs["val"])
-    if not keep_stp and scan_point not in keep_stp_scan_points:
+    # step file can go: keeping all of them fills up the CI runner's disk
+    if not keep_stp:
         shutil.rmtree(
-            Path(
-                f"out/{generator}/{name_kwargs['name']}/max_{name_kwargs['val']}/stp/"
-            ),
-            ignore_errors=True,
+            Path(f"out/{generator}/{name}/max_{val}/stp/"), ignore_errors=True
         )
 
 

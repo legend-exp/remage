@@ -27,7 +27,10 @@ message(STATUS "stats factor for validation tests: ${STATS_FACTOR}")
 # add tests from the sub-directories.
 
 add_subdirectory(basics)
+add_subdirectory(cluster-plots)
+add_subdirectory(clustering)
 add_subdirectory(confinement)
+add_subdirectory(confinement-plots)
 add_subdirectory(cosmogenics)
 add_subdirectory(detectors)
 add_subdirectory(distances)

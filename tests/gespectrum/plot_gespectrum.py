@@ -142,9 +142,11 @@ ax0, ax1, fig = plot_hist()
 ax0.set_xlim(10, 3100)
 with plt.rc_context({"figure.constrained_layout.use": False}):
     fig.savefig("hades-spectrum-full.output.png")
+    fig.savefig("hades-spectrum-full.output.pdf")
 
 ax0.set_yscale("linear")
 ax0.set_xlim(700, 3100)
 ax0.set_ylim(0, 5000)
 with plt.rc_context({"figure.constrained_layout.use": False}):
     fig.savefig("hades-spectrum-linear.output.png")
+    fig.savefig("hades-spectrum-linear.output.pdf")

@@ -1,0 +1,7 @@
+# combine steps into pre-clusters before writing them out
+/control/execute macros/_init.mac
+
+/RMG/Output/Germanium/Cluster/PreClusterOutputs true
+/RMG/Output/Germanium/Cluster/CombineLowEnergyElectronTracks true
+
+/run/beamOn 100
