@@ -18,11 +18,11 @@ extensive simulations (like showers) if not optimized.
 ## Staging
 
 Staging defers selected tracks (optical photons, and optionally secondary
-electrons/positrons) out of the initial tracking stage; see
-{ref}`manual-staging` for the mechanism and commands. The benchmarks below
-quantify the resource savings of the different staging backends and — since
-staging is a performance-improving option that must not change the result —
-check that enabling it does not bias the physics observables.
+electrons/positrons) out of the initial tracking stage; see the manual for the
+mechanism and commands. The benchmarks below quantify the resource savings of
+the different staging backends and — since staging is a performance-improving
+option that must not change the result — check that enabling it does not bias
+the physics observables.
 
 ### Memory footprint
 
