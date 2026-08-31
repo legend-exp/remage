@@ -82,7 +82,8 @@ propagated to the new track.
 :::{warning}
 
 As the `CreatorProcess` is not propagated to the new track, filtering track
-output by process (with `/RMG/Output/Track/FilterProcess`) will not work on
+output by process (with
+<project:../rmg-commands.md#rmgoutputtrackaddprocessfilter>) will not work on
 these tracks, and (if enabled) will discard all track output rows of re-injected
 tracks.
 
@@ -124,8 +125,9 @@ buffers in `ClearBeforeEvent`, which the framework only calls when an output
 file is configured; without one the in-memory records — and any scratch files —
 would accumulate across events without bound. Staging therefore aborts at run
 start if any deferral is enabled while persistency is off; enable it by setting
-an output file (`remage -o <file>` or `/RMG/Output/FileName`). There should be
-no use case where staging would be required without persistency.
+an output file (`remage -o <file>` or
+<project:../rmg-commands.md#rmgoutputfilename>). There should be no use case
+where staging would be required without persistency.
 
 The initial stage of Geant4 is stage 0 and this index is increased with every
 stage transition. A stage transition is caused when the Geant4 `Urgent` stack is
@@ -170,8 +172,9 @@ threshold should be tuned for the isotope and reaction channels of interest.
 This threshold applies to both staging and suspension.
 
 As already mentioned above, staging affects filtering track output by process
-(with `/RMG/Output/Track/FilterProcess`). Generally, with staging electrons, the
-relationship between the parent/child track ids in the output are broken.
+(with <project:../rmg-commands.md#rmgoutputtrackaddprocessfilter>). Generally,
+with staging electrons, the relationship between the parent/child track ids in
+the output are broken.
 
 Because of these caveats, validate staging and suspension against the physics
 observables of interest. In some cases (for example close-by sources), optical
@@ -209,54 +212,56 @@ optical photons.
 
 ### Optical-photon staging
 
-- `/RMG/Staging/OpticalPhotons/DeferToWaitingStage` enables deferral of optical
-  photons to the waiting stack during stage 0.
-- `/RMG/Staging/OpticalPhotons/RMGDeferring` enables the compact,
-  memory-efficient custom staging backend for optical photons instead of keeping
-  full `G4Track`s on the waiting stack (see
+- <project:../rmg-commands.md#rmgstagingopticalphotonsdefertowaitingstage>
+  enables deferral of optical photons to the waiting stack during stage 0.
+- <project:../rmg-commands.md#rmgstagingopticalphotonsrmgdeferring> enables the
+  compact, memory-efficient custom staging backend for optical photons instead
+  of keeping full `G4Track`s on the waiting stack (see
   [Implementation details](#implementation-details)). Requires
   `DeferToWaitingStage`.
-- `/RMG/Staging/OpticalPhotons/StorePath` sets a directory in which the compact
-  optical-photon records may spill to a scratch file, capping the recording
-  footprint. If unset, the records are kept in memory. Requires `RMGDeferring`.
-- `/RMG/Staging/OpticalPhotons/LimitMemory` sets the per-thread memory budget in
-  MB (default `510`). It bounds the rebuilt `G4Track`s re-injected per stage,
-  and
-  - when `StorePath` is set - the threshold at which the record buffer spills to
-    disk. Requires `RMGDeferring`.
+- <project:../rmg-commands.md#rmgstagingopticalphotonsstorepath> sets a
+  directory in which the compact optical-photon records may spill to a scratch
+  file, capping the recording footprint. If unset, the records are kept in
+  memory. Requires `RMGDeferring`.
+- <project:../rmg-commands.md#rmgstagingopticalphotonslimitmemory> sets the
+  per-thread memory budget in MB (default `510`). It bounds the rebuilt
+  `G4Track`s re-injected per stage, and - when `StorePath` is set - the
+  threshold at which the record buffer spills to disk. Requires `RMGDeferring`.
 
 ### Electron staging
 
-- `/RMG/Staging/Electrons/DeferToWaitingStage` enables deferral of secondary
-  electrons.
-- `/RMG/Staging/Electrons/IncludePositrons` additionally applies electron
-  staging to secondary positrons. Disabled by default. When enabled, positrons
-  are subject to the exact same conditions as electrons (energy thresholds,
-  volume safety and volume names) and are also suspended on energy drop if
-  `SuspendOnEnergyDrop` is enabled.
-- `/RMG/Staging/Electrons/VolumeSafety` sets a minimum distance to a Germanium
-  detector surface condition.
-- `/RMG/Staging/Electrons/MaxEnergyThresholdForStacking` limits deferred
-  electrons to those with kinetic energy below the threshold.
-- `/RMG/Staging/Electrons/MinEnergyThresholdForStacking` limits deferred
-  electrons to those with kinetic energy above the threshold, e.g. to skip
-  low-energy electrons below the Cherenkov threshold.
-- `/RMG/Staging/Electrons/AddVolumeName` restricts deferral to named logical
-  volumes.
-- `/RMG/Staging/Electrons/SuspendOnEnergyDrop` enables stepping-time suspension
-  when a track crosses from above to below the configured threshold.
-- `/RMG/Staging/Electrons/RMGDeferring` enables the compact custom staging
-  backend for electrons (and, with `IncludePositrons`, positrons) instead of
-  keeping full `G4Track`s on the waiting stack (see
+- <project:../rmg-commands.md#rmgstagingelectronsdefertowaitingstage> enables
+  deferral of secondary electrons.
+- <project:../rmg-commands.md#rmgstagingelectronsincludepositrons> additionally
+  applies electron staging to secondary positrons. Disabled by default. When
+  enabled, positrons are subject to the exact same conditions as electrons
+  (energy thresholds, volume safety and volume names) and are also suspended on
+  energy drop if `SuspendOnEnergyDrop` is enabled.
+- <project:../rmg-commands.md#rmgstagingelectronsvolumesafety> sets a minimum
+  distance to a Germanium detector surface condition.
+- <project:../rmg-commands.md#rmgstagingelectronsmaxenergythresholdforstacking>
+  limits deferred electrons to those with kinetic energy below the threshold.
+- <project:../rmg-commands.md#rmgstagingelectronsminenergythresholdforstacking>
+  limits deferred electrons to those with kinetic energy above the threshold,
+  e.g. to skip low-energy electrons below the Cherenkov threshold.
+- <project:../rmg-commands.md#rmgstagingelectronsaddvolumename> restricts
+  deferral to named logical volumes.
+- <project:../rmg-commands.md#rmgstagingelectronssuspendonenergydrop> enables
+  stepping-time suspension when a track crosses from above to below the
+  configured threshold.
+- <project:../rmg-commands.md#rmgstagingelectronsrmgdeferring> enables the
+  compact custom staging backend for electrons (and, with `IncludePositrons`,
+  positrons) instead of keeping full `G4Track`s on the waiting stack (see
   [Implementation details](#implementation-details)). Requires
   `DeferToWaitingStage`.
-- `/RMG/Staging/Electrons/StorePath` sets a directory in which the compact
-  electron records may spill to a scratch file, capping the recording footprint.
-  If unset, the records are kept in memory. Requires `RMGDeferring`.
-- `/RMG/Staging/Electrons/LimitMemory` sets the per-thread memory budget in MB
-  (default `120`). It bounds the rebuilt `G4Track`s re-injected per stage, and -
-  when `StorePath` is set - the threshold at which the record buffer spills to
-  disk. Requires `RMGDeferring`.
+- <project:../rmg-commands.md#rmgstagingelectronsstorepath> sets a directory in
+  which the compact electron records may spill to a scratch file, capping the
+  recording footprint. If unset, the records are kept in memory. Requires
+  `RMGDeferring`.
+- <project:../rmg-commands.md#rmgstagingelectronslimitmemory> sets the
+  per-thread memory budget in MB (default `120`). It bounds the rebuilt
+  `G4Track`s re-injected per stage, and - when `StorePath` is set - the
+  threshold at which the record buffer spills to disk. Requires `RMGDeferring`.
 
 ### Suspension behavior
 
@@ -272,13 +277,16 @@ You can configure conditions that clear waiting tracks at stage transition.
 These are separate from the defer-to-waiting staging commands.
 
 - **Germanium condition:**
-  `/RMG/Output/Germanium/DiscardWaitingTracksUnlessGermaniumEdep` clears waiting
-  tracks unless Germanium energy deposition occurred in the event.
+  <project:../rmg-commands.md#rmgoutputgermaniumdiscardwaitingtracksunlessgermaniumedep>
+  clears waiting tracks unless Germanium energy deposition occurred in the
+  event.
 - **IsotopeFilter condition:**
-  `/RMG/Output/IsotopeFilter/DiscardWaitingTracksUnlessIsotopeProduced` clears
-  waiting tracks unless one of the configured isotopes was produced. Typical
-  setup also requires: `/RMG/Output/ActivateOutputScheme` with `IsotopeFilter`
-  and at least one `/RMG/Output/IsotopeFilter/AddIsotope` command.
+  <project:../rmg-commands.md#rmgoutputisotopefilterdiscardwaitingtracksunlessisotopeproduced>
+  clears waiting tracks unless one of the configured isotopes was produced.
+  Typical setup also requires:
+  <project:../rmg-commands.md#rmgoutputactivateoutputscheme> with
+  `IsotopeFilter` and at least one
+  <project:../rmg-commands.md#rmgoutputisotopefilteraddisotope> command.
 
 ## Configuration checklist
 
