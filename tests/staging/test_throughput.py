@@ -77,13 +77,13 @@ def test_gamma_optical_event_rate_electron_stacking_is_faster():
             marker="x",
             label=mode.replace("_", " ").title(),
         )
-    ax.set_xlabel("Mode")
+    ax.set_xlabel("Distance from Source (cm)")
     ax.set_ylabel("Time per event (sec/evt)")
     ax.set_title("Simulation Time for Different Simulation Modes and Distances")
     ax.set_yscale("log")
     ax.legend(title="Distance from Source:")
     ax.grid(ls=":", color="gray", alpha=0.5)
-    fig.savefig("throughput_distance_scan.png", dpi=300, bbox_inches="tight")
+    fig.savefig("throughput_distance_scan.output.png", dpi=300, bbox_inches="tight")
 
     for optical_rate, electron_rate, d in zip(
         rates["optical_stacking"], rates["electron_stacking"], distances, strict=True

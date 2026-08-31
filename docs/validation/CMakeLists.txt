@@ -218,7 +218,13 @@ set(TESTS_IMAGES
     processes/processes.hadr-shielding.output.txt
     processes/processes.innerbrem.output.txt
     processes/processes.optical.output.txt
-    performance/combine-tracks-benchmark.output.png)
+    performance/combine-tracks-benchmark.output.png
+    staging/muon_stress_backend_memory.output.png
+    staging/muon_stress_backend_rate.output.png
+    staging/throughput_distance_scan.output.png
+    staging/energy_spectrum_comparison_10cm.output.png
+    staging/energy_spectrum_comparison_21cm.output.png
+    staging/energy_spectrum_comparison_46cm.output.png)
 
 # cmake-format: on
 

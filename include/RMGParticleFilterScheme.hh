@@ -52,6 +52,9 @@ class RMGParticleFilterScheme : public RMGVOutputScheme {
     /** @brief Add a particle, identified by its PDG code, to the list of particles to kill. */
     void AddParticle(int pdg) { fParticles.insert(pdg); }
 
+    /** @brief The particles this filter claims control over. */
+    [[nodiscard]] std::set<int> GetClaimedParticles() const override { return fParticles; }
+
     /** @brief Add a physical volume, by name, to the volumes in which the filter will
      *  not be applied.
      *  @details This means that specified particles outside of the specified

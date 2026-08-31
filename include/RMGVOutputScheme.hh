@@ -17,6 +17,7 @@
 #define _RMG_V_OUTPUT_SCHEME_HH_
 
 #include <optional>
+#include <set>
 #include <string>
 
 #include "G4AnalysisManager.hh"
@@ -114,6 +115,30 @@ class RMGVOutputScheme {
      * @return An optional boolean decision; if empty, no action is taken.
      */
     virtual std::optional<bool> StackingActionNewStage(const int) { return std::nullopt; }
+
+    /**
+     * @brief PDG codes whose stacking fate this scheme decides.
+     *
+     * Schemes that decide in @ref StackingActionClassify whether a given particle species lives,
+     * dies or is deferred should declare those species here. If two active schemes declare the same
+     * PDG code, the configuration is rejected by @ref RMGRunAction before the first event: there is
+     * no meaningful way to combine two such decisions, and resolving them by activation order would
+     * silently change the physics.
+     *
+     * @return The claimed PDG codes; empty if the scheme does not classify any particle species.
+     */
+    [[nodiscard]] virtual std::set<int> GetClaimedParticles() const { return {}; }
+
+    /**
+     * @brief Hook to re-inject tracks that were staged out of the Geant4 stacks during a previous
+     * stage.
+     *
+     * Called by @ref RMGStackingAction::NewStage for kept events, after the stage counter has
+     * advanced, so that re-pushed tracks are not classified for staging again. Schemes that hold
+     * their own staged-track buffer (e.g. @ref RMGStagingScheme) override this to rebuild the
+     * tracks and @c PushOneTrack them onto the current event's stack manager.
+     */
+    virtual void ReinjectStagedTracks() {}
 
     // hook into G4TrackingAction.
     /**
