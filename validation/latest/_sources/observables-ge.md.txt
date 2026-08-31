@@ -47,27 +47,27 @@ limits and with 10 um step limitations.
 ```{subfigure} ABC|DEF
 :subcaptions: above
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.tracks.out0.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.tracks-0.output.png
 :width: 300px
 :::
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.tracks.out1.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.tracks-1.output.png
 :width: 300px
 :::
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.tracks.out2.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.tracks-2.output.png
 :width: 300px
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks.out0.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks-0.output.png
 :width: 300px
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks.out1.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks-1.output.png
 :width: 300px
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks.out2.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.tracks-2.output.png
 :width: 300px
 :::
 
@@ -87,12 +87,12 @@ range of distances and also zooming into events close to the surface.
 ```{subfigure} AB
 :subcaptions: above
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.step-hist.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.step-hist.output.png
 :width: 400px
 :alt: Without step limits.
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.step-hist.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.step-hist.output.png
 :width: 400px
 :alt: With 10um step limits.
 :::
@@ -106,12 +106,12 @@ step lengths be limited to 10 um in the second case.
 ```{subfigure} AB
 :subcaptions: above
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist.output.png
 :width: 400px
 :alt: Without step limits.
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.step-vs-dist.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.step-vs-dist.output.png
 :width: 400px
 :alt: With 10um step limits.
 :::
@@ -129,12 +129,12 @@ lengths should be limited to 10 um.
 ```{subfigure} AB
 :subcaptions: above
 
-:::{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist-zoom.png
+:::{image} ./_img/observables/tracks-bulk-no-limit.step-vs-dist-zoom.output.png
 :width: 400px
 :alt: Without step limits.
 :::
 
-:::{image} ./_img/observables/tracks-bulk-10um-limit.step-vs-dist-zoom.png
+:::{image} ./_img/observables/tracks-bulk-10um-limit.step-vs-dist-zoom.output.png
 :width: 400px
 :alt: With 10um step limits.
 :::
