@@ -79,6 +79,15 @@ re-injected track reproduces the original to float32 precision (~1e-7 relative).
 Everything else, like the `CreatorProcess` or the `TouchableHistory` is not
 propagated to the new track.
 
+:::{warning}
+
+As the `CreatorProcess` is not propagated to the new track, filtering track
+output by process (with `/RMG/Output/Track/FilterProcess`) will not work on
+these tracks, and (if enabled) will discard all track output rows of re-injected
+tracks.
+
+:::
+
 `LimitMemory` bounds the memory the _rebuilt_ tracks may occupy: at each stage
 transition the custom backend re-injects at most `LimitMemory` megabytes worth
 of full `G4Track`s (sized from the actual Geant4 track footprint), spreading a
@@ -159,6 +168,10 @@ production channels in the initial stage. To mitigate this, use
 `MaxEnergyThresholdForStacking` so only lower-energy tracks are deferred. The
 threshold should be tuned for the isotope and reaction channels of interest.
 This threshold applies to both staging and suspension.
+
+As already mentioned above, staging affects filtering track output by process
+(with `/RMG/Output/Track/FilterProcess`). Generally, with staging electrons, the
+relationship between the parent/child track ids in the output are broken.
 
 Because of these caveats, validate staging and suspension against the physics
 observables of interest. In some cases (for example close-by sources), optical

@@ -47,8 +47,9 @@ RMGStagingScheme::~RMGStagingScheme() {
 void RMGStagingScheme::AssignOutputNames(G4AnalysisManager*) {
   // Staging resets its per-event buffers in ClearBeforeEvent, which the framework only calls when
   // output persistency is enabled.
-  const bool staging_active = fDeferOpticalPhotonsToWaitingStage || fDeferElectronsToWaitingStage ||
-                              fDeferPositronsToWaitingStage;
+  const bool staging_active = (fDeferOpticalPhotonsToWaitingStage && fRMGOpticaldeferring) ||
+                              ((fDeferElectronsToWaitingStage || fDeferPositronsToWaitingStage) &&
+                               fRMGElectrondeferring);
   // We test HasOutputFileName() because that is what actually drives persistency, and it is
   // the only signal available here: IsPersistencyEnabled() is not flipped off until after this
   // function returns.
@@ -137,6 +138,7 @@ std::optional<G4ClassificationOfNewTrack> RMGStagingScheme::StackingActionClassi
     int stage
 ) {
   if (stage != 0) return std::nullopt; // only apply staging logic in stage 0
+  if (aTrack->GetTrackStatus() == fSuspend) return std::nullopt; // do not touch suspended tracks
 
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
     return Classify_OpticalPhoton(aTrack);
@@ -466,7 +468,7 @@ bool RMGStagingScheme::ReinjectBatch(
   // rebuilt tracks cost on the Geant4 stacks. Taken from the actual types, so this follows the Geant4 version in use.
   constexpr size_t heap_overhead = 16; // approximate per-allocation malloc header/alignment
   constexpr size_t track_footprint = sizeof(G4Track) + sizeof(G4DynamicParticle) +
-                                     sizeof(G4StackedTrack) + 2 * heap_overhead;
+                                     sizeof(G4StackedTrack) + (2 * heap_overhead);
   // Clamp the limit: a zero would degenerate into one track - and thus one stage - per record.
   const size_t batch = std::max<size_t>(
       1,
@@ -651,6 +653,7 @@ void RMGStagingScheme::DefineCommands() {
       .SetGuidance("Set the allowed size of the electron staging vector (for each thread), before flushed to a temp file, in MB.")
       .SetGuidance(std::string("This is ") + (std::to_string(fElectronSize)) + " MB by default.")
       .SetParameterName("integer", true)
+      .SetRange("integer>0")
       .SetDefaultValue("120")
       .SetStates(G4State_Idle);
 

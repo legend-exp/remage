@@ -2740,6 +2740,7 @@ Set the allowed size of the electron staging vector (for each thread), before fl
 
 This is 120 MB by default.
 
+* **Range of parameters** – `integer>0`
 * **Parameter** – `integer`
   * **Parameter type** – `i`
   * **Omittable** – `True`
