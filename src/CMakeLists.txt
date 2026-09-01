@@ -146,8 +146,7 @@ target_compile_options(remage PRIVATE -Wno-cpp)
 target_include_directories(
   remage
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
-         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-         $<INSTALL_INTERFACE:include/remage>)
+         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>" $<INSTALL_INTERFACE:include/remage>)
 
 # link against dependent libraries
 target_link_libraries(
