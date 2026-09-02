@@ -87,7 +87,7 @@ endif()
 # Find dependencies
 set(RMG_G4_MINIMUM_VERSION 11.2.2)
 set(RMG_ROOT_MINIMUM_VERSION 6.06)
-set(RMG_BXDECAY0_MINIMUM_VERSION 1.0.10)
+set(RMG_BXDECAY0_MINIMUM_VERSION 1.1.2)
 
 # Find Geant4
 find_package(Geant4 ${RMG_G4_MINIMUM_VERSION} REQUIRED)
@@ -165,14 +165,9 @@ option(RMG_USE_BXDECAY0 "Build remage with BxDecay0 support" OFF)
 
 # find BxDecay0
 find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} QUIET COMPONENTS Geant4)
-set(BxDecay0_THREADSAFE 0)
 if(BxDecay0_FOUND)
   message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", support enabled")
   list(APPEND remage_components BxDecay0)
-  if(BxDecay0_VERSION VERSION_GREATER "1.1.0")
-    set(BxDecay0_THREADSAFE 1)
-    message(STATUS "Found BxDecay0 v" ${BxDecay0_VERSION} ", is thread-safe")
-  endif()
 else()
   if(RMG_USE_BXDECAY0)
     find_package(BxDecay0 ${RMG_BXDECAY0_MINIMUM_VERSION} REQUIRED COMPONENTS Geant4)

@@ -11,7 +11,7 @@
   - Multithreading
   - GDML geometry description
 - [ROOT] 6.06 or higher
-- [BxDecay0] 1.0.10 or higher
+- [BxDecay0] 1.1.2 or higher
 - [HDF5] C++ support for LH5 object persistency
 
 :::{note}

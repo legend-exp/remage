@@ -26,17 +26,16 @@ foreach(_mac ${_macros})
   set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS mt PROCESSORS ${NUM_CORES})
 endforeach()
 
+foreach(_mac ${_macros_extra})
+  add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES}
+                                         macros/${_mac})
+  set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS "mt;extra" PROCESSORS ${NUM_CORES})
+endforeach()
+
 if(NOT BxDecay0_FOUND)
   set_tests_properties("hades/run-2nbb.mac" PROPERTIES DISABLED True)
   set_tests_properties("hades/vis-2nbb.mac" PROPERTIES DISABLED True)
-endif()
-
-if(BxDecay0_THREADSAFE)
-  foreach(_mac ${_macros_extra})
-    add_test(NAME hades-mt/${_mac} COMMAND ${REMAGE_PYEXE} -g gdml/main.gdml -t ${NUM_CORES}
-                                           macros/${_mac})
-    set_tests_properties(hades-mt/${_mac} PROPERTIES LABELS "mt;extra" PROCESSORS ${NUM_CORES})
-  endforeach()
+  set_tests_properties("hades-mt/run-2nbb.mac" PROPERTIES DISABLED True)
 endif()
 
 list(TRANSFORM _macros_extra PREPEND "hades/")
