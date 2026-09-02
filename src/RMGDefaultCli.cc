@@ -136,8 +136,7 @@ void RMGDefaultCli::SetupLoggingAndIpc() {
     std::cout << "version: " << RMG_PROJECT_VERSION << "\n\n"
               << "· Geant4 version: " << g4_version << "\n"
               << "· ROOT CERN support: " << (RMG_HAS_ROOT ? "yes" : "no") << "\n"
-              << "· BxDecay0 support: "
-              << (RMG_HAS_BXDECAY0 or RMG_HAS_BXDECAY0_THREADSAFE ? "yes" : "no") << "\n"
+              << "· BxDecay0 support: " << (RMG_HAS_BXDECAY0 ? "yes" : "no") << "\n"
               << "· GDML support: " << (RMG_HAS_GDML ? "yes" : "no") << "\n"
               << "· HDF5 support: " << (RMG_HAS_HDF5 ? "yes" : "no") << std::endl;
     exit(0);

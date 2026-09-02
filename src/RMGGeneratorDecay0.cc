@@ -32,11 +32,6 @@
 RMGGeneratorDecay0::RMGGeneratorDecay0(RMGMasterGenerator* master_gen)
     : RMGVGenerator("Decay0"), fMasterGen(master_gen) {
 
-#if !RMG_HAS_BXDECAY0_THREADSAFE
-  if (!RMGManager::Instance()->IsExecSequential())
-    RMGLog::Out(RMGLog::fatal, "BxDecay0 is not thread-safe (yet). Re-run in sequential mode.");
-#endif
-
   if (!master_gen) RMGLog::OutDev(RMGLog::fatal, "Master generator is nullptr");
 
   fDecay0G4Generator = std::make_unique<bxdecay0_g4::PrimaryGeneratorAction>();
