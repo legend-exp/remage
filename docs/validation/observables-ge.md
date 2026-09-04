@@ -181,9 +181,10 @@ step limits to that with 10 um and 200 um limit. The residual shows the differen
 To quantify this we count the fraction of events within 1 keV of the full energy
 peak.
 
-```{figure} ./_img/observables/beta-observables.bulk-total-energy.eff.output.png
+```{figure} ./_img/observables/beta-observables.bulk-energy.eff.output.png
 :width: 800px
-*Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the step limits.*
+*Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the step limits. The same
+quantity after the active volume correction discussed below is shown in the lower panel.*
 ```
 
 &nbsp; &nbsp;
@@ -198,20 +199,14 @@ surface).
 Next, we compute the energy after active volume correction (see
 [[Bjoern Lehnert's thesis]](https://www.mpi-hd.mpg.de/gerda/public/2016/phd2016_bjoernLehnert.pdf)
 chapter 7). We employ a linear transition layer model with a 1 mm full-charge
-collection depth and a 0.5 mm linear component. The next plots show the spectrum
-and fraction of full energy peak events after this active volume correction.
+collection depth and a 0.5 mm linear component. The next plot shows the spectrum
+after this active volume correction; the fraction of full energy peak events is
+shown in the lower panel of the figure above.
 
 ```{figure} ./_img/observables/beta-observables.bulk-active-energy.spec.output.png
 :width: 800px
 *Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
 step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.*
-```
-
-&nbsp; &nbsp;
-
-```{figure} ./_img/observables/beta-observables.bulk-active-energy.eff.output.png
-:width: 800px
-*Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the step limits.*
 ```
 
 &nbsp; &nbsp;
@@ -419,9 +414,10 @@ production cuts to that with 10 um and 1 mm cut. The residual shows the differen
 To quantify this we count the fraction of events within 1 keV of the full energy
 peak.
 
-```{figure} ./_img/observables/beta-observables.bulk-total-energy.cuts.eff.output.png
+```{figure} ./_img/observables/beta-observables.bulk-energy.cuts.eff.output.png
 :width: 800px
-*Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the production cuts.*
+*Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the production cuts. The same
+quantity after the active volume correction discussed below is shown in the lower panel.*
 ```
 
 &nbsp; &nbsp;
@@ -432,20 +428,13 @@ not produced particles should be deposited locally.
 #### Active volume corrected energy
 
 Next, we again compute the energy after active volume correction as above. The
-next plots show the spectrum and fraction of full energy peak events after this
-active volume correction.
+next plot shows the spectrum after this active volume correction; the fraction
+of full energy peak events is shown in the lower panel of the figure above.
 
 ```{figure} ./_img/observables/beta-observables.bulk-active-energy.cuts.spec.output.png
 :width: 800px
 *Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
 production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.*
-```
-
-&nbsp; &nbsp;
-
-```{figure} ./_img/observables/beta-observables.bulk-active-energy.cuts.eff.output.png
-:width: 800px
-*Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the production cuts.*
 ```
 
 &nbsp; &nbsp;
