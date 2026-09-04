@@ -26,14 +26,47 @@ but also might have parts of Geant4's stacking action functionality. Output
 schemes, in general, are _remage_'s way to implement pluggable event selection,
 persistency and track stacking.
 
+:::{note}
+
+Throughout this manual, a _step_ is a single Geant4 step recorded in a detector,
+while a _hit_ is the set of steps recorded in a single detector within a
+time-coincidence window (10 µs by default), see
+[reshaping output tables](#reshaping-output-tables). One row of a reshaped
+_remage_ output table corresponds to one hit, and does not necessarily
+correspond one-to-one to one Geant4 event.
+
+:::
+
 ## Selection of output schemes
 
-Adding a sensitive detector of any type (see
-{ref}`manual-geometry-register-sens-det`) will add the corresponding main output
-scheme to the list of active output schemes.
+Output schemes fall into two categories: those tied to a detector type and those
+global to the run. _remage_ currently provides the following schemes:
 
-Additional output schemes might be used for **filtering output**. Optional
-output schemes can be enabled with the
+- **Detector-specific schemes**, activated automatically when a detector of the
+  corresponding type is registered (see
+  {ref}`manual-geometry-register-sens-det`). They record only interactions
+  occurring inside the registered volumes:
+  - [`Germanium`](#germanium-germanium-hpge-detectors): step-wise output for
+    HPGe and other solid-state detectors,
+  - [`Scintillator`](#scintillator-scintillating-bulk-media): step-wise output
+    for scintillating or other bulk media,
+  - [`Optical`](#optical-optical-photon-detectors): detected optical photons,
+  - [`Calorimeter`](#calorimeter-total-energy-calorimetric-detectors): total
+    energy per event only.
+- **Global schemes**:
+  - `Vertex`: records the [primary vertex](#the-vertex-table) of every event. It
+    is activated automatically whenever any other output scheme is active,
+  - [`Track`](#the-track-output-scheme): records the initial state of every
+    simulated track (opt-in),
+  - `GeometryCheck`: geometry validation with geantinos (opt-in, see
+    {ref}`manual-geometry`).
+- **Filtering and staging schemes**, which do not write any output but control
+  which events are persisted or which tracks are simulated (opt-in):
+  - [`IsotopeFilter`](#isotope-filter),
+  - [`ParticleFilter`](#particle-filtering),
+  - `Staging` (see {ref}`manual-staging`).
+
+Opt-in output schemes can be enabled with the
 <project:../rmg-commands.md#rmgoutputactivateoutputscheme> macro command:
 
 ```geant4
@@ -134,7 +167,7 @@ column is omitted, since the UID is encoded in the table name.
 ### `Germanium`: Germanium (HPGe) detectors
 
 The _Germanium_ output scheme handles the output from germanium (HPGe)
-detectors, but would also work for other solid state detectors (calorimeters).
+detectors, but would also work for other solid state detectors.
 
 HPGes have sensitivity to the topology of event interactions via the pulse shape
 and they also have a different response close to the detector electrodes. So
@@ -143,15 +176,15 @@ particles within the detector. Then "post-processing" software such as
 [_reboost_](https://reboost.readthedocs.io/en/stable/) can apply the detector
 response model without repeating the computationally intensive simulation.
 
-By default this output scheme writes out all steps in the registered sensitive
-HPGe detectors. The following properties of each hit are recorded (by default):
+By default this output scheme writes out all steps in the registered HPGe
+detectors. The following properties of each step are recorded (by default):
 
-- `time`: The global time of the hit,
+- `time`: The global time of the step,
 - `particle`: the PDG code of the particle,
 - `xloc`, `yloc`, `zloc`: the global position,
 - `evtid`: the index of the Geant4 event,
 - `edep`: the deposited energy,
-- `dist_to_surf`: the distance of the hit from the detector surface.
+- `dist_to_surf`: the distance of the step from the detector surface.
 
 By default all floating point fields are saved with 64-bit (double) precision.
 The precision of the energy and or position / distance fields can be reduced to
@@ -182,9 +215,9 @@ occur. The macro commands
 
 implement this functionality, for every event the total energy deposited is
 computed. This is based on summing the energy deposited in each `{UID}` added,
-or across all registered sensitive _Germanium_ detectors (if this macro command
-is not used). The event is then discarded if the energy is less than or equal to
-`ELOW` or more than `EHIGH`.
+or across all registered _Germanium_ detectors (if this macro command is not
+used). The event is then discarded if the energy is less than or equal to `ELOW`
+or more than `EHIGH`.
 
 :::{note}
 
@@ -229,20 +262,22 @@ Typically only steps where some energy was deposited are written out to disk, to
 control this behaviour there is
 <project:../rmg-commands.md#rmgoutputgermaniumdiscardzeroenergyhits>.
 
-Finally, it is possible to "pre-cluster" the steps, this is used to reduce the
-amount of data written out to disk by combining steps very close together. Since
-the surface region of a HPGe detector has different properties to the bulk this
-clustering can be performed differently for surface and bulk hits (see
-[data-reduction](#data-reduction-methods) for more details).
+Finally, it is possible to cluster the steps, this is used to reduce the amount
+of data written out to disk by combining steps very close together. Since the
+surface region of a HPGe detector has different properties to the bulk this
+clustering can be performed differently for surface and bulk steps (see
+[step clustering](#step-clustering) for more details).
 
-### `Scintillator`: calorimeters
+### `Scintillator`: scintillating bulk media
 
-This output scheme records stepping data in scintillating materials (e.g. liquid
-argon), following a calometric approach. This scheme is useful for applications
-where an optical detector response is applied on the simulated particle
-interactions. Detection of optical photons is handled by the _Optical_ output
-scheme (see later). Most functionality is similar to the _Germanium_ output
-scheme with a few exceptions:
+This output scheme records stepping data in scintillating (e.g. liquid argon) or
+other bulk materials, following the same step-wise approach as the _Germanium_
+scheme. This scheme is useful for applications where an optical detector
+response is applied on the simulated particle interactions in post-processing.
+If only the total energy deposited in a volume is of interest, consider the
+_Calorimeter_ scheme instead (see below). Detection of optical photons is
+handled by the _Optical_ output scheme (see later). Most functionality is
+similar to the _Germanium_ output scheme with a few exceptions:
 
 - Unlike for germanium detectors the distance to the detector surface is not
   calculated,
@@ -306,10 +341,10 @@ other detector types.
 
 ## Single- versus multi-detector table layout
 
-_remage_ will store sensitive volume hits in separate output tables by default,
-one per detector. While this layout is useful if analyzing data from each
-detector independently, sometimes having all hits stored in the same output
-table can be more beneficial. The multi-table layout can be disabled by setting
+_remage_ will store detector hits in separate output tables by default, one per
+detector. While this layout is useful if analyzing data from each detector
+independently, sometimes having all hits stored in the same output table can be
+more beneficial. The multi-table layout can be disabled by setting
 <project:../rmg-commands.md#rmgoutputntupleperdetector> to false. In this
 scenario, _remage_ will organize hits by detector type in separate tables (a
 table named `germanium` for the `Germanium` detectors, `scintillator` for
@@ -386,27 +421,38 @@ UID through the symbolic stored in the `/stp/__by_uid__` group.
 
 ## Data reduction methods
 
-### Step (pre-)clustering
+### Step clustering
 
 Often Geant4 takes steps much shorter than those that are meaningful in a HPGe
 or a scintillation detector. For example the typical dimension of charge clouds
 produced by interactions in germanium are 1-2 mm, so we are not sensitive to
 tracking at the micrometer level. To reduce the file size while retaining the
 useful information for computing observables of interest we have implemented
-some "pre-clustering" routines. These routines combine together steps that are
-very close together.
+step clustering routines. These routines combine together steps that are very
+close together.
 
-:::{note}
+:::{important}
 
-The aim of this (pre)-clustering is only to make a minimal reduction of
-information which cannot be useful! Further, more aggressive clustering may be
-needed for some applications.
+Step clustering has a large impact on the size of the output files and, through
+the reduced I/O, on the total runtime of a simulation. The
+[performance benchmarks](https://legend-exp.github.io/remage/validation/{REMAGE_VERSION}/performance.html)
+of the validation report quantify the effect of the clustering options.
 
 :::
 
-In order to have an efficient algorithm for pre-clustering we take use a
-"within-track" approach, this clusters only steps in the same `G4Track`, with
-some exceptions for very low energy tracks. In this way we only have to iterate
+:::{note}
+
+- In the macro commands and in the C++ code, step clustering is referred to as
+  "pre-clustering", since it is applied before the steps are written to disk.
+- The aim of this clustering is only to make a minimal reduction of information
+  which cannot be useful! Further, more aggressive clustering may be needed for
+  some applications.
+
+:::
+
+In order to have an efficient algorithm for clustering, we make use of a
+"within-track" approach that clusters only steps in the same `G4Track`, with
+some exceptions for very low-energy tracks. In this way we only have to iterate
 through the steps in each event once. This also means the rows in our output are
 still interpretable with steps in the detector (just with a larger step length).
 The clustering is handled by the function
@@ -431,13 +477,13 @@ schemes, it can be disabled with the command
 similarly for the _Scintillator_ output scheme:
 <project:../rmg-commands.md#rmgoutputscintillatorclusterpreclusteroutputs>.
 
-This clustering works by first organizing the hits by track id (the index of the
-`G4Track` within the event). Some processes in Geant4 produce a large number of
-secondary tracks due to atomic de-excitation, these tracks typically have a very
-low energy and range (however they are still produced since production cuts are
-not applied for most gamma interactions). Thus they are not expected to impact
-observables of interest. In many cases, after pre-clustering of high energy
-electrons, these tracks could form the majority of the output.
+This clustering works by first organizing the steps by track id (the index of
+the `G4Track` within the event). Some processes in Geant4 produce a large number
+of secondary tracks due to atomic de-excitation, these tracks typically have a
+very low energy and range (however they are still produced since production cuts
+are not applied for most gamma interactions). Thus they are not expected to
+impact observables of interest. In many cases, after pre-clustering of high
+energy electrons, these tracks could form the majority of the output.
 
 We implemented the possibility to merge these tracks prior to pre-clustering
 which can be enabled with
@@ -503,7 +549,7 @@ By default pre-clustering is performed for both the _Germanium_ and
 _Scintillator_ output schemes with 50 $\mu$m distance for Germanium. By default
 clustering is not applied to the surface for _Germanium_ (within the surface
 thickness set by default as 2 mm). For the _Scintillator_ output scheme we use
-500 $\mu$ m cluster distance by default. For both outputs a 10$\mu$ m time
+500 $\mu$m cluster distance by default. For both outputs a 10 $\mu$s time
 threshold is used by default.
 
 :::
@@ -528,12 +574,25 @@ step length.
 
 :::
 
-### Output filtering
+### Event filtering
 
 Another strategy for output file size reduction is to filter out unwanted events
-before even writing them to disk. In _remage_, these filters can be registered
-as optional "output" schemes (do not get confused by the name, they will not
-produce any additional output).
+before even writing them to disk. Event filtering acts purely at the output
+stage and leaves the simulation itself unaffected. _remage_ offers two criteria
+for this decision:
+
+- the energy deposited in _Germanium_ or _Scintillator_ detectors, configured
+  with the `EdepCutLow`/`EdepCutHigh`/`AddDetectorForEdepThreshold` commands of
+  the respective output scheme (see the
+  [_Germanium_ output scheme](#germanium-germanium-hpge-detectors) above). This
+  can be used to reproduce the trigger energy threshold of the real experiment;
+- the production of a given isotope, provided by the isotope filter described
+  below.
+
+Filters like the isotope filter are registered as optional "output" schemes (do
+not get confused by the name, they will not produce any additional output).
+
+(isotope-filter)=
 
 #### Isotope filter
 
@@ -547,12 +606,32 @@ The isotope filter is rather simple and can be enabled and used like this:
 Adds an isotope to the list. Only events that have a track with this isotope at
 any point in time will be persisted.
 
-#### Particle filter
+### Particle filtering
 
-The particle filter does not only affect the output files, but actually works on
-the track level. Tracks matching the defined criteria will not be simulated.
-With this, it not only reduces output file size, but also reduces the necessary
-simulation run time.
+The particle filter follows a more drastic approach than event filtering: rather
+than deciding after the fact whether an event is worth writing to disk, it
+removes selected particles from the simulation outright, immediately after they
+are created and before they are tracked. With this, it not only reduces output
+file size, but also reduces the necessary simulation run time.
+
+:::{warning}
+
+Particles removed by the filter simply disappear without being recorded. This
+differs from Geant4's production cuts (see {ref}`manual-physicslist-cuts`),
+which stop a particle only once its remaining range falls below a threshold and
+deposit its energy locally. Results obtained with the particle filter therefore
+break energy conservation and call for the same caution as any deliberately
+incomplete physical picture.
+
+:::
+
+Typical use cases are:
+
+- reducing the simulation effort by discarding particles with a short range that
+  are produced far from any detector and therefore cannot contribute to the
+  observables of interest.
+- verifying that a given particle species does not contribute to the output, by
+  removing it and comparing the results.
 
 ```geant4
 /RMG/Output/ActivateOutputScheme ParticleFilter
@@ -583,11 +662,13 @@ Filtering by process and process can be combined.
 is a simple, open-source HDF5-based data format specification initially
 developed by the LEGEND collaboration. Good support for reading and writing LH5
 files is available in Python (through
+[_legend-lh5io_](https://legend-lh5io.readthedocs.io) for file I/O, with the
+in-memory data types defined in
 [_legend-pydataobj_](https://legend-pydataobj.readthedocs.io)) and in Julia
-(through [_LegendHDF5IO.jl_](...)). Alternatively, since the data is stored in
-HDF5, it can be read by any other HDF5 I/O tool. Given the advantages of the LH5
-format over the others, _remage_ adopts it as primary output format and
-recommends it to all users.
+(through [_LegendHDF5IO.jl_](https://github.com/legend-exp/LegendHDF5IO.jl)).
+Alternatively, since the data is stored in HDF5, it can be read by any other
+HDF5 I/O tool. Given the advantages of the LH5 format over the others, _remage_
+adopts it as primary output format and recommends it to all users.
 
 It is possible to directly write a LH5 file from _remage_, to facilitate reading
 output ntuples as a
@@ -605,13 +686,29 @@ structures or adding useful information.
 
 ### Reshaping output tables
 
-For the LH5 format and _Germanium_ or _Scintillator_ outputs we implemented a
-"reshaping" of the output tables. This groups together rows in the same output
-table that have the same simulated Geant4 evtid and also with times with the
-user defined time window (more later). In this way the resulting rows of the
-output table represent physical interactions in a sensitive volume occurring in
-a window compatible with the time resolution of the detector. In the following,
-we will often refer to these as "hits".
+An event, in an actual experiment, is defined as the set of signals falling
+within a time window set by the detector's time resolution, and _remage_ aims to
+reproduce this definition for simulated events. The Geant4 event index alone
+does not achieve this: a Geant4 event describing a full radioactive decay chain
+(see {ref}`manual-generators-decays`), for instance, can include energy
+depositions from a delayed daughter decay occurring long after those from the
+parent, well beyond the time window of any real detector, yet still attributed
+to the same Geant4 event.
+
+_remage_ therefore introduces the concept of a "hit": the set of steps recorded
+within a single detector that fall within a given time-coincidence window. A new
+hit begins whenever the underlying Geant4 event index (`evtid`) changes, or
+whenever, within the same event, the recorded time jumps by more than the window
+size since the previous step. The window defaults to 10 µs, a value driven by
+the typical time resolution with which HPGe detectors separate two signals into
+distinct hits. As a result, one row of a reshaped _remage_ output table does not
+necessarily correspond one-to-one with one simulated Geant4 event: in the
+decay-chain example above, _remage_ splits the single Geant4 event into several
+separate hits. The same time window is also used to build the
+[time-coincidence map](#time-coincidence-map).
+
+For the LH5 format and _Germanium_ or _Scintillator_ outputs, this grouping is
+implemented as a "reshaping" of the output tables at the end of the run.
 
 This means the columns of the output table are converted from
 [LH5 Array's](https://legend-exp.github.io/legend-data-format-specs/dev/hdf5/#Array)
@@ -664,10 +761,10 @@ and reshape the output files.
 
 ### Time-coincidence map
 
-In the presence of multiple sensitive detectors written out as separate output
-tables, reconstructing event information can be a tedious operation when
-analyzing the simulation output. To simplify the task, _remage_ computes a
-so-called "time-coincidence map" (TCM) table at the end of a simulation run with
+In the presence of multiple detectors written out as separate output tables,
+reconstructing event information can be a tedious operation when analyzing the
+simulation output. To simplify the task, _remage_ computes a so-called
+"time-coincidence map" (TCM) table at the end of a simulation run with
 {func}`pygama.evt.tcm.build_tcm` and stores it in the output file as `/tcm`.
 
 ```
@@ -761,7 +858,7 @@ The table always lists data from all vertices, i.e. the length of the table is
 always equal to the number of simulated events.
 
 The vertex table is useful to reconstruct the event vertex of hits recorded in
-sensitive detectors by matching the information stored in the `evtid` column.
+detectors by matching the information stored in the `evtid` column.
 
 ## Run metadata
 

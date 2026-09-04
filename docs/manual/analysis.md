@@ -20,7 +20,7 @@ This tutorial is based on the output file produced in the {ref}`basic-tutorial`.
 Let's start by reading in the TCM in memory as an Awkward array:
 
 ```pycon
->>> from lgdo import lh5
+>>> import lh5
 >>>
 >>> tcm = lh5.read_as("/tcm", "output.lh5", library="ak")
 ```
@@ -56,7 +56,7 @@ from all tables and organize it by event:
 import re
 
 import awkward as ak
-from lgdo import lh5
+import lh5
 
 
 def read_hits_as_events(

@@ -31,8 +31,7 @@ The most useful options include:
   an existing file it is interpreted as a newline-separated list of commands.
 - `-g, --gdml-files` – include one or more GDML geometry files (see
   {ref}`manual-geometry`).
-- `-o, --output-file` – sensitive detector hits output file (see
-  {ref}`manual-output`).
+- `-o, --output-file` – detector hits output file (see {ref}`manual-output`).
 - `-i, --interactive` – keep the application open after executing macros and
   present a Geant4 prompt.
 - `-t, --threads` – number of worker threads to use (this cannot be combined
@@ -82,9 +81,10 @@ single core at the moment.
 ### Geant4 multithreading
 
 This mode is enabled by passing `--threads INTEGER` to the command line.
-_remage_ does not implement its own multithreading but delegates it to Geant4.
-This approach is memory-efficient because shared objects (such as the geometry)
-are instantiated only once.
+_remage_ does not implement its own multithreading but delegates it to Geant4: a
+single process spawns several worker threads sharing the same memory space. This
+approach is memory-efficient because shared objects (such as the geometry and
+the physics tables) are instantiated only once.
 
 :::{warning}
 
@@ -96,11 +96,17 @@ details).
 
 ### Multiple processes
 
-This mode is enabled by passing `--procs INTEGER` to the command line. The
-Python wrapper (see the {ref}`dev-guide` for details) can launch several
-independent _remage_ instances, each running a single process. This usually
-provides near 1:1 performance scaling but is more resource-hungry because every
-process carries a full memory footprint.
+This mode is enabled by passing `--procs INTEGER` to the command line. It is
+implemented by _remage_ itself, independently of Geant4: the Python wrapper (see
+the {ref}`dev-guide` for details) launches several independent _remage_
+instances, each running a single process with its own private memory. This mode
+is markedly more resource-hungry, because every process carries a full memory
+footprint. In exchange, it usually provides near 1:1 performance scaling up to
+the number of available physical CPU cores.
+
+As a rule of thumb, the threading mode is the better choice when memory is the
+limiting resource, while the multi-processing mode gives better overall
+throughput otherwise.
 
 :::{warning}
 

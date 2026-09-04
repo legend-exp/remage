@@ -3,10 +3,15 @@
 # Geometry benchmarking
 
 The `remage-geombench` command-line tool helps identify performance bottlenecks
-in detector geometries during the design phase. It systematically samples points
-on three grids of starting positions and simulates geantinos through the volume.
-It returns the median simulation time per geantino. Based on these overview
-plots and statistics are generated.
+in detector geometries during the design phase. Unlike the correctness checks
+described in {ref}`manual-geometry`, it profiles the navigation _performance_ of
+a geometry: it systematically samples points on three orthogonal grids of
+starting positions, shoots geantinos from them through the volume, and records
+the median simulation time per geantino at each grid point. The resulting
+per-point timing map highlights geometry regions where navigation is
+disproportionately slow (for example tessellated solids with many facets),
+guiding optimization before running full physics simulations. Based on these
+overview plots and statistics are generated.
 
 :::{tip}
 

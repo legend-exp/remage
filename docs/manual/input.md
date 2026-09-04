@@ -59,9 +59,9 @@ The vertex input file should be an LH5 table with the following columns:
 - `xloc`, `yloc`, `zloc` (double, with units): the global position of the
   particle emission
 
-(manual-input-kinetics)=
+(manual-input-kinematics)=
 
-## Kinetics input
+## Kinematics input
 
 _remage_ can also read the initial particle information from a file writtem by
 an external event generator.
@@ -72,7 +72,7 @@ format.
 ```
 /
 └── vtx
-    └── kin · table{ekin,g4_pid,n_part,px,py,pz}
+    └── kin · table{ekin,g4_pid,n_part,px,py,pz,time}
         ├── ekin · array<1>{real} ── {'units': 'keV'}
         ├── g4_pid · array<1>{real}
         ├── px · array<1>{real}
@@ -108,7 +108,7 @@ Where `{FILE_PATH}` is the path to the input LH5 file.
 
 :::{tip}
 
-When you want to simulate kinetics from a file at a specific point instead of
+When you want to simulate kinematics from a file at a specific point instead of
 confined to volume, you cannot use `/gps/position` to set the position. You can
 however use
 
@@ -123,15 +123,15 @@ to set a constant position for all events.
 
 ## Combining vertex and kinematics input
 
-Combining vertex and kinetics input **loaded from two tables** is possible, even
-from the same file. However, by design, each event can only have a single
-vertex, that will be shared between all particles for an event from the kinetics
-file.
+Combining vertex and kinematics input **loaded from two tables** is possible,
+even from the same file. However, by design, each event can only have a single
+vertex, that will be shared between all particles for an event from the
+kinematics file.
 
 However, in a multithreaded run, the consistent iteration between vertex and
-kinetic input files is not guaranteed. The events from the files might be mixed
-up in the simulation, i.e., it is not possible to simulate particle properties
-statistically dependent on their location.
+kinematics input files is not guaranteed. The events from the files might be
+mixed up in the simulation, i.e., it is not possible to simulate particle
+properties statistically dependent on their location.
 
 You can also load a **combined position/kinematics** table with the following
 structure; enable

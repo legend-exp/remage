@@ -6,11 +6,21 @@ We generate particles of interest using Geant4 macro commands (see
 [link](https://geant4.web.cern.ch/documentation/dev/bfad_html/ForApplicationDevelopers/GettingStarted/generalParticleSource.html#macro-commands)
 for some background).
 
-This section of the user manual describes generation of the kinematics of
-events. However, for some generators this can also involve generation of
-positions of the primary particles (for example for muons). In most other cases
-the position is handled by the vertex confinement commands described in
-<project:./confinement.md>.
+Every simulated event starts from a primary vertex: the position and time at
+which one or more particles are created, together with each particle's type and
+momentum. _remage_ splits the definition of an event's initial state into two
+independent steps, configured separately:
+
+- _vertex generation_, i.e. the spatial sampling of the primary vertex, handled
+  by a _vertex generator_ ({cpp:class}`RMGVVertexGenerator`), most importantly
+  the vertex confinement described in <project:./confinement.md>;
+- _event generation_, i.e. the generation of the primary particle kinematics,
+  handled by an _event generator_ ({cpp:class}`RMGVGenerator`).
+
+This section of the user manual describes the event generators. Note that some
+event generators produce the vertex position themselves (for example the cosmic
+muon generators); in that case, no separate vertex generator needs to be
+configured.
 
 You can check the list of all available generators in _remage_
 [here](project:../rmg-commands.md#rmggeneratorselect) under "candidates". This

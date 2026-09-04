@@ -26,6 +26,10 @@ commands, as well as the [remage macro interface](./rmg-commands).
   [legend-pygeom-l1000](https://github.com/legend-exp/legend-pygeom-l1000): the
   LEGEND-200 and LEGEND-1000 geometries for radiation transport simulations,
   useful examples of complex experimental setup implementations.
+- [legend-lh5io](https://github.com/legend-exp/legend-lh5io) and
+  [legend-pydataobj](https://github.com/legend-exp/legend-pydataobj): file I/O
+  and in-memory data types for the LH5 (LEGEND HDF5) format used for the primary
+  remage output.
 - [reboost](https://github.com/legend-exp/reboost): post-processing and analysis
   of remage output.
 - [revertex](https://github.com/legend-exp/revertex): generator for input vertex

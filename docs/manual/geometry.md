@@ -36,14 +36,16 @@ Full geometry implementations based on these tools:
 
 (manual-geometry-register-sens-det)=
 
-## Registering sensitive detectors
+## Registering detectors
 
-Sensitive detector volumes must be registered so that particle interactions are
-recorded in the output. In _remage_, this can be done in several ways. Each
-detector has a unique id (UID) and a _type_, which determines how hits in a
-physical volume (or in a group of them) are processed and stored. Detector of
-type `Germanium`, `Scintillator` and `Optical` are currently supported, see
-{ref}`manual-output` for more details.
+Detector volumes must be registered so that particle interactions are recorded
+in the output. Throughout this documentation, "detector" is used for what Geant4
+itself calls a _sensitive detector_ (or sensitive volume). In _remage_, this
+registration can be done in several ways. Each detector has a unique id (UID)
+and a _type_, which determines how hits in a physical volume (or in a group of
+them) are processed and stored. Detectors of type `Germanium`, `Scintillator`,
+`Optical` and `Calorimeter` are currently supported, see {ref}`manual-output`
+for more details.
 
 :::{note}
 
@@ -141,7 +143,26 @@ remage> /RMG/Geometry/PrintListOfPhysicalVolumes
 [Summary -> Total: 171 volumes
 ```
 
+## Step limits per volume
+
+A maximum step length for charged particles can be imposed on individual
+physical volumes (matched by regular expression) with
+<project:../rmg-commands.md#rmggeometrysetmaxstepsize>. See
+{ref}`manual-physicslist-steplimits` for details and guidance.
+
 ## Checking geometry
+
+_remage_ provides three distinct mechanisms to validate and profile a geometry,
+addressing different needs and offering different levels of detail:
+
+1. an always-on **overlap check** using Geant4's own sampled-point overlap test,
+   a convenient first line of defense against basic geometry construction
+   errors;
+2. a deeper, opt-in **navigation check** based on geantinos, provided by the
+   `GeometryCheck` output scheme and described below;
+3. a **performance benchmark** of the geometry navigation, provided by the
+   standalone `remage-geombench` tool (see {ref}`manual-geombench`), which
+   profiles the navigation speed rather than the correctness of a geometry.
 
 :::{tip}
 
@@ -151,11 +172,13 @@ provided. It can be disabled with the
 
 :::
 
-Apart from the on-by-default builtin overlap checking, _remage_ provides a means
-to perform additional geometry checks that go beyond. For this it will be
-checking the integraity of the volume hierarchy along random geantino paths, and
-verify that the geometry navigator is always never mis-navigating the
-implemented hierarchy.
+The `GeometryCheck` output scheme fires geantino primaries (massless,
+chargeless, non-interacting Geant4 tracking particles used purely to probe
+navigation) through the geometry and verifies, at every step, that the pre- and
+post-step volume transitions reported by the navigator are consistent with the
+declared volume hierarchy. This catches subtler navigation bugs than a plain
+overlap test can, such as volumes that only overlap through coincident surfaces
+and not through their bulk.
 
 The user has to initialize this test in a specialized macro, that needs to be
 adapted to the geometry dimensions:

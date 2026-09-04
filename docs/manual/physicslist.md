@@ -11,8 +11,9 @@ physics constructors. It combines:
   neutron (NeutronHP) models
 - **Radioactive decay** with extended control over decay time thresholds
 - Multiple **custom processes**:
-  - Inner Bremsstrahlung for beta decay
-  - Custom neutron capture with gamma cascades loaded from external files
+  - Inner bremsstrahlung for beta decay
+  - Neutron capture with gamma cascades loaded from external files (MAURINA
+    format)
   - Custom wavelength-shifting (WLS) optical process
 - Production cuts are managed explicitly per-region, including a dedicated
   **SensitiveRegion**.
@@ -58,11 +59,25 @@ scintillation, Cherenkov radiation, optical bulk absorption, Rayleigh scattering
 and wavelength shifting. The wavelength shifting (WLS) is either the default
 implementation or a custom WLS process.
 
+:::{important}
+
+Unlike any other area of physics in Geant4, enabling optical physics is not
+sufficient on its own: the optical properties of the materials and surfaces
+involved must also be supplied by the user as part of the geometry (see
+{ref}`manual-geometry`). The
+[legend-pygeom-optics](https://legend-pygeom-optics.readthedocs.io) package
+provides such properties for materials used in the LEGEND experiment.
+
+:::
+
 Global optical settings:
 
 - Track scintillation secondaries first
-- Enable scintillation by particle type
+- Enable scintillation by particle type (i.e. distinguishing the emission
+  spectrum and yield of different particle types)
 - Boundary process invokes sensitive detectors
+- The WLS emission time is sampled from an exponential profile, rather than from
+  Geant4's default delta function
 
 ### Custom optical wave length shifting (WLS) process
 
@@ -127,15 +142,16 @@ An addition option,
 <project:../rmg-commands.md#rmgprocessesenableneutronthermalscattering>, enables
 thermal scattering for low-energy neutrons.
 
-### Custom Grabmayr gamma cascades
+### Gamma cascades from external files (MAURINA format)
 
 When enabled with
 <project:../rmg-commands.md#rmgprocessesusegrabmayrsgammacascades>, _remage_
 replaces the standard neutron capture process (`nCapture`) with a custom one
-that will generate gamma cascades for specific isotopes from files as provided
-by P. Grabmayr _et al._ [^Grabmayr] and calculated with MAURINA. For all other
-isotopes without a registered override file, this process exactly behaves the
-same as the builtin process.
+that will generate gamma cascades for specific isotopes from external files. The
+file format is based on the output of the MAURINA Hauser-Feshbach generator, as
+provided by P. Grabmayr _et al._ [^Grabmayr]. For all other isotopes without a
+registered override file, this process exactly behaves the same as the builtin
+process.
 
 This option is primarily intended for simulation scenarios that require
 precision gamma spectroscopy following neutron capture.
@@ -162,9 +178,18 @@ densities and spin distributions are used.
 :::{important}
 
 The gamma cascade files are not shipped with _remage_ by default, but have to be
-provided and registered by the user. For this, the command
-<project:../rmg-commands.md#rmggrabmayrgammacascadessetgammacascadefile> can be
-added to a macro file. See [^Grabmayr] for files to use for this.
+provided and registered by the user, per isotope. Two commands are available for
+this:
+
+- <project:../rmg-commands.md#rmggrabmayrgammacascadessetgammacascadefile>
+  registers a single cascade file for an isotope, which is then used
+  independently of the kinetic energy of the captured neutron.
+- <project:../rmg-commands.md#rmggrabmayrgammacascadessetgammacascadefilelist>
+  registers a text file listing several cascade files, each valid for a range of
+  incoming neutron kinetic energies. _remage_ selects the file matching the
+  neutron energy at runtime.
+
+See [^Grabmayr] for files to use for this.
 
 :::
 
@@ -190,25 +215,27 @@ gammas emitted coincident with a radioative decay are enabled. This can be
 controlled by
 <project:../rmg-commands.md#rmgprocessesenablegammaangularcorrelation>.
 
-### Internal Bremsstrahlung
+### Inner bremsstrahlung
 
-Internal Bremsstrahlung is a radiative correction to beta decay where a photon
-is emitted along with the beta particle and neutrino. Unlike external
-bremsstrahlung (which occurs when the beta particle interacts with matter after
-emission), internal bremsstrahlung is emitted directly from the nucleus during
-the decay process itself.
+Inner bremsstrahlung (also called internal bremsstrahlung) is a radiative
+correction to beta decay where a photon is emitted along with the beta particle
+and neutrino. Unlike external bremsstrahlung (which occurs when the beta
+particle interacts with matter after emission), inner bremsstrahlung is emitted
+directly from the nucleus during the decay process itself.
 
 The IB photon energy spectrum is continuous, extending from zero up to the
 Q-value of the decay. For Ar-39 (Q = 565 keV), the IB photons are typically soft
 (low energy), with most photons below 0.5 MeV. The spectrum is calculated based
 on [^innerbremsstrahlung].
 
-The Inner Bremsstrahlung process is disabled by default in _remage_. To activate
-Inner Bremsstrahlung process, please use the command
+The inner bremsstrahlung process is disabled by default in _remage_. To activate
+it, please use the command
 <project:../rmg-commands.md#rmgprocessesenableinnerbremsstrahlung> before
 `/run/initialize`.
 
 ## Production cuts and step limits
+
+(manual-physicslist-cuts)=
 
 ### Production cuts
 
@@ -225,19 +252,62 @@ volume) and a sensitive region.
 
 :::{note}
 
-- The default cuts are tuned for low-energy applications (≈ 100 keV in Ge)
+- By default, _remage_ uses a production cut of 0.1 mm for all particle types in
+  both regions. This is lower than the cuts in all upstream Geant4 physics lists
+  and corresponds to a production threshold of about 175 keV for electrons and 6
+  keV for gammas in germanium, as required for high-precision modeling of HPGe
+  detectors, which are sensitive to the position of ionizing interactions on
+  this scale.
 - The energy range for production cuts is explicitly set for low energy physics
   (250 eV to 100 GeV).
-- All registered sensitive detectors will be automatically added to the
-  sensitive region.
+- All registered detectors will be automatically added to the sensitive region.
 
 :::
 
-### Step Limits
+:::{note}
 
-The `G4StepLimiterPhysics` is always added, but will not have an effect by
-default. It allows volume-level step limits to be enforced if configured
-elsewhere (e.g. in a GDML file).
+The default value was chosen based on a dedicated study in the
+[HPGe observables section](https://legend-exp.github.io/remage/validation/{REMAGE_VERSION}/observables-ge.html)
+of the validation report, which also provides guidance for choosing customized
+production cuts.
+
+:::
+
+(manual-physicslist-steplimits)=
+
+### Step limits
+
+No step limit is set by default. In this case Geant4 derives the step length
+from the distance to the next volume boundary, the mean free path to the next
+interaction and the multiple-scattering algorithm. A maximum step length for
+charged particles can be imposed separately for each volume with the
+<project:../rmg-commands.md#rmggeometrysetmaxstepsize> macro command, which
+accepts a regular expression to match several physical volumes at once:
+
+```geant4
+/RMG/Geometry/SetMaxStepSize 10 um germanium_.*
+```
+
+Forcing shorter steps samples the energy deposition along a track more finely,
+at a cost in computing time and output volume that grows steeply with decreasing
+step length.
+
+:::{note}
+
+Because Geant4 ends every step at a geometrical boundary, the energy attributed
+to each volume is approximately correct whatever the step length. Step limits
+matter where the spatial distribution of the energy deposits _within_ a volume
+is important, for example where a boundary that is not a Geant4 volume boundary
+is applied in post-processing, such as the transition layer at the surface of an
+HPGe detector. The impact of the step limit on observables and computing cost is
+quantified in the
+[HPGe observables section](https://legend-exp.github.io/remage/validation/{REMAGE_VERSION}/observables-ge.html)
+of the validation report.
+
+:::
+
+Step limits can also be attached to Geant4 regions defined in a GDML file, see
+below.
 
 ### Setting production cuts and step limits via GDML
 

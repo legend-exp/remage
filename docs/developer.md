@@ -46,6 +46,19 @@ Information about the C++ part of _remage_ is forwarded to the Python wrapper
 via the `cmake/cpp_config.py.in` file, which is configured by CMake at build
 time and moved into the package source folder.
 
+### Communication between the two halves
+
+At runtime, the Python wrapper and `remage-cpp` communicate over Unix pipes
+through a small inter-process communication (IPC) channel. The C++ side
+({cpp:class}`RMGIpc`) sends messages that the Python side ({mod}`remage.ipc`)
+receives and dispatches. Most messages are informational (e.g. the locations of
+the temporary output files needed for the LH5 post-processing), but the channel
+also carries _blocking_ requests from C++ for Python to handle before the
+simulation continues, such as checking that the versions of the two halves match
+or validating the GDML input as well-formed XML. The message format is
+documented in the {mod}`remage.ipc` module. In multi-process mode (`--procs`),
+every worker process has its own channel to the wrapper.
+
 ## Installing dependencies
 
 ```{include} _dependencies.md
