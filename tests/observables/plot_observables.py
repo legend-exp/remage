@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -114,14 +115,21 @@ SIZE_DEFAULT_LINESTYLE = (0, (5, 1.5, 1, 1.5))
 # color used for everything that refers to the reference simulation, i.e. to the
 # point of the scan the other ones are compared against
 DEFAULT_COLOR = "tab:red"
+# background of the panel holding the reference, and the marker style used in
+# it: both set the reference apart from the points of the scan
+REFERENCE_PANEL_COLOR = "0.95"
+REFERENCE_MARKER = {"markerfacecolor": "none", "markeredgewidth": 1.5}
 # color used to point out where the remage default of the scanned setting lies.
 # Distinct from DEFAULT_COLOR: the reference simulation and the default value of
 # the setting are only the same thing if `default_x` is used.
 MARK_COLOR = "dimgrey"
 
 
-def mark_default_x(ax, default_x, label, color=DEFAULT_COLOR):
+def mark_default_x(ax, default_x, label, color=DEFAULT_COLOR, annotate=True):
     ax.axvline(default_x, color=color, linestyle="--", zorder=0)
+    if not annotate:
+        # the line is drawn in every panel, but labelled only in one of them
+        return
     ax.annotate(
         label,
         xy=(default_x, 0.02),
@@ -133,6 +141,194 @@ def mark_default_x(ax, default_x, label, color=DEFAULT_COLOR):
         fontsize=SMALL_FONTSIZE,
         color=color,
     )
+
+
+def wrap_label(label):
+    """Break a short label into two lines, for use in a narrow panel."""
+    words = label.split()
+    if len(words) < 2:
+        return label
+    # split at the word boundary that leaves the two lines most similar in length
+    split = min(
+        range(1, len(words)),
+        key=lambda i: abs(len(" ".join(words[:i])) - len(" ".join(words[i:]))),
+    )
+    return "\n".join((" ".join(words[:split]), " ".join(words[split:])))
+
+
+# the diagonal marks that denote a break in an axis, drawn in axes coordinates.
+# They cross the spine they sit on, so the two breaks need marks at right angles
+BREAK_MARKS = {
+    "markersize": 8,
+    "linestyle": "none",
+    "color": "black",
+    "mew": 1,
+    "clip_on": False,
+}
+X_BREAK_MARKS = {"marker": [(-1, -3), (1, 3)], **BREAK_MARKS}
+Y_BREAK_MARKS = {"marker": [(-3, -1), (3, 1)], **BREAK_MARKS}
+
+
+def broken_axes(n_rows=1):
+    """Create the main panel(s) plus a narrow one each for the reference.
+
+    Used when the reference has no position on the x axis (e.g. "no step limit
+    at all"): it then gets a panel of its own, set off by a break in the axis.
+    """
+    fig, panels = plt.subplots(
+        n_rows,
+        2,
+        figsize=PAPER_FIGSIZE,
+        sharex="col",
+        sharey="row",
+        squeeze=False,
+        gridspec_kw={"width_ratios": [6, 1]},
+    )
+    return fig, list(panels[:, 0]), list(panels[:, 1])
+
+
+def mark_axis_break(ax, ax_ref, reference_label, label=True, ends=(0, 1)):
+    """Label the reference panel and mark the break between the two panels.
+
+    ``ends`` selects the vertical ends of the break that get the diagonals: with
+    several rows of panels, the ends inside the figure are left to the break in
+    the y axis instead of being marked twice.
+    """
+    # hide the two facing spines and mark the cut with the usual diagonals
+    ax.spines["right"].set_visible(False)
+    ax_ref.spines["left"].set_visible(False)
+    # tint the panel: what it holds is the reference, not a point of the scan
+    ax_ref.set_facecolor(REFERENCE_PANEL_COLOR)
+    ax_ref.tick_params(axis="y", length=0)
+    ax_ref.set_xlim(-0.5, 0.5)
+    ax_ref.set_xticks([0])
+    # with several rows, only the bottom one carries the label
+    ax_ref.set_xticklabels(
+        [wrap_label(reference_label) if label else ""], fontsize=SMALL_FONTSIZE
+    )
+    for end in ends:
+        ax.plot([1], [end], transform=ax.transAxes, **X_BREAK_MARKS)
+        ax_ref.plot([0], [end], transform=ax_ref.transAxes, **X_BREAK_MARKS)
+
+
+def equalize_y_scales(axes):
+    """Give all panels a y range of the same length, centred on their own data."""
+    span = max(abs(np.diff(ax.get_ylim())[0]) for ax in axes)
+    for ax in axes:
+        low, high = ax.get_ylim()
+        centre = (low + high) / 2
+        ax.set_ylim(centre - span / 2, centre + span / 2)
+
+
+def mark_y_break(upper, lower):
+    """Mark the break in the y axis between two rows of panels.
+
+    Each row is given a y axis of its own, so that a trend smaller than the
+    distance between the rows stays visible; the break says that the scale
+    jumps between them. Both arguments are the panels of one row, from left to
+    right.
+    """
+    for ax in upper:
+        ax.spines["bottom"].set_visible(False)
+        ax.tick_params(axis="x", bottom=False)
+    for ax in lower:
+        ax.spines["top"].set_visible(False)
+    # only the outer corners of the break need the diagonals, the inner ones
+    # are already marked by the break in the x axis
+    upper[0].plot([0], [0], transform=upper[0].transAxes, **Y_BREAK_MARKS)
+    upper[-1].plot([1], [0], transform=upper[-1].transAxes, **Y_BREAK_MARKS)
+    lower[0].plot([0], [1], transform=lower[0].transAxes, **Y_BREAK_MARKS)
+    lower[-1].plot([1], [1], transform=lower[-1].transAxes, **Y_BREAK_MARKS)
+
+
+def layout_panels(fig, axes, xlabel=None, ylabel=None, wspace=None, hspace=None):
+    """Lay out a figure of several panels, with axis labels shared by all of them.
+
+    ``tight_layout()`` resets the spacing between the panels and reserves no
+    room for figure-wide labels, so both are applied afterwards. Such a label is
+    needed wherever it is wider (or taller) than the panel it belongs to, and
+    would otherwise run into the labels of the neighboring panel.
+    """
+    plt.tight_layout()
+    adjust = {}
+    if wspace is not None:
+        adjust["wspace"] = wspace
+    if hspace is not None:
+        adjust["hspace"] = hspace
+    if xlabel is not None:
+        adjust["bottom"] = min(a.get_position().y0 for a in axes) + 0.05
+    if ylabel is not None:
+        adjust["left"] = min(a.get_position().x0 for a in axes) + 0.05
+    fig.subplots_adjust(**adjust)
+    if xlabel is not None:
+        fig.supxlabel(xlabel, y=0.02, fontsize=plt.rcParams["font.size"])
+    if ylabel is not None:
+        fig.supylabel(ylabel, x=0.015, fontsize=plt.rcParams["font.size"])
+
+
+def add_bottom_legend(fig, panels, handles, pad=0.012):
+    """Add a legend at the bottom of the plotting region, inside of it.
+
+    A single row spanning the full width of the region: it is anchored to the
+    region as a whole, and therefore not aligned with the boundaries of the
+    individual panels. The strip it occupies is taken out of the bottom row,
+    which is made taller by it at the expense of the rows above: that leaves
+    every row the same height of plotting area, and therefore the common y
+    scale set by equalize_y_scales().
+    """
+    positions = [panel.get_position() for panel in panels]
+    left = min(pos.x0 for pos in positions)
+    right = max(pos.x1 for pos in positions)
+    bottom = min(pos.y0 for pos in positions)
+    legend = fig.legend(
+        handles=handles,
+        ncol=len(handles),
+        loc="lower left",
+        # "expand" stretches the legend over the full width of the anchor box
+        bbox_to_anchor=(left + pad, bottom + pad, right - left - 2 * pad, 0.1),
+        mode="expand",
+        fontsize=SMALL_FONTSIZE,
+    )
+
+    # the legend is only placed now, so its size is known only after a draw
+    fig.canvas.draw()
+    strip = (
+        legend.get_window_extent().transformed(fig.transFigure.inverted()).height
+        + 2 * pad
+    )
+
+    # the rows, bottom to top; the panels of a row share their y axis, so the
+    # limits have to be set only once per row
+    rows = [
+        [panel for panel in panels if round(panel.get_position().y0, 6) == y0]
+        for y0 in sorted({round(panel.get_position().y0, 6) for panel in panels})
+    ]
+    # every row gives up an equal share of the strip, so that the bottom row can
+    # hold it without losing plotting area against the others
+    for idx, row in enumerate(rows[1:], start=1):
+        for panel in row:
+            pos = panel.get_position()
+            shift = strip * (len(rows) - idx) / len(rows)
+            panel.set_position(
+                (pos.x0, pos.y0 + shift, pos.width, pos.height - strip / len(rows))
+            )
+    for panel in rows[0]:
+        pos = panel.get_position()
+        panel.set_position(
+            (
+                pos.x0,
+                pos.y0,
+                pos.width,
+                pos.height + strip * (len(rows) - 1) / len(rows),
+            )
+        )
+
+    # the bottom row now covers the strip as well: its y range grows with it,
+    # leaving the same range as the other rows above the legend
+    panel = rows[0][0]
+    height = panel.get_position().height
+    low, high = panel.get_ylim()
+    panel.set_ylim(high - (high - low) * height / (height - strip), high)
 
 
 def plot_timing(
@@ -160,7 +356,14 @@ def plot_timing(
     if color_by_metric and len(generators) != 1:
         msg = "color_by_metric only works for a single generator"
         raise ValueError(msg)
-    _fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
+    # the reference simulation gets a panel of its own if it has no position on
+    # the x axis; there it is trivially at 100 %, but that keeps it comparable
+    # with the efficiency plots of the same scan
+    if default_x is None:
+        _fig, (ax,), (ax_ref,) = broken_axes()
+    else:
+        _fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
+        ax_ref = None
 
     colors = ["tab:blue", "tab:orange", "tab:purple", "tab:green"]
     # only used with color_by_metric, one per metric (see below)
@@ -196,6 +399,16 @@ def plot_timing(
                 linestyle=linestyle,
                 color=metric_colors[m_idx] if color_by_metric else colors[idx],
             )
+            if ax_ref is not None:
+                ax_ref.plot(
+                    [0],
+                    [100],
+                    marker=marker,
+                    markersize=6,
+                    linestyle="none",
+                    color=metric_colors[m_idx] if color_by_metric else colors[idx],
+                    **REFERENCE_MARKER,
+                )
             metric_handles.append(
                 Line2D(
                     [],
@@ -212,26 +425,20 @@ def plot_timing(
         else:
             handles.append(Line2D([], [], color=colors[idx], label=f"{generator}"))
 
-    # the reference is 100 % by construction, for both metrics
-    ax.axhline(100, color=DEFAULT_COLOR, linestyle="--", linewidth=1)
-    if default_x is None:
-        ax.annotate(
-            default_label,
-            xy=(0.01, 100),
-            xycoords=("axes fraction", "data"),
-            xytext=(0, -4),
-            textcoords="offset points",
-            ha="left",
-            va="top",
-            fontsize=SMALL_FONTSIZE,
-            color=DEFAULT_COLOR,
-        )
+    # the reference is 100 % by construction, for all metrics
+    for axis in (ax, ax_ref):
+        if axis is not None:
+            axis.axhline(100, color=DEFAULT_COLOR, linestyle="--", linewidth=1)
+    if ax_ref is not None:
+        mark_axis_break(ax, ax_ref, default_label)
     else:
         mark_default_x(ax, default_x, default_label)
     if mark_x is not None:
         mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR)
 
-    ax.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
+    timing_xlabel = xlabel if xlabel is not None else f"{name} [{unit}]"
+    if ax_ref is None:
+        ax.set_xlabel(timing_xlabel)
     ax.set_ylabel(f"Relative to {default_label.split(' (')[0].lower()} [%]")
     if title is not None:
         ax.set_title(title, fontsize=TITLE_FONTSIZE)
@@ -241,7 +448,10 @@ def plot_timing(
         handles += metric_handles
     ax.legend(handles=handles, loc="best")
 
-    plt.tight_layout()
+    if ax_ref is not None:
+        layout_panels(_fig, [ax], xlabel=timing_xlabel, wspace=0.08)
+    else:
+        plt.tight_layout()
     savefig(save_name)
 
 
@@ -340,6 +550,7 @@ def plot(
     legend_title=None,
     default_x=None,
     eff_title=None,
+    field_labels=None,
     mark_x=None,
     mark_label="remage default",
 ):
@@ -368,8 +579,16 @@ def plot(
         "tab:cyan",
     ]
 
+    # one spectrum figure is drawn per field, so several fields need several
+    # file names (the efficiencies of all fields share a single panel)
+    spec_names = (
+        list(save_spec_name)
+        if isinstance(save_spec_name, (list, tuple))
+        else [save_spec_name] * len(fields)
+    )
+
     # get default
-    for field in fields:
+    for field_idx, field in enumerate(fields):
         effs[field] = {}
         steps[field] = {}
         n_sels[field] = {}
@@ -497,14 +716,35 @@ def plot(
             -max(np.max(abs(resid)), 4.9) - 0.1, +max(np.max(abs(resid)), 4.9) + 0.1
         )
         plt.tight_layout()
-        savefig(save_spec_name)
+        savefig(spec_names[field_idx])
         if not doeff:
             return
 
-    # plot the efficiency
-    _fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
+    # plot the efficiency. Every field gets a row of its own, sharing the x
+    # axis: a small trend within a field would be invisible if the rows had to
+    # share a y axis as well. If the reference simulation has a position on the
+    # x axis it is drawn there like any other scan point; if it has none (e.g.
+    # "no step limit at all"), it gets a narrow panel of its own, set off by a
+    # break in the x axis.
     reference_label = default_label or "Default"
+    n_rows = len(effs)
+    if default_x is None:
+        _fig, axes, ref_axes = broken_axes(n_rows)
+    else:
+        _fig, panels = plt.subplots(
+            n_rows, 1, figsize=PAPER_FIGSIZE, sharex=True, squeeze=False
+        )
+        axes = list(panels[:, 0])
+        ref_axes = [None] * n_rows
+
     for idx, field in enumerate(effs.keys()):
+        ax = axes[idx]
+        ax_ref = ref_axes[idx]
+        # the labels below the panels belong to the bottom row only
+        bottom_row = idx == n_rows - 1
+        # the guide lines are labelled in the row that carries no legend
+        label_row = idx == 0 if field_labels is not None else bottom_row
+
         eff_def_low = (
             100 * get_binomial_interval(eff_def[field], n_sels[field]["def"])[0]
         )
@@ -513,28 +753,28 @@ def plot(
         )
         eff_def_val = 100 * eff_def[field] / n_sels[field]["def"]
 
-        if default_x is None:
-            # the reference has no position on the x axis (e.g. "no step limit
-            # at all"), so it can only be shown as a band spanning the whole
-            # axis. Give it a color of its own and label it in place, to make
-            # clear that it is not a scan point.
-            ax.axhline(y=eff_def_val, linestyle="--", color=DEFAULT_COLOR)
-            ax.axhspan(
-                ymin=eff_def_val - eff_def_low,
-                ymax=eff_def_val + eff_def_high,
-                alpha=0.2,
-                color=DEFAULT_COLOR,
+        if ax_ref is not None:
+            # the reference is not a scan point, it goes into the extra panel
+            ax_ref.errorbar(
+                [0],
+                [eff_def_val],
+                yerr=[[eff_def_low], [eff_def_high]],
+                fmt="o",
+                markersize=6,
+                linestyle="none",
+                capsize=3,
+                color=colors[idx],
+                zorder=3,
+                **REFERENCE_MARKER,
             )
-            ax.annotate(
+            # the ends of the break that face another row are left unmarked,
+            # the break in the y axis takes care of that corner
+            mark_axis_break(
+                ax,
+                ax_ref,
                 reference_label,
-                xy=(0.01, eff_def_val),
-                xycoords=("axes fraction", "data"),
-                xytext=(0, -4),
-                textcoords="offset points",
-                ha="left",
-                va="top",
-                fontsize=SMALL_FONTSIZE,
-                color=DEFAULT_COLOR,
+                label=bottom_row,
+                ends=([1] if idx == 0 else []) + ([0] if bottom_row else []),
             )
         else:
             # the reference is a scan point like any other, just draw it there
@@ -576,21 +816,70 @@ def plot(
                 color=colors[idx],
             )
 
-    if default_x is not None:
-        mark_default_x(ax, default_x, reference_label)
-    if mark_x is not None:
-        mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR)
+        if default_x is not None:
+            mark_default_x(ax, default_x, reference_label, annotate=label_row)
+        if mark_x is not None:
+            mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR, annotate=label_row)
 
-    ax.set_xlabel(xlabel if xlabel is not None else f"{name} [{unit}]")
-    ax.set_ylabel("Fraction of events [%]")
+    # the rows show different observables, but they share a single key, drawn
+    # below the panels once the layout is fixed
+    if field_labels is not None:
+        handles = [
+            Line2D(
+                [],
+                [],
+                color=colors[idx],
+                marker="o",
+                markersize=4,
+                linestyle="none",
+                label=field_label,
+            )
+            for idx, field_label in enumerate(field_labels)
+        ]
+
+    if n_rows > 1:
+        equalize_y_scales(axes)
+
+    # the rows do not share their y axis, so the jump between them is marked
+    rows = [
+        [panel for panel in (axes[row], ref_axes[row]) if panel is not None]
+        for row in range(n_rows)
+    ]
+    for upper, lower in itertools.pairwise(rows):
+        mark_y_break(upper, lower)
+
     title = (
         eff_title
         if eff_title is not None
         else f"Fraction of events in {format_range(*eff_range)} ({label})"
     )
-    ax.set_title(title, fontsize=TITLE_FONTSIZE)
+    axes[0].set_title(title, fontsize=TITLE_FONTSIZE)
 
-    plt.tight_layout()
+    # a label that fits next to its own panel is drawn there; the others are
+    # shared by all panels and placed by layout_panels() below
+    eff_xlabel = xlabel if xlabel is not None else f"{name} [{unit}]"
+    eff_ylabel = "Fraction of events [%]"
+    shared_y = eff_ylabel if n_rows > 1 else None
+    # the x label has to be shared as well as soon as the panels are moved to
+    # make room for a shared y label, or it ends up off-center
+    shared_x = eff_xlabel if ref_axes[0] is not None or shared_y is not None else None
+    if shared_x is None:
+        axes[-1].set_xlabel(eff_xlabel)
+    if shared_y is None:
+        axes[0].set_ylabel(eff_ylabel)
+
+    layout_panels(
+        _fig,
+        axes,
+        xlabel=shared_x,
+        ylabel=shared_y,
+        wspace=0.08 if ref_axes[0] is not None else None,
+        hspace=0.08 if n_rows > 1 else None,
+    )
+    if field_labels is not None:
+        add_bottom_legend(
+            _fig, [panel for panel in axes + ref_axes if panel is not None], handles
+        )
     savefig(save_eff_name)
 
 
@@ -665,31 +954,23 @@ if __name__ == "__main__":
             **timing_kwargs,
         )
 
+        # total and active energy in the bulk: one spectrum figure each, but a
+        # single efficiency panel, so that the two can be compared directly
         plot(
             "beta_bulk",
             (-1, 1020),
             values=lim,
             names=[names],
-            fields=["truth_energy"],
+            fields=["truth_energy", "active_energy_avg"],
+            field_labels=["Total energy", "Active energy"],
             doeff=True,
             unit=unit,
-            save_spec_name=f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
-            save_eff_name=f"{plot_name}.bulk-total-energy{suffix}.eff.output.png",
-            eff_title="Bulk: total energy in 1000 ± 1 keV",
-            **scan_kwargs,
-        )
-
-        plot(
-            "beta_bulk",
-            (-1, 1020),
-            values=lim,
-            names=[names],
-            fields=["active_energy_avg"],
-            doeff=True,
-            unit=unit,
-            save_spec_name=f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
-            save_eff_name=f"{plot_name}.bulk-active-energy{suffix}.eff.output.png",
-            eff_title="Bulk: active energy in 1000 ± 1 keV",
+            save_spec_name=[
+                f"{plot_name}.bulk-total-energy{suffix}.spec.output.png",
+                f"{plot_name}.bulk-active-energy{suffix}.spec.output.png",
+            ],
+            save_eff_name=f"{plot_name}.bulk-energy{suffix}.eff.output.png",
+            eff_title="Bulk: energy in 1000 ± 1 keV",
             **scan_kwargs,
         )
 
