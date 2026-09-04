@@ -88,6 +88,7 @@ def simulate(particle: str, energy: int, scintillate: bool):
         output=output,
         overwrite_output=True,
         log_level="summary",
+        raise_on_warning=True,
     )
 
     return output

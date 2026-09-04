@@ -138,7 +138,7 @@ def plot_hist(add_before: bool = False):
     return ax0, ax1, fig
 
 
-ax0, ax1, fig = plot_hist()
+ax0, ax1, fig = plot_hist(add_before=True)
 ax0.set_xlim(10, 3100)
 with plt.rc_context({"figure.constrained_layout.use": False}):
     fig.savefig("hades-spectrum-full.output.png")
