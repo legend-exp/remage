@@ -18,6 +18,10 @@ from scipy.stats import beta, norm, poisson
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["figure.figsize"] = (12, 4)
 plt.rcParams["font.size"] = 14
+# the tests run with the matplotlib config in tests/ (MPLCONFIGDIR), which turns
+# on constrained layout: it would place the panels itself at draw time and
+# discard the layout set up here
+plt.rcParams["figure.constrained_layout.use"] = False
 
 style = {
     "yerr": False,
@@ -49,11 +53,22 @@ PAPER_FIGSIZE = (5, 4.6)
 SMALL_FONTSIZE = 11
 TITLE_FONTSIZE = 13
 
+# margins of those figures, as a fraction of the figure. They are the same for
+# all of them, so that the frames end up in the same place: the figures are
+# placed below each other in the paper, and have to line up there. Wide enough
+# for the longest tick labels and for the labels of the reference panel
+PAPER_MARGINS = {"left": 0.22, "right": 0.95, "top": 0.90, "bottom": 0.20}
+
 
 def savefig(save_name):
     """Save the current figure, both as PNG and as PDF."""
-    plt.savefig(save_name)
-    plt.savefig(Path(save_name).with_suffix(".pdf"))
+    # the same config sets savefig.bbox to "tight", which crops the figure to
+    # its content: the publication figures instead keep the margins they were
+    # laid out with, or each of them would end up a different size
+    paper = tuple(plt.gcf().get_size_inches()) == PAPER_FIGSIZE
+    with plt.rc_context({"savefig.bbox": None} if paper else {}):
+        plt.savefig(save_name)
+        plt.savefig(Path(save_name).with_suffix(".pdf"))
 
 
 def get_lh5(generator, name, val, dist_low=None, dist_high=None):
@@ -241,24 +256,21 @@ def mark_y_break(upper, lower):
     lower[-1].plot([1], [1], transform=lower[-1].transAxes, **Y_BREAK_MARKS)
 
 
-def layout_panels(fig, axes, xlabel=None, ylabel=None, wspace=None, hspace=None):
+def layout_panels(fig, xlabel=None, ylabel=None, wspace=None, hspace=None):
     """Lay out a figure of several panels, with axis labels shared by all of them.
 
-    ``tight_layout()`` resets the spacing between the panels and reserves no
-    room for figure-wide labels, so both are applied afterwards. Such a label is
-    needed wherever it is wider (or taller) than the panel it belongs to, and
-    would otherwise run into the labels of the neighboring panel.
+    ``tight_layout()`` resets the spacing between the panels, so the spacing
+    and the fixed margins of the paper figures are applied afterwards. A
+    figure-wide label is needed wherever it is wider (or taller) than the panel
+    it belongs to, and would otherwise run into the labels of the neighboring
+    panel; it is placed in the margin, which tight_layout() does not reserve.
     """
     plt.tight_layout()
-    adjust = {}
+    adjust = dict(PAPER_MARGINS)
     if wspace is not None:
         adjust["wspace"] = wspace
     if hspace is not None:
         adjust["hspace"] = hspace
-    if xlabel is not None:
-        adjust["bottom"] = min(a.get_position().y0 for a in axes) + 0.05
-    if ylabel is not None:
-        adjust["left"] = min(a.get_position().x0 for a in axes) + 0.05
     fig.subplots_adjust(**adjust)
     if xlabel is not None:
         fig.supxlabel(xlabel, y=0.02, fontsize=plt.rcParams["font.size"])
@@ -287,7 +299,6 @@ def add_bottom_legend(fig, panels, handles, pad=0.012):
         # "expand" stretches the legend over the full width of the anchor box
         bbox_to_anchor=(left + pad, bottom + pad, right - left - 2 * pad, 0.1),
         mode="expand",
-        fontsize=SMALL_FONTSIZE,
     )
 
     # the legend is only placed now, so its size is known only after a draw
@@ -436,10 +447,10 @@ def plot_timing(
     if mark_x is not None:
         mark_default_x(ax, mark_x, mark_label, color=MARK_COLOR)
 
+    # both labels belong to the figure rather than to a panel: placed there,
+    # they sit in the same spot in every figure of the scan
     timing_xlabel = xlabel if xlabel is not None else f"{name} [{unit}]"
-    if ax_ref is None:
-        ax.set_xlabel(timing_xlabel)
-    ax.set_ylabel(f"Relative to {default_label.split(' (')[0].lower()} [%]")
+    timing_ylabel = f"Relative to {default_label.split(' (')[0].lower()} [%]"
     if title is not None:
         ax.set_title(title, fontsize=TITLE_FONTSIZE)
 
@@ -448,10 +459,12 @@ def plot_timing(
         handles += metric_handles
     ax.legend(handles=handles, loc="best")
 
-    if ax_ref is not None:
-        layout_panels(_fig, [ax], xlabel=timing_xlabel, wspace=0.08)
-    else:
-        plt.tight_layout()
+    layout_panels(
+        _fig,
+        xlabel=timing_xlabel,
+        ylabel=timing_ylabel,
+        wspace=0.08 if ax_ref is not None else None,
+    )
     savefig(save_name)
 
 
@@ -855,24 +868,16 @@ def plot(
     )
     axes[0].set_title(title, fontsize=TITLE_FONTSIZE)
 
-    # a label that fits next to its own panel is drawn there; the others are
-    # shared by all panels and placed by layout_panels() below
+    # both labels belong to the figure rather than to a panel: placed there,
+    # they sit in the same spot in every figure of the scan, and a label wider
+    # than its panel stays centred on the figure instead of running off it
     eff_xlabel = xlabel if xlabel is not None else f"{name} [{unit}]"
     eff_ylabel = "Fraction of events [%]"
-    shared_y = eff_ylabel if n_rows > 1 else None
-    # the x label has to be shared as well as soon as the panels are moved to
-    # make room for a shared y label, or it ends up off-center
-    shared_x = eff_xlabel if ref_axes[0] is not None or shared_y is not None else None
-    if shared_x is None:
-        axes[-1].set_xlabel(eff_xlabel)
-    if shared_y is None:
-        axes[0].set_ylabel(eff_ylabel)
 
     layout_panels(
         _fig,
-        axes,
-        xlabel=shared_x,
-        ylabel=shared_y,
+        xlabel=eff_xlabel,
+        ylabel=eff_ylabel,
         wspace=0.08 if ref_axes[0] is not None else None,
         hspace=0.08 if n_rows > 1 else None,
     )
