@@ -1,15 +1,18 @@
 (manual-staging)=
 
-# Staging and suspending tracks
+# Conditional tracking: staging and suspending tracks
 
 This page provides an introduction to the staging and suspension options in
-_remage_. In this context, "staging" refers to deferring selected tracks from
-immediate processing to the waiting stack, which is then handled in a later
-stage based on configurable conditions. "Suspending", conversely, refers to
-halting and deferring the further processing of tracks that meet certain
-criteria. These mechanisms can help manage computational load in scenarios with
-many low-energy secondaries or optical photons. For complete command signatures,
-see the command reference in <project:../rmg-commands.md>.
+_remage_, which together implement what we call _conditional tracking_: selected
+tracks are deferred and only tracked if the rest of the event fulfills a
+user-defined condition, otherwise they are dropped. In this context, "staging"
+refers to deferring selected tracks from immediate processing to the waiting
+stack, which is then handled in a later stage based on configurable conditions.
+"Suspending", conversely, refers to "mid-flight" halting and deferring the
+further processing of tracks that meet certain criteria. These mechanisms can
+help manage computational load in scenarios with many low-energy secondaries or
+optical photons. For complete command signatures, see the command reference in
+<project:../rmg-commands.md>.
 
 ## Overview
 

@@ -2,9 +2,11 @@
 
 # Vertex confinement
 
-_remage_ supports generating event vertices either in the bulk or on the surface
-of various solids. This is essential for simulating, for example, the decay of
-radioactive isotopes in detector components.
+Vertex confinement is _remage_'s main _vertex generator_ (see
+{ref}`manual-generators` for the distinction between vertex and event
+generation). It supports generating event vertices either in the bulk or on the
+surface of various solids. This is essential for simulating, for example, the
+decay of radioactive isotopes in detector components.
 
 To enable vertex confinement, activate the corresponding generator using
 <project:../rmg-commands.md#rmggeneratorconfine> (see {ref}`manual-generators`):
@@ -144,12 +146,18 @@ _remage_ can exactly sample in the bulk or surface of some simple solids
 methods are implemented. For sampling in the bulk of an arbitrary Geant4 solid,
 a rejection-sampling method is implementing by using Geant4's solid extent and
 {cpp:func}`G4VSolid::Inside`. For sampling on the surface of an arbitrary Geant4
-solid, the algorithm described in [^1] is implemented.
+solid, an algorithm based on counting the intersection points of random lines
+with the surface is implemented, as described in [^1]. Note that, unlike the
+description in that publication, _remage_ implements the surface sampling
+directly, without a first simulation pass that generates the vertices using
+geantinos and Geant4's tracking mechanism.
 
 All sampling modes described above are available, with few notes/limitations:
 
 - The algorithm samples across volumes _weighted by surface area_, to ensure
-  uniform vertex surface density.
+  uniform vertex surface density. The mass-based
+  [weighting modes](#weighting-modes) apply to bulk sampling only and cannot be
+  combined with surface sampling.
 - Sampling on the surface of volumes that contain daughters will result in
   vertices being distributed on the outer surface of the mother volume _only_.
 - volumes that have daughters coincinding with the mothers's surface will be
@@ -208,17 +216,26 @@ keep the resulting depth distribution meaningful.
 
 ## Weighting modes
 
-For the sampling in volumes, _remage_ by default weights the probability to find
-a sampled vertex in one of the volumes by the ratio of their volume to the total
-sampling volume. Other weighting modes can be selected by the user with a macro
-command:
+For the sampling in the bulk of volumes, _remage_ by default weights the
+probability to find a sampled vertex in one of the volumes by the ratio of their
+volume to the total sampling volume, so that the resulting vertex density is
+uniform across the sampling region regardless of how many volumes contribute to
+it. Two alternative weighting modes are available for cases where the
+contaminant is not expected to scale with the volume. They can be selected by
+the user with a macro command:
 
 - by the mass of the volumes can with the command
   <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymass>.
 - by the mass of a given isotope in the materials with the command
   <project:../rmg-commands.md#rmggeneratorconfinementsampleweightbymassisotope>.
   The isotope is specified by its atomic number $Z$ (number of protons) followed
-  by its mass number $A$ (number of nucleons), e.g. `32 76` for $^{76}$Ge.
+  by its mass number $A$ (number of nucleons), e.g. `32 76` for $^{76}$Ge. This
+  is the natural choice when the simulated process is bound to the abundance of
+  a specific isotope, for instance double-beta decays generated in a set of
+  volumes with different, known enrichment fractions.
+
+These mass-based weighting modes apply only to bulk sampling. Surface sampling
+is always weighted by surface area instead, and cannot be combined with them.
 
 ## Vertices from external files
 

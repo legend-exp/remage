@@ -98,7 +98,7 @@ coax_pv = pg4.geant4.PhysicalVolume(
     [0, 0, 0], [-5, 0, -3, "cm"], coax_l, "Coax", lar_l, registry=reg
 )
 
-# register them as sensitive in remage
+# register them as detectors in remage
 # this also saves the metadata into the files for later use
 bege_pv.set_pygeom_active_detector(
     pygeomtools.RemageDetectorInfo("germanium", 1, bege_meta)
@@ -153,14 +153,15 @@ more informed on what's going on by _remage_:
 /RMG/Manager/Logging/LogLevel detail
 ```
 
-Then we have to register the "sensitive detectors" (in our simple case, the two
-HPGes and the LAr). _remage_ offers several types of predefined detectors,
-targeting different physical quantities of the particles that interact with
-them. HPGes are of type `Germanium`, while the LAr is of type `Scintillator`.
-Their difference in terms of simulation output will be clear later, while
-inspecting it. As per specification of the `/RMG/Geometry/RegisterDetector`
-command, we need to provide a unique numeric identifier that will be used to
-label the detector data in the simulation output:
+Then we have to register the "detectors" (what Geant4 calls sensitive detectors;
+in our simple case, the two HPGes and the LAr). _remage_ offers several types of
+predefined detectors, targeting different physical quantities of the particles
+that interact with them. HPGes are of type `Germanium`, while the LAr is of type
+`Scintillator`. Their difference in terms of simulation output will be clear
+later, while inspecting it. As per specification of the
+`/RMG/Geometry/RegisterDetector` command, we need to provide a unique numeric
+identifier that will be used to label the detector data in the simulation
+output:
 
 ```geant4
 /RMG/Geometry/RegisterDetector Germanium BEGe 001
@@ -339,9 +340,10 @@ going to select the latter by supplying a file name with `.lh5` extension:
 $ remage --threads 8 --gdml-files geometry.gdml --output-file output.lh5 --merge-output-files -- gammas.mac
 ```
 
-We'll use the [legend-pydataobj](https://legend-pydataobj.readthedocs.io) Python
-package to read the data from disk. Let's first have a look at the data layout
-with the `lh5ls` utility:
+We'll use the [legend-lh5io](https://legend-lh5io.readthedocs.io) Python package
+to read the data from disk (the in-memory data types it returns are defined in
+[legend-pydataobj](https://legend-pydataobj.readthedocs.io)). Let's first have a
+look at the data layout with the `lh5ls` utility shipped with _legend-lh5io_:
 
 ```console
 $ lh5ls -d3 -a output.lh5
@@ -412,19 +414,20 @@ meter), but not shown by above output of the `lh5ls` tool.
 
 :::
 
-The step information is organized into data tables, one per sensitive detector.
-The table format is specified by the detector type (`Germanium` or
-`Scintillator` in this example). Event vertex information is stored in a
-separate table, `vtx`. Note the physical units specified as attributes, as per
-LH5 specification.
+The step information is organized into data tables, one per detector. Each row
+of a table is a "hit", i.e. the group of steps recorded in the detector within a
+time window of 10 µs (see {ref}`manual-output`). The table format is specified
+by the detector type (`Germanium` or `Scintillator` in this example). Event
+vertex information is stored in a separate table, `vtx`. Note the physical units
+specified as attributes, as per LH5 specification.
 
 Let's make an histogram of the total energy deposited in the HPGe detectors in
 each event. Check out the
-[legend-pydataobj documentation](https://legend-pydataobj.readthedocs.io) for
-more details.
+[legend-lh5io documentation](https://legend-lh5io.readthedocs.io) for more
+details.
 
 ```python
-from lgdo import lh5
+import lh5
 import awkward as ak
 import glob
 import hist
