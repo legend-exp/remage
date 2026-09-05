@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>HPGe tracking and observables - remage 0.26.1.dev33+gf629acd29 validation suite</title>
+        <title>HPGe tracking and observables - remage 1.0.0 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 0.26.1.dev33+gf629acd29 validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 1.0.0 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 0.26.1.dev33+gf629acd29 validation suite</span>
+  <span class="sidebar-brand-text">remage 1.0.0 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -444,10 +444,11 @@ step limits to that with 10 um and 200 um limit. The residual shows the differen
 <p>To quantify this we count the fraction of events within 1 keV of the full energy
 peak.</p>
 <figure class="align-default" id="id17">
-<a class="reference internal image-reference" href="_images/beta-observables.bulk-total-energy.eff.output.png"><img alt="_images/beta-observables.bulk-total-energy.eff.output.png" src="_images/beta-observables.bulk-total-energy.eff.output.png" style="width: 800px;" />
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-energy.eff.output.png"><img alt="_images/beta-observables.bulk-energy.eff.output.png" src="_images/beta-observables.bulk-energy.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the step limits. The same
+quantity after the active volume correction discussed below is shown in the lower panel.</em></span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -461,22 +462,15 @@ surface).</p>
 <p>Next, we compute the energy after active volume correction (see
 <a class="reference external" href="https://www.mpi-hd.mpg.de/gerda/public/2016/phd2016_bjoernLehnert.pdf">[Bjoern Lehnert’s thesis]</a>
 chapter 7). We employ a linear transition layer model with a 1 mm full-charge
-collection depth and a 0.5 mm linear component. The next plots show the spectrum
-and fraction of full energy peak events after this active volume correction.</p>
+collection depth and a 0.5 mm linear component. The next plot shows the spectrum
+after this active volume correction; the fraction of full energy peak events is
+shown in the lower panel of the figure above.</p>
 <figure class="align-default" id="id18">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.spec.output.png"><img alt="_images/beta-observables.bulk-active-energy.spec.output.png" src="_images/beta-observables.bulk-active-energy.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
 step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>   </p>
-<figure class="align-default" id="id19">
-<a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.eff.output.png"><img alt="_images/beta-observables.bulk-active-energy.eff.output.png" src="_images/beta-observables.bulk-active-energy.eff.output.png" style="width: 800px;" />
-</a>
-<figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -488,7 +482,7 @@ sampled in the partially active region. To decouple this effect from the
 variations due to step limitations we select the energies corresponding to
 vertices in the partially active region (distance to surface less than 1 mm) and
 in the bulk (distance greater than one mm).</p>
-<figure class="sphinx-subfigure align-default" id="id20">
+<figure class="sphinx-subfigure align-default" id="id19">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
 <span class="caption">Vertices sampled inside the transition layer (distance less than 1 mm).</span>
@@ -503,13 +497,13 @@ in the bulk (distance greater than one mm).</p>
 </div>
 <figcaption>
 <p><span class="caption-text">Energy spectra for 1 MeV electrons in Germanium, selecting vertices in the
-transition region and the detector bulk.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
+transition region and the detector bulk.</span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>  </p>
 <p>Similar to the previous tests we also plot the fraction of events with energy
 within 1 keV of the full energy peak.</p>
-<figure class="sphinx-subfigure align-default" id="id21">
+<figure class="sphinx-subfigure align-default" id="id20">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
 <a class="reference internal image-reference" href="_images/beta-observables.tl-active-energy.eff.output.png"><img alt="Vertices sampled inside the transition layer (distance less than 1 mm)." src="_images/beta-observables.tl-active-energy.eff.output.png" style="width: 400px;" />
@@ -522,7 +516,7 @@ within 1 keV of the full energy peak.</p>
 </div>
 <figcaption>
 <p><span class="caption-text">Fraction of generated electrons with fully reconstructed active energy (within 1
-keV), as a function of the step limits.</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+keV), as a function of the step limits.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -541,23 +535,23 @@ not technically observable it is still important to simulate them accuractely.</
 <p>We focus on “r90” defined as the smallest radius (centered on the energy
 weighted center) or the event containing at-least 90% of the deposited energy.
 The spectrum of r90 for 1 MeV electrons in bulk is shown below:</p>
-<figure class="align-default" id="id22">
+<figure class="align-default" id="id21">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.spec.output.png"><img alt="_images/beta-observables.bulk-r90.spec.output.png" src="_images/beta-observables.bulk-r90.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of r90 in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>To quantify the effect of the step limits on our observable of interest (the
 fraction of multisite events), we compute the fraction of events with &gt; 1 mm
 r90.</p>
-<figure class="align-default" id="id23">
+<figure class="align-default" id="id22">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.eff.output.png"><img alt="_images/beta-observables.bulk-r90.eff.output.png" src="_images/beta-observables.bulk-r90.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with r90 greater than 1 mm, as a function of the step limits.</em></span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with r90 greater than 1 mm, as a function of the step limits.</em></span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -572,20 +566,20 @@ for beta decays on the surface of the detector (eg. from Potassium-42) but also
 gives us a way to study more generally the surface effects.</p>
 <p>We generated 1 MeV electrons on the center of the bottom surface of the
 detector, all pointing upwards. As before we extract the total deposited energy:</p>
-<figure class="align-default" id="id24">
+<figure class="align-default" id="id23">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.spec.output.png"><img alt="_images/beta-observables.surf-total-energy.spec.output.png" src="_images/beta-observables.surf-total-energy.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of total energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
-<figure class="align-default" id="id25">
+<figure class="align-default" id="id24">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.eff.output.png"><img alt="_images/beta-observables.surf-total-energy.eff.output.png" src="_images/beta-observables.surf-total-energy.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the step limits.</em></span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -593,23 +587,23 @@ step limits to that with 10 um and 200 um limit. The residual shows the differen
 <section id="id2">
 <h4>Active volume corrected energy<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
 <p>Next we plot the spectrum after the active volume correction:</p>
-<figure class="align-default" id="id26">
+<figure class="align-default" id="id25">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.spec.output.png"><img alt="_images/beta-observables.surf-active-energy.spec.output.png" src="_images/beta-observables.surf-active-energy.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>It is not expected to observe many events with 1 MeV deposited in the active
 volume. So as an observable we count the fraction of events with more than 300
 keV deposited. This is relevant for the background induced by surface events.</p>
-<figure class="align-default" id="id27">
+<figure class="align-default" id="id26">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.eff.output.png"><img alt="_images/beta-observables.surf-active-energy.eff.output.png" src="_images/beta-observables.surf-active-energy.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with more than 300 keV active energy, as a function of the step limits.</em></span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with more than 300 keV active energy, as a function of the step limits.</em></span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -623,21 +617,21 @@ spectrum shape minimising the effect.</p>
 <p>Finally, we can extract the maximum z position of the electron, this gives a
 measurement of the range of the electrons. The spectrum of this parameter (not
 really an observable) is shown below:</p>
-<figure class="align-default" id="id28">
+<figure class="align-default" id="id27">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.spec.output.png"><img alt="_images/beta-observables.surf-max-z.spec.output.png" src="_images/beta-observables.surf-max-z.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Distribution of the range of the electrons in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+step limits to that with 10 um and 200 um limit. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>To quantify this we extract the fraction of events with a range &gt; 1 mm.</p>
-<figure class="align-default" id="id29">
+<figure class="align-default" id="id28">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.eff.output.png"><img alt="_images/beta-observables.surf-max-z.eff.output.png" src="_images/beta-observables.surf-max-z.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of 1 MeV electrons travelling more than 1 mm as a function of the step limits.</em></span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of 1 MeV electrons travelling more than 1 mm as a function of the step limits.</em></span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -668,22 +662,23 @@ the peak-to-continuum ratio for the gamma simulation.</p>
 <h4>Total energy<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
 <p>We extract the total energy deposited in the Germanium detector, the energy
 spectra are plotted below:</p>
-<figure class="align-default" id="id30">
+<figure class="align-default" id="id29">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-total-energy.cuts.spec.output.png"><img alt="_images/beta-observables.bulk-total-energy.cuts.spec.output.png" src="_images/beta-observables.bulk-total-energy.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of total energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>To quantify this we count the fraction of events within 1 keV of the full energy
 peak.</p>
-<figure class="align-default" id="id31">
-<a class="reference internal image-reference" href="_images/beta-observables.bulk-total-energy.cuts.eff.output.png"><img alt="_images/beta-observables.bulk-total-energy.cuts.eff.output.png" src="_images/beta-observables.bulk-total-energy.cuts.eff.output.png" style="width: 800px;" />
+<figure class="align-default" id="id30">
+<a class="reference internal image-reference" href="_images/beta-observables.bulk-energy.cuts.eff.output.png"><img alt="_images/beta-observables.bulk-energy.cuts.eff.output.png" src="_images/beta-observables.bulk-energy.cuts.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the production cuts.</em></span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed energy (within 1 keV), as a function of the production cuts. The same
+quantity after the active volume correction discussed below is shown in the lower panel.</em></span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -693,22 +688,14 @@ not produced particles should be deposited locally.</p>
 <section id="id5">
 <h4>Active volume corrected energy<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
 <p>Next, we again compute the energy after active volume correction as above. The
-next plots show the spectrum and fraction of full energy peak events after this
-active volume correction.</p>
-<figure class="align-default" id="id32">
+next plot shows the spectrum after this active volume correction; the fraction
+of full energy peak events is shown in the lower panel of the figure above.</p>
+<figure class="align-default" id="id31">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.cuts.spec.output.png"><img alt="_images/beta-observables.bulk-active-energy.cuts.spec.output.png" src="_images/beta-observables.bulk-active-energy.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated uniformly in the volume. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>   </p>
-<figure class="align-default" id="id33">
-<a class="reference internal image-reference" href="_images/beta-observables.bulk-active-energy.cuts.eff.output.png"><img alt="_images/beta-observables.bulk-active-energy.cuts.eff.output.png" src="_images/beta-observables.bulk-active-energy.cuts.eff.output.png" style="width: 800px;" />
-</a>
-<figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed active energy (within 1 keV), as a function of the production cuts.</em></span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -720,7 +707,7 @@ sampled in the partially active region. To decouple this effect from the
 variations due to production cuts, we select the energies corresponding to
 vertices in the partially active region (distance to surface less than 1 mm) and
 in the bulk (distance greater than one mm).</p>
-<figure class="sphinx-subfigure align-default" id="id34">
+<figure class="sphinx-subfigure align-default" id="id32">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
 <span class="caption">Vertices sampled inside the transition layer (distance less than 1 mm).</span>
@@ -735,13 +722,13 @@ in the bulk (distance greater than one mm).</p>
 </div>
 <figcaption>
 <p><span class="caption-text">Energy spectra for 1 MeV electrons in Germanium, selecting vertices in the
-transition region and the detector bulk.</span><a class="headerlink" href="#id34" title="Link to this image">¶</a></p>
+transition region and the detector bulk.</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>  </p>
 <p>Similar to the previous tests we also plot the fraction of events with energy
 within 1 keV of the full energy peak.</p>
-<figure class="sphinx-subfigure align-default" id="id35">
+<figure class="sphinx-subfigure align-default" id="id33">
 <div class="sphinx-subfigure-grid ss-layout-default-AB" style="display: grid;">
 <div class="sphinx-subfigure-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: A;">
 <a class="reference internal image-reference" href="_images/beta-observables.tl-active-energy.cuts.eff.output.png"><img alt="Vertices sampled inside the transition layer (distance less than 1 mm)." src="_images/beta-observables.tl-active-energy.cuts.eff.output.png" style="width: 400px;" />
@@ -754,7 +741,7 @@ within 1 keV of the full energy peak.</p>
 </div>
 <figcaption>
 <p><span class="caption-text">Fraction of generated electrons with fully reconstructed active energy (within 1
-keV), as a function of the production cuts.</span><a class="headerlink" href="#id35" title="Link to this image">¶</a></p>
+keV), as a function of the production cuts.</span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -768,23 +755,23 @@ detector</p>
 <p>We again focus on “r90” defined as the smallest radius (centered on the energy
 weighted center) or the event containing at-least 90% of the deposited energy.
 The spectrum of r90 for 1 MeV electrons in bulk is shown below:</p>
-<figure class="align-default" id="id36">
+<figure class="align-default" id="id34">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.cuts.spec.output.png"><img alt="_images/beta-observables.bulk-r90.cuts.spec.output.png" src="_images/beta-observables.bulk-r90.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of r90 in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id36" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id34" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>To quantify the effect of the production cuts on our observable of interest (the
 fraction of multisite events), we compute the fraction of events with &gt; 1 mm
 r90.</p>
-<figure class="align-default" id="id37">
+<figure class="align-default" id="id35">
 <a class="reference internal image-reference" href="_images/beta-observables.bulk-r90.cuts.eff.output.png"><img alt="_images/beta-observables.bulk-r90.cuts.eff.output.png" src="_images/beta-observables.bulk-r90.cuts.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with r90 greater than 1 mm, as a function of the production cuts.</em></span><a class="headerlink" href="#id37" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with r90 greater than 1 mm, as a function of the production cuts.</em></span><a class="headerlink" href="#id35" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -799,20 +786,20 @@ for beta decays on the surface of the detector (eg. from Potassium-42) but also
 gives us a way to study more generally the surface effects.</p>
 <p>We generated 1 MeV electrons on the center of the bottom surface of the
 detector, all pointing upwards. As before we extract the total deposited energy:</p>
-<figure class="align-default" id="id38">
+<figure class="align-default" id="id36">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.cuts.spec.output.png"><img alt="_images/beta-observables.surf-total-energy.cuts.spec.output.png" src="_images/beta-observables.surf-total-energy.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of total energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id38" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id36" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
-<figure class="align-default" id="id39">
+<figure class="align-default" id="id37">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-total-energy.cuts.eff.output.png"><img alt="_images/beta-observables.surf-total-energy.cuts.eff.output.png" src="_images/beta-observables.surf-total-energy.cuts.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the production cuts.</em></span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with fully reconstructed total energy (within 1 keV), as a function of the production cuts.</em></span><a class="headerlink" href="#id37" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -824,23 +811,23 @@ the detector will never escape.</p>
 <section id="id9">
 <h4>Active volume corrected energy<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
 <p>Next we plot the spectrum after the active volume correction:</p>
-<figure class="align-default" id="id40">
+<figure class="align-default" id="id38">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.cuts.spec.output.png"><img alt="_images/beta-observables.surf-active-energy.cuts.spec.output.png" src="_images/beta-observables.surf-active-energy.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Spectrum of active energy in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id38" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>It is not expected to observe many events with 1 MeV deposited in the active
 volume. So as an observable we count the fraction of events with more than 300
 keV deposited. This is relevant for the background induced by surface events.</p>
-<figure class="align-default" id="id41">
+<figure class="align-default" id="id39">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-active-energy.cuts.eff.output.png"><img alt="_images/beta-observables.surf-active-energy.cuts.eff.output.png" src="_images/beta-observables.surf-active-energy.cuts.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of generated electrons with more than 300 keV active energy, as a function of the production cuts.</em></span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of generated electrons with more than 300 keV active energy, as a function of the production cuts.</em></span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -860,21 +847,21 @@ spectrum shape minimising the effect.</p>
 <p>Finally, we can extract the maximum z position of the electron, this gives a
 measurement of the range of the electrons. The spectrum of this parameter (not
 really an observable) is shown below:</p>
-<figure class="align-default" id="id42">
+<figure class="align-default" id="id40">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.cuts.spec.output.png"><img alt="_images/beta-observables.surf-max-z.cuts.spec.output.png" src="_images/beta-observables.surf-max-z.cuts.spec.output.png" style="width: 800px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>Distribution of the range of the electrons in Germanium for 1 MeV electrons generated on the surface. We compare the spectrum without
-production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
+production cuts to that with 10 um and 1 mm cut. The residual shows the difference between the two extreme cases.</em></span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
 <p>To quantify this we extract the fraction of events with a range &gt; 1 mm.</p>
-<figure class="align-default" id="id43">
+<figure class="align-default" id="id41">
 <a class="reference internal image-reference" href="_images/beta-observables.surf-max-z.cuts.eff.output.png"><img alt="_images/beta-observables.surf-max-z.cuts.eff.output.png" src="_images/beta-observables.surf-max-z.cuts.eff.output.png" style="width: 800px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><em>Fraction of 1 MeV electrons travelling more than 1 mm as a function of the production cuts.</em></span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
+<p><span class="caption-text"><em>Fraction of 1 MeV electrons travelling more than 1 mm as a function of the production cuts.</em></span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
@@ -890,25 +877,25 @@ insensitive to the load of the machine running the tests), together with the
 size of the produced output file, both normalised to the number of simulated
 events. These plots should be compared with the observable distributions above
 to select the loosest settings that still give an accurate result.</p>
-<figure class="align-default" id="id44">
+<figure class="align-default" id="id42">
 <a class="reference internal image-reference" href="_images/beta-observables.timing.output.png"><img alt="_images/beta-observables.timing.output.png" src="_images/beta-observables.timing.output.png" style="width: 600px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>CPU time (left axis, solid) and output file size (right axis, dotted) per simulated event as a function of the step limit, for
-electrons generated in the bulk and on the surface of the detector. The dashed lines give the values without step limits.</em></span><a class="headerlink" href="#id44" title="Link to this image">¶</a></p>
+electrons generated in the bulk and on the surface of the detector. The dashed lines give the values without step limits.</em></span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You should observe the CPU time increasing steeply for tight step limits, since
 the number of steps per track grows accordingly. The output file size follows
 the same trend, since every step is written to the output file.</p>
 <p>   </p>
-<figure class="align-default" id="id45">
+<figure class="align-default" id="id43">
 <a class="reference internal image-reference" href="_images/beta-observables.timing.cuts.output.png"><img alt="_images/beta-observables.timing.cuts.output.png" src="_images/beta-observables.timing.cuts.output.png" style="width: 600px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><em>CPU time (left axis, solid) and output file size (right axis, dotted) per simulated event as a function of the production cut,
 for electrons generated in the bulk and on the surface of the detector. The dashed lines give the values with the default
-production cuts.</em></span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
+production cuts.</em></span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>   </p>
