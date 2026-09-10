@@ -148,6 +148,18 @@ simulation_time_per_event:
 
 In addition, the visualization of the data can help identify hotspots.
 
+:::{figure} ../_img/geometry_scan.png
+
+Example `remage-geombench` output (left panels) for a sample geometry (rendered
+in the rightmost panel). Each point of a map gives the wall-clock time Geant4
+spends navigating a single geantino launched from that point through the
+geometry, for two orthogonal sampling planes. The first plane isolates the base
+plate below the germanium detector, a tessellated solid whose many facets make
+tracking slow; the second shows it alongside parts built from Geant4 native
+solids, where it still dominates the simulation time.
+
+:::
+
 :::{warning}
 
 Navigation times are relative and depend on the hardware. Focus on identifying

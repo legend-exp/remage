@@ -80,6 +80,20 @@ are currently available:
 In the following, we will refer to physical volumes as $P_i$ and geometrical
 volumes as $G_i$.
 
+:::{figure} ../_img/confinement-modes.png
+
+Some of the vertex confinement options, illustrated with two germanium detectors
+in a surrounding medium. Shown is the radial component of the sampled vertices,
+hence the $1/r$ dependency in the density. From left to right: (a) bulk sampling
+in both detectors (`UnionAll`), (b) sampling from the intersection of the
+surrounding volume with a virtual, user-defined cylinder
+(`IntersectPhysicalWithGeometrical`), (c) the same cylinder subtracted from the
+surrounding volume (`SubtractGeometrical`), (d) sampling on the detector
+surfaces and (e) surface sampling with an additional depth profile applied (see
+[](#bulk-versus-surface) and [](#depth-profiles)).
+
+:::
+
 ### `UnionAll`
 
 In this mode, vertices are sampled randomly across all defined solids (physical
