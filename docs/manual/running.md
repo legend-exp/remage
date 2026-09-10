@@ -130,6 +130,18 @@ $ remage -i -g setup.gdml -- run.mac
 remage>
 ```
 
+:::{tip}
+
+The type of Geant4 user interface is chosen automatically, and a graphical
+session might be started if `DISPLAY` is set. To always get a plain terminal
+prompt, set the `G4UI_USE_TCSH` environment variable:
+
+```console
+$ G4UI_USE_TCSH=1 remage -i -g setup.gdml -- run.mac
+```
+
+:::
+
 ## Executing commands in batch mode
 
 Inline macro commands can also be executed directly from the command line,
