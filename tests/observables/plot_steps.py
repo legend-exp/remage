@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 # the PNG/PDF saving is shared with the other plotting scripts of this test
 from plot_observables import savefig
-from reboost.shape.cluster import apply_cluster, cluster_by_step_length, step_lengths
+from reboost.shape import apply_cluster, cluster_by_step_length, step_lengths
 
 plt.rcParams["lines.linewidth"] = 1
 plt.rcParams["font.size"] = 12

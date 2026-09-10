@@ -57,7 +57,7 @@ test = [
   "matplotlib",
   "numpy",
   "pyg4ometry",
-  "reboost >=0.11.0",
+  "reboost",
   "numba", # without this, uv somehow fails to pick a good numba version
 ]
 docs = [

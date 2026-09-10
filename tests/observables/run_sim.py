@@ -9,8 +9,7 @@ import time
 from multiprocessing import Pool
 from pathlib import Path
 
-import dbetto
-from reboost.build_hit import build_hit
+from build_hit import build_hit
 from remage import remage_run
 
 rmg = sys.argv[1]
@@ -18,9 +17,10 @@ n_proc = int(os.environ.get("RMG_STATS_FACTOR", "1"))
 n_events = 20000 * n_proc * (4 if n_proc > 1 else 1)
 
 # the step files are large and only needed to build the hit files, so they are
-# deleted as soon as reboost is done with them: keeping all of them fills up the
-# CI runner's disk. The two listed here are the ones plot_steps.py reads (see
-# CMakeLists.txt). Set RMG_KEEP_STP=1 to keep all of them around for debugging.
+# deleted as soon as the post-processing is done with them: keeping all of
+# them fills up the CI runner's disk. The two listed here are the ones
+# plot_steps.py reads (see CMakeLists.txt). Set RMG_KEEP_STP=1 to keep all of
+# them around for debugging.
 keep_stp = os.environ.get("RMG_KEEP_STP", "") not in ("", "0")
 keep_stp_scan_points = {
     ("beta_bulk", "step_limits", None),
@@ -52,7 +52,7 @@ def replace_lines(
             f.write(line_t)
 
 
-def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yaml"):
+def run_pproc(generator_name, name, val):
     path = f"{generator_name}/{name}/max_{val}/"
 
     # directories
@@ -62,19 +62,7 @@ def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yam
     # make the directories
     hit_directory.mkdir(parents=True, exist_ok=True)
 
-    stp_files = [f"{stp_directory}/out.lh5"]
-    hit_files = [f"{hit_directory}/out.lh5"]
-
-    args = dbetto.AttrsDict({"gdml": "gdml/geometry.gdml"})
-    _, _ = build_hit(
-        reboost_config,
-        args=args,
-        stp_files=stp_files,
-        glm_files=None,
-        hit_files=hit_files,
-        buffer=10_000_000,
-        overwrite=True,
-    )
+    build_hit(f"{stp_directory}/out.lh5", f"{hit_directory}/out.lh5")
 
 
 def run_sim(
@@ -225,11 +213,7 @@ def run_sim_and_pproc(gen):
     )
 
     # post-process it
-    run_reboost(
-        generator_name=generator,
-        reboost_config="config/hit_config.yaml",
-        **name_kwargs,
-    )
+    run_pproc(generator_name=generator, **name_kwargs)
 
     # the output size has already been recorded in timing.json above, so the
     # step file can go unless something downstream still reads it
