@@ -35,6 +35,14 @@ experiment, but is applicable to a wide variety of others.
 
 Get started with our [documentation pages](https://remage.readthedocs.io)!
 
+### Quick start
+
+Give it a try, with [pixi](https://pixi.sh):
+
+<p align="center">
+  <img src=".github/img/remage-pixi-showcase.png" alt="remage running in interactive mode through pixi" width="80%">
+</p>
+
 ### Main features
 
 - Low entry barrier: Most simulations can be executed directly using the
