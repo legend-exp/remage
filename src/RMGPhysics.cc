@@ -40,6 +40,7 @@
 #include "G4HadronElasticPhysicsHP.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronPhysicsFTFP_BERT_HP.hh"
+#include "G4HadronPhysicsINCLXX.hh"
 #include "G4HadronPhysicsQGSP_BERT_HP.hh"
 #include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
@@ -47,6 +48,7 @@
 #include "G4HadronicParameters.hh"
 #include "G4HadronicProcess.hh"
 #include "G4HadronicProcessStore.hh"
+#include "G4INCLXXInterfaceStore.hh"
 #include "G4IonConstructor.hh"
 #include "G4IonPhysics.hh"
 #include "G4IonTable.hh"
@@ -274,9 +276,35 @@ void RMGPhysics::ConstructProcess() {
         hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Shielding");
         break;
+      case HadronicPhysicsListOption::kFTFP_INCLXX_HP:
+        hPhysics = new G4HadronPhysicsINCLXX("hInelastic FTFP_INCLXX_HP", true, true, true);
+        hPhysics->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using FTFP_INCLXX_HP");
+        break;
+      case HadronicPhysicsListOption::kQGSP_INCLXX_HP:
+        hPhysics = new G4HadronPhysicsINCLXX("hInelastic QGSP_INCLXX_HP", true, true, false);
+        hPhysics->SetVerboseLevel(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using QGSP_INCLXX_HP");
+        break;
     }
     RMGLog::Out(RMGLog::detail, "Adding hadronic inelastic physics");
     hPhysics->ConstructProcess();
+
+    const bool is_inclxx = fHadronicPhysicsListOption == HadronicPhysicsListOption::kFTFP_INCLXX_HP ||
+                           fHadronicPhysicsListOption == HadronicPhysicsListOption::kQGSP_INCLXX_HP;
+    if (fUseAblaDeExcitation) {
+      if (!is_inclxx) {
+        RMGLog::Out(
+            RMGLog::warning,
+            "ABLA++ de-excitation only applies to the INCLXX hadronic physics lists, but ",
+            RMGTools::GetCandidate(fHadronicPhysicsListOption),
+            " is selected. Ignoring."
+        );
+      } else {
+        RMGLog::Out(RMGLog::detail, "Using ABLA++ as de-excitation model after INCL++");
+        G4INCLXXInterfaceStore::GetInstance()->UseAblaDeExcitation();
+      }
+    }
 
 #if G4VERSION_NUMBER >= 1140
     // the issue only affects the NeutronHPCaptureXS cross-section data, so inspect the data sets
@@ -696,6 +724,20 @@ void RMGPhysics::DefineCommands() {
       )
       .SetCandidates(RMGTools::GetCandidates<HadronicPhysicsListOption>())
       .SetDefaultValue(RMGTools::GetCandidate(HadronicPhysicsListOption::kShielding))
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("UseAblaDeExcitation", fUseAblaDeExcitation)
+      .SetGuidance("Use ABLA++ as de-excitation model after INCL++")
+      .SetGuidance(
+          "Only has an effect with the FTFP_INCLXX_HP or QGSP_INCLXX_HP hadronic physics lists. "
+          "ABLA++ takes over evaporation and fission of the excited remnant, replacing the default "
+          "Geant4 de-excitation chain."
+      )
+      .SetGuidance(
+          std::string("This is ") + (fUseAblaDeExcitation ? "enabled" : "disabled") + " by default"
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
 
   fMessenger->DeclareProperty("EnableNeutronThermalScattering", fUseNeutronThermalScattering)
