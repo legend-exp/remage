@@ -115,13 +115,16 @@ If enabled, the following processes are included:
 A hadronic physics option can be selected with
 <project:../rmg-commands.md#rmgprocesseshadronicphysics>. Available options are
 
-| Option         | Description                                                   |
-| -------------- | ------------------------------------------------------------- |
-| `None`         | No hadronic physics (**default**)                             |
-| `QGSP_BIC_HP`  | Quark-Gluon String + Binary Cascade + HP neutrons [^QGSP_BIC] |
-| `QGSP_BERT_HP` | QGSP with Bertini cascade + HP neutrons [^QGSP_BERT]          |
-| `FTFP_BERT_HP` | Fritiof string model + Bertini + HP neutrons [^FTFP_BERT]     |
-| `Shielding`    | Optimized shielding list with HP neutrons [^Shielding]        |
+| Option           | Description                                                   |
+| ---------------- | ------------------------------------------------------------- |
+| `None`           | No hadronic physics (**default**)                             |
+| `QGSP_BIC_HP`    | Quark-Gluon String + Binary Cascade + HP neutrons [^QGSP_BIC] |
+| `QGSP_BERT_HP`   | QGSP with Bertini cascade + HP neutrons [^QGSP_BERT]          |
+| `FTFP_BERT_HP`   | Fritiof string model + Bertini + HP neutrons [^FTFP_BERT]     |
+| `Shielding`      | Optimized shielding list with HP neutrons [^Shielding]        |
+| `ShieldingLEND`  | Shielding list with low-energy neutron data (LEND) [^LEND]    |
+| `FTFP_INCLXX_HP` | Fritiof string model + INCL++ cascade + HP neutrons [^INCLXX] |
+| `QGSP_INCLXX_HP` | QGSP with INCL++ cascade + HP neutrons [^INCLXX]              |
 
 The Geant4 physics reference contains descriptions of the
 [Fritiof](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/FTFmodel/FTFmodel.html)
@@ -141,6 +144,30 @@ For cosmogenic simulations, we recommend the `Shielding` hadronic option.
 An addition option,
 <project:../rmg-commands.md#rmgprocessesenableneutronthermalscattering>, enables
 thermal scattering for low-energy neutrons.
+
+### ABLA++ de-excitation
+
+With the two INCLXX options, the de-excitation of the excited remnant left over
+after the intra-nuclear cascade can be done by ABLA++ [^ABLA] instead of the
+default Geant4 de-excitation. Enable it with
+<project:../rmg-commands.md#rmgprocessesuseabladeexcitation>.
+
+ABLA++ takes over evaporation and fission of the remnant. It is mostly of
+interest for the production of spallation residues and fission fragments, and it
+changes the neutron multiplicity from the de-excitation stage.
+
+:::{warning}
+
+ABLA++ does not use the Geant4 de-excitation parameters. The related options
+<project:../rmg-commands.md#rmgprocessesenablegammaangularcorrelation>,
+<project:../rmg-commands.md#rmgprocessesgammatwojmax> and
+<project:../rmg-commands.md#rmgprocessesstoreicleveldata> thus have no effect on
+the de-excitation that ABLA++ does.
+
+:::
+
+The option has no effect with any other hadronic physics list. _remage_ prints a
+warning if you select it together with one of them.
 
 ### Gamma cascades from external files (MAURINA format)
 
@@ -343,6 +370,23 @@ package, see {doc}`pygeomtools:region`.
     see the "Hadronic Component" and "Related Physics Lists" sections in the
     [Shielding](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/Shielding.html)
     physics list docs.
+
+[^LEND]
+    see the
+    [LEND](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/LEND/lend.html)
+    page in the physlics reference manual.
+
+[^INCLXX]:
+    Boudard et al., in Phys. Rev. C 87, 014606 (2013). doi:
+    [10.1103/PhysRevC.87.014606](https://doi.org/10.1103/PhysRevC.87.014606).
+    The extension to light-ion projectiles is described in Mancusi et al., in
+    Phys. Rev. C 90, 054602 (2014). doi:
+    [10.1103/PhysRevC.90.054602](https://doi.org/10.1103/PhysRevC.90.054602).
+    The Geant4 reference physics list guide has no page for the INCLXX lists.
+
+[^ABLA]:
+    Kelić, Ricciardi and Schmidt, ABLA07. arXiv:
+    [0906.4193](https://arxiv.org/abs/0906.4193).
 
 [^NeutronHP]:
     https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/TrackingAndPhysics/physicsProcess.html#high-precision-neutron-interactions-neutronhp

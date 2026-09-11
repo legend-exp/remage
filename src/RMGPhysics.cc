@@ -45,6 +45,7 @@
 #include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
 #include "G4HadronPhysicsShielding.hh"
+#include "G4HadronPhysicsShieldingLEND.hh"
 #include "G4HadronicParameters.hh"
 #include "G4HadronicProcess.hh"
 #include "G4HadronicProcessStore.hh"
@@ -275,6 +276,10 @@ void RMGPhysics::ConstructProcess() {
       case HadronicPhysicsListOption::kShielding:
         hPhysics = new G4HadronPhysicsShielding(G4VModularPhysicsList::verboseLevel);
         RMGLog::Out(RMGLog::detail, "Using Shielding");
+        break;
+      case HadronicPhysicsListOption::kShieldingLEND:
+        hPhysics = new G4HadronPhysicsShieldingLEND(G4VModularPhysicsList::verboseLevel);
+        RMGLog::Out(RMGLog::detail, "Using ShieldingLEND");
         break;
       case HadronicPhysicsListOption::kFTFP_INCLXX_HP:
         hPhysics = new G4HadronPhysicsINCLXX("hInelastic FTFP_INCLXX_HP", true, true, true);

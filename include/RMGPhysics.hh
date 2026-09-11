@@ -66,6 +66,7 @@ class RMGPhysics : public G4VModularPhysicsList {
       kQGSP_BERT_HP,
       kFTFP_BERT_HP,
       kShielding,
+      kShieldingLEND,
       kFTFP_INCLXX_HP,
       kQGSP_INCLXX_HP,
       kNone
