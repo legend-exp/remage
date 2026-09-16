@@ -92,7 +92,7 @@ def _build_vertices(stp_file: str, hit_file: str) -> None:
         "rloc", Array(ak.to_numpy(np.sqrt(xloc**2 + yloc**2)), attrs={"units": "m"})
     )
 
-    lh5.write(out, "hit/vtx", hit_file, wo_mode="append_column")
+    lh5.write(out, "hit/vtx", hit_file, wo_mode="append")
 
 
 def _energy(data: ak.Array) -> Array:
