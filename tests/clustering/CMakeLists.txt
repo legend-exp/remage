@@ -1,7 +1,6 @@
 # effect of the germanium (pre-)clustering settings on CPU time, output file
-# size and the reconstructed observables. The geometry, the reboost
-# configuration and the plotting helpers are shared with the observables-ge
-# test.
+# size and the reconstructed observables. The geometry, the post-processing
+# and the plotting helpers are shared with the observables-ge test.
 
 # collect auxiliary files
 file(
@@ -14,9 +13,9 @@ foreach(_file ${_aux})
   configure_file(${PROJECT_SOURCE_DIR}/${_file} ${PROJECT_BINARY_DIR}/${_file} COPYONLY)
 endforeach()
 
-# reuse the geometry, the hit configuration and the plotting helpers of the
+# reuse the geometry, the post-processing and the plotting helpers of the
 # observables-ge test
-foreach(_file make_gdml.py plot_observables.py config/hit_config.yaml)
+foreach(_file make_gdml.py plot_observables.py build_hit.py)
   configure_file(${PROJECT_SOURCE_DIR}/observables/${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file}
                  COPYONLY)
 endforeach()

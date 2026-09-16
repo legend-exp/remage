@@ -8,9 +8,6 @@ import lh5
 import matplotlib.pyplot as plt
 import numpy as np
 import reboost
-import reboost.hpge.surface
-import reboost.math.functions
-import reboost.math.stats
 from pygeomhpges import make_hpge
 
 d1 = dt.datetime.strptime("2013-11-01", "%Y-%m-%d").replace(tzinfo=dt.UTC)
@@ -45,7 +42,7 @@ def gauss_smear(arr_true: ak.Array, arr_reso: ak.Array) -> ak.Array:
     Samples from gaussian and shifts negative values to a fixed, tiny positive
     value.
     """
-    arr_smear = reboost.math.stats.gaussian_sample(
+    arr_smear = reboost.math.gaussian_sample(
         arr_true,
         arr_reso,
     )
@@ -70,7 +67,7 @@ meta = dbetto.AttrsDict(dbetto.utils.load_dict("dummy-metadata.yaml"))
 hpge_pyobj = make_hpge(
     meta["detectors"]["germanium"]["diodes"]["B00000B"], registry=None
 )
-distance_to_nplus = reboost.hpge.surface.distance_to_surface(
+distance_to_nplus = reboost.hpge.distance_to_surface(
     sim.xloc,
     sim.yloc,
     sim.zloc,
@@ -79,7 +76,7 @@ distance_to_nplus = reboost.hpge.surface.distance_to_surface(
     surface_type="nplus",
 )
 
-activeness = reboost.math.functions.piecewise_linear_activeness(
+activeness = reboost.math.piecewise_linear_activeness(
     distance_to_nplus, fccd_in_mm=fccd, dlf=0.5
 )
 active_energy = ak.sum(sim.edep * activeness, axis=-1)

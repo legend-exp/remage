@@ -2,25 +2,27 @@ from __future__ import annotations
 
 import time
 
-import dbetto
-from reboost.build_hit import build_hit
+import awkward as ak
+import lh5
+import reboost
+from lgdo import Array
 from remage import remage_run
 
 
-def run_reboost(f, reboost_config="config/hit_config.yaml"):
-    stp_files = [f"{f}.stp.lh5"]
-    hit_files = [f"{f}.lh5"]
+def run_pproc(f):
+    """Sum the energy deposited in each hit of the germanium detector."""
+    stps = lh5.read("stp/det001", f"{f}.stp.lh5")
+    steps = stps.view_as("ak", with_units=True)
+    edep = reboost.units.units_conv_ak(steps.edep, "keV")
 
-    args = dbetto.AttrsDict({})
-    _, _ = build_hit(
-        reboost_config,
-        args=args,
-        stp_files=stp_files,
-        glm_files=None,
-        hit_files=hit_files,
-        buffer=10_000_000,
-        overwrite=True,
+    # carries over the evtid and t0 fields, i.e. what a TCM needs
+    hits = reboost.init_hit_table(stps)
+    hits.add_field(
+        "active_energy",
+        Array(ak.to_numpy(ak.sum(edep, axis=-1)), attrs={"units": "keV"}),
     )
+
+    lh5.write(hits, "hit/det001", f"{f}.lh5", wo_mode="overwrite_file")
 
 
 t0 = time.time()
@@ -31,7 +33,7 @@ remage_run(
     overwrite_output=True,
 )
 tib = time.time() - t0
-run_reboost("output_IB")
+run_pproc("output_IB")
 
 t0 = time.time()
 remage_run(
@@ -42,7 +44,7 @@ remage_run(
 )
 tno = time.time() - t0
 print("simulation time ratio (IB/no IB)", tib / tno)
-run_reboost("output_noIB")
+run_pproc("output_noIB")
 
 remage_run(
     macros="macros/run_IB_track.mac",

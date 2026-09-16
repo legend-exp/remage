@@ -136,17 +136,22 @@ We find the event structure expected from the TCM.
 [_reboost_](https://github.com/legend-exp/reboost) is the general
 post-processing and analysis toolkit for remage output. _remage_ does the
 built-in hit-table reshaping on its own (without depending on reboost), but does
-not apply any further user-defined post-processing — that is where reboost comes
+not apply any further user-defined post-processing: that is where reboost comes
 in.
 
 _reboost_ supports various processors for output tables from remage: HPGe
 pulse-shape emulation or heuristics, optical map application for scintillators,
-... It can be used as a command-line tool, or by writing custom code.
+and more. The post-processing is written directly as a python script or notebook
+calling these processors on the tables read from the remage output.
 
-:::{important}
+:::{tip}
 
-When using _reboost_ with a config file, the TCM will not be available after
-post-processing. This is currently a known limitation; in the future we will
-recommend moving away from config files toward a python-script based workflow.
+_reboost_ also ships helpers to write the post-processed tables back in the
+remage output layout (`reboost.init_hit_table`, `reboost.write_hit_table_chunk`)
+and to rebuild the TCM on them (`reboost.build_remage_tcm`), so that the event
+structure described above survives the post-processing.
 
 :::
+
+The `tests/observables/build_hit.py` script in the _remage_ source tree is a
+small, self-contained example of such a post-processing.
