@@ -1,7 +1,26 @@
 from __future__ import annotations
 
+import os
+import subprocess
+from pathlib import Path
+
 import pytest
 from remage import remage_run
+
+
+def _tendl_data_dir() -> str | None:
+    """Return the G4TENDL directory in the same way as Geant4, or None."""
+    path = os.environ.get("G4PARTICLEHPDATA")
+    if path is None:
+        datasets = subprocess.run(
+            ["geant4-config", "--datasets"], capture_output=True, text=True, check=True
+        ).stdout
+        for line in datasets.splitlines():
+            fields = line.split()
+            if len(fields) == 3 and fields[1] == "G4PARTICLEHPDATA":
+                path = fields[2]
+    return path if path is not None and Path(path).is_dir() else None
+
 
 # TENDL only holds data for these five projectiles.
 PARTICLES = ["proton", "deuteron", "triton", "He3", "alpha"]
@@ -51,6 +70,8 @@ def _inelastic_models(capfd, physics_list, use_tendl):
     return models
 
 
+# some Geant4 installations (e.g. conda-forge) do not include the optional G4TENDL data set.
+@pytest.mark.skipif(_tendl_data_dir() is None, reason="G4TENDL data set not installed")
 @pytest.mark.parametrize("physics_list", PHYSICS_LISTS)
 def test_tendl_is_used_for_all_physics_lists(capfd, physics_list):
     """ParticleHP must replace the default model of every hadronic physics option.

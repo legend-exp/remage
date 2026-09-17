@@ -16,7 +16,6 @@
 #include "RMGPhysics.hh"
 
 #include <algorithm>
-#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -38,6 +37,7 @@
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "G4EnvironmentUtils.hh"
 #include "G4Gamma.hh"
 #include "G4HadronElasticPhysicsHP.hh"
 #include "G4HadronElasticProcess.hh"
@@ -341,6 +341,15 @@ void RMGPhysics::ConstructProcess() {
     RMGLog::Out(RMGLog::detail, "Adding ion physics");
     G4VPhysicsConstructor* ionPhysics = nullptr;
     if (fUseTENDLLightIons) {
+      // Geant4 aborts with an unclear exception if the TENDL data is missing
+      const auto* tendl_dir = G4FindDataDir("G4PARTICLEHPDATA");
+      if (!tendl_dir || !std::filesystem::is_directory(tendl_dir)) {
+        RMGLog::Out(
+            RMGLog::fatal,
+            "EnableTENDLLightIons needs the G4TENDL data set, but it was not found. Install it ",
+            "or set G4PARTICLEHPDATA to its directory."
+        );
+      }
       // this covers the deuteron, triton, He3 and alpha with the TENDL data below 200 MeV
       ionPhysics = new G4IonPhysicsPHP(G4VModularPhysicsList::verboseLevel);
     } else {
