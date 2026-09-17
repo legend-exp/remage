@@ -431,6 +431,20 @@ useful information for computing observables of interest we have implemented
 step clustering routines. These routines combine together steps that are very
 close together.
 
+:::{figure} ../_img/clustering-event89.png
+
+Microscopic view of simulated steps in a germanium volume, after Compton
+scattering of a gamma (bottom left). Without clustering (a), many small steps of
+the secondary electrons and of secondary low-energy bremsstrahlung gammas are
+visible. The markers are the post-step points, with an area proportional to the
+energy deposited in the step leading to them. With clustering (b, default
+settings), these low-energy depositions are merged into fewer steps of higher
+energy each, preserving their locality. The number of secondary tracks and their
+particle type are not necessarily preserved: here the bremsstrahlung track is
+merged into one of the electron tracks.
+
+:::
+
 :::{important}
 
 Step clustering has a large impact on the size of the output files and, through

@@ -2,7 +2,7 @@
 file(
   GLOB _aux
   RELATIVE ${PROJECT_SOURCE_DIR}
-  macros/*.mac config/*.yaml *.py gdml/*)
+  macros/*.mac *.py gdml/*)
 
 # copy them to the build area
 foreach(_file ${_aux})

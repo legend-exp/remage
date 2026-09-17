@@ -108,6 +108,21 @@ As a rule of thumb, the threading mode is the better choice when memory is the
 limiting resource, while the multi-processing mode gives better overall
 throughput otherwise.
 
+:::{figure} ../_img/speedup_log.png
+
+Speedup factor of the simulated event rate as a function of the number of
+parallel threads or processes, for a germanium box in liquid argon with both
+volumes registered as sensitive. Primaries were 1 MeV electrons (left) and
+gammas (right), generated with the general particle source without confinement,
+with the same number of primaries per worker. The benchmark ran on a node with
+two AMD EPYC 7763 CPUs (128 physical cores) writing to flash storage. Both modes
+scale linearly at first: multi-processing slows down around the number of
+physical cores, when entering the hyper-threaded regime, while multithreading
+saturates earlier, at a point that depends on the setup and the primary
+particle.
+
+:::
+
 :::{warning}
 
 In the current design, a macro executed with multiple processes will simulate
@@ -129,6 +144,18 @@ command prompt is opened after macro execution:
 $ remage -i -g setup.gdml -- run.mac
 remage>
 ```
+
+:::{tip}
+
+The type of Geant4 user interface is chosen automatically, and a graphical
+session might be started if `DISPLAY` is set. To always get a plain terminal
+prompt, set the `G4UI_USE_TCSH` environment variable:
+
+```console
+$ G4UI_USE_TCSH=1 remage -i -g setup.gdml -- run.mac
+```
+
+:::
 
 ## Executing commands in batch mode
 

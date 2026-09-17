@@ -9,8 +9,9 @@ import time
 from multiprocessing import Pool
 from pathlib import Path
 
-import dbetto
-from reboost.build_hit import build_hit
+# the post-processing is shared with the observables-ge test, the file is copied
+# into this directory by CMake
+from build_hit import build_hit
 from remage import remage_run
 
 rmg = sys.argv[1] if len(sys.argv) > 1 else None
@@ -19,8 +20,8 @@ n_events = 20000 * n_proc * (2 if n_proc > 1 else 1)
 
 # the step files of this scan are large (a run without pre-clustering writes
 # ~2.7 kB/event) and are only needed to build the hit files, so they are
-# deleted as soon as reboost is done with them. Set RMG_KEEP_STP=1 to keep
-# them around for debugging.
+# deleted as soon as the post-processing is done with them. Set RMG_KEEP_STP=1
+# to keep them around for debugging.
 keep_stp = os.environ.get("RMG_KEEP_STP", "") not in ("", "0")
 
 # the germanium pre-clustering settings scanned here. ``None`` always means
@@ -65,7 +66,7 @@ def replace_lines(
             f.write(line_t)
 
 
-def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yaml"):
+def run_pproc(generator_name, name, val):
     path = f"{generator_name}/{name}/max_{val}/"
 
     # directories
@@ -75,19 +76,7 @@ def run_reboost(generator_name, name, val, reboost_config="config/hit_config.yam
     # make the directories
     hit_directory.mkdir(parents=True, exist_ok=True)
 
-    stp_files = [f"{stp_directory}/out.lh5"]
-    hit_files = [f"{hit_directory}/out.lh5"]
-
-    args = dbetto.AttrsDict({"gdml": "gdml/geometry.gdml"})
-    _, _ = build_hit(
-        reboost_config,
-        args=args,
-        stp_files=stp_files,
-        glm_files=None,
-        hit_files=hit_files,
-        buffer=10_000_000,
-        overwrite=True,
-    )
+    build_hit(f"{stp_directory}/out.lh5", f"{hit_directory}/out.lh5")
 
 
 def run_sim(generator_name="", name="", val="0", cluster="", generator=""):
@@ -203,12 +192,7 @@ def run_sim_and_pproc(job):
     )
 
     # post-process it
-    run_reboost(
-        generator_name=generator,
-        name=name,
-        val=val,
-        reboost_config="config/hit_config.yaml",
-    )
+    run_pproc(generator_name=generator, name=name, val=val)
 
     # the output size has already been recorded in timing.json above, so the
     # step file can go: keeping all of them fills up the CI runner's disk
