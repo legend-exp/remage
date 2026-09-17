@@ -87,8 +87,8 @@ def test_tendl_is_used_for_all_physics_lists(capfd, physics_list):
         )
 
 
-def test_default_models_are_kept_without_the_command(capfd):
-    """The command must be the only way to get ParticleHP for these particles."""
+def test_models_are_kept_when_tendl_is_disabled(capfd):
+    """Disabling the command must keep the default inelastic models for these particles."""
     models = _inelastic_models(capfd, PHYSICS_LISTS[0], use_tendl=False)
 
     for particle in PARTICLES:
