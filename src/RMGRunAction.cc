@@ -75,11 +75,14 @@ void RMGRunAction::SetupAnalysisManager() {
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
   ana_man->SetNtupleDirectoryName(rmg_man->GetOutputNtupleDirectory());
 
-  // inform downstream consumers about the ntuples directory
+  // inform downstream consumers about the ntuples directory and the group the output is stored in
   if (this->IsMaster()) {
     RMGIpc::SendIpcNonBlocking(
         RMGIpc::CreateMessage("ntuple_output_directory", rmg_man->GetOutputNtupleDirectory())
     );
+    if (!rmg_man->GetOutputGroup().empty()) {
+      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_group", rmg_man->GetOutputGroup()));
+    }
   }
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
@@ -407,7 +410,8 @@ void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primarie
       rmg_man->GetNtupleIDs(),
       false,
       false,
-      number_of_primaries
+      number_of_primaries,
+      rmg_man->GetOutputGroup()
   );
   if (!result) {
     RMGLog::Out(

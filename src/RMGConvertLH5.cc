@@ -300,6 +300,16 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   }
   LH5Log(RMGLog::debug, "opened Geant4 HDF5 file ", fHdf5FileName);
 
+  // if requested, move everything from the file root into a group.
+  std::string output_group_path;
+  if (!fOutputGroupName.empty()) {
+    LH5Log(RMGLog::debug, "storing output in group ", fOutputGroupName);
+    output_group_path = fOutputGroupName + "/";
+    hfile.createGroup(fOutputGroupName);
+    hfile.moveLink(ntuple_group_name, output_group_path + ntuple_group_name);
+    ntuple_group_name = output_group_path + ntuple_group_name;
+  }
+
   // rework the ntuples to LGDO tables.
   auto ntuples_group = hfile.openGroup(ntuple_group_name);
   auto ntuples = GetChildren(ntuples_group);
@@ -352,7 +362,10 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
     // if this is an auxiliary table, move it one level up out of the group
     if (fAuxNtuples.contains(ntuple)) {
       LH5Log(RMGLog::debug, "moving ntuple ", ntuple_group_name, "/", ntuple, " one group back");
-      hfile.moveLink(std::string(ntuple_group_name).append("/").append(ntuple), ntuple);
+      hfile.moveLink(
+          std::string(ntuple_group_name).append("/").append(ntuple),
+          output_group_path + ntuple
+      );
     }
   }
 
@@ -365,8 +378,8 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   if (ntuples.empty()) hfile.unlink(ntuple_group_name);
   else {
     if (fEventCount > 0) {
-      CreateUIntDataset(hfile, n_ev_name, fEventCount);
-      auto n_ev_dset = hfile.openDataSet(n_ev_name);
+      CreateUIntDataset(hfile, output_group_path + n_ev_name, fEventCount);
+      auto n_ev_dset = hfile.openDataSet(output_group_path + n_ev_name);
       SetStringAttribute(n_ev_dset, "datatype", "real");
       n_ev_dset.close();
     }
@@ -426,7 +439,8 @@ bool RMGConvertLH5::ConvertToLH5(
     const std::map<int, std::pair<int, std::string>>& ntuple_meta,
     bool dry_run,
     bool part_of_batch,
-    int n_ev
+    int n_ev,
+    std::string output_group
 ) {
   auto conv = RMGConvertLH5(
       hdf5_file_name,
@@ -435,7 +449,8 @@ bool RMGConvertLH5::ConvertToLH5(
       ntuple_meta,
       dry_run,
       part_of_batch,
-      n_ev
+      n_ev,
+      output_group
   );
   try {
     return conv.ConvertToLH5Internal();

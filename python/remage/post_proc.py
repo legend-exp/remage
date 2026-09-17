@@ -44,6 +44,8 @@ def post_proc(
     main_output_file: str | None = ipc_info.get_single("output_main")
     overwrite_output: bool = ipc_info.get_single("overwrite_output", "0") == "1"
     det_tables_path: str | None = ipc_info.get_single("ntuple_output_directory")
+    # the whole output can be stored in a group instead of the file root
+    output_group: str = ipc_info.get_single("output_group") or ""
 
     ipc_info.remove("output_main")
 
@@ -51,6 +53,9 @@ def post_proc(
         return
 
     assert det_tables_path is not None
+
+    group_path = output_group + "/" if output_group else ""
+    det_tables_path = group_path + det_tables_path
 
     output_file_exts = {
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
@@ -84,7 +89,9 @@ def post_proc(
     lh5_links_group_name: str = (
         det_tables_path + "/" + ipc_info.get("lh5_links_group_name")[0]
     )
-    lh5_event_number_name: str = "/" + ipc_info.get("lh5_event_number_name")[0]
+    lh5_event_number_name: str = (
+        "/" + group_path + ipc_info.get("lh5_event_number_name")[0]
+    )
 
     time_start = time.time()
 
@@ -123,7 +130,9 @@ def post_proc(
         # additional (non-detector) tables in the output file, forwarded as-is
         extra_tables = list(
             dict.fromkeys(
-                table for tables in detector_info_aux.values() for table in tables
+                group_path + table
+                for tables in detector_info_aux.values()
+                for table in tables
             )
         )
 
@@ -151,7 +160,7 @@ def post_proc(
             )
 
         # add a time-coincidence map to the output file(s)
-        msg = "Computing and storing the TCM as /tcm"
+        msg = f"Computing and storing the TCM as /{group_path}tcm"
         log.info(msg)
 
         for file in utils._to_list(output_files):
@@ -167,6 +176,7 @@ def post_proc(
                     hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
                     coin_windows=[0, time_window_in_us * 1000],
                     out_file=file,
+                    out_name=group_path + "tcm",
                     wo_mode="write_safe",
                 )
 
@@ -201,7 +211,7 @@ def post_proc(
     ntuples_to_deduplicate = set(ipc_info.get("output_ntuple_deduplicate"))
     for file in utils._to_list(output_files):
         for table in ntuples_to_deduplicate:
-            deduplicate_table(file, table, "name", not flat_output)
+            deduplicate_table(file, group_path + table, "name", not flat_output)
 
     msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
     log.info(msg)

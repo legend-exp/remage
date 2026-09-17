@@ -84,6 +84,7 @@ class RMGDefaultCli {
     std::vector<std::string> macros;
     std::vector<std::string> macro_substitutions;
     std::string output;
+    std::string output_group;
     RMGLog::LogLevel loglevel = RMGLog::summary;
 };
 

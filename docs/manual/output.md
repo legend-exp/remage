@@ -698,6 +698,18 @@ structures or adding useful information.
 
 :::
 
+### Storing the output in a group
+
+By default, all output is written at the root of the LH5 file. The
+`--output-group` command line option stores it in a group instead:
+
+```
+remage --output-group sim -o OUTPUT.lh5 ...
+```
+
+writes the stepping tables to `/sim/stp`, the vertex table to `/sim/vtx`, the
+time-coincidence map to `/sim/tcm`, and so on.
+
 ### Reshaping output tables
 
 An event, in an actual experiment, is defined as the set of signals falling

@@ -91,6 +91,11 @@ class RMGOutputManager {
      */
     const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
     /**
+     * @brief Gets the LH5 group the whole output is stored in.
+     * @return Reference to the group name, empty if the output is stored in the file root.
+     */
+    const std::string& GetOutputGroup() { return fOutputGroup; }
+    /**
      * @brief Checks if output ntuples are generated per detector.
      * @return true if ntuples are generated per detector.
      */
@@ -139,6 +144,12 @@ class RMGOutputManager {
      * @param dir The directory name for ntuple output.
      */
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
+    /**
+     * @brief Stores the whole output in the given LH5 group, instead of the file root.
+     * @details this is only used by the LH5 output format.
+     * @param name The group name.
+     */
+    void SetOutputGroup(std::string name) { fOutputGroup = name; }
 
     /**
      * @brief Registers an alreaday created ntuple for a given detector.
@@ -214,6 +225,7 @@ class RMGOutputManager {
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
+    std::string fOutputGroup;
 
     /** @brief Mapping of detector UIDs assigned by remage to the Geant4 ntuple
      * IDs and the ntuple names (written to disk).

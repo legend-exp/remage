@@ -93,6 +93,12 @@ void RMGDefaultCli::SetupCli(CLI::App& app) {
   )
       ->type_name("FILE");
   app.add_option("-o,--output-file", output, "Output file for detector hits")->type_name("FILE");
+  app.add_option(
+         "--output-group",
+         output_group,
+         "Store the whole output in the /NAME group of the LH5 file, instead of its root"
+  )
+      ->type_name("NAME");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
   app.add_option(
          "--pipe-o-fd",
@@ -202,6 +208,7 @@ void RMGDefaultCli::SetupOutput(RMGManager& manager) {
 
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
   if (!output.empty()) manager.GetOutputManager()->SetOutputFileName(output);
+  manager.GetOutputManager()->SetOutputGroup(output_group);
 }
 
 void RMGDefaultCli::SetupGeometry(RMGManager& manager) {
