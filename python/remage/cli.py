@@ -239,6 +239,8 @@ def remage_run(
     threads: int = 1,
     procs: int = 1,
     overwrite_output: bool = False,
+    append_output: bool = False,
+    output_group: str | None = None,
     merge_output_files: bool = False,
     flat_output: bool = False,
     time_window: float | None = None,
@@ -267,6 +269,11 @@ def remage_run(
         `threads`.
     overwrite_output
         overwrite existing output files.
+    append_output
+        Add the output to existing output files, keeping the objects this run does not
+        write.
+    output_group
+        Store the whole output in the /NAME group of the LH5 file, instead of its root.
     merge_output_files
         merge output files created by individual remage threads.
     flat_output
@@ -339,6 +346,11 @@ def remage_run(
 
     if overwrite_output:
         args.append("--overwrite")
+    if append_output:
+        args.append("--append")
+
+    if output_group is not None:
+        args.append(f"--output-group={output_group}")
 
     if macro_substitutions is not None:
         for subst_k, subst_v in macro_substitutions.items():
