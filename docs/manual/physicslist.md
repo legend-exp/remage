@@ -371,7 +371,7 @@ package, see {doc}`pygeomtools:region`.
     [Shielding](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/html/reference_PL/Shielding.html)
     physics list docs.
 
-[^LEND]
+[^LEND]:
     see the
     [LEND](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsReferenceManual/html/hadronic/LEND/lend.html)
     page in the physlics reference manual.
