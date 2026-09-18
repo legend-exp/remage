@@ -428,7 +428,17 @@ void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primarie
   // example simulations with a different output group can be added to it.
   if (rmg_man->GetOutputAppendToFiles() && fs::exists(worker_lh5)) {
     RMGLog::Out(RMGLog::detail, "Adding output to the existing file ", worker_lh5.string());
-    RMGConvertLH5::CopyMissingObjects(worker_lh5.string(), worker_tmp.string());
+    if (!RMGConvertLH5::CopyMissingObjects(worker_lh5.string(), worker_tmp.string())) {
+      RMGLog::Out(
+          RMGLog::error,
+          "Copying existing objects from ",
+          worker_lh5.string(),
+          " to ",
+          worker_tmp.string(),
+          " to LH5 failed. Data is potentially corrupted."
+      );
+      return;
+    }
   }
 #else
   RMGLog::OutDev(RMGLog::fatal, "HDF5 and LH5 support is not available!");
