@@ -66,6 +66,9 @@ class RMGPhysics : public G4VModularPhysicsList {
       kQGSP_BERT_HP,
       kFTFP_BERT_HP,
       kShielding,
+      kShieldingLEND,
+      kFTFP_INCLXX_HP,
+      kQGSP_INCLXX_HP,
       kNone
     };
 
@@ -143,6 +146,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     bool fUseOpticalCustomWLS = true;
     bool fUseNeutronThermalScattering = false;
     bool fUseGrabmayrGammaCascades = false;
+    bool fUseAblaDeExcitation = false;
     bool fUseInnerBremsstrahlung = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
     HadronicPhysicsListOption fHadronicPhysicsListOption = HadronicPhysicsListOption::kNone;
