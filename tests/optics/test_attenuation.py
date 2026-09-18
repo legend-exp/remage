@@ -101,6 +101,7 @@ def simulate(distance_mm: float, label, setup):
         output=output,
         overwrite_output=True,
         log_level="summary",
+        raise_on_warning=True,
     )
 
     return output
