@@ -60,7 +60,8 @@ def reshape_output(
     forward_tables
         auxiliary tables to forward to the output unchanged.
     out_field
-        lh5 group under which reshaped detector tables are written.
+        lh5 group holding the detector tables, both in the input and in the
+        output files.
     time_window_in_us
         coincidence time window in microseconds for hit grouping.
     flat_hit_tables
@@ -94,7 +95,7 @@ def reshape_output(
         n_det_written = 0
 
         for detector in reshape_tables:
-            table = f"stp/{detector}"
+            table = f"{out_field}/{detector}"
             if lh5.ls(stp_file, table) == []:
                 continue
 
@@ -128,7 +129,7 @@ def reshape_output(
                 n_det_written += 1
 
         for detector in flat_hit_tables:
-            table = f"stp/{detector}"
+            table = f"{out_field}/{detector}"
             if lh5.ls(stp_file, table) == []:
                 continue
 

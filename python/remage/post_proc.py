@@ -43,7 +43,10 @@ def post_proc(
     remage_files: list[str] = ipc_info.get("output")
     main_output_file: str | None = ipc_info.get_single("output_main")
     overwrite_output: bool = ipc_info.get_single("overwrite_output", "0") == "1"
+    append_output: bool = ipc_info.get_single("append_output", "0") == "1"
     det_tables_path: str | None = ipc_info.get_single("ntuple_output_directory")
+    # the whole output can be stored in a group instead of the file root
+    output_group: str = ipc_info.get_single("output_group") or ""
 
     ipc_info.remove("output_main")
 
@@ -51,6 +54,9 @@ def post_proc(
         return
 
     assert det_tables_path is not None
+
+    group_path = output_group + "/" if output_group else ""
+    det_tables_path = group_path + det_tables_path
 
     output_file_exts = {
         Path(p).suffix.lower() for p in [*remage_files, main_output_file]
@@ -84,13 +90,26 @@ def post_proc(
     lh5_links_group_name: str = (
         det_tables_path + "/" + ipc_info.get("lh5_links_group_name")[0]
     )
-    lh5_event_number_name: str = "/" + ipc_info.get("lh5_event_number_name")[0]
+    lh5_event_number_name: str = (
+        "/" + group_path + ipc_info.get("lh5_event_number_name")[0]
+    )
 
     time_start = time.time()
 
     # if merging is on, write everything to a single file
     output_files: list[str] | str = (
         remage_files if not merge_output_files else main_output_file
+    )
+
+    # the merged output file is written from scratch, so hide it as well to be able to keep
+    # the objects it already contains
+    pre_existing: list[str] = (
+        [main_output_file]
+        if merge_output_files
+        and append_output
+        and main_output_file not in remage_files
+        and Path(main_output_file).exists()
+        else []
     )
 
     if not flat_output:
@@ -123,11 +142,16 @@ def post_proc(
         # additional (non-detector) tables in the output file, forwarded as-is
         extra_tables = list(
             dict.fromkeys(
-                table for tables in detector_info_aux.values() for table in tables
+                group_path + table
+                for tables in detector_info_aux.values()
+                for table in tables
             )
         )
 
-        with tmp_renamed_files(remage_files) as original_files:
+        with (
+            tmp_renamed_files(remage_files) as original_files,
+            tmp_renamed_files(pre_existing) as pre_existing_files,
+        ):
             # post-process outputs: reshape detector tables by time-grouping,
             # forward calorimeter tables as flat hits and auxiliary tables
             # unchanged
@@ -150,24 +174,30 @@ def post_proc(
                 original_files, output_files, lh5_event_number_name
             )
 
-        # add a time-coincidence map to the output file(s)
-        msg = "Computing and storing the TCM as /tcm"
-        log.info(msg)
+            # add a time-coincidence map to the output file(s)
+            msg = f"Computing and storing the TCM as /{group_path}tcm"
+            log.info(msg)
 
-        for file in utils._to_list(output_files):
-            # do not compute the TCM if there are no stepping tables
-            if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
-                # use tables keyed by UID in the __by_uid__ group.  in this way, the
-                # TCM will index tables by UID.  the coincidence criterium is based
-                # on Geant4 event identifier and time of the hits
-                # NOTE: uses the same time window as in reshape_output() reshaping
-                pygama.evt.build_tcm(
-                    [(file, rf"{lh5_links_group_name}/*")],  # input_tables
-                    ["evtid", "t0"],  # coin_cols
-                    hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
-                    coin_windows=[0, time_window_in_us * 1000],
-                    out_file=file,
-                    wo_mode="write_safe",
+            for file in utils._to_list(output_files):
+                # do not compute the TCM if there are no stepping tables
+                if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
+                    # use tables keyed by UID in the __by_uid__ group.  in this way, the
+                    # TCM will index tables by UID.  the coincidence criterium is based
+                    # on Geant4 event identifier and time of the hits
+                    # NOTE: uses the same time window as in reshape_output() reshaping
+                    pygama.evt.build_tcm(
+                        [(file, rf"{lh5_links_group_name}/*")],  # input_tables
+                        ["evtid", "t0"],  # coin_cols
+                        hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
+                        coin_windows=[0, time_window_in_us * 1000],
+                        out_file=file,
+                        out_name=group_path + "tcm",
+                        wo_mode="write_safe",
+                    )
+
+            if append_output:
+                copy_untouched_objects(
+                    [*pre_existing_files, *original_files], output_files
                 )
 
         # set the output file(s) for downstream consumers.
@@ -177,7 +207,10 @@ def post_proc(
         msg = "Merging output files"
         log.info(msg)
 
-        with tmp_renamed_files(remage_files) as original_files:
+        with (
+            tmp_renamed_files(remage_files) as original_files,
+            tmp_renamed_files(pre_existing) as pre_existing_files,
+        ):
             lh5concat(
                 lh5_files=original_files,
                 output=main_output_file,
@@ -194,6 +227,10 @@ def post_proc(
             update_number_of_simulated_events(
                 original_files, output_files, lh5_event_number_name
             )
+            if append_output:
+                copy_untouched_objects(
+                    [*pre_existing_files, *original_files], main_output_file
+                )
 
         ipc_info.set("output", main_output_file)
 
@@ -201,7 +238,7 @@ def post_proc(
     ntuples_to_deduplicate = set(ipc_info.get("output_ntuple_deduplicate"))
     for file in utils._to_list(output_files):
         for table in ntuples_to_deduplicate:
-            deduplicate_table(file, table, "name", not flat_output)
+            deduplicate_table(file, group_path + table, "name", not flat_output)
 
     msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
     log.info(msg)
@@ -233,6 +270,39 @@ def copy_links(
                         msg = f"removing broken symlink {link_name} -> {link.path}"
                         log.debug(msg)
                         del links_group[link_name]
+
+
+def copy_untouched_objects(
+    original_files: list[str], output_files: str | list[str]
+) -> None:
+    """Copy the objects that the current run did not write to the output files.
+
+    Objects that are already in an output file are left untouched, i.e. the new data wins over
+    the data that was already in the file.
+    """
+    output_files = utils._to_list(output_files)
+    original_files = utils._to_list(original_files)
+
+    # we can either handle the case of one single output file, or the same number of input/output files.
+    if len(output_files) != len(original_files):
+        assert len(output_files) == 1
+        output_files = output_files * len(original_files)
+
+    for f_in, f_out in zip(original_files, output_files, strict=True):
+        with h5py.File(f_in, "r") as inf, h5py.File(f_out, "a") as ouf:
+            for name in inf:
+                if name in ouf:
+                    continue
+                msg = f"copying {name} from {f_in} to {f_out}"
+                log.debug(msg)
+                inf.copy(
+                    name,
+                    ouf,
+                    name,
+                    expand_soft=False,  # do _not_ follow soft-links; preserve them
+                    expand_external=False,  # likewise for external links
+                    expand_refs=False,  # likewise for object-reference datasets
+                )
 
 
 def update_number_of_simulated_events(

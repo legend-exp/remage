@@ -53,6 +53,7 @@ class RMGConvertLH5 {
      * @param dry_run If true, the conversion is performed in-memory without writing to disk.
      * @param part_of_batch Indicates if this conversion is part of a batch operation.
      * @param n_ev number of events to write as an additional attribute into the file.
+     * @param output_group group the whole output is moved into; empty to keep it in the file root.
      *
      * @return True if the conversion is successful, false otherwise.
      */
@@ -63,8 +64,22 @@ class RMGConvertLH5 {
         const std::map<int, std::pair<int, std::string>>&,
         bool,
         bool part_of_batch = false,
-        int n_ev = -1
+        int n_ev = -1,
+        std::string output_group = ""
     );
+    /**
+     * @brief Copy the top-level objects of an LH5 file into another one.
+     *
+     * Objects already present in the destination file are not copied, i.e. the contents of the
+     * destination file win over the ones of the source file.
+     *
+     * @param src_file_name The file to copy from.
+     * @param dst_file_name The file to copy into.
+     *
+     * @return True if all objects could be copied, false otherwise.
+     */
+    static bool CopyMissingObjects(std::string src_file_name, std::string dst_file_name);
+
     /**
      * @brief Convert an LH5 input file to HDF5 format.
      *
@@ -98,11 +113,12 @@ class RMGConvertLH5 {
         const std::map<int, std::pair<int, std::string>>& ntuple_meta,
         bool dry_run,
         bool part_of_batch,
-        int n_ev
+        int n_ev,
+        std::string output_group = ""
     )
         : fHdf5FileName(filename), fNtupleGroupName(ntuple_group), fAuxNtuples(aux_ntuples),
           fNtupleMeta(ntuple_meta), fDryRun(dry_run), fIsPartOfBatch(part_of_batch),
-          fEventCount(n_ev) {};
+          fEventCount(n_ev), fOutputGroupName(output_group) {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,6 +186,7 @@ class RMGConvertLH5 {
     bool fDryRun;
     bool fIsPartOfBatch;
     int fEventCount = -1;
+    std::string fOutputGroupName;
 };
 
 #endif

@@ -698,6 +698,23 @@ structures or adding useful information.
 
 :::
 
+### Storing the output in a group
+
+By default, all output is written at the root of the LH5 file. The
+`--output-group` command line option stores it in a group instead:
+
+```
+remage --output-group sim -o OUTPUT.lh5 ...
+```
+
+writes the stepping tables to `/sim/stp`, the vertex table to `/sim/vtx`, the
+time-coincidence map to `/sim/tcm`, and so on.
+
+With `--append` (or `-a`), a simulation can be added to a file that already
+exists: only the objects at the top level of the file that the run writes are
+replaced, the others are kept. Running the example above a second time with
+`--output-group sim2 -a` therefore keeps `/sim` and adds `/sim2`.
+
 ### Reshaping output tables
 
 An event, in an actual experiment, is defined as the set of signals falling

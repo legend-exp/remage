@@ -39,5 +39,9 @@ list(TRANSFORM _macros PREPEND "output-mp/hdf5-" OUTPUT_VARIABLE _macros_hdf5)
 set_tests_properties(${_macros_hdf5} PROPERTIES LABELS "mt;extra" PROCESSORS 2)
 
 # SPECIAL TESTS
+add_test(NAME output/output-group COMMAND ./run-test-output-group.sh ${REMAGE_PYEXE} ${PYTHONPATH}
+                                          ntuple-per-det.mac)
+set_tests_properties(output/output-group PROPERTIES LABELS extra)
+
 add_test(NAME output/th228-chain COMMAND ${PYTHONPATH} run-test-th228-chain.py)
 set_tests_properties(output/th228-chain PROPERTIES LABELS extra)

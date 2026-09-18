@@ -38,7 +38,11 @@ The most useful options include:
   with `-P/--procs`).
 - `-P, --procs` – number of worker processes to use (this cannot be combined
   with `-t/--threads`).
+- `--output-group` – store the whole output in the given group of the LH5 file,
+  instead of its root (see {ref}`manual-output`).
 - `-w, --overwrite` – overwrite an existing output file.
+- `-a, --append` – add the output to an existing output file, keeping the
+  objects that the run does not write (see {ref}`manual-output`).
 - `-q, --quiet`/`-v, --verbose`/`-l, --log-level` – control the verbosity.
   Logging levels are `debug`, `detail`, `summary`, `warning`, `error`, `fatal`,
   and `nothing` (e.g. `-l debug`).

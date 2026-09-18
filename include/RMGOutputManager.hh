@@ -86,10 +86,20 @@ class RMGOutputManager {
      */
     [[nodiscard]] bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
     /**
+     * @brief Indicates whether the output should be added to existing output files.
+     * @return true if appending is enabled.
+     */
+    [[nodiscard]] bool GetOutputAppendToFiles() const { return fOutputAppendToFiles; }
+    /**
      * @brief Gets the directory name for output ntuples.
      * @return Reference to the ntuple directory name.
      */
     const std::string& GetOutputNtupleDirectory() { return fOutputNtupleDirectory; }
+    /**
+     * @brief Gets the LH5 group the whole output is stored in.
+     * @return Reference to the group name, empty if the output is stored in the file root.
+     */
+    const std::string& GetOutputGroup() { return fOutputGroup; }
     /**
      * @brief Checks if output ntuples are generated per detector.
      * @return true if ntuples are generated per detector.
@@ -134,11 +144,24 @@ class RMGOutputManager {
      */
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
     /**
+     * @brief Configures whether the output should be added to existing output files.
+     * @details objects that this run does not write are kept. This is only used by the LH5
+     * output format.
+     * @param append True to add to existing files, false otherwise.
+     */
+    void SetOutputAppendToFiles(bool append) { fOutputAppendToFiles = append; }
+    /**
      * @brief Sets the directory for output ntuples.
      * @details this might not be used by all output file formats.
      * @param dir The directory name for ntuple output.
      */
     void SetOutputNtupleDirectory(std::string dir) { fOutputNtupleDirectory = dir; }
+    /**
+     * @brief Stores the whole output in the given LH5 group, instead of the file root.
+     * @details this is only used by the LH5 output format.
+     * @param name The group name.
+     */
+    void SetOutputGroup(std::string name) { fOutputGroup = name; }
 
     /**
      * @brief Registers an alreaday created ntuple for a given detector.
@@ -211,9 +234,11 @@ class RMGOutputManager {
     std::string fOutputFile;
     bool fIsPersistencyEnabled = true;
     bool fOutputOverwriteFiles = false;
+    bool fOutputAppendToFiles = false;
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";
+    std::string fOutputGroup;
 
     /** @brief Mapping of detector UIDs assigned by remage to the Geant4 ntuple
      * IDs and the ntuple names (written to disk).

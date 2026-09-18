@@ -75,11 +75,14 @@ void RMGRunAction::SetupAnalysisManager() {
   // otherwise the ntuples get placed in /default_ntuples (at least with HDF5 output)
   ana_man->SetNtupleDirectoryName(rmg_man->GetOutputNtupleDirectory());
 
-  // inform downstream consumers about the ntuples directory
+  // inform downstream consumers about the ntuples directory and the group the output is stored in
   if (this->IsMaster()) {
     RMGIpc::SendIpcNonBlocking(
         RMGIpc::CreateMessage("ntuple_output_directory", rmg_man->GetOutputNtupleDirectory())
     );
+    if (!rmg_man->GetOutputGroup().empty()) {
+      RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_group", rmg_man->GetOutputGroup()));
+    }
   }
 
   if (RMGLog::GetLogLevel() <= RMGLog::debug) ana_man->SetVerboseLevel(10);
@@ -335,7 +338,8 @@ RMGRunAction::OutputFilePaths RMGRunAction::BuildOutputFile() const {
     );
   }
   auto path_for_overwrite = fs::path(GetWorkerTmpPath(path, path.extension().string()));
-  if (fs::exists(path_for_overwrite) && !rmg_man->GetOutputOverwriteFiles()) {
+  if (fs::exists(path_for_overwrite) && !rmg_man->GetOutputOverwriteFiles() &&
+      !rmg_man->GetOutputAppendToFiles()) {
     RMGLog::Out(RMGLog::fatal, "Output file ", path_for_overwrite.string(), " does already exists.");
   }
 
@@ -407,7 +411,8 @@ void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primarie
       rmg_man->GetNtupleIDs(),
       false,
       false,
-      number_of_primaries
+      number_of_primaries,
+      rmg_man->GetOutputGroup()
   );
   if (!result) {
     RMGLog::Out(
@@ -417,6 +422,23 @@ void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primarie
         " to LH5 failed. Data is potentially corrupted."
     );
     return;
+  }
+
+  // if we are adding to the output file, keep the objects it already contains, so that for
+  // example simulations with a different output group can be added to it.
+  if (rmg_man->GetOutputAppendToFiles() && fs::exists(worker_lh5)) {
+    RMGLog::Out(RMGLog::detail, "Adding output to the existing file ", worker_lh5.string());
+    if (!RMGConvertLH5::CopyMissingObjects(worker_lh5.string(), worker_tmp.string())) {
+      RMGLog::Out(
+          RMGLog::error,
+          "Copying existing objects from ",
+          worker_lh5.string(),
+          " to ",
+          worker_tmp.string(),
+          " to LH5 failed. Data is potentially corrupted."
+      );
+      return;
+    }
   }
 #else
   RMGLog::OutDev(RMGLog::fatal, "HDF5 and LH5 support is not available!");

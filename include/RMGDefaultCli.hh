@@ -78,12 +78,14 @@ class RMGDefaultCli {
     int rand_seed = -1;
     bool interactive = false;
     bool overwrite_output = false;
+    bool append_output = false;
     int pipe_fd_out = -1, pipe_fd_in = -1;
     int proc_num_offset = -1;
     std::vector<std::string> gdmls;
     std::vector<std::string> macros;
     std::vector<std::string> macro_substitutions;
     std::string output;
+    std::string output_group;
     RMGLog::LogLevel loglevel = RMGLog::summary;
 };
 
