@@ -68,6 +68,19 @@ class RMGConvertLH5 {
         std::string output_group = ""
     );
     /**
+     * @brief Copy the top-level objects of an LH5 file into another one.
+     *
+     * Objects already present in the destination file are not copied, i.e. the contents of the
+     * destination file win over the ones of the source file.
+     *
+     * @param src_file_name The file to copy from.
+     * @param dst_file_name The file to copy into.
+     *
+     * @return True if all objects could be copied, false otherwise.
+     */
+    static bool CopyMissingObjects(std::string src_file_name, std::string dst_file_name);
+
+    /**
      * @brief Convert an LH5 input file to HDF5 format.
      *
      * This function converts the specified LH5 file to HDF5 format suitable for reading

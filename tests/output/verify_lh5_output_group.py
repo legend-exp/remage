@@ -25,19 +25,20 @@ def get_paths(file: str) -> dict[str, str | None]:
 
 
 plain = get_paths(plain_file)
-grouped = get_paths(grouped_file)
 
-# the grouped file must hold the same objects, just one level deeper
-expected = {group: None} | {
-    f"{group}/{name}": (f"/{group}{target}" if target is not None else None)
-    for name, target in plain.items()
+# the group must hold the same objects as the whole plain file, just one level deeper
+in_group = {
+    name.removeprefix(group + "/"): (
+        target.removeprefix("/" + group) if target is not None else None
+    )
+    for name, target in get_paths(grouped_file).items()
+    if name.startswith(group + "/")
 }
 
-if grouped != expected:
+if in_group != plain:
     msg = (
-        f"file {grouped_file} does not hold the contents of {plain_file} "
-        f"in the /{group} group\n"
-        f"missing: {sorted(set(expected) - set(grouped))}\n"
-        f"unexpected: {sorted(set(grouped) - set(expected))}"
+        f"the /{group} group of {grouped_file} does not hold the contents of {plain_file}\n"
+        f"missing: {sorted(set(plain) - set(in_group))}\n"
+        f"unexpected: {sorted(set(in_group) - set(plain))}"
     )
     raise RuntimeError(msg)

@@ -432,6 +432,39 @@ bool RMGConvertLH5::ConvertToLH5Internal() {
   return ntuple_success;
 }
 
+bool RMGConvertLH5::CopyMissingObjects(std::string src_file_name, std::string dst_file_name) {
+  try {
+    H5::H5File src_file(src_file_name, H5F_ACC_RDONLY);
+    H5::H5File dst_file(dst_file_name, H5F_ACC_RDWR);
+    auto src_root = src_file.openGroup("/");
+
+    for (const auto& name : GetChildren(src_root)) {
+      if (dst_file.nameExists(name)) continue;
+
+      // soft links are copied as links (and not expanded), so that they keep pointing to the
+      // objects they were created for.
+      auto copied = H5Ocopy(
+          src_file.getId(),
+          name.c_str(),
+          dst_file.getId(),
+          name.c_str(),
+          H5P_DEFAULT,
+          H5P_DEFAULT
+      );
+      if (copied < 0) {
+        RMGLog::Out(RMGLog::error, "Copying ", name, " from ", src_file_name, " failed");
+        return false;
+      }
+      RMGLog::Out(RMGLog::debug, "copied ", name, " from ", src_file_name, " to ", dst_file_name);
+    }
+  } catch (const H5::Exception& e) {
+    RMGLog::Out(RMGLog::error, e.getDetailMsg());
+    return false;
+  }
+
+  return true;
+}
+
 bool RMGConvertLH5::ConvertToLH5(
     std::string hdf5_file_name,
     std::string ntuple_group_name,

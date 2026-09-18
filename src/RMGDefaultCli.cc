@@ -100,6 +100,12 @@ void RMGDefaultCli::SetupCli(CLI::App& app) {
   )
       ->type_name("NAME");
   app.add_flag("-w,--overwrite", overwrite_output, "Overwrite existing output files");
+  app.add_flag(
+         "-a,--append",
+         append_output,
+         "Add the output to existing output files, keeping the objects this run does not write"
+  )
+      ->excludes("--overwrite");
   app.add_option(
          "--pipe-o-fd",
          pipe_fd_out,
@@ -177,6 +183,7 @@ void RMGDefaultCli::SetupLoggingAndIpc() {
   RMGIpc::Setup(pipe_fd_out, pipe_fd_in, proc_num_offset > 0 ? proc_num_offset : 0);
   // send general-purpose information to the python wrapper.
   RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("overwrite_output", overwrite_output ? "1" : "0"));
+  RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("append_output", append_output ? "1" : "0"));
 }
 
 void RMGDefaultCli::SetupRuntime(RMGManager& manager) {
@@ -207,6 +214,7 @@ void RMGDefaultCli::SetupMacros(RMGManager& manager) {
 void RMGDefaultCli::SetupOutput(RMGManager& manager) {
 
   manager.GetOutputManager()->SetOutputOverwriteFiles(overwrite_output);
+  manager.GetOutputManager()->SetOutputAppendToFiles(append_output);
   if (!output.empty()) manager.GetOutputManager()->SetOutputFileName(output);
   manager.GetOutputManager()->SetOutputGroup(output_group);
 }

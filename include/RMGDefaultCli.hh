@@ -78,6 +78,7 @@ class RMGDefaultCli {
     int rand_seed = -1;
     bool interactive = false;
     bool overwrite_output = false;
+    bool append_output = false;
     int pipe_fd_out = -1, pipe_fd_in = -1;
     int proc_num_offset = -1;
     std::vector<std::string> gdmls;

@@ -86,6 +86,11 @@ class RMGOutputManager {
      */
     [[nodiscard]] bool GetOutputOverwriteFiles() const { return fOutputOverwriteFiles; }
     /**
+     * @brief Indicates whether the output should be added to existing output files.
+     * @return true if appending is enabled.
+     */
+    [[nodiscard]] bool GetOutputAppendToFiles() const { return fOutputAppendToFiles; }
+    /**
      * @brief Gets the directory name for output ntuples.
      * @return Reference to the ntuple directory name.
      */
@@ -138,6 +143,13 @@ class RMGOutputManager {
      * @param overwrite True to enable overwriting, false otherwise.
      */
     void SetOutputOverwriteFiles(bool overwrite) { fOutputOverwriteFiles = overwrite; }
+    /**
+     * @brief Configures whether the output should be added to existing output files.
+     * @details objects that this run does not write are kept. This is only used by the LH5
+     * output format.
+     * @param append True to add to existing files, false otherwise.
+     */
+    void SetOutputAppendToFiles(bool append) { fOutputAppendToFiles = append; }
     /**
      * @brief Sets the directory for output ntuples.
      * @details this might not be used by all output file formats.
@@ -222,6 +234,7 @@ class RMGOutputManager {
     std::string fOutputFile;
     bool fIsPersistencyEnabled = true;
     bool fOutputOverwriteFiles = false;
+    bool fOutputAppendToFiles = false;
     bool fOutputNtuplePerDetector = true;
     bool fOutputNtupleUseVolumeName = false;
     std::string fOutputNtupleDirectory = "stp";

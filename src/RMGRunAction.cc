@@ -338,7 +338,8 @@ RMGRunAction::OutputFilePaths RMGRunAction::BuildOutputFile() const {
     );
   }
   auto path_for_overwrite = fs::path(GetWorkerTmpPath(path, path.extension().string()));
-  if (fs::exists(path_for_overwrite) && !rmg_man->GetOutputOverwriteFiles()) {
+  if (fs::exists(path_for_overwrite) && !rmg_man->GetOutputOverwriteFiles() &&
+      !rmg_man->GetOutputAppendToFiles()) {
     RMGLog::Out(RMGLog::fatal, "Output file ", path_for_overwrite.string(), " does already exists.");
   }
 
@@ -421,6 +422,13 @@ void RMGRunAction::PostprocessOutputFile([[maybe_unused]] int number_of_primarie
         " to LH5 failed. Data is potentially corrupted."
     );
     return;
+  }
+
+  // if we are adding to the output file, keep the objects it already contains, so that for
+  // example simulations with a different output group can be added to it.
+  if (rmg_man->GetOutputAppendToFiles() && fs::exists(worker_lh5)) {
+    RMGLog::Out(RMGLog::detail, "Adding output to the existing file ", worker_lh5.string());
+    RMGConvertLH5::CopyMissingObjects(worker_lh5.string(), worker_tmp.string());
   }
 #else
   RMGLog::OutDev(RMGLog::fatal, "HDF5 and LH5 support is not available!");
