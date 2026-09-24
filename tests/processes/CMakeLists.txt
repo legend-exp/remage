@@ -29,3 +29,7 @@ set_tests_properties(processes/selective-ekin-min PROPERTIES LABELS extra)
 add_test(NAME processes/innerbrem-conservation COMMAND ${PYTHONPATH} -m pytest -s -vvv
                                                        innerbrem_conservation.py)
 set_tests_properties(processes/innerbrem-conservation PROPERTIES LABELS extra)
+
+add_test(NAME processes/tendl-light-ions COMMAND ${PYTHONPATH} -m pytest -s -vvv
+                                                 tendl_light_ions.py)
+set_tests_properties(processes/tendl-light-ions PROPERTIES LABELS extra)

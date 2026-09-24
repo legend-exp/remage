@@ -142,6 +142,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     bool fConstructOptical = false;
     bool fUseOpticalCustomWLS = true;
     bool fUseNeutronThermalScattering = false;
+    bool fUseTENDLLightIons = false;
     bool fUseGrabmayrGammaCascades = false;
     bool fUseInnerBremsstrahlung = false;
     LowEnergyEMOption fLowEnergyEMOption = LowEnergyEMOption::kLivermore;
@@ -150,6 +151,7 @@ class RMGPhysics : public G4VModularPhysicsList {
     G4double fHighEnergyRange = 100. * CLHEP::GeV;
     std::unique_ptr<G4GenericMessenger> fMessenger;
     void DefineCommands();
+    void ConstructTENDLProton();
 };
 
 #endif
