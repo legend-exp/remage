@@ -23,10 +23,14 @@ at runtime. For typical use cases, the OpenGL and ToolsSG drivers should be
 sufficient. Whereas ToolsSG is suitable for offscreen rendering (i.e. on CI
 pipelines), the OpenGL drivers typically require a running X11 session.
 
-Unlike the `legend-pygeom-vis` viewer, Geant4 cannot read the colors from the
-GDML file, but requires expplicit color definition with macro commands. However,
-such a coloring macro can also typically be generated from your GDML file
-creation tool.
+Geant4 cannot read colors from standard GDML, but _remage_ applies the
+per-volume colors stored in the `rmg_color` auxiliary structure, as written by
+{func}`pygeomtools.write.write_pygeom` (also used by `legend-pygeom-vis`). The
+value is either `r,g,b,a` (the volume is then drawn as a solid) or `-1` (the
+volume is hidden). Colors set with `/vis/geometry/set/...` macro commands take
+precedence over the colors read from the GDML file. Use
+<project:../rmg-commands.md#rmggeometrygdmldisablecolors> to ignore the GDML
+colors altogether.
 
 The basic setup of a visualization macro needs to contain some commands to setup
 the desired viewer to contain the geometry and the particle tracks:
