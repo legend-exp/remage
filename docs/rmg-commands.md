@@ -443,6 +443,7 @@ Commands for controlling geometry definitions
 * `GDMLDisableOverlapCheck` – Disable the automatic overlap check after loading a GDML file
 * `GDMLOverlapCheckNumPoints` – Change the number of points sampled for overlap checks
 * `GDMLDisableXmlCheck` – Disable the automatic xml validity check after loading a GDML file
+* `GDMLDisableColors` – Do not apply the visualization colors from the GDML auxval structure (rmg_color), as written by pygeomtools.
 * `RegisterDetectorsFromGDML` – Register detectors as saved in the GDML auxval structure, as written by pygeomtools.
 * `IncludeGDMLFile` – Use GDML file for geometry definition
 * `PrintListOfLogicalVolumes` – Print list of defined logical volumes
@@ -473,6 +474,16 @@ Change the number of points sampled for overlap checks
 ### `/RMG/Geometry/GDMLDisableXmlCheck`
 
 Disable the automatic xml validity check after loading a GDML file
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Geometry/GDMLDisableColors`
+
+Do not apply the visualization colors from the GDML auxval structure (rmg_color), as written by pygeomtools.
 
 * **Parameter** – `boolean`
   * **Parameter type** – `b`

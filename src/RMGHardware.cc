@@ -18,8 +18,13 @@
 #include <algorithm>
 #include <filesystem>
 #include <format>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 namespace fs = std::filesystem;
 
+#include "G4Colour.hh"
 #include "G4GenericMessenger.hh"
 #include "G4GeomTestVolume.hh"
 #include "G4LogicalVolume.hh"
@@ -27,6 +32,7 @@ namespace fs = std::filesystem;
 #include "G4SDManager.hh"
 #include "G4UserLimits.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4VisAttributes.hh"
 
 #include "RMGCalorimeterDetector.hh"
 #include "RMGCalorimeterOutputScheme.hh"
@@ -79,6 +85,39 @@ G4VPhysicalVolume* RMGHardware::Construct() {
       parser.Read(file, false);
     }
     fWorld = parser.GetWorldVolume();
+
+    // apply visualization attributes from the GDML file, as written by pygeomtools.
+    if (!fGDMLDisableColors) {
+      for (const auto& [lv, aux_list] : *parser.GetAuxMap()) {
+        for (const auto& aux : aux_list) {
+          if (aux.type != "rmg_color") continue;
+
+          G4VisAttributes va;
+          if (aux.value == "-1") {
+            va.SetVisibility(false);
+          } else {
+            std::vector<double> rgba;
+            std::istringstream iss(aux.value);
+            std::string part;
+            try {
+              while (std::getline(iss, part, ',')) rgba.push_back(std::stod(part));
+            } catch (const std::logic_error&) { rgba.clear(); }
+            if (rgba.size() != 4) {
+              RMGLog::Out(
+                  RMGLog::fatal,
+                  "invalid rmg_color aux value '",
+                  aux.value,
+                  "' for logical volume ",
+                  lv->GetName()
+              );
+            }
+            va.SetColour(G4Colour(rgba[0], rgba[1], rgba[2], rgba[3]));
+            va.SetForceSolid(true);
+          }
+          lv->SetVisAttributes(va);
+        }
+      }
+    }
 
     // register detectors from the GDML file, as written by pygeomtools.
     // https://legend-pygeom-tools.readthedocs.io/en/stable/metadata.html
@@ -636,6 +675,15 @@ void RMGHardware::DefineCommands() {
 
   fMessenger->DeclareProperty("GDMLDisableXmlCheck", fGDMLDisableXmlCheck)
       .SetGuidance("Disable the automatic xml validity check after loading a GDML file")
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("GDMLDisableColors", fGDMLDisableColors)
+      .SetGuidance(
+          "Do not apply the visualization colors from the GDML auxval structure (rmg_color), as "
+          "written by pygeomtools."
+      )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
       .SetStates(G4State_PreInit);
