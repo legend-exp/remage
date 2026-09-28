@@ -42,3 +42,25 @@ def sanitize_macro_cmds(text: str | Iterable[str]) -> list[str]:
                 output.append(cmd)
 
     return output
+
+
+def proc_name_hash(proc_name: str | bytes) -> int:
+    """Helper function to generate FNV-1a process name hashes as in the tracks table.
+
+    .. note::
+        This function is only for convenience in analysis of remage output, and is not
+        used by remage itself.
+    """
+    bs = proc_name.encode("utf-8") if isinstance(proc_name, str) else proc_name
+
+    # The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
+    # see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+    # and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
+    hash_value = 0x811C9DC5
+
+    for b in bs:
+        hash_value ^= b
+        hash_value = (hash_value * 0x01000193) & 0xFFFFFFFF
+
+    # xor-fold down to 16 bit.
+    return (hash_value >> 16) ^ (hash_value & 0xFFFF)
