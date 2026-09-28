@@ -11,7 +11,6 @@ from pygeomhpges import make_hpge
 # read the configs
 out_gdml = "gdml/ge-array.gdml"
 det_macro = "macros/detectors-fake.mac"
-colors = "macros/colors.mac"
 
 config_dict = {}
 heights = {}
@@ -126,11 +125,5 @@ with Path("macros/lar-in-coordinates.mac").open("w") as f:
 with Path("macros/lar-out-coordinates.mac").open("w") as f:
     f.writelines(line + "\n" for line in lines_exclude)
 
-pytools.detectors.write_detector_auxvals(reg)
-pytools.geometry.check_registry_sanity(reg, reg)
-
-w = pg4.gdml.Writer()
-w.addDetector(reg)
-w.write(out_gdml)
+pytools.write_pygeom(reg, out_gdml)
 pytools.detectors.generate_detector_macro(reg, det_macro)
-pytools.visualization.generate_color_macro(reg, colors)

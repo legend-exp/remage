@@ -10,9 +10,6 @@
 # draw the detector
 /vis/drawVolume
 
-# set colors
-/control/execute macros/colors.mac
-
 #/vis/geometry/set/forceWireframe
 
 # set the viewpoint
