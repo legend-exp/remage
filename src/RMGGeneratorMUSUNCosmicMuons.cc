@@ -190,6 +190,9 @@ void RMGGeneratorMUSUNCosmicMuons::EndOfRunAction(const G4Run*) {
 
   // reset the reader state so a subsequent /run/beamOn re-opens the input cleanly.
   fAnalysisReader->CloseFile();
+  // the columns are bound again when re-opening the input in the next BeginOfRunAction.
+  delete fInputData;
+  fInputData = nullptr;
 }
 
 
