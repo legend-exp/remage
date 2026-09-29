@@ -25,6 +25,7 @@
 #include "G4MuonMinus.hh"
 #include "G4MuonPlus.hh"
 #include "G4ParticleGun.hh"
+#include "G4RunManager.hh"
 #include "G4ThreeVector.hh"
 #include "Randomize.hh"
 
@@ -155,6 +156,13 @@ void RMGGeneratorMUSUNCosmicMuons::BeginOfRunAction(const G4Run*) {
       reader.SetNtupleDColumn("py", (fInputData->fPy));
       reader.SetNtupleDColumn("pz", (fInputData->fPz));
     }
+    reader.unlock(); // end the setup mode.
+
+    // in the multiprocessing-mode we get here with an offset on the main thread. Skip the rows
+    // simulated by the other processes, so that each process uses a distinct block of the file.
+    size_t start_event = RMGManager::Instance()->GetProcessNumberOffset() *
+                         G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
+    fAnalysisReader->GetLockedReader().Seek(start_event);
   }
 }
 
