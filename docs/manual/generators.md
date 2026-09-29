@@ -288,6 +288,9 @@ _remage_ with the following commands:
 /RMG/Generator/MUSUNCosmicMuons/MUSUNFile filename
 ```
 
+For multithreaded or multi-processing runs of _remage_, the same iteration modes
+as for any other input files is used, see {ref}`manual-input-parallel`.
+
 (manual-generators-extfiles)=
 
 ## Simulating event vertices and kinematics from external files
