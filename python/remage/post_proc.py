@@ -218,6 +218,7 @@ def post_proc(
                 exclude_list=[
                     f"{lh5_links_group_name}/*",
                     f"{lh5_event_number_name}/*",
+                    lh5_event_number_name,
                 ],
             )
             # also copy __by_uid__ group to the output files
