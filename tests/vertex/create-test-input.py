@@ -35,7 +35,9 @@ rng = np.random.default_rng(123456)
 
 def _get_pos_input(dtype, units: str):
     attrs = {"units": units}
-    xloc = Array(np.linspace(0, 1000, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
+    xloc = Array(
+        np.linspace(0, 1, INPUT_FILE_ROWS, endpoint=False).astype(dtype), attrs=attrs
+    )
     yloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
     zloc = Array(rng.uniform(-1, 1, INPUT_FILE_ROWS).astype(dtype), attrs=attrs)
     return {"xloc": xloc, "yloc": yloc, "zloc": zloc}
