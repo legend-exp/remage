@@ -15,6 +15,7 @@
 
 #include "RMGRunAction.hh"
 
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <fmt/chrono.h>
@@ -236,7 +237,25 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
   else if (tot_events < 100) fCurrentPrintModulo = 100;
 
   int proc_num = RMGManager::Instance()->GetProcessNumberOffset();
-  for (auto& oscheme : fOutputDataFields) { oscheme->SetEventIDOffset(proc_num * tot_events); }
+  auto evtid_offset = static_cast<int64_t>(proc_num) * tot_events;
+  // the evtid is stored as a 32-bit integer in the output.
+  auto max_evtid = evtid_offset + tot_events - 1;
+  if (this->IsMaster() && max_evtid > std::numeric_limits<int>::max()) {
+    RMGLog::OutFormat(
+        RMGLog::fatal,
+        "The largest event ID of this run ({:d} = process {:d} x {:d} events + {:d}) exceeds the "
+        "maximum of the 32-bit evtid column ({:d}). The stored evtid values will overflow and "
+        "become negative. Reduce the number of events per process or the number of processes",
+        max_evtid,
+        proc_num,
+        tot_events,
+        tot_events - 1,
+        std::numeric_limits<int>::max()
+    );
+  }
+  for (auto& oscheme : fOutputDataFields) {
+    oscheme->SetEventIDOffset(static_cast<int>(evtid_offset));
+  }
 }
 
 void RMGRunAction::EndOfRunAction(const G4Run*) {
