@@ -157,6 +157,7 @@ Commands for controlling physics processes
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
 * `HadronicPhysics` – Add hadronic processes to the physics list
 * `EnableNeutronThermalScattering` – Use thermal scattering cross sections for neutrons
+* `EnableTENDLLightIons` – Use the ParticleHP models with the TENDL data for inelastic reactions of protons, deuterons, tritons, He3 and alphas below 200 MeV.
 * `EnableGammaAngularCorrelation` – Set correlated gamma emission flag
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
 * `StoreICLevelData` – Store e- internal conversion data
@@ -254,6 +255,20 @@ Uses None by default
 ### `/RMG/Processes/EnableNeutronThermalScattering`
 
 Use thermal scattering cross sections for neutrons
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Processes/EnableTENDLLightIons`
+
+Use the ParticleHP models with the TENDL data for inelastic reactions of protons, deuterons, tritons, He3 and alphas below 200 MeV.
+
+This works with every hadronic physics option. It needs the G4TENDL data set. Geant4 reads it from the Geant4 installation, or from the directory in the environment variable G4PARTICLEHPDATA if that variable is set.
 
 This is disabled by default
 
