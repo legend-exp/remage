@@ -524,8 +524,8 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < N; i++) {
       G4ThreeVector vertex;
-      size_t n_trials = 0;
-      const bool success = obj.Sample(vertex, 200, false, n_trials);
+      RMGVertexConfinement::SamplingCounters counters;
+      const bool success = obj.Sample(vertex, 200, false, counters);
       if (!success) {
         std::cout << "Sample failed" << std::endl;
         return 1;

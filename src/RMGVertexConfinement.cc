@@ -524,11 +524,13 @@ bool RMGVertexConfinement::SampleableObject::Sample(
   return true;
 }
 
-void RMGVertexConfinement::SamplingCounters::Accept(const G4ThreeVector& vertex) {
+void RMGVertexConfinement::SamplingCounters::Accept(const G4ThreeVector& vertex, bool lookup_density) {
+  n_accepted++;
+  if (!lookup_density) return;
+
   auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   auto physvol = navigator->LocateGlobalPointAndSetup(vertex);
   auto rho = physvol ? physvol->GetLogicalVolume()->GetMaterial()->GetDensity() : 0;
-  n_accepted++;
   rho_sum += rho;
   rho2_sum += rho * rho;
 }
@@ -1028,7 +1030,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
         // is it also in the other volume class (geometrical/physical)?
         if (physical_first ? fGeomVolumeSolids.IsInside(vertex) : fPhysicalVolumes.IsInside(vertex)) {
-          counters.Accept(vertex);
+          counters.Accept(vertex, !fOnSurface);
           return true;
         }
       }
@@ -1134,7 +1136,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
 
         // now check for subtractions
         if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) {
-          counters.Accept(vertex);
+          counters.Accept(vertex, !fOnSurface);
           return true;
         }
 
@@ -1181,7 +1183,7 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
         return false;
       }
-      counters.Accept(vertex);
+      counters.Accept(vertex, !fOnSurface);
       return true;
     }
 

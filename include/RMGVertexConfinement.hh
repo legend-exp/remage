@@ -235,7 +235,7 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
         double rho_sum = 0;    // sum of the material density at the accepted vertices
         double rho2_sum = 0;   // sum of the squared density
 
-        void Accept(const G4ThreeVector& vertex);
+        void Accept(const G4ThreeVector& vertex, bool lookup_density);
         SamplingCounters& operator+=(const SamplingCounters& o) {
           n_drawn += o.n_drawn;
           n_inside += o.n_inside;
