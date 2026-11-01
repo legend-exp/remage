@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <map>
 #include <memory>
 #include <optional>
 #include <regex>
@@ -226,6 +227,25 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
       return fGeomVolumeData;
     }
 
+    /** @brief Per-volume counters, used to estimate the sampled volume and mass by rejection. */
+    struct SamplingCounters {
+        size_t n_drawn = 0;    // candidates drawn in the sampling solid
+        size_t n_inside = 0;   // candidates inside the volume
+        size_t n_accepted = 0; // candidates also passing the intersection/subtraction checks
+        double rho_sum = 0;    // sum of the material density at the accepted vertices
+        double rho2_sum = 0;   // sum of the squared density
+
+        void Accept(const G4ThreeVector& vertex);
+        SamplingCounters& operator+=(const SamplingCounters& o) {
+          n_drawn += o.n_drawn;
+          n_inside += o.n_inside;
+          n_accepted += o.n_accepted;
+          rho_sum += o.rho_sum;
+          rho2_sum += o.rho2_sum;
+          return *this;
+        }
+    };
+
     /**
      * An object which we can generate position samples in. Based on either a
      * @c G4VPhysicalVolume or geometrical volume defined by a @c G4VSolid . The
@@ -286,13 +306,13 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
          * @param max_attempts The maximum number of candidate vertices for rejection sampling.
          * @param force_containment_check Whether to force a check on where the point is
          * inside the solid.
-         * @param n_trials The total number of trials performed.
+         * @param counters The counters of this object, updated with the drawn candidates.
          */
         [[nodiscard]] bool Sample(
             G4ThreeVector& vertex,
             size_t max_attempts,
             bool force_containment_check,
-            size_t& n_trials
+            SamplingCounters& counters
         ) const;
 
         /**
@@ -480,9 +500,14 @@ class RMGVertexConfinement : public RMGVVertexGenerator {
     /** @brief Depth profile configuration propagated to all sampled volumes. */
     DepthProfile fDepthProfile = {};
 
-    // counters used for the current run.
-    size_t fTrials = 0;
+    // counters used for the current run, in this thread.
+    std::map<const SampleableObject*, SamplingCounters> fCounters;
     std::chrono::nanoseconds fVertexGenerationTime{};
+
+    // counters summed over all threads at the end of the run, protected by fStatsMutex.
+    static G4Mutex fStatsMutex;
+    static std::map<const SampleableObject*, SamplingCounters> fMergedCounters;
+    static std::chrono::nanoseconds fMergedVertexGenerationTime;
 
     std::vector<std::unique_ptr<G4GenericMessenger>> fMessengers;
     void SetSamplingModeString(std::string mode);

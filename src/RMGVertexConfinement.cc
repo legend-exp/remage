@@ -28,6 +28,7 @@
 #include "G4SolidStore.hh"
 #include "G4Sphere.hh"
 #include "G4SubtractionSolid.hh"
+#include "G4Threading.hh"
 #include "G4TransportationManager.hh"
 #include "G4Tubs.hh"
 #include "G4UnitsTable.hh"
@@ -49,6 +50,11 @@ RMGVertexConfinement::SampleableObjectCollection RMGVertexConfinement::fUnionVol
 std::vector<G4VSolid*> RMGVertexConfinement::fOwnedSolids = {};
 
 std::atomic<bool> RMGVertexConfinement::fVolumesInitialized = false;
+
+G4Mutex RMGVertexConfinement::fStatsMutex = G4MUTEX_INITIALIZER;
+std::map<const RMGVertexConfinement::SampleableObject*, RMGVertexConfinement::SamplingCounters>
+    RMGVertexConfinement::fMergedCounters = {};
+std::chrono::nanoseconds RMGVertexConfinement::fMergedVertexGenerationTime{};
 
 RMGVertexConfinement::SampleableObject::SampleableObject(
     G4VPhysicalVolume* physvol,
@@ -417,7 +423,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
     G4ThreeVector& vertex,
     size_t max_attempts,
     bool force_containment_check,
-    size_t& n_trials
+    SamplingCounters& counters
 ) const {
 
   if (this->physical_volume) {
@@ -437,6 +443,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
   RMGLog::OutDev(RMGLog::debug_event, "Maximum attempts to find a good vertex: ", max_attempts);
 
   size_t calls = 0;
+  counters.n_drawn++;
 
   // possible sampling strategies
   // 1) native sampling
@@ -486,7 +493,7 @@ bool RMGVertexConfinement::SampleableObject::Sample(
     vertex = this->translation + this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);
 
     while (!this->IsInside(vertex) and calls++ < max_attempts) {
-      n_trials++;
+      counters.n_drawn++;
       vertex = this->translation +
                this->rotation * RMGGeneratorUtil::rand(this->sampling_solid, false);
       RMGLog::OutDev(RMGLog::debug_event, "Vertex was not inside, new vertex: ", vertex / CLHEP::cm, " cm");
@@ -513,7 +520,17 @@ bool RMGVertexConfinement::SampleableObject::Sample(
       calls,
       " iterations, returning"
   );
+  counters.n_inside++;
   return true;
+}
+
+void RMGVertexConfinement::SamplingCounters::Accept(const G4ThreeVector& vertex) {
+  auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+  auto physvol = navigator->LocateGlobalPointAndSetup(vertex);
+  auto rho = physvol ? physvol->GetLogicalVolume()->GetMaterial()->GetDensity() : 0;
+  n_accepted++;
+  rho_sum += rho;
+  rho2_sum += rho * rho;
 }
 
 bool RMGVertexConfinement::SampleableObjectCollection::IsInside(const G4ThreeVector& vertex) const {
@@ -1000,7 +1017,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         choice_nonconst = nullptr;
 
         // generate a candidate vertex
-        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
+        auto& counters = fCounters[&choice];
+        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, counters);
 
         if (!success) {
           RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
@@ -1009,10 +1027,9 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         }
 
         // is it also in the other volume class (geometrical/physical)?
-        if (physical_first) {
-          if (fGeomVolumeSolids.IsInside(vertex)) return true;
-        } else {
-          if (fPhysicalVolumes.IsInside(vertex)) return true;
+        if (physical_first ? fGeomVolumeSolids.IsInside(vertex) : fPhysicalVolumes.IsInside(vertex)) {
+          counters.Accept(vertex);
+          return true;
         }
       }
 
@@ -1090,7 +1107,8 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         choice_nonconst = nullptr;
 
         // generate a candidate vertex
-        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
+        auto& counters = fCounters[&choice];
+        bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, counters);
 
         if (!success) {
           RMGLog::Out(RMGLog::error, "Sampling unsuccessful, return dummy vertex");
@@ -1115,7 +1133,10 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
         );
 
         // now check for subtractions
-        if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) return true;
+        if (accept && !fExcludedGeomVolumeSolids.IsInside(vertex)) {
+          counters.Accept(vertex);
+          return true;
+        }
 
         RMGLog::Out(RMGLog::debug_event, "Chosen vertex fails intersection criteria.");
       }
@@ -1152,13 +1173,15 @@ bool RMGVertexConfinement::ActualGenerateVertex(G4ThreeVector& vertex) {
                                       : fUnionVolumes.VolumeWeightedRand(fWeightByMass);
 
       // do the sampling
-      bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, fTrials);
+      auto& counters = fCounters[&choice];
+      bool success = choice.Sample(vertex, fMaxAttempts, fForceContainmentCheck, counters);
 
       if (!success) {
         RMGLog::Out(RMGLog::error, "Sampling unsuccessful return dummy vertex");
         vertex = RMGVVertexGenerator::kDummyPrimaryPosition;
         return false;
       }
+      counters.Accept(vertex);
       return true;
     }
 
@@ -1261,26 +1284,77 @@ RMGVertexConfinement::GenericGeometricalSolidData& RMGVertexConfinement::SafeBac
 }
 
 void RMGVertexConfinement::BeginOfRunAction(const G4Run*) {
-  // Reset all timers and counters before the next run.
-  fTrials = 0;
+  // Reset all timers and counters before the next run. The master thread starts the run before
+  // the worker threads.
+  fCounters.clear();
   fVertexGenerationTime = std::chrono::nanoseconds::zero();
+
+  if (G4Threading::IsMasterThread()) {
+    G4AutoLock lock(&fStatsMutex);
+    fMergedCounters.clear();
+    fMergedVertexGenerationTime = std::chrono::nanoseconds::zero();
+  }
 }
 
 void RMGVertexConfinement::EndOfRunAction(const G4Run* run) {
+  // sum the counters of all threads. The master thread ends the run after the worker threads,
+  // so it reports the summary.
+  {
+    G4AutoLock lock(&fStatsMutex);
+    for (const auto& [obj, c] : fCounters) fMergedCounters[obj] += c;
+    fMergedVertexGenerationTime += fVertexGenerationTime;
+  }
+  if (!G4Threading::IsMasterThread()) return;
+
   auto n_ev = run->GetNumberOfEvent();
   if (n_ev == 0) return;
-  auto avg_iter = fTrials * 1. / n_ev;
+
+  // estimate the volume (mass) of the region where vertices are accepted. For each sampled
+  // volume, it is V_solid * a * <y>, where V_solid is the volume of the solid where candidates are
+  // uniformly drawn, a the fraction of candidates inside the volume and <y> the average, over
+  // these candidates, of y = 1 (y = density) if the vertex is accepted, 0 otherwise.
+  size_t n_drawn = 0;
+  double volume = 0, volume_var = 0, mass = 0, mass_var = 0;
+  for (const auto& [obj, c] : fMergedCounters) {
+    n_drawn += c.n_drawn;
+    if (fOnSurface or c.n_inside == 0) continue;
+
+    const double v_solid = obj->sampling_solid->GetCubicVolume();
+    const double a = 1. * c.n_inside / c.n_drawn;
+    // add value and binomial variance of the estimate, given the sums of y and y^2
+    auto add = [&](double sum, double sum2, double& val, double& var) {
+      const double y = sum / c.n_inside;
+      val += v_solid * a * y;
+      var += v_solid * v_solid *
+             ((y * y * a * (1 - a) / c.n_drawn) +
+              (a * a * std::max(0., (sum2 / c.n_inside) - (y * y)) / c.n_inside));
+    };
+    add(c.n_accepted, c.n_accepted, volume, volume_var);
+    add(c.rho_sum, c.rho2_sum, mass, mass_var);
+  }
+
   RMGLog::OutFormat(
       RMGLog::summary,
-      "Stats: on average, {:.1f} iterations were needed to sample a valid vertex ({:.1f}% "
+      "Stats: on average, {:.1f} candidate points were drawn to sample a valid vertex ({:.1f}% "
       "efficiency)",
-      avg_iter,
-      avg_iter > 0 ? 100 / avg_iter : 100.0
+      n_drawn * 1. / n_ev,
+      n_drawn > 0 ? 100. * n_ev / n_drawn : 100.
   );
+  if (!fOnSurface) {
+    RMGLog::OutFormat(
+        RMGLog::summary,
+        "Stats: sampled region (estimated with the rejection method) has volume {:.6g} ± "
+        "{:.2g} cm3 and mass {:.6g} ± {:.2g} kg",
+        volume / CLHEP::cm3,
+        std::sqrt(volume_var) / CLHEP::cm3,
+        mass / CLHEP::kg,
+        std::sqrt(mass_var) / CLHEP::kg
+    );
+  }
   RMGLog::OutFormat(
       RMGLog::summary,
       "Stats: average time to sample a vertex was {:.5f} us/event",
-      fVertexGenerationTime.count() / n_ev / 1000.0
+      fMergedVertexGenerationTime.count() / n_ev / 1000.0
   );
 }
 
