@@ -1563,7 +1563,7 @@ Set the isotope, process and energy level for the double beta decay mode of the 
     – Name the decay process you want to simulate
   * **Parameter type** – `s`
   * **Omittable** – `False`
-  * **Candidates** – `0vbb 0vbb_lambda_0 0vbb_lambda_02 2vbb 0vbb_M1 0vbb_M2 0vbb_M3 0vbb_M7 0vbb_lambda_2 2vbb_2 0vkb 2vkb 0v2k 2v2k 2vbb_bos0 2vbb_bos2 0vbb_eta_s 0vbb_eta_nmes 2vbb_lv 0v4b`
+  * **Candidates** – `0vbb 0vbb_lambda_0 0vbb_lambda_02 2vbb 0vbb_M1 0vbb_M2 0vbb_M3 0vbb_M7 0vbb_lambda_2 2vbb_2 0vkb 2vkb 0v2k 2v2k 2vbb_bos0 2vbb_bos2 0vbb_eta_s 0vbb_eta_nmes 2vbb_lv 0v4b 2vbb_gA_g0 2vbb_gA_g2 2vbb_gA_g22 2vbb_gA_g4`
 * **Parameter** – `level`
     – Energy level of the daughter nucleus
   * **Parameter type** – `i`

@@ -69,7 +69,11 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
       /** @brief 0+ -> 0+ with RHC eta simplified expression */ k0vbb_eta_s = 17,
       /** @brief 0+ -> 0+ with RHC eta and specific NMEs */ k0vbb_eta_nmes = 18,
       /** @brief 0+ -> 0+ with Lorentz violation */ k2vbb_lv = 19,
-      /** @brief 0+ -> 0+ Quadruple beta decay */ k0v4b = 20
+      /** @brief 0+ -> 0+ Quadruple beta decay */ k0v4b = 20,
+      /** @brief 0+ -> 0+ {2n}, gA expansion term G0 */ k2vbb_gA_g0 = 21,
+      /** @brief 0+ -> 0+ {2n}, gA expansion term G2 */ k2vbb_gA_g2 = 22,
+      /** @brief 0+ -> 0+ {2n}, gA expansion term G22 */ k2vbb_gA_g22 = 23,
+      /** @brief 0+ -> 0+ {2n}, gA expansion term G4 */ k2vbb_gA_g4 = 24
     };
 
     /** @brief Constructor that links the BxDecay0 generator action to remage.
