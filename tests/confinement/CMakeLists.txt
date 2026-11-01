@@ -204,6 +204,8 @@ endforeach()
 add_test(NAME confinement/weighting COMMAND ${PYTHONPATH} test_weighting.py)
 set_tests_properties(confinement/weighting PROPERTIES LABELS extra)
 
+add_test(NAME confinement/sampled-volume COMMAND ${PYTHONPATH} test_sampled_volume.py)
+
 # depth-profile validation: sample on the surface of a box with a depth profile,
 # check the depth distribution and that no vertex is generated outside the volume
 

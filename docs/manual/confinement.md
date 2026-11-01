@@ -119,6 +119,14 @@ volume, to improve sampling efficiency), then checks if it lies in the other
 group. Override the default group with
 <project:../rmg-commands.md#rmggeneratorconfinementfirstsamplingvolume>.
 
+:::{note}
+
+For bulk sampling, the volume and mass of the sampled region are estimated with
+the rejection method and reported at the end of the run. This is useful when
+they are hard to compute analytically, as for intersections and subtractions.
+
+:::
+
 ### `SubtractGeometrical`
 
 This mode allows to perform subtractions between physical and geometrical
