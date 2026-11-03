@@ -47,7 +47,8 @@ class RMGGeneratorDecay0 : public RMGVGenerator {
      * @enum Process
      * @brief Enumeration of nuclear decay processes supported by the generator.
      *
-     * This matches the BxDecay0 numbering, shifted by 1 as BxDecay0 starts counting at 1.
+     * The values follow the legacy Decay0 numbering (`modebb`). They are converted to the BxDecay0
+     * numbering (`bxdecay0::dbd_mode_type`) before they are passed to BxDecay0.
      */
     enum class Process {
       /** @brief neutrinoless double beta decay */ k0vbb = 1,

@@ -176,10 +176,19 @@ void RMGGeneratorDecay0::BxMessenger::GeneratorCmd(const std::string& parameters
 
   bxdecay0_g4::PrimaryGeneratorAction::ConfigurationInterface& configInt = fGen->fDecay0G4Generator
                                                                                ->GrabConfiguration();
+  // the process enum follows the legacy Decay0 numbering, but BxDecay0 expects its own mode
+  // numbering. The two differ for some processes (e.g. the Majoron modes).
+  const auto dbd_mode = bxdecay0::dbd_mode_from_legacy_modebb(
+      static_cast<bxdecay0::legacy_modebb_type>(p)
+  );
+  if (dbd_mode == bxdecay0::DBDMODE_UNDEF) {
+    RMGLog::Out(RMGLog::fatal, "BxDecay0 does not support the double beta decay process ", proc);
+  }
+
   configInt.reset_mdl();
   configInt.decay_category = "dbd";
   configInt.nuclide = isotope;
-  configInt.dbd_mode = static_cast<int>(p);
+  configInt.dbd_mode = dbd_mode;
   configInt.dbd_level = level;
   configInt.debug = false;   // If we want a debug mode, we need to add it to the command
   fGen->fUpdateSeeds = true; // The seed and config update should now be done in BeginOfRunAction
