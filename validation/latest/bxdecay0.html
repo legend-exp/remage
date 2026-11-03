@@ -7,7 +7,7 @@
         <link rel="prefetch" href="_static/remage-logo.png" as="image">
 
     <!-- Generated with Sphinx 9.2.0 and Furo 2025.12.19 -->
-        <title>Double-beta decay physics - remage 1.2.1.dev2+g3fceee7be validation suite</title>
+        <title>Double-beta decay physics - remage 1.2.1.dev9+g419e231e3 validation suite</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">remage 1.2.1.dev2+g3fceee7be validation suite</div></a>
+      <a href="index.html"><div class="brand">remage 1.2.1.dev9+g419e231e3 validation suite</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
     <img class="sidebar-logo" src="_static/remage-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">remage 1.2.1.dev2+g3fceee7be validation suite</span>
+  <span class="sidebar-brand-text">remage 1.2.1.dev9+g419e231e3 validation suite</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -302,6 +302,48 @@ distinctive continuous electron spectrum. Other exotic physics like the
 <span class="math notranslate nohighlight">\(0\nu\beta\beta\_\lambda0\)</span> is a decay mode driven by right-handed currents
 according to the lambda mechanism and shows a distinctive angular correlation.</p>
 </section>
+<section id="majoron-emitting-decay-modes">
+<h2>Majoron-emitting decay modes<a class="headerlink" href="#majoron-emitting-decay-modes" title="Link to this heading">¶</a></h2>
+<p>The summed energy spectrum of the two electrons in Majoron-emitting neutrinoless
+double beta decay depends on the spectral index <span class="math notranslate nohighlight">\(n\)</span>: the spectrum scales as
+<span class="math notranslate nohighlight">\((Q_{\beta\beta} - E)^n\)</span>, where <span class="math notranslate nohighlight">\(E\)</span> is the summed electron energy. A larger
+spectral index moves the spectrum to lower energies. For comparison, the
+spectral index of <span class="math notranslate nohighlight">\(2\nu\beta\beta\)</span> is <span class="math notranslate nohighlight">\(n = 5\)</span>.</p>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="_images/double-beta-majoron-combined-primary-energy.output.png"><img alt="_images/double-beta-majoron-combined-primary-energy.output.png" src="_images/double-beta-majoron-combined-primary-energy.output.png" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Summed energy of the two primary electrons for the Majoron-emitting decay modes
+of Ge76 with spectral index <span class="math notranslate nohighlight">\(n = 1, 2, 3, 7\)</span>, and for <span class="math notranslate nohighlight">\(2\nu\beta\beta\)</span> (<span class="math notranslate nohighlight">\(n = 5\)</span>).
+Spectra are normalized to unit area. The test checks that the mean summed
+electron energy decreases with increasing spectral index.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="decays-to-excited-states">
+<h2>Decays to excited states<a class="headerlink" href="#decays-to-excited-states" title="Link to this heading">¶</a></h2>
+<p>Ge76 can also decay to excited states of the daughter nucleus Se76. The
+electrons then share at most <span class="math notranslate nohighlight">\(Q_{\beta\beta} - E_\text{level}\)</span>, where
+<span class="math notranslate nohighlight">\(Q_{\beta\beta} = 2039\)</span> keV and <span class="math notranslate nohighlight">\(E_\text{level}\)</span> is the energy of the level. The
+daughter nucleus de-excites by emitting gammas:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(2^+_1\)</span> (559 keV): one gamma at 559 keV</p></li>
+<li><p><span class="math notranslate nohighlight">\(0^+_1\)</span> (1122 keV): two gammas at 563 and 559 keV</p></li>
+<li><p><span class="math notranslate nohighlight">\(2^+_2\)</span> (1216 keV): one gamma at 1216 keV, or two gammas at 657 and 559 keV</p></li>
+</ul>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="_images/double-beta-excited-states-primary-energy.output.png"><img alt="_images/double-beta-excited-states-primary-energy.output.png" src="_images/double-beta-excited-states-primary-energy.output.png" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Top: summed energy of the primary electrons for the decays of Ge76 to the ground
+state and to the excited states of Se76. The dotted lines mark the endpoints
+<span class="math notranslate nohighlight">\(Q_{\beta\beta} - E_\text{level}\)</span>. <span class="math notranslate nohighlight">\(0\nu\beta\beta\_\lambda\)</span> to <span class="math notranslate nohighlight">\(2^+_1\)</span> gives a
+single line at the endpoint. Bottom: summed energy of the primary gammas, which
+equals the energy of the excited level. The test checks the endpoints and the
+summed gamma energies.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
 </section>
 
         </article>
@@ -361,6 +403,8 @@ according to the lambda mechanism and shows a distinctive angular correlation.</
             <ul>
 <li><a class="reference internal" href="#">Double-beta decay physics</a><ul>
 <li><a class="reference internal" href="#primary-electron-properties">Primary electron properties</a></li>
+<li><a class="reference internal" href="#majoron-emitting-decay-modes">Majoron-emitting decay modes</a></li>
+<li><a class="reference internal" href="#decays-to-excited-states">Decays to excited states</a></li>
 </ul>
 </li>
 </ul>
