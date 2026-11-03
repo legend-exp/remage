@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 from math import pi
+from pathlib import Path
 
 # Box1 is a 1 m lead cube centered at x = 2 m, Box2 a 1 m lead cube with a 0.99 m daughter
 sphere = """
@@ -28,7 +29,6 @@ cases = {
         100**3 - v_sphere,
     ),
     "with-daughter": (
-        "/RMG/Generator/Confinement/MaxSamplingTrials 1000\n"
         "/RMG/Generator/Confinement/Physical/AddVolume Box2\n",
         100**3 - 99**3,
     ),
@@ -36,10 +36,10 @@ cases = {
 
 for name, (cmds, v_exp) in cases.items():
     macro = f"sampled-volume-{name}.mac"
-    with open(macro, "w") as f:
-        f.write(f"""
+    Path(macro).write_text(f"""
 /run/initialize
 /RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/MaxSamplingTrials 1000
 {cmds}
 /RMG/Generator/Select GPS
 /gps/particle e-
@@ -48,8 +48,17 @@ for name, (cmds, v_exp) in cases.items():
 """)
 
     out = subprocess.run(
-        [sys.executable, "-m", "remage", "-t", "2", "-g", "gdml/geometry_boxes.gdml"]
-        + ["--", macro],
+        [
+            sys.executable,
+            "-m",
+            "remage",
+            "-t",
+            "2",
+            "-g",
+            "gdml/geometry_boxes.gdml",
+            "--",
+            macro,
+        ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
