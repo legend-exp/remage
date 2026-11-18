@@ -1,0 +1,98 @@
+name: Check for new Geant4 releases
+
+# Compares the Geant4 releases listed on https://geant4.org/download/all with the versions built in
+# the remage base images (legend-exp/legendexp_remage-base_img, one
+# Dockerfile.G4-<major>-<minor> per release series). Opens one issue per
+# release that the images do not ship yet:
+# - a newer patch of a release series that has a base image
+# - any release of a series newer than all base images
+# Beta releases are ignored.
+# An issue is not opened again if one with the same title exists (open or
+# closed).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch:
+  # test run: print the issues that would be opened, without opening them
+  pull_request:
+    paths:
+      - .github/workflows/geant4-release-check.yml
+
+# runs must not overlap, otherwise both may open an issue for the same release
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open issues for Geant4 releases missing in the base images
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' }}
+        shell: python3 {0}
+        run: |
+          import base64, json, os, re, subprocess, urllib.request
+
+          def gh(*args):
+              return subprocess.run(["gh", *args], check=True, capture_output=True, text=True).stdout
+
+          def parse(version):
+              return tuple(int(x) for x in re.findall(r"\d+", version)[:3])
+
+          # Geant4 version built in each base image, keyed by (major, minor)
+          img_repo = "repos/legend-exp/legendexp_remage-base_img/contents"
+          images = {}
+          for f in json.loads(gh("api", img_repo)):
+              if not re.fullmatch(r"Dockerfile\.G4-\d+-\d+", f["name"]):
+                  continue
+              text = base64.b64decode(json.loads(gh("api", f"{img_repo}/{f['name']}"))["content"]).decode()
+              v = parse(re.search(r'GEANT4_VERSION="([^"]+)"', text).group(1))
+              images[v[:2]] = v
+          print("Base images:", {f"{k[0]}.{k[1]}": ".".join(map(str, v)) for k, v in images.items()})
+          newest_series = max(images)
+
+          # releases listed on the Geant4 website, e.g. "11.4.3" (betas are not matched)
+          html = urllib.request.urlopen("https://geant4.org/download/all").read().decode()
+          releases = set(re.findall(r"download/(\d+\.\d+\.\d+)\.html", html))
+          for tag in sorted(releases, key=parse):
+              v = parse(tag)
+              series = v[:2]
+              if series in images:
+                  new = v > images[series]
+              else:
+                  new = series > newest_series
+              if not new:
+                  continue
+
+              title = f"New Geant4 release: {tag}"
+              found = gh("issue", "list", "--state", "all", "--search", f'"{title}" in:title',
+                         "--json", "title", "--jq", ".[].title").splitlines()
+              if title in found:
+                  print(f"{tag}: issue exists")
+                  continue
+
+              # main releases (patch number 0) have HTML release notes, patches plain text
+              notes_ext = "html" if v[2] == 0 else "txt"
+              built = ", ".join(".".join(map(str, x)) for x in sorted(images.values()))
+              body = (
+                  f"Geant4 {tag} is available: https://geant4.org/download/{tag}.html\n"
+                  f"Release notes: https://geant4.org/download/release-notes/notes-v{tag}.{notes_ext}\n\n"
+                  f"The remage base images currently build Geant4 {built} "
+                  "(https://github.com/legend-exp/legendexp_remage-base_img).\n\n"
+                  "Consider updating the base images and testing remage against this version "
+                  "(see the container policy in `docs/manual/containers.md`).\n\n"
+                  "_Opened automatically by the `geant4-release-check` workflow._"
+              )
+              if os.environ["DRY_RUN"] == "true":
+                  print(f"{tag}: would open issue '{title}' with body:\n{body}")
+                  continue
+              gh("issue", "create", "--title", title, "--body", body, "--label", "dependencies")
+              print(f"{tag}: issue opened")
