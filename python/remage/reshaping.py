@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import itertools
 import logging
 from collections.abc import Sequence
 
@@ -81,32 +82,49 @@ def reshape_output(
         msg = "hit_files must be a single path or match stp_files in length"
         raise ValueError(msg)
 
-    # physical output paths that have already received at least one write.
-    written_files: set[str] = set()
-
+    # step files that end up in the same hit file
+    stp_files_of: dict[str, list[str]] = {}
     for stp_file, hit_file in zip(stp_files, hit_files_list, strict=True):
-        msg = f"processing {stp_file} -> {hit_file}"
+        stp_files_of.setdefault(str(hit_file), []).append(stp_file)
+
+    for hit_file, inputs in stp_files_of.items():
+        msg = f"processing {', '.join(inputs)} -> {hit_file}"
         log.info(msg)
 
-        new_file = str(hit_file) not in written_files
-        written_tables: set[str] = set()
-        # number of detector tables already written to this hit file; drives the
-        # "first write creates the file, the rest append a column" logic
-        n_det_written = 0
+        # tables already written to this hit file, in order: the first write
+        # creates the file, the first write of a further table appends a column
+        written_tables: list[str] = []
 
         for detector in reshape_tables:
             table = f"{out_field}/{detector}"
-            if lh5.ls(stp_file, table) == []:
-                continue
+            # writing a table has a large fixed cost, so the hits from all step
+            # files are collected and written together, every ``buffer`` steps
+            pending: list[Table] = []
+            n_pending_steps = 0
 
-            wrote_any = False
-            for chunk_idx, stps in enumerate(
-                _iter_event_aligned_chunks(stp_file, table, buffer)
-            ):
-                hit_table = _group_by_time(
-                    stps.view_as("ak", with_units=True),
-                    window_us=time_window_in_us,
-                )
+            chunks = (
+                stps
+                for stp_file in inputs
+                if lh5.ls(stp_file, table) != []
+                for stps in _iter_event_aligned_chunks(stp_file, table, buffer)
+            )
+            # the trailing None triggers the write of what is left
+            for stps in itertools.chain(chunks, [None]):
+                if stps is not None:
+                    pending.append(
+                        _group_by_time(
+                            stps.view_as("ak", with_units=True),
+                            window_us=time_window_in_us,
+                        )
+                    )
+                    n_pending_steps += len(stps)
+
+                if not pending or (stps is not None and n_pending_steps < buffer):
+                    continue
+
+                hit_table = _concatenate_hit_tables(pending)
+                pending, n_pending_steps = [], 0
+
                 # move units from the VoV down to its flattened_data, matching
                 # the convention used elsewhere
                 for data in hit_table.values():
@@ -118,66 +136,49 @@ def reshape_output(
                 hit_table.add_field("t0", Array(np.asarray(t0), attrs={"units": "ns"}))
                 hit_table.add_field("evtid", Array(np.asarray(evtid)))
 
-                wo_mode = _get_wo_mode(
-                    n_det_written == 0, chunk_idx, new_file, overwrite
-                )
+                wo_mode = _get_wo_mode(written_tables, detector, overwrite)
                 _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
-                wrote_any = True
-
-            if wrote_any:
-                written_tables.add(detector)
-                n_det_written += 1
+                if detector not in written_tables:
+                    written_tables.append(detector)
 
         for detector in flat_hit_tables:
             table = f"{out_field}/{detector}"
-            if lh5.ls(stp_file, table) == []:
-                continue
+            for stp_file in inputs:
+                if lh5.ls(stp_file, table) == []:
+                    continue
 
-            wrote_any = False
-            for chunk_idx, stps in enumerate(_iter_chunks(stp_file, table, buffer)):
-                # already one hit per detector per event: forward as-is, only
-                # renaming the time column so it can join the coincidence map
-                hit_table = _calorimeter_hit_table(stps)
-                wo_mode = _get_wo_mode(
-                    n_det_written == 0, chunk_idx, new_file, overwrite
-                )
-                _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
-                wrote_any = True
+                for stps in _iter_chunks(stp_file, table, buffer):
+                    # already one hit per detector per event: forward as-is, only
+                    # renaming the time column so it can join the coincidence map
+                    hit_table = _calorimeter_hit_table(stps)
+                    wo_mode = _get_wo_mode(written_tables, detector, overwrite)
+                    _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
+                    if detector not in written_tables:
+                        written_tables.append(detector)
 
-            if wrote_any:
-                written_tables.add(detector)
-                n_det_written += 1
-
-        for obj in forward_tables:
-            wo_mode = _get_wo_mode_forwarded(written_tables, new_file, overwrite)
-            lh5.write(lh5.read(obj, stp_file), obj, hit_file, wo_mode=wo_mode)
-            written_tables.add(obj)
-
-        # mark this output path as created once anything was written to it, so a
-        # later stp file merging into the same hit file appends.
-        if written_tables:
-            written_files.add(str(hit_file))
+        for i, stp_file in enumerate(inputs):
+            for obj in forward_tables:
+                wo_mode = _get_wo_mode_forwarded(written_tables, i == 0, overwrite)
+                lh5.write(lh5.read(obj, stp_file), obj, hit_file, wo_mode=wo_mode)
+                written_tables.append(obj)
 
 
-def _get_wo_mode(
-    first_write: bool, chunk_idx: int, new_file: bool, overwrite: bool
-) -> str:
-    """LH5 write mode for a detector table chunk.
+def _get_wo_mode(written_tables: list[str], detector: str, overwrite: bool) -> str:
+    """LH5 write mode for a detector table, given the tables already in the hit file.
 
-    For the first chunk of the first detector in a new hit file we (over)write
-    the whole file; for the first chunk of a further detector we append a new
-    column to the parent struct; otherwise we append rows to the existing
-    table.
+    The first write to the hit file (over)writes the whole file; the first
+    write of a further detector appends a new column to the parent struct;
+    otherwise we append rows to the existing table.
     """
-    if chunk_idx == 0 and new_file:
-        if first_write:
-            return "overwrite_file" if overwrite else "write_safe"
-        return "append_column"
-    return "append"
+    if detector in written_tables:
+        return "append"
+    if not written_tables:
+        return "overwrite_file" if overwrite else "write_safe"
+    return "append_column"
 
 
 def _get_wo_mode_forwarded(
-    written_tables: set[str], new_file: bool, overwrite: bool
+    written_tables: list[str], new_file: bool, overwrite: bool
 ) -> str:
     """LH5 write mode for a table that is copied through unchanged."""
     if not new_file:
@@ -306,6 +307,33 @@ def _group_by_time(obj: ak.Array, *, window_us: float) -> Table:
         if units_dict[f] is not None:
             vov.attrs["units"] = units_dict[f]
         out.add_field(f, vov)
+    return out
+
+
+def _concatenate_hit_tables(tables: list[Table]) -> Table:
+    """Concatenate the rows of hit tables returned by :func:`_group_by_time`."""
+    if len(tables) == 1:
+        return tables[0]
+
+    out = Table(size=sum(len(t) for t in tables))
+    for field, first in tables[0].items():
+        cols = [t[field] for t in tables]
+        # each cumulative_length restarts from zero: shift it by the number of
+        # steps in the tables before
+        n_steps = np.cumsum([0] + [len(c.flattened_data) for c in cols[:-1]])
+        out.add_field(
+            field,
+            VectorOfVectors(
+                cumulative_length=np.concatenate(
+                    [
+                        c.cumulative_length.nda + n
+                        for c, n in zip(cols, n_steps, strict=True)
+                    ]
+                ),
+                flattened_data=np.concatenate([c.flattened_data.nda for c in cols]),
+                attrs=first.attrs,
+            ),
+        )
     return out
 
 
