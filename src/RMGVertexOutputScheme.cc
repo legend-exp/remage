@@ -15,11 +15,16 @@
 
 #include "RMGVertexOutputScheme.hh"
 
+#include <set>
+
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
+#include "G4TransportationManager.hh"
 
+#include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
+#include "RMGOutputTools.hh"
 
 namespace u = CLHEP;
 
@@ -38,9 +43,19 @@ void RMGVertexOutputScheme::AssignOutputNames(G4AnalysisManager* ana_man) {
     CreateNtupleFOrDColumn(ana_man, vid, "yloc_in_m", fStoreSinglePrecisionPosition);
     CreateNtupleFOrDColumn(ana_man, vid, "zloc_in_m", fStoreSinglePrecisionPosition);
     ana_man->CreateNtupleIColumn(vid, "n_part");
+    if (fStoreVolumeInformation) { ana_man->CreateNtupleIColumn(vid, "volumeid"); }
   }
 
   ana_man->FinishNtuple(vid);
+
+  if (!fSkipPrimaryVertexOutput && fStoreVolumeInformation) {
+    auto volid = RMGOutputManager::Instance()
+                     ->CreateAndRegisterAuxNtuple("vtx_volumes", "RMGVertexOutputScheme", ana_man);
+    ana_man->CreateNtupleIColumn(volid, "volumeid");
+    ana_man->CreateNtupleSColumn(volid, "name");
+    ana_man->FinishNtuple(volid);
+    RMGIpc::SendIpcNonBlocking(RMGIpc::CreateMessage("output_ntuple_deduplicate", "vtx_volumes"));
+  }
 
   if (!fSkipPrimaryVertexOutput && fStorePrimaryParticleInformation) {
     auto pid = RMGOutputManager::Instance()
@@ -99,6 +114,20 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
             fStoreSinglePrecisionPosition
         );
         ana_man->FillNtupleIColumn(vntupleid, vcol_id++, n_primaries);
+
+        if (fStoreVolumeInformation) {
+          int vol_id = -1;
+          auto navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+          const auto primary_vol = navigator->LocateGlobalPointAndSetup(primary_vertex->GetPosition());
+          if (primary_vol) {
+            auto vol_name = primary_vol->GetName();
+            auto [it, inserted] = fVolumeMap.try_emplace(vol_name, 0);
+            if (inserted) { it->second = RMGOutputTools::HashStringFnv1a(vol_name); }
+            vol_id = static_cast<int>(it->second);
+          }
+
+          ana_man->FillNtupleIColumn(vntupleid, vcol_id++, vol_id);
+        }
       }
 
       // NOTE: must be called here for hit-oriented output
@@ -149,6 +178,30 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
   }
 }
 
+void RMGVertexOutputScheme::EndOfRunAction(const G4Run*) {
+  auto rmg_man = RMGOutputManager::Instance();
+  if (!rmg_man->IsPersistencyEnabled() || fSkipPrimaryVertexOutput || !fStoreVolumeInformation)
+    return;
+
+  const auto ana_man = G4AnalysisManager::Instance();
+  auto ntupleid = rmg_man->GetAuxNtupleID("vtx_volumes");
+
+  std::set<uint32_t> volume_ids; // to check for duplicates.
+
+  for (auto& [vol_name, vol_id_map] : fVolumeMap) {
+    int vol_id = static_cast<int>(vol_id_map);
+
+    ana_man->FillNtupleIColumn(ntupleid, 0, vol_id);
+    ana_man->FillNtupleSColumn(ntupleid, 1, vol_name);
+    ana_man->AddNtupleRow(ntupleid);
+
+    // Check for duplicate volume IDs
+    if (!volume_ids.insert(vol_id_map).second) {
+      RMGLog::OutDev(RMGLog::error, "Duplicate volume name hash ", vol_id_map);
+    }
+  }
+}
+
 void RMGVertexOutputScheme::DefineCommands() {
 
   fMessenger = std::make_unique<G4GenericMessenger>(
@@ -190,6 +243,15 @@ void RMGVertexOutputScheme::DefineCommands() {
       .SetGuidance("Use float32 (instead of float64) for energy output.")
       .SetGuidance(
           std::string("This is ") + (fStoreSinglePrecisionEnergy ? "enabled" : "disabled") + " by default"
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_Idle);
+
+  fMessenger->DeclareProperty("StoreVolumeInformation", fStoreVolumeInformation)
+      .SetGuidance("Store the originating sampling volume.")
+      .SetGuidance(
+          std::string("This is ") + (fStoreVolumeInformation ? "enabled" : "disabled") + " by default"
       )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
