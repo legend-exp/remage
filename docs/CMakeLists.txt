@@ -4,18 +4,59 @@ find_package(Doxygen REQUIRED)
 get_target_property(REMAGE_PUBLIC_HEADER_DIR remage INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB REMAGE_PUBLIC_HEADERS ${REMAGE_PUBLIC_HEADER_DIR}/*.hh)
 
-set(GEANT4_TAG_URL "https://geant4.kek.jp/Reference/11.3.0/geant4.tag")
-message(STATUS "Downloading Geant4 tag file from: ${GEANT4_TAG_URL}")
-file(
-  DOWNLOAD "${GEANT4_TAG_URL}" "${CMAKE_CURRENT_BINARY_DIR}/geant4.tag"
-  EXPECTED_HASH SHA256=79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c
-  TLS_VERIFY OFF # TODO: re-enable
-  STATUS download_status
-  LOG download_log)
+# The Geant4 Doxygen tag file is only used to cross-link Geant4 classes. The upstream host is
+# known to be flaky, so a failed download must not break the docs build: warn and build without
+# the cross-links instead.
+set(GEANT4_TAG_BASE_URL "https://geant4.kek.jp/Reference/11.3.0")
+set(GEANT4_TAG_SHA256 "79b695ba4d8993c6bb8b93aba40fbc019c91378ab0bd1c20e200f8203cfd2b3c")
+set(GEANT4_TAG_FILE "${CMAKE_CURRENT_BINARY_DIR}/geant4.tag")
 
-if(NOT download_status EQUAL 0)
-  message(
-    WARNING "Download of Geant4 tag file failed with status ${download_status}:\n${download_log}")
+set(_g4tag_ok FALSE)
+if(EXISTS "${GEANT4_TAG_FILE}")
+  file(SHA256 "${GEANT4_TAG_FILE}" _g4tag_hash)
+  if(_g4tag_hash STREQUAL GEANT4_TAG_SHA256)
+    set(_g4tag_ok TRUE)
+  endif()
+endif()
+
+if(NOT _g4tag_ok)
+  message(STATUS "Downloading Geant4 tag file from: ${GEANT4_TAG_BASE_URL}/geant4.tag")
+  # no EXPECTED_HASH here: with it, a failed download is a fatal configure error.
+  file(
+    DOWNLOAD "${GEANT4_TAG_BASE_URL}/geant4.tag" "${GEANT4_TAG_FILE}.part"
+    TLS_VERIFY OFF # TODO: re-enable
+    TIMEOUT 120
+    INACTIVITY_TIMEOUT 30
+    STATUS _g4tag_status)
+  list(GET _g4tag_status 0 _g4tag_code)
+  list(GET _g4tag_status 1 _g4tag_status)
+  if(_g4tag_code EQUAL 0)
+    file(SHA256 "${GEANT4_TAG_FILE}.part" _g4tag_hash)
+    if(_g4tag_hash STREQUAL GEANT4_TAG_SHA256)
+      file(RENAME "${GEANT4_TAG_FILE}.part" "${GEANT4_TAG_FILE}")
+      set(_g4tag_ok TRUE)
+    else()
+      set(_g4tag_status "SHA256 mismatch (got ${_g4tag_hash})")
+    endif()
+  endif()
+  file(REMOVE "${GEANT4_TAG_FILE}.part")
+endif()
+
+set(DOXYGEN_WARN_AS_ERROR "YES")
+if(_g4tag_ok)
+  set(DOXYGEN_TAGFILES "\"${GEANT4_TAG_FILE}=${GEANT4_TAG_BASE_URL}\"")
+else()
+  set(DOXYGEN_TAGFILES "")
+  set(DOXYGEN_WARN_AS_ERROR "NO")
+  string(CONCAT _g4tag_msg "Could not obtain Geant4 Doxygen tag file (${_g4tag_status}). "
+                "Building docs without links to the Geant4 reference and with "
+                "Doxygen warnings not treated as errors.")
+  message(WARNING "${_g4tag_msg}")
+  if(DEFINED ENV{GITHUB_ACTIONS})
+    # surface as an annotation on the workflow run
+    execute_process(COMMAND ${CMAKE_COMMAND} -E echo
+                            "::warning title=Geant4 tag file::${_g4tag_msg}")
+  endif()
 endif()
 
 set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
