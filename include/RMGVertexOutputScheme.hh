@@ -16,6 +16,8 @@
 #ifndef _RMG_VERTEX_OUTPUT_SCHEME_HH_
 #define _RMG_VERTEX_OUTPUT_SCHEME_HH_
 
+#include <map>
+#include <string>
 #include <vector>
 
 #include "G4AnalysisManager.hh"
@@ -42,6 +44,9 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     /** @brief Fill one row per primary vertex of the event. */
     void StoreEvent(const G4Event*) override;
 
+    /** @brief handles the storage of the volume map. */
+    void EndOfRunAction(const G4Run*) override;
+
     // always store vertex data, so that results are not skewed if events are discarded.
     [[nodiscard]] bool StoreAlways() const override { return true; }
 
@@ -59,7 +64,10 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     bool fStorePrimaryParticleInformation = false;
     bool fStoreSinglePrecisionEnergy = false;
     bool fStoreSinglePrecisionPosition = false;
+    bool fStoreVolumeInformation = false;
     bool fSkipPrimaryVertexOutput = false;
+
+    std::map<std::string, uint32_t> fVolumeMap;
 };
 
 #endif
