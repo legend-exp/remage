@@ -8,7 +8,8 @@ GENERATE_HTML = YES
 GENERATE_XML = YES
 XML_PROGRAMLISTING = NO
 WARN_IF_UNDOCUMENTED = NO
-WARN_AS_ERROR = YES
+# NO only if the Geant4 tag file is unavailable (references to Geant4 classes cannot be resolved)
+WARN_AS_ERROR = @DOXYGEN_WARN_AS_ERROR@
 HAVE_DOT = YES
 DOT_PATH = $(DOXYGEN_DOT_PATH)
 
@@ -19,4 +20,5 @@ EXCLUDE = "@DOXYGEN_INPUT_DIR@/src/remage.cc" \
           "@DOXYGEN_INPUT_DIR@/src/remage-from-lh5.cc" \
           "@DOXYGEN_INPUT_DIR@/src/remage-doc-dump.cc"
 
-TAGFILES = "geant4.tag=https://geant4.kek.jp/Reference/11.3.0"
+# filled in only if the Geant4 tag file could be downloaded
+TAGFILES = @DOXYGEN_TAGFILES@
