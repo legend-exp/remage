@@ -19,7 +19,6 @@ import itertools
 import logging
 from collections.abc import Sequence
 
-import awkward as ak
 import lh5
 import numpy as np
 from lgdo import Array
@@ -123,13 +122,13 @@ def reshape_output(
                     for data in hit_table.values():
                         _move_units_to_flattened_data(data)
 
-                    hits_ak = hit_table.view_as("ak")
-                    t0 = ak.fill_none(ak.firsts(hits_ak.time, axis=-1), 0)
-                    evtid = ak.fill_none(ak.firsts(hits_ak.evtid, axis=-1), 0)
-                    hit_table.add_field(
-                        "t0", Array(np.asarray(t0), attrs={"units": "ns"})
-                    )
-                    hit_table.add_field("evtid", Array(np.asarray(evtid)))
+                    # time and evtid of the first step of each hit
+                    cumlen = hit_table["time"].cumulative_length.nda
+                    first = cumlen - np.diff(cumlen, prepend=0)
+                    t0 = hit_table["time"].flattened_data.nda[first]
+                    evtid = hit_table["evtid"].flattened_data.nda[first]
+                    hit_table.add_field("t0", Array(t0, attrs={"units": "ns"}))
+                    hit_table.add_field("evtid", Array(evtid.astype(np.int64)))
 
                     wo_mode = _get_wo_mode(written_tables, detector, overwrite)
                     _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
@@ -137,12 +136,7 @@ def reshape_output(
                         written_tables.append(detector)
 
                 if stps is not None:
-                    pending.append(
-                        _group_by_time(
-                            stps.view_as("ak", with_units=True),
-                            window_us=time_window_in_us,
-                        )
-                    )
+                    pending.append(_group_by_time(stps, window_us=time_window_in_us))
                     n_pending_steps += len(stps)
 
         for detector in flat_hit_tables:
@@ -250,8 +244,10 @@ def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
     if n_total == 0:
         return
 
-    evtids = lh5.read(f"{table}/evtid", stp_file).nda
-    diffs = np.diff(evtids)
+    # a table that fits in one chunk is read only once
+    stps = lh5.read(table, stp_file) if n_total <= buffer else None
+    evtids = stps["evtid"] if stps is not None else lh5.read(f"{table}/evtid", stp_file)
+    diffs = np.diff(evtids.nda)
     if np.any(diffs < 0):
         msg = (
             f"evtids in {table} of {stp_file} are not monotonically increasing: "
@@ -259,6 +255,10 @@ def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
             "hit grouping"
         )
         raise ValueError(msg)
+    if stps is not None:
+        yield stps
+        return
+
     event_starts = np.concatenate(([0], np.flatnonzero(diffs) + 1, [n_total]))
 
     start = 0
@@ -273,27 +273,35 @@ def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
         start = end
 
 
-def _group_by_time(obj: ak.Array, *, window_us: float) -> Table:
+def _group_by_time(stps: Table, *, window_us: float) -> Table:
     """Group steps into hits by ``evtid`` and a coincidence time window.
 
     A new hit starts whenever ``evtid`` changes, or ``time`` jumps by more than
     ``window_us`` microseconds within the same evtid. Returns an :class:`lgdo.Table`
-    of :class:`VectorOfVectors`, one per field of ``obj``, preserving each
-    field's ``units`` parameter.
+    of :class:`VectorOfVectors`, one per column of ``stps``, preserving each
+    column's ``units`` attribute.
 
-    ``time`` is assumed to be in nanoseconds (the unit remage writes).
+    ``time`` is assumed to be in nanoseconds (the unit remage writes). Only flat
+    columns (one-dimensional :class:`lgdo.Array`) are supported.
     """
-    fields = obj.fields
-    units_dict = {f: ak.parameters(obj[f]).get("units") for f in fields}
+    fields = list(stps)
+    for f in fields:
+        col = stps[f]
+        if not isinstance(col, Array) or col.nda.ndim != 1:
+            msg = (
+                f"cannot group step column {f!r} of type {type(col).__name__}: "
+                "only flat columns (one-dimensional lgdo.Array) are supported"
+            )
+            raise TypeError(msg)
+
+    units_dict = {f: stps[f].attrs.get("units") for f in fields}
     if units_dict.get("time") != "ns":
         msg = f"expected time field in 'ns', got {units_dict.get('time')!r}"
         raise ValueError(msg)
 
     # sort first by evtid, then by time within each evtid
-    by_evtid = obj[ak.argsort(obj["evtid"])]
-    grouped = ak.unflatten(by_evtid, ak.run_lengths(by_evtid["evtid"]))
-    time_order = ak.argsort(grouped["time"], axis=-1)
-    sorted_cols = {f: np.asarray(ak.flatten(grouped[f][time_order])) for f in fields}
+    order = np.lexsort((stps["time"].nda, stps["evtid"].nda))
+    sorted_cols = {f: stps[f].nda[order] for f in fields}
 
     window_ns = window_us * 1000.0
     time = sorted_cols["time"]
@@ -301,7 +309,11 @@ def _group_by_time(obj: ak.Array, *, window_us: float) -> Table:
     dt = np.diff(time)
     de = np.diff(evtid)
     boundary = ((dt > window_ns) & (de == 0)) | (de > 0)
-    cumulative_length = np.append(np.where(boundary)[0] + 1, len(time))
+    # an empty step table has no hits, not one empty hit
+    if len(time) == 0:
+        cumulative_length = np.empty(0, dtype=np.int64)
+    else:
+        cumulative_length = np.append(np.where(boundary)[0] + 1, len(time))
 
     out = Table(size=len(cumulative_length))
     for f in fields:
