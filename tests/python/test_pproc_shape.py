@@ -43,8 +43,7 @@ def test_time_group():
     in_tab = Table(in_arr_evtid)
 
     # 1us =1000ns
-    in_ak = in_tab.view_as("ak", with_units=True)
-    out = _group_by_time(in_ak, window_us=1)
+    out = _group_by_time(in_tab, window_us=1)
     out_ak = out.view_as("ak", with_units=True)
 
     assert ak.all(
