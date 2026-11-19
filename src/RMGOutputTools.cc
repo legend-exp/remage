@@ -555,4 +555,17 @@ bool RMGOutputTools::is_within_surface_safety(
   return false;
 }
 
+uint32_t RMGOutputTools::HashStringFnv1a(std::string_view str) {
+  // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
+  // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+  // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
+  uint32_t hash = 0x811c9dc5;
+  for (char& b : str) {
+    hash ^= (uint32_t)b;
+    hash *= 0x01000193;
+  }
+  // xor-fold down to 16 bit.
+  return (hash >> 16) ^ (hash & (uint32_t)0xffff);
+}
+
 // vim: tabstop=2 shiftwidth=2 expandtab
