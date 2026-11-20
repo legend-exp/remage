@@ -18,7 +18,8 @@ set(_macros
     ntuple-single-table.mac
     ntuple-single-table-with-tracks.mac
     ntuple-optionals.mac
-    ntuple-no-stp.mac)
+    ntuple-no-stp.mac
+    ntuple-vtx-volume.mac)
 
 foreach(_mac ${_macros})
   add_test(NAME output/hdf5-${_mac} COMMAND ./run-test-hdf5.sh ${REMAGE_PYEXE} ${PYTHONPATH}
