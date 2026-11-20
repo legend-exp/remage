@@ -1,0 +1,21 @@
+/RMG/Geometry/RegisterDetector Scintillator scint1 1
+/RMG/Geometry/RegisterDetector Scintillator scint2 2
+/RMG/Geometry/RegisterDetector Germanium det1 11
+/RMG/Geometry/RegisterDetector Germanium det2 12
+
+/control/execute macros/_init.mac
+
+/RMG/Output/NtuplePerDetector true
+/RMG/Output/NtupleUseVolumeName true
+/RMG/Output/Vertex/StoreVolumeInformation
+
+/RMG/Generator/Confine Volume
+/RMG/Generator/Confinement/Physical/AddVolume det1
+/RMG/Generator/Confinement/Physical/AddVolume scint1
+
+/RMG/Generator/Select GPS
+/gps/ang/type iso
+/gps/particle gamma
+/gps/energy 200 keV
+
+/run/beamOn 1000

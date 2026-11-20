@@ -17,6 +17,7 @@
 #define _RMG_OUTPUT_TOOLS_HH_
 
 #include <map>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -199,6 +200,8 @@ namespace RMGOutputTools {
       ClusterPars cluster_pars,
       bool has_distance_to_surface
   );
+
+  uint32_t HashStringFnv1a(std::string& str);
 } // namespace RMGOutputTools
 
 #endif
