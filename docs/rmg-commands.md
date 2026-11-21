@@ -156,6 +156,7 @@ Commands for controlling physics processes
 * `OpticalPhysicsMaxOneWLSPhoton` – Use a custom wavelegth shifting process that produces at maximum one secondary photon.
 * `LowEnergyEMPhysics` – Add low energy electromagnetic processes to the physics list
 * `HadronicPhysics` – Add hadronic processes to the physics list
+* `UseAblaDeExcitation` – Use ABLA++ as de-excitation model after INCL++
 * `EnableNeutronThermalScattering` – Use thermal scattering cross sections for neutrons
 * `EnableGammaAngularCorrelation` – Set correlated gamma emission flag
 * `GammaTwoJMAX` – Set max 2J for sampling of angular correlations
@@ -248,7 +249,21 @@ Uses None by default
   * **Parameter type** – `s`
   * **Omittable** – `False`
   * **Default value** – `Shielding`
-  * **Candidates** – `QGSP_BIC_HP QGSP_BERT_HP FTFP_BERT_HP Shielding None`
+  * **Candidates** – `QGSP_BIC_HP QGSP_BERT_HP FTFP_BERT_HP Shielding ShieldingLEND FTFP_INCLXX_HP QGSP_INCLXX_HP None`
+* **Allowed states** – `PreInit`
+
+### `/RMG/Processes/UseAblaDeExcitation`
+
+Use ABLA++ as de-excitation model after INCL++
+
+Only has an effect with the FTFP_INCLXX_HP or QGSP_INCLXX_HP hadronic physics lists. ABLA++ takes over evaporation and fission of the excited remnant, replacing the default Geant4 de-excitation chain.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
 * **Allowed states** – `PreInit`
 
 ### `/RMG/Processes/EnableNeutronThermalScattering`
