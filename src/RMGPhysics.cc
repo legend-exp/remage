@@ -16,6 +16,7 @@
 #include "RMGPhysics.hh"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -36,19 +37,21 @@
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "G4EnvironmentUtils.hh"
 #include "G4Gamma.hh"
 #include "G4HadronElasticPhysicsHP.hh"
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronPhysicsFTFP_BERT_HP.hh"
 #include "G4HadronPhysicsQGSP_BERT_HP.hh"
-#include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
 #include "G4HadronPhysicsShielding.hh"
 #include "G4HadronicParameters.hh"
 #include "G4HadronicProcess.hh"
 #include "G4HadronicProcessStore.hh"
+#include "G4HadronicProcessType.hh"
 #include "G4IonConstructor.hh"
 #include "G4IonPhysics.hh"
+#include "G4IonPhysicsPHP.hh"
 #include "G4IonTable.hh"
 #include "G4LeptonConstructor.hh"
 #include "G4Material.hh"
@@ -64,6 +67,8 @@
 #include "G4ParticleHPCaptureData.hh"
 #include "G4ParticleHPElastic.hh"
 #include "G4ParticleHPElasticData.hh"
+#include "G4ParticleHPInelastic.hh"
+#include "G4ParticleHPInelasticData.hh"
 #include "G4ParticleHPThermalScattering.hh"
 #include "G4ParticleHPThermalScatteringData.hh"
 #include "G4Positron.hh"
@@ -334,8 +339,26 @@ void RMGPhysics::ConstructProcess() {
     stoppingPhysics->ConstructProcess();
 
     RMGLog::Out(RMGLog::detail, "Adding ion physics");
-    G4VPhysicsConstructor* ionPhysics = new G4IonPhysics(G4VModularPhysicsList::verboseLevel);
+    G4VPhysicsConstructor* ionPhysics = nullptr;
+    if (fUseTENDLLightIons) {
+      // Geant4 aborts with an unclear exception if the TENDL data is missing
+      const auto* tendl_dir = G4FindDataDir("G4PARTICLEHPDATA");
+      if (!tendl_dir || !std::filesystem::is_directory(tendl_dir)) {
+        RMGLog::Out(
+            RMGLog::fatal,
+            "EnableTENDLLightIons needs the G4TENDL data set, but it was not found. Install it ",
+            "or set G4PARTICLEHPDATA to its directory."
+        );
+      }
+      // this covers the deuteron, triton, He3 and alpha with the TENDL data below 200 MeV
+      ionPhysics = new G4IonPhysicsPHP(G4VModularPhysicsList::verboseLevel);
+    } else {
+      ionPhysics = new G4IonPhysics(G4VModularPhysicsList::verboseLevel);
+    }
     ionPhysics->ConstructProcess();
+
+    // this activates the TENDL data for the proton inelastic process, not covered by G4IonPhysicsPHP
+    if (fUseTENDLLightIons) this->ConstructTENDLProton();
   }
 
   // Add decays
@@ -410,6 +433,50 @@ void RMGPhysics::ConstructProcess() {
     proc_manager->RemoveProcess(user_special_cut);
     proc_manager->AddDiscreteProcess(new RMGSelectiveEkinMinCutProcess());
   }
+}
+
+void RMGPhysics::ConstructTENDLProton() {
+  // This function adds the TENDL data for the proton inelastic process for any hadronic physics
+  // list. It is based on the implementation in G4HadronPhysicsQGSP_BIC_AllHP::ConstructProcess().
+  const double max_hp_energy = 200 * u::MeV;
+  const double min_default_energy = 190 * u::MeV; // new lower limit for internuclear cascade models
+
+  auto* proton = G4Proton::Proton();
+
+  G4HadronicProcess* inelastic = nullptr;
+  const auto processes = proton->GetProcessManager()->GetProcessList();
+  for (size_t i = 0; i < processes->size(); i++) {
+    auto* proc = dynamic_cast<G4HadronicProcess*>((*processes)[(int)i]);
+    if (proc && proc->GetProcessSubType() == fHadronInelastic) inelastic = proc;
+  }
+
+  if (!inelastic) {
+    RMGLog::Out(RMGLog::error, "Found no proton inelastic process, TENDL data is not used for it");
+    return;
+  }
+
+  for (auto* model : inelastic->GetHadronicInteractionList()) {
+    if (model->GetMinEnergy() < min_default_energy && model->GetMaxEnergy() > min_default_energy) {
+      model->SetMinEnergy(min_default_energy);
+    }
+  }
+
+  auto* hp_model = new G4ParticleHPInelastic(proton, "ParticleHPInelastic");
+  hp_model->SetMinEnergy(0);
+  hp_model->SetMaxEnergy(max_hp_energy);
+  inelastic->RegisterMe(hp_model);
+
+  auto* hp_data = new G4ParticleHPInelasticData(proton);
+  hp_data->SetMinKinEnergy(0);
+  hp_data->SetMaxKinEnergy(max_hp_energy);
+  inelastic->AddDataSet(hp_data);
+
+  RMGLog::Out(
+      RMGLog::detail,
+      "Using TENDL data below ",
+      max_hp_energy / u::MeV,
+      " MeV for inelastic reactions of the proton"
+  );
 }
 
 void RMGPhysics::ConstructOptical() {
@@ -703,6 +770,23 @@ void RMGPhysics::DefineCommands() {
       .SetGuidance(
           std::string("This is ") + (fUseNeutronThermalScattering ? "enabled" : "disabled") +
           " by default"
+      )
+      .SetParameterName("boolean", true)
+      .SetDefaultValue("true")
+      .SetStates(G4State_PreInit);
+
+  fMessenger->DeclareProperty("EnableTENDLLightIons", fUseTENDLLightIons)
+      .SetGuidance(
+          "Use the ParticleHP models with the TENDL data for inelastic reactions of protons, "
+          "deuterons, tritons, He3 and alphas below 200 MeV."
+      )
+      .SetGuidance(
+          "This works with every hadronic physics option. It needs the G4TENDL data set. Geant4 "
+          "reads it from the Geant4 installation, or from the directory in the environment "
+          "variable G4PARTICLEHPDATA if that variable is set."
+      )
+      .SetGuidance(
+          std::string("This is ") + (fUseTENDLLightIons ? "enabled" : "disabled") + " by default"
       )
       .SetParameterName("boolean", true)
       .SetDefaultValue("true")
