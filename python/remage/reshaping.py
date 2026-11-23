@@ -128,7 +128,7 @@ def reshape_output(
                     t0 = hit_table["time"].flattened_data.nda[first]
                     evtid = hit_table["evtid"].flattened_data.nda[first]
                     hit_table.add_field("t0", Array(t0, attrs={"units": "ns"}))
-                    hit_table.add_field("evtid", Array(evtid.astype(np.int64)))
+                    hit_table.add_field("evtid", Array(evtid))
 
                     wo_mode = _get_wo_mode(written_tables, detector, overwrite)
                     _write_lh5(hit_table, hit_file, out_field, detector, wo_mode)
