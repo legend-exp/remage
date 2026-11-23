@@ -19,6 +19,7 @@ import itertools
 import logging
 from collections.abc import Sequence
 
+import h5py
 import lh5
 import numpy as np
 from lgdo import Array
@@ -107,7 +108,6 @@ def reshape_output(
             chunks = (
                 stps
                 for stp_file in inputs
-                if lh5.ls(stp_file, table) != []
                 for stps in _iter_event_aligned_chunks(stp_file, table, buffer)
             )
             # write what is pending before a chunk that would exceed ``buffer``
@@ -142,9 +142,6 @@ def reshape_output(
         for detector in flat_hit_tables:
             table = f"{out_field}/{detector}"
             for stp_file in inputs:
-                if lh5.ls(stp_file, table) == []:
-                    continue
-
                 for stps in _iter_chunks(stp_file, table, buffer):
                     # already one hit per detector per event: forward as-is, only
                     # renaming the time column so it can join the coincidence map
@@ -212,65 +209,85 @@ def _calorimeter_hit_table(stps: Table) -> Table:
     return out
 
 
+def _read_steps(group: h5py.Group, start: int, stop: int) -> Table:
+    """Read rows ``start`` to ``stop`` of a step table.
+
+    A step table is an HDF5 group with one dataset per column. Reading it
+    directly is faster than :func:`lh5.read`, which matters for the many small
+    tables of a multithreaded run.
+    """
+    out = Table(size=stop - start)
+    # columns in the order given by the LH5 datatype, "table{col1,col2,...}"
+    for name in group.attrs["datatype"][6:-1].split(","):
+        ds = group[name]
+        if not isinstance(ds, h5py.Dataset) or ds.ndim != 1:
+            msg = f"column {ds.name} of {group.file.filename} is not a 1D array"
+            raise ValueError(msg)
+        attrs = {"units": ds.attrs["units"]} if "units" in ds.attrs else {}
+        out.add_field(name, Array(ds[start:stop], attrs=attrs))
+    return out
+
+
 def _iter_chunks(stp_file: str, table: str, buffer: int):
-    """Yield ``buffer``-sized row chunks of ``table``.
+    """Yield ``buffer``-sized row chunks of ``table``, if it is in ``stp_file``.
 
     Used for flat hit tables (e.g. calorimeter) where every row is an
     independent hit, so no evtid alignment is needed and the table can be
     streamed in fixed-size blocks to bound memory.
     """
-    # read_n_rows returns None for a Table group, so count rows on a column
-    columns = lh5.ls(stp_file, f"{table}/*")
-    if not columns:
-        return
-    n_total = lh5.read_n_rows(columns[0], stp_file) or 0
-    start = 0
-    while start < n_total:
-        n_rows = min(buffer, n_total - start)
-        yield lh5.read(table, stp_file, start_row=start, n_rows=n_rows)
-        start += n_rows
+    with h5py.File(stp_file) as h5f:
+        if table not in h5f:
+            return
+        n_total = min((ds.shape[0] for ds in h5f[table].values()), default=0)
+        for start in range(0, n_total, buffer):
+            yield _read_steps(h5f[table], start, min(start + buffer, n_total))
 
 
 def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
     """Yield ``buffer``-sized chunks of ``table`` aligned to evtid boundaries.
 
-    All steps of a given evtid stay in the same chunk, so each chunk can be
-    grouped into hits independently. The full evtid column is read once up front
-    to compute the split points.
+    Nothing is yielded if ``table`` is not in ``stp_file``. All steps of a given
+    evtid stay in the same chunk, so each chunk can be grouped into hits
+    independently. The full evtid column is read once up front to compute the
+    split points.
 
     This relies on remage writing evtids monotonically increasing.
     """
-    n_total = lh5.read_n_rows(f"{table}/evtid", stp_file) or 0
-    if n_total == 0:
-        return
+    with h5py.File(stp_file) as h5f:
+        if table not in h5f:
+            return
+        group = h5f[table]
+        n_total = group["evtid"].shape[0]
+        if n_total == 0:
+            return
 
-    # a table that fits in one chunk is read only once
-    stps = lh5.read(table, stp_file) if n_total <= buffer else None
-    evtids = stps["evtid"] if stps is not None else lh5.read(f"{table}/evtid", stp_file)
-    diffs = np.diff(evtids.nda)
-    if np.any(diffs < 0):
-        msg = (
-            f"evtids in {table} of {stp_file} are not monotonically increasing: "
-            "an event's steps would span separate blocks, breaking per-chunk "
-            "hit grouping"
-        )
-        raise ValueError(msg)
-    if stps is not None:
-        yield stps
-        return
+        # a table that fits in one chunk is read only once
+        stps = _read_steps(group, 0, n_total) if n_total <= buffer else None
+        evtids = stps["evtid"].nda if stps is not None else group["evtid"][()]
+        diffs = np.diff(evtids)
+        if np.any(diffs < 0):
+            msg = (
+                f"evtids in {table} of {stp_file} are not monotonically increasing: "
+                "an event's steps would span separate blocks, breaking per-chunk "
+                "hit grouping"
+            )
+            raise ValueError(msg)
+        if stps is not None:
+            yield stps
+            return
 
-    event_starts = np.concatenate(([0], np.flatnonzero(diffs) + 1, [n_total]))
+        event_starts = np.concatenate(([0], np.flatnonzero(diffs) + 1, [n_total]))
 
-    start = 0
-    while start < n_total:
-        target = start + buffer
-        pos = int(np.searchsorted(event_starts, target, side="right")) - 1
-        end = int(event_starts[pos])
-        if end <= start:
-            # buffer smaller than a single event - take the whole event
-            end = int(event_starts[pos + 1])
-        yield lh5.read(table, stp_file, start_row=start, n_rows=end - start)
-        start = end
+        start = 0
+        while start < n_total:
+            target = start + buffer
+            pos = int(np.searchsorted(event_starts, target, side="right")) - 1
+            end = int(event_starts[pos])
+            if end <= start:
+                # buffer smaller than a single event - take the whole event
+                end = int(event_starts[pos + 1])
+            yield _read_steps(group, start, end)
+            start = end
 
 
 def _group_by_time(stps: Table, *, window_us: float) -> Table:
