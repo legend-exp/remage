@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     import pyg4ometry.geant4 as g4
 
 from . import logging as rmg_logging
+from . import post_proc as post_proc_module
 from . import utils
 from ._version import __version__
 from .find_remage import find_remage_cpp
@@ -500,4 +501,5 @@ def remage_run_from_args(
 
 
 def remage_cli() -> int:
+    post_proc_module._main_is_remage_cli = True
     return remage_run_from_args(raise_on_error=False)[0]
