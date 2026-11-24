@@ -265,6 +265,12 @@ For more complicated vertex confinement _remage_ supports the possibility to
 read in directly event primary positions from input files, as described in
 {ref}`manual-input-vertex`.
 
+## Identifying the sampling volume
+
+When sampling in more than one volume, the name of the physical volume that
+contains each vertex can be stored in the output vertex table, see
+{ref}`manual-output-vertex-volume`.
+
 ## Visualization
 
 You can use `legend-pygeom-vis` from the

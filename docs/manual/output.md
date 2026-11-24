@@ -891,6 +891,51 @@ always equal to the number of simulated events.
 The vertex table is useful to reconstruct the event vertex of hits recorded in
 detectors by matching the information stored in the `evtid` column.
 
+(manual-output-vertex-volume)=
+
+### Storing the vertex volume
+
+When primaries are sampled in several volumes at once, it is often necessary to
+know in which volume each vertex was generated. _remage_ can store this
+information as an additional `volumeid` column in the vertex table, enabled with
+<project:../rmg-commands.md#rmgoutputvertexstorevolumeinformation>:
+
+```geant4
+/RMG/Output/Vertex/StoreVolumeInformation true
+```
+
+The `volumeid` column holds a numeric hash of the name of the physical volume
+that contains the vertex position. A mapping of volume names (strings) to these
+identifiers is stored in the `vtx_volumes` struct, analogous to the `processes`
+struct of the [track output scheme](#the-track-output-scheme). Only volumes that
+contained at least one vertex are listed:
+
+```text
+/
+├── vtx · table{evtid,n_part,time,volumeid,xloc,yloc,zloc}
+│   ├── evtid · array<1>{real}
+│   ├── n_part · array<1>{real}
+│   ├── time · array<1>{real} ── {'units': 'ns'}
+│   ├── volumeid · array<1>{real}
+│   ├── xloc · array<1>{real} ── {'units': 'm'}
+│   ├── yloc · array<1>{real} ── {'units': 'm'}
+│   └── zloc · array<1>{real} ── {'units': 'm'}
+└── vtx_volumes · struct{det1,scint1}
+    ├── det1 · real
+    └── scint1 · real
+```
+
+Some details to keep in mind:
+
+- The volume is determined by locating the vertex position in the geometry after
+  the vertex has been generated, independently of how it was sampled. This works
+  with any vertex generator, but always yields the innermost physical volume at
+  that position: a vertex sampled in a mother volume that falls into one of its
+  daughters is attributed to the daughter.
+- Only the physical volume _name_ is used. Different placements sharing the same
+  name (e.g. copies distinguished only by their copy number) are mapped to the
+  same identifier.
+
 ## Run metadata
 
 The output file will also contain the total number of simulated Geant4 events in
