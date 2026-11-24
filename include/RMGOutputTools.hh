@@ -201,7 +201,7 @@ namespace RMGOutputTools {
       bool has_distance_to_surface
   );
 
-  uint32_t HashStringFnv1a(std::string_view str);
+  uint32_t HashStringFnv1a(std::string_view str, bool fold);
 } // namespace RMGOutputTools
 
 #endif

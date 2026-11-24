@@ -122,7 +122,9 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
           if (primary_vol) {
             auto vol_name = primary_vol->GetName();
             auto [it, inserted] = fVolumeMap.try_emplace(vol_name, 0);
-            if (inserted) { it->second = RMGOutputTools::HashStringFnv1a(vol_name); }
+            if (inserted) {
+              it->second = RMGOutputTools::HashStringFnv1a(vol_name, /* fold */ false);
+            }
             vol_id = static_cast<int>(it->second);
           }
 

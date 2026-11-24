@@ -141,7 +141,7 @@ if "volume" in macro:
     for vol_id, vol_name_b in zip(vol_tbl["volumeid"], vol_tbl["name"], strict=True):
         vol_name = vol_name_b.decode()
         assert vol_map.setdefault(vol_name, vol_id) == vol_id
-        assert vol_id == fnv1a_name_hash(vol_name)
+        assert vol_id == fnv1a_name_hash(vol_name, fold=False)
     # only volumes that contained a vertex are listed.
     assert set(expected[~on_surface]) <= set(vol_map) <= set(volumes)
 

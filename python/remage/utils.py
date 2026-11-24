@@ -44,13 +44,18 @@ def sanitize_macro_cmds(text: str | Iterable[str]) -> list[str]:
     return output
 
 
-def fnv1a_name_hash(proc_name: str | bytes) -> int:
+def fnv1a_name_hash(proc_name: str | bytes, fold: bool) -> int:
     """Helper function to generate FNV-1a process name and volume name hashes, as in the
     tracks and vtx tables.
 
     .. note::
         This function is only for convenience in analysis of remage output, and is not
         used by remage itself.
+
+    Returns
+    -------
+    With ``fold=False``, the full 32-bit hash is returned, cast to a signed 32-bit integer
+    (as stored in the remage output); otherwise it is xor-folded down to 16 bit.
     """
     bs = proc_name.encode("utf-8") if isinstance(proc_name, str) else proc_name
 
@@ -63,5 +68,7 @@ def fnv1a_name_hash(proc_name: str | bytes) -> int:
         hash_value ^= b
         hash_value = (hash_value * 0x01000193) & 0xFFFFFFFF
 
+    if not fold:
+        return hash_value - (1 << 32) if hash_value & 0x80000000 else hash_value
     # xor-fold down to 16 bit.
     return (hash_value >> 16) ^ (hash_value & 0xFFFF)

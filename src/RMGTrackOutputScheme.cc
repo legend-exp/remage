@@ -86,7 +86,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   int proc_id = -1;
   if (proc) {
     auto [it, inserted] = fProcessMap.try_emplace(proc_name, 0);
-    if (inserted) { it->second = RMGOutputTools::HashStringFnv1a(proc_name); }
+    if (inserted) { it->second = RMGOutputTools::HashStringFnv1a(proc_name, /* fold */ true); }
     proc_id = static_cast<int>(it->second);
   }
 
