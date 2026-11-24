@@ -44,8 +44,9 @@ def sanitize_macro_cmds(text: str | Iterable[str]) -> list[str]:
     return output
 
 
-def proc_name_hash(proc_name: str | bytes) -> int:
-    """Helper function to generate FNV-1a process name hashes as in the tracks table.
+def fnv1a_name_hash(proc_name: str | bytes) -> int:
+    """Helper function to generate FNV-1a process name and volume name hashes, as in the
+    tracks and vtx tables.
 
     .. note::
         This function is only for convenience in analysis of remage output, and is not
