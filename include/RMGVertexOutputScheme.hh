@@ -44,6 +44,9 @@ class RMGVertexOutputScheme : public RMGVOutputScheme {
     /** @brief Fill one row per primary vertex of the event. */
     void StoreEvent(const G4Event*) override;
 
+    /** @brief Check that the volume name hashes of the full geometry are collision-free. */
+    void BeginOfRunAction(const G4Run*) override;
+
     /** @brief handles the storage of the volume map. */
     void EndOfRunAction(const G4Run*) override;
 

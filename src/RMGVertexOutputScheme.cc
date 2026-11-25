@@ -15,10 +15,12 @@
 
 #include "RMGVertexOutputScheme.hh"
 
+#include <map>
 #include <set>
 
 #include "G4AnalysisManager.hh"
 #include "G4Event.hh"
+#include "G4PhysicalVolumeStore.hh"
 #include "G4TransportationManager.hh"
 
 #include "RMGIpc.hh"
@@ -180,6 +182,49 @@ void RMGVertexOutputScheme::StoreEvent(const G4Event* event) {
   }
 }
 
+void RMGVertexOutputScheme::BeginOfRunAction(const G4Run*) {
+  // the geometry is identical on all threads (and in all processes), so checking once on the
+  // master is sufficient - it runs before any worker starts.
+  if (!G4Threading::IsMasterThread()) return;
+  if (!RMGOutputManager::Instance()->IsPersistencyEnabled() || fSkipPrimaryVertexOutput ||
+      !fStoreVolumeInformation)
+    return;
+
+  // check all volumes of the geometry, not only the ones that will be hit during this run. This
+  // way, the check does not depend on the simulated events and every process reaches the same
+  // verdict.
+  std::set<std::string> names;
+  for (const auto* pv : *G4PhysicalVolumeStore::GetInstance()) names.insert(pv->GetName());
+
+  std::map<uint32_t, std::string> hashes;
+  for (const auto& name : names) {
+    const auto hash = RMGOutputTools::HashStringFnv1a(name, /* fold */ false);
+    // -1 is used as sentinel for "no volume" in the output.
+    if (static_cast<int>(hash) == -1) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Volume name hash of '",
+          name,
+          "' collides with the sentinel value -1. Rename the volume to store vertex volume ",
+          "information."
+      );
+    }
+    auto [it, inserted] = hashes.try_emplace(hash, name);
+    if (!inserted) {
+      RMGLog::Out(
+          RMGLog::fatal,
+          "Volume names '",
+          it->second,
+          "' and '",
+          name,
+          "' have the same hash ",
+          hash,
+          ". Rename one of the volumes to store vertex volume information."
+      );
+    }
+  }
+}
+
 void RMGVertexOutputScheme::EndOfRunAction(const G4Run*) {
   auto rmg_man = RMGOutputManager::Instance();
   if (!rmg_man->IsPersistencyEnabled() || fSkipPrimaryVertexOutput || !fStoreVolumeInformation)
@@ -188,19 +233,11 @@ void RMGVertexOutputScheme::EndOfRunAction(const G4Run*) {
   const auto ana_man = G4AnalysisManager::Instance();
   auto ntupleid = rmg_man->GetAuxNtupleID("vtx_volumes");
 
-  std::set<uint32_t> volume_ids; // to check for duplicates.
-
-  for (auto& [vol_name, vol_id_map] : fVolumeMap) {
-    int vol_id = static_cast<int>(vol_id_map);
-
-    ana_man->FillNtupleIColumn(ntupleid, 0, vol_id);
+  // hash collisions have already been excluded in BeginOfRunAction.
+  for (auto& [vol_name, vol_id] : fVolumeMap) {
+    ana_man->FillNtupleIColumn(ntupleid, 0, static_cast<int>(vol_id));
     ana_man->FillNtupleSColumn(ntupleid, 1, vol_name);
     ana_man->AddNtupleRow(ntupleid);
-
-    // Check for duplicate volume IDs
-    if (!volume_ids.insert(vol_id_map).second) {
-      RMGLog::OutDev(RMGLog::error, "Duplicate volume name hash ", vol_id_map);
-    }
   }
 }
 

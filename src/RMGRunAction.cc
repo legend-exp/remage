@@ -199,6 +199,8 @@ void RMGRunAction::BeginOfRunAction(const G4Run*) {
     RMGLog::Out(level, "Object persistency disabled");
   }
 
+  for (const auto& oscheme : GetAllOutputDataFields()) { oscheme->BeginOfRunAction(fRMGRun); }
+
   if (fRMGMasterGenerator) {
     if (fRMGMasterGenerator->GetVertexGenerator()) {
       fRMGMasterGenerator->GetVertexGenerator()->BeginOfRunAction(fRMGRun);
