@@ -1,0 +1,13 @@
+/control/execute macros/_init.mac
+/RMG/Output/Vertex/StoreVolumeInformation true
+
+/RMG/Generator/Confine FromFile
+
+/RMG/Generator/Confinement/FromFile/FileName macros/vtx-pos.lh5
+
+/RMG/Generator/Select GPS
+/gps/particle     geantino
+/gps/energy       1 keV
+/gps/ang/type     iso
+
+/run/beamOn {events}

@@ -164,6 +164,13 @@ class RMGVOutputScheme {
     virtual void SteppingAction(const G4Step*) {};
 
     /**
+     * @brief Perform initial actions at the start of a run.
+     *
+     * Called on every thread (including the master) after the output file has been opened.
+     */
+    virtual void BeginOfRunAction(const G4Run*) {};
+
+    /**
      * @brief Perform final actions at the end of a run.
      *
      * This function can be used by derived output schemes to finalize or write remaining data.

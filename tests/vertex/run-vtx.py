@@ -10,6 +10,7 @@ import awkward as ak
 import lh5
 import numpy as np
 from remage import remage_run
+from remage.utils import fnv1a_name_hash
 
 macro = sys.argv[1]
 nthread = int(sys.argv[2])
@@ -98,6 +99,55 @@ if "pos" in macro:
         # output file and should have the same position.
         assert _compare_input_output(output_pos[0::2], input_pos)
         assert _compare_input_output(output_pos[1::2], input_pos)
+
+if "volume" in macro:
+
+    def _inside(pos, center_x, half, tol=0):
+        return (
+            (np.abs(pos[:, 0] - center_x) < half[0] + tol)
+            & (np.abs(pos[:, 1]) < half[1] + tol)
+            & (np.abs(pos[:, 2]) < half[2] + tol)
+        )
+
+    # analytic placement of the volumes in gdml/geometry.gdml with x >= 0 (in m),
+    # ordered from mother to daughter.
+    volumes = {
+        "world_PV": (0, (1, 1, 1)),  # default name of the world physical volume.
+        "optdet2": (0.27, (0.26, 0.51, 0.51)),
+        "scint2": (0.27, (0.25, 0.5, 0.5)),
+        "det2": (0.27, (0.05, 0.25, 0.25)),
+        "calo2": (0.17, (0.0025, 0.15, 0.15)),
+    }
+
+    vtx = lh5.read("vtx", lh5_file=files).view_as("pd")
+    pos = vtx[["xloc", "yloc", "zloc"]].to_numpy()
+    assert np.all(pos[:, 0] >= 0)
+
+    expected = np.full(len(vtx), "", dtype=object)
+    # vertices on a volume surface (the x input positions are on a regular grid, which
+    # coincides with some faces) can be attributed to either volume.
+    on_surface = np.zeros(len(vtx), dtype=bool)
+    for name, (center_x, half) in volumes.items():
+        expected[_inside(pos, center_x, half)] = name
+        on_surface |= _inside(pos, center_x, half, 1e-9) != _inside(
+            pos, center_x, half, -1e-9
+        )
+    assert np.all(expected != "")
+    assert np.sum(on_surface) < 0.01 * len(vtx)
+
+    # check the name <-> id mapping (also across threads and processes).
+    vol_tbl = lh5.read("vtx_volumes", lh5_file=files).view_as("pd")
+    vol_map = {}
+    for vol_id, vol_name_b in zip(vol_tbl["volumeid"], vol_tbl["name"], strict=True):
+        vol_name = vol_name_b.decode()
+        assert vol_map.setdefault(vol_name, vol_id) == vol_id
+        assert vol_id == fnv1a_name_hash(vol_name, fold=False)
+    # only volumes that contained a vertex are listed.
+    assert set(expected[~on_surface]) <= set(vol_map) <= set(volumes)
+
+    # check the volume of each vertex.
+    expected_ids = np.array([vol_map[name] for name in expected[~on_surface]])
+    assert np.all(vtx["volumeid"].to_numpy()[~on_surface] == expected_ids)
 
 if "kin" in macro:
     kin_input_file = kin_input_file.replace(".hdf5", ".lh5")

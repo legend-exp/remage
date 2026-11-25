@@ -25,6 +25,7 @@ set(_macros
     pos-lh5
     pos-lh5-mm
     pos-lh5-multivertex
+    pos-volume-lh5
     kin-lh5
     kin-hdf5
     kin2-lh5

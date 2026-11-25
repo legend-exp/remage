@@ -2012,6 +2012,7 @@ Commands for controlling output of primary vertices.
 * `SkipPrimaryVertexOutput` – Do not store vertex/primary particle data (except the evtid column).
 * `StoreSinglePrecisionPosition` – Use float32 (instead of float64) for position output.
 * `StoreSinglePrecisionEnergy` – Use float32 (instead of float64) for energy output.
+* `StoreVolumeInformation` – Store the originating sampling volume.
 
 ### `/RMG/Output/Vertex/StorePrimaryParticleInformation`
 
@@ -2052,6 +2053,18 @@ This is disabled by default
 ### `/RMG/Output/Vertex/StoreSinglePrecisionEnergy`
 
 Use float32 (instead of float64) for energy output.
+
+This is disabled by default
+
+* **Parameter** – `boolean`
+  * **Parameter type** – `b`
+  * **Omittable** – `True`
+  * **Default value** – `true`
+* **Allowed states** – `Idle`
+
+### `/RMG/Output/Vertex/StoreVolumeInformation`
+
+Store the originating sampling volume.
 
 This is disabled by default
 

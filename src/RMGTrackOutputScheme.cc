@@ -24,6 +24,7 @@
 #include "RMGIpc.hh"
 #include "RMGLog.hh"
 #include "RMGOutputManager.hh"
+#include "RMGOutputTools.hh"
 #include "RMGStackingAction.hh"
 
 namespace u = CLHEP;
@@ -85,19 +86,7 @@ void RMGTrackOutputScheme::TrackingActionPre(const G4Track* track) {
   int proc_id = -1;
   if (proc) {
     auto [it, inserted] = fProcessMap.try_emplace(proc_name, 0);
-    if (inserted) {
-      // The following lines are a FNV-1a hash function (based on the CC0 licensed algorithm)
-      // see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-      // and http://www.isthe.com/chongo/tech/comp/fnv/index.html for details.
-      uint32_t proc_name_hash = 0x811c9dc5;
-      for (char& b : proc_name) {
-        proc_name_hash ^= (uint32_t)b;
-        proc_name_hash *= 0x01000193;
-      }
-      // xor-fold down to 16 bit.
-      proc_name_hash = (proc_name_hash >> 16) ^ (proc_name_hash & (uint32_t)0xffff);
-      it->second = proc_name_hash;
-    }
+    if (inserted) { it->second = RMGOutputTools::HashStringFnv1a(proc_name, /* fold */ true); }
     proc_id = static_cast<int>(it->second);
   }
 
