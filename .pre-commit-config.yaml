@@ -3,7 +3,7 @@ ci:
   autoupdate_schedule: "monthly"
   autofix_commit_msg: "style: pre-commit fixes"
 
-exclude: ^include/(EcoMug)/|^docs/rmg-commands.md
+exclude: ^include/(EcoMug)/|^docs/rmg-commands.md|^CHANGELOG.md
 repos:
   - repo: https://github.com/adamchainz/blacken-docs
     rev: "1.20.0"
