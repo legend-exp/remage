@@ -209,6 +209,33 @@ def _calorimeter_hit_table(stps: Table) -> Table:
     return out
 
 
+def _columns(group: h5py.Group) -> dict[str, h5py.Dataset]:
+    """Return the columns of a step table, checking that each is a 1D dataset.
+
+    The columns are in the order given by the LH5 datatype,
+    ``table{col1,col2,...}``.
+    """
+    columns = {}
+    for name in group.attrs["datatype"][6:-1].split(","):
+        if not name:
+            continue
+        ds = group[name]
+        if not isinstance(ds, h5py.Dataset) or ds.ndim != 1:
+            msg = f"column {ds.name} of {group.file.filename} is not a 1D array"
+            raise ValueError(msg)
+        columns[name] = ds
+    return columns
+
+
+def _n_rows(group: h5py.Group) -> int:
+    """Return the number of rows of a step table, checking all columns agree."""
+    lengths = {name: ds.shape[0] for name, ds in _columns(group).items()}
+    if len(set(lengths.values())) > 1:
+        msg = f"columns of {group.name} in {group.file.filename} differ in length: {lengths}"
+        raise ValueError(msg)
+    return next(iter(lengths.values()), 0)
+
+
 def _read_steps(group: h5py.Group, start: int, stop: int) -> Table:
     """Read rows ``start`` to ``stop`` of a step table.
 
@@ -217,12 +244,7 @@ def _read_steps(group: h5py.Group, start: int, stop: int) -> Table:
     tables of a multithreaded run.
     """
     out = Table(size=stop - start)
-    # columns in the order given by the LH5 datatype, "table{col1,col2,...}"
-    for name in group.attrs["datatype"][6:-1].split(","):
-        ds = group[name]
-        if not isinstance(ds, h5py.Dataset) or ds.ndim != 1:
-            msg = f"column {ds.name} of {group.file.filename} is not a 1D array"
-            raise ValueError(msg)
+    for name, ds in _columns(group).items():
         attrs = {"units": ds.attrs["units"]} if "units" in ds.attrs else {}
         out.add_field(name, Array(ds[start:stop], attrs=attrs))
     return out
@@ -238,7 +260,7 @@ def _iter_chunks(stp_file: str, table: str, buffer: int):
     with h5py.File(stp_file) as h5f:
         if table not in h5f:
             return
-        n_total = min((ds.shape[0] for ds in h5f[table].values()), default=0)
+        n_total = _n_rows(h5f[table])
         for start in range(0, n_total, buffer):
             yield _read_steps(h5f[table], start, min(start + buffer, n_total))
 
@@ -257,7 +279,7 @@ def _iter_event_aligned_chunks(stp_file: str, table: str, buffer: int):
         if table not in h5f:
             return
         group = h5f[table]
-        n_total = group["evtid"].shape[0]
+        n_total = _n_rows(group)
         if n_total == 0:
             return
 
