@@ -78,6 +78,12 @@ def change_extent_of_world_volume(
         if object_name not in registry.logicalVolumeList:
             registry.logicalVolumeList.append(object_name)
 
+    # geantinos ignore optical surfaces, and surfaces that refer to volumes
+    # outside the extracted volume cannot be resolved when reading the GDML
+    registry.surfaceDict.clear()
+    registry.surfaceTypeCountDict.clear()
+    registry.surfaceNameCount.clear()
+
     # Always ensure world is set correctly
     registry.setWorld(world_lv.name)
 
