@@ -56,7 +56,7 @@ class SummaryGenerator:
         )
         self.z = np.linspace(
             np.min(self.data_xz["z"]),
-            np.max(self.data_xz["z"]) + (self.data_xz["z"][1] - self.data_xz["z"][0]),
+            np.max(self.data_xz["z"]) + np.diff(np.unique(self.data_xz["z"]))[0],
             self.n_z_gridpoint + 1,
         )
 
@@ -124,7 +124,7 @@ class SummaryGenerator:
             )
             h_xy[:, :] = (
                 np.array(self.data_xy["time"])
-                .reshape(self.n_x_gridpoint, self.n_y_gridpoint)
+                .reshape(self.n_y_gridpoint, self.n_x_gridpoint)
                 .T
                 * 1e6
             )
@@ -147,7 +147,7 @@ class SummaryGenerator:
             )
             h_xz[:, :] = (
                 np.array(self.data_xz["time"])
-                .reshape(self.n_x_gridpoint, self.n_z_gridpoint)
+                .reshape(self.n_z_gridpoint, self.n_x_gridpoint)
                 .T
                 * 1e6
             )
@@ -170,7 +170,7 @@ class SummaryGenerator:
             )
             h_yz[:, :] = (
                 np.array(self.data_yz["time"])
-                .reshape(self.n_y_gridpoint, self.n_z_gridpoint)
+                .reshape(self.n_z_gridpoint, self.n_y_gridpoint)
                 .T
                 * 1e6
             )

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import argparse
 import re
 from pathlib import Path
 
 import lh5
+import numpy as np
 from remage.geombench.cli import generate_macro, remage_geombench_cli
+from remage.geombench.summary_generator import SummaryGenerator
 
 
 def test_remage_geombench_cli(tmp_path: Path) -> None:
@@ -31,6 +34,38 @@ def test_remage_geombench_cli(tmp_path: Path) -> None:
 
     # check if data was written correctly
     assert lh5.read("benchmark_xy", output_dir / "geometry.lh5") is not None
+
+
+def test_remage_geombench_cli_unequal_axes(tmp_path: Path) -> None:
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+
+    args = [
+        "gdml/geometry.gdml",
+        "--output-dir",
+        str(output_dir),
+        "--num-events",
+        "20000",
+        "--grid-increments",
+        "{'x': 20, 'y': 15, 'z': 10}",
+    ]
+
+    remage_geombench_cli(external_args=args)
+
+    assert (output_dir / "geometry_lin_simulation_time_profiles.pdf").exists()
+    assert (output_dir / "geometry_log_simulation_time_profiles.pdf").exists()
+    assert (output_dir / "geometry_stats.yaml").exists()
+
+    gen = SummaryGenerator(
+        output_dir / "geometry.lh5",
+        argparse.Namespace(geometry="gdml/geometry.gdml", output_dir=output_dir),
+        "geometry",
+    )
+    assert len({gen.n_x_gridpoint, gen.n_y_gridpoint, gen.n_z_gridpoint}) == 3
+
+    # bin edges must span the same distance as the pixel increments
+    for edges, step in ((gen.x, 20), (gen.y, 15), (gen.z, 10)):
+        assert np.allclose(np.diff(edges), step)
 
 
 def test_generate_macro(tmp_path: Path) -> None:
