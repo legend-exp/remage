@@ -16,8 +16,14 @@
 from __future__ import annotations
 
 import logging
+import multiprocessing
+import os
+import sys
+import threading
 import time
+from concurrent.futures import ProcessPoolExecutor
 from contextlib import contextmanager
+from functools import partial
 from pathlib import Path
 
 import h5py
@@ -29,6 +35,7 @@ from lh5.io.concat import lh5concat
 
 from . import utils
 from .ipc import IpcResult
+from .logging import setup_log
 from .reshaping import reshape_output
 
 log = logging.getLogger("remage")
@@ -152,53 +159,49 @@ def post_proc(
             tmp_renamed_files(remage_files) as original_files,
             tmp_renamed_files(pre_existing) as pre_existing_files,
         ):
-            # post-process outputs: reshape detector tables by time-grouping,
-            # forward calorimeter tables as flat hits and auxiliary tables
-            # unchanged
-            reshape_output(
-                stp_files=original_files,
-                hit_files=output_files,
+            run = partial(
+                _reshape_and_build_tcm,
                 reshape_tables=reshape_detectors,
                 forward_tables=extra_tables,
                 flat_hit_tables=flat_hit_detectors,
-                out_field=det_tables_path,
+                det_tables_path=det_tables_path,
+                group_path=group_path,
+                lh5_links_group_name=lh5_links_group_name,
+                lh5_event_number_name=lh5_event_number_name,
                 time_window_in_us=time_window_in_us,
                 overwrite=overwrite_output,
+                append=append_output,
             )
 
-            # also copy __by_uid__ group to the output files
-            # we do this here and not in reboost, as the links require special syntax
-            # NOTE: using just the first original file since the links are always the same
-            copy_links(original_files[0], output_files, lh5_links_group_name)
-            update_number_of_simulated_events(
-                original_files, output_files, lh5_event_number_name
-            )
+            mp_context = None
+            if (
+                not merge_output_files
+                and len(original_files) > 1
+                and os.getenv("RMG_DISABLE_PARALLEL_PPROC") != "1"
+            ):
+                mp_context = _pool_mp_context()
 
-            # add a time-coincidence map to the output file(s)
-            msg = f"Computing and storing the TCM as /{group_path}tcm"
-            log.info(msg)
-
-            for file in utils._to_list(output_files):
-                # do not compute the TCM if there are no stepping tables
-                if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
-                    # use tables keyed by UID in the __by_uid__ group.  in this way, the
-                    # TCM will index tables by UID.  the coincidence criterium is based
-                    # on Geant4 event identifier and time of the hits
-                    # NOTE: uses the same time window as in reshape_output() reshaping
-                    pygama.evt.build_tcm(
-                        [(file, rf"{lh5_links_group_name}/*")],  # input_tables
-                        ["evtid", "t0"],  # coin_cols
-                        hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
-                        coin_windows=[0, time_window_in_us * 1000],
-                        out_file=file,
-                        out_name=group_path + "tcm",
-                        wo_mode="write_safe",
-                    )
-
-            if append_output:
-                copy_untouched_objects(
-                    [*pre_existing_files, *original_files], output_files
-                )
+            if mp_context is None:
+                run(original_files, pre_existing_files, output_files)
+            else:
+                # each input file has its own output file, so the files can be
+                # processed at the same time, each one by its own process
+                # remage-cpp writes one output file per worker thread/process,
+                # so the number of files is the parallelism the user asked for.
+                with ProcessPoolExecutor(
+                    initializer=_setup_worker_log,
+                    initargs=(log.level,),
+                    max_workers=min(len(original_files), _available_cpus()),
+                    mp_context=mp_context,
+                ) as pool:
+                    futures = [
+                        pool.submit(run, [f_in], [], f_out)
+                        for f_in, f_out in zip(
+                            original_files, output_files, strict=True
+                        )
+                    ]
+                    for future in futures:
+                        future.result()
 
         # set the output file(s) for downstream consumers.
         ipc_info.set("output", output_files)
@@ -243,6 +246,135 @@ def post_proc(
 
     msg = f"Finished post-processing which took {int(time.time() - time_start)} s"
     log.info(msg)
+
+
+def _available_cpus() -> int:
+    """Number of CPUs usable by this process (respects affinity masks, e.g. under Slurm)."""
+    if hasattr(os, "process_cpu_count"):  # Python >= 3.13
+        return os.process_cpu_count() or 1
+    if hasattr(os, "sched_getaffinity"):
+        return len(os.sched_getaffinity(0)) or 1
+    return os.cpu_count() or 1
+
+
+#: set by the ``remage`` CLI entry point, whose main script only calls remage
+#: behind an ``if __name__ == "__main__":`` guard.
+_main_is_remage_cli = False
+
+
+def _main_reimport_is_safe() -> bool:
+    """Whether workers started with spawn/forkserver can re-import ``__main__``.
+
+    Both start methods run the caller's main script again in every worker. For
+    a script that calls remage at top level without an
+    ``if __name__ == "__main__":`` guard, this would run the whole simulation
+    again in each worker, so only allow it when the main module is known.
+    """
+    if _main_is_remage_cli:
+        return True
+    main = sys.modules.get("__main__")
+    # interactive sessions (REPL, Jupyter) have no main script to re-import
+    if getattr(main, "__file__", None) is None:
+        return True
+    # `python -m pkg` mains are never re-imported by multiprocessing
+    spec_name = getattr(getattr(main, "__spec__", None), "name", None) or ""
+    return spec_name == "__main__" or spec_name.endswith(".__main__")
+
+
+def _pool_mp_context() -> multiprocessing.context.BaseContext | None:
+    """Pick a start method for the post-processing workers.
+
+    Returns ``None`` if the files should be processed sequentially instead.
+    """
+    methods = multiprocessing.get_all_start_methods()
+
+    # fork is cheapest and does not re-import __main__, but is only safe in a
+    # single-threaded process: another thread (e.g. in a Jupyter kernel) could
+    # hold a lock at fork time that then stays locked forever in the child.
+    # it is also unsafe on macOS, where system libraries are not fork-safe.
+    if sys.platform != "darwin" and "fork" in methods and threading.active_count() == 1:
+        return multiprocessing.get_context("fork")
+
+    if _main_reimport_is_safe():
+        return multiprocessing.get_context(
+            "forkserver" if "forkserver" in methods else "spawn"
+        )
+
+    msg = (
+        "post-processing output files sequentially: cannot start worker "
+        "processes safely from this main script"
+    )
+    log.warning(msg)
+    return None
+
+
+def _setup_worker_log(level: int) -> None:
+    """Make a worker process log like the main process."""
+    setup_log().setLevel(level)
+
+
+def _reshape_and_build_tcm(
+    original_files: list[str],
+    pre_existing_files: list[str],
+    output_files: list[str] | str,
+    *,
+    reshape_tables: list[str],
+    forward_tables: list[str],
+    flat_hit_tables: list[str],
+    det_tables_path: str,
+    group_path: str,
+    lh5_links_group_name: str,
+    lh5_event_number_name: str,
+    time_window_in_us: float,
+    overwrite: bool,
+    append: bool,
+) -> None:
+    """Turn step files into hit files and add the time-coincidence map."""
+    # post-process outputs: reshape detector tables by time-grouping,
+    # forward calorimeter tables as flat hits and auxiliary tables
+    # unchanged
+    reshape_output(
+        stp_files=original_files,
+        hit_files=output_files,
+        reshape_tables=reshape_tables,
+        forward_tables=forward_tables,
+        flat_hit_tables=flat_hit_tables,
+        out_field=det_tables_path,
+        time_window_in_us=time_window_in_us,
+        overwrite=overwrite,
+    )
+
+    # also copy __by_uid__ group to the output files
+    # we do this here and not in reboost, as the links require special syntax
+    # NOTE: using just the first original file since the links are always the same
+    copy_links(original_files[0], output_files, lh5_links_group_name)
+    update_number_of_simulated_events(
+        original_files, output_files, lh5_event_number_name
+    )
+
+    # add a time-coincidence map to the output file(s)
+    msg = f"Computing and storing the TCM as /{group_path}tcm"
+    log.info(msg)
+
+    for file in utils._to_list(output_files):
+        # do not compute the TCM if there are no stepping tables
+        if lh5.ls(file, rf"{lh5_links_group_name}/det*") != []:
+            # use tables keyed by UID in the __by_uid__ group.  in this way, the
+            # TCM will index tables by UID.  the coincidence criterium is based
+            # on Geant4 event identifier and time of the hits
+            # NOTE: uses the same time window as in reshape_output() reshaping
+            pygama.evt.build_tcm(
+                [(file, rf"{lh5_links_group_name}/*")],  # input_tables
+                ["evtid", "t0"],  # coin_cols
+                hash_func=rf"(?<={lh5_links_group_name}/det)\d+",
+                coin_windows=[0, time_window_in_us * 1000],
+                out_file=file,
+                out_name=group_path + "tcm",
+                wo_mode="write_safe",
+            )
+
+    if append:
+        copy_untouched_objects([*pre_existing_files, *original_files], output_files)
 
 
 def copy_links(
